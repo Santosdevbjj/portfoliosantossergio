@@ -13,7 +13,7 @@
     "postinstall": "tailwindcss -i ./styles/globals.css -o ./public/output.css --minify"
   },
   "dependencies": {
-    "next": "15.0.5",
+    "next": "16.0.7",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "@formatjs/intl-localematcher": "^0.5.4",
