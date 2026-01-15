@@ -1,7 +1,10 @@
 {
   "name": "portfolio-sergio-santos",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,12 +12,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@formatjs/intl-localematcher": "^0.5.4",
-    "lucide-react": "^0.400.0",
-    "negotiator": "^0.6.3",
-    "next": "15.0.0",
+    "next": "15.0.5",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "@formatjs/intl-localematcher": "^0.5.4",
+    "negotiator": "^0.6.3",
+    "lucide-react": "^0.400.0",
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.3.0"
   },
