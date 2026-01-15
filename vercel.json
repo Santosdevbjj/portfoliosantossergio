@@ -1,13 +1,31 @@
 {
-  "framework": "nextjs",
   "buildCommand": "npm run build",
-  "installCommand": "npm install",
+  "installCommand": "npm ci",
   "cleanUrls": true,
-  "regions": ["iad1"],
+  "regions": ["gru1"], 
   "functions": {
-    "src/app/[lang]/page.tsx": {
-      "runtime": "nodejs24.x",
-      "memory": 1024
+    "src/app/**/*.ts": {
+      "runtime": "edge",
+      "memory": 512,
+      "maxDuration": 10
+    },
+    "src/app/**/*.tsx": {
+      "runtime": "edge",
+      "memory": 512,
+      "maxDuration": 10
+    },
+    "src/app/api/**/*.ts": {
+      "runtime": "edge",
+      "memory": 1024,
+      "maxDuration": 15
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" }
+      ]
+    }
+  ]
 }
