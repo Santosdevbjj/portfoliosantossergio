@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "tailwindcss -i ./styles/globals.css -o ./public/output.css --minify"
   },
   "dependencies": {
     "next": "15.0.5",
