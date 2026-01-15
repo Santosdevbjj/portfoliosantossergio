@@ -1,61 +1,90 @@
 import { getGitHubProjects } from '@/lib/github';
+import { translations } from '@/constants/translations';
+import { ProjectCard } from '@/components/ProjectCard';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
-
-// Esta função define quais idiomas são permitidos
-export async function generateStaticParams() {
-  return [{ lang: 'pt' }, { lang: 'en' }, { lang: 'es' }];
-}
 
 export default async function Page({ params }: { params: { lang: string } }) {
   const { lang } = params;
 
-  // Validação de segurança para os idiomas permitidos
-  if (!['pt', 'en', 'es'].includes(lang)) {
-    notFound();
-  }
+  // Validação de idioma
+  if (!translations[lang]) notFound();
 
-  // Busca os projetos do GitHub (com o filtro de topic 'portfolio' que criamos)
-  const projects = await getGitHubProjects();
+  const t = translations[lang];
+  const allProjects = await getGitHubProjects();
+
+  // Função para organizar projetos nas 14 categorias definidas por você
+  const categorizedProjects = t.categories.map((category: string) => {
+    // Normaliza o nome da categoria para busca nos topics (ex: "Ciência de Dados" -> "ciencia-de-dados")
+    const searchTag = category.toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
+      .replace(/[^\w\s]/g, "").replace(/\s+/g, "-");  // Substitui espaços por hifens
+
+    const filtered = allProjects
+      .filter((p: any) => p.topics.includes(searchTag))
+      .sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+
+    return { title: category, projects: filtered };
+  });
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* SEÇÃO: APRESENTAÇÃO PESSOAL */}
-      <section className="mb-20">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          {lang === 'pt' && "Analista de Ciência de Dados | Eficiência Operacional"}
-          {lang === 'en' && "Data Science Analyst | Operational Efficiency"}
-          {lang === 'es' && "Analista de Ciencia de Datos | Eficiencia Operativa"}
+    <div className="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
+      <LanguageSwitcher />
+
+      {/* HEADER / BIO */}
+      <header className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-white mb-6">
+          {t.role}
         </h1>
-        <p className="text-xl text-gray-600 max-w-3xl">
-          {lang === 'pt' && "Mais de 15 anos de experiência em sistemas de missão crítica no setor bancário..."}
-          {lang === 'en' && "Over 15 years of experience in mission-critical banking systems..."}
-          {lang === 'es' && "Más de 15 años de experiencia en sistemas de misión crítica en el sector bancario..."}
+        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-4xl leading-relaxed mb-8">
+          {t.aboutText}
         </p>
-        {/* Adicionaremos o restante da sua bio detalhada no próximo passo via arquivo de constantes */}
-      </section>
-
-      {/* SEÇÃO: PROJETOS EM DESTAQUE (Manuais) */}
-      <section className="mb-20">
-        <h2 className="text-2xl font-bold mb-8">🎯 {lang === 'pt' ? 'Projetos em Destaque' : lang === 'en' ? 'Featured Projects' : 'Proyectos Destacados'}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-           {/* Aqui entrarão os cards dos seus 5 projetos principais */}
-           <p className="text-gray-500 italic">Carregando projetos de alto impacto...</p>
-        </div>
-      </section>
-
-      {/* SEÇÃO: REPOSITÓRIO POR TECNOLOGIA (Dinâmico do GitHub) */}
-      <section>
-        <h2 className="text-2xl font-bold mb-8">📂 {lang === 'pt' ? 'Repositório por Tecnologia' : 'Repository by Technology'}</h2>
         
-        {/* O código abaixo vai iterar sobre as 14 categorias que você definiu */}
-        <div className="space-y-12">
-          {projects.length > 0 ? (
-            <p>Encontrados {projects.length} projetos com a tag 'portfolio'.</p>
-          ) : (
-            <p className="text-red-500 text-sm">Nenhum projeto encontrado. Verifique o GITHUB_ACCESS_TOKEN e os TOPICS no seu GitHub.</p>
-          )}
+        <div className="flex flex-wrap gap-4">
+          <a href={t.cvLink} target="_blank" className="px-8 py-3 bg-brand text-white font-bold rounded-lg hover:bg-brand-dark transition-all shadow-lg">
+            {t.cvButton}
+          </a>
+        </div>
+      </header>
+
+      {/* ESTATÍSTICAS DE IMPACTO (O seu diferencial Bradesco) */}
+      <section className="bg-slate-100 dark:bg-slate-800/50 py-12 mb-20">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          {t.impactStats.map((stat: any) => (
+            <div key={stat.label} className="p-6">
+              <div className="text-3xl font-bold text-brand mb-2">{stat.value}</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-widest">{stat.label}</div>
+            </div>
+          ))}
         </div>
       </section>
-    </main>
+
+      {/* REPOSITÓRIO POR TECNOLOGIA (As 14 Categorias) */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12 border-l-4 border-brand pl-4">
+          {lang === 'pt' ? 'Repositório de Projetos por Tecnologia' : 'Project Repository by Technology'}
+        </h2>
+
+        {categorizedProjects.map((cat: any) => (
+          cat.projects.length > 0 && (
+            <div key={cat.title} className="mb-16">
+              <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
+                <span className="w-2 h-2 bg-brand rounded-full"></span>
+                {cat.title}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {cat.projects.map((project: any) => (
+                  <ProjectCard key={project.id} project={project} lang={lang} />
+                ))}
+              </div>
+            </div>
+          )
+        ))}
+      </main>
+
+      <footer className="py-12 border-t border-slate-200 dark:border-slate-800 text-center text-slate-500">
+        <p>© 2026 Sérgio Santos - Data Science & Engineering</p>
+      </footer>
+    </div>
   );
 }
