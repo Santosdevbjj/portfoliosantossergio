@@ -2,6 +2,8 @@ export async function getGitHubProjects() {
   const username = process.env.NEXT_PUBLIC_GITHUB_USERNAME;
   const token = process.env.GITHUB_ACCESS_TOKEN;
 
+  // Se não tiver username, retorna vazio. 
+  // O token é opcional para repos públicos, mas recomendável para evitar limites de taxa.
   if (!username) return [];
 
   try {
@@ -9,19 +11,21 @@ export async function getGitHubProjects() {
       `https://api.github.com/users/${username}/repos?sort=updated&per_page=100`,
       {
         headers: {
-          Authorization: `token ${token}`,
+          ...(token && { Authorization: `token ${token}` }),
           Accept: "application/vnd.github+json",
         },
         next: { revalidate: 3600 }, // Cache de 1 hora
       }
     );
 
-    if (!response.ok) return [];
+    if (!response.ok) {
+      console.error(`GitHub API retornou erro: ${response.status}`);
+      return [];
+    }
 
     const repos = await response.json();
 
-    // Filtra apenas repositórios com o tópico 'portfolio'
-    // E retorna os dados limpos para o frontend
+    // Filtra repositórios que tenham a tag 'portfolio' nos tópicos
     return repos
       .filter((repo: any) => repo.topics?.includes("portfolio"))
       .map((repo: any) => ({
@@ -35,7 +39,7 @@ export async function getGitHubProjects() {
       }));
     
   } catch (error) {
-    console.error("Erro ao buscar projetos:", error);
+    console.error("Erro na conexão com GitHub:", error);
     return [];
   }
 }
