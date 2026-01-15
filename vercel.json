@@ -1,0 +1,13 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "cleanUrls": true,
+  "regions": ["iad1"],
+  "functions": {
+    "src/app/[lang]/page.tsx": {
+      "runtime": "nodejs24.x",
+      "memory": 1024
+    }
+  }
+}
