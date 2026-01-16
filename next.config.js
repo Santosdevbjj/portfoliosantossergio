@@ -1,18 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true, // ativa checagens extras do React
-  swcMinify: true,       // usa o compilador SWC para builds mais rápidos
+  reactStrictMode: true,
+  // No Next.js 15, swcMinify é true por padrão, não precisa declarar.
+  
   experimental: {
-    appDir: true,        // garante que o App Router esteja habilitado
-    typedRoutes: true,   // ajuda a evitar erros em rotas dinâmicas
-    optimizeCss: true,   // melhora performance com TailwindCSS
+    // appDir foi removido (já é o padrão no Next 15)
+    typedRoutes: true,
   },
+
   images: {
-    domains: [],         // adicione domínios externos se usar imagens remotas
+    // 'domains' está sendo descontinuado em favor de 'remotePatterns'
+    // Mas se não usar imagens externas, pode deixar vazio.
+    remotePatterns: [], 
   },
+
   compiler: {
-    removeConsole: process.env.NODE_ENV === "production", // remove console.* em produção
+    // Excelente prática para performance e segurança
+    removeConsole: process.env.NODE_ENV === "production",
   },
+
   async headers() {
     return [
       {
