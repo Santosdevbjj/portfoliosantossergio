@@ -1,6 +1,6 @@
 {
   "name": "portfolio-sergio-vercel-final",
-  "version": "1.1.1",
+  "version": "1.4.0",
   "private": true,
   "engines": {
     "node": "24.x"
