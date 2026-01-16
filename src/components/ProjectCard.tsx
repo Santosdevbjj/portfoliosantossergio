@@ -20,11 +20,7 @@ export const ProjectCard = ({ project, lang }: ProjectProps) => {
       <div className="flex justify-between w-full mb-3">
         <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
           <svg className="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="Header3 10l4 4m0 0l4-4m-4 4V4" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17l3 3L15 17m-6-4h6" />
-            {/* Ícone de código/repositório */}
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-          </svg>
+           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
         </div>
         <div className="flex gap-2">
           <a href={project.url} target="_blank" rel="noopener noreferrer" title="GitHub">
