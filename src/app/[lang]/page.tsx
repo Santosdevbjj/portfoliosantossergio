@@ -4,38 +4,22 @@ import { ProjectCard } from '@/components/ProjectCard';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
 
-// No Next.js 15, o params deve ser tratado como uma Promise
-
-// ... (mantenha os imports iguais)
-
 export default async function Page(props: { params: Promise<{ lang: string }> }) {
-  // 1. Aguardamos os params
+  // 1. Tratamento correto para Next.js 15 (Promise)
   const resolvedParams = await props.params;
-  
-  // 2. Forçamos o lang a ser tratado como string para o TypeScript não reclamar
-  const lang = String(resolvedParams.lang); 
+  const lang = String(resolvedParams.lang);
 
-  // Validação de idioma (garantindo que existe no seu objeto de traduções)
-  if (!translations[lang as keyof typeof translations]) notFound();
+  // 2. Validação de idioma segura para TypeScript
+  if (!translations[lang as keyof typeof translations]) {
+    notFound();
+  }
 
   const t = translations[lang as keyof typeof translations];
   const allProjects = await getGitHubProjects();
 
-  // ... (o restante do código de categorização continua igual)
-
-  // 3. Na linha 81, onde está o erro, garanta que está assim:
-  // <ProjectCard key={String(project.id)} project={project} lang={lang} />
-
- 
-  // Validação de idioma
-  if (!translations[lang]) notFound();
-
-  const t = translations[lang];
-  const allProjects = await getGitHubProjects();
-
-  // Função para organizar projetos nas categorias
+  // 3. Organização dos projetos por categorias (Tecnologias)
   const categorizedProjects = t.categories.map((category: string) => {
-    // Normaliza o nome da categoria para busca nos topics
+    // Normaliza o nome da categoria para bater com os 'topics' do GitHub
     const searchTag = category.toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
       .replace(/[^\w\s]/g, "").replace(/\s+/g, "-");
@@ -51,7 +35,7 @@ export default async function Page(props: { params: Promise<{ lang: string }> })
     <div className="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
       <LanguageSwitcher />
 
-      {/* HEADER / BIO */}
+      {/* HEADER / BIO - Responsivo com md:text-6xl */}
       <header className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-white mb-6">
           {t.role}
@@ -61,13 +45,13 @@ export default async function Page(props: { params: Promise<{ lang: string }> })
         </p>
         
         <div className="flex flex-wrap gap-4">
-          <a href={t.cvLink} target="_blank" className="px-8 py-3 bg-brand text-white font-bold rounded-lg hover:bg-brand-dark transition-all shadow-lg">
+          <a href={t.cvLink} target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-brand text-white font-bold rounded-lg hover:bg-brand-dark transition-all shadow-lg">
             {t.cvButton}
           </a>
         </div>
       </header>
 
-      {/* ESTATÍSTICAS DE IMPACTO */}
+      {/* ESTATÍSTICAS DE IMPACTO - Grid Responsivo 1 col -> 3 col */}
       <section className="bg-slate-100 dark:bg-slate-800/50 py-12 mb-20">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           {t.impactStats.map((stat: any) => (
@@ -94,9 +78,14 @@ export default async function Page(props: { params: Promise<{ lang: string }> })
                 <span className="w-2 h-2 bg-brand rounded-full"></span>
                 {cat.title}
               </h3>
+              {/* Grid de Projetos Responsivo */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {cat.projects.map((project: any) => (
-                  <ProjectCard key={project.id} project={project} lang={lang} />
+                  <ProjectCard 
+                    key={String(project.id)} 
+                    project={project} 
+                    lang={lang} 
+                  />
                 ))}
               </div>
             </div>
