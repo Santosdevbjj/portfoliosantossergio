@@ -1,5 +1,6 @@
 'use client'
 
+const currentLang = pathname?.split('/')[1] || 'pt'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
