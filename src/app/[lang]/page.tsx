@@ -5,10 +5,28 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
 
 // No Next.js 15, o params deve ser tratado como uma Promise
-export default async function Page(props: { params: Promise<{ lang: string }> }) {
-  const params = await props.params;
-  const lang = params.lang as keyof typeof translations;
 
+// ... (mantenha os imports iguais)
+
+export default async function Page(props: { params: Promise<{ lang: string }> }) {
+  // 1. Aguardamos os params
+  const resolvedParams = await props.params;
+  
+  // 2. Forçamos o lang a ser tratado como string para o TypeScript não reclamar
+  const lang = String(resolvedParams.lang); 
+
+  // Validação de idioma (garantindo que existe no seu objeto de traduções)
+  if (!translations[lang as keyof typeof translations]) notFound();
+
+  const t = translations[lang as keyof typeof translations];
+  const allProjects = await getGitHubProjects();
+
+  // ... (o restante do código de categorização continua igual)
+
+  // 3. Na linha 81, onde está o erro, garanta que está assim:
+  // <ProjectCard key={String(project.id)} project={project} lang={lang} />
+
+ 
   // Validação de idioma
   if (!translations[lang]) notFound();
 
