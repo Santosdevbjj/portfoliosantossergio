@@ -1,23 +1,16 @@
 {
+  "version": 2,
+  "framework": "nextjs",
   "buildCommand": "npm run build",
-  "installCommand": "npm ci",
+  "installCommand": "npm install",
   "cleanUrls": true,
   "regions": ["gru1"], 
+  "nodeVersion": "24.x",
   "functions": {
-    "src/app/**/*.ts": {
-      "runtime": "edge",
-      "memory": 512,
-      "maxDuration": 10
-    },
-    "src/app/**/*.tsx": {
-      "runtime": "edge",
-      "memory": 512,
-      "maxDuration": 10
-    },
-    "src/app/api/**/*.ts": {
-      "runtime": "edge",
+    "src/app/**/*": {
+      "runtime": "nodejs24.x",
       "memory": 1024,
-      "maxDuration": 15
+      "maxDuration": 30
     }
   },
   "headers": [
