@@ -4,8 +4,10 @@ import { ProjectCard } from '@/components/ProjectCard';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
 
-export default async function Page({ params }: { params: { lang: string } }) {
-  const { lang } = params;
+// No Next.js 15, o params deve ser tratado como uma Promise
+export default async function Page(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
+  const lang = params.lang as keyof typeof translations;
 
   // Validação de idioma
   if (!translations[lang]) notFound();
@@ -13,12 +15,12 @@ export default async function Page({ params }: { params: { lang: string } }) {
   const t = translations[lang];
   const allProjects = await getGitHubProjects();
 
-  // Função para organizar projetos nas 14 categorias definidas por você
+  // Função para organizar projetos nas categorias
   const categorizedProjects = t.categories.map((category: string) => {
-    // Normaliza o nome da categoria para busca nos topics (ex: "Ciência de Dados" -> "ciencia-de-dados")
+    // Normaliza o nome da categoria para busca nos topics
     const searchTag = category.toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
-      .replace(/[^\w\s]/g, "").replace(/\s+/g, "-");  // Substitui espaços por hifens
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+      .replace(/[^\w\s]/g, "").replace(/\s+/g, "-");
 
     const filtered = allProjects
       .filter((p: any) => p.topics.includes(searchTag))
@@ -47,7 +49,7 @@ export default async function Page({ params }: { params: { lang: string } }) {
         </div>
       </header>
 
-      {/* ESTATÍSTICAS DE IMPACTO (O seu diferencial Bradesco) */}
+      {/* ESTATÍSTICAS DE IMPACTO */}
       <section className="bg-slate-100 dark:bg-slate-800/50 py-12 mb-20">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           {t.impactStats.map((stat: any) => (
@@ -59,10 +61,12 @@ export default async function Page({ params }: { params: { lang: string } }) {
         </div>
       </section>
 
-      {/* REPOSITÓRIO POR TECNOLOGIA (As 14 Categorias) */}
+      {/* REPOSITÓRIO POR TECNOLOGIA */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12 border-l-4 border-brand pl-4">
-          {lang === 'pt' ? 'Repositório de Projetos por Tecnologia' : 'Project Repository by Technology'}
+          {lang === 'pt' ? 'Repositório de Projetos por Tecnologia' : 
+           lang === 'en' ? 'Project Repository by Technology' : 
+           'Repositorio de Proyectos por Tecnología'}
         </h2>
 
         {categorizedProjects.map((cat: any) => (
