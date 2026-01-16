@@ -4,9 +4,10 @@ import { Metadata } from 'next';
 
 const inter = Inter({ subsets: ['latin'] });
 
-// Função para gerar as Metatags dinâmicas (SEO e Redes Sociais)
-export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
-  const { lang } = params;
+// 1. Correção para Next.js 15: params agora é uma Promise
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const params = await props.params;
+  const lang = params.lang;
   
   const titles: Record<string, string> = {
     pt: "Sérgio Santos | Analista de Ciência de Dados",
@@ -26,23 +27,20 @@ export async function generateMetadata({ params }: { params: { lang: string } })
   };
 }
 
-export default function RootLayout({
-  children,
-  params,
-}: {
+// 2. Correção para Next.js 15: O layout deve ser async para dar await no params
+export default async function RootLayout(props: {
   children: React.ReactNode;
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }) {
+  const params = await props.params;
+  const children = props.children;
+
   return (
     <html lang={params.lang}>
       <body className={`${inter.className} bg-white text-gray-900 antialiased`}>
-        {/* Aqui você pode futuramente inserir o componente <Header /> */}
-        
         <div className="min-h-screen">
           {children}
         </div>
-
-        {/* Aqui você pode futuramente inserir o componente <Footer /> */}
       </body>
     </html>
   );
