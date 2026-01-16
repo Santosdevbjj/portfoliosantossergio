@@ -28,6 +28,9 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Ignora arquivos internos e estáticos (imagens, ícones, etc)
-  matcher: ['/((?!api|_next/static|_next/image|images|favicon.ico|.*\\.png$|.*\\.pdf$).*)'],
+  // Melhorei o matcher para garantir que ele não tente redirecionar arquivos da pasta public
+  matcher: [
+    '/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|pdf)$).*)',
+  ],
 }
+
