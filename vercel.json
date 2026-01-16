@@ -1,13 +1,11 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
   "cleanUrls": true,
   "regions": ["gru1"], 
   "functions": {
     "src/app/**/*": {
-      "runtime": "nodejs24.x",
+      "runtime": "nodejs20.x",
       "memory": 1024,
       "maxDuration": 30
     }
