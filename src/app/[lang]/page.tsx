@@ -5,11 +5,9 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { notFound } from 'next/navigation';
 
 export default async function Page(props: { params: Promise<{ lang: string }> }) {
-  // 1. Tratamento correto para Next.js 15 (Promise)
   const resolvedParams = await props.params;
   const lang = String(resolvedParams.lang);
 
-  // 2. Validação de idioma segura para TypeScript
   if (!translations[lang as keyof typeof translations]) {
     notFound();
   }
@@ -17,9 +15,7 @@ export default async function Page(props: { params: Promise<{ lang: string }> })
   const t = translations[lang as keyof typeof translations];
   const allProjects = await getGitHubProjects();
 
-  // 3. Organização dos projetos por categorias (Tecnologias)
   const categorizedProjects = t.categories.map((category: string) => {
-    // Normaliza o nome da categoria para bater com os 'topics' do GitHub
     const searchTag = category.toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
       .replace(/[^\w\s]/g, "").replace(/\s+/g, "-");
@@ -32,10 +28,9 @@ export default async function Page(props: { params: Promise<{ lang: string }> })
   });
 
   return (
-    <div className="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300">
+    <div className="bg-white dark:bg-slate-900 min-h-screen transition-colors duration-300">
       <LanguageSwitcher />
 
-      {/* HEADER / BIO - Responsivo com md:text-6xl */}
       <header className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-white mb-6">
           {t.role}
@@ -45,27 +40,25 @@ export default async function Page(props: { params: Promise<{ lang: string }> })
         </p>
         
         <div className="flex flex-wrap gap-4">
-          <a href={t.cvLink} target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-brand text-white font-bold rounded-lg hover:bg-brand-dark transition-all shadow-lg">
+          <a href={t.cvLink} target="_blank" rel="noopener noreferrer" className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-lg">
             {t.cvButton}
           </a>
         </div>
       </header>
 
-      {/* ESTATÍSTICAS DE IMPACTO - Grid Responsivo 1 col -> 3 col */}
       <section className="bg-slate-100 dark:bg-slate-800/50 py-12 mb-20">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           {t.impactStats.map((stat: any) => (
             <div key={stat.label} className="p-6">
-              <div className="text-3xl font-bold text-brand mb-2">{stat.value}</div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">{stat.value}</div>
               <div className="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-widest">{stat.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* REPOSITÓRIO POR TECNOLOGIA */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12 border-l-4 border-brand pl-4">
+        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-12 border-l-4 border-blue-600 pl-4">
           {lang === 'pt' ? 'Repositório de Projetos por Tecnologia' : 
            lang === 'en' ? 'Project Repository by Technology' : 
            'Repositorio de Proyectos por Tecnología'}
@@ -75,10 +68,9 @@ export default async function Page(props: { params: Promise<{ lang: string }> })
           cat.projects.length > 0 && (
             <div key={cat.title} className="mb-16">
               <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
-                <span className="w-2 h-2 bg-brand rounded-full"></span>
+                <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
                 {cat.title}
               </h3>
-              {/* Grid de Projetos Responsivo */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {cat.projects.map((project: any) => (
                   <ProjectCard 
