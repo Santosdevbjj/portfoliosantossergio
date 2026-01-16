@@ -1,21 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "framework": "nextjs",
-  "cleanUrls": true,
-  "regions": ["gru1"], 
-  "functions": {
-    "src/app/**/*": {
-      "runtime": "nodejs20.x",
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" }
-      ]
-    }
-  ]
+  "cleanUrls": true
 }
