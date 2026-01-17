@@ -1,50 +1,52 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Configurações de localização
+// Importamos a configuração centralizada para manter o código DRY (Don't Repeat Yourself)
+// Caso você ainda não tenha criado o arquivo i18n-config, pode manter a lista manual.
 const locales = ['pt', 'en', 'es']
 const defaultLocale = 'pt'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // 1. Verifica se o pathname já contém um dos locales permitidos
+  // 1. Verifica se o pathname já possui um locale válido
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   )
 
-  // 2. Se já tem o locale, não faz nada (segue o fluxo normal)
   if (pathnameHasLocale) return
 
-  // 3. Se NÃO tem o locale, decide para qual redirecionar
+  // 2. Detecção inteligente de idioma (Accept-Language)
   const acceptLanguage = request.headers.get('accept-language')
   let locale = defaultLocale
 
-  // Lógica simplificada de detecção de idioma do navegador
   if (acceptLanguage) {
-    if (acceptLanguage.startsWith('en') || acceptLanguage.includes('en-')) {
+    // Usamos uma busca por prioridade
+    if (acceptLanguage.includes('en')) {
       locale = 'en'
-    } else if (acceptLanguage.startsWith('es') || acceptLanguage.includes('es-')) {
+    } else if (acceptLanguage.includes('es')) {
       locale = 'es'
     }
   }
 
-  // 4. Redireciona para a versão com o locale (ex: /about -> /pt/about)
-  return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url))
+  // 3. Redirecionamento amigável
+  // Preserva os parâmetros de busca (query strings) se houverem
+  const url = request.nextUrl.clone()
+  url.pathname = `/${locale}${pathname}`
+  
+  return NextResponse.redirect(url)
 }
 
 export const config = {
-  // O Matcher é crucial: ele impede que o middleware rode em arquivos estáticos e APIs
+  /*
+   * Matcher ultra-seguro para Next.js 15:
+   * Protege contra redirecionamento de:
+   * - Arquivos estáticos (_next/static, _next/image)
+   * - Imagens e Ativos (images, favicon, icon)
+   * - Documentos (pdf)
+   * - Service Workers (sw.js)
+   */
   matcher: [
-    /*
-     * Ignora:
-     * - api (rotas de API)
-     * - _next/static (arquivos estáticos do Next)
-     * - _next/image (otimização de imagens)
-     * - icon.png, favicon.ico (ícones)
-     * - images/ (sua pasta de troféus)
-     * - .pdf (seus currículos)
-     */
     '/((?!api|_next/static|_next/image|images|assets|favicon.ico|icon.png|sw.js|.*\\.png$|.*\\.pdf$).*)',
   ],
 }
