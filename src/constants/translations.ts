@@ -1,18 +1,19 @@
 export const translations: any = {
   pt: {
-    role: "Analista de Ciência de Dados & Engenharia de Sistemas",
-    aboutText: "Mais de 15 anos de experiência em sistemas de missão crítica no setor bancário (Bradesco), transformando dados em inteligência estratégica e eficiência operacional com rigor técnico e conformidade.",
-    cvButton: "Baixar Currículo (PT)",
+    role: "Analista de Ciência de Dados | Sistemas de Missão Crítica",
+    aboutText: `Seja bem-vindo(a). Sou um profissional com mais de 15 anos de experiência em sistemas de missão crítica no setor bancário (Bradesco), agora transformando dados em inteligência estratégica.
+
+Utilizo um stack moderno baseado em Python, Azure Databricks, SQL e Neo4J para desenvolver soluções com rigor técnico, conformidade e foco em impacto direto no negócio e eficiência operacional.`,
+    cvButton: "Baixar Currículo",
     cvLink: "/cv-sergio-pt.pdf",
     impactStats: [
       { label: "Horas Economizadas/Ano", value: "2.920" },
       { label: "Disponibilidade de Rede", value: "99,5%" },
       { label: "Experiência Bancária", value: "15+ Anos" }
     ],
-    categories: ["Ciência de Dados", "Microserviços", "Cloud Azure", "Grafos", "Inteligência Artificial"],
     featuredArticle: {
       title: "Vencedor DIO: Low-Code na Saúde",
-      description: "Artigo premiado sobre aceleração de apps médicos, disponível em 3 idiomas.",
+      description: "Artigo premiado sobre a aplicação de plataformas Low-Code no setor médico e aceleração de soluções.",
       links: {
         pt: "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
         en: "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
@@ -21,19 +22,20 @@ export const translations: any = {
     }
   },
   en: {
-    role: "Data Science Analyst & Systems Engineering",
-    aboutText: "15+ years of experience in mission-critical banking systems (Bradesco), transforming data into strategic intelligence and operational efficiency with technical rigor and compliance.",
-    cvButton: "Download Resume (EN)",
+    role: "Data Science Analyst | Mission-Critical Systems",
+    aboutText: `Welcome. I am a professional with over 15 years of experience in mission-critical banking systems (Bradesco), now transforming data into strategic intelligence.
+
+I use a modern stack based on Python, Azure Databricks, SQL, and Neo4J to develop solutions with technical rigor, compliance, and a focus on direct business impact and operational efficiency.`,
+    cvButton: "Download Resume",
     cvLink: "/cv-sergio-en.pdf",
     impactStats: [
       { label: "Hours Saved/Year", value: "2,920" },
       { label: "Network Availability", value: "99.5%" },
       { label: "Banking Expertise", value: "15+ Years" }
     ],
-    categories: ["Data Science", "Microservices", "Azure Cloud", "Graphs", "Artificial Intelligence"],
     featuredArticle: {
       title: "DIO Winner: Low-Code in Healthcare",
-      description: "Award-winning article on medical app acceleration, available in 3 languages.",
+      description: "Award-winning article on the application of Low-Code platforms in the medical sector.",
       links: {
         pt: "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
         en: "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
@@ -42,19 +44,20 @@ export const translations: any = {
     }
   },
   es: {
-    role: "Analista de Ciencia de Datos e Ingeniería de Sistemas",
-    aboutText: "Más de 15 años de experiencia en sistemas críticos bancarios (Bradesco), transformando datos en inteligencia estratégica y eficiencia operativa con rigor técnico y cumplimiento.",
-    cvButton: "Descargar CV (ES)",
+    role: "Analista de Ciencia de Datos | Sistemas de Misión Crítica",
+    aboutText: `Bienvenido(a). Soy un profesional con más de 15 años de experiencia en sistemas de misión crítica en el sector bancario (Bradesco), ahora transformando datos en inteligencia estratégica.
+
+Utilizo un stack moderno basado en Python, Azure Databricks, SQL y Neo4J para desarrollar soluciones con rigor técnico, cumplimiento y enfoque en el impacto directo en el negocio y la eficiencia operativa.`,
+    cvButton: "Descargar CV",
     cvLink: "/cv-sergio-es.pdf",
     impactStats: [
       { label: "Horas Ahorradas/Año", value: "2.920" },
       { label: "Disponibilidad de Red", value: "99,5%" },
       { label: "Experiencia Bancaria", value: "15+ Años" }
     ],
-    categories: ["Ciencia de Datos", "Microservicios", "Cloud Azure", "Grafos", "Inteligencia Artificial"],
     featuredArticle: {
       title: "Ganador DIO: Low-Code en Salud",
-      description: "Artículo premiado sobre aceleración de apps médicas, disponible en 3 idiomas.",
+      description: "Artículo premiado sobre la aplicación de plataformas Low-Code en el sector médico.",
       links: {
         pt: "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
         en: "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
