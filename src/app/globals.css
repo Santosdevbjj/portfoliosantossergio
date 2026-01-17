@@ -2,33 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --brand-blue: #1e40af;
+/* Configurações globais de cores e comportamento */
+@layer base {
+  :root {
+    --brand-blue: #1e40af;
+    color-scheme: light dark; /* Informa ao navegador que o site suporta ambos os temas */
+  }
+
+  html {
+    /* Rolagem suave para navegação entre seções */
+    scroll-behavior: smooth;
+    /* Evita saltos de layout ao abrir modais */
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply bg-[#f8fafc] text-slate-900 antialiased;
+    /* Suporte ao modo escuro via classe ou preferência do sistema */
+    @apply dark:bg-[#0f172a] dark:text-slate-200;
+    
+    /* Melhora a legibilidade em diferentes idiomas */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Ajuda na responsividade de textos longos em PT/ES */
+    hyphens: auto;
+  }
 }
 
-body {
-  /* Suaviza a renderização das fontes */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  
-  /* Rolagem suave para links internos */
-  scroll-behavior: smooth;
+/* Utilitários customizados */
+@layer components {
+  .glass-effect {
+    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/20 dark:border-slate-700/30;
+  }
 }
 
-/* Customização da barra de rolagem (opcional, mas deixa elegante) */
+/* Customização da barra de rolagem para um visual Sênior */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #1e40af;
+  @apply bg-blue-600;
+}
+
+/* Ajuste para garantir que imagens e vídeos sejam sempre responsivos */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Foco acessível para navegação via teclado */
+:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-900;
 }
