@@ -1,59 +1,65 @@
 export const translations: any = {
   pt: {
-    role: "Analista de Ciência de Dados | Eficiência Operacional",
-    introduction: "Seja bem-vindo(a). Sou um profissional com mais de 15 anos de experiência em sistemas de missão crítica no setor bancário...",
-    aboutTitle: "Sobre mim",
-    aboutText: "Analista de Ciência de Dados com base sólida em sistemas críticos bancários e foco em transformar dados em decisões, redução de custos e eficiência operacional. Atuei por mais de 15 anos no Banco Bradesco...",
-    experienceTitle: "Experiência Técnica",
-    impactStats: [
-      { label: "Horas economizadas/ano", value: "2.920" },
-      { label: "Disponibilidade de rede", value: "99,5%" },
-      { label: "Usuários atendidos", value: "500+" }
-    ],
-    categories: [
-      "Ciência de Dados", "Azure Databricks", "Neo4J", "Power BI e Análise de Dados",
-      "Banco de Dados", "Python", "C#/dotnet .NET", "Java", "Machine Learning",
-      "Amazon AWS", "Cibersegurança", "Lógica de Programação", "HTML", "Artigos Técnicos"
-    ],
+    role: "Analista de Ciência de Dados & Engenharia de Sistemas",
+    aboutText: "Mais de 15 anos de experiência em sistemas de missão crítica no setor bancário (Bradesco), transformando dados em inteligência estratégica e eficiência operacional com rigor técnico e conformidade.",
     cvButton: "Baixar Currículo (PT)",
-    cvLink: "/cv-sergio-santos-pt.pdf"
+    cvLink: "/cv-sergio-pt.pdf",
+    impactStats: [
+      { label: "Horas Economizadas/Ano", value: "2.920" },
+      { label: "Disponibilidade de Rede", value: "99,5%" },
+      { label: "Experiência Bancária", value: "15+ Anos" }
+    ],
+    categories: ["Ciência de Dados", "Microserviços", "Cloud Azure", "Grafos", "Inteligência Artificial"],
+    featuredArticle: {
+      title: "Vencedor DIO: Low-Code na Saúde",
+      description: "Artigo premiado sobre aceleração de apps médicos, disponível em 3 idiomas.",
+      links: {
+        pt: "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
+        en: "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
+        es: "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-en-semanas-5474e7dddfad"
+      }
+    }
   },
   en: {
-    role: "Data Science Analyst | Operational Efficiency",
-    introduction: "Welcome. I am a professional with over 15 years of experience in mission-critical systems in the banking sector...",
-    aboutTitle: "About Me",
-    aboutText: "Data Science Analyst with a solid background in critical banking systems, focusing on transforming data into decisions and cost reduction. I worked for 15+ years at Bradesco Bank...",
-    experienceTitle: "Technical Experience",
-    impactStats: [
-      { label: "Hours saved/year", value: "2,920" },
-      { label: "Network availability", value: "99.5%" },
-      { label: "Users served", value: "500+" }
-    ],
-    categories: [
-      "Data Science", "Azure Databricks", "Neo4J", "Power BI & Data Analysis",
-      "Database", "Python", "C#/.NET", "Java", "Machine Learning",
-      "Amazon AWS", "Cybersecurity", "Programming Logic", "HTML", "Technical Articles"
-    ],
+    role: "Data Science Analyst & Systems Engineering",
+    aboutText: "15+ years of experience in mission-critical banking systems (Bradesco), transforming data into strategic intelligence and operational efficiency with technical rigor and compliance.",
     cvButton: "Download Resume (EN)",
-    cvLink: "/cv-sergio-santos-en.pdf"
+    cvLink: "/cv-sergio-en.pdf",
+    impactStats: [
+      { label: "Hours Saved/Year", value: "2,920" },
+      { label: "Network Availability", value: "99.5%" },
+      { label: "Banking Expertise", value: "15+ Years" }
+    ],
+    categories: ["Data Science", "Microservices", "Azure Cloud", "Graphs", "Artificial Intelligence"],
+    featuredArticle: {
+      title: "DIO Winner: Low-Code in Healthcare",
+      description: "Award-winning article on medical app acceleration, available in 3 languages.",
+      links: {
+        pt: "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
+        en: "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
+        es: "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-en-semanas-5474e7dddfad"
+      }
+    }
   },
   es: {
-    role: "Analista de Ciencia de Datos | Eficiencia Operativa",
-    introduction: "Bienvenido(a). Soy un profesional con más de 15 años de experiencia en sistemas de misión crítica en el sector bancario...",
-    aboutTitle: "Sobre mí",
-    aboutText: "Analista de Ciencia de Datos con una sólida base em sistemas bancarios críticos, enfocado en transformar datos en decisiones y reducción de costos. Trabajé por más de 15 años en Banco Bradesco...",
-    experienceTitle: "Experiencia Técnica",
+    role: "Analista de Ciencia de Datos e Ingeniería de Sistemas",
+    aboutText: "Más de 15 años de experiencia en sistemas críticos bancarios (Bradesco), transformando datos en inteligencia estratégica y eficiencia operativa con rigor técnico y cumplimiento.",
+    cvButton: "Descargar CV (ES)",
+    cvLink: "/cv-sergio-es.pdf",
     impactStats: [
-      { label: "Horas ahorradas/año", value: "2.920" },
-      { label: "Disponibilidad de red", value: "99,5%" },
-      { label: "Usuarios atendidos", value: "500+" }
+      { label: "Horas Ahorradas/Año", value: "2.920" },
+      { label: "Disponibilidad de Red", value: "99,5%" },
+      { label: "Experiencia Bancaria", value: "15+ Años" }
     ],
-    categories: [
-      "Ciencia de Datos", "Azure Databricks", "Neo4J", "Power BI y Análisis de Datos",
-      "Base de Datos", "Python", "C#/.NET", "Java", "Machine Learning",
-      "Amazon AWS", "Ciberseguridad", "Lógica de Programación", "HTML", "Artículos Técnicos"
-    ],
-    cvButton: "Descargar Currículum (ES)",
-    cvLink: "/cv-sergio-santos-es.pdf"
+    categories: ["Ciencia de Datos", "Microservicios", "Cloud Azure", "Grafos", "Inteligencia Artificial"],
+    featuredArticle: {
+      title: "Ganador DIO: Low-Code en Salud",
+      description: "Artículo premiado sobre aceleración de apps médicas, disponible en 3 idiomas.",
+      links: {
+        pt: "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
+        en: "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
+        es: "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-en-semanas-5474e7dddfad"
+      }
+    }
   }
 };
