@@ -1,4 +1,34 @@
-export const translations: any = {
+// src/constants/translations.ts
+
+export interface ImpactStat {
+  label: string;
+  value: string;
+}
+
+export interface TranslationContent {
+  role: string;
+  aboutText: string;
+  cvButton: string;
+  cvLink: string;
+  impactStats: ImpactStat[];
+  featuredArticle: {
+    title: string;
+    description: string;
+    links: {
+      pt: string;
+      en: string;
+      es: string;
+    };
+  };
+}
+
+export interface ITranslations {
+  pt: TranslationContent;
+  en: TranslationContent;
+  es: TranslationContent;
+}
+
+export const translations: ITranslations = {
   pt: {
     role: "Analista de Ciência de Dados | Sistemas de Missão Crítica",
     aboutText: `Seja bem-vindo(a). Sou um profissional com mais de 15 anos de experiência em sistemas de missão crítica no setor bancário (Bradesco), agora transformando dados em inteligência estratégica.
@@ -52,7 +82,7 @@ Utilizo un stack moderno basado en Python, Azure Databricks, SQL y Neo4J para de
     cvLink: "/cv-sergio-santos-es.pdf",
     impactStats: [
       { label: "Horas Ahorradas/Año", value: "2.920" },
-      { label: "Disponibilidade de Red", value: "99,5%" },
+      { label: "Disponibilidad de Red", value: "99,5%" },
       { label: "Experiencia Bancaria", value: "15+ Años" }
     ],
     featuredArticle: {
