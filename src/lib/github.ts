@@ -1,31 +1,48 @@
-export async function getGitHubProjects() {
-  const username = process.env.NEXT_PUBLIC_GITHUB_USERNAME;
-  const token = process.env.GITHUB_ACCESS_TOKEN;
+// src/lib/github.ts
 
-  // Se não tiver username, retorna vazio. 
-  // O token é opcional para repos públicos, mas recomendável para evitar limites de taxa.
-  if (!username) return [];
+export interface GitHubRepo {
+  id: number;
+  name: string;
+  description: string | null;
+  url: string;
+  homepage: string | null;
+  topics: string[];
+  updatedAt: string;
+}
+
+export async function getGitHubProjects(): Promise<GitHubRepo[]> {
+  // Use variáveis de ambiente SEM NEXT_PUBLIC para o Token (Segurança Máxima)
+  const username = process.env.NEXT_PUBLIC_GITHUB_USERNAME || 'Santosdevbjj';
+  const token = process.env.GITHUB_ACCESS_TOKEN;
 
   try {
     const response = await fetch(
       `https://api.github.com/users/${username}/repos?sort=updated&per_page=100`,
       {
         headers: {
-          ...(token && { Authorization: `token ${token}` }),
-          Accept: "application/vnd.github+json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+          'Accept': 'application/vnd.github+json',
+          'User-Agent': 'Portfolio-Sergio-Santos', // Boa prática para API do GitHub
         },
-        next: { revalidate: 3600 }, // Cache de 1 hora
+        // No Next.js 15, o fetch é estático por padrão. 
+        // Aqui configuramos o revalidate para 1 hora (3600s)
+        next: { revalidate: 3600 }, 
       }
     );
 
     if (!response.ok) {
-      console.error(`GitHub API retornou erro: ${response.status}`);
+      console.error(`Erro GitHub: ${response.status} ${response.statusText}`);
       return [];
     }
 
     const repos = await response.json();
 
-    // Filtra repositórios que tenham a tag 'portfolio' nos tópicos
+    if (!Array.isArray(repos)) {
+      console.error("Resposta do GitHub não é um array");
+      return [];
+    }
+
+    // Filtra repositórios que tenham o tópico 'portfolio'
     return repos
       .filter((repo: any) => repo.topics?.includes("portfolio"))
       .map((repo: any) => ({
@@ -35,7 +52,8 @@ export async function getGitHubProjects() {
         url: repo.html_url,
         homepage: repo.homepage,
         topics: repo.topics || [],
-        updatedAt: repo.updated_at,
+        // Mapeamos para camelCase para facilitar o uso no frontend
+        updatedAt: repo.updated_at, 
       }));
     
   } catch (error) {
