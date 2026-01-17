@@ -143,4 +143,115 @@ export default async function Page(props: { params: Promise<{ lang: string }> })
       </footer>
     </div>
   );
+  {/* SEÇÃO DE RECONHECIMENTO E PRÊMIOS */}
+
+<section className="max-w-7xl mx-auto px-4 mb-24">
+
+  <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 rounded-3xl p-8 md:p-12 text-white shadow-2xl border border-purple-500/30 relative overflow-hidden">
+
+    
+
+    <div className="relative z-10">
+
+      <div className="flex items-center gap-3 mb-8 justify-center lg:justify-start">
+
+        <Trophy className="text-yellow-400" size={40} />
+
+        <h2 className="text-3xl md:text-5xl font-black tracking-tight">Prêmios & Reconhecimento</h2>
+
+      </div>
+
+
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+        
+
+        {/* GALERIA DE FOTOS DO TROFÉU */}
+
+        <div className="flex flex-col md:flex-row gap-6 justify-center">
+
+          <div className="relative group">
+
+            <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
+
+            <img 
+
+              src="/public/images/trofeu-35-edicao.png" 
+
+              alt="Artigo Campeão DIO 35° Edição" 
+
+              className="relative rounded-xl shadow-2xl w-full max-w-[300px] object-cover border border-white/10"
+
+            />
+
+          </div>
+
+          <div className="relative group self-center lg:self-end">
+
+            <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
+
+            <img 
+
+              src="/public/images/trofeu-melhor-artigo-setembro.png" 
+
+              alt="Troféu Melhor Artigo do mês de setembro de 2025" 
+
+              className="relative rounded-xl shadow-2xl w-full max-w-[240px] object-cover border border-white/10"
+
+            />
+
+          </div>
+
+        </div>
+
+
+
+        {/* DESCRIÇÃO DO FEITO */}
+
+        <div className="text-center lg:text-left">
+
+          <div className="inline-block px-4 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 text-sm font-bold mb-4">
+
+            SETEMBRO 2025 • DIO COMMUNITY
+
+          </div>
+
+          <h3 className="text-2xl md:text-3xl font-bold mb-4 text-white">
+
+            Melhor Artigo do Mês: <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Low-Code na Saúde</span>
+
+          </h3>
+
+          <p className="text-slate-300 text-lg mb-8 leading-relaxed">
+
+            Vencedor da 35ª Competição de Artigos da Digital Innovation One (DIO). Uma análise técnica sobre como a agilidade das plataformas Low-Code está revolucionando o setor médico, garantindo conformidade e escala.
+
+          </p>
+
+          <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+
+            <a href={t.featuredArticle.links.pt} target="_blank" className="flex items-center gap-2 px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:scale-105 transition-transform">
+
+              <ExternalLink size={18} /> Ler Artigo Premiado
+
+            </a>
+
+          </div>
+
+        </div>
+
+
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+
 }
