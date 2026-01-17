@@ -1,6 +1,6 @@
 {
   "name": "portfolio-sergio-vercel-final",
-  "version": "9.10.2",
+  "version": "9.10.3",
   "private": true,
   "engines": {
     "node": "24.x"
