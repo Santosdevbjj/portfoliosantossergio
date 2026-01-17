@@ -5,7 +5,7 @@ export const translations: any = {
 
 Utilizo um stack moderno baseado em Python, Azure Databricks, SQL e Neo4J para desenvolver soluções com rigor técnico, conformidade e foco em impacto direto no negócio e eficiência operacional.`,
     cvButton: "Baixar Currículo",
-    cvLink: "/cv-sergio-pt.pdf",
+    cvLink: "/cv-sergio-santos-pt.pdf",
     impactStats: [
       { label: "Horas Economizadas/Ano", value: "2.920" },
       { label: "Disponibilidade de Rede", value: "99,5%" },
@@ -27,7 +27,7 @@ Utilizo um stack moderno baseado em Python, Azure Databricks, SQL e Neo4J para d
 
 I use a modern stack based on Python, Azure Databricks, SQL, and Neo4J to develop solutions with technical rigor, compliance, and a focus on direct business impact and operational efficiency.`,
     cvButton: "Download Resume",
-    cvLink: "/cv-sergio-en.pdf",
+    cvLink: "/cv-sergio-santos-en.pdf",
     impactStats: [
       { label: "Hours Saved/Year", value: "2,920" },
       { label: "Network Availability", value: "99.5%" },
@@ -49,10 +49,10 @@ I use a modern stack based on Python, Azure Databricks, SQL, and Neo4J to develo
 
 Utilizo un stack moderno basado en Python, Azure Databricks, SQL y Neo4J para desarrollar soluciones con rigor técnico, cumplimiento y enfoque en el impacto directo en el negocio y la eficiencia operativa.`,
     cvButton: "Descargar CV",
-    cvLink: "/cv-sergio-es.pdf",
+    cvLink: "/cv-sergio-santos-es.pdf",
     impactStats: [
       { label: "Horas Ahorradas/Año", value: "2.920" },
-      { label: "Disponibilidad de Red", value: "99,5%" },
+      { label: "Disponibilidade de Red", value: "99,5%" },
       { label: "Experiencia Bancaria", value: "15+ Años" }
     ],
     featuredArticle: {
