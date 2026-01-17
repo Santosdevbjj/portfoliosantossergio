@@ -1,36 +1,50 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-let locales = ['pt', 'en', 'es']
-let defaultLocale = 'pt'
+// Configurações de localização
+const locales = ['pt', 'en', 'es']
+const defaultLocale = 'pt'
 
 export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
+  const { pathname } = request.nextUrl
 
-  // Verifica se o caminho já tem o idioma (ex: /pt/...)
-  const pathnameIsMissingLocale = locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  // 1. Verifica se o pathname já contém um dos locales permitidos
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   )
 
-  // Se não tiver o idioma na URL, redireciona
-  if (pathnameIsMissingLocale) {
-    // Tenta detectar o idioma do navegador, senão usa PT
-    const acceptLanguage = request.headers.get('accept-language')
-    let locale = defaultLocale
+  // 2. Se já tem o locale, não faz nada (segue o fluxo normal)
+  if (pathnameHasLocale) return
 
-    if (acceptLanguage) {
-      if (acceptLanguage.includes('en')) locale = 'en'
-      else if (acceptLanguage.includes('es')) locale = 'es'
+  // 3. Se NÃO tem o locale, decide para qual redirecionar
+  const acceptLanguage = request.headers.get('accept-language')
+  let locale = defaultLocale
+
+  // Lógica simplificada de detecção de idioma do navegador
+  if (acceptLanguage) {
+    if (acceptLanguage.startsWith('en') || acceptLanguage.includes('en-')) {
+      locale = 'en'
+    } else if (acceptLanguage.startsWith('es') || acceptLanguage.includes('es-')) {
+      locale = 'es'
     }
-
-    return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url))
   }
+
+  // 4. Redireciona para a versão com o locale (ex: /about -> /pt/about)
+  return NextResponse.redirect(new URL(`/${locale}${pathname}`, request.url))
 }
 
 export const config = {
-  // Melhorei o matcher para garantir que ele não tente redirecionar arquivos da pasta public
+  // O Matcher é crucial: ele impede que o middleware rode em arquivos estáticos e APIs
   matcher: [
-    '/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|pdf)$).*)',
+    /*
+     * Ignora:
+     * - api (rotas de API)
+     * - _next/static (arquivos estáticos do Next)
+     * - _next/image (otimização de imagens)
+     * - icon.png, favicon.ico (ícones)
+     * - images/ (sua pasta de troféus)
+     * - .pdf (seus currículos)
+     */
+    '/((?!api|_next/static|_next/image|images|assets|favicon.ico|icon.png|sw.js|.*\\.png$|.*\\.pdf$).*)',
   ],
 }
-
