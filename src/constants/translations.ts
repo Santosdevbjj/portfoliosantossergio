@@ -113,15 +113,34 @@ Data Science Analyst with a solid background in critical banking systems and a f
 
 I worked for more than 15 years at Banco Bradesco in regulated mission-critical environments, where security, governance, and business continuity were essential. This experience gave me a systemic view, risk analysis capability, and operational discipline — skills I now apply directly to data projects.
 
+Currently, I direct my efforts toward Data Science and Artificial Intelligence, applying the rigor of critical systems to the creation of predictive models, advanced analysis, and process automation.
+
+I use Python, SQL, Azure Databricks, and Neo4J to develop governed pipelines, build models, and generate actionable insights with business impact — connecting technical data to corporate decision-making.
+
+My focus is on transforming data into strategic intelligence, ensuring scalable, secure solutions aligned with modern business challenges.
+
 Technical Experience
 Critical systems developed:
 • Automated IPVA system that eliminated 2,920 annual hours of manual processing
 • Corporate network infrastructure for 500+ users with 99.5% availability
-• Interdepartmental legal systems with LGPD compliance
+• Interdepartmental legal systems with full traceability and LGPD (Brazilian Data Protection Law) compliance
+
+Consolidated Stack: Visual Basic, C, SQL Server, Windows Server, IBM Mainframe Emulation, Active Directory
+Stack in updating: Java, C#/.NET, Python, Azure Databricks, Azure AI, Power BI, Machine Learning, Docker, Neo4J (graph databases)
+
+Transition and Reskilling
+Since 2008, I have been working as an independent consultant while investing in continuous updates through bootcamps and specialized certifications. Recently, I completed training in Data Science with Python and Neo4J for graph data analysis — a skill applicable to fraud detection scenarios, relationship analysis, and compliance in corporate environments.
+
+Completed training: Santander Coders, Microsoft AI Agents, IBM AI Fundamentals, Azure Databricks, Azure Cloud, Java, C#/.NET, Cybersecurity, Power BI, Data Science.
+
+The projects in this portfolio reflect this transition from legacy systems to modern technologies, focusing on data analysis and governance.
 
 Differential
-I combine deep knowledge of regulated environments with technical capacity to modernize legacy infrastructure and apply advanced data analysis. Experience in evaluating technical feasibility, risks, and organizational impact.`,
-    cvButton: "Download Resume (EN)",
+I combine deep knowledge of regulated environments (banking compliance, data security, auditing) with the technical capacity to modernize legacy infrastructure and apply advanced data analysis. Practical experience in evaluating not only technical feasibility but also risks, compliance, and organizational impact of each solution.
+
+Objective
+I am looking for opportunities in projects involving data governance, infrastructure modernization, or regulated corporate systems — preferably in a remote or hybrid format — where my banking experience and diversified technical stack can generate measurable impact.`,
+    cvButton: "Download CV (EN)",
     cvLink: "/cv-sergio-santos-en.pdf",
     repoTitle: "Data Solutions & Engineering",
     excellenceDescription: "Awarded by DIO (Digital Innovation One) for high-impact technical analysis on Low-Code in healthcare and operational efficiency.",
@@ -162,19 +181,38 @@ Utilizo un stack moderno basado en Python, Azure Databricks, SQL y Neo4J para de
 👨‍💻 Sobre mí
 Analista de Ciencia de Datos con una sólida base en sistemas bancarios críticos y enfoque en transformar datos en decisiones, reducción de costos y eficiencia operativa.
 
-Trabajé por más de 15 años en Banco Bradesco en entornos regulados de misión crítica, donde la seguridad, la gobernanza y la continuidad del negocio eran requisitos esenciales. Esta experiencia me dio una visión sistémica, capacidad de análisis de riesgos y disciplina operativa.
+Trabajé por más de 15 años en Banco Bradesco en entornos regulados de misión crítica, donde la seguridad, la gobernanza y la continuidad del negocio eran requisitos esenciales. Esta experiencia me dio una visión sistémica, capacidad de análisis de riesgos y disciplina operativa — competencias que hoy aplico directamente en proyectos de datos.
+
+Actualmente, dirijo mi actuación hacia la Ciencia de Datos e Inteligencia Artificial, aplicando el rigor de los sistemas críticos a la creación de modelos predictivos, análisis avanzados y automatización de procesos.
+
+Utilizo Python, SQL, Azure Databricks y Neo4J para desarrollar pipelines gobernados, construir modelos y generar insights accionables con impacto en el negocio — conectando datos técnicos a la toma de decisiones corporativas.
+
+Mi enfoque es transformar datos en inteligencia estratégica, garantizando soluciones escalables, seguras y alineadas con los desafíos comerciales modernos.
 
 Experiencia Técnica
 Sistemas críticos desarrollados:
 • Sistema automatizado de IPVA que eliminó 2.920 horas anuales de procesamiento manual
-• Infraestructura de red corporativa para 500+ usuarios con 99,5% de disponibilidad
-• Sistemas legales interdepartamentales con cumplimiento de LGPD
+• Infraestructura de red corporativa para más de 500 usuarios con 99,5% de disponibilidad
+• Sistemas legales interdepartamentales con trazabilidad completa y cumplimiento de LGPD (Ley de Protección de Datos)
+
+Stack consolidado: Visual Basic, C, SQL Server, Windows Server, Emulación de Mainframe IBM, Active Directory
+Stack en actualización: Java, C#/.NET, Python, Azure Databricks, Azure AI, Power BI, Machine Learning, Docker, Neo4J (bases de datos de grafos)
+
+Transición y Reskilling
+Desde 2008 actúo como consultor independiente mientras invierto en actualización continua a través de bootcamps y certificaciones especializadas. Recientemente completé mi formación en Ciencia de Datos con Python y Neo4J para el análisis de datos con grafos, una habilidad aplicable a escenarios de detección de fraudes, análisis de relaciones y cumplimiento en entornos corporativos.
+
+Formaciones completadas: Santander Coders, Microsoft AI Agents, IBM AI Fundamentals, Azure Databricks, Azure Cloud, Java, C#/.NET, Ciberseguridad, Power BI, Ciencia de Datos.
+
+Los proyectos de este portafolio reflejan esta transición de sistemas heredados a tecnologías modernas, con un enfoque en el análisis de datos y la gobernanza.
 
 Diferencial
-Combino un profundo conocimiento de entornos regulados con la capacidad técnica para modernizar la infraestructura heredada y aplicar análisis de datos avanzados.`,
-    cvButton: "Descargar Currículum (ES)",
+Combino un profundo conocimiento de entornos regulados (cumplimiento bancario, seguridad de datos, auditoría) con la capacidad técnica para modernizar la infraestructura heredada y aplicar análisis de datos avanzados. Experiencia práctica en evaluar no solo la viabilidad técnica, sino también los riesgos, el cumplimiento y el impacto organizacional de cada solución.
+
+Objetivo
+Busco oportunidades en proyectos que involucren gobernanza de datos, modernización de infraestructura o sistemas corporativos regulados, preferiblemente en formato remoto o híbrido, donde mi experiencia bancaria y mi stack técnico diversificado puedan generar un impacto mensurable.`,
+    cvButton: "Descargar CV (ES)",
     cvLink: "/cv-sergio-santos-es.pdf",
-    repoTitle: "Soluções de Dados e Engenharia",
+    repoTitle: "Soluciones de Datos e Ingeniería",
     excellenceDescription: "Premiado por DIO (Digital Innovation One) por análisis técnicos de alto impacto sobre Low-Code en salud y eficiencia operativa.",
     categories: {
       "data-science": "Ciencia de Datos",
@@ -184,7 +222,7 @@ Combino un profundo conocimiento de entornos regulados con la capacidad técnica
       "python": "Python y Automatización",
       "java": "Desarrollo Java",
       "machine-learning": "Inteligencia Artificial",
-      "cybersecurity": "Cibersegurança",
+      "cybersecurity": "Ciberseguridad",
       "programming-logic": "Lógica y Algoritmos",
       "html": "Front-end",
       "articles": "Publicaciones Técnicas"
