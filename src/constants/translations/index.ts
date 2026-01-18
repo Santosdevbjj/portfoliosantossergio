@@ -3,10 +3,12 @@
 import { pt } from './pt';
 import { en } from './en';
 import { es } from './es';
+import { Locale } from '@/i18n-config';
 
 /**
- * Dicionário centralizado de traduções.
- * Agrupa as constantes pt, en e es em um único objeto para consumo via [lang].
+ * DICIONÁRIO ESTRUTURADO DE TRADUÇÕES
+ * Centraliza os arquivos pt.ts, en.ts e es.ts.
+ * O uso de 'as const' garante que as chaves sejam tratadas como valores literais e imutáveis.
  */
 export const translations = { 
   pt, 
@@ -15,22 +17,34 @@ export const translations = {
 } as const;
 
 /**
- * Tipagem de Conteúdo:
- * Define que qualquer tradução deve seguir rigorosamente a estrutura do arquivo pt.ts.
- * Se você adicionar uma chave em PT, o TypeScript exigirá que ela exista em EN e ES.
+ * ENGENHARIA DE TIPOS (Type Safety)
+ * Define que a estrutura de referência para todo o site é o arquivo pt.ts.
+ * Isso força a consistência: se uma chave de projeto existe em PT, 
+ * o TypeScript exigirá sua existência em EN e ES.
  */
 export type TranslationContent = typeof pt;
 
 /**
- * Tipagem do Objeto de Traduções:
- * Mapeia as chaves permitidas (pt | en | es) para o conteúdo traduzido.
+ * TIPO DE ACESSO AOS IDIOMAS
+ * Define que as chaves válidas são estritamente as definidas no dicionário.
  */
 export type ITranslations = typeof translations;
 
 /**
- * Helper para garantir que o idioma solicitado existe no dicionário.
- * Caso contrário, retorna o idioma padrão (pt).
+ * HELPER DE ACESSO SEGURO
+ * @param lang - Código do idioma (pt, en, es)
+ * @returns O objeto de tradução correspondente ou o padrão (pt)
+ * * Este helper é usado tanto em Client Components quanto em Server Components
+ * para garantir que o layout nunca renderize sem texto (fallback).
  */
 export const getTranslations = (lang: string): TranslationContent => {
-  return translations[lang as keyof ITranslations] || translations.pt;
+  // Verifica se o idioma passado é uma das chaves válidas do nosso dicionário
+  const isSupportedLocale = Object.keys(translations).includes(lang);
+  
+  if (isSupportedLocale) {
+    return translations[lang as keyof ITranslations];
+  }
+
+  // Fallback de segurança para o idioma padrão
+  return translations.pt;
 };
