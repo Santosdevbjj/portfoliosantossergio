@@ -2,41 +2,54 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // ESSENCIAL: Isso fará o build passar ignorando erros de TypeScript
+  // Mantido para garantir o deploy imediato, 
+  // mas como engenheiro, recomendo corrigir os tipos futuramente.
   typescript: {
     ignoreBuildErrors: true,
   },
   
-  // ESSENCIAL: Isso ignora erros de Linting durante o build
   eslint: {
     ignoreDuringBuilds: true,
   },
 
+  // Ativa suporte a rotas tipadas para maior segurança no desenvolvimento
   experimental: {
     typedRoutes: true,
   },
 
   images: {
-    remotePatterns: [], 
+    // ESSENCIAL: Permite que o Next.js renderize imagens externas com segurança
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'github.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'raw.githubusercontent.com',
+      },
+    ],
   },
 
+  // Remove logs de console em produção para não expor lógica do sistema
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  async headers() {
+  // Otimização de redirects para SEO (Caso o usuário acesse a raiz /)
+  async redirects() {
     return [
       {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=3600, stale-while-revalidate=86400"
-          }
-        ]
-      }
+        source: '/',
+        destination: '/pt',
+        permanent: true,
+      },
     ];
-  }
+  },
 };
 
 module.exports = nextConfig;
