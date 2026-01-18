@@ -3,23 +3,28 @@
 import { motion } from 'framer-motion';
 
 /**
- * O arquivo template.tsx no Next.js funciona de forma similar ao layout,
- * mas ele remonta o componente em cada navegação, permitindo que a 
- * animação de entrada ocorra sempre que o usuário trocar de página.
+ * Template Component - Next.js 15
+ * * Diferente do layout.tsx, o template.tsx é remontado a cada troca de rota.
+ * Isso garante que a animação de "fade-in" e "slide-up" ocorra sempre que o 
+ * recrutador alternar entre os idiomas ou navegar pelo site.
  */
 export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
-      // Estado inicial (invisível e levemente abaixo)
-      initial={{ opacity: 0, y: 15 }}
-      // Estado final (visível e na posição original)
+      // A animação começa com o conteúdo invisível e levemente deslocado para baixo (y: 20)
+      initial={{ opacity: 0, y: 20 }}
+      // Evolui para a posição final e opacidade total
       animate={{ opacity: 1, y: 0 }}
-      // Configuração da transição para ser suave e profissional
+      // Configuração de transição de nível sênior
       transition={{ 
-        duration: 0.5, 
-        ease: [0.22, 1, 0.36, 1], // Cubic-bezier para um efeito de "entrada suave"
-        delay: 0.1 
+        duration: 0.6, 
+        ease: [0.16, 1, 0.3, 1], // Ease-out suave para evitar movimentos bruscos
+        delay: 0.05 // Delay mínimo para permitir que o Hydration do Next.js ocorra
       }}
+      // Otimização de performance: informa ao navegador que essas propriedades mudarão
+      style={{ willChange: 'opacity, transform' }}
+      // Garante que a div ocupe toda a altura necessária para não quebrar o scroll
+      className="min-h-screen"
     >
       {children}
     </motion.div>
