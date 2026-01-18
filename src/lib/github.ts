@@ -4,50 +4,48 @@ export interface GitHubRepo {
   id: number;
   name: string;
   description: string | null;
-  html_url: string; // Mantido o nome original da API para evitar erros de mapeamento
+  html_url: string;
   homepage: string | null;
   topics: string[];
-  updated_at: string; // Padronizado com o que a API envia e o componente espera
+  updated_at: string;
 }
 
 export async function getGitHubProjects(): Promise<GitHubRepo[]> {
-  const username = process.env.NEXT_PUBLIC_GITHUB_USERNAME || 'Santosdevbjj';
   const token = process.env.GITHUB_ACCESS_TOKEN;
+  
+  // Rota otimizada: 'user/repos' busca os repositórios do dono do token (mais estável)
+  // Se não houver token, ele usará a rota pública como fallback
+  const url = token 
+    ? `https://api.github.com/user/repos?sort=updated&per_page=100&affiliation=owner`
+    : `https://api.github.com/users/Santosdevbjj/repos?sort=updated&per_page=100`;
 
-  // No Next.js 15, o fetch é cacheado no servidor. 
-  // Revalidamos a cada 3600 segundos (1 hora).
   try {
-    const response = await fetch(
-      `https://api.github.com/users/${username}/repos?sort=updated&per_page=100`,
-      {
-        headers: {
-          ...(token && { Authorization: `token ${token}` }), // GitHub aceita 'token' ou 'Bearer'
-          'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'Portfolio-Data-Science-Sergio',
-        },
-        next: { revalidate: 3600 }, 
-      }
-    );
+    const response = await fetch(url, {
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }), // Mudança para Bearer
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'Portfolio-Sergio-Data-Science',
+      },
+      // Revalidação de 1 hora (Next.js 15 Cache)
+      next: { revalidate: 3600 }, 
+    });
 
-    if (response.status === 403) {
-      console.warn("GitHub API Rate Limit atingido. Verifique seu GITHUB_ACCESS_TOKEN.");
-      return [];
-    }
-
+    // Se o token estiver expirado ou errado (401/403), não derruba o site
     if (!response.ok) {
-      throw new Error(`GitHub API Error: ${response.status}`);
+      console.error(`GitHub API Error: ${response.status} na rota ${url}`);
+      return []; 
     }
 
-    const repos: any[] = await response.json();
+    const repos = await response.json();
 
     if (!Array.isArray(repos)) return [];
 
-    // Filtro e Mapeamento Rigoroso
+    // Filtro: Apenas repositórios com a tag 'portfolio'
     return repos
       .filter((repo) => repo.topics?.includes("portfolio"))
       .map((repo) => ({
         id: repo.id,
-        name: repo.name.replace(/-/g, ' '), // Formata nome-do-repo para Nome Do Repo
+        name: repo.name.replace(/-/g, ' '), 
         description: repo.description,
         html_url: repo.html_url,
         homepage: repo.homepage,
@@ -56,8 +54,7 @@ export async function getGitHubProjects(): Promise<GitHubRepo[]> {
       }));
     
   } catch (error) {
-    // Em produção, aqui você enviaria o erro para o Sentry ou LogDNA
-    console.error("Falha ao buscar projetos do GitHub:", error);
-    return [];
+    console.error("Erro fatal no fetch do GitHub:", error);
+    return []; // Retorna lista vazia para a página carregar (mesmo sem projetos)
   }
 }
