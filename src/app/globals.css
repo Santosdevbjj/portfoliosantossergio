@@ -14,21 +14,21 @@
 
   html {
     scroll-behavior: smooth;
-    /* Impede scrolls laterais indesejados em animações mobile */
+    /* Evita trepidação lateral em animações de entrada */
     overflow-x: hidden;
-    /* Garante que o fundo do navegador (além do body) combine com o tema */
     @apply bg-[#f8fafc] dark:bg-[#0f172a];
   }
 
   body {
+    /* Cores de fundo consistentes com a estratégia de marca */
     @apply bg-[#f8fafc] text-slate-900 antialiased;
     @apply dark:bg-[#0f172a] dark:text-slate-200;
     
-    /* Suporte a hifens para idiomas latinos (PT/ES) evitando quebra de containers */
+    /* Resiliência Multilíngue: Evita quebras de layout em palavras longas (PT/ES) */
+    overflow-wrap: break-word;
     hyphens: auto;
-    word-wrap: break-word;
     
-    /* Renderização de fonte de alta qualidade */
+    /* Renderização de fonte ultra-nítida */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -36,53 +36,71 @@
 }
 
 @layer components {
-  /* Efeito de vidro para Header e LanguageSwitcher */
+  /* Efeito Glassmorphism para Header, Switcher e Cards Premium */
   .glass-effect {
-    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50;
+    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50;
   }
 
-  /* Container padrão para manter a responsividade em ultra-wide monitors */
+  /* Container centralizado para telas ultra-wide (Engenharia de Layout) */
   .main-container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full;
   }
+
+  /* Utilitário para ocultar barra de rolagem mas manter funcionalidade (Filtros de Projetos) */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Animação suave para transição de tema Dark/Light */
+  .theme-transition {
+    @apply transition-colors duration-500 ease-in-out;
+  }
 }
 
-/* Barra de rolagem minimalista e moderna */
+/* Scrollbar Moderna e Minimalista (Foco em Desktop) */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-[#f8fafc] dark:bg-[#0f172a];
+  @apply bg-slate-50 dark:bg-[#0f172a];
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full border-2 border-solid;
-  /* Cria uma margem ao redor do thumb usando a cor do track */
-  border-color: #f8fafc; 
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full border-4 border-solid;
+  border-color: #f8fafc; /* Deve bater com o bg do body light */
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  border-color: #0f172a;
+  border-color: #0f172a; /* Deve bater com o bg do body dark */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-blue-600;
+  @apply bg-blue-600 dark:bg-blue-500;
 }
 
-/* Garante que elementos de mídia não estourem o grid responsivo */
+/* Responsividade de Mídia e SVG */
 img, svg, video, canvas {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-/* Melhora a visibilidade do foco para usuários de teclado (Acessibilidade) */
+/* Foco de Acessibilidade (WCAG 2.1) */
 :focus-visible {
   @apply outline-none ring-2 ring-blue-600 ring-offset-2 dark:ring-offset-slate-900;
 }
 
-/* Remove o destaque azul padrão do Safari Mobile */
+/* Ajustes para Safari Mobile e Inputs */
 input, button, a {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Estilização de Seleção de Texto (Branding) */
+::selection {
+  @apply bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100;
 }
