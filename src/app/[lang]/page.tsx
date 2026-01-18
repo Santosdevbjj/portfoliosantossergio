@@ -6,8 +6,7 @@ import { Shield, ExternalLink, Mail, Linkedin, Award, Medal } from 'lucide-react
 import Image from 'next/image';
 import { ProjectSection } from '@/components/ProjectSection';
 
-// Configuração de Revalidação (Lado do Servidor)
-// Nota: Certifique-se de que nenhum componente importado aqui force o 'use client' globalmente
+// Configuração de Revalidação (Lado do Servidor) - Atualiza os dados do GitHub a cada 1 hora
 export const revalidate = 3600; 
 
 interface PageProps {
@@ -15,29 +14,29 @@ interface PageProps {
 }
 
 export default async function Page({ params }: PageProps) {
-  // 1. Resolução do parâmetro de idioma
+  // 1. Resolução do parâmetro de idioma (Obrigatório no Next.js 15)
   const resolvedParams = await params;
   const lang = resolvedParams.lang;
   
-  // 2. Validação rigorosa do idioma
-  const currentLang = (['pt', 'en', 'es'].includes(lang) ? lang : 'pt') as keyof typeof translations;
+  // 2. Validação do idioma com fallback seguro
+  const validLangs = ['pt', 'en', 'es'] as const;
+  const currentLang = (validLangs.includes(lang as any) ? lang : 'pt') as keyof typeof translations;
 
   // 3. Verificação de existência da tradução
   const t = translations[currentLang];
   if (!t) {
-    notFound();
+    return notFound();
   }
 
-  // 4. Busca de dados (Tratada internamente no github.ts para nunca retornar erro 500)
+  // 4. Busca de dados do GitHub (Tratada para ser resiliente)
   const allProjects = await getGitHubProjects();
 
-  // 5. Mapeamento de UI Localizada
+  // 5. Mapeamento de UI Localizada para seções fixas
   const ui = {
     badge: currentLang === 'pt' ? '15+ Anos em Sistemas de Missão Crítica' : currentLang === 'es' ? '15+ Años en Sistemas Críticos' : '15+ Years in Mission-Critical Systems',
     awardWinner: currentLang === 'pt' ? 'Vencedor 35ª Competição' : currentLang === 'es' ? 'Ganador 35ª Competición' : 'Winner 35th Competition',
     bestArticle: currentLang === 'pt' ? 'Melhor Artigo do Mês' : currentLang === 'es' ? 'Mejor Artículo del Mes' : 'Best Article of the Month',
     excellenceTitle: currentLang === 'pt' ? 'Excelência Técnica Reconhecida' : currentLang === 'es' ? 'Excelencia Técnica Reconocida' : 'Recognized Technical Excellence',
-    excellenceDesc: t.excellenceDescription,
     readArticle: currentLang === 'pt' ? 'Ler Artigo Premiado' : currentLang === 'es' ? 'Leer Artículo Premiado' : 'Read Awarded Article'
   };
 
@@ -57,7 +56,8 @@ export default async function Page({ params }: PageProps) {
           </span>
         </h1>
 
-        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl leading-relaxed mb-10 mx-auto lg:mx-0 whitespace-pre-line">
+        {/* whitespace-pre-line é vital aqui para manter a formatação da sua apresentação */}
+        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-4xl leading-relaxed mb-10 mx-auto lg:mx-0 whitespace-pre-line font-medium">
           {t.aboutText}
         </p>
 
@@ -66,10 +66,10 @@ export default async function Page({ params }: PageProps) {
             {t.cvButton}
           </a>
           <div className="flex gap-3">
-            <a href="https://www.linkedin.com/in/santossergioluiz" target="_blank" rel="noopener noreferrer" className="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-all shadow-sm">
+            <a href="https://www.linkedin.com/in/santossergioluiz" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-all shadow-sm">
               <Linkedin size={24} />
             </a>
-            <a href="mailto:santossergiorealbjj@outlook.com" className="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-all shadow-sm">
+            <a href="mailto:santossergiorealbjj@outlook.com" aria-label="Email" className="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-all shadow-sm">
               <Mail size={24} />
             </a>
           </div>
@@ -83,7 +83,12 @@ export default async function Page({ params }: PageProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full xl:w-1/2">
               <div className="flex flex-col items-center gap-5">
                 <div className="relative aspect-[3/4] w-full max-w-[260px] transform hover:scale-105 transition-transform duration-500">
-                  <Image src="/images/trofeu-35-edicao.png" alt={ui.awardWinner} fill priority className="rounded-3xl shadow-2xl object-cover border border-white/10" />
+                  <Image 
+                    src="/images/trofeu-35-edicao.png" 
+                    alt={ui.awardWinner} 
+                    fill 
+                    className="rounded-3xl shadow-2xl object-cover border border-white/10" 
+                  />
                 </div>
                 <p className="text-yellow-500 font-black text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2">
                   <Award size={14}/> {ui.awardWinner}
@@ -91,7 +96,12 @@ export default async function Page({ params }: PageProps) {
               </div>
               <div className="flex flex-col items-center gap-5">
                 <div className="relative aspect-[3/4] w-full max-w-[260px] transform hover:scale-105 transition-transform duration-500">
-                  <Image src="/images/trofeu-melhor-artigo-setembro.png" alt={ui.bestArticle} fill priority className="rounded-3xl shadow-2xl object-cover border border-white/10" />
+                  <Image 
+                    src="/images/trofeu-melhor-artigo-setembro.png" 
+                    alt={ui.bestArticle} 
+                    fill 
+                    className="rounded-3xl shadow-2xl object-cover border border-white/10" 
+                  />
                 </div>
                 <p className="text-blue-400 font-black text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2">
                   <Medal size={14}/> {ui.bestArticle}
@@ -101,7 +111,7 @@ export default async function Page({ params }: PageProps) {
 
             <div className="w-full xl:w-1/2 text-center xl:text-left">
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-[1.1] tracking-tighter">{ui.excellenceTitle}</h2>
-              <p className="text-slate-300 text-lg md:text-xl mb-10 leading-relaxed font-medium">{ui.excellenceDesc}</p>
+              <p className="text-slate-300 text-lg md:text-xl mb-10 leading-relaxed font-medium">{t.excellenceDescription}</p>
               <a href={t.featuredArticle.links[currentLang]} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-8 py-4 bg-white text-slate-900 font-bold rounded-2xl hover:bg-blue-50 transition-all active:scale-95">
                 <ExternalLink size={20} /> {ui.readArticle}
               </a>
