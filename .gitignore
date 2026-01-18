@@ -1,0 +1,45 @@
+# Dependências
+/node_modules
+/.pnp
+.pnp.js
+
+# Build e Saída do Next.js
+/.next/
+/out/
+/build
+
+# Configurações de Ambiente (SEGURANÇA CRÍTICA)
+# Nunca remova as linhas abaixo para evitar vazamento de Tokens
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Debug do VS Code
+.vscode/*
+!.vscode/extensions.json
+.history
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
+
+# Cache de Ferramentas e Testes
+.cache/
+/coverage
+.nyc_output
+
+# Arquivos de Telemetria do Next.js
+.next/cache
+
+# Documentação de Ambiente (Ignorar apenas se você usar ferramentas de segredos externas)
+# Mas mantemos o .env.example visível no Git
+!.env.example
