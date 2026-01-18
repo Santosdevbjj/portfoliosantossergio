@@ -1,51 +1,53 @@
+// src/constants/translations/es.ts
+
 export const es = {
-  // UX Microcopy: Headline Directa (Regla Luiz Café)
-  role: "Analista de Ciencia de Datos | Especialista en Eficiencia Operativa",
-  headline: "Transformando datos en inteligencia estratégica con el rigor de más de 15 años en sistemas de misión crítica.",
+  // UX Microcopy: Headline Directa (Regla Luiz Café - Enfoque en Seniority)
+  role: "Especialista en Datos | Ingeniería de Sistemas y Eficiencia Operativa",
+  headline: "Transformando datos complejos en decisiones estratégicas con el rigor de más de 15 años en sistemas bancarios de misión crítica.",
   
-  // Sección Sobre (Con soporte para Foto)
+  // Sección Sobre (Narrativa Profesional)
   about: {
     title: "Sobre Mí",
     photoAlt: "Foto profesional de Sérgio Santos",
-    description: `Soy un profesional sénior con más de 15 años de trayectoria en el sector bancario (Bradesco), donde trabajé en entornos de alta criticidad y regulación rigurosa.
+    description: `Soy un especialista sénior con más de 15 años de trayectoria consolidada en el sector bancario (Bradesco), operando en entornos donde la seguridad, la alta disponibilidad y la regulación estricta son innegociables.
 
-Hoy, mi misión es unir esa mentalidad de gobernanza y continuidad del negocio con el poder de la Ciencia de Datos e Inteligencia Artificial. No solo escribo código; desarrollo soluciones que resuelven problemas reales de negocio, reducen costos y automatizan procesos complejos.
+Mi misión actual es fusionar esta sólida cultura de gobernanza y continuidad del negocio con el potencial transformador de la Ciencia de Datos e IA. Más allá de escribir código, entrego soluciones que resuelven cuellos de botella financieros y operativos, uniendo la visión de negocio con una arquitectura robusta.
 
-Mi transición hacia Datos y Cloud fue una decisión estratégica para aplicar rigor técnico en arquitecturas modernas como Azure Databricks, SQL y Neo4J.`,
+Me especializo en el ecosistema Azure Databricks, SQL y Neo4j para aplicar inteligencia de datos en escenarios de alta complejidad y cumplimiento normativo.`,
   },
 
   // Framework Meigarom: Problema -> Estrategia -> Impacto
-  aboutText: `👨‍💻 TRAYECTORIA PROFESIONAL
-Operé en entornos regulados donde la seguridad y la disponibilidad del 99,5% eran el estándar. Esta base me permite entregar proyectos de datos con una capa de confiabilidad que pocos profesionales poseen.
+  aboutText: `👨‍💻 TRAYECTORIA Y CONFIABILIDAD
+Desarrollé mi carrera gestionando infraestructuras donde la tolerancia a fallos era cero. Este bagaje me permite entregar pipelines de datos y modelos analíticos con un nivel de seguridad y documentación diferenciado en el mercado.
 
-EXPERIENCIA TÉCNICA Y DE NEGOCIO
-• Automatización de Procesos: Eliminación de 2.920 horas/año de trabajo manual mediante sistemas inteligentes.
-• Gobernanza: Implementación de sistemas jurídicos en total conformidad con las leyes de protección de datos (LGPD).
-• Infraestructura: Gestión de redes corporativas para más de 500 usuarios.
+📈 IMPACTO MEDIBLE EN EL NEGOCIO
+• Eficiencia Operativa: Automatización de procesos que resultó en un ahorro directo de 2.920 horas/año de trabajo manual.
+• Gobernanza y Cumplimiento: Liderazgo en la implementación de sistemas jurídicos complejos en total conformidad con las leyes de protección de datos (LGPD/GDPR).
+• Gestión a Escala: Administración de redes y sistemas para más de 500 usuarios simultáneos en entornos corporativos de alto rendimiento.
 
-TRANSICIÓN Y RECALIFICACIÓN (RESKILLING)
-Desde 2008, actúo como consultor independiente, invirtiendo continuamente en tecnologías como Python, Azure Databricks y Bases de Datos de Grafos (Neo4J). Mi formación reciente se centra en la detección de fraudes y el cumplimiento corporativo (compliance) a través del análisis de datos.
+🎯 ENFOQUE TECNOLÓGICO ACTUAL
+Actúo como consultor estratégico desde 2008, con enfoque en la modernización de stacks para Python, Azure Databricks y Bases de Datos de Grafos (Neo4j). Mi especialidad es la detección de anomalías y la optimización de flujos de decisión mediante análisis predictivo.
 
-OBJETIVO
-Busco proyectos desafiantes en gobernanza de datos y modernización de infraestructura en entornos regulados, donde el impacto medible y la seguridad sean prioridades.`,
+🚀 OBJETIVO
+Busco alianzas en proyectos de modernización de datos, gobernanza corporativa e implementación de IA en entornos regulados, donde la precisión técnica y el impacto financiero sean los pilares del éxito.`,
 
   cvButton: "Descargar CV (ES)",
   cvLink: "/cv-sergio-santos-es.pdf",
-  repoTitle: "Proyectos y Soluciones",
+  repoTitle: "Soluciones de Ingeniería y Datos",
   
-  // Categorías Ordenadas (Regla de 1 a 17)
+  // Categorías Ordenadas (Regla de prioridad 1 a 17)
   categories: {
     "data-science": "1. Ciencia de Datos",
     "databricks": "2. Azure Databricks",
-    "neo4j": "3. Neo4J y Grafos",
-    "power-bi": "4. Power BI y Análisis",
-    "excel": "5. Excel Avanzado",
-    "database": "6. Bases de Datos",
+    "neo4j": "3. Neo4j y Grafos",
+    "power-bi": "4. Power BI y Dashboards",
+    "excel": "5. Excel Avanzado / VBA",
+    "database": "6. Ingeniería de Datos",
     "python": "7. Python y Automatización",
-    "java": "9. Java",
+    "java": "9. Desarrollo Java",
     "machine-learning": "10. Machine Learning",
-    "cybersecurity": "13. Ciberseguridad",
-    "articles": "17. Artículos Técnicos"
+    "cybersecurity": "13. Ciberseguridad y LGPD",
+    "articles": "17. Artículos y Publicaciones"
   },
 
   featuredArticle: {
@@ -54,16 +56,16 @@ Busco proyectos desafiantes en gobernanza de datos y modernización de infraestr
     links: {
       pt: "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
       en: "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
-      es: "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad"
+      es: "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-en-semanas-5474e7dddfad"
     }
   },
 
   // Etiquetas para los Cards de Proyectos (Framework CDS - Meigarom)
   projectLabels: {
     problem: "Problema de Negocio",
-    solution: "Estrategia de la Solución",
+    solution: "Estrategia Técnica",
     impact: "Impacto y Resultados",
-    viewProject: "Ver Proyecto en GitHub"
+    viewProject: "Ver Detalles en GitHub"
   },
 
   impactStats: [
