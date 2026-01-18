@@ -2,57 +2,88 @@
 
 import React from 'react'
 import { translations } from '@/constants/translations'
-import { Linkedin, Github, Mail, ExternalLink } from 'lucide-react'
+import { Linkedin, Github, Mail, Cpu, Globe } from 'lucide-react'
 
 export const Footer = ({ lang }: { lang: 'pt' | 'en' | 'es' }) => {
   const t = translations[lang]
   const currentYear = new Date().getFullYear()
 
+  // Seus dados atualizados
+  const email = "santossergiorealbjj@outlook.com"
+  const linkedinUrl = "https://www.linkedin.com/in/santossergioluiz"
+  const githubUrl = "https://github.com/Santosdevbjj"
+
+  const footerContent = {
+    pt: { social: "Social", contact: "Contato", location: "Brasil" },
+    en: { social: "Social", contact: "Contact", location: "Brazil" },
+    es: { social: "Social", contact: "Contacto", location: "Brasil" }
+  }[lang]
+
   return (
-    <footer className="bg-slate-50 dark:bg-slate-950 pt-20 pb-10 border-t border-slate-200 dark:border-slate-800/50">
+    <footer className="bg-slate-50 dark:bg-[#020617] pt-20 pb-10 border-t border-slate-200 dark:border-slate-800/50 transition-colors duration-500">
       <div className="main-container">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          {/* Bio Curta */}
+          
+          {/* Identidade de Marca */}
           <div className="lg:col-span-2">
             <span className="font-black text-2xl tracking-tighter text-slate-900 dark:text-white mb-6 block">
               SÉRGIO<span className="text-blue-600">SANTOS</span>
             </span>
-            <p className="text-slate-600 dark:text-slate-400 max-w-md leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 max-w-sm leading-relaxed font-medium">
               {t.headline}
             </p>
-          </div>
-
-          {/* Links Rápidos */}
-          <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-xs">
-              Social
-            </h4>
-            <div className="flex flex-col gap-4">
-              <a href="https://linkedin.com/in/santos-sergio" target="_blank" className="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors">
-                <Linkedin size={18} /> LinkedIn
-              </a>
-              <a href="https://github.com/Santosdevbjj" target="_blank" className="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors">
-                <Github size={18} /> GitHub
-              </a>
+            <div className="mt-6 flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
+              <Globe size={14} className="text-blue-500" />
+              {footerContent.location}
             </div>
           </div>
 
-          {/* Contato */}
+          {/* Redes Profissionais */}
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-widest text-xs">
-              Contato
+            <h4 className="font-black text-slate-900 dark:text-white mb-6 uppercase tracking-[0.2em] text-[10px]">
+              {footerContent.social}
             </h4>
-            <a href="mailto:sergiosantosluiz@gmail.com" className="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors break-all">
-              <Mail size={18} /> sergiosantosluiz@gmail.com
+            <ul className="flex flex-col gap-4">
+              <li>
+                <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-bold text-sm">
+                  <Linkedin size={18} className="group-hover:scale-110 transition-transform" /> 
+                  <span>LinkedIn</span>
+                </a>
+              </li>
+              <li>
+                <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-bold text-sm">
+                  <Github size={18} className="group-hover:scale-110 transition-transform" /> 
+                  <span>GitHub</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Informações de Contato */}
+          <div>
+            <h4 className="font-black text-slate-900 dark:text-white mb-6 uppercase tracking-[0.2em] text-[10px]">
+              {footerContent.contact}
+            </h4>
+            <a 
+              href={`mailto:${email}`} 
+              className="group flex items-center gap-3 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-bold text-sm break-all"
+            >
+              <Mail size={18} className="group-hover:animate-pulse" /> 
+              {email}
             </a>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500 font-medium">
-          <p>© {currentYear} • Sérgio Santos • {t.role.split('|')[0]}</p>
-          <div className="flex gap-6">
-            <span className="flex items-center gap-1">
-              Built with <span className="text-blue-600 font-bold">Next.js 15</span>
+        {/* Linha Final de Copyright e Stack */}
+        <div className="pt-8 border-t border-slate-200 dark:border-slate-800/80 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-slate-500 font-bold uppercase tracking-widest">
+          <p className="text-center md:text-left">
+            © {currentYear} • Sérgio Santos • <span className="text-blue-600 dark:text-blue-400">{t.role.split('|')[0]}</span>
+          </p>
+          
+          <div className="flex items-center gap-4 bg-white dark:bg-slate-900 px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm">
+            <span className="flex items-center gap-2">
+              <Cpu size={14} className="text-blue-600" />
+              <span>Built with <span className="text-slate-900 dark:text-white">Next.js 15</span></span>
             </span>
           </div>
         </div>
