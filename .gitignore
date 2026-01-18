@@ -1,15 +1,17 @@
-# Dependências
-/node_modules
-/.pnp
+# --- DEPENDÊNCIAS ---
+node_modules/
+.pnp
 .pnp.js
 
-# Build e Saída do Next.js
-/.next/
-/out/
-/build
+# --- BUILD E SAÍDA (NEXT.JS 15) ---
+.next/
+out/
+build/
+dist/
+.vercel/
 
-# Configurações de Ambiente (SEGURANÇA CRÍTICA)
-# Nunca remova as linhas abaixo para evitar vazamento de Tokens
+# --- CONFIGURAÇÕES DE AMBIENTE (SEGURANÇA CRÍTICA) ---
+# Bloqueia qualquer arquivo que contenha segredos reais
 .env
 .env.local
 .env.development.local
@@ -17,29 +19,50 @@
 .env.production.local
 .env*.local
 
-# Logs
+# Permite que o exemplo de configuração seja compartilhado
+!.env.example
+
+# --- LOGS E PERFORMANCE ---
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+lerna-debug.log*
 
-# Debug do VS Code
+# --- SISTEMA OPERACIONAL ---
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+desktop.ini
+
+# --- IDE E FERRAMENTAS ---
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
+.idea/
 .history
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
 
-# Sistema Operacional
-.DS_Store
-Thumbs.db
-
-# Cache de Ferramentas e Testes
+# --- CACHE E TESTES ---
 .cache/
 /coverage
 .nyc_output
+.eslintcache
+.stylelintcache
+.turbo/
 
-# Arquivos de Telemetria do Next.js
-.next/cache
+# --- ESPECÍFICO NEXT.JS / TURBOPACK ---
+.next/cache/
+.next/trace
 
-# Documentação de Ambiente (Ignorar apenas se você usar ferramentas de segredos externas)
-# Mas mantemos o .env.example visível no Git
-!.env.example
+# --- TYPESCRIPT ---
+*.tsbuildinfo
+next-env.d.ts
+
+# --- OUTROS ---
+.DS_Store
+*.log
