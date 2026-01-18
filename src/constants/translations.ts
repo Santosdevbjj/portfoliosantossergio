@@ -45,14 +45,31 @@ Atuei por mais de 15 anos no Banco Bradesco em ambientes regulados de missão cr
 
 Atualmente direciono minha atuação para Ciência de Dados e Inteligência Artificial, aplicando o rigor de sistemas críticos à criação de modelos preditivos, análises avançadas e automação de processos.
 
+Utilizo Python, SQL, Azure Databricks e Neo4J para desenvolver pipelines governados, construir modelos e gerar insights acionáveis com impacto no negócio — conectando dados técnicos à tomada de decisão corporativa.
+
+Meu foco é transformar dados em inteligência estratégica, garantindo soluções escaláveis, seguras e alinhadas aos desafios de negócios modernos.
+
 Experiência Técnica
 Sistemas críticos desenvolvidos:
 • Sistema automatizado de IPVA que eliminou 2.920 horas anuais de processamento manual
 • Infraestrutura de rede corporativa para 500+ usuários com 99,5% de disponibilidade
-• Sistemas jurídicos interdepartamentais com conformidade LGPD
+• Sistemas jurídicos interdepartamentais com rastreabilidade completa e conformidade LGPD
+
+Stack consolidado: Visual Basic, C, SQL Server, Windows Server, Emulação Mainframe IBM, Active Directory
+Stack em atualização: Java, C#/.NET, Python, Azure Databricks, Azure AI, Power BI, Machine Learning, Docker, Neo4J (bancos de dados de grafos)
+
+Transição e Reskilling
+Desde 2008 atuo como consultor independente enquanto invisto em atualização contínua através de bootcamps e certificações especializadas. Recentemente concluí formação em Ciência de Dados com Python e Neo4J para análise de dados com grafos — habilidade aplicável a cenários de detecção de fraudes, análise de relacionamentos e compliance em ambientes corporativos.
+
+Formações concluídas: Santander Coders, Microsoft AI Agents, IBM AI Fundamentals, Azure Databricks, Azure Cloud, Java, C#/.NET, Cibersegurança, Power BI, Ciência de Dados.
+
+Os projetos deste portfólio refletem essa transição de sistemas legados para tecnologias modernas, com foco em análise de dados e governança.
 
 Diferencial
-Combino profundo conhecimento de ambientes regulados com capacidade técnica para modernizar infraestrutura legada e aplicar análise avançada de dados.`,
+Combino profundo conhecimento de ambientes regulados (compliance bancário, segurança de dados, auditoria) com capacidade técnica para modernizar infraestrutura legada e aplicar análise avançada de dados. Experiência prática em avaliar não apenas viabilidade técnica, mas também riscos, conformidade e impacto organizacional de cada solução.
+
+Objetivo
+Busco oportunidades em projetos que envolvam governança de dados, modernização de infraestrutura ou sistemas corporativos regulados — preferencialmente em formato remoto ou híbrido — onde minha experiência bancária e stack técnico diversificado possam gerar impacto mensurável.`,
     cvButton: "Baixar Currículo (PT)",
     cvLink: "/cv-sergio-santos-pt.pdf",
     repoTitle: "Soluções de Dados & Engenharia",
@@ -103,7 +120,7 @@ Critical systems developed:
 • Interdepartmental legal systems with LGPD compliance
 
 Differential
-I combine deep knowledge of regulated environments with technical capacity to modernize legacy infrastructure and apply advanced data analysis.`,
+I combine deep knowledge of regulated environments with technical capacity to modernize legacy infrastructure and apply advanced data analysis. Experience in evaluating technical feasibility, risks, and organizational impact.`,
     cvButton: "Download Resume (EN)",
     cvLink: "/cv-sergio-santos-en.pdf",
     repoTitle: "Data Solutions & Engineering",
@@ -157,7 +174,7 @@ Diferencial
 Combino un profundo conocimiento de entornos regulados con la capacidad técnica para modernizar la infraestructura heredada y aplicar análisis de datos avanzados.`,
     cvButton: "Descargar Currículum (ES)",
     cvLink: "/cv-sergio-santos-es.pdf",
-    repoTitle: "Soluciones de Datos e Ingeniería",
+    repoTitle: "Soluções de Dados e Engenharia",
     excellenceDescription: "Premiado por DIO (Digital Innovation One) por análisis técnicos de alto impacto sobre Low-Code en salud y eficiencia operativa.",
     categories: {
       "data-science": "Ciencia de Datos",
