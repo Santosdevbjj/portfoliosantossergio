@@ -1,18 +1,35 @@
 'use client';
 
 import * as React from 'react';
-import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from 'next-themes';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import { type ThemeProviderProps } from 'next-themes';
 
 /**
- * ThemeProvider - Wrapper para o next-themes compatível com Next.js 15.
- * Este componente deve envolver o conteúdo no RootLayout para permitir
- * a troca dinâmica entre temas Light, Dark e System.
- * * O uso de 'suppressHydrationWarning' no arquivo layout.tsx é essencial
- * em conjunto com este provider.
+ * ThemeProvider
+ * * Este componente atua como a espinha dorsal do design system (Tailwind CSS).
+ * Ele permite que o atributo 'class="dark"' seja injetado dinamicamente no <html>.
+ * * Responsividade: Indireta (Permite que o design responsivo mude cores conforme o tema).
+ * Multilingue: Indireta (Garante que a UI traduzida seja legível em qualquer contraste).
  */
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  const [mounted, setMounted] = React.useState(false);
+
+  // Garante que o provider só atue após a montagem no cliente,
+  // prevenindo discrepâncias entre o HTML do servidor e do navegador.
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // Renderiza o conteúdo sem o provider durante o primeiro frame para evitar 'flicker'
+    return <>{children}</>;
+  }
+
   return (
     <NextThemesProvider 
+      attribute="class" 
+      defaultTheme="system" 
+      enableSystem
       {...props}
     >
       {children}
