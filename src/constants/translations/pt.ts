@@ -1,51 +1,53 @@
+// src/constants/translations/pt.ts
+
 export const pt = {
-  // UX Microcopy: Headline Direta (Regra Luiz Café)
-  role: "Analista de Ciência de Dados | Especialista em Eficiência Operacional",
-  headline: "Transformando dados em inteligência estratégica com o rigor de 15+ anos em sistemas de missão crítica.",
+  // UX Microcopy: Headline Direta (Regra Luiz Café - Foco em Senioridade)
+  role: "Especialista em Dados | Engenharia de Sistemas & Eficiência Operacional",
+  headline: "Convertendo dados complexos em decisões estratégicas com o rigor de 15+ anos em sistemas bancários de missão crítica.",
   
-  // Seção Sobre (Com suporte para Foto)
+  // Seção Sobre (Narrativa Sênior)
   about: {
     title: "Sobre Mim",
     photoAlt: "Foto profissional de Sérgio Santos",
-    description: `Sou um profissional sênior com mais de 15 anos de trajetória no setor bancário (Bradesco), onde atuei em ambientes de alta criticidade e regulação rigorosa. 
+    description: `Sou um especialista sênior com mais de 15 anos de trajetória consolidada no setor bancário (Bradesco), atuando em ambientes onde segurança, disponibilidade e regulação são inegociáveis. 
 
-Hoje, minha missão é unir essa mentalidade de governança e continuidade de negócio ao poder da Ciência de Dados e IA. Não apenas escrevo código; desenvolvo soluções que resolvem problemas reais de negócio, reduzem custos e automatizam processos complexos.
+Minha missão atual é fundir essa sólida cultura de governança e continuidade de negócio com o potencial transformador da Ciência de Dados e IA. Diferente de um perfil puramente técnico, entrego soluções que resolvem gargalos financeiros e operacionais, unindo visão de negócio e arquitetura robusta.
 
-Minha transição para Dados e Cloud foi uma decisão estratégica para aplicar rigor técnico em arquiteturas modernas como Azure Databricks, SQL e Neo4J.`,
+Especializei-me no ecossistema Azure Databricks, SQL e Neo4J para aplicar inteligência de dados em cenários de alta complexidade e conformidade.`,
   },
 
-  // Framework Meigarom: Problema -> Solução -> Impacto
-  aboutText: `👨‍💻 TRAJETÓRIA PROFISSIONAL
-Atuei em ambientes regulados onde segurança e disponibilidade de 99,5% eram o padrão. Essa base me permite entregar projetos de dados com uma camada de confiabilidade que poucos profissionais possuem.
+  // Framework Meigarom: Problema -> Solução -> Impacto (Foco em Resultados)
+  aboutText: `👨‍💻 TRAJETÓRIA E CONFIABILIDADE
+Desenvolvi minha carreira gerenciando infraestruturas onde a tolerância a falhas era zero. Essa bagagem me permite entregar pipelines de dados e modelos analíticos com um nível de segurança e documentação diferenciado para o mercado.
 
-EXPERIÊNCIA TÉCNICA E NEGÓCIO
-• Automação de Processos: Eliminação de 2.920 horas/ano de trabalho manual via sistemas inteligentes.
-• Governança: Implementação de sistemas jurídicos em total conformidade com a LGPD.
-• Infraestrutura: Gestão de redes corporativas para 500+ usuários.
+📈 IMPACTO MENSURÁVEL EM NEGÓCIO
+• Eficiência Operativa: Automação de processos que resultou na economia direta de 2.920 horas/ano de trabalho manual.
+• Governança & Compliance: Liderança na implementação de sistemas jurídicos complexos em conformidade total com a LGPD.
+• Gestão de Escala: Administração de redes e sistemas para mais de 500 usuários simultâneos em ambiente corporativo.
 
-TRANSIÇÃO E RESKILLING
-Desde 2008, atuo como consultor independente, investindo continuamente em tecnologias como Python, Azure Databricks e Bancos de Dados de Grafos (Neo4J). Minha formação recente foca em detecção de fraudes e compliance corporativo através de análise de dados.
+🎯 FOCO TECNOLÓGICO ATUAL
+Atuo como consultor estratégico desde 2008, com foco em modernização de stack para Python, Azure Databricks e Bancos de Dados de Grafos (Neo4J). Minha especialidade é a detecção de anomalias e a otimização de fluxos de decisão através de análise preditiva.
 
-OBJETIVO
-Busco projetos desafiadores em governança de dados e modernização de infraestrutura em ambientes regulados, onde impacto mensurável e segurança sejam prioridades.`,
+🚀 OBJETIVO
+Busco parcerias em projetos de modernização de dados, governança corporativa e implementação de IA em ambientes regulados, onde a precisão técnica e o impacto financeiro sejam os pilares do sucesso.`,
 
   cvButton: "Baixar Currículo (PT)",
-  cvLink: "/cv-sergio-santos-pt.pdf",
-  repoTitle: "Projetos & Soluções",
+  cvLink: "/cv-sergio-santos-pt.pdf", // Verifique se o nome do arquivo na pasta public é exatamente este
+  repoTitle: "Soluções de Engenharia & Dados",
   
-  // Categorias Ordenadas (1 a 17 conforme sua regra)
+  // Categorias Ordenadas (Conforme sua regra de prioridade 1 a 17)
   categories: {
     "data-science": "1. Ciência de Dados",
     "databricks": "2. Azure Databricks",
     "neo4j": "3. Neo4J & Grafos",
-    "power-bi": "4. Power BI & Análise",
-    "excel": "5. Excel Avançado",
-    "database": "6. Banco de Dados",
+    "power-bi": "4. Power BI & Dashboard",
+    "excel": "5. Excel Avançado / VBA",
+    "database": "6. Engenharia de Dados",
     "python": "7. Python & Automação",
-    "java": "9. Java",
+    "java": "9. Desenvolvimento Java",
     "machine-learning": "10. Machine Learning",
-    "cybersecurity": "13. Cibersegurança",
-    "articles": "17. Artigos Técnicos"
+    "cybersecurity": "13. Cibersegurança & LGPD",
+    "articles": "17. Artigos e Publicações"
   },
 
   featuredArticle: {
@@ -58,11 +60,11 @@ Busco projetos desafiadores em governança de dados e modernização de infraest
     }
   },
   
-  // Metadados para SEO e Projetos (Framework Meigarom)
+  // Metadados para o ProjectCard (Framework Meigarom)
   projectLabels: {
     problem: "Problema de Negócio",
-    solution: "Estratégia da Solução",
+    solution: "Estratégia Técnica",
     impact: "Impacto & Resultados",
-    viewProject: "Ver Projeto no GitHub"
+    viewProject: "Ver Detalhes no GitHub"
   }
 };
