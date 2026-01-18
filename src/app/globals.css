@@ -2,68 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Configurações globais de cores e comportamento */
+/* Importação das animações customizadas */
+@import '../styles/animations.css';
+
 @layer base {
   :root {
-    --brand-blue: #1e40af;
-    color-scheme: light dark; /* Informa ao navegador que o site suporta ambos os temas */
+    --brand-blue: #2563eb;
+    --brand-blue-hover: #1d4ed8;
+    color-scheme: light dark;
   }
 
   html {
-    /* Rolagem suave para navegação entre seções */
     scroll-behavior: smooth;
-    /* Evita saltos de layout ao abrir modais */
+    /* Impede scrolls laterais indesejados em animações mobile */
     overflow-x: hidden;
+    /* Garante que o fundo do navegador (além do body) combine com o tema */
+    @apply bg-[#f8fafc] dark:bg-[#0f172a];
   }
 
   body {
     @apply bg-[#f8fafc] text-slate-900 antialiased;
-    /* Suporte ao modo escuro via classe ou preferência do sistema */
     @apply dark:bg-[#0f172a] dark:text-slate-200;
     
-    /* Melhora a legibilidade em diferentes idiomas */
+    /* Suporte a hifens para idiomas latinos (PT/ES) evitando quebra de containers */
+    hyphens: auto;
+    word-wrap: break-word;
+    
+    /* Renderização de fonte de alta qualidade */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
-    /* Ajuda na responsividade de textos longos em PT/ES */
-    hyphens: auto;
   }
 }
 
-/* Utilitários customizados */
 @layer components {
+  /* Efeito de vidro para Header e LanguageSwitcher */
   .glass-effect {
-    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/20 dark:border-slate-700/30;
+    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50;
+  }
+
+  /* Container padrão para manter a responsividade em ultra-wide monitors */
+  .main-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full;
   }
 }
 
-/* Customização da barra de rolagem para um visual Sênior */
+/* Barra de rolagem minimalista e moderna */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  @apply bg-[#f8fafc] dark:bg-[#0f172a];
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full;
-  border: 2px solid transparent;
-  background-clip: content-box;
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full border-2 border-solid;
+  /* Cria uma margem ao redor do thumb usando a cor do track */
+  border-color: #f8fafc; 
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  border-color: #0f172a;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-blue-600;
 }
 
-/* Ajuste para garantir que imagens e vídeos sejam sempre responsivos */
-img, video {
+/* Garante que elementos de mídia não estourem o grid responsivo */
+img, svg, video, canvas {
   max-width: 100%;
   height: auto;
+  display: block;
 }
 
-/* Foco acessível para navegação via teclado */
+/* Melhora a visibilidade do foco para usuários de teclado (Acessibilidade) */
 :focus-visible {
-  @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-900;
+  @apply outline-none ring-2 ring-blue-600 ring-offset-2 dark:ring-offset-slate-900;
+}
+
+/* Remove o destaque azul padrão do Safari Mobile */
+input, button, a {
+  -webkit-tap-highlight-color: transparent;
 }
