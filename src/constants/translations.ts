@@ -11,7 +11,7 @@ export interface TranslationContent {
   cvButton: string;
   cvLink: string;
   repoTitle: string;
-  excellenceDescription: string; // Adicionado para sincronia com page.tsx
+  excellenceDescription: string;
   categories: Record<string, string>;
   impactStats: ImpactStat[];
   featuredArticle: {
@@ -40,17 +40,17 @@ export const translations: ITranslations = {
     repoTitle: "Soluções de Dados & Engenharia",
     excellenceDescription: "Premiado pela DIO (Digital Innovation One) por análises técnicas de alto impacto sobre Low-Code na saúde e eficiência operacional.",
     categories: {
-      "Ciência de Dados": "Ciência de Dados",
-      "Azure Databricks": "Azure Databricks",
-      "Neo4J": "Banco de Grafo (Neo4J)",
-      "Banco de Dados": "Engenharia de Dados",
-      "Python": "Python & Automação",
-      "Java": "Desenvolvimento Java",
-      "Machine Learning": "Inteligência Artificial",
-      "Cibersegurança": "Cibersegurança",
-      "Lógica de Programação": "Lógica & Algoritmos",
-      "HTML": "Front-end",
-      "Artigos Técnicos": "Publicações Técnicas"
+      "data-science": "Ciência de Dados",
+      "databricks": "Azure Databricks",
+      "neo4j": "Banco de Grafo (Neo4J)",
+      "database": "Engenharia de Dados",
+      "python": "Python & Automação",
+      "java": "Desenvolvimento Java",
+      "machine-learning": "Inteligência Artificial",
+      "cybersecurity": "Cibersegurança",
+      "programming-logic": "Lógica & Algoritmos",
+      "html": "Front-end",
+      "articles": "Publicações Técnicas"
     },
     impactStats: [
       { label: "Horas economizadas/ano", value: "2.920" },
@@ -75,17 +75,17 @@ export const translations: ITranslations = {
     repoTitle: "Data Solutions & Engineering",
     excellenceDescription: "Awarded by DIO (Digital Innovation One) for high-impact technical analysis on Low-Code in healthcare and operational efficiency.",
     categories: {
-      "Ciência de Dados": "Data Science",
-      "Azure Databricks": "Azure Databricks",
-      "Neo4J": "Graph Database (Neo4J)",
-      "Banco de Dados": "Data Engineering",
-      "Python": "Python & Automation",
-      "Java": "Java Development",
-      "Machine Learning": "Artificial Intelligence",
-      "Cibersegurança": "Cybersecurity",
-      "Lógica de Programação": "Logic & Algorithms",
-      "HTML": "Front-end",
-      "Artigos Técnicos": "Technical Publications"
+      "data-science": "Data Science",
+      "databricks": "Azure Databricks",
+      "neo4j": "Graph Database (Neo4J)",
+      "database": "Data Engineering",
+      "python": "Python & Automation",
+      "java": "Java Development",
+      "machine-learning": "Artificial Intelligence",
+      "cybersecurity": "Cybersecurity",
+      "programming-logic": "Logic & Algorithms",
+      "html": "Front-end",
+      "articles": "Technical Publications"
     },
     impactStats: [
       { label: "Hours saved/year", value: "2,920" },
@@ -110,17 +110,17 @@ export const translations: ITranslations = {
     repoTitle: "Soluciones de Datos e Ingeniería",
     excellenceDescription: "Premiado por DIO (Digital Innovation One) por análisis técnicos de alto impacto sobre Low-Code en salud y eficiencia operativa.",
     categories: {
-      "Ciência de Dados": "Ciencia de Datos",
-      "Azure Databricks": "Azure Databricks",
-      "Neo4J": "Base de Datos de Grafos (Neo4J)",
-      "Banco de Dados": "Ingeniería de Datos",
-      "Python": "Python y Automatización",
-      "Java": "Desarrollo Java",
-      "Machine Learning": "Inteligencia Artificial",
-      "Cibersegurança": "Ciberseguridad",
-      "Lógica de Programação": "Lógica y Algoritmos",
-      "HTML": "Front-end",
-      "Artigos Técnicos": "Publicaciones Técnicas"
+      "data-science": "Ciencia de Datos",
+      "databricks": "Azure Databricks",
+      "neo4j": "Base de Datos de Grafos (Neo4J)",
+      "database": "Ingeniería de Datos",
+      "python": "Python y Automatización",
+      "java": "Desarrollo Java",
+      "machine-learning": "Inteligencia Artificial",
+      "cybersecurity": "Ciberseguridad",
+      "programming-logic": "Lógica y Algoritmos",
+      "html": "Front-end",
+      "articles": "Publicaciones Técnicas"
     },
     impactStats: [
       { label: "Horas ahorradas/año", value: "2.920" },
