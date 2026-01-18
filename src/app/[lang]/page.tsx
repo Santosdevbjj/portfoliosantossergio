@@ -4,8 +4,10 @@ import { translations } from '@/constants/translations';
 import { notFound } from 'next/navigation';
 import { Shield, ExternalLink, Mail, Linkedin, Award, Medal } from 'lucide-react';
 import Image from 'next/image';
-import { ProjectSection } from '@/components/ProjectSection'; // Importação do novo componente
+import { ProjectSection } from '@/components/ProjectSection';
 
+// Configuração de Revalidação (Lado do Servidor)
+// Nota: Certifique-se de que nenhum componente importado aqui force o 'use client' globalmente
 export const revalidate = 3600; 
 
 interface PageProps {
@@ -13,16 +15,23 @@ interface PageProps {
 }
 
 export default async function Page({ params }: PageProps) {
-  const { lang } = await params;
+  // 1. Resolução do parâmetro de idioma
+  const resolvedParams = await params;
+  const lang = resolvedParams.lang;
+  
+  // 2. Validação rigorosa do idioma
   const currentLang = (['pt', 'en', 'es'].includes(lang) ? lang : 'pt') as keyof typeof translations;
 
-  if (!translations[currentLang]) {
+  // 3. Verificação de existência da tradução
+  const t = translations[currentLang];
+  if (!t) {
     notFound();
   }
 
-  const t = translations[currentLang];
+  // 4. Busca de dados (Tratada internamente no github.ts para nunca retornar erro 500)
   const allProjects = await getGitHubProjects();
 
+  // 5. Mapeamento de UI Localizada
   const ui = {
     badge: currentLang === 'pt' ? '15+ Anos em Sistemas de Missão Crítica' : currentLang === 'es' ? '15+ Años en Sistemas Críticos' : '15+ Years in Mission-Critical Systems',
     awardWinner: currentLang === 'pt' ? 'Vencedor 35ª Competição' : currentLang === 'es' ? 'Ganador 35ª Competición' : 'Winner 35th Competition',
@@ -101,7 +110,7 @@ export default async function Page({ params }: PageProps) {
         </div>
       </section>
 
-      {/* SEÇÃO DE PROJETOS MODULARIZADA (Aqui entra o ProjectSection) */}
+      {/* SEÇÃO DE PROJETOS MODULARIZADA */}
       <ProjectSection projects={allProjects} lang={currentLang} />
 
       {/* RODAPÉ */}
