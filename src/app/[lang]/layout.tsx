@@ -1,7 +1,7 @@
 // src/app/[lang]/layout.tsx
 import { Inter } from 'next/font/google';
 import '../globals.css';
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeProvider } from '@/components/ThemeProvider'; 
 import { i18n } from '@/i18n-config';
@@ -17,7 +17,18 @@ interface RootLayoutProps {
   params: Promise<{ lang: string }>;
 }
 
-// SEO e Metadados Dinâmicos - Essencial para autoridade internacional
+// Configuração de Viewport para Responsividade e Tema
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+  ],
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5, // Permite zoom para acessibilidade, mas mantém controle
+};
+
+// SEO e Metadados Dinâmicos
 export async function generateMetadata({ 
   params 
 }: { 
@@ -53,6 +64,7 @@ export async function generateMetadata({
         'x-default': `${siteUrl}/pt`,
       },
     },
+    manifest: '/manifest.json',
     openGraph: {
       title: titles[lang] || titles.pt,
       description: descriptions[lang] || descriptions.pt,
@@ -65,13 +77,6 @@ export async function generateMetadata({
     robots: {
       index: true,
       follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
     },
   };
 }
@@ -80,15 +85,15 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
   const { lang } = await params;
 
   return (
-    // suppressHydrationWarning é vital para evitar erros com Temas (Dark/Light)
+    // suppressHydrationWarning é necessário para o next-themes funcionar sem erros no console
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body 
-        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-200 antialiased overflow-x-hidden`}
+        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-200 antialiased overflow-x-hidden min-h-screen flex flex-col`}
       >
         <ThemeProvider
           attribute="class"
@@ -96,11 +101,11 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           enableSystem
           disableTransitionOnChange
         >
-          {/* Interface de troca de idioma sempre acessível */}
+          {/* Switcher flutuante para facilitar a troca de idioma em qualquer seção */}
           <LanguageSwitcher />
 
-          <div className="min-h-screen flex flex-col relative w-full">
-            <main className="flex-grow animate-fade-in">
+          <div className="relative flex-grow w-full flex flex-col">
+            <main className="flex-grow w-full max-w-[100vw]">
               {children}
             </main>
           </div>
