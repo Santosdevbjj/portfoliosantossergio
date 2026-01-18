@@ -1,33 +1,41 @@
+// src/app/[lang]/layout.tsx
 import { Inter } from 'next/font/google';
 import '../globals.css';
 import { Metadata } from 'next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeProvider } from '@/components/ThemeProvider'; 
+import { i18n } from '@/i18n-config';
 
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
+  variable: '--font-inter',
 });
 
-// SEO e Metadados Dinâmicos (Server Side)
+interface RootLayoutProps {
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+}
+
+// SEO e Metadados Dinâmicos - Essencial para autoridade internacional
 export async function generateMetadata({ 
   params 
 }: { 
   params: Promise<{ lang: string }> 
 }): Promise<Metadata> {
   const resolvedParams = await params;
-  const lang = resolvedParams.lang || 'pt';
+  const lang = resolvedParams.lang || i18n.defaultLocale;
   
   const titles: Record<string, string> = {
-    pt: "Sérgio Santos | Analista de Ciência de Dados",
-    en: "Sérgio Santos | Data Science Analyst",
-    es: "Sérgio Santos | Analista de Ciencia de Datos"
+    pt: "Sérgio Santos | Especialista em Dados e Eficiência",
+    en: "Sérgio Santos | Data & Efficiency Specialist",
+    es: "Sérgio Santos | Especialista en Datos y Eficiencia"
   };
 
   const descriptions: Record<string, string> = {
-    pt: "Analista de Dados com 15+ anos em sistemas críticos bancários, especializado em Python, Azure Databricks e IA.",
-    en: "Data Analyst with 15+ years in critical banking systems, specialized in Python, Azure Databricks, and AI.",
-    es: "Analista de Datos con 15+ años en sistemas bancarios críticos, especializado em Python, Azure Databricks e IA."
+    pt: "Analista Sênior com 15+ anos em sistemas críticos. Especialista em Ciência de Dados, Azure Databricks e automação estratégica.",
+    en: "Senior Analyst with 15+ years in critical systems. Specialist in Data Science, Azure Databricks, and strategic automation.",
+    es: "Analista Sénior con 15+ años en sistemas críticos. Especialista en Ciencia de Datos, Azure Databricks y automatización estratégica."
   };
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
@@ -37,62 +45,62 @@ export async function generateMetadata({
     description: descriptions[lang] || descriptions.pt,
     metadataBase: new URL(siteUrl),
     alternates: {
-      canonical: `/${lang}`,
+      canonical: `${siteUrl}/${lang}`,
       languages: {
-        'pt-BR': '/pt',
-        'en-US': '/en',
-        'es-ES': '/es',
+        'pt-BR': `${siteUrl}/pt`,
+        'en-US': `${siteUrl}/en`,
+        'es-ES': `${siteUrl}/es`,
+        'x-default': `${siteUrl}/pt`,
       },
-    },
-    manifest: '/manifest.json',
-    icons: {
-      icon: '/icon.png',
-      apple: '/apple-icon.png',
     },
     openGraph: {
       title: titles[lang] || titles.pt,
       description: descriptions[lang] || descriptions.pt,
       url: `${siteUrl}/${lang}`,
       siteName: "Sérgio Santos Portfolio",
-      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Sérgio Santos Portfolio' }],
       locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
   };
 }
 
-export default async function RootLayout(props: {
-  children: React.ReactNode;
-  params: Promise<{ lang: string }>;
-}) {
-  // No Next.js 15, params deve ser esperado (awaited)
-  const resolvedParams = await props.params;
-  const lang = resolvedParams.lang;
-  const { children } = props;
+export default async function RootLayout({ children, params }: RootLayoutProps) {
+  const { lang } = await params;
 
   return (
-    // suppressHydrationWarning é necessário aqui porque o next-themes modifica o atributo class
+    // suppressHydrationWarning é vital para evitar erros com Temas (Dark/Light)
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="theme-color" content="#0f172a" />
+        <link rel="icon" href="/favicon.ico" />
       </head>
       <body 
-        suppressHydrationWarning
-        className={`${inter.className} bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-200 antialiased overflow-x-hidden`}
+        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-200 antialiased overflow-x-hidden`}
       >
-        {/* O ThemeProvider deve envolver toda a aplicação */}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+          {/* Interface de troca de idioma sempre acessível */}
           <LanguageSwitcher />
 
           <div className="min-h-screen flex flex-col relative w-full">
-            <main className="flex-grow">
+            <main className="flex-grow animate-fade-in">
               {children}
             </main>
           </div>
