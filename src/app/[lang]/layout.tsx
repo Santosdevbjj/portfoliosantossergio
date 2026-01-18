@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google';
 import '../globals.css';
 import { Metadata } from 'next';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'; // Importação essencial
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -23,7 +24,7 @@ export async function generateMetadata(props: {
   const descriptions: Record<string, string> = {
     pt: "Analista de Dados com 15+ anos em sistemas críticos bancários, especializado em Python, Azure Databricks e IA.",
     en: "Data Analyst with 15+ years in critical banking systems, specialized in Python, Azure Databricks, and AI.",
-    es: "Analista de Datos con 15+ años en sistemas bancarios críticos, especializado en Python, Azure Databricks e IA."
+    es: "Analista de Datos con 15+ años en sistemas bancarios críticos, especializado em Python, Azure Databricks e IA."
   };
 
   const siteUrl = "https://portfoliosantossergio.vercel.app";
@@ -47,24 +48,13 @@ export async function generateMetadata(props: {
       ],
       apple: '/icon.png',
     },
-    manifest: '/manifest.json', // Recomendado para PWA/Mobile
-    themeColor: [
-      { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-      { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
-    ],
+    manifest: '/manifest.json',
     openGraph: {
       title: titles[lang],
       description: descriptions[lang],
       url: `${siteUrl}/${lang}`,
       siteName: "Sérgio Santos Portfolio",
-      images: [
-        {
-          url: `/og-image-${lang}.png`,
-          width: 1200,
-          height: 630,
-          alt: titles[lang],
-        }
-      ],
+      images: [{ url: `/og-image-${lang}.png`, width: 1200, height: 630 }],
       locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
     },
@@ -73,17 +63,6 @@ export async function generateMetadata(props: {
       title: titles[lang],
       description: descriptions[lang],
       images: [`/og-image-${lang}.png`],
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
     },
   };
 }
@@ -99,11 +78,22 @@ export default async function RootLayout(props: {
 
   return (
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
+      <head>
+        {/* Apple Status Bar Color */}
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      </head>
       <body 
-        className={`${inter.className} bg-white dark:bg-[#0f172a] text-gray-900 dark:text-slate-200 antialiased`}
+        className={`${inter.className} bg-white dark:bg-[#0f172a] text-gray-900 dark:text-slate-200 antialiased overflow-x-hidden`}
       >
-        <div className="min-h-screen flex flex-col relative">
-          {children}
+        {/* Seletor de Idiomas Global */}
+        <LanguageSwitcher />
+
+        <div className="min-h-screen flex flex-col relative w-full">
+          <main className="flex-grow">
+            {children}
+          </main>
+          
+          {/* Opcional: Footer Global aqui */}
         </div>
       </body>
     </html>
