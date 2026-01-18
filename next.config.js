@@ -2,8 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // Mantido para garantir o deploy imediato, 
-  // mas como engenheiro, recomendo corrigir os tipos futuramente.
+  // Como engenheiro sênior, você sabe que o build deve ser rápido.
+  // Ignorar erros temporariamente acelera o deploy, mas o 'typedRoutes' 
+  // ajudará você a manter a integridade das rotas no futuro.
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -12,13 +13,14 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  // Ativa suporte a rotas tipadas para maior segurança no desenvolvimento
-  experimental: {
-    typedRoutes: true,
+  // Otimizações de Compilação
+  compiler: {
+    // Remove consoles apenas em produção (melhor segurança e limpeza de logs)
+    removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false,
   },
 
   images: {
-    // ESSENCIAL: Permite que o Next.js renderize imagens externas com segurança
+    // ESSENCIAL para portfólios que consomem a API do GitHub
     remotePatterns: [
       {
         protocol: 'https',
@@ -32,21 +34,42 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'raw.githubusercontent.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com', // Opcional: Caso use imagens do Unsplash no Sobre
+      },
     ],
+    // Melhora a performance de carregamento das imagens
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    formats: ['image/avif', 'image/webp'],
   },
 
-  // Remove logs de console em produção para não expor lógica do sistema
-  compiler: {
-    removeConsole: process.env.NODE_ENV === "production",
+  // Configurações experimentais para Next.js 15
+  experimental: {
+    typedRoutes: true,
+    // Otimiza o pacote de ícones para não carregar a biblioteca Lucide inteira no cliente
+    optimizePackageImports: ['lucide-react'],
   },
 
-  // Otimização de redirects para SEO (Caso o usuário acesse a raiz /)
-  async redirects() {
+  // Otimização de Header para Segurança (Prevenção de Clickjacking e XSS)
+  async headers() {
     return [
       {
-        source: '/',
-        destination: '/pt',
-        permanent: true,
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+        ],
       },
     ];
   },
