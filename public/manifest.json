@@ -2,12 +2,14 @@
   "name": "Sérgio Santos | Data Science Portfolio",
   "short_name": "Sérgio Santos",
   "description": "Portfólio de Ciência de Dados e Engenharia de Sistemas Críticos",
-  "start_url": "/pt",
+  "lang": "pt-BR",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#2563eb",
   "orientation": "portrait",
   "scope": "/",
+  "categories": ["business", "productivity", "education"],
   "icons": [
     {
       "src": "/icon.png",
@@ -20,16 +22,34 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     }
   ],
-  "categories": ["education", "business", "productivity"],
   "screenshots": [
     {
-      "src": "/og-image-pt.png",
+      "src": "/og-image.png",
       "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Sérgio Santos Portfolio"
+      "label": "Sérgio Santos Data Portfolio - Desktop View"
+    },
+    {
+      "src": "/og-image-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Sérgio Santos Data Portfolio - Mobile View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ver Projetos",
+      "url": "/pt#projects",
+      "description": "Ir direto para o portfólio de projetos"
     }
   ]
 }
