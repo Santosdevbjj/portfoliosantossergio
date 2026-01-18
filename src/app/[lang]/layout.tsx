@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 
 const inter = Inter({ 
   subsets: ['latin'],
-  display: 'swap', // Melhora a performance de carregamento da fonte
+  display: 'swap',
 });
 
 // 1. Geração de Metadados Dinâmicos e SEO Internacional
@@ -21,39 +21,68 @@ export async function generateMetadata(props: {
   };
 
   const descriptions: Record<string, string> = {
-    pt: "15+ anos de experiência em sistemas críticos e transição para Ciência de Dados e IA.",
-    en: "15+ years of experience in mission-critical systems and transition to Data Science & AI.",
-    es: "15+ años de experiencia en sistemas críticos y transición a Ciencia de Datos e IA."
+    pt: "Analista de Dados com 15+ anos em sistemas críticos bancários, especializado em Python, Azure Databricks e IA.",
+    en: "Data Analyst with 15+ years in critical banking systems, specialized in Python, Azure Databricks, and AI.",
+    es: "Analista de Datos con 15+ años en sistemas bancarios críticos, especializado en Python, Azure Databricks e IA."
   };
+
+  const siteUrl = "https://portfoliosantossergio.vercel.app";
 
   return {
     title: titles[lang] || titles.pt,
     description: descriptions[lang] || descriptions.pt,
-    viewport: 'width=device-width, initial-scale=1', // Garante responsividade
-    icons: {
-      icon: '/icon.png',
-      apple: '/icon.png', // Para dispositivos iOS
+    metadataBase: new URL(siteUrl),
+    alternates: {
+      canonical: `/${lang}`,
+      languages: {
+        'pt': '/pt',
+        'en': '/en',
+        'es': '/es',
+      },
     },
-    // Define a imagem social correta conforme o idioma
+    icons: {
+      icon: [
+        { url: '/favicon.ico' },
+        { url: '/icon.png', type: 'image/png' },
+      ],
+      apple: '/icon.png',
+    },
+    manifest: '/manifest.json', // Recomendado para PWA/Mobile
+    themeColor: [
+      { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+      { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+    ],
     openGraph: {
       title: titles[lang],
       description: descriptions[lang],
+      url: `${siteUrl}/${lang}`,
+      siteName: "Sérgio Santos Portfolio",
       images: [
         {
           url: `/og-image-${lang}.png`,
           width: 1200,
           height: 630,
-          alt: `Sérgio Santos Portfolio - ${lang.toUpperCase()}`,
+          alt: titles[lang],
         }
       ],
+      locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
     },
-    // Adiciona links alternativos para SEO multilingue (Hreflang)
-    alternates: {
-      languages: {
-        'pt-BR': '/pt',
-        'en-US': '/en',
-        'es-ES': '/es',
+    twitter: {
+      card: 'summary_large_image',
+      title: titles[lang],
+      description: descriptions[lang],
+      images: [`/og-image-${lang}.png`],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
       },
     },
   };
@@ -69,15 +98,11 @@ export default async function RootLayout(props: {
   const { children } = props;
 
   return (
-    // Define o atributo lang dinâmico para acessibilidade e leitores de tela
-    <html lang={lang} suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning className="scroll-smooth">
       <body 
         className={`${inter.className} bg-white dark:bg-[#0f172a] text-gray-900 dark:text-slate-200 antialiased`}
       >
-        {/* O div min-h-screen garante que o fundo cubra toda a tela.
-          Adicionado suporte a cores de fundo para Dark Mode conforme sua page.tsx
-        */}
-        <div className="min-h-screen relative flex flex-col">
+        <div className="min-h-screen flex flex-col relative">
           {children}
         </div>
       </body>
