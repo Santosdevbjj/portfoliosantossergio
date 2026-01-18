@@ -38,7 +38,7 @@ export const translations: ITranslations = {
 
 Utilizo um stack moderno baseado em Python, Azure Databricks, SQL e Neo4J para desenvolver soluções de dados com rigor técnico, conformidade e foco em impacto direto no negócio.
 
-👨‍💻 Sobre mim
+👨‍💻 SOBRE MIM
 Analista de Ciência de Dados com base sólida em sistemas críticos bancários e foco em transformar dados em decisões, redução de custos e eficiência operacional.
 
 Atuei por mais de 15 anos no Banco Bradesco em ambientes regulados de missão crítica, onde segurança, governança e continuidade do negócio eram requisitos essenciais. Essa experiência me deu visão sistêmica, capacidade de análise de risco e disciplina operacional — competências que hoje aplico diretamente em projetos de dados.
@@ -49,7 +49,7 @@ Utilizo Python, SQL, Azure Databricks e Neo4J para desenvolver pipelines governa
 
 Meu foco é transformar dados em inteligência estratégica, garantindo soluções escaláveis, seguras e alinhadas aos desafios de negócios modernos.
 
-Experiência Técnica
+EXPERIÊNCIA TÉCNICA
 Sistemas críticos desenvolvidos:
 • Sistema automatizado de IPVA que eliminou 2.920 horas anuais de processamento manual
 • Infraestrutura de rede corporativa para 500+ usuários com 99,5% de disponibilidade
@@ -58,17 +58,17 @@ Sistemas críticos desenvolvidos:
 Stack consolidado: Visual Basic, C, SQL Server, Windows Server, Emulação Mainframe IBM, Active Directory
 Stack em atualização: Java, C#/.NET, Python, Azure Databricks, Azure AI, Power BI, Machine Learning, Docker, Neo4J (bancos de dados de grafos)
 
-Transição e Reskilling
+TRANSIÇÃO E RESKILLING
 Desde 2008 atuo como consultor independente enquanto invisto em atualização contínua através de bootcamps e certificações especializadas. Recentemente concluí formação em Ciência de Dados com Python e Neo4J para análise de dados com grafos — habilidade aplicável a cenários de detecção de fraudes, análise de relacionamentos e compliance em ambientes corporativos.
 
 Formações concluídas: Santander Coders, Microsoft AI Agents, IBM AI Fundamentals, Azure Databricks, Azure Cloud, Java, C#/.NET, Cibersegurança, Power BI, Ciência de Dados.
 
 Os projetos deste portfólio refletem essa transição de sistemas legados para tecnologias modernas, com foco em análise de dados e governança.
 
-Diferencial
+DIFERENCIAL
 Combino profundo conhecimento de ambientes regulados (compliance bancário, segurança de dados, auditoria) com capacidade técnica para modernizar infraestrutura legada e aplicar análise avançada de dados. Experiência prática em avaliar não apenas viabilidade técnica, mas também riscos, conformidade e impacto organizacional de cada solução.
 
-Objetivo
+OBJETIVO
 Busco oportunidades em projetos que envolvam governança de dados, modernização de infraestrutura ou sistemas corporativos regulados — preferencialmente em formato remoto ou híbrido — onde minha experiência bancária e stack técnico diversificado possam gerar impacto mensurável.`,
     cvButton: "Baixar Currículo (PT)",
     cvLink: "/cv-sergio-santos-pt.pdf",
@@ -108,7 +108,7 @@ Busco oportunidades em projetos que envolvam governança de dados, modernizaçã
 
 I use a modern stack based on Python, Azure Databricks, SQL, and Neo4J to develop data solutions with technical rigor, compliance, and focus on direct business impact.
 
-👨‍💻 About Me
+👨‍💻 ABOUT ME
 Data Science Analyst with a solid background in critical banking systems and a focus on transforming data into decisions, cost reduction, and operational efficiency.
 
 I worked for more than 15 years at Banco Bradesco in regulated mission-critical environments, where security, governance, and business continuity were essential. This experience gave me a systemic view, risk analysis capability, and operational discipline — skills I now apply directly to data projects.
@@ -119,7 +119,7 @@ I use Python, SQL, Azure Databricks, and Neo4J to develop governed pipelines, bu
 
 My focus is on transforming data into strategic intelligence, ensuring scalable, secure solutions aligned with modern business challenges.
 
-Technical Experience
+TECHNICAL EXPERIENCE
 Critical systems developed:
 • Automated IPVA system that eliminated 2,920 annual hours of manual processing
 • Corporate network infrastructure for 500+ users with 99.5% availability
@@ -128,17 +128,17 @@ Critical systems developed:
 Consolidated Stack: Visual Basic, C, SQL Server, Windows Server, IBM Mainframe Emulation, Active Directory
 Stack in updating: Java, C#/.NET, Python, Azure Databricks, Azure AI, Power BI, Machine Learning, Docker, Neo4J (graph databases)
 
-Transition and Reskilling
+TRANSITION AND RESKILLING
 Since 2008, I have been working as an independent consultant while investing in continuous updates through bootcamps and specialized certifications. Recently, I completed training in Data Science with Python and Neo4J for graph data analysis — a skill applicable to fraud detection scenarios, relationship analysis, and compliance in corporate environments.
 
 Completed training: Santander Coders, Microsoft AI Agents, IBM AI Fundamentals, Azure Databricks, Azure Cloud, Java, C#/.NET, Cybersecurity, Power BI, Data Science.
 
 The projects in this portfolio reflect this transition from legacy systems to modern technologies, focusing on data analysis and governance.
 
-Differential
+DIFFERENTIAL
 I combine deep knowledge of regulated environments (banking compliance, data security, auditing) with the technical capacity to modernize legacy infrastructure and apply advanced data analysis. Practical experience in evaluating not only technical feasibility but also risks, compliance, and organizational impact of each solution.
 
-Objective
+OBJECTIVE
 I am looking for opportunities in projects involving data governance, infrastructure modernization, or regulated corporate systems — preferably in a remote or hybrid format — where my banking experience and diversified technical stack can generate measurable impact.`,
     cvButton: "Download CV (EN)",
     cvLink: "/cv-sergio-santos-en.pdf",
@@ -178,37 +178,37 @@ I am looking for opportunities in projects involving data governance, infrastruc
 
 Utilizo un stack moderno basado en Python, Azure Databricks, SQL y Neo4J para desarrollar soluciones de datos con rigor técnico, cumplimiento y enfoque en el impacto directo en el negocio.
 
-👨‍💻 Sobre mí
-Analista de Ciencia de Datos con una sólida base en sistemas bancarios críticos y enfoque en transformar datos en decisiones, reducción de costos y eficiencia operativa.
+👨‍💻 SOBRE MÍ
+Analista de Ciencia de Dados com base sólida em sistemas críticos bancários e foco em transformar dados em decisões, redução de custos e eficiência operacional.
 
-Trabajé por más de 15 años en Banco Bradesco en entornos regulados de misión crítica, donde la seguridad, la gobernanza y la continuidad del negocio eran requisitos esenciales. Esta experiencia me dio una visión sistémica, capacidad de análisis de riesgos y disciplina operativa — competencias que hoy aplico directamente en proyectos de datos.
+Atuei por mais de 15 anos no Banco Bradesco em ambientes regulados de missão crítica, onde segurança, governança e continuidade do negócio eram requisitos essenciais. Esta experiência me deu uma visão sistêmica, capacidade de análise de riscos e disciplina operativa — competências que hoje aplico diretamente em projetos de dados.
 
 Actualmente, dirijo mi actuación hacia la Ciencia de Datos e Inteligencia Artificial, aplicando el rigor de los sistemas críticos a la creación de modelos predictivos, análisis avanzados y automatización de procesos.
 
-Utilizo Python, SQL, Azure Databricks y Neo4J para desarrollar pipelines gobernados, construir modelos y generar insights accionables con impacto en el negocio — conectando datos técnicos a la toma de decisiones corporativas.
+Utilizo Python, SQL, Azure Databricks y Neo4J para desarrollar pipelines governados, construir modelos y generar insights accionables con impacto en el negocio — conectando datos técnicos a la toma de decisiones corporativas.
 
 Mi enfoque es transformar datos en inteligencia estratégica, garantizando soluciones escalables, seguras y alineadas con los desafíos comerciales modernos.
 
-Experiencia Técnica
-Sistemas críticos desarrollados:
-• Sistema automatizado de IPVA que eliminó 2.920 horas anuales de procesamiento manual
+EXPERIENCIA TÉCNICA
+Sistemas críticos desenvolvidos:
+• Sistema automatizado de IPVA que eliminou 2.920 horas anuais de processamento manual
 • Infraestructura de red corporativa para más de 500 usuarios con 99,5% de disponibilidad
 • Sistemas legales interdepartamentales con trazabilidad completa y cumplimiento de LGPD (Ley de Protección de Datos)
 
 Stack consolidado: Visual Basic, C, SQL Server, Windows Server, Emulación de Mainframe IBM, Active Directory
 Stack en actualización: Java, C#/.NET, Python, Azure Databricks, Azure AI, Power BI, Machine Learning, Docker, Neo4J (bases de datos de grafos)
 
-Transición y Reskilling
+TRANSICIÓN Y RESKILLING
 Desde 2008 actúo como consultor independiente mientras invierto en actualización continua a través de bootcamps y certificaciones especializadas. Recientemente completé mi formación en Ciencia de Datos con Python y Neo4J para el análisis de datos con grafos, una habilidad aplicable a escenarios de detección de fraudes, análisis de relaciones y cumplimiento en entornos corporativos.
 
 Formaciones completadas: Santander Coders, Microsoft AI Agents, IBM AI Fundamentals, Azure Databricks, Azure Cloud, Java, C#/.NET, Ciberseguridad, Power BI, Ciencia de Datos.
 
 Los proyectos de este portafolio reflejan esta transición de sistemas heredados a tecnologías modernas, con un enfoque en el análisis de datos y la gobernanza.
 
-Diferencial
-Combino un profundo conocimiento de entornos regulados (cumplimiento bancario, seguridad de datos, auditoría) con la capacidad técnica para modernizar la infraestructura heredada y aplicar análisis de datos avanzados. Experiencia práctica en evaluar no solo la viabilidad técnica, sino también los riesgos, el cumplimiento y el impacto organizacional de cada solución.
+DIFERENCIAL
+Combino un profundo conocimiento de entornos regulados (cumplimiento bancario, seguridad de datos, auditoria) con la capacidad técnica para modernizar la infraestructura heredada y aplicar análisis de datos avanzados. Experiencia práctica en evaluar no solo la viabilidad técnica, sino también los riesgos, el cumplimiento y el impacto organizacional de cada solución.
 
-Objetivo
+OBJETIVO
 Busco oportunidades en proyectos que involucren gobernanza de datos, modernización de infraestructura o sistemas corporativos regulados, preferiblemente en formato remoto o híbrido, donde mi experiencia bancaria y mi stack técnico diversificado puedan generar un impacto mensurable.`,
     cvButton: "Descargar CV (ES)",
     cvLink: "/cv-sergio-santos-es.pdf",
