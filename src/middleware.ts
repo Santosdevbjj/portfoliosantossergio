@@ -4,32 +4,33 @@ import type { NextRequest } from 'next/server'
 import { i18n } from './i18n-config'
 
 /**
- * MIDDLEWARE DE INTERNACIONALIZAÇÃO
- * Responsável por detectar o idioma do navegador e redirecionar para a rota correta.
+ * MIDDLEWARE DE INTERNACIONALIZAÇÃO - NEXT.JS 15
+ * Implementa a lógica de roteamento baseada em localização (Locale-based Routing).
  */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // 1. Verificação de Idioma na URL
-  // Se a URL já começa com um dos idiomas suportados, não faz nada.
+  // 1. Validação de Rota com Locale
+  // Verifica se o caminho atual já possui um idioma válido (ex: /en/projects)
   const pathnameHasLocale = i18n.locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   )
 
   if (pathnameHasLocale) return NextResponse.next()
 
-  // 2. Detecção Automática (Inteligência de UX)
-  // O middleware lê o cabeçalho 'accept-language' enviado pelo navegador do usuário.
+  // 2. Motor de Detecção de Idioma (UX Intelligence)
+  // Analisa os cabeçalhos da requisição para entender a preferência do visitante.
   const acceptLanguage = request.headers.get('accept-language')
   let locale = i18n.defaultLocale
 
   if (acceptLanguage) {
-    // Quebra a string "en-US,en;q=0.9,pt-BR;q=0.8" e extrai os códigos base (en, pt)
+    // Processa a string complexa do navegador (ex: "pt-BR,pt;q=0.9,en-US;q=0.8")
+    // Extrai apenas os códigos primários (pt, en, es)
     const preferredLocales = acceptLanguage
       .split(',')
       .map(lang => lang.split(';')[0].split('-')[0].trim().toLowerCase())
 
-    // Procura o primeiro idioma preferido do usuário que nós suportamos (pt, en ou es)
+    // Encontra a primeira correspondência entre os idiomas que o seu portfólio suporta
     const detectedLocale = preferredLocales.find((lang) => 
       i18n.locales.includes(lang as any)
     )
@@ -39,30 +40,34 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // 3. Redirecionamento Estratégico
-  // Redireciona de "/" para "/pt", "/en" ou "/es" preservando parâmetros de busca.
-  const redirectUrl = request.nextUrl.clone()
+  // 3. Redirecionamento de Fluxo
+  // Se o usuário acessar a raiz ou uma rota sem idioma, redirecionamos preservando os parâmetros (?query=...)
+  const url = request.nextUrl.clone()
   
-  // Garante que o pathname seja limpo antes do redirecionamento
+  // Normaliza o pathname para evitar barras duplas (ex: //en)
   const targetPath = pathname === '/' ? '' : pathname
-  redirectUrl.pathname = `/${locale}${targetPath}`
+  url.pathname = `/${locale}${targetPath}`
   
-  // Retorna um redirecionamento 307 (Temporário) para não "sujar" o cache do navegador
-  return NextResponse.redirect(redirectUrl)
+  // Redirecionamento 307 (Temporário) - Ideal para SEO e troca dinâmica de idiomas
+  return NextResponse.redirect(url)
 }
 
+/**
+ * CONFIGURAÇÃO DO MATCHER
+ * Define as regras de exclusão para que o Middleware não interfira em arquivos estáticos.
+ */
 export const config = {
-  /**
-   * MATCHER - O FILTRO DE ROTAS
-   * Define exatamente onde o middleware deve e NÃO deve atuar.
-   */
   matcher: [
     /*
-     * Ignora caminhos que não devem ser internacionalizados:
-     * - api: Rotas de servidor
-     * - _next: Arquivos internos do Next.js (JS, CSS do sistema)
-     * - assets: Imagens, favicons, manifestos, currículos em PDF
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - images (pasta public/images)
+     * - favicon.ico (icon)
+     * - robots.txt, sitemap.xml (SEO)
+     * - Todos os arquivos com extensão (pdf, png, jpg, svg, webp)
      */
-    '/((?!api|_next/static|_next/image|images|favicon.ico|manifest.json|cv|.*\\..*$).*)',
+    '/((?!api|_next/static|_next/image|images|assets|favicon.ico|robots.txt|sitemap.xml|.*\\..*$).*)',
   ],
 }
