@@ -10,8 +10,9 @@ export interface TranslationContent {
   aboutText: string;
   cvButton: string;
   cvLink: string;
-  repoTitle: string; // Título da seção de repositórios
-  categories: Record<string, string>; // Mapeamento de categorias
+  repoTitle: string;
+  excellenceDescription: string; // Adicionado para sincronia com page.tsx
+  categories: Record<string, string>;
   impactStats: ImpactStat[];
   featuredArticle: {
     title: string;
@@ -33,27 +34,28 @@ export interface ITranslations {
 export const translations: ITranslations = {
   pt: {
     role: "Analista de Ciência de Dados | Sistemas de Missão Crítica",
-    aboutText: "Analista de Ciência de Dados com base sólida em sistemas críticos bancários e foco em transformar dados em decisões, redução de custos e eficiência operacional. Atuei por mais de 15 anos no Banco Bradesco...",
+    aboutText: "Analista de Ciência de Dados com base sólida em sistemas críticos bancários e foco em transformar dados em decisões, redução de custos e eficiência operacional. Atuei por mais de 15 anos no Banco Bradesco, liderando automações que otimizaram processos complexos de infraestrutura e governança de dados.",
     cvButton: "Baixar Currículo (PT)",
     cvLink: "/cv-sergio-santos-pt.pdf",
-    repoTitle: "Repositório de Projetos por Tecnologia",
+    repoTitle: "Soluções de Dados & Engenharia",
+    excellenceDescription: "Premiado pela DIO (Digital Innovation One) por análises técnicas de alto impacto sobre Low-Code na saúde e eficiência operacional.",
     categories: {
       "Ciência de Dados": "Ciência de Dados",
       "Azure Databricks": "Azure Databricks",
-      "Neo4J": "Neo4J",
-      "Banco de Dados": "Banco de Dados",
-      "Python": "Python",
-      "Java": "Java",
-      "Machine Learning": "Machine Learning",
+      "Neo4J": "Banco de Grafo (Neo4J)",
+      "Banco de Dados": "Engenharia de Dados",
+      "Python": "Python & Automação",
+      "Java": "Desenvolvimento Java",
+      "Machine Learning": "Inteligência Artificial",
       "Cibersegurança": "Cibersegurança",
-      "Lógica de Programação": "Lógica de Programação",
-      "HTML": "HTML",
-      "Artigos Técnicos": "Artigos Técnicos"
+      "Lógica de Programação": "Lógica & Algoritmos",
+      "HTML": "Front-end",
+      "Artigos Técnicos": "Publicações Técnicas"
     },
     impactStats: [
       { label: "Horas economizadas/ano", value: "2.920" },
       { label: "Disponibilidade de rede", value: "99,5%" },
-      { label: "Usuários atendidos", value: "500+" }
+      { label: "Projetos no GitHub", value: "40+" }
     ],
     featuredArticle: {
       title: "Vencedor DIO: Low-Code na Saúde",
@@ -66,28 +68,29 @@ export const translations: ITranslations = {
     }
   },
   en: {
-    role: "Data Science Analyst | Operational Efficiency",
-    aboutText: "Data Science Analyst with a solid background in critical banking systems, focusing on transforming data into decisions and cost reduction. I worked for 15+ years at Bradesco Bank...",
+    role: "Data Science Analyst | Mission-Critical Systems",
+    aboutText: "Data Science Analyst with a solid background in critical banking systems, focusing on transforming data into decisions, cost reduction, and operational efficiency. I worked for 15+ years at Bradesco Bank, leading automations that optimized complex infrastructure and data governance processes.",
     cvButton: "Download Resume (EN)",
     cvLink: "/cv-sergio-santos-en.pdf",
-    repoTitle: "Project Repository by Technology",
+    repoTitle: "Data Solutions & Engineering",
+    excellenceDescription: "Awarded by DIO (Digital Innovation One) for high-impact technical analysis on Low-Code in healthcare and operational efficiency.",
     categories: {
       "Ciência de Dados": "Data Science",
       "Azure Databricks": "Azure Databricks",
-      "Neo4J": "Neo4J",
-      "Banco de Dados": "Database",
-      "Python": "Python",
-      "Java": "Java",
-      "Machine Learning": "Machine Learning",
+      "Neo4J": "Graph Database (Neo4J)",
+      "Banco de Dados": "Data Engineering",
+      "Python": "Python & Automation",
+      "Java": "Java Development",
+      "Machine Learning": "Artificial Intelligence",
       "Cibersegurança": "Cybersecurity",
-      "Lógica de Programação": "Programming Logic",
-      "HTML": "HTML",
-      "Artigos Técnicos": "Technical Articles"
+      "Lógica de Programação": "Logic & Algorithms",
+      "HTML": "Front-end",
+      "Artigos Técnicos": "Technical Publications"
     },
     impactStats: [
       { label: "Hours saved/year", value: "2,920" },
       { label: "Network availability", value: "99.5%" },
-      { label: "Users served", value: "500+" }
+      { label: "GitHub Projects", value: "40+" }
     ],
     featuredArticle: {
       title: "DIO Winner: Low-Code in Healthcare",
@@ -100,28 +103,29 @@ export const translations: ITranslations = {
     }
   },
   es: {
-    role: "Analista de Ciencia de Datos | Eficiencia Operativa",
-    aboutText: "Analista de Ciencia de Datos con una sólida base en sistemas bancarios críticos, enfocado en transformar datos en decisiones y reducción de costos. Trabajé por más de 15 años en Banco Bradesco...",
+    role: "Analista de Ciencia de Datos | Sistemas Críticos",
+    aboutText: "Analista de Ciencia de Datos con una sólida base en sistemas bancarios críticos, enfocado en transformar datos en decisiones, reducción de costos y eficiencia operativa. Trabajé por más de 15 años en Banco Bradesco, liderando automatizaciones que optimizaron procesos complejos de infraestructura y gobernanza de datos.",
     cvButton: "Descargar Currículum (ES)",
     cvLink: "/cv-sergio-santos-es.pdf",
-    repoTitle: "Repositorio de Proyectos por Tecnología",
+    repoTitle: "Soluciones de Datos e Ingeniería",
+    excellenceDescription: "Premiado por DIO (Digital Innovation One) por análisis técnicos de alto impacto sobre Low-Code en salud y eficiencia operativa.",
     categories: {
       "Ciência de Dados": "Ciencia de Datos",
       "Azure Databricks": "Azure Databricks",
-      "Neo4J": "Neo4J",
-      "Banco de Dados": "Base de Datos",
-      "Python": "Python",
-      "Java": "Java",
-      "Machine Learning": "Machine Learning",
+      "Neo4J": "Base de Datos de Grafos (Neo4J)",
+      "Banco de Dados": "Ingeniería de Datos",
+      "Python": "Python y Automatización",
+      "Java": "Desarrollo Java",
+      "Machine Learning": "Inteligencia Artificial",
       "Cibersegurança": "Ciberseguridad",
-      "Lógica de Programação": "Lógica de Programación",
-      "HTML": "HTML",
-      "Artigos Técnicos": "Artículos Técnicos"
+      "Lógica de Programação": "Lógica y Algoritmos",
+      "HTML": "Front-end",
+      "Artigos Técnicos": "Publicaciones Técnicas"
     },
     impactStats: [
       { label: "Horas ahorradas/año", value: "2.920" },
       { label: "Disponibilidad de red", value: "99,5%" },
-      { label: "Usuarios atendidos", value: "500+" }
+      { label: "Proyectos en GitHub", value: "40+" }
     ],
     featuredArticle: {
       title: "Ganador DIO: Low-Code en Salud",
