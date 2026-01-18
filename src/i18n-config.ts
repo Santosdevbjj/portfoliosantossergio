@@ -1,21 +1,34 @@
 // src/i18n-config.ts
 
+/**
+ * Configuração centralizada de internacionalização.
+ * Define os idiomas suportados e o padrão do sistema.
+ */
 export const i18n = {
   defaultLocale: 'pt',
   locales: ['pt', 'en', 'es'],
 } as const;
 
-// Este tipo garante que você nunca use um idioma não suportado no código
+/**
+ * Tipo derivado para garantir segurança em todo o projeto.
+ * Impede o uso de strings de idioma inválidas.
+ */
 export type Locale = (typeof i18n)['locales'][number];
 
+/**
+ * Estrutura de metadados para SEO, Acessibilidade e Componentes.
+ */
 interface LocaleDetail {
-  name: string;
-  region: string;
-  flag: string;
-  label: string;
+  name: string;   // Nome completo (ex: English)
+  region: string; // Formato BCP 47 (ex: en-US) para SEO/HTML Lang
+  flag: string;   // Emoji ou referência de ícone
+  label: string;  // Sigla curta para o Switcher
 }
 
-// Metadados centralizados para SEO, Acessibilidade e Componentes de UI
+/**
+ * Metadados centralizados. 
+ * Se você mudar algo aqui, reflete no Switcher e nos metadados da página.
+ */
 export const localeMetadata: Record<Locale, LocaleDetail> = {
   pt: { 
     name: 'Português', 
@@ -38,9 +51,18 @@ export const localeMetadata: Record<Locale, LocaleDetail> = {
 };
 
 /**
- * Função utilitária para validar se um locale é suportado.
- * Útil para verificações de segurança no Middleware ou Server Components.
+ * VALIDADO E SEGURO:
+ * Função para verificar se o idioma na URL é suportado pelo nosso sistema.
+ * Essencial para o Middleware e para rotas dinâmicas [lang].
  */
 export function isValidLocale(locale: string): locale is Locale {
-  return i18n.locales.includes(locale as Locale);
+  return i18n.locales.includes(locale as any);
+}
+
+/**
+ * HELPER DE REGIONALIZAÇÃO:
+ * Retorna o código de região (ex: pt-BR) para ser usado na tag <html lang="...">
+ */
+export function getRegion(locale: Locale): string {
+  return localeMetadata[locale].region;
 }
