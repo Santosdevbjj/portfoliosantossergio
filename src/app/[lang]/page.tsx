@@ -40,6 +40,33 @@ export default async function Page({ params }: PageProps) {
     readArticle: currentLang === 'pt' ? 'Ler Artigo Premiado' : currentLang === 'es' ? 'Leer Artículo Premiado' : 'Read Awarded Article'
   };
 
+  /**
+   * Função para processar o texto e destacar títulos em Negrito Azul
+   * Procura por padrões em caixa alta que definimos no translations.ts
+   */
+  const renderFormattedText = (text: string) => {
+    const titles = [
+      'SOBRE MIM', 'ABOUT ME', 'SOBRE MÍ',
+      'EXPERIÊNCIA TÉCNICA', 'TECHNICAL EXPERIENCE', 'EXPERIENCIA TÉCNICA',
+      'TRANSIÇÃO E RESKILLING', 'TRANSITION AND RESKILLING', 'TRANSICIÓN Y RESKILLING',
+      'DIFERENCIAL', 'DIFFERENTIAL',
+      'OBJETIVO', 'OBJECTIVE'
+    ];
+
+    return text.split('\n').map((line, index) => {
+      const isTitle = titles.some(title => line.includes(title));
+      
+      if (isTitle) {
+        return (
+          <span key={index} className="block text-blue-600 dark:text-blue-400 font-black mt-6 mb-2 tracking-wide uppercase text-sm md:text-base">
+            {line}
+          </span>
+        );
+      }
+      return <span key={index}>{line}{'\n'}</span>;
+    });
+  };
+
   return (
     <div className="bg-[#f8fafc] dark:bg-[#0f172a] min-h-screen transition-colors duration-300">
       
@@ -56,13 +83,10 @@ export default async function Page({ params }: PageProps) {
           </span>
         </h1>
 
-        {/* AJUSTE DE LAYOUT:
-            Aumentamos o max-w para 5xl e o leading-relaxed para comportar sua apresentação completa.
-            A classe whitespace-pre-line mantém seus parágrafos exatamente como definidos no translations.ts.
-        */}
-        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-5xl leading-relaxed mb-10 mx-auto lg:mx-0 whitespace-pre-line font-medium text-left">
-          {t.aboutText}
-        </p>
+        {/* AJUSTE FINO: Renderização com títulos destacados */}
+        <div className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-5xl leading-relaxed mb-10 mx-auto lg:mx-0 whitespace-pre-line font-medium text-left">
+          {renderFormattedText(t.aboutText)}
+        </div>
 
         <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
           <a href={t.cvLink} target="_blank" rel="noopener noreferrer" className="px-10 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/25 active:scale-95">
