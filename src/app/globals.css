@@ -11,23 +11,22 @@
 
   html {
     scroll-behavior: smooth;
-    /* Impede o "balanço" lateral em dispositivos móveis */
+    /* Evita saltos laterais indesejados no mobile */
     overflow-x: hidden;
-    @apply bg-slate-50 dark:bg-[#0f172a];
+    @apply bg-slate-50 dark:bg-[#020617];
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased theme-transition;
-    @apply dark:bg-[#0f172a] dark:text-slate-200;
+    @apply bg-slate-50 text-slate-900 antialiased transition-colors duration-500;
+    @apply dark:bg-[#020617] dark:text-slate-100;
     
-    /* RESILIÊNCIA MULTILÍNGUE: 
-       Essencial para que palavras longas em PT/ES não quebrem o layout em telas pequenas 
-    */
+    /* RESILIÊNCIA TEXTUAL MULTILÍNGUE */
+    /* Garante que termos técnicos longos em PT/ES não quebrem o container no celular */
     overflow-wrap: break-word;
     word-wrap: break-word;
-    hyphens: auto;
+    hyphens: none; /* Evita hifenização estranha em nomes de bibliotecas/tecnologias */
     
-    /* Performance de renderização */
+    /* Otimização de Legibilidade */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -35,93 +34,91 @@
 }
 
 @layer components {
-  /* Layout Estrutural Responsivo */
+  /* Container Central Responsivo (Padrão de Ouro) */
   .main-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 w-full;
   }
 
-  /* Efeito de Vidro (Glassmorphism) para Header e Switcher */
+  /* Efeito Glassmorphism Elevado */
   .glass-effect {
-    @apply bg-white/70 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/50 dark:border-white/10;
+    @apply bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/60 dark:border-white/5 shadow-2xl;
   }
 
-  /* Utilitário para os filtros de categorias (scroll horizontal sem barra visível) */
+  /* Badge de Especialidade (Filtros) */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+    /* Melhora o scroll no mobile */
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* Transição de cores suave ao alternar Dark/Light mode */
-  .theme-transition {
-    @apply transition-colors duration-500 ease-in-out;
+  /* Card de Projeto (Efeito Meigarom) */
+  .project-card-gradient {
+    @apply relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 transition-all duration-500 hover:shadow-premium dark:hover:shadow-premium-dark;
   }
 
-  /* Animações de Entrada (Staggered Load) */
-  .animate-in {
-    animation-delay: calc(var(--index) * 100ms);
+  /* Animações de Staggered Load (Entrada em cascata) */
+  .stagger-load > * {
+    @apply opacity-0;
+    animation: slideUpFade 0.6s ease-out forwards;
   }
+
+  .stagger-load > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-load > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-load > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-load > *:nth-child(4) { animation-delay: 0.4s; }
 }
 
-/* Customização da Scrollbar (Estilo Data Science/Tech) */
+/* Scrollbar Customizada Estilo "Dark Tech" */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100 dark:bg-slate-900;
+  @apply bg-slate-50 dark:bg-[#020617];
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-800 rounded-full border-2 border-solid;
-  border-color: transparent;
-  background-clip: padding-box;
+  @apply bg-slate-300 dark:bg-slate-800 rounded-full border-2 border-solid border-transparent bg-clip-padding hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-blue-600 dark:bg-blue-500;
-}
-
-/* Otimização de Imagens e SVGs para não estourarem o container */
+/* Otimização Global de Media */
 img, svg, video {
   max-width: 100%;
   height: auto;
-  @apply select-none;
+  @apply select-none pointer-events-none; /* Proteção básica contra arraste */
 }
 
-/* Foco de Acessibilidade (WCAG 2.1) */
+/* Foco de Acessibilidade */
 :focus-visible {
-  @apply outline-none ring-2 ring-blue-600 ring-offset-2 dark:ring-offset-slate-900;
+  @apply outline-none ring-2 ring-blue-600 ring-offset-2 dark:ring-offset-slate-950;
 }
 
-/* Reset de interação mobile (evita o brilho azul ao clicar em botões no iOS) */
-a, button, input {
-  -webkit-tap-highlight-color: transparent;
+/* Animações de Chave (Keyframes) */
+@keyframes slideUpFade {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
-/* Branding na seleção de texto */
+.animate-in {
+  animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Efeito de brilho sutil para destaque de projetos principais */
+.glow-effect {
+  @apply relative after:absolute after:inset-0 after:z-[-1] after:bg-blue-600/20 after:blur-[100px] after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-700;
+}
+
+/* Seleção de Texto Personalizada */
 ::selection {
-  @apply bg-blue-600/20 text-blue-900 dark:text-blue-100;
-}
-
-/* Classes de Animação Auxiliares */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
+  @apply bg-blue-600/30 text-blue-900 dark:text-white;
 }
