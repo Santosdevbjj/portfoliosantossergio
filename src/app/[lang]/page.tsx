@@ -28,10 +28,10 @@ export default async function Page({ params }: PageProps) {
     return notFound();
   }
 
-  // 4. Busca de dados do GitHub (Tratada para ser resiliente)
+  // 4. Busca de dados do GitHub
   const allProjects = await getGitHubProjects();
 
-  // 5. Mapeamento de UI Localizada para seções fixas
+  // 5. Mapeamento de UI Localizada
   const ui = {
     badge: currentLang === 'pt' ? '15+ Anos em Sistemas de Missão Crítica' : currentLang === 'es' ? '15+ Años en Sistemas Críticos' : '15+ Years in Mission-Critical Systems',
     awardWinner: currentLang === 'pt' ? 'Vencedor 35ª Competição' : currentLang === 'es' ? 'Ganador 35ª Competición' : 'Winner 35th Competition',
@@ -56,8 +56,11 @@ export default async function Page({ params }: PageProps) {
           </span>
         </h1>
 
-        {/* whitespace-pre-line é vital aqui para manter a formatação da sua apresentação */}
-        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-4xl leading-relaxed mb-10 mx-auto lg:mx-0 whitespace-pre-line font-medium">
+        {/* AJUSTE DE LAYOUT:
+            Aumentamos o max-w para 5xl e o leading-relaxed para comportar sua apresentação completa.
+            A classe whitespace-pre-line mantém seus parágrafos exatamente como definidos no translations.ts.
+        */}
+        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-5xl leading-relaxed mb-10 mx-auto lg:mx-0 whitespace-pre-line font-medium text-left">
           {t.aboutText}
         </p>
 
