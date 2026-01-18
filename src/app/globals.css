@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Importação das animações customizadas */
-@import '../styles/animations.css';
-
 @layer base {
   :root {
     --brand-blue: #2563eb;
@@ -14,21 +11,23 @@
 
   html {
     scroll-behavior: smooth;
-    /* Evita trepidação lateral em animações de entrada */
+    /* Impede o "balanço" lateral em dispositivos móveis */
     overflow-x: hidden;
-    @apply bg-[#f8fafc] dark:bg-[#0f172a];
+    @apply bg-slate-50 dark:bg-[#0f172a];
   }
 
   body {
-    /* Cores de fundo consistentes com a estratégia de marca */
-    @apply bg-[#f8fafc] text-slate-900 antialiased;
+    @apply bg-slate-50 text-slate-900 antialiased theme-transition;
     @apply dark:bg-[#0f172a] dark:text-slate-200;
     
-    /* Resiliência Multilíngue: Evita quebras de layout em palavras longas (PT/ES) */
+    /* RESILIÊNCIA MULTILÍNGUE: 
+       Essencial para que palavras longas em PT/ES não quebrem o layout em telas pequenas 
+    */
     overflow-wrap: break-word;
+    word-wrap: break-word;
     hyphens: auto;
     
-    /* Renderização de fonte ultra-nítida */
+    /* Performance de renderização */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -36,17 +35,17 @@
 }
 
 @layer components {
-  /* Efeito Glassmorphism para Header, Switcher e Cards Premium */
-  .glass-effect {
-    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50;
-  }
-
-  /* Container centralizado para telas ultra-wide (Engenharia de Layout) */
+  /* Layout Estrutural Responsivo */
   .main-container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full;
   }
 
-  /* Utilitário para ocultar barra de rolagem mas manter funcionalidade (Filtros de Projetos) */
+  /* Efeito de Vidro (Glassmorphism) para Header e Switcher */
+  .glass-effect {
+    @apply bg-white/70 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/50 dark:border-white/10;
+  }
+
+  /* Utilitário para os filtros de categorias (scroll horizontal sem barra visível) */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -55,39 +54,41 @@
     scrollbar-width: none;
   }
 
-  /* Animação suave para transição de tema Dark/Light */
+  /* Transição de cores suave ao alternar Dark/Light mode */
   .theme-transition {
     @apply transition-colors duration-500 ease-in-out;
   }
+
+  /* Animações de Entrada (Staggered Load) */
+  .animate-in {
+    animation-delay: calc(var(--index) * 100ms);
+  }
 }
 
-/* Scrollbar Moderna e Minimalista (Foco em Desktop) */
+/* Customização da Scrollbar (Estilo Data Science/Tech) */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-slate-50 dark:bg-[#0f172a];
+  @apply bg-slate-100 dark:bg-slate-900;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full border-4 border-solid;
-  border-color: #f8fafc; /* Deve bater com o bg do body light */
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  border-color: #0f172a; /* Deve bater com o bg do body dark */
+  @apply bg-slate-300 dark:bg-slate-800 rounded-full border-2 border-solid;
+  border-color: transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-blue-600 dark:bg-blue-500;
 }
 
-/* Responsividade de Mídia e SVG */
-img, svg, video, canvas {
+/* Otimização de Imagens e SVGs para não estourarem o container */
+img, svg, video {
   max-width: 100%;
   height: auto;
-  display: block;
+  @apply select-none;
 }
 
 /* Foco de Acessibilidade (WCAG 2.1) */
@@ -95,12 +96,32 @@ img, svg, video, canvas {
   @apply outline-none ring-2 ring-blue-600 ring-offset-2 dark:ring-offset-slate-900;
 }
 
-/* Ajustes para Safari Mobile e Inputs */
-input, button, a {
+/* Reset de interação mobile (evita o brilho azul ao clicar em botões no iOS) */
+a, button, input {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Estilização de Seleção de Texto (Branding) */
+/* Branding na seleção de texto */
 ::selection {
-  @apply bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100;
+  @apply bg-blue-600/20 text-blue-900 dark:text-blue-100;
+}
+
+/* Classes de Animação Auxiliares */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
 }
