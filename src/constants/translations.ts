@@ -2,6 +2,8 @@
 
 export interface ImpactStat {
   label: string;
+
+  
   value: string;
 }
 
@@ -12,7 +14,7 @@ export interface TranslationContent {
   cvLink: string;
   repoTitle: string;
   excellenceDescription: string;
-  categories: Record<string, string>;
+  categories: Record<string, string>; 
   impactStats: ImpactStat[];
   featuredArticle: {
     title: string;
