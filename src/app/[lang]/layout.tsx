@@ -1,14 +1,15 @@
 import { Inter } from 'next/font/google';
 import '../globals.css';
 import { Metadata } from 'next';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher'; // Importação essencial
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeProvider } from '@/components/ThemeProvider'; // Importação do Provider
 
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
 });
 
-// 1. Geração de Metadados Dinâmicos e SEO Internacional
+// SEO e Metadados Dinâmicos
 export async function generateMetadata(props: { 
   params: Promise<{ lang: string }> 
 }): Promise<Metadata> {
@@ -27,7 +28,7 @@ export async function generateMetadata(props: {
     es: "Analista de Datos con 15+ años en sistemas bancarios críticos, especializado em Python, Azure Databricks e IA."
   };
 
-  const siteUrl = "https://portfoliosantossergio.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
 
   return {
     title: titles[lang] || titles.pt,
@@ -41,13 +42,6 @@ export async function generateMetadata(props: {
         'es': '/es',
       },
     },
-    icons: {
-      icon: [
-        { url: '/favicon.ico' },
-        { url: '/icon.png', type: 'image/png' },
-      ],
-      apple: '/icon.png',
-    },
     manifest: '/manifest.json',
     openGraph: {
       title: titles[lang],
@@ -58,43 +52,39 @@ export async function generateMetadata(props: {
       locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
     },
-    twitter: {
-      card: 'summary_large_image',
-      title: titles[lang],
-      description: descriptions[lang],
-      images: [`/og-image-${lang}.png`],
-    },
   };
 }
 
-// 2. Root Layout Principal
 export default async function RootLayout(props: {
   children: React.ReactNode;
   params: Promise<{ lang: string }>;
 }) {
-  const params = await props.params;
-  const { lang } = params;
-  const { children } = props;
+  const { lang } = await props.params;
 
   return (
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
       <head>
-        {/* Apple Status Bar Color */}
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="theme-color" content="#0f172a" />
       </head>
       <body 
-        className={`${inter.className} bg-white dark:bg-[#0f172a] text-gray-900 dark:text-slate-200 antialiased overflow-x-hidden`}
+        className={`${inter.className} bg-[#f8fafc] dark:bg-[#0f172a] text-slate-900 dark:text-slate-200 antialiased overflow-x-hidden`}
       >
-        {/* Seletor de Idiomas Global */}
-        <LanguageSwitcher />
+        {/* ThemeProvider gerencia o DarkMode sem Flash de luz branca */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <LanguageSwitcher />
 
-        <div className="min-h-screen flex flex-col relative w-full">
-          <main className="flex-grow">
-            {children}
-          </main>
-          
-          {/* Opcional: Footer Global aqui */}
-        </div>
+          <div className="min-h-screen flex flex-col relative w-full">
+            <main className="flex-grow">
+              {children}
+            </main>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
