@@ -19,9 +19,13 @@ interface ProjectProps {
 export const ProjectCard = ({ project, lang }: ProjectProps) => {
   const t = translations[lang];
   
-  // Tags de controle que não devem aparecer como "chips" de tecnologia
-  const internalTopics = ['portfolio', 'destaque', 'primeiro', 'data-science', 'python', 'databricks', 'primeiro-projeto'];
-  const displayTopics = project.topics.filter(topic => !internalTopics.includes(topic));
+  // Lista exaustiva de tags de controle que NÃO devem aparecer no card como tecnologia
+  const internalTopics = [
+    'portfolio', 'destaque', 'primeiro', 'data-science', 'python', 
+    'databricks', 'primeiro-projeto', 'data', 'science', 'featured'
+  ];
+  
+  const displayTopics = project.topics.filter(topic => !internalTopics.includes(topic.toLowerCase()));
   
   const isMain = project.topics.includes('primeiro');
   const isHighlight = project.topics.includes('destaque');
@@ -32,122 +36,135 @@ export const ProjectCard = ({ project, lang }: ProjectProps) => {
 
   /**
    * Framework Meigarom: 
-   * Tenta dividir a descrição do GitHub em 3 partes se você usar o separador "|"
-   * Exemplo no GitHub: "Previsão de Atrasos | Random Forest | Redução de 15% nas multas"
+   * Divide a descrição do GitHub em: Problema | Solução | Impacto
    */
   const descriptionParts = project.description?.split('|') || [];
   const hasStructuredDesc = descriptionParts.length >= 2;
 
+  // Texto de fallback para descrição vazia baseado no idioma
+  const fallbackDesc = {
+    pt: 'Documentação técnica em atualização para este repositório.',
+    en: 'Technical documentation currently being updated for this repository.',
+    es: 'Documentación técnica en proceso de actualización para este repositorio.'
+  };
+
   return (
     <div className={`
-      group relative flex flex-col h-full p-7 md:p-9 rounded-[2.5rem] border transition-all duration-500
+      group relative flex flex-col h-full p-6 md:p-8 rounded-[2rem] border transition-all duration-500
       ${isMain 
-        ? 'border-blue-500/30 bg-gradient-to-b from-blue-50/50 to-white dark:from-blue-900/10 dark:to-slate-900 shadow-xl shadow-blue-500/5' 
+        ? 'border-blue-500/30 bg-gradient-to-b from-blue-50/40 to-white dark:from-blue-900/10 dark:to-slate-900 shadow-xl shadow-blue-500/5' 
         : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm'
       }
-      hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2
+      hover:shadow-2xl hover:shadow-blue-500/15 hover:-translate-y-2
     `}>
       
-      {/* Badge de Status (Luiz Café: Prova de Cuidado) */}
+      {/* Badge de Destaque Sênior */}
       {(isHighlight || isMain) && (
-        <div className="absolute -top-3 right-8 z-10">
-          <span className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-lg">
-            <Star size={12} fill="currentColor" className="text-yellow-400" />
-            {isMain ? (lang === 'pt' ? 'Projeto Principal' : 'Featured Project') : 'Top Case'}
+        <div className="absolute -top-3 right-6 z-10 animate-fade-in">
+          <span className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg">
+            <Star size={10} fill="currentColor" className="text-amber-300" />
+            {isMain ? (lang === 'pt' ? 'Principal' : lang === 'es' ? 'Principal' : 'Main') : 'Top Case'}
           </span>
         </div>
       )}
 
-      {/* Header: Ícone e Links */}
+      {/* Header: Branding do Repo e Links */}
       <div className="flex justify-between items-start mb-6">
         <div className={`
-          p-4 rounded-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3
-          ${isMain ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400'}
+          p-3.5 rounded-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3
+          ${isMain ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400'}
         `}>
-          <Folder size={28} strokeWidth={1.5} />
+          <Folder size={24} strokeWidth={2} />
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1">
           <a 
             href={project.html_url} 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="p-3 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
-            title={t.projectLabels.viewProject}
+            className="p-2.5 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all"
+            aria-label="GitHub Repository"
           >
-            <Github size={22} />
+            <Github size={20} />
           </a>
           {project.homepage && (
             <a 
               href={project.homepage} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="p-3 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
+              className="p-2.5 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all"
+              aria-label="Project Demo"
             >
-              <ExternalLink size={22} />
+              <ExternalLink size={20} />
             </a>
           )}
         </div>
       </div>
 
-      {/* Título do Projeto */}
-      <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-5 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-        {project.name.replace(/-/g, ' ')}
+      {/* Título: Nome do Repositório formatado */}
+      <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-4 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors capitalize">
+        {project.name.replace(/[_-]/g, ' ')}
       </h3>
 
-      {/* Conteúdo: Framework Meigarom (Problema/Solução/Impacto) */}
-      <div className="space-y-4 mb-8">
+      {/* Conteúdo Dinâmico baseada no Framework de Autoridade */}
+      <div className="space-y-4 mb-8 flex-grow">
         {hasStructuredDesc ? (
-          <>
-            <div className="flex gap-3 items-start">
-              <Target size={16} className="text-blue-500 mt-1 flex-shrink-0" />
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-snug">
-                <strong className="text-slate-900 dark:text-slate-200 block text-[10px] uppercase tracking-widest mb-1">{t.projectLabels.problem}</strong>
-                {descriptionParts[0].trim()}
-              </p>
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-3">
+              <Target size={14} className="text-blue-500 mt-1 flex-shrink-0" />
+              <div className="overflow-hidden">
+                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-0.5">{t.projectLabels.problem}</span>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-snug line-clamp-2">
+                  {descriptionParts[0].trim()}
+                </p>
+              </div>
             </div>
-            <div className="flex gap-3 items-start">
-              <Lightbulb size={16} className="text-amber-500 mt-1 flex-shrink-0" />
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-snug">
-                <strong className="text-slate-900 dark:text-slate-200 block text-[10px] uppercase tracking-widest mb-1">{t.projectLabels.solution}</strong>
-                {descriptionParts[1].trim()}
-              </p>
+            
+            <div className="flex gap-3">
+              <Lightbulb size={14} className="text-amber-500 mt-1 flex-shrink-0" />
+              <div className="overflow-hidden">
+                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-0.5">{t.projectLabels.solution}</span>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-snug line-clamp-2">
+                  {descriptionParts[1].trim()}
+                </p>
+              </div>
             </div>
+
             {descriptionParts[2] && (
-              <div className="flex gap-3 items-start">
-                <TrendingUp size={16} className="text-emerald-500 mt-1 flex-shrink-0" />
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-snug font-medium italic">
+              <div className="flex gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/50">
+                <TrendingUp size={14} className="text-emerald-500 mt-1 flex-shrink-0" />
+                <p className="text-[13px] text-slate-800 dark:text-slate-300 font-bold italic leading-tight">
                    {descriptionParts[2].trim()}
                 </p>
               </div>
             )}
-          </>
+          </div>
         ) : (
           <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-            {project.description || (lang === 'pt' ? 'Documentação em desenvolvimento...' : 'No description available.')}
+            {project.description || fallbackDesc[lang]}
           </p>
         )}
       </div>
 
-      {/* Footer: Tech Stack Chips */}
-      <div className="mt-auto pt-6 flex flex-wrap gap-2">
+      {/* Footer: Tecnologias extraídas das Tags do GitHub */}
+      <div className="flex flex-wrap gap-1.5 mt-auto">
         {displayTopics.length > 0 ? (
-          displayTopics.map((topic) => (
+          displayTopics.slice(0, 4).map((topic) => (
             <span 
               key={topic} 
-              className="px-3 py-1 text-[10px] font-black bg-slate-100 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 rounded-lg border border-slate-200/50 dark:border-slate-700 uppercase tracking-tighter"
+              className="px-2.5 py-1 text-[9px] font-bold bg-slate-100/50 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 rounded-lg border border-slate-200/50 dark:border-slate-700/50 uppercase tracking-tight group-hover:border-blue-500/30 transition-colors"
             >
               {formatTopic(topic)}
             </span>
           ))
         ) : (
-          <span className="text-[10px] text-slate-400 uppercase tracking-widest">Engineering & Data</span>
+          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest opacity-50">Data Solution</span>
         )}
       </div>
 
-      {/* Linha Decorativa de Progresso (UX Sênior) */}
+      {/* Indicador Visual de Autoridade (Bottom Bar) */}
       <div className={`
-        absolute bottom-0 left-0 h-1.5 transition-all duration-700 group-hover:w-full rounded-b-full
-        ${isMain ? 'w-[30%] bg-blue-600' : 'w-0 bg-blue-400/30'}
+        absolute bottom-0 left-0 h-1 rounded-b-full transition-all duration-700 
+        ${isMain ? 'w-full bg-blue-600' : 'w-0 group-hover:w-full bg-blue-400/30'}
       `}></div>
     </div>
   );
