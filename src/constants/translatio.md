@@ -1,5 +1,7 @@
 // src/constants/translations.ts 
 
+
+
 export interface ImpactStat {
   label: string;
 
