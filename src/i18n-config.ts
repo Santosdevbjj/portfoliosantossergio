@@ -1,9 +1,8 @@
 // src/i18n-config.ts
 
 /**
- * CONFIGURAÇÃO GLOBAL DE IDIOMAS
- * Define a espinha dorsal do sistema multilíngue para Next.js 15.
- * O uso de 'as const' garante que o TypeScript trate os valores como literais.
+ * CONFIGURAÇÃO GLOBAL DE IDIOMAS - NEXT.JS 15
+ * Define os idiomas suportados e o padrão do sistema.
  */
 export const i18n = {
   defaultLocale: 'pt',
@@ -12,25 +11,21 @@ export const i18n = {
 
 /**
  * TIPO LOCALE
- * Extrai os valores 'pt' | 'en' | 'es' para garantir segurança de tipos em todo o código.
+ * Cria um tipo dinâmico ('pt' | 'en' | 'es') para segurança total com TypeScript.
  */
 export type Locale = (typeof i18n)['locales'][number];
 
 /**
- * INTERFACE DE METADADOS DE IDIOMA
- * Estrutura que alimenta o seletor de idiomas (LanguageSwitcher) e as tags de SEO.
+ * METADADOS DE IDIOMA
+ * Informações cruciais para o LanguageSwitcher (Interface) e SEO (Metadados).
  */
 interface LocaleDetail {
-  readonly name: string;   // Nome completo (Ex: English)
-  readonly region: string; // Código de região (Crucial para a tag <html lang="..."> e hreflang)
-  readonly flag: string;   // Emoji da bandeira para a UI
-  readonly label: string;  // Sigla curta para botões de troca rápida
+  readonly name: string;   
+  readonly region: string; 
+  readonly flag: string;   
+  readonly label: string;  
 }
 
-/**
- * DICIONÁRIO DE METADADOS DOS IDIOMAS
- * Centraliza as informações que alimentam os componentes de interface e o Middleware.
- */
 export const localeMetadata: Record<Locale, LocaleDetail> = {
   pt: { 
     name: 'Português', 
@@ -53,9 +48,8 @@ export const localeMetadata: Record<Locale, LocaleDetail> = {
 };
 
 /**
- * SEGURANÇA DE ROTA (Type Guard)
- * Valida se uma string qualquer é um idioma suportado pelo sistema.
- * Útil para proteger rotas dinâmicas [lang].
+ * VALIDADO DE LOCALE (Type Guard)
+ * Garante que a aplicação não quebre se alguém digitar algo como /fr na URL.
  */
 export function isValidLocale(locale: string | undefined | null): locale is Locale {
   if (!locale) return false;
@@ -63,37 +57,40 @@ export function isValidLocale(locale: string | undefined | null): locale is Loca
 }
 
 /**
- * HELPER DE REGIONALIZAÇÃO
- * Retorna o código de região exato para a tag <html lang="..."> no Layout principal.
+ * RETORNA A REGIÃO (SEO)
  */
 export function getRegion(locale: Locale): string {
   return localeMetadata[locale]?.region ?? 'pt-BR';
 }
 
 /**
- * HELPER DE FALLBACK
- * Garante que a aplicação sempre retorne um idioma válido, evitando erros de renderização.
+ * GARANTE UM IDIOMA SEGURO
  */
 export function getSafeLocale(locale: string | undefined | null): Locale {
   return isValidLocale(locale) ? locale : i18n.defaultLocale;
 }
 
 /**
- * HELPER PARA SEO (Alternates)
- * Utilizado para gerar metadados de cabeçalho, informando ao Google as versões traduzidas da página.
+ * BUSCA IDIOMAS ALTERNATIVOS (SEO Hreflang)
  */
 export const getAlternateLocales = (currentLocale: Locale) => {
   return i18n.locales.filter((locale) => locale !== currentLocale);
 };
 
 /**
- * CONFIGURAÇÃO DE DICTIONARY (Utility)
- * Mapeia os idiomas para as importações dinâmicas dos arquivos JSON.
+ * CARREGAMENTO DINÂMICO DE DICIONÁRIOS
+ * Importante: O caminho '@/' aponta para a pasta 'src' configurada no seu tsconfig.json.
  */
 export const dictionaries = {
-  pt: () => import('./dictionaries/pt.json').then((module) => module.default),
-  en: () => import('./dictionaries/en.json').then((module) => module.default),
-  es: () => import('./dictionaries/es.json').then((module) => module.default),
+  pt: () => import('@/dictionaries/pt.json').then((module) => module.default),
+  en: () => import('@/dictionaries/en.json').then((module) => module.default),
+  es: () => import('@/dictionaries/es.json').then((module) => module.default),
 };
 
-export const getDictionary = async (locale: Locale) => dictionaries[locale]();
+/**
+ * HELPER PARA ACESSAR OS TEXTOS TRADUZIDOS
+ */
+export const getDictionary = async (locale: Locale) => {
+  const safeLocale = getSafeLocale(locale);
+  return dictionaries[safeLocale]();
+};
