@@ -17,7 +17,10 @@ interface RootLayoutProps {
   params: Promise<{ lang: string }>;
 }
 
-// Configuração de Viewport para Responsividade e Tema
+/**
+ * Configuração de Viewport: Garante que o site seja TOTALMENTE RESPONSIVO.
+ * Define a largura como a do dispositivo e impede quebras de layout.
+ */
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
@@ -28,7 +31,10 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-// SEO e Metadados Dinâmicos e Trilíngues
+/**
+ * SEO e Metadados: Gerencia as versões PT, EN e ES de forma dinâmica.
+ * Inclui a nova Tag de Verificação do Google.
+ */
 export async function generateMetadata({ 
   params 
 }: { 
@@ -64,9 +70,9 @@ export async function generateMetadata({
         'x-default': `${siteUrl}/pt`,
       },
     },
-    // VERIFICAÇÃO DO GOOGLE (Injetada diretamente no HEAD)
+    // NOVA TAG DE VERIFICAÇÃO DO GOOGLE (Atualizada)
     verification: {
-      google: 'google17c20f9676697c79',
+      google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
     openGraph: {
       title: titles[lang] || titles.pt,
@@ -109,7 +115,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           enableSystem
           disableTransitionOnChange
         >
-          {/* Componente responsivo de troca de idiomas */}
+          {/* Componente responsivo para troca de idiomas (PT, EN, ES) */}
           <LanguageSwitcher />
 
           <div className="relative flex-grow w-full flex flex-col">
