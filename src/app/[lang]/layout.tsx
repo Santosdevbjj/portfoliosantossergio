@@ -2,7 +2,7 @@
 import { Inter } from 'next/font/google';
 import '../globals.css';
 import { Metadata, Viewport } from 'next';
-import { ThemeProvider } from '@/hooks/ThemeContext'; 
+import { ThemeProvider } from '@/components/ThemeProvider'; 
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n } from '@/i18n-config';
 
@@ -18,8 +18,8 @@ interface RootLayoutProps {
 }
 
 /**
- * RESPONSIVIDADE E TEMA MOBILE
- * Otimizado para visualização em smartphones e tablets.
+ * RESPONSIVIDADE E TEMA MOBILE (UI/UX)
+ * Controla como o navegador mobile renderiza a escala e as cores do sistema.
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -32,7 +32,8 @@ export const viewport: Viewport = {
 };
 
 /**
- * SEO MULTILINGUE DINÂMICO & VERIFICAÇÃO DE PROPRIEDADE
+ * SEO MULTILINGUE DINÂMICO & GOOGLE VERIFICATION
+ * Gera metadados específicos para cada idioma e valida a propriedade do site.
  */
 export async function generateMetadata({ 
   params 
@@ -49,9 +50,9 @@ export async function generateMetadata({
   };
 
   const descriptions: Record<string, string> = {
-    pt: "Analista Sênior com 15+ anos em sistemas críticos (Bradesco). Especialista em Ciência de Dados e Azure Databricks.",
-    en: "Senior Analyst with 15+ years in critical systems (Bradesco). Specialist in Data Science and Azure Databricks.",
-    es: "Analista Sénior con 15+ años en sistemas críticos (Bradesco). Especialista en Ciencia de Datos y Azure Databricks."
+    pt: "Analista Sênior com 15+ anos em sistemas críticos (Bradesco). Especialista em Ciência de Dados, Azure e automação estratégica.",
+    en: "Senior Analyst with 15+ years in critical systems (Bradesco). Specialist in Data Science, Azure, and strategic automation.",
+    es: "Analista Sénior con 15+ años en sistemas críticos (Bradesco). Especialista en Ciencia de Datos, Azure y automatización estratégica."
   };
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
@@ -64,7 +65,10 @@ export async function generateMetadata({
     description: descriptions[lang as keyof typeof descriptions] || descriptions.pt,
     metadataBase: new URL(siteUrl),
     
-    // TAG DE VERIFICAÇÃO DO GOOGLE (Garante a propriedade no Search Console)
+    /**
+     * TAG DE VERIFICAÇÃO DO GOOGLE (Search Console)
+     * Mantida com prioridade para garantir a indexação correta.
+     */
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
@@ -95,14 +99,24 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * ROOT LAYOUT
+ * O componente pai que define o HTML básico e os provedores globais.
+ */
 export default async function RootLayout({ children, params }: RootLayoutProps) {
   const { lang } = await params;
 
   return (
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
+      <head>
+        {/* Apple Mobile Web App tags para melhor experiência no iOS */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
       <body 
         className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden min-h-screen flex flex-col`}
       >
+        {/* ThemeProvider centralizado para evitar conflitos de Dark Mode */}
         <ThemeProvider>
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <main className="flex-grow w-full">
@@ -110,7 +124,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
             </main>
           </div>
 
-          {/* Governança e Compliance (LGPD) */}
+          {/* Governança de Dados (LGPD) */}
           <CookieBanner />
         </ThemeProvider>
       </body>
