@@ -44,8 +44,27 @@
       }
     }
   },
+  "portfolio": {
+    "title": "Proyectos Destacados",
+    "all": "Todos",
+    "categories": {
+      "data-science": "Ciencia de Datos",
+      "big-data": "Big Data",
+      "automation": "Automatización",
+      "governance": "Gobernanza"
+    }
+  },
+  "contact": {
+    "title": "¿Hablamos?",
+    "sub": "Disponible para proyectos estratégicos, liderazgo técnico y consultoría de datos.",
+    "emailBtn": "Enviar Correo",
+    "socialLabel": "Redes Profesionales",
+    "status": "Disponible para desafíos 2026"
+  },
   "common": {
     "language": "Español",
-    "contact": "Contactar"
+    "contact": "Contactar",
+    "viewProject": "Ver Proyecto",
+    "repoTitle": "Repositorios"
   }
 }
