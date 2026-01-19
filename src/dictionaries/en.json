@@ -1,4 +1,12 @@
 {
+  "common": {
+    "language": "English",
+    "contact": "Get in touch",
+    "viewProject": "View Project",
+    "repoTitle": "Repositories",
+    "portfolioTitle": "Solutions Portfolio",
+    "governance": "Rigor & Governance"
+  },
   "about": {
     "title": "About Me",
     "headline": "Transforming Banking System Resilience into Strategic Data Intelligence.",
@@ -9,17 +17,25 @@
         "items": [
           {
             "label": "Operational Efficiency",
-            "description": "Developed an automated IPV tax system that eliminated 2,920 annual hours of manual processing."
+            "description": "Automated IPV tax system that eliminated 2,920 annual hours of manual processing."
           },
           {
             "label": "Critical Availability",
-            "description": "Sustained corporate infrastructure for 500+ users with a 99.5% availability SLA."
+            "description": "Corporate infrastructure for 500+ users with a 99.5% availability SLA."
           },
           {
-            "label": "Compliance & Data Privacy",
-            "description": "Implemented interdepartmental legal systems with full traceability and LGPD/GDPR compliance."
+            "label": "Compliance & Privacy",
+            "description": "Interdepartmental legal systems with full traceability and LGPD/GDPR compliance."
           }
         ]
+      },
+      "metrics": {
+        "title": "Performance & Governance",
+        "subtitle": "KPIs & IMPACT",
+        "availabilityValue": "99.5%",
+        "availabilityLabel": "Availability",
+        "automationValue": "2.9K",
+        "automationLabel": "Automated Hours"
       },
       "stack": {
         "title": "Stack & Specialties",
@@ -34,7 +50,7 @@
           },
           {
             "label": "Relationship Intelligence",
-            "description": "Neo4J (Graph Databases) applied to fraud detection and complex link analysis."
+            "description": "Neo4J (Graph Databases) applied to fraud detection and link analysis."
           },
           {
             "label": "Governance",
@@ -46,25 +62,33 @@
   },
   "portfolio": {
     "title": "Featured Projects",
+    "description": "Real-impact projects, documented through the lens of problem, solution, and business value.",
     "all": "All",
     "categories": {
       "data-science": "Data Science",
       "big-data": "Big Data",
       "automation": "Automation",
-      "governance": "Governance"
+      "governance": "Governance",
+      "machine-learning": "Machine Learning",
+      "azure": "Azure Cloud"
+    },
+    "projectLabels": {
+      "problem": "The Problem",
+      "solution": "The Solution",
+      "impact": "Business Impact"
     }
   },
   "contact": {
     "title": "Let's talk?",
-    "sub": "Available for strategic projects, technical leadership, and data consultancy.",
+    "subtitle": "Available for strategic projects, technical leadership, and data consultancy.",
     "emailBtn": "Send Email",
     "socialLabel": "Professional Networks",
     "status": "Open for new challenges 2026"
   },
-  "common": {
-    "language": "English",
-    "contact": "Get in touch",
-    "viewProject": "View Project",
-    "repoTitle": "Repositories"
+  "footer": {
+    "social": "Professional Networks",
+    "contact": "Contact",
+    "location": "Brazil",
+    "builtBy": "Developed by"
   }
 }
