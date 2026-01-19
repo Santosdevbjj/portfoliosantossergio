@@ -1,15 +1,31 @@
 module.exports = {
   plugins: {
-    // Motor de estilização principal
-    'tailwindcss/nesting': {}, // Permite aninhamento de CSS estilo Sass (opcional, mas recomendado)
+    // Permite o uso de aninhamento (nesting) nativo do CSS seguindo a especificação W3C
+    'tailwindcss/nesting': {},
+    
+    // Processador principal do Tailwind CSS
     tailwindcss: {},
     
-    // Adiciona prefixos (ex: -webkit, -moz) automaticamente para compatibilidade de browsers
+    // Garante compatibilidade com browsers antigos adicionando prefixos automaticamente
     autoprefixer: {
       flexbox: 'no-2009',
+      grid: 'autoplace', // Importante para garantir que o Grid do seu Portfolio funcione em browsers legados
     },
     
-    // Otimização de produção: Minificação de CSS
-    ...(process.env.NODE_ENV === 'production' ? { cssnano: { preset: 'default' } } : {})
+    // Otimização extrema para Produção
+    ...(process.env.NODE_ENV === 'production' 
+      ? { 
+          cssnano: { 
+            preset: [
+              'default', 
+              { 
+                discardComments: { removeAll: true },
+                normalizeWhitespace: true,
+              }
+            ] 
+          } 
+        } 
+      : {}
+    ),
   },
 };
