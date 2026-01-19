@@ -1,0 +1,59 @@
+# EditorConfig ajuda a manter estilos consistentes entre diferentes IDEs e editores
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Tipografia e Documentação técnica
+[*.{md,mdx}]
+# No Markdown, dois espaços no final da linha significam quebra de linha <br>
+trim_trailing_whitespace = false
+indent_size = 2
+
+# Engenharia de Dados e Backend (Python e SQL)
+# Python segue a PEP8 (4 espaços) por convenção mundial
+[*.{py,sql}]
+indent_style = space
+indent_size = 4
+
+# Web Development (Frontend e Configurações)
+# Adicionado suporte para arquivos de configuração do Next.js 15 e metadados
+[*.{js,jsx,ts,tsx,cjs,mjs,cts,mts,json,css,scss,html,yml,yaml,toml}]
+indent_style = space
+indent_size = 2
+
+# Metadados e Verificação (Google Search Console e Manifests)
+# Garante que arquivos de verificação e o manifest.json mantenham a integridade
+[*.{html,json,xml}]
+indent_style = space
+indent_size = 2
+
+# Variáveis de ambiente (Segurança e Integridade)
+[*.env*]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+# Scripts de terminal e Automação
+[*.{sh,bash}]
+indent_style = space
+indent_size = 2
+
+# Configuração de Makefile e arquivos que exigem TABS (Padrão Unix)
+[Makefile]
+indent_style = tab
+indent_size = 4
+
+# Dados e Logs (Preservação de integridade de caracteres)
+[*.{csv,log,lock}]
+trim_trailing_whitespace = false
+
+# Ignorar arquivos binários e gerados
+[*.{png,jpg,jpeg,gif,webp,ico,pdf,woff,woff2}]
+insert_final_newline = false
+trim_trailing_whitespace = false
