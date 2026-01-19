@@ -7,7 +7,7 @@ import { MetadataRoute } from 'next'
  * áreas do portfólio devem ser rastreadas, garantindo SEO multilingue eficiente.
  */
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://portfoliosantossergio.vercel.app'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app'
 
   return {
     rules: [
@@ -15,25 +15,26 @@ export default function robots(): MetadataRoute.Robots {
         // Aplica-se a todos os robôs (Googlebot, Bingbot, etc.)
         userAgent: '*',
         allow: [
-          '/',        // Home
-          '/pt',      // Versão Português
-          '/en',      // Versão Inglês
-          '/es',      // Versão Espanhol
-          '/api/og',  // Permite indexar imagens de compartilhamento social
+          '/',           // Home
+          '/pt',         // Versão Português (Prioridade 1)
+          '/en',         // Versão Inglês
+          '/es',         // Versão Espanhol
+          '/api/og',     // Imagens de compartilhamento social
+          '/manifest.json' // IMPORTANTE: Permitir leitura para habilitar PWA
         ],
         disallow: [
-          '/private/', // Área reservada para testes
-          '/admin/',   // Caso venha a ter um dashboard futuro
-          '/*.json$',  // Evita indexar arquivos de configuração internos
+          '/private/',   // Área reservada para testes
+          '/admin/',     // Dashboard futuro
+          '/_next/',     // Arquivos internos do Next.js
         ],
       },
       {
-        // Proteção contra robôs de IA que consomem banda sem gerar tráfego (opcional)
+        // Otimização para IA: Evita consumo excessivo de banda por crawlers de treino
         userAgent: ['GPTBot', 'CCBot'],
-        disallow: ['/'],
+        disallow: ['/private/'],
       }
     ],
-    // Aponta para o Sitemap dinâmico que criamos anteriormente
+    // Vinculação direta com o Sitemap já verificado no Search Console
     sitemap: `${baseUrl}/sitemap.xml`,
   }
 }
