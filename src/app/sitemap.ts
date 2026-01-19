@@ -1,29 +1,33 @@
 // src/app/sitemap.ts
 import { MetadataRoute } from 'next'
+import { i18n } from '@/i18n-config'
 
 /**
- * Gerador de Sitemap Dinâmico - Next.js 15
- * Este arquivo gera automaticamente as entradas para os buscadores,
- * garantindo a correlação entre as versões PT, EN e ES (Hreflang).
+ * GERADOR DE SITEMAP DINÂMICO - NEXT.JS 15
+ * Cria o mapeamento de URLs e as relações hreflang para garantir que 
+ * o Google entregue a versão correta do site dependendo do país do usuário.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://portfoliosantossergio.vercel.app'
-  const locales = ['pt', 'en', 'es']
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app'
   const lastModified = new Date()
 
-  // Mapeamento das rotas base (neste caso, a Home para cada idioma)
-  return locales.map((locale) => ({
+  // Geramos as entradas para cada idioma suportado
+  return i18n.locales.map((locale) => ({
     url: `${baseUrl}/${locale}`,
     lastModified,
-    changeFrequency: 'monthly',
-    priority: locale === 'pt' ? 1 : 0.8,
-    // Configuração Multilingue (Hreflang)
-    // Isso diz ao Google que cada página tem suas versões irmãs em outros idiomas
+    changeFrequency: 'weekly', // Alterado para semanal para indexar novos projetos mais rápido
+    priority: locale === i18n.defaultLocale ? 1.0 : 0.8,
+    
+    /**
+     * RELAÇÕES DE IDIOMA (Hreflang)
+     * Essencial para SEO Internacional: evita que o Google considere as versões 
+     * traduzidas como "conteúdo duplicado".
+     */
     languages: {
-      pt: `${baseUrl}/pt`,
-      en: `${baseUrl}/en`,
-      es: `${baseUrl}/es`,
-      'x-default': `${baseUrl}/pt`, // Define PT como padrão global
+      'pt-BR': `${baseUrl}/pt`,
+      'en-US': `${baseUrl}/en`,
+      'es-ES': `${baseUrl}/es`,
+      'x-default': `${baseUrl}/pt`, // Direciona usuários de outros idiomas para a versão principal
     },
   }))
 }
