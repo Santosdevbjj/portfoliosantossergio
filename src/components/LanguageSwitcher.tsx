@@ -3,36 +3,41 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { Moon, Sun } from 'lucide-react'
+import { Moon, Sun, Globe } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
+/**
+ * LANGUAGE & THEME SWITCHER
+ * Componente flutuante ultra-responsivo com suporte a i18n e modo escuro.
+ */
 export const LanguageSwitcher = () => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   
-  // Garante que o componente só renderize no cliente para evitar erros de hidratação
+  // Impede erros de hidratação (SSR vs Client)
   useEffect(() => {
     setMounted(true)
   }, [])
 
   const languages = [
-    { code: 'pt', label: 'PT', aria: 'Mudar para Português' },
-    { code: 'en', label: 'EN', aria: 'Switch to English' },
-    { code: 'es', label: 'ES', aria: 'Cambiar a Español' }
+    { code: 'pt', label: 'PT', aria: 'Versão em Português' },
+    { code: 'en', label: 'EN', aria: 'English Version' },
+    { code: 'es', label: 'ES', aria: 'Versión en Español' }
   ] as const;
 
+  // Detecta idioma atual de forma segura
   const currentLang = pathname?.split('/')[1] || 'pt'
 
   /**
-   * getNewPath: Gera a URL mantendo a rota e os parâmetros de busca (query strings)
+   * getNewPath: Reconstrói a URL para troca de idioma preservando filtros
    */
   const getNewPath = (langCode: string) => {
     if (!pathname) return `/${langCode}`
     const segments = pathname.split('/')
     
-    // Substitui o código de idioma no pathname
+    // Se o primeiro segmento após a barra for um idioma conhecido, substitui
     if (languages.some(l => l.code === segments[1])) {
       segments[1] = langCode
     } else {
@@ -44,56 +49,63 @@ export const LanguageSwitcher = () => {
     return `/${cleanPath}${queryString ? `?${queryString}` : ''}`
   }
 
+  // Previne a renderização incorreta do tema antes da montagem no cliente
   if (!mounted) return null
+
+  const isDark = resolvedTheme === 'dark'
 
   return (
     <nav 
-      aria-label="Language and Theme Preferences"
-      className="fixed top-3 right-3 sm:top-6 sm:right-8 z-[100] flex items-center gap-1.5 p-1 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-200/60 dark:border-slate-800/60 shadow-xl"
+      aria-label="Preferências de Idioma e Tema"
+      className="fixed top-4 right-4 sm:top-6 sm:right-8 z-[100] flex items-center gap-2 p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[1.25rem] border border-slate-200/50 dark:border-slate-800/50 shadow-2xl transition-all duration-500 hover:border-blue-500/30"
     >
-      {/* Dark/Light Mode Toggle */}
+      {/* Botão de Tema com Feedback Visual */}
       <button
-        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-        className="p-2 rounded-xl text-slate-500 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
-        title={theme === 'dark' ? "Modo Claro" : "Modo Escuro"}
+        onClick={() => setTheme(isDark ? 'light' : 'dark')}
+        className="p-2.5 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-90"
+        aria-label={isDark ? "Ativar Modo Claro" : "Ativar Modo Escuro"}
       >
-        {theme === 'dark' ? (
-          <Sun size={18} className="animate-in fade-in zoom-in spin-in-12 duration-500" />
+        {isDark ? (
+          <Sun size={20} className="animate-in fade-in zoom-in spin-in-12 duration-700" />
         ) : (
-          <Moon size={18} className="animate-in fade-in zoom-in -rotate-12 duration-500" />
+          <Moon size={20} className="animate-in fade-in zoom-in -rotate-12 duration-700" />
         )}
       </button>
 
-      <div className="w-px h-4 bg-slate-200 dark:bg-slate-700/50" aria-hidden="true" />
+      <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/60 mx-1" aria-hidden="true" />
 
-      {/* Language Selector Container */}
-      <div className="flex gap-0.5">
-        {languages.map((lang) => {
-          const isActive = currentLang === lang.code
-          return (
-            <Link
-              key={lang.code}
-              href={getNewPath(lang.code)}
-              hreflang={lang.code}
-              scroll={false} 
-              className={`
-                relative px-3 py-1.5 text-[11px] font-black tracking-tighter rounded-xl transition-all duration-300
-                ${isActive 
-                  ? 'text-white' 
-                  : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400'
-                }
-              `}
-            >
-              <span className="relative z-10">{lang.label}</span>
-              {isActive && (
-                <div 
-                  className="absolute inset-0 bg-blue-600 rounded-[10px] z-0 shadow-md shadow-blue-600/20 animate-in fade-in zoom-in duration-300" 
-                  aria-hidden="true"
-                />
-              )}
-            </Link>
-          )
-        })}
+      {/* Seletor de Idiomas */}
+      <div className="flex items-center gap-1">
+        <Globe size={14} className="text-slate-400 ml-1 hidden sm:block" />
+        <div className="flex gap-0.5">
+          {languages.map((lang) => {
+            const isActive = currentLang === lang.code
+            return (
+              <Link
+                key={lang.code}
+                href={getNewPath(lang.code)}
+                hreflang={lang.code}
+                scroll={false} 
+                aria-label={lang.aria}
+                className={`
+                  relative px-3.5 py-2 text-[12px] font-bold tracking-tight rounded-lg transition-all duration-300
+                  ${isActive 
+                    ? 'text-white' 
+                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+                  }
+                `}
+              >
+                <span className="relative z-10">{lang.label}</span>
+                {isActive && (
+                  <div 
+                    className="absolute inset-0 bg-blue-600 rounded-lg z-0 shadow-lg shadow-blue-600/30 animate-in fade-in zoom-in duration-300" 
+                    aria-hidden="true"
+                  />
+                )}
+              </Link>
+            )
+          })}
+        </div>
       </div>
     </nav>
   )
