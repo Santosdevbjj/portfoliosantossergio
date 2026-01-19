@@ -21,14 +21,14 @@ interface RootLayoutProps {
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
-    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+    { media: '(prefers-color-scheme: dark)', color: '#020617' },
   ],
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5, // Permite zoom para acessibilidade, mas mantém controle
+  maximumScale: 5,
 };
 
-// SEO e Metadados Dinâmicos
+// SEO e Metadados Dinâmicos e Trilíngues
 export async function generateMetadata({ 
   params 
 }: { 
@@ -64,7 +64,10 @@ export async function generateMetadata({
         'x-default': `${siteUrl}/pt`,
       },
     },
-    manifest: '/manifest.json',
+    // VERIFICAÇÃO DO GOOGLE (Injetada diretamente no HEAD)
+    verification: {
+      google: 'google17c20f9676697c79',
+    },
     openGraph: {
       title: titles[lang] || titles.pt,
       description: descriptions[lang] || descriptions.pt,
@@ -77,6 +80,13 @@ export async function generateMetadata({
     robots: {
       index: true,
       follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
   };
 }
@@ -85,15 +95,13 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
   const { lang } = await params;
 
   return (
-    // suppressHydrationWarning é necessário para o next-themes funcionar sem erros no console
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <link rel="icon" href="/favicon.ico" />
       </head>
       <body 
-        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-200 antialiased overflow-x-hidden min-h-screen flex flex-col`}
+        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden min-h-screen flex flex-col`}
       >
         <ThemeProvider
           attribute="class"
@@ -101,11 +109,11 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           enableSystem
           disableTransitionOnChange
         >
-          {/* Switcher flutuante para facilitar a troca de idioma em qualquer seção */}
+          {/* Componente responsivo de troca de idiomas */}
           <LanguageSwitcher />
 
           <div className="relative flex-grow w-full flex flex-col">
-            <main className="flex-grow w-full max-w-[100vw]">
+            <main className="flex-grow w-full max-w-full overflow-x-hidden">
               {children}
             </main>
           </div>
