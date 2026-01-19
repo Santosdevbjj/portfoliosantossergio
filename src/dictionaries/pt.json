@@ -1,0 +1,21 @@
+{
+  "about": {
+    "title": "Sobre Mim",
+    "headline": "Transformando a resiliência de sistemas bancários em inteligência de dados estratégica.",
+    "bio": "Com mais de 15 anos de experiência em sistemas de missão crítica no setor bancário (Bradesco), especializei-me em garantir que a tecnologia sustente decisões de alto risco com 100% de governança. Hoje, utilizo esse rigor operacional para liderar projetos de Ciência de Dados e Eficiência Operacional.",
+    "highlights": {
+      "automation": "Sistema automatizado de IPVA: eliminou 2.920 horas anuais de processamento manual.",
+      "availability": "Infraestrutura corporativa: 500+ usuários com 99,5% de disponibilidade.",
+      "compliance": "Sistemas jurídicos: rastreabilidade completa e conformidade LGPD."
+    },
+    "stack": {
+      "title": "Stack & Especialidades",
+      "items": [
+        "Data Science: Python, SQL e Machine Learning",
+        "Big Data: Azure Databricks e Azure Cloud",
+        "Grafos: Neo4J aplicado a detecção de fraudes",
+        "Governança: Ambientes regulados e auditoria bancária"
+      ]
+    }
+  }
+}
