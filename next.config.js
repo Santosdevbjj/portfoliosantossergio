@@ -2,56 +2,65 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // Como engenheiro sênior, você sabe que o build deve ser rápido.
-  // Ignorar erros temporariamente acelera o deploy, mas o 'typedRoutes' 
-  // ajudará você a manter a integridade das rotas no futuro.
+  // Segurança: Impede que o Next.js exponha informações do servidor no header
+  poweredByHeader: false,
+
+  // Build e Integridade técnica
   typescript: {
-    ignoreBuildErrors: true,
+    // Em 2026, manter o build estrito evita regressões em produção
+    ignoreBuildErrors: false, 
   },
   
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 
-  // Otimizações de Compilação
+  // Otimizações de Compilação de Próxima Geração
   compiler: {
-    // Remove consoles apenas em produção (melhor segurança e limpeza de logs)
-    removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false,
+    // Remove console.log em produção, mantendo apenas erros críticos
+    removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
   },
 
   images: {
-    // ESSENCIAL para portfólios que consomem a API do GitHub
+    // Configuração robusta para imagens externas (GitHub e Unsplash)
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'github.com',
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'avatars.githubusercontent.com',
+        pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'raw.githubusercontent.com',
+        pathname: '/**',
       },
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com', // Opcional: Caso use imagens do Unsplash no Sobre
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
       },
     ],
-    // Melhora a performance de carregamento das imagens
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    // Prioriza formatos modernos (AVIF é 30% menor que WebP)
     formats: ['image/avif', 'image/webp'],
+    deviceSizes: [450, 640, 750, 828, 1080, 1200, 1920],
+    minimumCacheTTL: 60,
   },
 
-  // Configurações experimentais para Next.js 15
+  // Recursos do Next.js 15
   experimental: {
     typedRoutes: true,
-    // Otimiza o pacote de ícones para não carregar a biblioteca Lucide inteira no cliente
-    optimizePackageImports: ['lucide-react'],
+    // Reduz drasticamente o tamanho do bundle ao importar ícones de forma inteligente
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    // Melhora a performance de Server Components
+    serverSourceMaps: false,
   },
 
-  // Otimização de Header para Segurança (Prevenção de Clickjacking e XSS)
+  // Segurança de Headers (Hardened Configuration)
   async headers() {
     return [
       {
@@ -63,11 +72,19 @@ const nextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN', // Permite frames apenas do próprio domínio
           },
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; font-src 'self' data:; connect-src 'self' https://api.github.com;",
           },
         ],
       },
