@@ -1,6 +1,6 @@
 // src/app/[lang]/page.tsx
 import { getGitHubProjects } from '@/lib/github';
-import { getDictionary } from '@/i18n-config'; // Caminho corrigido para consistência
+import { getDictionary } from '@/i18n-config'; 
 import { notFound } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { HeroSection } from '@/components/HeroSection';
@@ -10,9 +10,12 @@ import { FeaturedArticleSection } from '@/components/FeaturedArticleSection';
 import { ContactSection } from '@/components/ContactSection';
 import { Footer } from '@/components/Footer';
 import { PageWrapper } from '@/components/PageWrapper';
-import { i18n, type Locale, isValidLocale } from '@/i18n-config';
 
-// ISR: Revalida os dados do GitHub a cada 1 hora sem precisar de novo deploy
+// CORREÇÃO CRÍTICA: Importação de tipos para VerbatimModuleSyntax (TS 5.7)
+import type { Metadata } from 'next';
+import { i18n, isValidLocale, type Locale } from '@/i18n-config';
+
+// ISR: Revalida os dados do GitHub a cada 1 hora para manter performance máxima
 export const revalidate = 3600; 
 
 interface PageProps {
@@ -21,9 +24,9 @@ interface PageProps {
 
 /**
  * METADADOS DINÂMICOS (SEO Sênior)
- * Ajusta o título na aba do navegador conforme o idioma selecionado.
+ * Resolve o erro de compilação da Vercel ao usar 'import type'
  */
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
   if (!isValidLocale(lang)) return {};
 
@@ -45,12 +48,13 @@ export async function generateMetadata({ params }: PageProps) {
 
 /**
  * PÁGINA PRINCIPAL - SERVER COMPONENT
- * Renderização de alto desempenho para SEO e acessibilidade.
+ * Totalmente Responsiva e Multilingue (PT, EN, ES)
  */
 export default async function Page({ params }: PageProps) {
+  // No Next.js 15, params deve ser aguardado (awaited)
   const { lang } = await params;
   
-  // Proteção de rota para idiomas não suportados
+  // Segurança: Se o idioma na URL não for suportado, exibe 404
   if (!isValidLocale(lang)) {
     notFound();
   }
@@ -58,7 +62,7 @@ export default async function Page({ params }: PageProps) {
   const currentLang = lang as Locale;
 
   /** * DATA FETCHING PARALELIZADO
-   * Buscamos o dicionário local e os projetos remotos ao mesmo tempo.
+   * Carrega dicionário e projetos do GitHub simultaneamente (Performance)
    */
   const [dict, allProjects] = await Promise.all([
     getDictionary(currentLang),
@@ -67,39 +71,39 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageWrapper>
-      {/* NAVBAR: Passa o dicionário para traduzir os links do menu */}
+      {/* NAVBAR: Traduzida dinamicamente conforme o 'lang' */}
       <Navbar dict={dict} lang={currentLang} />
 
       <main className="flex flex-col w-full overflow-x-hidden min-h-screen">
         
-        {/* 1. HERO: Primeira impressão e Proposta de Valor */}
+        {/* 1. HERO: Proposta de valor imediata */}
         <section id="hero" className="relative">
           <HeroSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* 2. ABOUT: Trajetória e Especialidades (Bradesco + Data Science) */}
-        <section id="about" className="scroll-mt-24 lg:scroll-mt-32">
+        {/* 2. ABOUT: Scroll-mt garante que o menu fixo não cubra o título no mobile */}
+        <section id="about" className="scroll-mt-20 lg:scroll-mt-32">
           <AboutSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* 3. ARTICLES: Seção de autoridade (LinkedIn / Medium) */}
-        <section id="articles" className="scroll-mt-24 lg:scroll-mt-32">
+        {/* 3. ARTICLES: Thought Leadership */}
+        <section id="articles" className="scroll-mt-20 lg:scroll-mt-32">
           <FeaturedArticleSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* 4. PROJECTS: Vitrine filtrável com dados reais do GitHub */}
-        <section id="projects" className="scroll-mt-24 lg:scroll-mt-32">
+        {/* 4. PROJECTS: Dados reais do GitHub */}
+        <section id="projects" className="scroll-mt-20 lg:scroll-mt-32">
           <PortfolioGrid projects={allProjects} lang={currentLang} dict={dict} />
         </section>
 
-        {/* 5. CONTACT: Conversão final para o recrutador */}
-        <section id="contact" className="scroll-mt-24 lg:scroll-mt-32 pb-20">
+        {/* 5. CONTACT: Call to Action final */}
+        <section id="contact" className="scroll-mt-20 lg:scroll-mt-32 pb-20">
           <ContactSection lang={currentLang} dict={dict} />
         </section>
         
       </main>
 
-      {/* FOOTER: Identidade final e links sociais */}
+      {/* FOOTER: Encerramento com créditos e stack */}
       <Footer lang={currentLang} dict={dict} />
     </PageWrapper>
   );
