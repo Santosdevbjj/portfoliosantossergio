@@ -1,12 +1,13 @@
 // src/app/[lang]/layout.tsx
 import { Inter } from 'next/font/google';
 import '../globals.css';
-import { Metadata, Viewport } from 'next';
+// CORREÇÃO: Importação como 'type' para conformidade com TS 5.7 e Next 15
+import type { Metadata, Viewport } from 'next';
 import { ThemeProvider } from '@/components/ThemeProvider'; 
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n } from '@/i18n-config';
 
-// Otimização de fonte para performance máxima
+// Otimização de fonte: Inter é o padrão ouro para legibilidade de dados
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -20,6 +21,7 @@ interface RootLayoutProps {
 
 /**
  * CONFIGURAÇÃO DE VIEWPORT (UX MOBILE)
+ * Essencial para que o portfólio não "trema" ao carregar no celular.
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -34,6 +36,7 @@ export const viewport: Viewport = {
 
 /**
  * SEO MULTILINGUE & GOOGLE VERIFICATION
+ * Configuração de autoridade para o robô do Google e redes sociais.
  */
 export async function generateMetadata({ 
   params 
@@ -55,6 +58,7 @@ export async function generateMetadata({
     es: "Analista Sénior con 15+ años en sistemas críticos (Bradesco). Especialista en Ciencia de Datos, Azure y automatización estratégica."
   };
 
+  // URL de produção vinda do ambiente ou fallback
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
 
   return {
@@ -66,7 +70,8 @@ export async function generateMetadata({
     metadataBase: new URL(siteUrl),
     
     /**
-     * TAG DE VERIFICAÇÃO DO GOOGLE (Search Console) - PRIORIDADE
+     * TAG DE VERIFICAÇÃO DO GOOGLE (Search Console)
+     * Mantida com atenção total para indexação correta.
      */
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
@@ -78,7 +83,7 @@ export async function generateMetadata({
         'pt-BR': `${siteUrl}/pt`,
         'en-US': `${siteUrl}/en`,
         'es-ES': `${siteUrl}/es`,
-        'x-default': `${siteUrl}/pt`,
+        'x-default': `${siteUrl}/pt`, // Define o português como padrão para o resto do mundo
       },
     },
     icons: {
@@ -101,7 +106,7 @@ export async function generateMetadata({
           url: '/og-image.png',
           width: 1200,
           height: 630,
-          alt: 'Sérgio Santos - Portfolio',
+          alt: 'Sérgio Santos - Portfolio Presentation',
         },
       ],
       locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
@@ -122,11 +127,13 @@ export async function generateMetadata({
 }
 
 export default async function RootLayout({ children, params }: RootLayoutProps) {
+  // O params deve ser aguardado no Next.js 15
   const { lang } = await params;
 
   return (
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
       <head>
+        {/* Meta tags específicas para experiência mobile premium no iOS */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="format-detection" content="telephone=no" />
@@ -135,14 +142,14 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
         className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased min-h-screen flex flex-col`}
       >
         <ThemeProvider>
-          {/* Container Principal que garante que o rodapé fique sempre embaixo */}
-          <div className="relative flex flex-col min-h-screen w-full">
+          {/* Layout estrutural: Flex-col e flex-grow para manter o rodapé no fundo */}
+          <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <main className="flex-grow">
               {children}
             </main>
           </div>
 
-          {/* Governança e LGPD */}
+          {/* Banner de Cookies: Conformidade LGPD/GDPR para visitantes europeus e brasileiros */}
           <CookieBanner />
         </ThemeProvider>
       </body>
