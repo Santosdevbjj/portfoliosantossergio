@@ -2,77 +2,85 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { i18n } from './i18n-config';
+import { match as matchLocale } from '@formatjs/intl-localematcher';
+import Negotiator from 'negotiator';
 
 /**
- * MIDDLEWARE DE INTERNACIONALIZAÇÃO (i18n)
- * Gerencia o roteamento dinâmico para garantir que o usuário veja
- * o conteúdo no idioma correto desde o primeiro acesso.
+ * FUNÇÃO AUXILIAR: DETECÇÃO DE LOCALE
+ * Utiliza algoritmos de negociação de conteúdo para escolher o melhor idioma.
+ */
+function getLocale(request: NextRequest): string | undefined {
+  // 1. Extrai as preferências do header do navegador
+  const negotiatorHeaders: Record<string, string> = {};
+  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
+
+  // @ts-ignore: Locales são readonly, mas o Negotiator aceita strings
+  const locales: string[] = i18n.locales;
+  const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
+
+  try {
+    // Tenta encontrar a melhor correspondência entre o que o site oferece e o que o usuário quer
+    return matchLocale(languages, locales, i18n.defaultLocale);
+  } catch (error) {
+    return i18n.defaultLocale;
+  }
+}
+
+/**
+ * MIDDLEWARE DE INTERNACIONALIZAÇÃO
+ * Intercepta requisições para garantir roteamento limpo e SEO consistente.
  */
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const pathname = request.nextUrl.pathname;
 
-  // 1. IGNORAR PÁGINAS PÚBLICAS E ASSETS ESPECÍFICOS
-  // Garante que arquivos na pasta /public não sejam redirecionados
+  // 1. BYPASS PARA ASSETS E ARQUIVOS PÚBLICOS
+  // Evita que o middleware processe imagens, ícones e arquivos técnicos
+  const isPublicFile = pathname.match(
+    /\.(.*)$/ // Captura qualquer coisa com extensão (png, jpg, svg, xml, etc)
+  );
+
   if (
+    pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
-    pathname.includes('.') || // ignora arquivos como .png, .ico, .json
-    pathname.startsWith('/_next')
+    isPublicFile
   ) {
     return NextResponse.next();
   }
 
-  // 2. VERIFICAÇÃO DE LOCALE NA URL
-  // Checa se a URL já começa com /pt, /en ou /es
-  const pathnameHasLocale = i18n.locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  // 2. VERIFICAÇÃO DE PRESENÇA DE LOCALE NA URL
+  const pathnameIsMissingLocale = i18n.locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
 
-  if (pathnameHasLocale) return NextResponse.next();
+  // 3. REDIRECIONAMENTO SE O LOCALE ESTIVER AUSENTE
+  if (pathnameIsMissingLocale) {
+    const locale = getLocale(request);
 
-  // 3. DETECÇÃO DE IDIOMA DO NAVEGADOR (ACCEPT-LANGUAGE)
-  const acceptLanguage = request.headers.get('accept-language');
-  let locale = i18n.defaultLocale;
-
-  if (acceptLanguage) {
-    // Converte 'pt-BR,pt;q=0.9,en-US;q=0.8' em ['pt', 'en']
-    const preferredLocales = acceptLanguage
-      .split(',')
-      .map((lang) => lang.split(';')[0].split('-')[0].trim().toLowerCase());
-
-    const detectedLocale = preferredLocales.find((lang) =>
-      i18n.locales.includes(lang as any)
+    // Constrói a nova URL mantendo query params (ex: ?ref=linkedin)
+    return NextResponse.redirect(
+      new URL(
+        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}${request.nextUrl.search}`,
+        request.url
+      )
     );
-
-    if (detectedLocale) {
-      locale = detectedLocale;
-    }
   }
 
-  // 4. REDIRECIONAMENTO ESTRATÉGICO
-  // Redireciona de "/" para "/pt" (ou o idioma detectado)
-  const url = request.nextUrl.clone();
-  
-  // Trata a raiz e subcaminhos corretamente
-  const targetPath = pathname === '/' ? `/${locale}` : `/${locale}${pathname}`;
-  url.pathname = targetPath;
-
-  // Redirecionamento 307 (Temporário) é melhor para desenvolvimento e SEO dinâmico
-  return NextResponse.redirect(url);
+  return NextResponse.next();
 }
 
 /**
- * CONFIGURAÇÃO DO MATCHER
- * Filtro de alta performance para evitar execução desnecessária do middleware.
+ * CONFIGURAÇÃO DO MATCHER (PERFORMANCE)
+ * Define onde o middleware deve ou não atuar.
  */
 export const config = {
   matcher: [
     /*
-     * Aplica o middleware em todas as rotas, exceto:
-     * - api (rotas de API)
-     * - _next/static (arquivos estáticos)
-     * - _next/image (otimização de imagens)
-     * - favicon.ico, sitemap, robots, manifest (arquivos de SEO)
+     * Aplica o middleware em todas as rotas de página:
+     * - Não aplica em rotas de API (_api)
+     * - Não aplica em arquivos estáticos (_next/static)
+     * - Não aplica em otimização de imagem (_next/image)
+     * - Não aplica em arquivos na raiz (favicon.ico, etc)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.json).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.json|apple-touch-icon.png).*)',
   ],
 };
