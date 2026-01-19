@@ -2,7 +2,7 @@
 
 /**
  * CONFIGURAÇÃO GLOBAL DE IDIOMAS
- * Define a espinha dorsal do sistema multilíngue.
+ * Define a espinha dorsal do sistema multilíngue para Next.js 15.
  */
 export const i18n = {
   defaultLocale: 'pt',
@@ -11,24 +11,24 @@ export const i18n = {
 
 /**
  * TIPO LOCALE
- * Garante que o TypeScript aceite apenas 'pt', 'en' ou 'es' em todo o projeto.
+ * Extrai os valores 'pt' | 'en' | 'es' para uso em todo o projeto via TypeScript.
  */
 export type Locale = (typeof i18n)['locales'][number];
 
 /**
  * INTERFACE DE METADADOS
- * Atributos necessários para o LanguageSwitcher e tags HTML.
+ * Atributos necessários para SEO, LanguageSwitcher e tags HTML.
  */
 interface LocaleDetail {
   readonly name: string;   // Ex: English
-  readonly region: string; // Ex: en-US (Para SEO/Sitemap)
-  readonly flag: string;   // Emoji da bandeira
-  readonly label: string;  // Sigla exibida na UI
+  readonly region: string; // Ex: en-US (Crucial para hreflang no SEO)
+  readonly flag: string;   // Emoji ou ícone da bandeira
+  readonly label: string;  // Sigla curta (PT, EN, ES)
 }
 
 /**
  * DICIONÁRIO DE METADADOS DOS IDIOMAS
- * Centraliza as informações que alimentam os componentes de interface.
+ * Centraliza as informações que alimentam os componentes de interface e o Middleware.
  */
 export const localeMetadata: Record<Locale, LocaleDetail> = {
   pt: { 
@@ -53,25 +53,33 @@ export const localeMetadata: Record<Locale, LocaleDetail> = {
 
 /**
  * SEGURANÇA DE ROTA (Type Guard)
- * Função essencial usada no Middleware e no layout para validar a URL.
+ * Valida se a string da URL é um idioma suportado pelo sistema.
  */
-export function isValidLocale(locale: string): locale is Locale {
-  return i18n.locales.includes(locale as Locale);
+export function isValidLocale(locale: string | undefined | null): locale is Locale {
+  if (!locale) return false;
+  return (i18n.locales as readonly string[]).includes(locale);
 }
 
 /**
  * HELPER DE REGIONALIZAÇÃO
- * Retorna o código de região para a tag <html lang="..."> no layout principal.
+ * Retorna o código de região exato para a tag <html lang="...">.
  */
 export function getRegion(locale: Locale): string {
-  // Se por algum erro o locale for inválido, retorna o padrão pt-BR
-  return localeMetadata[locale]?.region || localeMetadata[i18n.defaultLocale].region;
+  return localeMetadata[locale]?.region ?? localeMetadata[i18n.defaultLocale].region;
 }
 
 /**
  * HELPER DE FALLBACK
- * Garante que sempre tenhamos um idioma válido para evitar erros de renderização.
+ * Garante que a aplicação nunca quebre se uma URL malformada for acessada.
  */
-export function getSafeLocale(locale: string): Locale {
+export function getSafeLocale(locale: string | undefined | null): Locale {
   return isValidLocale(locale) ? locale : i18n.defaultLocale;
 }
+
+/**
+ * HELPER PARA SEO (Alternates)
+ * Utilizado para gerar as tags link rel="alternate" no sitemap.xml
+ */
+export const getAlternateLocales = (currentLocale: Locale) => {
+  return i18n.locales.filter((locale) => locale !== currentLocale);
+};
