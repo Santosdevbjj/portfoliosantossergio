@@ -3,15 +3,16 @@ node_modules/
 .pnp
 .pnp.js
 
-# --- BUILD E SAÍDA (NEXT.JS 15) ---
+# --- BUILD E SAÍDA (NEXT.JS 15 + VERCEL) ---
 .next/
 out/
 build/
 dist/
 .vercel/
+*.tsbuildinfo
 
 # --- CONFIGURAÇÕES DE AMBIENTE (SEGURANÇA CRÍTICA) ---
-# Bloqueia qualquer arquivo que contenha segredos reais
+# Jamais versionar segredos. Isso protege suas chaves do GitHub/Azure.
 .env
 .env.local
 .env.development.local
@@ -19,7 +20,7 @@ dist/
 .env.production.local
 .env*.local
 
-# Permite que o exemplo de configuração seja compartilhado
+# Permite versionar apenas o modelo de configuração
 !.env.example
 
 # --- LOGS E PERFORMANCE ---
@@ -28,6 +29,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 lerna-debug.log*
+*.log
 
 # --- SISTEMA OPERACIONAL ---
 .DS_Store
@@ -46,6 +48,7 @@ desktop.ini
 *.sublime-workspace
 .project
 .settings/
+.swp
 
 # --- CACHE E TESTES ---
 .cache/
@@ -56,13 +59,19 @@ desktop.ini
 .turbo/
 
 # --- ESPECÍFICO NEXT.JS / TURBOPACK ---
+# Otimização para quem usa Next.js 15 com o novo motor de build
 .next/cache/
 .next/trace
 
 # --- TYPESCRIPT ---
+# Mantemos o env.d.ts para garantir que o build na Vercel reconheça os tipos
+# Mas ignoramos informações temporárias de build
 *.tsbuildinfo
-next-env.d.ts
 
-# --- OUTROS ---
-.DS_Store
-*.log
+# --- ARQUIVOS TEMPORÁRIOS DE DADOS ---
+# Útil para cientistas de dados: evita subir datasets pesados sem querer
+*.csv
+*.json.tmp
+*.sqlite
+.python-version
+__pycache__/
