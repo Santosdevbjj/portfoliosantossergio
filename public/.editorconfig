@@ -1,4 +1,5 @@
 # EditorConfig ajuda a manter estilos consistentes entre diferentes IDEs e editores
+# Para um Engenheiro Sênior, garante que o código seja "agnóstico" ao editor.
 root = true
 
 [*]
@@ -9,27 +10,28 @@ indent_size = 2
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-# Tipografia e Documentação técnica
+# Tipografia e Documentação técnica (MD/MDX)
 [*.{md,mdx}]
 # No Markdown, dois espaços no final da linha significam quebra de linha <br>
+# Por isso, desativamos o trim para preservar a formatação do texto.
 trim_trailing_whitespace = false
 indent_size = 2
 
 # Engenharia de Dados e Backend (Python e SQL)
-# Python segue a PEP8 (4 espaços) por convenção mundial
-[*.{py,sql}]
+# Respeito à PEP8 (4 espaços) para manter o padrão profissional de Data Science.
+[*.{py,sql,ipynb}]
 indent_style = space
 indent_size = 4
 
-# Web Development (Frontend e Configurações)
-# Adicionado suporte para arquivos de configuração do Next.js 15 e metadados
+# Web Development (Frontend, Configurações e Scripts)
+# Padronização Next.js 15 e Ecossistema JavaScript/TypeScript
 [*.{js,jsx,ts,tsx,cjs,mjs,cts,mts,json,css,scss,html,yml,yaml,toml}]
 indent_style = space
 indent_size = 2
 
 # Metadados e Verificação (Google Search Console e Manifests)
-# Garante que arquivos de verificação e o manifest.json mantenham a integridade
-[*.{html,json,xml}]
+# Garante a integridade de arquivos lidos por bots e crawlers.
+[*.{xml,json,webmanifest}]
 indent_style = space
 indent_size = 2
 
@@ -39,21 +41,28 @@ indent_style = space
 indent_size = 2
 trim_trailing_whitespace = false
 
-# Scripts de terminal e Automação
-[*.{sh,bash}]
+# Scripts de terminal e Automação de Pipeline
+[*.{sh,bash,zsh}]
 indent_style = space
 indent_size = 2
 
-# Configuração de Makefile e arquivos que exigem TABS (Padrão Unix)
+# Configuração de Makefile e arquivos que exigem TABS (Padrão Unix/Build)
 [Makefile]
 indent_style = tab
 indent_size = 4
 
 # Dados e Logs (Preservação de integridade de caracteres)
+# Evita corrupção de arquivos CSV durante a edição automática.
 [*.{csv,log,lock}]
 trim_trailing_whitespace = false
 
-# Ignorar arquivos binários e gerados
+# Ativos Binários e Estáticos
+# Desativamos edições automáticas para não corromper arquivos não-texto.
 [*.{png,jpg,jpeg,gif,webp,ico,pdf,woff,woff2}]
 insert_final_newline = false
 trim_trailing_whitespace = false
+
+# Configurações de Docker (caso utilize para o ambiente de Dados)
+[Dockerfile]
+indent_style = space
+indent_size = 4
