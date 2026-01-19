@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n } from '@/i18n-config';
 
+// Otimização de fonte para performance máxima
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -18,8 +19,7 @@ interface RootLayoutProps {
 }
 
 /**
- * RESPONSIVIDADE E TEMA MOBILE (UI/UX)
- * Controla como o navegador mobile renderiza a escala e as cores do sistema.
+ * CONFIGURAÇÃO DE VIEWPORT (UX MOBILE)
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -29,11 +29,11 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  userScalable: true,
 };
 
 /**
- * SEO MULTILINGUE DINÂMICO & GOOGLE VERIFICATION
- * Gera metadados específicos para cada idioma e valida a propriedade do site.
+ * SEO MULTILINGUE & GOOGLE VERIFICATION
  */
 export async function generateMetadata({ 
   params 
@@ -66,8 +66,7 @@ export async function generateMetadata({
     metadataBase: new URL(siteUrl),
     
     /**
-     * TAG DE VERIFICAÇÃO DO GOOGLE (Search Console)
-     * Mantida com prioridade para garantir a indexação correta.
+     * TAG DE VERIFICAÇÃO DO GOOGLE (Search Console) - PRIORIDADE
      */
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
@@ -83,8 +82,13 @@ export async function generateMetadata({
       },
     },
     icons: {
-      icon: '/favicon.ico',
-      apple: '/apple-touch-icon.png',
+      icon: [
+        { url: '/favicon.ico' },
+        { url: '/icon.png', type: 'image/png' },
+      ],
+      apple: [
+        { url: '/apple-touch-icon.png' },
+      ],
     },
     manifest: '/manifest.json',
     openGraph: {
@@ -92,39 +96,53 @@ export async function generateMetadata({
       description: descriptions[lang as keyof typeof descriptions] || descriptions.pt,
       url: `${siteUrl}/${lang}`,
       siteName: "Sérgio Santos Portfolio",
-      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Sérgio Santos' }],
+      images: [
+        {
+          url: '/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: 'Sérgio Santos - Portfolio',
+        },
+      ],
       locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
   };
 }
 
-/**
- * ROOT LAYOUT
- * O componente pai que define o HTML básico e os provedores globais.
- */
 export default async function RootLayout({ children, params }: RootLayoutProps) {
   const { lang } = await params;
 
   return (
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
       <head>
-        {/* Apple Mobile Web App tags para melhor experiência no iOS */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="format-detection" content="telephone=no" />
       </head>
       <body 
-        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden min-h-screen flex flex-col`}
+        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased min-h-screen flex flex-col`}
       >
-        {/* ThemeProvider centralizado para evitar conflitos de Dark Mode */}
         <ThemeProvider>
-          <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
-            <main className="flex-grow w-full">
+          {/* Container Principal que garante que o rodapé fique sempre embaixo */}
+          <div className="relative flex flex-col min-h-screen w-full">
+            <main className="flex-grow">
               {children}
             </main>
           </div>
 
-          {/* Governança de Dados (LGPD) */}
+          {/* Governança e LGPD */}
           <CookieBanner />
         </ThemeProvider>
       </body>
