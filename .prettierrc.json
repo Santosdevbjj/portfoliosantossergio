@@ -14,5 +14,6 @@
   "proseWrap": "always",
   "plugins": ["prettier-plugin-tailwindcss"],
   "tailwindAttributes": ["className", "class"],
-  "tailwindFunctions": ["clsx", "twMerge", "twJoin", "cn"]
+  "tailwindFunctions": ["clsx", "twMerge", "twJoin", "cn"],
+  "tailwindConfig": "./tailwind.config.ts"
 }
