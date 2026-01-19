@@ -4,7 +4,7 @@ import '../globals.css';
 import { Metadata, Viewport } from 'next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeProvider } from '@/components/ThemeProvider'; 
-import { i18n } from '@/i18n-config';
+import { i18n, getRegion } from '@/i18n-config';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -18,8 +18,8 @@ interface RootLayoutProps {
 }
 
 /**
- * Configuração de Viewport: Garante que o site seja TOTALMENTE RESPONSIVO.
- * Define a largura como a do dispositivo e impede quebras de layout.
+ * RESPONSIVIDADE EXTREMA
+ * Define as diretrizes para o navegador renderizar em qualquer tela.
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -29,11 +29,12 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  userScalable: true,
 };
 
 /**
- * SEO e Metadados: Gerencia as versões PT, EN e ES de forma dinâmica.
- * Inclui a nova Tag de Verificação do Google.
+ * SEO MULTILINGUE & GOVERNANÇA DE DADOS
+ * Gera os metadados dinamicamente para PT, EN e ES.
  */
 export async function generateMetadata({ 
   params 
@@ -58,8 +59,11 @@ export async function generateMetadata({
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
 
   return {
-    title: titles[lang] || titles.pt,
-    description: descriptions[lang] || descriptions.pt,
+    title: {
+      default: titles[lang as keyof typeof titles] || titles.pt,
+      template: `%s | Sérgio Santos`
+    },
+    description: descriptions[lang as keyof typeof descriptions] || descriptions.pt,
     metadataBase: new URL(siteUrl),
     alternates: {
       canonical: `${siteUrl}/${lang}`,
@@ -70,35 +74,35 @@ export async function generateMetadata({
         'x-default': `${siteUrl}/pt`,
       },
     },
-    // NOVA TAG DE VERIFICAÇÃO DO GOOGLE (Atualizada)
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
+    icons: {
+      icon: '/favicon.ico',
+      apple: '/apple-touch-icon.png',
+    },
+    manifest: '/manifest.json',
     openGraph: {
-      title: titles[lang] || titles.pt,
-      description: descriptions[lang] || descriptions.pt,
+      title: titles[lang as keyof typeof titles] || titles.pt,
+      description: descriptions[lang as keyof typeof descriptions] || descriptions.pt,
       url: `${siteUrl}/${lang}`,
       siteName: "Sérgio Santos Portfolio",
-      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Sérgio Santos Portfolio' }],
+      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Sérgio Santos' }],
       locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
     },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
+    twitter: {
+      card: 'summary_large_image',
+      title: titles[lang as keyof typeof titles] || titles.pt,
+      description: descriptions[lang as keyof typeof descriptions] || descriptions.pt,
+      images: ['/og-image.png'],
+    }
   };
 }
 
 export default async function RootLayout({ children, params }: RootLayoutProps) {
   const { lang } = await params;
+  const region = getRegion(lang as any);
 
   return (
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
@@ -115,7 +119,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           enableSystem
           disableTransitionOnChange
         >
-          {/* Componente responsivo para troca de idiomas (PT, EN, ES) */}
+          {/* Navegação Global Multilingue */}
           <LanguageSwitcher />
 
           <div className="relative flex-grow w-full flex flex-col">
