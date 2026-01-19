@@ -4,14 +4,15 @@
 
 @layer base {
   :root {
-    --brand-blue: #2563eb;
-    --brand-blue-hover: #1d4ed8;
+    /* Alinhado com a paleta Brand 600 do Tailwind Config */
+    --brand-blue: #026fc7;
+    --brand-blue-hover: #0358a1;
     color-scheme: light dark;
   }
 
   html {
     scroll-behavior: smooth;
-    /* Evita saltos laterais indesejados no mobile */
+    /* Previne saltos de layout e garante responsividade horizontal */
     overflow-x: hidden;
     @apply bg-slate-50 dark:bg-[#020617];
   }
@@ -20,13 +21,13 @@
     @apply bg-slate-50 text-slate-900 antialiased transition-colors duration-500;
     @apply dark:bg-[#020617] dark:text-slate-100;
     
-    /* RESILIÊNCIA TEXTUAL MULTILÍNGUE */
-    /* Garante que termos técnicos longos em PT/ES não quebrem o container no celular */
+    /* RESILIÊNCIA TEXTUAL MULTILÍNGUE (Sistemas de Missão Crítica) */
+    /* Impede que nomes de tecnologias complexas quebrem o layout em telas pequenas */
     overflow-wrap: break-word;
     word-wrap: break-word;
-    hyphens: none; /* Evita hifenização estranha em nomes de bibliotecas/tecnologias */
+    hyphens: none; 
     
-    /* Otimização de Legibilidade */
+    /* Otimização de Legibilidade para Engenharia de Dados */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -34,33 +35,32 @@
 }
 
 @layer components {
-  /* Container Central Responsivo (Padrão de Ouro) */
+  /* Container Central Responsivo (Padrão Sênior) */
   .main-container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 w-full;
   }
 
-  /* Efeito Glassmorphism Elevado */
+  /* Efeito Glassmorphism para Menus e Overlays */
   .glass-effect {
-    @apply bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/60 dark:border-white/5 shadow-2xl;
+    @apply bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border border-slate-200/60 dark:border-white/5 shadow-2xl;
   }
 
-  /* Badge de Especialidade (Filtros) */
+  /* Utilitário para ocultar scrollbars sem perder a funcionalidade de scroll */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
-    /* Melhora o scroll no mobile */
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Card de Projeto (Efeito Meigarom) */
+  /* Card de Projeto Estilo Enterprise */
   .project-card-gradient {
-    @apply relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 transition-all duration-500 hover:shadow-premium dark:hover:shadow-premium-dark;
+    @apply relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900/50 border border-slate-200/50 dark:border-slate-800/50 transition-all duration-500 hover:shadow-premium dark:hover:shadow-premium-dark;
   }
 
-  /* Animações de Staggered Load (Entrada em cascata) */
+  /* Animações de Entrada em Cascata (Staggered Load) */
   .stagger-load > * {
     @apply opacity-0;
     animation: slideUpFade 0.6s ease-out forwards;
@@ -70,11 +70,12 @@
   .stagger-load > *:nth-child(2) { animation-delay: 0.2s; }
   .stagger-load > *:nth-child(3) { animation-delay: 0.3s; }
   .stagger-load > *:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-load > *:nth-child(5) { animation-delay: 0.5s; }
 }
 
-/* Scrollbar Customizada Estilo "Dark Tech" */
+/* Scrollbar Customizada "Dark Tech" */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -85,23 +86,23 @@
   @apply bg-slate-300 dark:bg-slate-800 rounded-full border-2 border-solid border-transparent bg-clip-padding hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors;
 }
 
-/* Otimização Global de Media */
+/* Proteção de Mídia e Responsividade */
 img, svg, video {
   max-width: 100%;
   height: auto;
-  @apply select-none pointer-events-none; /* Proteção básica contra arraste */
+  @apply select-none; /* Removido pointer-events-none para permitir interação se necessário */
 }
 
-/* Foco de Acessibilidade */
+/* Foco de Acessibilidade (WCAG Compliance) */
 :focus-visible {
   @apply outline-none ring-2 ring-blue-600 ring-offset-2 dark:ring-offset-slate-950;
 }
 
-/* Animações de Chave (Keyframes) */
+/* Keyframes Globais */
 @keyframes slideUpFade {
   from { 
     opacity: 0; 
-    transform: translateY(30px); 
+    transform: translateY(20px); 
   }
   to { 
     opacity: 1; 
@@ -109,16 +110,17 @@ img, svg, video {
   }
 }
 
+/* Animação para elementos que entram na tela */
 .animate-in {
   animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Efeito de brilho sutil para destaque de projetos principais */
+/* Glow para Destaques (Projetos Principais) */
 .glow-effect {
-  @apply relative after:absolute after:inset-0 after:z-[-1] after:bg-blue-600/20 after:blur-[100px] after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-700;
+  @apply relative after:absolute after:inset-0 after:z-[-1] after:bg-blue-600/10 after:blur-[100px] after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-700;
 }
 
-/* Seleção de Texto Personalizada */
+/* Seleção de Texto Inteligente */
 ::selection {
   @apply bg-blue-600/30 text-blue-900 dark:text-white;
 }
