@@ -1,0 +1,51 @@
+{
+  "about": {
+    "title": "Sobre Mí",
+    "headline": "Transformando la resiliencia de los sistemas bancarios en inteligencia de datos estratégica.",
+    "bio": "Con más de 15 años de experiencia en sistemas de misión crítica en el sector bancario (Bradesco), me especialicé en garantizar que la tecnología respalde la toma de decisiones de alto riesgo con un 100% de gobernanza. Hoy, aplico este rigor operativo para liderar proyectos de Ciencia de Datos y Eficiencia Operativa, conectando infraestructuras complejas con insights accionables.",
+    "sections": {
+      "highlights": {
+        "title": "Hitos de Carrera",
+        "items": [
+          {
+            "label": "Eficiencia Operativa",
+            "description": "Desarrollé un sistema automatizado para el procesamiento de impuestos (IPVA), eliminando 2.920 horas anuales de trabajo manual."
+          },
+          {
+            "label": "Disponibilidad Crítica",
+            "description": "Mantuve la infraestructura corporativa para más de 500 usuarios con un SLA de disponibilidad del 99,5%."
+          },
+          {
+            "label": "Cumplimiento y Privacidad",
+            "description": "Implementé sistemas legales interdepartamentales con trazabilidad completa y cumplimiento de normativas de datos (LGPD)."
+          }
+        ]
+      },
+      "stack": {
+        "title": "Stack y Especialidades",
+        "items": [
+          {
+            "label": "Ciencia de Datos",
+            "description": "Python, SQL y Machine Learning para modelos predictivos y análisis de escenarios."
+          },
+          {
+            "label": "Big Data & Cloud",
+            "description": "Azure Databricks y Azure Cloud para pipelines escalables y gobernados."
+          },
+          {
+            "label": "Inteligencia de Relaciones",
+            "description": "Neo4J (Bases de datos de grafos) aplicado a la detección de fraudes y análisis de vínculos complejos."
+          },
+          {
+            "label": "Gobernanza",
+            "description": "Especialista en entornos regulados, seguridad de datos y auditoría bancaria."
+          }
+        ]
+      }
+    }
+  },
+  "common": {
+    "language": "Español",
+    "contact": "Contactar"
+  }
+}
