@@ -1,6 +1,6 @@
 // src/app/[lang]/page.tsx
 import { getGitHubProjects } from '@/lib/github';
-import { translations } from '@/constants/translations';
+import { getDictionary } from '@/lib/get-dictionary';
 import { notFound } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { HeroSection } from '@/components/HeroSection';
@@ -10,8 +10,9 @@ import { FeaturedArticleSection } from '@/components/FeaturedArticleSection';
 import { ContactSection } from '@/components/ContactSection';
 import { Footer } from '@/components/Footer';
 import { PageWrapper } from '@/components/PageWrapper';
+import type { Locale } from '@/i18n-config';
 
-// Revalida os dados do GitHub a cada 1 hora
+// Revalida os dados do GitHub a cada 1 hora (ISR)
 export const revalidate = 3600; 
 
 interface PageProps {
@@ -19,50 +20,57 @@ interface PageProps {
 }
 
 /**
- * PAGE PRINCIPAL
- * Esta página compõe todas as seções do portfólio utilizando os componentes
- * modulares que seguem a estratégia de autoridade e impacto.
+ * PÁGINA PRINCIPAL - NEXT.JS 15
+ * Implementação dinâmica multilingue (PT, EN, ES) com foco em
+ * performance de carregamento e SEO de missão crítica.
  */
 export default async function Page({ params }: PageProps) {
   const { lang } = await params;
   
-  // Validação de Idioma Seguro
-  const validLangs = ['pt', 'en', 'es'] as const;
-  const currentLang = (validLangs.includes(lang as any) ? lang : 'pt') as keyof typeof translations;
+  // Validação de Idioma Seguro para evitar rotas inexistentes
+  const validLangs: Locale[] = ['pt', 'en', 'es'];
+  if (!validLangs.includes(lang as Locale)) {
+    return notFound();
+  }
 
-  // Carrega as traduções
-  const t = translations[currentLang];
-  if (!t) return notFound();
+  const currentLang = lang as Locale;
 
-  // Busca projetos do GitHub com filtro de tópicos integrado na lib
+  /** * CARREGAMENTO DO DICIONÁRIO DINÂMICO
+   * Aqui injetamos os textos de "Sobre Mim" e outros metadados
+   * definidos nos arquivos JSON (pt.json, en.json, es.json).
+   */
+  const dict = await getDictionary(currentLang);
+
+  // Busca assíncrona dos projetos do GitHub (Engenharia de Dados)
   const allProjects = await getGitHubProjects();
 
   return (
     <PageWrapper>
-      {/* Navegação Global */}
+      {/* Navegação Global com injeção de idioma */}
       <Navbar lang={currentLang} />
 
       <main className="flex flex-col w-full">
-        {/* 1. Hero: Impacto Imediato e Headline Luiz Café */}
-        <HeroSection lang={currentLang} />
+        {/* 1. Hero: Impacto Imediato e Identidade Visual */}
+        <HeroSection lang={currentLang} dict={dict} />
 
-        {/* 2. Sobre: Narrativa de 15 anos e Framework Meigarom */}
+        {/* 2. Sobre: Narrativa de 15 anos de Bradesco e Data Science */}
         <div id="about">
-          <AboutSection lang={currentLang} />
+          {/* Passamos o 'dict' para que o componente Sobre acesse os novos textos */}
+          <AboutSection lang={currentLang} dict={dict} />
         </div>
 
-        {/* 3. Destaque: Artigo Premiado (Autoridade Técnica) */}
-        <FeaturedArticleSection lang={currentLang} />
+        {/* 3. Destaque: Autoridade Técnica (Artigos e Papers) */}
+        <FeaturedArticleSection lang={currentLang} dict={dict} />
 
-        {/* 4. Grid de Projetos: O motor de busca e ordenação 1 a 17 */}
-        <PortfolioGrid projects={allProjects} lang={currentLang} />
+        {/* 4. Portfolio: Grid dinâmica de projetos reais */}
+        <PortfolioGrid projects={allProjects} lang={currentLang} dict={dict} />
 
-        {/* 5. Contato: Conversão de Recrutadores */}
-        <ContactSection lang={currentLang} />
+        {/* 5. Contato: Foco em conversão de leads e parcerias */}
+        <ContactSection lang={currentLang} dict={dict} />
       </main>
 
-      {/* Rodapé Profissional */}
-      <Footer lang={currentLang} />
+      {/* Rodapé Corporativo */}
+      <Footer lang={currentLang} dict={dict} />
     </PageWrapper>
   );
 }
