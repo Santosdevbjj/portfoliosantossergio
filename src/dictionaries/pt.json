@@ -2,20 +2,50 @@
   "about": {
     "title": "Sobre Mim",
     "headline": "Transformando a resiliência de sistemas bancários em inteligência de dados estratégica.",
-    "bio": "Com mais de 15 anos de experiência em sistemas de missão crítica no setor bancário (Bradesco), especializei-me em garantir que a tecnologia sustente decisões de alto risco com 100% de governança. Hoje, utilizo esse rigor operacional para liderar projetos de Ciência de Dados e Eficiência Operacional.",
-    "highlights": {
-      "automation": "Sistema automatizado de IPVA: eliminou 2.920 horas anuais de processamento manual.",
-      "availability": "Infraestrutura corporativa: 500+ usuários com 99,5% de disponibilidade.",
-      "compliance": "Sistemas jurídicos: rastreabilidade completa e conformidade LGPD."
-    },
-    "stack": {
-      "title": "Stack & Especialidades",
-      "items": [
-        "Data Science: Python, SQL e Machine Learning",
-        "Big Data: Azure Databricks e Azure Cloud",
-        "Grafos: Neo4J aplicado a detecção de fraudes",
-        "Governança: Ambientes regulados e auditoria bancária"
-      ]
+    "bio": "Com mais de 15 anos de experiência em sistemas de missão crítica no setor bancário (Bradesco), especializei-me em garantir que a tecnologia sustente decisões de alto risco com 100% de governança. Hoje, utilizo esse rigor operacional para liderar projetos de Ciência de Dados e Eficiência Operacional, conectando infraestruturas complexas a insights acionáveis.",
+    "sections": {
+      "highlights": {
+        "title": "Experiência Técnica",
+        "items": [
+          {
+            "label": "Eficiência Operacional",
+            "description": "Sistema automatizado de IPVA que eliminou 2.920 horas anuais de processamento manual."
+          },
+          {
+            "label": "Disponibilidade Crítica",
+            "description": "Infraestrutura de rede corporativa para 500+ usuários com 99,5% de disponibilidade."
+          },
+          {
+            "label": "Compliance e Privacidade",
+            "description": "Sistemas jurídicos interdepartamentais com rastreabilidade completa e conformidade LGPD."
+          }
+        ]
+      },
+      "stack": {
+        "title": "Stack & Especialidades",
+        "items": [
+          {
+            "label": "Ciência de Dados",
+            "description": "Python, SQL e Machine Learning para modelos preditivos e análise de cenários."
+          },
+          {
+            "label": "Big Data & Cloud",
+            "description": "Azure Databricks e Azure Cloud para pipelines escaláveis e governados."
+          },
+          {
+            "label": "Inteligência de Relacionamentos",
+            "description": "Neo4J (bancos de dados de grafos) aplicado a detecção de fraudes e análise de vínculos."
+          },
+          {
+            "label": "Governança",
+            "description": "Especialista em ambientes regulados, segurança de dados e auditoria bancária."
+          }
+        ]
+      }
     }
+  },
+  "common": {
+    "language": "Português",
+    "contact": "Entre em contato"
   }
 }
