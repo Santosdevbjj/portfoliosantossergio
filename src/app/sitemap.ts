@@ -1,33 +1,44 @@
 // src/app/sitemap.ts
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next'
+
 import { i18n } from '@/i18n-config'
 
 /**
  * GERADOR DE SITEMAP DINÂMICO - NEXT.JS 15
- * Cria o mapeamento de URLs e as relações hreflang para garantir que 
- * o Google entregue a versão correta do site dependendo do país do usuário.
+ * Cria o mapeamento de URLs e as relações hreflang.
+ * Essencial para que o Google entenda a estrutura multilingue e não penalize por conteúdo duplicado.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app'
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '')
   const lastModified = new Date()
 
-  // Geramos as entradas para cada idioma suportado
-  return i18n.locales.map((locale) => ({
+  // Mapeamento das rotas por idioma
+  const localeEntries = i18n.locales.map((locale) => ({
     url: `${baseUrl}/${locale}`,
     lastModified,
-    changeFrequency: 'weekly', // Alterado para semanal para indexar novos projetos mais rápido
+    changeFrequency: 'weekly' as const,
     priority: locale === i18n.defaultLocale ? 1.0 : 0.8,
-    
-    /**
-     * RELAÇÕES DE IDIOMA (Hreflang)
-     * Essencial para SEO Internacional: evita que o Google considere as versões 
-     * traduzidas como "conteúdo duplicado".
-     */
     languages: {
       'pt-BR': `${baseUrl}/pt`,
       'en-US': `${baseUrl}/en`,
       'es-ES': `${baseUrl}/es`,
-      'x-default': `${baseUrl}/pt`, // Direciona usuários de outros idiomas para a versão principal
+      'x-default': `${baseUrl}/pt`,
     },
   }))
+
+  // Adicionamos a URL raiz (/) para garantir indexação completa do domínio
+  const rootEntry = {
+    url: baseUrl,
+    lastModified,
+    changeFrequency: 'weekly' as const,
+    priority: 1.0,
+    languages: {
+      'pt-BR': `${baseUrl}/pt`,
+      'en-US': `${baseUrl}/en`,
+      'es-ES': `${baseUrl}/es',
+      'x-default': `${baseUrl}/pt`,
+    },
+  }
+
+  return [rootEntry, ...localeEntries]
 }
