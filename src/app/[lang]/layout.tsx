@@ -2,7 +2,7 @@
 import { Inter } from 'next/font/google';
 import '../globals.css';
 import { Metadata, Viewport } from 'next';
-import { ThemeProvider } from '@/hooks/ThemeContext'; // Importação corrigida para seu hook customizado
+import { ThemeProvider } from '@/hooks/ThemeContext'; 
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n } from '@/i18n-config';
 
@@ -19,6 +19,7 @@ interface RootLayoutProps {
 
 /**
  * RESPONSIVIDADE E TEMA MOBILE
+ * Otimizado para visualização em smartphones e tablets.
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -31,7 +32,7 @@ export const viewport: Viewport = {
 };
 
 /**
- * SEO MULTILINGUE DINÂMICO
+ * SEO MULTILINGUE DINÂMICO & VERIFICAÇÃO DE PROPRIEDADE
  */
 export async function generateMetadata({ 
   params 
@@ -62,6 +63,12 @@ export async function generateMetadata({
     },
     description: descriptions[lang as keyof typeof descriptions] || descriptions.pt,
     metadataBase: new URL(siteUrl),
+    
+    // TAG DE VERIFICAÇÃO DO GOOGLE (Garante a propriedade no Search Console)
+    verification: {
+      google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
+    },
+
     alternates: {
       canonical: `${siteUrl}/${lang}`,
       languages: {
@@ -96,17 +103,14 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
       <body 
         className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden min-h-screen flex flex-col`}
       >
-        {/* O ThemeProvider agora envolve a aplicação usando sua lógica customizada */}
         <ThemeProvider>
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
-            {/* O LanguageSwitcher e Navbar são renderizados dentro das páginas ou aqui, 
-                dependendo da sua preferência de design. Mantendo flexibilidade: */}
             <main className="flex-grow w-full">
               {children}
             </main>
           </div>
 
-          {/* Governança de Dados visível em todas as rotas */}
+          {/* Governança e Compliance (LGPD) */}
           <CookieBanner />
         </ThemeProvider>
       </body>
