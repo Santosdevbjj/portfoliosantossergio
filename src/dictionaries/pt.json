@@ -5,7 +5,7 @@
     "bio": "Com mais de 15 anos de experiência em sistemas de missão crítica no setor bancário (Bradesco), especializei-me em garantir que a tecnologia sustente decisões de alto risco com 100% de governança. Hoje, utilizo esse rigor operacional para liderar projetos de Ciência de Dados e Eficiência Operacional, conectando infraestruturas complexas a insights acionáveis.",
     "sections": {
       "highlights": {
-        "title": "Experiência Técnica",
+        "title": "Destaques de Carreira",
         "items": [
           {
             "label": "Eficiência Operacional",
@@ -44,8 +44,27 @@
       }
     }
   },
+  "portfolio": {
+    "title": "Projetos em Destaque",
+    "all": "Todos",
+    "categories": {
+      "data-science": "Ciência de Dados",
+      "big-data": "Big Data",
+      "automation": "Automação",
+      "governance": "Governança"
+    }
+  },
+  "contact": {
+    "title": "Vamos conversar?",
+    "sub": "Disponível para projetos estratégicos, liderança técnica e consultoria em dados.",
+    "emailBtn": "Enviar E-mail",
+    "socialLabel": "Redes Profissionais",
+    "status": "Disponível para desafios em 2026"
+  },
   "common": {
     "language": "Português",
-    "contact": "Entre em contato"
+    "contact": "Entre em contato",
+    "viewProject": "Ver Projeto",
+    "repoTitle": "Repositórios"
   }
 }
