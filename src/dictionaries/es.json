@@ -5,7 +5,8 @@
     "viewProject": "Ver Proyecto",
     "repoTitle": "Repositorios",
     "portfolioTitle": "Portafolio de Soluciones",
-    "governance": "Rigor y Gobernanza"
+    "governance": "Rigor y Gobernanza",
+    "backToTop": "Volver arriba"
   },
   "about": {
     "title": "Sobre Mí",
@@ -17,44 +18,44 @@
         "items": [
           {
             "label": "Eficiencia Operativa",
-            "description": "Sistema automatizado para el procesamiento de impuestos que eliminó 2.920 horas anuales de trabajo manual."
+            "description": "Automatización de sistemas fiscales que eliminó 2.920 horas anuales de trabajo manual."
           },
           {
             "label": "Disponibilidad Crítica",
-            "description": "Infraestructura corporativa para más de 500 usuarios con un SLA de disponibilidad del 99,5%."
+            "description": "Infraestructura corporativa para más de 500 usuarios con un SLA del 99,5%."
           },
           {
             "label": "Cumplimiento y Privacidad",
-            "description": "Sistemas legales interdepartamentales con trazabilidad completa y cumplimiento de normativas LGPD/GDPR."
+            "description": "Sistemas legales con trazabilidad completa y cumplimiento de normativas GDPR/LGPD."
           }
         ]
       },
       "metrics": {
-        "title": "Performance y Gobernanza",
+        "title": "Rendimiento y Gobernanza",
         "subtitle": "KPIs e IMPACTO",
         "availabilityValue": "99.5%",
         "availabilityLabel": "Disponibilidad",
         "automationValue": "2.9K",
-        "automationLabel": "Horas Automatizadas"
+        "automationLabel": "Horas Ahorradas"
       },
       "stack": {
         "title": "Stack y Especialidades",
         "items": [
           {
             "label": "Ciencia de Datos",
-            "description": "Python, SQL y Machine Learning para modelos predictivos y análisis de escenarios."
+            "description": "Python, SQL y Machine Learning para modelos predictivos."
           },
           {
             "label": "Big Data & Cloud",
-            "description": "Azure Databricks y Azure Cloud para pipelines escalables y gobernados."
+            "description": "Azure Databricks para pipelines escalables y gobernados."
           },
           {
-            "label": "Inteligencia de Relaciones",
-            "description": "Neo4J (Bases de datos de grafos) aplicado a la detección de fraudes y análisis de vínculos."
+            "label": "Inteligencia de Grafos",
+            "description": "Neo4J aplicado a la detección de fraudes y análisis de vínculos."
           },
           {
             "label": "Gobernanza",
-            "description": "Especialista en entornos regulados, seguridad de datos y auditoría bancaria."
+            "description": "Especialista en entornos regulados y auditoría bancaria."
           }
         ]
       }
@@ -75,7 +76,8 @@
     "projectLabels": {
       "problem": "El Problema",
       "solution": "La Solución",
-      "impact": "Impacto de Negocio"
+      "impact": "Impacto de Negocio",
+      "technologies": "Tecnologías"
     }
   },
   "contact": {
@@ -83,12 +85,19 @@
     "subtitle": "Disponible para proyectos estratégicos, liderazgo técnico y consultoría de datos.",
     "emailBtn": "Enviar Correo",
     "socialLabel": "Redes Profesionales",
-    "status": "Disponible para desafíos 2026"
+    "status": "Disponible para desafíos en 2026",
+    "form": {
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "message": "Mensaje",
+      "send": "Enviar Mensaje"
+    }
   },
   "footer": {
     "social": "Redes Profesionales",
     "contact": "Contacto",
     "location": "Brasil",
-    "builtBy": "Desarrollado por"
+    "builtBy": "Desarrollado por",
+    "rights": "Todos los derechos reservados"
   }
 }
