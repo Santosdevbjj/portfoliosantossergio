@@ -3,15 +3,10 @@
   "extends": [
     "next/core-web-vitals",
     "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:jsx-a11y/recommended",
-    "prettier"
+    "plugin:jsx-a11y/recommended"
   ],
   "plugins": [
-    "react",
-    "react-hooks",
     "@typescript-eslint",
     "jsx-a11y",
     "unused-imports",
@@ -31,14 +26,12 @@
     }
   },
   "rules": {
-    /* React 19 / Next 15: Otimização de Compilação */
+    /* React 19 / Next 15: Otimização */
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
-    "react/display-name": "off",
-    "react/jsx-no-target-blank": "warn",
     "react/no-unescaped-entities": "off",
 
-    /* Clean Code: Remoção automática de lixo eletrônico (Imports não usados) */
+    /* Clean Code: Remoção automática de imports não usados */
     "@typescript-eslint/no-unused-vars": "off",
     "unused-imports/no-unused-imports": "error",
     "unused-imports/no-unused-vars": [
@@ -51,7 +44,7 @@
       }
     ],
 
-    /* Arquitetura de Software: Padronização de Imports */
+    /* Organização de Imports */
     "import/order": [
       "warn",
       {
@@ -76,45 +69,20 @@
       }
     ],
 
-    /* TypeScript Estrito (Alinhado ao TS 5.7+) */
+    /* TypeScript Estrito (TS 5.7+) */
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/consistent-type-imports": [
-      "warn",
-      { "prefer": "type-imports", "fixStyle": "inline-type-imports" }
+      "error",
+      { "prefer": "type-imports", "fixStyle": "separate-type-imports" }
     ],
-    "@typescript-eslint/no-empty-interface": "warn",
-    "@typescript-eslint/no-duplicate-enum-values": "error",
-    "@typescript-eslint/no-wrapper-object-types": "error",
     "@typescript-eslint/no-non-null-assertion": "warn",
 
-    /* Acessibilidade Digital (Padrão Sênior) */
+    /* Acessibilidade (SEO e UX) */
     "jsx-a11y/alt-text": "error",
-    "jsx-a11y/aria-props": "warn",
-    "jsx-a11y/aria-proptypes": "warn",
-    "jsx-a11y/aria-unsupported-elements": "warn",
-    "jsx-a11y/role-has-required-aria-props": "warn",
-    "jsx-a11y/role-supports-aria-props": "warn",
-    "jsx-a11y/no-static-element-interactions": "warn",
-    "jsx-a11y/click-events-have-key-events": "warn",
     "jsx-a11y/anchor-is-valid": "warn",
 
-    /* Higiene de Logs e Debugging */
+    /* Logs e Debugging */
     "no-console": ["warn", { "allow": ["warn", "error"] }],
     "no-debugger": "error"
-  },
-  "overrides": [
-    {
-      "files": ["*.test.ts", "*.test.tsx", "*.spec.ts", "*.spec.tsx"],
-      "rules": {
-        "@typescript-eslint/no-explicit-any": "off",
-        "no-console": "off"
-      }
-    },
-    {
-      "files": ["src/app/**/layout.tsx", "src/app/**/page.tsx"],
-      "rules": {
-        "@typescript-eslint/explicit-function-return-type": "off"
-      }
-    }
-  ]
+  }
 }
