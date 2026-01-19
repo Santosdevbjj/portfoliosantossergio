@@ -2,7 +2,7 @@
 
 /**
  * Interface rigorosa para os dados do GitHub.
- * Alinhada com as necessidades do ProjectCard e PortfolioGrid.
+ * Garante que o TypeScript valide o contrato de dados entre a API e a UI.
  */
 export interface GitHubRepo {
   id: number;
@@ -16,16 +16,15 @@ export interface GitHubRepo {
 }
 
 /**
- * EXTRAÇÃO E TRATAMENTO DE DADOS (ETL)
- * Busca os repositórios do GitHub com foco em performance e segurança.
- * No Next.js 15, esta função roda no servidor durante a geração das páginas.
+ * SERVIÇO DE INTEGRAÇÃO GITHUB (Server-Side Only)
+ * Busca e filtra repositórios para demonstrar autoridade técnica.
  */
 export async function getGitHubProjects(): Promise<GitHubRepo[]> {
   const token = process.env.GITHUB_ACCESS_TOKEN;
   const username = "Santosdevbjj";
   
-  // Rota autenticada tem limite maior (5000 req/hora). 
-  // Se o token não estiver no .env, usa a API pública (limite 60 req/hora).
+  // URL dinâmica: se houver token, acessa repositórios privados/organizações se necessário.
+  // Caso contrário, busca apenas os públicos do usuário especificado.
   const url = token 
     ? `https://api.github.com/user/repos?sort=updated&direction=desc&per_page=100&affiliation=owner`
     : `https://api.github.com/users/${username}/repos?sort=updated&direction=desc&per_page=100`;
@@ -33,40 +32,41 @@ export async function getGitHubProjects(): Promise<GitHubRepo[]> {
   try {
     const response = await fetch(url, {
       headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(token && { Authorization: `token ${token}` }),
         'Accept': 'application/vnd.github.v3+json',
         'User-Agent': 'Portfolio-Sergio-Santos-Data-Science',
       },
-      // Revalidação ISR (Incremental Static Regeneration)
-      // O Next.js manterá uma versão em cache e atualizará em background a cada 1 hora.
+      /**
+       * NEXT.JS 15 CACHING (ISR)
+       * O cache é mantido no servidor e revalidado a cada 1 hora.
+       * Isso garante que o site seja ultrarrápido (não consulta a API a cada clique).
+       */
       next: { revalidate: 3600 }, 
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`[GitHub API Error] Status: ${response.status} | Context: ${errorText}`);
+      console.error(`[GitHub Error] Status: ${response.status} para o usuário ${username}`);
       return []; 
     }
 
     const repos = await response.json();
 
     if (!Array.isArray(repos)) {
-      console.warn("[GitHub API Warning] Response is not an array. Check username or token.");
+      console.warn("[GitHub Warning] Resposta da API não é um array.");
       return [];
     }
 
     /**
-     * TRANSFORMAÇÃO E FILTRAGEM
-     * 1. Removemos forks (foco em autoria própria).
-     * 2. Exigimos a tag 'portfolio' para aparecer no site.
-     * 3. Mapeamos apenas os campos necessários para reduzir o payload.
+     * FILTRAGEM E MAPEAMENTO (Data Transformation)
+     * 1. Ignoramos forks para mostrar apenas trabalho original.
+     * 2. Exigimos a tag 'portfolio' (controle de qualidade do que aparece no site).
      */
     const filteredRepos = repos
       .filter((repo) => !repo.fork && repo.topics?.includes("portfolio"))
-      .map((repo) => ({
+      .map((repo): GitHubRepo => ({
         id: repo.id,
         name: repo.name, 
-        description: repo.description,
+        description: repo.description || "",
         html_url: repo.html_url,
         homepage: repo.homepage,
         topics: repo.topics || [],
@@ -74,16 +74,31 @@ export async function getGitHubProjects(): Promise<GitHubRepo[]> {
         stargazers_count: repo.stargazers_count,
       }));
 
-    // Ordenação final: Repositórios com 'primeiro' ou 'destaque' no topo, 
-    // seguidos pelos mais recentes.
+    /**
+     * ORDENAÇÃO ESTRATÉGICA
+     * Prioridade 1: Tag 'primeiro' (Seu projeto principal de Ciência de Dados/Azure)
+     * Prioridade 2: Tag 'destaque' (Projetos secundários de alto impacto)
+     * Prioridade 3: Ordem cronológica (Mais recentes primeiro)
+     */
     return filteredRepos.sort((a, b) => {
-      if (a.topics.includes('primeiro')) return -1;
-      if (b.topics.includes('primeiro')) return 1;
+      const getWeight = (repo: GitHubRepo) => {
+        if (repo.topics.includes('primeiro')) return 2;
+        if (repo.topics.includes('destaque')) return 1;
+        return 0;
+      };
+
+      const weightA = getWeight(a);
+      const weightB = getWeight(b);
+
+      if (weightA !== weightB) {
+        return weightB - weightA;
+      }
+
       return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
     });
     
   } catch (error) {
-    console.error("[GitHub API Fatal Error] Connection failed:", error);
-    return []; // Graceful degradation: o site continua no ar mesmo sem projetos
+    console.error("[GitHub Fatal Error] Falha na conexão com a API:", error);
+    return []; // Degradação graciosa: o grid de projetos apenas não aparece, mas o site não cai.
   }
 }
