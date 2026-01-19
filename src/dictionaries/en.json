@@ -5,7 +5,8 @@
     "viewProject": "View Project",
     "repoTitle": "Repositories",
     "portfolioTitle": "Solutions Portfolio",
-    "governance": "Rigor & Governance"
+    "governance": "Rigor & Governance",
+    "backToTop": "Back to top"
   },
   "about": {
     "title": "About Me",
@@ -17,7 +18,7 @@
         "items": [
           {
             "label": "Operational Efficiency",
-            "description": "Automated IPV tax system that eliminated 2,920 annual hours of manual processing."
+            "description": "Automated tax systems eliminating 2,920 annual hours of manual processing."
           },
           {
             "label": "Critical Availability",
@@ -25,7 +26,7 @@
           },
           {
             "label": "Compliance & Privacy",
-            "description": "Interdepartmental legal systems with full traceability and LGPD/GDPR compliance."
+            "description": "Interdepartmental systems with full traceability and GDPR/LGPD compliance."
           }
         ]
       },
@@ -33,28 +34,28 @@
         "title": "Performance & Governance",
         "subtitle": "KPIs & IMPACT",
         "availabilityValue": "99.5%",
-        "availabilityLabel": "Availability",
+        "availabilityLabel": "Uptime",
         "automationValue": "2.9K",
-        "automationLabel": "Automated Hours"
+        "automationLabel": "Hours Saved"
       },
       "stack": {
         "title": "Stack & Specialties",
         "items": [
           {
             "label": "Data Science",
-            "description": "Python, SQL, and Machine Learning for predictive modeling and scenario analysis."
+            "description": "Python, SQL, and Machine Learning for predictive modeling."
           },
           {
             "label": "Big Data & Cloud",
-            "description": "Azure Databricks and Azure Cloud for scalable and governed pipelines."
+            "description": "Azure Databricks for scalable and governed data pipelines."
           },
           {
-            "label": "Relationship Intelligence",
-            "description": "Neo4J (Graph Databases) applied to fraud detection and link analysis."
+            "label": "Graph Intelligence",
+            "description": "Neo4J applied to fraud detection and complex link analysis."
           },
           {
             "label": "Governance",
-            "description": "Specialist in regulated environments, data security, and banking auditing."
+            "description": "Specialist in regulated environments and banking audits."
           }
         ]
       }
@@ -75,7 +76,8 @@
     "projectLabels": {
       "problem": "The Problem",
       "solution": "The Solution",
-      "impact": "Business Impact"
+      "impact": "Business Impact",
+      "technologies": "Technologies"
     }
   },
   "contact": {
@@ -83,12 +85,19 @@
     "subtitle": "Available for strategic projects, technical leadership, and data consultancy.",
     "emailBtn": "Send Email",
     "socialLabel": "Professional Networks",
-    "status": "Open for new challenges 2026"
+    "status": "Available for challenges in 2026",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "send": "Send Message"
+    }
   },
   "footer": {
     "social": "Professional Networks",
     "contact": "Contact",
     "location": "Brazil",
-    "builtBy": "Developed by"
+    "builtBy": "Developed by",
+    "rights": "All rights reserved"
   }
 }
