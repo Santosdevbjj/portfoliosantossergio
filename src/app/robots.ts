@@ -2,9 +2,8 @@
 import { MetadataRoute } from 'next'
 
 /**
- * Configuração de Robots Dinâmico - Next.js 15
- * Este arquivo orienta os indexadores (Google, Bing, etc.) sobre quais 
- * áreas do portfólio devem ser rastreadas, garantindo SEO multilingue eficiente.
+ * CONFIGURAÇÃO DINÂMICA DE ROBOTS - NEXT.JS 15
+ * Gerencia a visibilidade do portfólio para motores de busca globais.
  */
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app'
@@ -12,29 +11,37 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        // Aplica-se a todos os robôs (Googlebot, Bingbot, etc.)
         userAgent: '*',
         allow: [
-          '/',           // Home
-          '/pt',         // Versão Português (Prioridade 1)
-          '/en',         // Versão Inglês
-          '/es',         // Versão Espanhol
-          '/api/og',     // Imagens de compartilhamento social
-          '/manifest.json' // IMPORTANTE: Permitir leitura para habilitar PWA
+          '/',              // Raiz
+          '/pt',            // Versão Brasileira (Principal)
+          '/en',            // Versão Internacional
+          '/es',            // Versão LatAm/Espanha
+          '/images/',       // Permite indexação de fotos de projetos e perfil
+          '/assets/',       // Permite indexação de documentos (Ex: CV em PDF)
+          '/manifest.json', // Vital para o PWA que configuramos
+          '/favicon.ico'    // Ícone do site
         ],
         disallow: [
-          '/private/',   // Área reservada para testes
-          '/admin/',     // Dashboard futuro
-          '/_next/',     // Arquivos internos do Next.js
+          '/api/',          // Bloqueia rotas de backend/servidor
+          '/_next/',        // Bloqueia arquivos internos de build
+          '/private/',      // Área de staging/testes
+          '/*.json$',       // Bloqueia arquivos JSON genéricos (exceto manifest)
         ],
       },
       {
-        // Otimização para IA: Evita consumo excessivo de banda por crawlers de treino
-        userAgent: ['GPTBot', 'CCBot'],
-        disallow: ['/private/'],
+        /**
+         * POLÍTICA PARA IA (GPTBot, Claude-bot, etc.)
+         * Permite que leiam o portfólio (bom para recomendações de IA),
+         * mas bloqueia áreas privadas.
+         */
+        userAgent: ['GPTBot', 'CCBot', 'Claude-bot'],
+        allow: ['/pt', '/en', '/es'],
+        disallow: ['/private/', '/api/'],
       }
     ],
-    // Vinculação direta com o Sitemap já verificado no Search Console
+    // Link direto para o Sitemap para acelerar a indexação das 3 línguas
     sitemap: `${baseUrl}/sitemap.xml`,
+    host: baseUrl,
   }
 }
