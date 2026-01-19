@@ -1,4 +1,12 @@
 {
+  "common": {
+    "language": "Español",
+    "contact": "Contactar",
+    "viewProject": "Ver Proyecto",
+    "repoTitle": "Repositorios",
+    "portfolioTitle": "Portafolio de Soluciones",
+    "governance": "Rigor y Gobernanza"
+  },
   "about": {
     "title": "Sobre Mí",
     "headline": "Transformando la resiliencia de los sistemas bancarios en inteligencia de datos estratégica.",
@@ -9,17 +17,25 @@
         "items": [
           {
             "label": "Eficiencia Operativa",
-            "description": "Desarrollé un sistema automatizado para el procesamiento de impuestos (IPVA), eliminando 2.920 horas anuales de trabajo manual."
+            "description": "Sistema automatizado para el procesamiento de impuestos que eliminó 2.920 horas anuales de trabajo manual."
           },
           {
             "label": "Disponibilidad Crítica",
-            "description": "Mantuve la infraestructura corporativa para más de 500 usuarios con un SLA de disponibilidad del 99,5%."
+            "description": "Infraestructura corporativa para más de 500 usuarios con un SLA de disponibilidad del 99,5%."
           },
           {
             "label": "Cumplimiento y Privacidad",
-            "description": "Implementé sistemas legales interdepartamentales con trazabilidad completa y cumplimiento de normativas de datos (LGPD)."
+            "description": "Sistemas legales interdepartamentales con trazabilidad completa y cumplimiento de normativas LGPD/GDPR."
           }
         ]
+      },
+      "metrics": {
+        "title": "Performance y Gobernanza",
+        "subtitle": "KPIs e IMPACTO",
+        "availabilityValue": "99.5%",
+        "availabilityLabel": "Disponibilidad",
+        "automationValue": "2.9K",
+        "automationLabel": "Horas Automatizadas"
       },
       "stack": {
         "title": "Stack y Especialidades",
@@ -34,7 +50,7 @@
           },
           {
             "label": "Inteligencia de Relaciones",
-            "description": "Neo4J (Bases de datos de grafos) aplicado a la detección de fraudes y análisis de vínculos complejos."
+            "description": "Neo4J (Bases de datos de grafos) aplicado a la detección de fraudes y análisis de vínculos."
           },
           {
             "label": "Gobernanza",
@@ -46,25 +62,33 @@
   },
   "portfolio": {
     "title": "Proyectos Destacados",
+    "description": "Proyectos de impacto real, documentados bajo la óptica de problema, solución y valor entregado.",
     "all": "Todos",
     "categories": {
       "data-science": "Ciencia de Datos",
       "big-data": "Big Data",
       "automation": "Automatización",
-      "governance": "Gobernanza"
+      "governance": "Gobernanza",
+      "machine-learning": "Machine Learning",
+      "azure": "Azure Cloud"
+    },
+    "projectLabels": {
+      "problem": "El Problema",
+      "solution": "La Solución",
+      "impact": "Impacto de Negocio"
     }
   },
   "contact": {
     "title": "¿Hablamos?",
-    "sub": "Disponible para proyectos estratégicos, liderazgo técnico y consultoría de datos.",
+    "subtitle": "Disponible para proyectos estratégicos, liderazgo técnico y consultoría de datos.",
     "emailBtn": "Enviar Correo",
     "socialLabel": "Redes Profesionales",
     "status": "Disponible para desafíos 2026"
   },
-  "common": {
-    "language": "Español",
-    "contact": "Contactar",
-    "viewProject": "Ver Proyecto",
-    "repoTitle": "Repositorios"
+  "footer": {
+    "social": "Redes Profesionales",
+    "contact": "Contacto",
+    "location": "Brasil",
+    "builtBy": "Desarrollado por"
   }
 }
