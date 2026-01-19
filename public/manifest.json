@@ -1,15 +1,16 @@
 {
-  "name": "Sérgio Santos | Data & Systems Portfolio",
-  "short_name": "Sérgio Santos",
+  "name": "Sérgio Santos | Portfolio",
+  "short_name": "Sérgio.Data",
   "description": "Portfólio de Ciência de Dados e Engenharia de Sistemas de Missão Crítica",
   "lang": "pt-BR",
-  "start_url": "/pt",
+  "start_url": "/",
+  "id": "/",
   "display": "standalone",
   "background_color": "#020617",
-  "theme_color": "#0e8ce9",
-  "orientation": "portrait",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
   "scope": "/",
-  "categories": ["business", "productivity", "education"],
+  "categories": ["business", "education", "developer", "productivity"],
   "icons": [
     {
       "src": "/icon.png",
@@ -35,22 +36,35 @@
       "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Sérgio Santos Portfolio - Desktop"
+      "label": "Sérgio Santos Data Portfolio Desktop"
+    },
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Sérgio Santos Data Portfolio Mobile"
     }
   ],
   "shortcuts": [
     {
       "name": "Projetos (PT)",
+      "short_name": "Projetos",
+      "description": "Ver portfólio em Português",
       "url": "/pt#projects",
       "icons": [{ "src": "/icon.png", "sizes": "192x192" }]
     },
     {
       "name": "Projects (EN)",
+      "short_name": "Projects",
+      "description": "View English portfolio",
       "url": "/en#projects",
       "icons": [{ "src": "/icon.png", "sizes": "192x192" }]
     },
     {
       "name": "Proyectos (ES)",
+      "short_name": "Proyectos",
+      "description": "Ver portafolio en Español",
       "url": "/es#projects",
       "icons": [{ "src": "/icon.png", "sizes": "192x192" }]
     }
