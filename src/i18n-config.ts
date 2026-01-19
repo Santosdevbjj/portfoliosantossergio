@@ -17,9 +17,9 @@ export type Locale = (typeof i18n)['locales'][number];
 
 /**
  * METADADOS DE IDIOMA
- * Informações cruciais para o LanguageSwitcher (Interface) e SEO (Metadados).
+ * Informações para LanguageSwitcher e SEO.
  */
-interface LocaleDetail {
+export interface LocaleDetail {
   readonly name: string;   
   readonly region: string; 
   readonly flag: string;   
@@ -49,7 +49,6 @@ export const localeMetadata: Record<Locale, LocaleDetail> = {
 
 /**
  * VALIDADO DE LOCALE (Type Guard)
- * Garante que a aplicação não quebre se alguém digitar algo como /fr na URL.
  */
 export function isValidLocale(locale: string | undefined | null): locale is Locale {
   if (!locale) return false;
@@ -57,40 +56,36 @@ export function isValidLocale(locale: string | undefined | null): locale is Loca
 }
 
 /**
- * RETORNA A REGIÃO (SEO)
- */
-export function getRegion(locale: Locale): string {
-  return localeMetadata[locale]?.region ?? 'pt-BR';
-}
-
-/**
- * GARANTE UM IDIOMA SEGURO
+ * GARANTE UM IDIOMA SEGURO (Fallback)
  */
 export function getSafeLocale(locale: string | undefined | null): Locale {
   return isValidLocale(locale) ? locale : i18n.defaultLocale;
 }
 
 /**
- * BUSCA IDIOMAS ALTERNATIVOS (SEO Hreflang)
- */
-export const getAlternateLocales = (currentLocale: Locale) => {
-  return i18n.locales.filter((locale) => locale !== currentLocale);
-};
-
-/**
  * CARREGAMENTO DINÂMICO DE DICIONÁRIOS
- * Importante: O caminho '@/' aponta para a pasta 'src' configurada no seu tsconfig.json.
+ * Implementação otimizada para Server Components do Next.js 15.
  */
-export const dictionaries = {
+const dictionaries: Record<Locale, () => Promise<any>> = {
   pt: () => import('@/dictionaries/pt.json').then((module) => module.default),
   en: () => import('@/dictionaries/en.json').then((module) => module.default),
   es: () => import('@/dictionaries/es.json').then((module) => module.default),
 };
 
 /**
- * HELPER PARA ACESSAR OS TEXTOS TRADUZIDOS
+ * BUSCA O DICIONÁRIO TRADUZIDO
+ * Função assíncrona para ser usada em Server e Client Components.
  */
 export const getDictionary = async (locale: Locale) => {
   const safeLocale = getSafeLocale(locale);
   return dictionaries[safeLocale]();
+};
+
+/**
+ * HELPERS PARA SEO
+ */
+export const getRegion = (locale: Locale): string => localeMetadata[locale]?.region ?? 'pt-BR';
+
+export const getAlternateLocales = (currentLocale: Locale) => {
+  return i18n.locales.filter((locale) => locale !== currentLocale);
 };
