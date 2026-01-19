@@ -31,14 +31,14 @@
     }
   },
   "rules": {
-    /* React 19 / Next 15 Optimization */
+    /* React 19 / Next 15: Otimização de Compilação */
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
     "react/display-name": "off",
     "react/jsx-no-target-blank": "warn",
     "react/no-unescaped-entities": "off",
 
-    /* Clean Code: Auto-remove unused imports */
+    /* Clean Code: Remoção automática de lixo eletrônico (Imports não usados) */
     "@typescript-eslint/no-unused-vars": "off",
     "unused-imports/no-unused-imports": "error",
     "unused-imports/no-unused-vars": [
@@ -51,7 +51,7 @@
       }
     ],
 
-    /* Architecture: Import Organization */
+    /* Arquitetura de Software: Padronização de Imports */
     "import/order": [
       "warn",
       {
@@ -76,7 +76,7 @@
       }
     ],
 
-    /* TypeScript Strictness for Node 24 */
+    /* TypeScript Estrito (Alinhado ao TS 5.7+) */
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
@@ -85,8 +85,9 @@
     "@typescript-eslint/no-empty-interface": "warn",
     "@typescript-eslint/no-duplicate-enum-values": "error",
     "@typescript-eslint/no-wrapper-object-types": "error",
+    "@typescript-eslint/no-non-null-assertion": "warn",
 
-    /* Accessibility (WCAG 2.1 Compliance) */
+    /* Acessibilidade Digital (Padrão Sênior) */
     "jsx-a11y/alt-text": "error",
     "jsx-a11y/aria-props": "warn",
     "jsx-a11y/aria-proptypes": "warn",
@@ -95,16 +96,15 @@
     "jsx-a11y/role-supports-aria-props": "warn",
     "jsx-a11y/no-static-element-interactions": "warn",
     "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/anchor-is-valid": "warn",
 
-    /* Data Integrity & Debugging */
-    "no-console": ["warn", { "allow": ["warn", "error"] }]
+    /* Higiene de Logs e Debugging */
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-debugger": "error"
   },
   "overrides": [
     {
       "files": ["*.test.ts", "*.test.tsx", "*.spec.ts", "*.spec.tsx"],
-      "env": {
-        "jest": true
-      },
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
         "no-console": "off"
@@ -115,10 +115,6 @@
       "rules": {
         "@typescript-eslint/explicit-function-return-type": "off"
       }
-    },
-    {
-      "files": ["*.mdx"],
-      "extends": ["plugin:mdx/recommended"]
     }
   ]
 }
