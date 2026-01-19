@@ -44,8 +44,27 @@
       }
     }
   },
+  "portfolio": {
+    "title": "Featured Projects",
+    "all": "All",
+    "categories": {
+      "data-science": "Data Science",
+      "big-data": "Big Data",
+      "automation": "Automation",
+      "governance": "Governance"
+    }
+  },
+  "contact": {
+    "title": "Let's talk?",
+    "sub": "Available for strategic projects, technical leadership, and data consultancy.",
+    "emailBtn": "Send Email",
+    "socialLabel": "Professional Networks",
+    "status": "Open for new challenges 2026"
+  },
   "common": {
     "language": "English",
-    "contact": "Get in touch"
+    "contact": "Get in touch",
+    "viewProject": "View Project",
+    "repoTitle": "Repositories"
   }
 }
