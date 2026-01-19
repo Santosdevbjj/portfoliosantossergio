@@ -1,4 +1,12 @@
 {
+  "common": {
+    "language": "Português",
+    "contact": "Entre em contato",
+    "viewProject": "Ver Projeto",
+    "repoTitle": "Repositórios",
+    "portfolioTitle": "Portfólio de Soluções",
+    "governance": "Rigor e Governança"
+  },
   "about": {
     "title": "Sobre Mim",
     "headline": "Transformando a resiliência de sistemas bancários em inteligência de dados estratégica.",
@@ -21,6 +29,14 @@
           }
         ]
       },
+      "metrics": {
+        "title": "Performance & Governança",
+        "subtitle": "KPIs & IMPACTO",
+        "availabilityValue": "99.5%",
+        "availabilityLabel": "Disponibilidade",
+        "automationValue": "2.9K",
+        "automationLabel": "Horas Automatizadas"
+      },
       "stack": {
         "title": "Stack & Especialidades",
         "items": [
@@ -34,7 +50,7 @@
           },
           {
             "label": "Inteligência de Relacionamentos",
-            "description": "Neo4J (bancos de dados de grafos) aplicado a detecção de fraudes e análise de vínculos."
+            "description": "Neo4J (bancos de dados de grafos) aplicado a detecção de fraudes e vínculos."
           },
           {
             "label": "Governança",
@@ -46,25 +62,33 @@
   },
   "portfolio": {
     "title": "Projetos em Destaque",
+    "description": "Projetos de impacto real, documentados sob a ótica de problema, solução e valor entregue.",
     "all": "Todos",
     "categories": {
       "data-science": "Ciência de Dados",
       "big-data": "Big Data",
       "automation": "Automação",
-      "governance": "Governança"
+      "governance": "Governança",
+      "machine-learning": "Machine Learning",
+      "azure": "Azure Cloud"
+    },
+    "projectLabels": {
+      "problem": "O Problema",
+      "solution": "A Solução",
+      "impact": "Impacto de Negócio"
     }
   },
   "contact": {
     "title": "Vamos conversar?",
-    "sub": "Disponível para projetos estratégicos, liderança técnica e consultoria em dados.",
+    "subtitle": "Disponível para projetos estratégicos, liderança técnica e consultoria em dados.",
     "emailBtn": "Enviar E-mail",
     "socialLabel": "Redes Profissionais",
     "status": "Disponível para desafios em 2026"
   },
-  "common": {
-    "language": "Português",
-    "contact": "Entre em contato",
-    "viewProject": "Ver Projeto",
-    "repoTitle": "Repositórios"
+  "footer": {
+    "social": "Redes Profissionais",
+    "contact": "Contato",
+    "location": "Brasil",
+    "builtBy": "Desenvolvido por"
   }
 }
