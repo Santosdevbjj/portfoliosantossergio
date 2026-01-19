@@ -4,42 +4,44 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Moon, Sun, Globe } from 'lucide-react'
-import { useTheme } from '@/hooks/useTheme' // Ajustado para usar seu hook real
+import { useTheme } from '@/hooks/useTheme'
 
 /**
- * LANGUAGE & THEME SWITCHER
- * Componente flutuante ultra-responsivo.
- * No celular, ele se mantém discreto mas acessível.
+ * COMPONENTE: LanguageSwitcher
+ * Função: Alternar idiomas (PT, EN, ES) e Temas (Light/Dark).
+ * Design: Flutuante (Glassmorphism) e otimizado para toque mobile.
  */
 export const LanguageSwitcher = () => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { isDark, toggleTheme } = useTheme() // Usando sua lógica customizada
+  const { isDark, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   
-  // Impede erros de hidratação (necessário em componentes Client que usam estado)
+  // Garante que o componente só renderize no cliente para evitar erros de hidratação
   useEffect(() => {
     setMounted(true)
   }, [])
 
   const languages = [
-    { code: 'pt', label: 'PT', aria: 'Versão em Português' },
-    { code: 'en', label: 'EN', aria: 'English Version' },
-    { code: 'es', label: 'ES', aria: 'Versión en Español' }
+    { code: 'pt', label: 'PT', aria: 'Mudar para Português' },
+    { code: 'en', label: 'EN', aria: 'Switch to English' },
+    { code: 'es', label: 'ES', aria: 'Cambiar a Español' }
   ] as const;
 
-  // Detecta idioma atual de forma segura pela URL
+  // Extrai o idioma atual da URL de forma segura
   const currentLang = pathname?.split('/')[1] || 'pt'
 
   /**
-   * Reconstrói a URL para troca de idioma preservando o caminho atual
+   * getNewPath: Altera o prefixo de idioma na URL sem perder a rota interna.
    */
   const getNewPath = (langCode: string) => {
     if (!pathname) return `/${langCode}`
     const segments = pathname.split('/')
     
-    // Substitui ou insere o código do idioma na URL
-    if (languages.some(l => l.code === segments[1])) {
+    // Verifica se o primeiro segmento é um dos idiomas suportados
+    const hasLang = languages.some(l => l.code === segments[1])
+    
+    if (hasLang) {
       segments[1] = langCode
     } else {
       segments.splice(1, 0, langCode)
@@ -50,32 +52,36 @@ export const LanguageSwitcher = () => {
     return `/${cleanPath}${queryString ? `?${queryString}` : ''}`
   }
 
+  // Se não estiver montado, retorna nulo para evitar saltos visuais (CLS)
   if (!mounted) return null
 
   return (
     <nav 
-      aria-label="Preferências de Idioma e Tema"
-      className="fixed top-3 right-3 sm:top-6 sm:right-8 z-[100] flex items-center gap-1.5 p-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-2xl transition-all duration-300"
+      aria-label="Controles de Idioma e Tema"
+      className="fixed top-3 right-3 sm:top-6 sm:right-8 z-[100] flex items-center gap-1 p-1 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-xl"
     >
-      {/* Botão de Tema - Otimizado para Toque no Celular */}
+      {/* Botão de Tema: Área de clique expandida para Touch */}
       <button
         onClick={toggleTheme}
-        className="p-2.5 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-90"
-        aria-label={isDark ? "Ativar Modo Claro" : "Ativar Modo Escuro"}
+        className="p-3 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all active:scale-90"
+        aria-label={isDark ? "Mudar para modo claro" : "Mudar para modo escuro"}
       >
-        {isDark ? (
-          <Sun size={20} className="text-yellow-500 transition-transform duration-500 rotate-0" />
-        ) : (
-          <Moon size={20} className="text-blue-600 transition-transform duration-500 -rotate-12" />
-        )}
+        <div className="relative w-5 h-5">
+          {isDark ? (
+            <Sun size={20} className="text-yellow-500 animate-in fade-in zoom-in spin-in-12 duration-500" />
+          ) : (
+            <Moon size={20} className="text-blue-600 animate-in fade-in zoom-in -rotate-12 duration-500" />
+          )}
+        </div>
       </button>
 
-      <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/60 mx-0.5" aria-hidden="true" />
+      {/* Divisor Visual */}
+      <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1" aria-hidden="true" />
 
-      {/* Seletor de Idiomas */}
-      <div className="flex items-center gap-0.5">
-        <Globe size={14} className="text-slate-400 ml-1 hidden xs:block" />
-        <div className="flex gap-0.5">
+      {/* Grid de Idiomas */}
+      <div className="flex items-center gap-0.5 pr-1">
+        <Globe size={14} className="text-slate-400 mx-1 hidden xs:block" />
+        <div className="flex gap-1">
           {languages.map((lang) => {
             const isActive = currentLang === lang.code
             return (
@@ -85,17 +91,17 @@ export const LanguageSwitcher = () => {
                 hreflang={lang.code}
                 scroll={false} 
                 className={`
-                  relative px-3 py-2 text-[11px] font-bold tracking-tighter rounded-lg transition-all
+                  relative px-3 py-2 text-[12px] font-bold rounded-lg transition-all duration-300
                   ${isActive 
                     ? 'text-white' 
                     : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400'
                   }
                 `}
               >
-                <span className="relative z-10 uppercase">{lang.label}</span>
+                <span className="relative z-10">{lang.label}</span>
                 {isActive && (
                   <div 
-                    className="absolute inset-0 bg-blue-600 rounded-lg z-0 shadow-md shadow-blue-600/40" 
+                    className="absolute inset-0 bg-blue-600 rounded-lg z-0 shadow-lg shadow-blue-600/30" 
                     aria-hidden="true"
                   />
                 )}
