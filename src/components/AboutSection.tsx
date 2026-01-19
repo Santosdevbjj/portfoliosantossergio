@@ -9,91 +9,110 @@ interface AboutSectionProps {
   dict: any; 
 }
 
+/**
+ * SEÇÃO SOBRE - FOCO EM AUTORIDADE E GOVERNANÇA
+ * Apresenta a trajetória sênior com ênfase em rigor técnico e stack de dados.
+ */
 export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
   const { about } = dict;
 
+  // Fallback para títulos de governança baseado no idioma
+  const governanceTitle = dict.common?.governance || {
+    pt: 'Rigor e Governança',
+    en: 'Rigor & Governance',
+    es: 'Rigor y Gobernanza'
+  }[lang];
+
   return (
-    <section className="py-20 lg:py-32 bg-white dark:bg-[#020617] overflow-hidden transition-colors duration-500">
+    <section id="about" className="py-20 lg:py-32 bg-white dark:bg-[#020617] overflow-hidden transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
           
-          {/* LADO ESQUERDO: Visual & Branding (Sticky no Desktop) */}
+          {/* LADO ESQUERDO: Visual & Experiência (Fixo ao rolar no Desktop) */}
           <div className="relative group lg:sticky lg:top-32">
-            {/* Efeito de Brilho de Fundo */}
-            <div className="absolute -inset-4 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-[3rem] opacity-10 blur-2xl group-hover:opacity-20 transition-all duration-700" />
+            {/* Aura de destaque */}
+            <div className="absolute -inset-4 bg-gradient-to-tr from-blue-600/20 to-indigo-500/20 rounded-[3rem] opacity-30 blur-2xl group-hover:opacity-50 transition-all duration-700" />
             
-            <div className="relative bg-slate-100 dark:bg-slate-800/50 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-slate-800 aspect-[4/5] shadow-2xl">
+            <div className="relative bg-slate-100 dark:bg-slate-800/40 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-slate-800 aspect-[4/5] shadow-2xl">
                <img 
                  src="/images/sergio-santos-profile.png" 
-                 alt="Sérgio Santos"
+                 alt={`Sérgio Santos - ${about.headline}`}
                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                  loading="lazy"
                />
                
-               {/* Badge de Experiência - Dinâmico */}
-               <div className="absolute bottom-6 left-6 right-6 p-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-slate-700/50 shadow-2xl animate-soft">
-                  <p className="text-blue-600 dark:text-blue-400 font-black text-4xl leading-none">15+</p>
-                  <p className="text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-1">
-                    {about.sections.highlights.title}
+               {/* Badge Flutuante de Senioridade */}
+               <div className="absolute bottom-6 left-6 right-6 p-6 bg-white/95 dark:bg-slate-950/90 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-blue-900/20 shadow-2xl">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-blue-600 dark:text-blue-400 font-black text-5xl leading-none">15</span>
+                    <span className="text-blue-600 dark:text-blue-400 font-bold text-2xl">+</span>
+                  </div>
+                  <p className="text-slate-900 dark:text-slate-100 text-[10px] font-black uppercase tracking-[0.2em] mt-2 leading-tight">
+                    {about.sections?.highlights?.title || "Anos de Experiência em Sistemas Críticos"}
                   </p>
                </div>
             </div>
           </div>
 
-          {/* LADO DIREITO: Conteúdo Estratégico */}
+          {/* LADO DIREITO: Narrativa e Competências */}
           <div className="flex flex-col space-y-12">
-            <div>
-              <span className="text-blue-600 font-black uppercase tracking-[0.3em] text-xs mb-4 block">
+            <header>
+              <span className="inline-block text-blue-600 dark:text-blue-400 font-black uppercase tracking-[0.3em] text-[10px] mb-4 px-3 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 {about.title}
               </span>
-              <h3 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-[1.1] mb-8 tracking-tighter">
+              <h3 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-[1.05] mb-8 tracking-tighter">
                 {about.headline}
               </h3>
-              <div className="relative">
-                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-600 rounded-full" />
-                <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed font-medium pl-8 italic">
-                  {about.bio}
+              <div className="relative pl-8 border-l-4 border-blue-600 dark:border-blue-500">
+                <p className="text-lg md:text-xl text-slate-700 dark:text-slate-300 leading-relaxed font-medium italic">
+                  "{about.bio}"
                 </p>
               </div>
-            </div>
+            </header>
 
-            {/* Componente de Estatísticas de Impacto (Requer que as chaves existam no dict) */}
+            {/* Componente de Estatísticas (Números que vendem seu perfil) */}
             <CareerHighlights dict={dict} />
 
-            {/* Grid de Governança e Rigor */}
+            {/* Cartões de Diferenciais Técnicos */}
             <div className="space-y-6">
-              <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-lg uppercase tracking-widest">
-                <ShieldCheck className="text-blue-500" size={24} />
-                {/* Tradução dinâmica baseada na chave do dicionário se disponível ou fallback seguro */}
-                {dict.common?.governance || (lang === 'pt' ? 'Rigor e Governança' : lang === 'es' ? 'Rigor y Gobernanza' : 'Rigor & Governance')}
+              <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-sm uppercase tracking-widest">
+                <ShieldCheck className="text-blue-600" size={20} />
+                {governanceTitle}
               </h4>
               
-              <div className="grid gap-4 sm:grid-cols-1">
-                {about.sections.highlights.items.map((item: any, i: number) => (
-                  <div key={i} className="group flex gap-5 items-start p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800 hover:border-blue-500/30 transition-all duration-300">
-                    <div className="p-2 bg-emerald-500/10 rounded-lg">
+              <div className="grid gap-4">
+                {about.sections?.highlights?.items?.map((item: any, i: number) => (
+                  <div key={i} className="group flex gap-5 items-start p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 hover:border-blue-500/50 hover:bg-white dark:hover:bg-slate-800/60 transition-all duration-300">
+                    <div className="mt-1 p-2 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-lg">
                       <CheckCircle2 className="text-emerald-500" size={20} />
                     </div>
                     <div>
-                      <span className="block text-slate-900 dark:text-white font-bold text-lg mb-1">{item.label}</span>
-                      <span className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed block">{item.description}</span>
+                      <h5 className="text-slate-900 dark:text-white font-bold text-lg mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {item.label}
+                      </h5>
+                      <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                        {item.description}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Stack Tecnológico */}
-            <div className="space-y-6 pt-4">
-              <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-lg uppercase tracking-widest">
-                <Database className="text-blue-500" size={24} />
-                {about.sections.stack.title}
+            {/* Stack Tecnológico Organizado */}
+            <div className="space-y-6 pt-6">
+              <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-sm uppercase tracking-widest">
+                <Database className="text-blue-600" size={20} />
+                {about.sections?.stack?.title}
               </h4>
               <div className="flex flex-wrap gap-2">
-                {about.sections.stack.items.map((item: any, i: number) => (
-                  <div key={i} className="px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500/50 transition-all shadow-sm">
-                    <span className="text-slate-700 dark:text-slate-300 text-xs font-bold tracking-tight">
-                      {item.label}: <span className="text-blue-600 dark:text-blue-400 font-medium ml-1">{item.description}</span>
+                {about.sections?.stack?.items?.map((item: any, i: number) => (
+                  <div 
+                    key={i} 
+                    className="px-4 py-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 hover:scale-105 transition-transform cursor-default"
+                  >
+                    <span className="text-slate-700 dark:text-slate-300 text-[11px] font-bold">
+                      {item.label}: <span className="text-blue-600 dark:text-blue-400 ml-1">{item.description}</span>
                     </span>
                   </div>
                 ))}
