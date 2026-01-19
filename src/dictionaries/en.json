@@ -1,0 +1,51 @@
+{
+  "about": {
+    "title": "About Me",
+    "headline": "Transforming Banking System Resilience into Strategic Data Intelligence.",
+    "bio": "With over 15 years of experience in mission-critical systems within the banking sector (Bradesco), I specialized in ensuring technology supports high-stakes decision-making with 100% governance. Today, I apply this operational rigor to lead Data Science and Operational Efficiency projects, connecting complex infrastructures to actionable insights.",
+    "sections": {
+      "highlights": {
+        "title": "Career Highlights",
+        "items": [
+          {
+            "label": "Operational Efficiency",
+            "description": "Developed an automated IPV tax system that eliminated 2,920 annual hours of manual processing."
+          },
+          {
+            "label": "Critical Availability",
+            "description": "Sustained corporate infrastructure for 500+ users with a 99.5% availability SLA."
+          },
+          {
+            "label": "Compliance & Data Privacy",
+            "description": "Implemented interdepartmental legal systems with full traceability and LGPD/GDPR compliance."
+          }
+        ]
+      },
+      "stack": {
+        "title": "Stack & Specialties",
+        "items": [
+          {
+            "label": "Data Science",
+            "description": "Python, SQL, and Machine Learning for predictive modeling and scenario analysis."
+          },
+          {
+            "label": "Big Data & Cloud",
+            "description": "Azure Databricks and Azure Cloud for scalable and governed pipelines."
+          },
+          {
+            "label": "Relationship Intelligence",
+            "description": "Neo4J (Graph Databases) applied to fraud detection and complex link analysis."
+          },
+          {
+            "label": "Governance",
+            "description": "Specialist in regulated environments, data security, and banking auditing."
+          }
+        ]
+      }
+    }
+  },
+  "common": {
+    "language": "English",
+    "contact": "Get in touch"
+  }
+}
