@@ -4,7 +4,8 @@ import '../globals.css';
 import { Metadata, Viewport } from 'next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeProvider } from '@/components/ThemeProvider'; 
-import { i18n, getRegion } from '@/i18n-config';
+import { CookieBanner } from '@/components/CookieBanner'; // Importação do componente de governança
+import { i18n } from '@/i18n-config';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -19,7 +20,8 @@ interface RootLayoutProps {
 
 /**
  * RESPONSIVIDADE EXTREMA
- * Define as diretrizes para o navegador renderizar em qualquer tela.
+ * Configurações de viewport para garantir que o layout se adapte perfeitamente
+ * a dispositivos móveis, tablets e desktops de alta resolução.
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -34,7 +36,7 @@ export const viewport: Viewport = {
 
 /**
  * SEO MULTILINGUE & GOVERNANÇA DE DADOS
- * Gera os metadados dinamicamente para PT, EN e ES.
+ * Metadados dinâmicos para PT, EN e ES com suporte a verificações de segurança.
  */
 export async function generateMetadata({ 
   params 
@@ -91,18 +93,11 @@ export async function generateMetadata({
       locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
     },
-    twitter: {
-      card: 'summary_large_image',
-      title: titles[lang as keyof typeof titles] || titles.pt,
-      description: descriptions[lang as keyof typeof descriptions] || descriptions.pt,
-      images: ['/og-image.png'],
-    }
   };
 }
 
 export default async function RootLayout({ children, params }: RootLayoutProps) {
   const { lang } = await params;
-  const region = getRegion(lang as any);
 
   return (
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
@@ -119,14 +114,17 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           enableSystem
           disableTransitionOnChange
         >
-          {/* Navegação Global Multilingue */}
+          {/* Navegação Global e Troca de Idiomas */}
           <LanguageSwitcher />
 
           <div className="relative flex-grow w-full flex flex-col">
-            <main className="flex-grow w-full max-w-full overflow-x-hidden">
+            <main className="flex-grow w-full max-w-full overflow-x-hidden pt-16 md:pt-0">
               {children}
             </main>
           </div>
+
+          {/* Banner de Cookies e Privacidade (LGPD/GDPR Compliance) */}
+          <CookieBanner />
         </ThemeProvider>
       </body>
     </html>
