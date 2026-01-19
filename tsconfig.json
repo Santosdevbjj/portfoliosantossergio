@@ -22,20 +22,23 @@
         "name": "next"
       }
     ],
+    // Segurança e Rigor Técnico
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "exactOptionalPropertyTypes": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "checkJs": false,
+    "verbatimModuleSyntax": true
   },
   "include": [
     "next-env.d.ts", 
     "**/*.ts", 
     "**/*.tsx", 
-    ".next/types/**/*.ts",
-    "src/i18n-config.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
