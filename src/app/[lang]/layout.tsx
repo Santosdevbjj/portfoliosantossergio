@@ -2,9 +2,8 @@
 import { Inter } from 'next/font/google';
 import '../globals.css';
 import { Metadata, Viewport } from 'next';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { ThemeProvider } from '@/components/ThemeProvider'; 
-import { CookieBanner } from '@/components/CookieBanner'; // Importação do componente de governança
+import { ThemeProvider } from '@/hooks/ThemeContext'; // Importação corrigida para seu hook customizado
+import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n } from '@/i18n-config';
 
 const inter = Inter({ 
@@ -19,9 +18,7 @@ interface RootLayoutProps {
 }
 
 /**
- * RESPONSIVIDADE EXTREMA
- * Configurações de viewport para garantir que o layout se adapte perfeitamente
- * a dispositivos móveis, tablets e desktops de alta resolução.
+ * RESPONSIVIDADE E TEMA MOBILE
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -31,12 +28,10 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  userScalable: true,
 };
 
 /**
- * SEO MULTILINGUE & GOVERNANÇA DE DADOS
- * Metadados dinâmicos para PT, EN e ES com suporte a verificações de segurança.
+ * SEO MULTILINGUE DINÂMICO
  */
 export async function generateMetadata({ 
   params 
@@ -53,9 +48,9 @@ export async function generateMetadata({
   };
 
   const descriptions: Record<string, string> = {
-    pt: "Analista Sênior com 15+ anos em sistemas críticos. Especialista em Ciência de Dados, Azure Databricks e automação estratégica.",
-    en: "Senior Analyst with 15+ years in critical systems. Specialist in Data Science, Azure Databricks, and strategic automation.",
-    es: "Analista Sénior con 15+ años en sistemas críticos. Especialista en Ciencia de Datos, Azure Databricks y automatización estratégica."
+    pt: "Analista Sênior com 15+ anos em sistemas críticos (Bradesco). Especialista em Ciência de Dados e Azure Databricks.",
+    en: "Senior Analyst with 15+ years in critical systems (Bradesco). Specialist in Data Science and Azure Databricks.",
+    es: "Analista Sénior con 15+ años en sistemas críticos (Bradesco). Especialista en Ciencia de Datos y Azure Databricks."
   };
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
@@ -75,9 +70,6 @@ export async function generateMetadata({
         'es-ES': `${siteUrl}/es`,
         'x-default': `${siteUrl}/pt`,
       },
-    },
-    verification: {
-      google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
     icons: {
       icon: '/favicon.ico',
@@ -101,29 +93,20 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
 
   return (
     <html lang={lang} suppressHydrationWarning className="scroll-smooth">
-      <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-      </head>
       <body 
         className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden min-h-screen flex flex-col`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {/* Navegação Global e Troca de Idiomas */}
-          <LanguageSwitcher />
-
-          <div className="relative flex-grow w-full flex flex-col">
-            <main className="flex-grow w-full max-w-full overflow-x-hidden pt-16 md:pt-0">
+        {/* O ThemeProvider agora envolve a aplicação usando sua lógica customizada */}
+        <ThemeProvider>
+          <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
+            {/* O LanguageSwitcher e Navbar são renderizados dentro das páginas ou aqui, 
+                dependendo da sua preferência de design. Mantendo flexibilidade: */}
+            <main className="flex-grow w-full">
               {children}
             </main>
           </div>
 
-          {/* Banner de Cookies e Privacidade (LGPD/GDPR Compliance) */}
+          {/* Governança de Dados visível em todas as rotas */}
           <CookieBanner />
         </ThemeProvider>
       </body>
