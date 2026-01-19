@@ -1,17 +1,30 @@
 'use client'
 
 import React, { useState } from 'react';
-import { translations } from '@/constants/translations';
-import { Mail, Linkedin, Github, MessageSquare, Copy, Check, ExternalLink } from 'lucide-react';
+import { Mail, Linkedin, Github, Copy, Check, ExternalLink } from 'lucide-react';
 
-export const ContactSection = ({ lang }: { lang: 'pt' | 'en' | 'es' }) => {
-  const t = translations[lang];
+interface ContactSectionProps {
+  lang: 'pt' | 'en' | 'es';
+  dict: any; // Recebe o dicionário dinâmico
+}
+
+export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
   const [copied, setCopied] = useState(false);
   
-  // Seus dados atualizados
+  // Seus dados consolidados
   const email = "santossergiorealbjj@outlook.com";
   const linkedinUrl = "https://www.linkedin.com/in/santossergioluiz";
   const githubUrl = "https://github.com/Santosdevbjj";
+
+  // Acessamos o dicionário (Certifique-se que estas chaves existam nos JSONs)
+  // Fallback seguro caso o JSON ainda não esteja totalmente preenchido
+  const content = dict.contact || {
+    title: lang === 'pt' ? 'Vamos conversar?' : lang === 'es' ? '¿Hablamos?' : "Let's talk?",
+    sub: dict.about?.headline || "",
+    emailBtn: lang === 'pt' ? 'Enviar E-mail' : lang === 'es' ? 'Enviar Correo' : 'Send Email',
+    socialLabel: lang === 'pt' ? 'Redes Profissionais' : lang === 'es' ? 'Redes Profesionales' : 'Professional Networks',
+    status: lang === 'pt' ? 'Disponível para desafios em 2026' : lang === 'es' ? 'Disponible para desafíos 2026' : 'Open for new challenges 2026'
+  };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(email);
@@ -19,43 +32,16 @@ export const ContactSection = ({ lang }: { lang: 'pt' | 'en' | 'es' }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const content = {
-    pt: { 
-      title: "Vamos conversar?", 
-      sub: "Disponível para projetos estratégicos, liderança técnica e consultoria em dados.", 
-      emailBtn: "Enviar E-mail",
-      socialLabel: "Redes Profissionais",
-      status: "Disponível para desafios em 2026",
-      copyToast: "E-mail copiado!"
-    },
-    en: { 
-      title: "Let's talk?", 
-      sub: "Available for strategic projects, technical leadership, and data consultancy.", 
-      emailBtn: "Send Email",
-      socialLabel: "Professional Networks",
-      status: "Open for new challenges 2026",
-      copyToast: "Email copied!"
-    },
-    es: { 
-      title: "¿Hablamos?", 
-      sub: "Disponible para proyectos estratégicos, liderazgo técnico y consultoría de datos.", 
-      emailBtn: "Enviar Correo",
-      socialLabel: "Redes Profesionales",
-      status: "Disponible para desafíos 2026",
-      copyToast: "¡Correo copiado!"
-    }
-  }[lang];
-
   return (
-    <section id="contact" className="py-24 bg-slate-50 dark:bg-[#0f172a] overflow-hidden relative transition-colors duration-500">
-      <div className="main-container relative z-10">
-        <div className="bg-blue-600 dark:bg-blue-700 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-12 overflow-hidden relative">
+    <section id="contact" className="py-24 bg-slate-50 dark:bg-[#020617] overflow-hidden relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="bg-blue-600 dark:bg-blue-700 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-12 overflow-hidden relative border border-white/10">
           
-          {/* Elementos Visuais de Fundo */}
+          {/* Decoração de Fundo */}
           <div className="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
           <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-blue-900/30 rounded-full blur-3xl" />
 
-          <div className="max-w-2xl text-center lg:text-left flex-grow">
+          <div className="max-w-2xl text-center lg:text-left flex-grow relative z-20">
             <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter">
               {content.title}
             </h2>
@@ -63,11 +49,11 @@ export const ContactSection = ({ lang }: { lang: 'pt' | 'en' | 'es' }) => {
               {content.sub}
             </p>
 
-            {/* Ações de Contato Direto */}
+            {/* Ações de Contato */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <a 
                 href={`mailto:${email}`}
-                className="group inline-flex items-center justify-center gap-3 bg-white text-blue-600 px-8 py-4 rounded-2xl font-black hover:bg-blue-50 transition-all active:scale-95 shadow-lg"
+                className="group inline-flex items-center justify-center gap-3 bg-white text-blue-600 px-8 py-4 rounded-2xl font-black hover:bg-blue-50 transition-all active:scale-95 shadow-xl"
               >
                 <Mail size={20} className="group-hover:animate-bounce" />
                 {content.emailBtn}
@@ -75,38 +61,38 @@ export const ContactSection = ({ lang }: { lang: 'pt' | 'en' | 'es' }) => {
               
               <button 
                 onClick={copyToClipboard}
-                className="inline-flex items-center justify-center gap-3 bg-blue-700/50 text-white border border-white/20 px-8 py-4 rounded-2xl font-bold hover:bg-blue-800 transition-all backdrop-blur-sm"
+                className="group inline-flex items-center justify-center gap-3 bg-blue-800/40 text-white border border-white/20 px-8 py-4 rounded-2xl font-bold hover:bg-blue-800/60 transition-all backdrop-blur-sm"
               >
-                {copied ? <Check size={20} className="text-emerald-300" /> : <Copy size={20} className="opacity-70" />}
-                <span className="text-sm md:text-base truncate">{email}</span>
+                {copied ? <Check size={20} className="text-emerald-300" /> : <Copy size={20} className="opacity-70 group-hover:opacity-100" />}
+                <span className="text-sm md:text-base truncate max-w-[180px] sm:max-w-none">{email}</span>
               </button>
             </div>
           </div>
 
-          {/* Cartão de Social Media */}
-          <div className="w-full lg:w-auto">
-            <div className="bg-white/10 backdrop-blur-xl p-8 rounded-[2rem] border border-white/20 shadow-inner">
-              <p className="text-blue-100 text-[10px] font-black uppercase tracking-[0.3em] mb-6 text-center lg:text-left">
+          {/* Card de Social Media */}
+          <div className="w-full lg:w-auto relative z-20">
+            <div className="bg-white/10 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/20 shadow-2xl">
+              <p className="text-blue-100 text-[10px] font-black uppercase tracking-[0.3em] mb-8 text-center">
                 {content.socialLabel}
               </p>
-              <div className="flex justify-center lg:justify-start gap-4">
+              <div className="flex justify-center gap-6">
                 <a 
                   href={linkedinUrl} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="p-5 bg-white text-blue-600 hover:bg-blue-50 rounded-2xl transition-all hover:-translate-y-2 shadow-lg"
+                  className="p-5 bg-white text-blue-600 hover:bg-blue-50 rounded-2xl transition-all hover:-translate-y-2 hover:rotate-3 shadow-lg flex items-center justify-center"
                   title="LinkedIn"
                 >
-                  <Linkedin size={28} fill="currentColor" />
+                  <Linkedin size={32} fill="currentColor" />
                 </a>
                 <a 
                   href={githubUrl} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="p-5 bg-slate-900 text-white hover:bg-black rounded-2xl transition-all hover:-translate-y-2 shadow-lg"
+                  className="p-5 bg-slate-900 text-white hover:bg-black rounded-2xl transition-all hover:-translate-y-2 hover:-rotate-3 shadow-lg flex items-center justify-center"
                   title="GitHub"
                 >
-                  <Github size={28} />
+                  <Github size={32} />
                 </a>
               </div>
             </div>
@@ -114,8 +100,8 @@ export const ContactSection = ({ lang }: { lang: 'pt' | 'en' | 'es' }) => {
         </div>
 
         {/* Badge de Status Inferior */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full shadow-sm animate-fade-in">
+        <div className="mt-16 text-center animate-in fade-in duration-1000">
+          <div className="inline-flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full shadow-sm hover:shadow-md transition-shadow">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
