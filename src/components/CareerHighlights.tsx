@@ -6,7 +6,8 @@ import {
   ShieldCheck, 
   BarChart3, 
   Clock, 
-  Server 
+  Server,
+  Activity
 } from 'lucide-react';
 
 interface CareerHighlightsProps {
@@ -14,44 +15,47 @@ interface CareerHighlightsProps {
 }
 
 export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
-  // Verificação de segurança para evitar erro de 'undefined' no build
+  // Verificação de segurança profunda para o dicionário
   const highlights = dict?.about?.sections?.highlights;
+  const metrics = dict?.about?.sections?.metrics; // Chave sugerida para métricas no JSON
   
   if (!highlights) return null;
 
   const items = highlights.items || [];
 
-  // Mapeamento de ícones técnicos
+  // Mapeamento dinâmico de ícones técnicos para os cards
   const icons = [
-    <Clock key="icon-0" className="text-amber-500" size={24} />,
-    <Server key="icon-1" className="text-blue-500" size={24} />,
-    <ShieldCheck key="icon-2" className="text-emerald-500" size={24} />
+    <Clock key="icon-0" size={24} />,
+    <Server key="icon-1" size={24} />,
+    <ShieldCheck key="icon-2" size={24} />
   ];
 
   return (
-    <div className="mt-16 space-y-8">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="h-8 w-1.5 bg-blue-600 rounded-full" />
-        <h4 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+    <div className="mt-16 space-y-12">
+      {/* Título da Seção de Destaques */}
+      <div className="flex items-center gap-4 mb-10">
+        <div className="h-10 w-2 bg-blue-600 rounded-full" />
+        <h4 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
           {highlights.title}
-        </h4> 
-        {/* A correção principal foi aqui: h4 fechando com h4 */}
+        </h4>
       </div>
 
+      {/* Grid de Cards de Carreira - Totalmente Responsivo */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {items.map((item: any, i: number) => (
           <div 
             key={i}
-            className="group relative p-8 rounded-[2rem] bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 hover:border-blue-500/50 transition-all duration-500 shadow-sm hover:shadow-xl hover:-translate-y-1"
+            className="group relative p-8 rounded-[2.5rem] bg-white dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 hover:border-blue-500/50 transition-all duration-500 shadow-sm hover:shadow-2xl hover:-translate-y-2"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2rem]" />
+            {/* Efeito Glow no Hover */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem]" />
 
             <div className="relative z-10">
-              <div className="mb-6 p-3 inline-flex rounded-2xl bg-slate-100 dark:bg-slate-700/50 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-500">
+              <div className="mb-6 p-4 inline-flex rounded-2xl bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                 {icons[i] || <Zap size={24} />}
               </div>
 
-              <h5 className="text-lg font-bold text-slate-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <h5 className="text-xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
                 {item.label}
               </h5>
 
@@ -63,30 +67,50 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
         ))}
       </div>
 
-      {/* Banner de Impacto de Dados */}
-      <div className="p-8 rounded-[2.5rem] bg-blue-600 text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl shadow-blue-600/20">
-        <div className="flex items-center gap-6">
-          <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-md">
-            <BarChart3 size={32} />
+      {/* Banner de Impacto de Dados (Compliance & Performance) */}
+      <div className="relative overflow-hidden p-8 md:p-12 rounded-[3rem] bg-blue-600 text-white shadow-2xl shadow-blue-600/40 transition-all">
+        {/* Elemento Visual de Fundo */}
+        <Activity className="absolute -right-10 -top-10 text-white/10 w-64 h-64 rotate-12" />
+        
+        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
+          
+          {/* Título do Banner */}
+          <div className="flex items-center gap-6 text-center lg:text-left">
+            <div className="p-5 bg-white/15 rounded-3xl backdrop-blur-xl border border-white/20 shadow-inner">
+              <BarChart3 size={40} className="text-white" />
+            </div>
+            <div>
+              <p className="text-blue-100 text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-80">
+                {metrics?.subtitle || "KPIs & IMPACT"}
+              </p>
+              <p className="text-3xl font-black tracking-tighter leading-none">
+                {metrics?.title || "Performance & Governance"}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-blue-100 text-sm font-bold uppercase tracking-wider mb-1">Impacto</p>
-            <p className="text-2xl font-black">Performance & Governance</p>
+          
+          <div className="hidden lg:block h-16 w-px bg-white/20" />
+          
+          {/* Métricas Dinâmicas do Dicionário */}
+          <div className="grid grid-cols-2 gap-8 md:gap-16 w-full lg:w-auto">
+            <div className="text-center">
+              <p className="text-4xl md:text-5xl font-black mb-2 tracking-tighter">
+                {metrics?.availabilityValue || "99.5%"}
+              </p>
+              <p className="text-blue-100 text-[10px] font-black uppercase tracking-widest opacity-80 leading-tight">
+                {metrics?.availabilityLabel || "Disponibilidade"}
+              </p>
+            </div>
+            
+            <div className="text-center border-l border-white/10 pl-8 md:pl-16">
+              <p className="text-4xl md:text-5xl font-black mb-2 tracking-tighter">
+                {metrics?.automationValue || "2.9K"}
+              </p>
+              <p className="text-blue-100 text-[10px] font-black uppercase tracking-widest opacity-80 leading-tight">
+                {metrics?.automationLabel || "Horas Automatizadas"}
+              </p>
+            </div>
           </div>
-        </div>
-        
-        <div className="hidden md:block h-12 w-px bg-white/20" />
-        
-        <div className="text-center md:text-left">
-          <p className="text-4xl font-black mb-1">99.5%</p>
-          <p className="text-blue-100 text-[10px] font-bold uppercase tracking-widest">Disponibilidade</p>
-        </div>
-        
-        <div className="hidden md:block h-12 w-px bg-white/20" />
-        
-        <div className="text-center md:text-left">
-          <p className="text-4xl font-black mb-1">2.9K</p>
-          <p className="text-blue-100 text-[10px] font-bold uppercase tracking-widest">Horas Automatizadas</p>
         </div>
       </div>
     </div>
