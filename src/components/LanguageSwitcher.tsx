@@ -4,19 +4,20 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Moon, Sun, Globe } from 'lucide-react'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/hooks/useTheme' // Ajustado para usar seu hook real
 
 /**
  * LANGUAGE & THEME SWITCHER
- * Componente flutuante ultra-responsivo com suporte a i18n e modo escuro.
+ * Componente flutuante ultra-responsivo.
+ * No celular, ele se mantém discreto mas acessível.
  */
 export const LanguageSwitcher = () => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { theme, setTheme, resolvedTheme } = useTheme()
+  const { isDark, toggleTheme } = useTheme() // Usando sua lógica customizada
   const [mounted, setMounted] = useState(false)
   
-  // Impede erros de hidratação (SSR vs Client)
+  // Impede erros de hidratação (necessário em componentes Client que usam estado)
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -27,17 +28,17 @@ export const LanguageSwitcher = () => {
     { code: 'es', label: 'ES', aria: 'Versión en Español' }
   ] as const;
 
-  // Detecta idioma atual de forma segura
+  // Detecta idioma atual de forma segura pela URL
   const currentLang = pathname?.split('/')[1] || 'pt'
 
   /**
-   * getNewPath: Reconstrói a URL para troca de idioma preservando filtros
+   * Reconstrói a URL para troca de idioma preservando o caminho atual
    */
   const getNewPath = (langCode: string) => {
     if (!pathname) return `/${langCode}`
     const segments = pathname.split('/')
     
-    // Se o primeiro segmento após a barra for um idioma conhecido, substitui
+    // Substitui ou insere o código do idioma na URL
     if (languages.some(l => l.code === segments[1])) {
       segments[1] = langCode
     } else {
@@ -49,34 +50,31 @@ export const LanguageSwitcher = () => {
     return `/${cleanPath}${queryString ? `?${queryString}` : ''}`
   }
 
-  // Previne a renderização incorreta do tema antes da montagem no cliente
   if (!mounted) return null
-
-  const isDark = resolvedTheme === 'dark'
 
   return (
     <nav 
       aria-label="Preferências de Idioma e Tema"
-      className="fixed top-4 right-4 sm:top-6 sm:right-8 z-[100] flex items-center gap-2 p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[1.25rem] border border-slate-200/50 dark:border-slate-800/50 shadow-2xl transition-all duration-500 hover:border-blue-500/30"
+      className="fixed top-3 right-3 sm:top-6 sm:right-8 z-[100] flex items-center gap-1.5 p-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-2xl transition-all duration-300"
     >
-      {/* Botão de Tema com Feedback Visual */}
+      {/* Botão de Tema - Otimizado para Toque no Celular */}
       <button
-        onClick={() => setTheme(isDark ? 'light' : 'dark')}
+        onClick={toggleTheme}
         className="p-2.5 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-90"
         aria-label={isDark ? "Ativar Modo Claro" : "Ativar Modo Escuro"}
       >
         {isDark ? (
-          <Sun size={20} className="animate-in fade-in zoom-in spin-in-12 duration-700" />
+          <Sun size={20} className="text-yellow-500 transition-transform duration-500 rotate-0" />
         ) : (
-          <Moon size={20} className="animate-in fade-in zoom-in -rotate-12 duration-700" />
+          <Moon size={20} className="text-blue-600 transition-transform duration-500 -rotate-12" />
         )}
       </button>
 
-      <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/60 mx-1" aria-hidden="true" />
+      <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/60 mx-0.5" aria-hidden="true" />
 
       {/* Seletor de Idiomas */}
-      <div className="flex items-center gap-1">
-        <Globe size={14} className="text-slate-400 ml-1 hidden sm:block" />
+      <div className="flex items-center gap-0.5">
+        <Globe size={14} className="text-slate-400 ml-1 hidden xs:block" />
         <div className="flex gap-0.5">
           {languages.map((lang) => {
             const isActive = currentLang === lang.code
@@ -86,19 +84,18 @@ export const LanguageSwitcher = () => {
                 href={getNewPath(lang.code)}
                 hreflang={lang.code}
                 scroll={false} 
-                aria-label={lang.aria}
                 className={`
-                  relative px-3.5 py-2 text-[12px] font-bold tracking-tight rounded-lg transition-all duration-300
+                  relative px-3 py-2 text-[11px] font-bold tracking-tighter rounded-lg transition-all
                   ${isActive 
                     ? 'text-white' 
-                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400'
                   }
                 `}
               >
-                <span className="relative z-10">{lang.label}</span>
+                <span className="relative z-10 uppercase">{lang.label}</span>
                 {isActive && (
                   <div 
-                    className="absolute inset-0 bg-blue-600 rounded-lg z-0 shadow-lg shadow-blue-600/30 animate-in fade-in zoom-in duration-300" 
+                    className="absolute inset-0 bg-blue-600 rounded-lg z-0 shadow-md shadow-blue-600/40" 
                     aria-hidden="true"
                   />
                 )}
