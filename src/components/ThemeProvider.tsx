@@ -5,24 +5,31 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { type ThemeProviderProps } from 'next-themes';
 
 /**
- * ThemeProvider
- * * Este componente atua como a espinha dorsal do design system (Tailwind CSS).
- * Ele permite que o atributo 'class="dark"' seja injetado dinamicamente no <html>.
- * * Responsividade: Indireta (Permite que o design responsivo mude cores conforme o tema).
- * Multilingue: Indireta (Garante que a UI traduzida seja legível em qualquer contraste).
+ * THEME PROVIDER - ADAPTADO PARA PORTFÓLIO SÊNIOR
+ * * Este componente é o "invólucro" que permite ao Tailwind CSS aplicar as classes
+ * de modo escuro (dark mode) em toda a árvore de componentes.
  */
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   const [mounted, setMounted] = React.useState(false);
 
-  // Garante que o provider só atue após a montagem no cliente,
-  // prevenindo discrepâncias entre o HTML do servidor e do navegador.
+  /**
+   * HIDRATAÇÃO (SSR vs Client)
+   * No celular, o processamento pode demorar milissegundos a mais. 
+   * O useEffect garante que o tema só seja aplicado quando o navegador estiver pronto,
+   * evitando aquele "flash" branco antes de ficar escuro.
+   */
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Enquanto o componente não monta, renderizamos um conteúdo "neutro"
+  // para manter a estabilidade visual (CLS - Cumulative Layout Shift)
   if (!mounted) {
-    // Renderiza o conteúdo sem o provider durante o primeiro frame para evitar 'flicker'
-    return <>{children}</>;
+    return (
+      <div className="contents" style={{ visibility: 'hidden' }}>
+        {children}
+      </div>
+    );
   }
 
   return (
@@ -30,6 +37,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
       attribute="class" 
       defaultTheme="system" 
       enableSystem
+      disableTransitionOnChange // Melhora a performance em dispositivos móveis
       {...props}
     >
       {children}
