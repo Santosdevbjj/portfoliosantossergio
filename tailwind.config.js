@@ -1,18 +1,18 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // Ativa o modo escuro via classe (essencial para next-themes)
+  // Ativa o modo escuro via classe para compatibilidade total com next-themes
   darkMode: 'class',
   
   content: [
-    "./src/app/**/*.{js,ts,jsx,tsx}",
-    "./src/components/**/*.{js,ts,jsx,tsx}",
-    "./src/constants/**/*.{js,ts,jsx,tsx}", // Adicionado para garantir tradução segura
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/constants/**/*.{js,ts,jsx,tsx,mdx}", 
   ],
 
   theme: {
     extend: {
       colors: {
-        // Paleta Profissional: Tons de azul "Banking/Enterprise"
+        // Paleta Profissional: Tons de azul "Enterprise/Data-Driven"
         brand: {
           50: '#f0f7ff',
           100: '#e0effe',
@@ -24,9 +24,9 @@ module.exports = {
           700: '#0358a1',
           800: '#074b85',
           900: '#0c3f6d',
-          DEFAULT: "#1e40af", // Azul Bradesco/Corporate
+          DEFAULT: "#1e40af", 
         },
-        // Cores de fundo para modo escuro otimizado
+        // Escuro Profundo (Otimizado para OLED e contraste sênior)
         slate: {
           950: '#020617',
         }
@@ -34,13 +34,14 @@ module.exports = {
       fontFamily: {
         sans: ["var(--font-inter)", "ui-sans-serif", "system-ui"],
       },
-      // SISTEMA DE ANIMAÇÕES: Essencial para a UX Sênior
+      // SISTEMA DE ANIMAÇÕES: Essencial para a UX de sistemas de missão crítica
       animation: {
         'fade-in': 'fadeIn 0.6s ease-out forwards',
         'slide-up': 'slideUp 0.5s ease-out forwards',
         'slide-down': 'slideDown 0.3s ease-out forwards',
         'scale-in': 'scaleIn 0.2s ease-out forwards',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'shimmer': 'shimmer 2s infinite linear',
       },
       keyframes: {
         fadeIn: {
@@ -59,8 +60,11 @@ module.exports = {
           '0%': { transform: 'scale(0.95)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
       },
-      // Adiciona sombras personalizadas para os cards de projeto
       boxShadow: {
         'premium': '0 20px 50px -12px rgba(0, 0, 0, 0.1)',
         'premium-dark': '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
@@ -68,6 +72,6 @@ module.exports = {
     }
   },
   plugins: [
-    require('@tailwindcss/typography'), // Melhora a renderização de textos longos
+    require('@tailwindcss/typography'), 
   ],
 };
