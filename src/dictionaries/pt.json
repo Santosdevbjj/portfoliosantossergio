@@ -5,7 +5,8 @@
     "viewProject": "Ver Projeto",
     "repoTitle": "Repositórios",
     "portfolioTitle": "Portfólio de Soluções",
-    "governance": "Rigor e Governança"
+    "governance": "Rigor e Governança",
+    "backToTop": "Voltar ao topo"
   },
   "about": {
     "title": "Sobre Mim",
@@ -42,19 +43,19 @@
         "items": [
           {
             "label": "Ciência de Dados",
-            "description": "Python, SQL e Machine Learning para modelos preditivos e análise de cenários."
+            "description": "Python, SQL e Machine Learning para modelos preditivos."
           },
           {
             "label": "Big Data & Cloud",
-            "description": "Azure Databricks e Azure Cloud para pipelines escaláveis e governados."
+            "description": "Azure Databricks para pipelines escaláveis e governados."
           },
           {
-            "label": "Inteligência de Relacionamentos",
-            "description": "Neo4J (bancos de dados de grafos) aplicado a detecção de fraudes e vínculos."
+            "label": "Grafos & Fraude",
+            "description": "Neo4J aplicado a detecção de fraudes e vínculos complexos."
           },
           {
             "label": "Governança",
-            "description": "Especialista em ambientes regulados, segurança de dados e auditoria bancária."
+            "description": "Especialista em ambientes regulados e auditoria bancária."
           }
         ]
       }
@@ -75,7 +76,8 @@
     "projectLabels": {
       "problem": "O Problema",
       "solution": "A Solução",
-      "impact": "Impacto de Negócio"
+      "impact": "Impacto de Negócio",
+      "technologies": "Tecnologias"
     }
   },
   "contact": {
@@ -83,12 +85,19 @@
     "subtitle": "Disponível para projetos estratégicos, liderança técnica e consultoria em dados.",
     "emailBtn": "Enviar E-mail",
     "socialLabel": "Redes Profissionais",
-    "status": "Disponível para desafios em 2026"
+    "status": "Disponível para desafios em 2026",
+    "form": {
+      "name": "Nome",
+      "email": "E-mail",
+      "message": "Mensagem",
+      "send": "Enviar Mensagem"
+    }
   },
   "footer": {
     "social": "Redes Profissionais",
     "contact": "Contato",
     "location": "Brasil",
-    "builtBy": "Desenvolvido por"
+    "builtBy": "Desenvolvido por",
+    "rights": "Todos os direitos reservados"
   }
 }
