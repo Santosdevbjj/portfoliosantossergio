@@ -6,27 +6,35 @@
     "repoTitle": "Repositórios",
     "portfolioTitle": "Portfólio de Soluções",
     "governance": "Rigor e Governança",
-    "backToTop": "Voltar ao topo"
+    "backToTop": "Voltar ao topo",
+    "menu_aria": "Abrir Menu Principal"
+  },
+  "nav": {
+    "about": "Sobre",
+    "experience": "Trajetória",
+    "articles": "Artigos",
+    "projects": "Projetos",
+    "contact": "Contato"
   },
   "about": {
     "title": "Sobre Mim",
     "headline": "Transformando a resiliência de sistemas bancários em inteligência de dados estratégica.",
-    "bio": "Com mais de 15 anos de experiência em sistemas de missão crítica no setor bancário (Bradesco), especializei-me em garantir que a tecnologia sustente decisões de alto risco com 100% de governança. Hoje, utilizo esse rigor operacional para liderar projetos de Ciência de Dados e Eficiência Operacional, conectando infraestruturas complexas a insights acionáveis.",
+    "bio": "Com mais de 20 anos de experiência em sistemas de missão crítica no setor bancário, especializei-me em garantir que a tecnologia sustente decisões de alto risco com rigor operacional. Hoje, utilizo essa base sólida para liderar projetos de Ciência de Dados, conectando infraestruturas complexas a insights acionáveis e mensuráveis.",
     "sections": {
       "highlights": {
         "title": "Destaques de Carreira",
         "items": [
           {
             "label": "Eficiência Operacional",
-            "description": "Sistema automatizado de IPVA que eliminou 2.920 horas anuais de processamento manual."
+            "description": "Automação de processos que eliminou 2.920 horas anuais de trabalho manual."
           },
           {
             "label": "Disponibilidade Crítica",
-            "description": "Infraestrutura de rede corporativa para 500+ usuários com 99,5% de disponibilidade."
+            "description": "Gestão de infraestrutura para 500+ usuários com 99,5% de disponibilidade."
           },
           {
-            "label": "Compliance e Privacidade",
-            "description": "Sistemas jurídicos interdepartamentais com rastreabilidade completa e conformidade LGPD."
+            "label": "Compliance e Dados",
+            "description": "Sistemas focados em rastreabilidade completa e conformidade regulatória."
           }
         ]
       },
@@ -36,34 +44,39 @@
         "availabilityValue": "99.5%",
         "availabilityLabel": "Disponibilidade",
         "automationValue": "2.9K",
-        "automationLabel": "Horas Automatizadas"
+        "automationLabel": "Horas/Ano"
+      }
+    }
+  },
+  "experience": {
+    "title": "Trajetória & Impacto",
+    "subtitle": "Experiência em Sistemas Críticos e Inteligência de Dados",
+    "solving": "Problema de Negócio",
+    "impact": "Impacto Mensurável",
+    "items": {
+      "data_consultant": {
+        "company": "Consultor Independente — Ciência de Dados",
+        "role": "Cientista de Dados",
+        "period": "2023 – Presente",
+        "solving": "Incerteza no cronograma de obras e multas por atraso em engenharia.",
+        "impact": "Melhoria de 61% na precisão logística. Economia estimada de R$ 420 mil/ano.",
+        "desc1": "Desenvolvimento de algoritmos de Machine Learning para mitigação de riscos financeiros.",
+        "desc2": "Criação de dashboards operacionais e bots de alerta em tempo real."
       },
-      "stack": {
-        "title": "Stack & Especialidades",
-        "items": [
-          {
-            "label": "Ciência de Dados",
-            "description": "Python, SQL e Machine Learning para modelos preditivos."
-          },
-          {
-            "label": "Big Data & Cloud",
-            "description": "Azure Databricks para pipelines escaláveis e governados."
-          },
-          {
-            "label": "Grafos & Fraude",
-            "description": "Neo4J aplicado a detecção de fraudes e vínculos complexos."
-          },
-          {
-            "label": "Governança",
-            "description": "Especialista em ambientes regulados e auditoria bancária."
-          }
-        ]
+      "bradesco": {
+        "company": "Banco Bradesco S.A.",
+        "role": "Analista de Sistemas Sênior",
+        "period": "1985 – 2008",
+        "solving": "Ineficiência em processos manuais e necessidade de alta disponibilidade bancária.",
+        "impact": "Automação economizando 2.920 horas/ano. Manutenção de 99,5% de disponibilidade.",
+        "desc1": "Liderança técnica e suporte para 500+ usuários em ambiente regulado.",
+        "desc2": "Implementação de sistemas com foco em rastreabilidade e continuidade operacional."
       }
     }
   },
   "portfolio": {
     "title": "Projetos em Destaque",
-    "description": "Projetos de impacto real, documentados sob a ótica de problema, solução e valor entregue.",
+    "description": "Soluções analíticas documentadas sob a ótica de problema, solução e valor entregue.",
     "all": "Todos",
     "categories": {
       "data-science": "Ciência de Dados",
@@ -71,14 +84,16 @@
       "automation": "Automação",
       "governance": "Governança",
       "machine-learning": "Machine Learning",
-      "azure": "Azure Cloud"
+      "azure": "Azure Cloud",
+      "portfolio": "Destaque"
     },
     "projectLabels": {
       "problem": "O Problema",
       "solution": "A Solução",
       "impact": "Impacto de Negócio",
       "technologies": "Tecnologias"
-    }
+    },
+    "empty": "Nenhum projeto encontrado para esta categoria."
   },
   "contact": {
     "title": "Vamos conversar?",
@@ -94,10 +109,10 @@
     }
   },
   "footer": {
-    "social": "Redes Profissionais",
+    "social": "Social",
     "contact": "Contato",
     "location": "Brasil",
     "builtBy": "Desenvolvido por",
-    "rights": "Todos os direitos reservados"
+    "rights": "Sérgio Santos • Todos os direitos reservados"
   }
 }
