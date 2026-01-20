@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n } from '@/i18n-config';
 
-// Otimização de fonte para leitura de dados e relatórios
+// Fonte otimizada para legibilidade e performance
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -18,7 +18,6 @@ interface RootLayoutProps {
   params: Promise<{ lang: string }>;
 }
 
-// Tipagem estrita para garantir que o TS nunca veja 'undefined' no build
 type LocaleContent = {
   pt: string;
   en: string;
@@ -26,7 +25,7 @@ type LocaleContent = {
 };
 
 /**
- * CONFIGURAÇÃO DE VIEWPORT (UX MOBILE)
+ * CONFIGURAÇÃO DE VIEWPORT (Foco em Responsividade e Acessibilidade)
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -40,7 +39,7 @@ export const viewport: Viewport = {
 };
 
 /**
- * SEO MULTILINGUE & GOOGLE VERIFICATION
+ * SEO MULTILINGUE & VERIFICAÇÃO DE AUTORIDADE
  */
 export async function generateMetadata({ 
   params 
@@ -48,24 +47,22 @@ export async function generateMetadata({
   params: Promise<{ lang: string }> 
 }): Promise<Metadata> {
   const resolvedParams = await params;
-  // Fallback e cast para garantir que 'lang' seja uma das chaves válidas
   const lang = (resolvedParams.lang || i18n.defaultLocale) as keyof LocaleContent;
   
   const titles: LocaleContent = {
-    pt: "Sérgio Santos | Especialista em Dados e Eficiência",
-    en: "Sérgio Santos | Data & Efficiency Specialist",
-    es: "Sérgio Santos | Especialista en Datos y Eficiencia"
+    pt: "Sérgio Santos | Especialista em Dados e Sistemas Críticos",
+    en: "Sérgio Santos | Data & Critical Systems Specialist",
+    es: "Sérgio Santos | Especialista en Datos y Sistemas Críticos"
   };
 
   const descriptions: LocaleContent = {
-    pt: "Analista Sênior com 15+ anos em sistemas críticos (Bradesco). Especialista em Ciência de Dados e Azure.",
-    en: "Senior Analyst with 15+ years in critical systems (Bradesco). Specialist in Data Science and Azure.",
-    es: "Analista Sénior con 15+ años en sistemas críticos (Bradesco). Especialista en Ciencia de Datos y Azure."
+    pt: "Analista Sênior com 20+ anos em sistemas críticos (Bradesco). Especialista em Ciência de Dados, Azure e Eficiência Operacional.",
+    en: "Senior Analyst with 20+ years in critical systems (Bradesco). Specialist in Data Science, Azure, and Operational Efficiency.",
+    es: "Analista Sénior con 20+ años en sistemas críticos (Bradesco). Especialista en Ciencia de Datos, Azure y Eficiencia Operativa."
   };
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
 
-  // Resolução segura de valores (Garante que nunca retorne undefined)
   const title = titles[lang] || titles.pt;
   const description = descriptions[lang] || descriptions.pt;
 
@@ -77,7 +74,7 @@ export async function generateMetadata({
     description: description,
     metadataBase: new URL(siteUrl),
     
-    // ATENÇÃO: TAG DO GOOGLE MANTIDA CONFORME SOLICITADO
+    // TAG DE VERIFICAÇÃO DO GOOGLE (Mantida estritamente)
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
@@ -85,9 +82,9 @@ export async function generateMetadata({
     alternates: {
       canonical: `${siteUrl}/${lang}`,
       languages: {
-        'pt-BR': `${siteUrl}/pt`,
-        'en-US': `${siteUrl}/en`,
-        'es-ES': `${siteUrl}/es`,
+        'pt': `${siteUrl}/pt`,
+        'en': `${siteUrl}/en`,
+        'es': `${siteUrl}/es`,
         'x-default': `${siteUrl}/pt`,
       },
     },
@@ -104,6 +101,25 @@ export async function generateMetadata({
       siteName: "Sérgio Santos Portfolio",
       locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
+      images: [
+        {
+          url: '/og-image.png', // Certifique-se de ter esta imagem em /public
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
   };
 }
@@ -112,15 +128,25 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
   const { lang } = await params;
 
   return (
-    <html lang={lang} suppressHydrationWarning className="scroll-smooth">
+    <html 
+      lang={lang} 
+      suppressHydrationWarning 
+      className="scroll-smooth"
+    >
       <head>
+        {/* PWA e Tags de Mobile Nativo */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body 
         className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased min-h-screen flex flex-col`}
       >
-        <ThemeProvider>
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="system" 
+          enableSystem 
+          disableTransitionOnChange
+        >
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <main className="flex-grow">
               {children}
