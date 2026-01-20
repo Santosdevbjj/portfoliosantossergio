@@ -6,8 +6,10 @@ import React, {
   useEffect,
   useState,
   useCallback,
-  ReactNode,
 } from "react";
+
+// Correção do Warning do Log: Importando como 'type'
+import type { ReactNode } from "react";
 
 export type Theme = "light" | "dark" | "system";
 
@@ -17,21 +19,21 @@ interface ThemeContextValue {
   toggleTheme: () => void;
   resetTheme: () => void;
   applyTheme: (newTheme: Theme) => void;
-  mounted: boolean; // Útil para componentes que precisam evitar erros de hidratação
+  mounted: boolean; 
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 /**
  * PROVIDER DE TEMA - GERENCIAMENTO DE DARK MODE
- * Implementa suporte a cookies para renderização híbrida (SSR/Client).
+ * Otimizado para Next.js 15 e prevenção de Hydration Mismatch.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("system");
   const [isDark, setIsDark] = useState<boolean>(false);
   const [mounted, setMounted] = useState(false);
 
-  // Função otimizada para manipular o DOM sem causar reflows desnecessários
+  // Função para manipular o DOM de forma segura no Next.js
   const applyToDOM = useCallback((dark: boolean) => {
     if (typeof window === "undefined") return;
     
@@ -62,11 +64,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         : "system";
     };
 
-    setTheme(getInitialTheme());
+    const initial = getInitialTheme();
+    setTheme(initial);
     setMounted(true);
   }, []);
 
-  // 2. Efeito Reativo: Responde a mudanças de tema e preferência do sistema
+  // 2. Efeito Reativo: Responde a mudanças de tema e preferência do SO
   useEffect(() => {
     if (!mounted) return;
 
@@ -82,12 +85,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     handleSystemChange();
 
-    // Listener para mudanças dinâmicas no SO (ex: agendamento de modo noturno)
     mediaQuery.addEventListener("change", handleSystemChange);
     return () => mediaQuery.removeEventListener("change", handleSystemChange);
   }, [theme, mounted, applyToDOM]);
 
-  // 3. Persistência de Dados
+  // 3. Persistência de Dados (localStorage + Cookies para SSR)
   const saveThemePreference = useCallback((newTheme: Theme) => {
     setTheme(newTheme);
     
@@ -98,7 +100,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("theme", newTheme);
       }
       
-      // Expira em 1 ano. Lax é necessário para segurança e performance no Next.js 15
+      // Cookie com expiração de 1 ano e SameSite=Lax para compatibilidade Vercel
       document.cookie = `theme=${newTheme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
     }
   }, []);
@@ -120,11 +122,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     <ThemeContext.Provider
       value={{ theme, isDark, toggleTheme, resetTheme, applyTheme, mounted }}
     >
-      {/* Usamos uma transição suave de opacidade em vez de 'visibility' 
-          para que o carregamento pareça mais fluido no mobile.
+      {/* A transição de opacidade evita o "flash" de hidratação.
+          No mobile, isso garante que o conteúdo só apareça quando o tema estiver decidido.
       */}
       <div 
-        className={`transition-opacity duration-300 ${mounted ? "opacity-100" : "opacity-0"}`}
+        className={`min-h-screen transition-opacity duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}
       >
         {children}
       </div>
