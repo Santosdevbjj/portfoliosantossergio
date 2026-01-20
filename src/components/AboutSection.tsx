@@ -7,19 +7,18 @@ import { CareerHighlights } from './CareerHighlights';
 
 interface AboutSectionProps {
   lang: 'pt' | 'en' | 'es';
-  // Tipagem 'any' mantida para flexibilidade com o dicionário dinâmico
   dict: any; 
 }
 
 /**
  * SEÇÃO SOBRE - FOCO EM AUTORIDADE E GOVERNANÇA
- * Apresenta a trajetória sênior com ênfase em rigor técnico e stack de dados.
- * Otimizada para Next.js 15 com suporte nativo a Image Optimization.
+ * Implementa as melhores práticas de Image Optimization do Next.js 15.
  */
 export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
-  const { about } = dict;
+  // Garantia de que o objeto 'about' existe para evitar erros de renderização
+  const about = dict?.about || {};
 
-  // Resolução dinâmica do título de governança vindo do dicionário ou fallback por idioma
+  // Resolução dinâmica do título de governança (Common ou Fallback)
   const governanceTitle = dict.common?.governance || {
     pt: 'Rigor e Governança',
     en: 'Rigor & Governance',
@@ -31,29 +30,29 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
           
-          {/* LADO ESQUERDO: Visual & Experiência (Fixo ao rolar no Desktop) */}
+          {/* LADO ESQUERDO: Visual & Experiência (Sticky no Desktop) */}
           <div className="relative group lg:sticky lg:top-32">
-            {/* Aura de destaque decorativa */}
+            {/* Efeito Visual de Fundo */}
             <div className="absolute -inset-4 bg-gradient-to-tr from-blue-600/20 to-indigo-500/20 rounded-[3rem] opacity-30 blur-2xl group-hover:opacity-50 transition-all duration-700" />
             
             <div className="relative bg-slate-100 dark:bg-slate-800/40 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-slate-800 aspect-[4/5] shadow-2xl">
                <Image 
                  src="/images/sergio-santos-profile.png" 
-                 alt={`Sérgio Santos - ${about.headline}`}
+                 alt={`Sérgio Santos - ${about.headline || 'Profile'}`}
                  fill
-                 sizes="(max-width: 768px) 100vw, 50vw"
+                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                  className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                 priority={false}
+                 priority={false} // Mantido false pois o Hero já carrega o LCP
                />
                
-               {/* Badge Flutuante de Senioridade */}
+               {/* Badge de Senioridade */}
                <div className="absolute bottom-6 left-6 right-6 p-6 bg-white/95 dark:bg-slate-950/90 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-blue-900/20 shadow-2xl">
                   <div className="flex items-baseline gap-1">
                     <span className="text-blue-600 dark:text-blue-400 font-black text-5xl leading-none">15</span>
                     <span className="text-blue-600 dark:text-blue-400 font-bold text-2xl">+</span>
                   </div>
                   <p className="text-slate-900 dark:text-slate-100 text-[10px] font-black uppercase tracking-[0.2em] mt-2 leading-tight">
-                    {about.sections?.highlights?.title || "Anos de Experiência em Sistemas Críticos"}
+                    {about.sections?.highlights?.title || "Anos de Experiência"}
                   </p>
                </div>
             </div>
@@ -75,10 +74,10 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
               </div>
             </header>
 
-            {/* Componente de Estatísticas de Carreira */}
+            {/* Números da Carreira */}
             <CareerHighlights dict={dict} />
 
-            {/* Cartões de Diferenciais Técnicos e Governança */}
+            {/* Diferenciais Técnicos */}
             <div className="space-y-6">
               <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-sm uppercase tracking-widest">
                 <ShieldCheck className="text-blue-600" size={20} />
@@ -104,7 +103,7 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
               </div>
             </div>
 
-            {/* Stack Tecnológico Organizado por Tags */}
+            {/* Stack Tecnológico */}
             <div className="space-y-6 pt-6">
               <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-sm uppercase tracking-widest">
                 <Database className="text-blue-600" size={20} />
