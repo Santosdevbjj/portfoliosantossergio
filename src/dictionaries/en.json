@@ -6,27 +6,35 @@
     "repoTitle": "Repositories",
     "portfolioTitle": "Solutions Portfolio",
     "governance": "Rigor & Governance",
-    "backToTop": "Back to top"
+    "backToTop": "Back to top",
+    "menu_aria": "Open Main Menu"
+  },
+  "nav": {
+    "about": "About",
+    "experience": "Experience",
+    "articles": "Articles",
+    "projects": "Projects",
+    "contact": "Contact"
   },
   "about": {
     "title": "About Me",
     "headline": "Transforming Banking System Resilience into Strategic Data Intelligence.",
-    "bio": "With over 15 years of experience in mission-critical systems within the banking sector (Bradesco), I specialized in ensuring technology supports high-stakes decision-making with 100% governance. Today, I apply this operational rigor to lead Data Science and Operational Efficiency projects, connecting complex infrastructures to actionable insights.",
+    "bio": "With over 20 years of experience in mission-critical systems within the banking sector, I specialized in ensuring technology supports high-stakes decision-making with operational rigor. Today, I leverage this solid foundation to lead Data Science projects, connecting complex infrastructures to actionable and measurable insights.",
     "sections": {
       "highlights": {
         "title": "Career Highlights",
         "items": [
           {
             "label": "Operational Efficiency",
-            "description": "Automated tax systems eliminating 2,920 annual hours of manual processing."
+            "description": "Process automation that eliminated 2,920 annual hours of manual labor."
           },
           {
             "label": "Critical Availability",
-            "description": "Corporate infrastructure for 500+ users with a 99.5% availability SLA."
+            "description": "Infrastructure management for 500+ users with 99.5% uptime."
           },
           {
-            "label": "Compliance & Privacy",
-            "description": "Interdepartmental systems with full traceability and GDPR/LGPD compliance."
+            "label": "Compliance & Data",
+            "description": "Systems focused on full traceability and regulatory compliance."
           }
         ]
       },
@@ -34,36 +42,41 @@
         "title": "Performance & Governance",
         "subtitle": "KPIs & IMPACT",
         "availabilityValue": "99.5%",
-        "availabilityLabel": "Uptime",
+        "availabilityLabel": "Availability",
         "automationValue": "2.9K",
-        "automationLabel": "Hours Saved"
+        "automationLabel": "Hours/Year"
+      }
+    }
+  },
+  "experience": {
+    "title": "Career & Impact",
+    "subtitle": "Critical Systems Experience & Data Intelligence",
+    "solving": "Business Problem",
+    "impact": "Measurable Impact",
+    "items": {
+      "data_consultant": {
+        "company": "Independent Consultant — Data Science",
+        "role": "Data Scientist",
+        "period": "2023 – Present",
+        "solving": "Uncertainty in construction schedules and late delivery penalties in engineering.",
+        "impact": "61% improvement in logistics accuracy. Estimated savings of R$ 420k/year.",
+        "desc1": "Development of Machine Learning algorithms for financial risk mitigation.",
+        "desc2": "Creation of operational dashboards and real-time alert bots."
       },
-      "stack": {
-        "title": "Stack & Specialties",
-        "items": [
-          {
-            "label": "Data Science",
-            "description": "Python, SQL, and Machine Learning for predictive modeling."
-          },
-          {
-            "label": "Big Data & Cloud",
-            "description": "Azure Databricks for scalable and governed data pipelines."
-          },
-          {
-            "label": "Graph Intelligence",
-            "description": "Neo4J applied to fraud detection and complex link analysis."
-          },
-          {
-            "label": "Governance",
-            "description": "Specialist in regulated environments and banking audits."
-          }
-        ]
+      "bradesco": {
+        "company": "Banco Bradesco S.A.",
+        "role": "Senior Systems Analyst",
+        "period": "1985 – 2008",
+        "solving": "Inefficiency in manual processes and need for high banking availability.",
+        "impact": "Automation saving 2,920 hours/year. Maintained 99.5% availability.",
+        "desc1": "Technical leadership and support for 500+ users in a regulated environment.",
+        "desc2": "System implementation with a strict focus on traceability and operational continuity."
       }
     }
   },
   "portfolio": {
     "title": "Featured Projects",
-    "description": "Real-impact projects, documented through the lens of problem, solution, and business value.",
+    "description": "Analytical solutions documented through the lens of problem, solution, and business value.",
     "all": "All",
     "categories": {
       "data-science": "Data Science",
@@ -71,14 +84,16 @@
       "automation": "Automation",
       "governance": "Governance",
       "machine-learning": "Machine Learning",
-      "azure": "Azure Cloud"
+      "azure": "Azure Cloud",
+      "portfolio": "Featured"
     },
     "projectLabels": {
       "problem": "The Problem",
       "solution": "The Solution",
       "impact": "Business Impact",
       "technologies": "Technologies"
-    }
+    },
+    "empty": "No projects found for this category."
   },
   "contact": {
     "title": "Let's talk?",
@@ -94,10 +109,10 @@
     }
   },
   "footer": {
-    "social": "Professional Networks",
+    "social": "Social",
     "contact": "Contact",
     "location": "Brazil",
     "builtBy": "Developed by",
-    "rights": "All rights reserved"
+    "rights": "Sérgio Santos • All rights reserved"
   }
 }
