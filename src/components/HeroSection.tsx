@@ -11,9 +11,17 @@ interface HeroSectionProps {
 /**
  * HERO SECTION - IMPACTO VISUAL E AUTORIDADE
  * Otimizado para conversão e demonstração de senioridade técnica.
+ * Totalmente responsivo e multilingue.
  */
 export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
   const { about, common, portfolio } = dict;
+
+  // Fallbacks locais baseados em 'lang' para garantir consistência
+  const localTexts = {
+    pt: { seniorBadge: "Especialista Sênior em Dados" },
+    en: { seniorBadge: "Senior Data Expert" },
+    es: { seniorBadge: "Especialista Sénior en Datos" }
+  }[lang];
 
   return (
     <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-white dark:bg-[#020617] transition-colors duration-500">
@@ -36,12 +44,12 @@ export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 mb-8 animate-in fade-in slide-in-from-top-6 duration-700">
             <Sparkles size={16} className="text-blue-600 dark:text-blue-400" />
             <span className="text-[10px] md:text-xs font-black text-blue-800 dark:text-blue-300 uppercase tracking-[0.25em]">
-              {about.sections?.highlights?.title || "Senior Data Expert"}
+              {about.sections?.highlights?.title || localTexts.seniorBadge}
             </span>
           </div>
 
-          {/* Nome com Tipografia Ultra-Bold */}
-          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter leading-[0.85] animate-in fade-in slide-in-from-left-8 duration-1000">
+          {/* Nome com Tipografia Ultra-Bold - Responsividade Ajustada */}
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter leading-[0.9] sm:leading-[0.85] animate-in fade-in slide-in-from-left-8 duration-1000">
             Sérgio <br />
             <span className="text-blue-600 inline-block hover:translate-x-2 transition-transform duration-500">
                Santos
@@ -58,7 +66,7 @@ export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
             {about.bio}
           </p>
 
-          {/* CTA Group: Responsividade Inteligente */}
+          {/* CTA Group: Botões Empilhados no Mobile, Lado a Lado no Desktop */}
           <div className="flex flex-col sm:flex-row items-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
             <a 
               href="#projects" 
@@ -77,22 +85,22 @@ export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
             </a>
           </div>
 
-          {/* Tech Stack Grayscale (Social Proof) */}
-          <div className="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800/50 flex flex-wrap items-center gap-x-10 gap-y-6 opacity-50 hover:opacity-100 transition-opacity duration-700">
-             <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white uppercase tracking-widest text-[10px]">
-                <Database size={18} className="text-blue-600" /> Azure Databricks
+          {/* Tech Stack Grayscale (Social Proof) - Otimizado para Mobile */}
+          <div className="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800/50 flex flex-wrap items-center gap-x-10 gap-y-6 opacity-60 hover:opacity-100 transition-opacity duration-700">
+             <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white uppercase tracking-widest text-[9px] md:text-[10px]">
+                <Database size={18} className="text-blue-600 shrink-0" /> Azure Databricks
              </div>
-             <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white uppercase tracking-widest text-[10px]">
-                <BarChart3 size={18} className="text-blue-600" /> Data Science
+             <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white uppercase tracking-widest text-[9px] md:text-[10px]">
+                <BarChart3 size={18} className="text-blue-600 shrink-0" /> Data Science
              </div>
-             <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white uppercase tracking-widest text-[10px]">
-                <ShieldCheck size={18} className="text-blue-600" /> Critical Systems
+             <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white uppercase tracking-widest text-[9px] md:text-[10px]">
+                <ShieldCheck size={18} className="text-blue-600 shrink-0" /> Critical Systems
              </div>
           </div>
         </div>
       </div>
       
-      {/* Elemento Decorativo: O "Cérebro" de Dados */}
+      {/* Elemento Decorativo: O "Cérebro" de Dados - Escondido no Mobile para Performance */}
       <div className="absolute -right-32 top-1/2 -translate-y-1/2 opacity-[0.03] dark:opacity-[0.07] pointer-events-none select-none hidden xl:block">
         <Database 
           size={800} 
