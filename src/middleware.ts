@@ -8,19 +8,20 @@ import Negotiator from 'negotiator';
 /**
  * FUNÇÃO AUXILIAR: DETECÇÃO DE LOCALE
  * Resolve o melhor idioma baseado nos headers de aceitação do navegador.
+ * Performance: Otimizado para Edge Runtime do Next.js.
  */
 function getLocale(request: NextRequest): string {
   const negotiatorHeaders: Record<string, string> = {};
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
 
-  // @ts-ignore: i18n.locales é readonly, mas Negotiator exige string mutable array
+  // @ts-ignore: i18n.locales é readonly, Negotiator exige string[]
   const locales: string[] = i18n.locales;
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
 
   try {
-    // Busca a melhor interseção entre o que o usuário quer e o que o site oferece
+    // Busca a melhor correspondência entre preferência do usuário e idiomas disponíveis
     return matchLocale(languages, locales, i18n.defaultLocale);
-  } catch (_error) {
+  } catch {
     // Fallback silencioso para o padrão em caso de erro na negociação
     return i18n.defaultLocale;
   }
@@ -28,13 +29,13 @@ function getLocale(request: NextRequest): string {
 
 /**
  * MIDDLEWARE DE INTERNACIONALIZAÇÃO
- * Gerencia o roteamento de idiomas e protege assets estáticos.
+ * Intercepta requisições para gerenciar o roteamento de idiomas.
  */
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // 1. FILTRO DE EXCEÇÕES (Assets, API e Arquivos Públicos)
-  // Verifica se a rota termina com uma extensão de arquivo (evita processar imagens/fontes)
+  // Evita que o middleware atue sobre imagens, PDFs ou fontes.
   const isPublicFile = /\.(.*)$/.test(pathname);
 
   if (
@@ -46,7 +47,7 @@ export function middleware(request: NextRequest) {
   }
 
   // 2. VERIFICAÇÃO DE LOCALE NA URL
-  // Checa se o pathname já começa com algum dos idiomas suportados
+  // Se o caminho não começar com um idioma suportado, precisamos redirecionar.
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
@@ -55,30 +56,29 @@ export function middleware(request: NextRequest) {
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
 
-    // Preserva query strings (ex: ?utm_source=linkedin) durante o redirecionamento
-    return NextResponse.redirect(
-      new URL(
-        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}${request.nextUrl.search}`,
-        request.url
-      )
+    // Constrói a URL mantendo query params para não perder dados de rastreamento (ex: LinkedIn)
+    const redirectUrl = new URL(
+      `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}${request.nextUrl.search}`,
+      request.url
     );
+
+    return NextResponse.redirect(redirectUrl);
   }
 
   return NextResponse.next();
 }
 
 /**
- * CONFIGURAÇÃO DO MATCHER (PERFORMANCE)
- * Instruímos o Next.js a ignorar rotas técnicas para ganhar milissegundos no First Contentful Paint.
+ * CONFIGURAÇÃO DO MATCHER (ESTRATEGIA SÊNIOR)
+ * Define as rotas onde o middleware deve ser ignorado para preservar a performance.
  */
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     * Ignora rotas que não são páginas para otimizar o tempo de resposta:
+     * - api, _next/static, _next/image
+     * - Arquivos de metadados na raiz
+     * - Pasta /icons/ que você criou na pasta public
      */
     '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.json|apple-touch-icon.png|icons/).*)',
   ],
