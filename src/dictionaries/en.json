@@ -18,7 +18,7 @@
   },
   "about": {
     "title": "About Me",
-    "headline": "Transforming Banking System Resilience into Strategic Data Intelligence.",
+    "headline": "Transforming banking system resilience into strategic data intelligence.",
     "bio": "With over 20 years of experience in mission-critical systems within the banking sector, I specialized in ensuring technology supports high-stakes decision-making with operational rigor. Today, I leverage this solid foundation to lead Data Science projects, connecting complex infrastructures to actionable and measurable insights.",
     "sections": {
       "highlights": {
@@ -42,9 +42,17 @@
         "title": "Performance & Governance",
         "subtitle": "KPIs & IMPACT",
         "availabilityValue": "99.5%",
-        "availabilityLabel": "Availability",
+        "availabilityLabel": "Uptime",
         "automationValue": "2.9K",
         "automationLabel": "Hours/Year"
+      },
+      "stack": {
+        "title": "Tech Stack",
+        "items": [
+          { "label": "Languages", "description": "Python, SQL, R" },
+          { "label": "Big Data", "description": "Azure Databricks, Spark, ADF" },
+          { "label": "Analytics", "description": "Power BI, Machine Learning, Scikit-learn" }
+        ]
       }
     }
   },
@@ -78,6 +86,8 @@
     "title": "Featured Projects",
     "description": "Analytical solutions documented through the lens of problem, solution, and business value.",
     "all": "All",
+    "mainCaseLabel": "Main Case",
+    "noDescription": "Technical documentation in progress.",
     "categories": {
       "data-science": "Data Science",
       "big-data": "Big Data",
