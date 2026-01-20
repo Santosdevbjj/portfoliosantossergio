@@ -2,7 +2,7 @@
 
 /**
  * CONFIGURAÇÃO GLOBAL DE IDIOMAS - NEXT.JS 15
- * Define a espinha dorsal do sistema multilingue.
+ * Define os idiomas suportados e o padrão do sistema.
  */
 export const i18n = {
   defaultLocale: 'pt',
@@ -11,21 +11,20 @@ export const i18n = {
 
 /**
  * TIPO LOCALE
- * Extrai ('pt' | 'en' | 'es') para garantir que o TypeScript aponte erros
- * caso você tente usar um idioma não configurado.
+ * Define estritamente os idiomas aceitos pelo TypeScript.
  */
 export type Locale = (typeof i18n)['locales'][number];
 
 /**
  * METADADOS DE IDIOMA
- * Utilizado pelo LanguageSwitcher para renderizar bandeiras e labels.
+ * Estrutura para SEO, LanguageSwitcher e Acessibilidade (Screen Readers).
  */
 export interface LocaleDetail {
   readonly name: string;   
   readonly region: string; 
   readonly flag: string;   
   readonly label: string;
-  readonly ariaLabel: string; // Para acessibilidade (Screen Readers)
+  readonly ariaLabel: string;
 }
 
 export const localeMetadata: Record<Locale, LocaleDetail> = {
@@ -54,7 +53,7 @@ export const localeMetadata: Record<Locale, LocaleDetail> = {
 
 /**
  * VALIDADO DE LOCALE (Type Guard)
- * Verifica se uma string de URL é um idioma suportado.
+ * Segurança: impede que strings arbitrárias quebrem o carregamento de dados.
  */
 export function isValidLocale(locale: string | undefined | null): locale is Locale {
   if (!locale) return false;
@@ -62,16 +61,16 @@ export function isValidLocale(locale: string | undefined | null): locale is Loca
 }
 
 /**
- * GARANTE UM IDIOMA SEGURO (Fallback)
- * Se o usuário digitar /fr na URL, o sistema redireciona silenciosamente para /pt.
+ * GARANTE UM IDIOMA SEGURO (Fallback Strategy)
+ * Se o parâmetro for inválido, retorna o idioma padrão.
  */
 export function getSafeLocale(locale: string | undefined | null): Locale {
   return isValidLocale(locale) ? locale : i18n.defaultLocale;
 }
 
 /**
- * REGISTRO DE DICIONÁRIOS
- * Usa Dynamic Imports para não sobrecarregar o navegador com textos que não serão usados.
+ * REGISTRO DE DICIONÁRIOS (Lazy Loading)
+ * Os arquivos JSON só são baixados quando o usuário acessa o idioma correspondente.
  */
 const dictionaries: Record<Locale, () => Promise<any>> = {
   pt: () => import('@/dictionaries/pt.json').then((module) => module.default),
@@ -81,24 +80,33 @@ const dictionaries: Record<Locale, () => Promise<any>> = {
 
 /**
  * BUSCA O DICIONÁRIO TRADUZIDO
- * Função central usada nos Server Components (page.tsx) e Client Components.
+ * Função central para Server e Client Components injetarem textos dinâmicos.
  */
 export const getDictionary = async (locale: Locale) => {
   try {
     const safeLocale = getSafeLocale(locale);
-    return await dictionaries[safeLocale]();
+    const dictionaryLoader = dictionaries[safeLocale];
+    
+    if (!dictionaryLoader) {
+      throw new Error(`Dicionário não encontrado para: ${safeLocale}`);
+    }
+
+    return await dictionaryLoader();
   } catch (error) {
-    console.error(`Erro ao carregar dicionário para: ${locale}`, error);
-    // Fallback crítico: se o dicionário falhar, tenta carregar o padrão (PT)
+    console.error(`[i18n] Falha crítica ao carregar dicionário para: ${locale}`, error);
+    // Fallback de segurança nível 2: tenta carregar o PT para o site não ficar em branco
     return dictionaries[i18n.defaultLocale]();
   }
 };
 
 /**
- * HELPERS PARA SEO E ACESSIBILIDADE
+ * HELPERS PARA SEO
  */
 export const getRegion = (locale: Locale): string => localeMetadata[locale]?.region ?? 'pt-BR';
 
+/**
+ * Retorna os idiomas que NÃO são o atual (útil para links hreflang)
+ */
 export const getAlternateLocales = (currentLocale: Locale) => {
   return i18n.locales.filter((locale) => locale !== currentLocale);
 };
