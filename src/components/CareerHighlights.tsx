@@ -1,8 +1,7 @@
-'use client'
+'use client';
 
 import React from 'react';
 import { 
-  Zap, 
   ShieldCheck, 
   BarChart3, 
   Clock, 
@@ -17,19 +16,19 @@ interface CareerHighlightsProps {
 
 /**
  * CAREER HIGHLIGHTS - MÉTRICAS DE IMPACTO
- * Exibe as conquistas profissionais e KPIs técnicos de forma visual.
+ * Exibe conquistas e KPIs técnicos. 
+ * Totalmente responsivo e limpo de avisos de lint (Zap removido).
  */
 export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
-  // Acessando as seções do dicionário com segurança total
+  // Acesso seguro aos dicionários
   const highlights = dict?.about?.sections?.highlights;
   const metrics = dict?.about?.sections?.metrics; 
   
-  // Se não houver dados essenciais, não renderizamos a seção para evitar layout quebrado
   if (!highlights) return null;
 
   const items = highlights.items || [];
 
-  // Mapeamento de ícones para os cards superiores
+  // Mapeamento de ícones para os cards (indexado para evitar variáveis soltas)
   const icons = [
     <Clock key="icon-0" size={24} />,
     <Server key="icon-1" size={24} />,
@@ -46,14 +45,14 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
         </h4>
       </div>
 
-      {/* Grid de Destaques: Responsividade MD (1 -> 3 colunas) */}
+      {/* Grid de Destaques: 1 coluna no mobile, 3 colunas no desktop */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {items.map((item: any, i: number) => (
           <div 
             key={i}
             className="group relative p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800 hover:border-blue-500/50 transition-all duration-500 shadow-sm hover:shadow-xl"
           >
-            {/* Efeito Visual de Fundo no Hover */}
+            {/* Overlay de gradiente no hover */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem]" />
 
             <div className="relative z-10">
@@ -74,15 +73,15 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
       </div>
 
       {/* BANNER DE IMPACTO (KPIs de Data Engineering) */}
-      <div className="relative overflow-hidden p-8 md:p-12 rounded-[3rem] bg-blue-600 text-white shadow-2xl shadow-blue-600/40">
-        {/* Gráfico de fundo decorativo */}
-        <Activity className="absolute -right-12 -top-12 text-white/10 w-64 h-64 rotate-12 pointer-events-none" />
+      <div className="relative overflow-hidden p-6 md:p-12 rounded-[3rem] bg-blue-600 text-white shadow-2xl shadow-blue-600/40">
+        {/* Gráfico decorativo de fundo */}
+        <Activity className="absolute -right-12 -top-12 text-white/5 w-64 h-64 rotate-12 pointer-events-none" />
         
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
           
           {/* Identificação da Métrica */}
           <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-            <div className="p-5 bg-white/10 rounded-3xl backdrop-blur-md border border-white/20">
+            <div className="p-4 md:p-5 bg-white/10 rounded-3xl backdrop-blur-md border border-white/20 shrink-0">
               <BarChart3 size={40} className="text-white" />
             </div>
             <div>
@@ -97,22 +96,22 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
           
           <div className="hidden lg:block h-16 w-px bg-white/20" />
           
-          {/* Grid de Valores Numéricos */}
-          <div className="grid grid-cols-2 gap-8 md:gap-16 w-full lg:w-auto">
+          {/* Grid de Valores Numéricos: Ajustado para não quebrar em telas pequenas */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-16 w-full lg:w-auto">
             <div className="text-center">
               <span className="block text-4xl md:text-5xl font-black mb-1 tracking-tighter">
                 {metrics?.availabilityValue || "99.9%"}
               </span>
-              <span className="text-blue-100 text-[9px] font-black uppercase tracking-widest opacity-80">
+              <span className="text-blue-100 text-[9px] font-black uppercase tracking-widest opacity-80 block">
                 {metrics?.availabilityLabel || "System Uptime"}
               </span>
             </div>
             
-            <div className="text-center border-l border-white/10 pl-8 md:pl-16">
+            <div className="text-center sm:border-l border-white/10 sm:pl-8 md:pl-16">
               <span className="block text-4xl md:text-5xl font-black mb-1 tracking-tighter">
                 {metrics?.automationValue || "3K+"}
               </span>
-              <span className="text-blue-100 text-[9px] font-black uppercase tracking-widest opacity-80">
+              <span className="text-blue-100 text-[9px] font-black uppercase tracking-widest opacity-80 block">
                 {metrics?.automationLabel || "Hrs Saved"}
               </span>
             </div>
