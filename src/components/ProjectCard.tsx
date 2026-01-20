@@ -19,19 +19,20 @@ interface ProjectProps {
 /**
  * PROJECT CARD - FRAMEWORK DE AUTORIDADE
  * Exibe repositórios do GitHub estruturados por Problema/Solução/Impacto.
+ * Focado em demonstrar ROI e capacidade técnica para stakeholders.
  */
 export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
-  // Acesso seguro aos labels do dicionário de portfólio
+  // Acesso seguro aos labels do dicionário
   const labels = dict?.portfolio?.projectLabels || {
-    problem: 'Problem',
-    solution: 'Solution',
-    impact: 'Impact'
+    problem: lang === 'pt' ? 'Problema' : lang === 'es' ? 'Problema' : 'Problem',
+    solution: lang === 'pt' ? 'Solução' : lang === 'es' ? 'Solución' : 'Solution',
+    impact: lang === 'pt' ? 'Impacto' : lang === 'es' ? 'Impacto' : 'Impact'
   };
   
-  // Tags que usamos para controle e não queremos exibir como tecnologia
+  // Tags de controle interno que não devem aparecer como "tecnologias" no card
   const internalTopics = [
     'portfolio', 'destaque', 'primeiro', 'data-science', 'python', 
-    'databricks', 'primeiro-projeto', 'data', 'science', 'featured', 'featured'
+    'databricks', 'primeiro-projeto', 'data', 'science', 'featured', 'highlight'
   ];
   
   const displayTopics = project.topics.filter(topic => !internalTopics.includes(topic.toLowerCase()));
@@ -47,7 +48,7 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
 
   /**
    * Framework de Descrição Estruturada:
-   * No seu GitHub, escreva a descrição como: "Problema | Solução | Impacto"
+   * Divide a descrição do GitHub usando o pipe (|) como separador.
    */
   const descriptionParts = project.description?.split('|') || [];
   const hasStructuredDesc = descriptionParts.length >= 2;
@@ -92,6 +93,7 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
             target="_blank" 
             rel="noopener noreferrer" 
             className="p-3 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all active:scale-90"
+            aria-label="GitHub Repository"
           >
             <Github size={20} />
           </a>
@@ -101,6 +103,7 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
               target="_blank" 
               rel="noopener noreferrer" 
               className="p-3 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all active:scale-90"
+              aria-label="Live Demo"
             >
               <ExternalLink size={20} />
             </a>
@@ -108,7 +111,7 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
         </div>
       </div>
 
-      {/* Título Formatado */}
+      {/* Título Formatado: Trata snake_case e kebab-case */}
       <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-5 tracking-tighter capitalize leading-tight">
         {project.name.replace(/[_-]/g, ' ')}
       </h3>
@@ -147,7 +150,7 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
               </div>
             </div>
 
-            {/* Impacto Final */}
+            {/* Impacto Final (Negócio/Métricas) */}
             {descriptionParts[2] && (
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-start gap-3">
                 <TrendingUp size={16} className="text-emerald-500 mt-0.5" />
@@ -164,8 +167,8 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
         )}
       </div>
 
-      {/* Rodapé do Card: Tags Técnicas */}
-      <div className="flex flex-wrap gap-2 pt-4">
+      {/* Rodapé do Card: Tags Técnicas (Máximo 4 visíveis) */}
+      <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100 dark:border-slate-800/40">
         {displayTopics.slice(0, 4).map((topic) => (
           <span 
             key={topic} 
@@ -175,7 +178,7 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
           </span>
         ))}
         {displayTopics.length > 4 && (
-          <span className="text-[9px] font-bold text-slate-400 self-center">
+          <span className="text-[9px] font-bold text-slate-400 self-center ml-1">
             +{displayTopics.length - 4}
           </span>
         )}
