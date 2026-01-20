@@ -1,22 +1,25 @@
-'use client'
+'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { CheckCircle2, Database, ShieldCheck } from 'lucide-react';
 import { CareerHighlights } from './CareerHighlights';
 
 interface AboutSectionProps {
   lang: 'pt' | 'en' | 'es';
+  // Tipagem 'any' mantida para flexibilidade com o dicionário dinâmico
   dict: any; 
 }
 
 /**
  * SEÇÃO SOBRE - FOCO EM AUTORIDADE E GOVERNANÇA
  * Apresenta a trajetória sênior com ênfase em rigor técnico e stack de dados.
+ * Otimizada para Next.js 15 com suporte nativo a Image Optimization.
  */
 export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
   const { about } = dict;
 
-  // Fallback para títulos de governança baseado no idioma
+  // Resolução dinâmica do título de governança vindo do dicionário ou fallback por idioma
   const governanceTitle = dict.common?.governance || {
     pt: 'Rigor e Governança',
     en: 'Rigor & Governance',
@@ -30,15 +33,17 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
           
           {/* LADO ESQUERDO: Visual & Experiência (Fixo ao rolar no Desktop) */}
           <div className="relative group lg:sticky lg:top-32">
-            {/* Aura de destaque */}
+            {/* Aura de destaque decorativa */}
             <div className="absolute -inset-4 bg-gradient-to-tr from-blue-600/20 to-indigo-500/20 rounded-[3rem] opacity-30 blur-2xl group-hover:opacity-50 transition-all duration-700" />
             
             <div className="relative bg-slate-100 dark:bg-slate-800/40 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-slate-800 aspect-[4/5] shadow-2xl">
-               <img 
+               <Image 
                  src="/images/sergio-santos-profile.png" 
                  alt={`Sérgio Santos - ${about.headline}`}
-                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                 loading="lazy"
+                 fill
+                 sizes="(max-width: 768px) 100vw, 50vw"
+                 className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                 priority={false}
                />
                
                {/* Badge Flutuante de Senioridade */}
@@ -70,10 +75,10 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
               </div>
             </header>
 
-            {/* Componente de Estatísticas (Números que vendem seu perfil) */}
+            {/* Componente de Estatísticas de Carreira */}
             <CareerHighlights dict={dict} />
 
-            {/* Cartões de Diferenciais Técnicos */}
+            {/* Cartões de Diferenciais Técnicos e Governança */}
             <div className="space-y-6">
               <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-sm uppercase tracking-widest">
                 <ShieldCheck className="text-blue-600" size={20} />
@@ -99,7 +104,7 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
               </div>
             </div>
 
-            {/* Stack Tecnológico Organizado */}
+            {/* Stack Tecnológico Organizado por Tags */}
             <div className="space-y-6 pt-6">
               <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-sm uppercase tracking-widest">
                 <Database className="text-blue-600" size={20} />
@@ -109,7 +114,7 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
                 {about.sections?.stack?.items?.map((item: any, i: number) => (
                   <div 
                     key={i} 
-                    className="px-4 py-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 hover:scale-105 transition-transform cursor-default"
+                    className="px-4 py-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 hover:border-blue-500/50 hover:scale-105 transition-all cursor-default"
                   >
                     <span className="text-slate-700 dark:text-slate-300 text-[11px] font-bold">
                       {item.label}: <span className="text-blue-600 dark:text-blue-400 ml-1">{item.description}</span>
