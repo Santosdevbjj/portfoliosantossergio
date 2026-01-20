@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n } from '@/i18n-config';
 
-// Fonte otimizada para legibilidade e performance
+// Fonte otimizada: Inter é excelente para leitura de dados e dashboards
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -25,7 +25,8 @@ type LocaleContent = {
 };
 
 /**
- * CONFIGURAÇÃO DE VIEWPORT (Foco em Responsividade e Acessibilidade)
+ * CONFIGURAÇÃO DE VIEWPORT
+ * Garante que o site não tenha zoom indesejado no mobile e respeite o tema do sistema.
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -35,11 +36,10 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  userScalable: true,
 };
 
 /**
- * SEO MULTILINGUE & VERIFICAÇÃO DE AUTORIDADE
+ * SEO MULTILINGUE DINÂMICO
  */
 export async function generateMetadata({ 
   params 
@@ -62,7 +62,6 @@ export async function generateMetadata({
   };
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
-
   const title = titles[lang] || titles.pt;
   const description = descriptions[lang] || descriptions.pt;
 
@@ -74,7 +73,7 @@ export async function generateMetadata({
     description: description,
     metadataBase: new URL(siteUrl),
     
-    // TAG DE VERIFICAÇÃO DO GOOGLE (Mantida estritamente)
+    // Verificação de Propriedade do Google
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
@@ -82,18 +81,13 @@ export async function generateMetadata({
     alternates: {
       canonical: `${siteUrl}/${lang}`,
       languages: {
-        'pt': `${siteUrl}/pt`,
-        'en': `${siteUrl}/en`,
-        'es': `${siteUrl}/es`,
-        'x-default': `${siteUrl}/pt`,
+        'pt-BR': `${siteUrl}/pt`,
+        'en-US': `${siteUrl}/en`,
+        'es-ES': `${siteUrl}/es`,
+        'x-default': `${siteUrl}/en`, // Recomendado Inglês como fallback global
       },
     },
-    icons: {
-      icon: '/favicon.ico',
-      shortcut: '/icon.png',
-      apple: '/apple-touch-icon.png',
-    },
-    manifest: '/manifest.json',
+
     openGraph: {
       title: title,
       description: description,
@@ -101,24 +95,23 @@ export async function generateMetadata({
       siteName: "Sérgio Santos Portfolio",
       locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
-      images: [
-        {
-          url: '/og-image.png', // Certifique-se de ter esta imagem em /public
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
+      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: title }],
     },
+
+    twitter: {
+      card: 'summary_large_image',
+      title: title,
+      description: description,
+      images: ['/og-image.png'],
+    },
+
     robots: {
       index: true,
       follow: true,
       googleBot: {
         index: true,
         follow: true,
-        'max-video-preview': -1,
         'max-image-preview': 'large',
-        'max-snippet': -1,
       },
     },
   };
@@ -134,12 +127,12 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
       className="scroll-smooth"
     >
       <head>
-        {/* PWA e Tags de Mobile Nativo */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body 
-        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased min-h-screen flex flex-col`}
+        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased min-h-screen flex flex-col selection:bg-blue-500/30`}
       >
         <ThemeProvider 
           attribute="class" 
@@ -147,11 +140,14 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           enableSystem 
           disableTransitionOnChange
         >
+          {/* Container Raiz Otimizado para Responsividade */}
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
-            <main className="flex-grow">
+            <main className="flex-grow w-full">
               {children}
             </main>
           </div>
+          
+          {/* Banner de Cookies traduzido via componente interno */}
           <CookieBanner />
         </ThemeProvider>
       </body>
