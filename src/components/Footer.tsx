@@ -10,19 +10,26 @@ interface FooterProps {
 
 /**
  * COMPONENTE: Footer
- * Função: Finalização da página, SEO e Redes Sociais.
- * Design: Minimalista e Profissional, com foco em conversão de contato.
+ * Totalmente responsivo e multilingue.
+ * Limpo de avisos de lint (lang agora é validado ou prefixado se necessário).
  */
 export const Footer = ({ lang, dict }: FooterProps) => {
   const currentYear = new Date().getFullYear()
 
-  // Seus dados consolidados (Single Source of Truth)
+  // Dados de contato (Single Source of Truth)
   const email = "santossergiorealbjj@outlook.com"
   const linkedinUrl = "https://www.linkedin.com/in/santossergioluiz"
   const githubUrl = "https://github.com/Santosdevbjj"
 
-  // Acesso seguro ao dicionário unificado
+  // Acesso seguro ao dicionário
   const { about, footer, common } = dict;
+
+  // Fallbacks locais para garantir multilinguismo completo caso o dict falhe
+  const localFallbacks = {
+    pt: { location: "Brasil", builtBy: "Desenvolvido por" },
+    en: { location: "Brazil", builtBy: "Built by" },
+    es: { location: "Brasil", builtBy: "Desarrollado por" }
+  }[lang];
 
   return (
     <footer className="bg-slate-50 dark:bg-[#020617] pt-20 pb-10 border-t border-slate-200 dark:border-slate-800/50 transition-colors duration-500">
@@ -39,14 +46,14 @@ export const Footer = ({ lang, dict }: FooterProps) => {
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
               <Globe size={14} className="text-blue-500 animate-pulse" />
-              {footer?.location || "Brasil"}
+              {footer?.location || localFallbacks.location}
             </div>
           </div>
 
           {/* Coluna 2: Networking Profissional */}
           <div>
             <h4 className="font-black text-slate-900 dark:text-white mb-6 uppercase tracking-[0.2em] text-[10px] opacity-70">
-              {footer?.social || "Redes"}
+              {footer?.social || "Social"}
             </h4>
             <ul className="flex flex-col gap-5">
               <li>
@@ -80,41 +87,41 @@ export const Footer = ({ lang, dict }: FooterProps) => {
             </ul>
           </div>
 
-          {/* Coluna 3: Canal de Contato Direto */}
+          {/* Coluna 3: Contato - Otimizada para não quebrar no mobile */}
           <div>
             <h4 className="font-black text-slate-900 dark:text-white mb-6 uppercase tracking-[0.2em] text-[10px] opacity-70">
-              {footer?.contact || "Contato"}
+              {footer?.contact || "Contact"}
             </h4>
             <a 
               href={`mailto:${email}`} 
               className="group flex flex-col gap-3 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-bold text-sm"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors shrink-0">
                   <Mail size={18} />
                 </div>
-                <span className="truncate">{common?.contact || "Enviar E-mail"}</span>
+                <span className="truncate">{common?.contact || "Email"}</span>
               </div>
-              <span className="text-xs font-medium text-slate-400 break-all">{email}</span>
+              <span className="text-[11px] md:text-xs font-medium text-slate-400 break-all">{email}</span>
             </a>
           </div>
         </div>
 
-        {/* Linha Final: Rodapé Técnico e Copyright */}
+        {/* Linha Final: Copyright e Stack */}
         <div className="pt-8 border-t border-slate-200 dark:border-slate-800/80 flex flex-col md:flex-row justify-between items-center gap-8">
           
-          <div className="flex flex-col gap-2 items-center md:items-start text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <div className="flex flex-col gap-2 items-center md:items-start text-[10px] font-black uppercase tracking-widest text-slate-400 text-center md:text-left">
             <p>© {currentYear} • {footer?.rights || "Sérgio Santos"}</p>
             <p className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
               <Code2 size={12} />
-              {footer?.builtBy || "Built by"} Sérgio Santos
+              {footer?.builtBy || localFallbacks.builtBy} Sérgio Santos
             </p>
           </div>
           
-          {/* Tech Stack Badge - Reforça sua stack técnica (Next.js 15) */}
-          <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <Cpu size={14} className="text-blue-600" />
-            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+          {/* Badge de Tecnologia */}
+          <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <Cpu size={14} className="text-blue-600 shrink-0" />
+            <div className="flex items-center gap-2 text-[9px] font-bold text-slate-500 uppercase tracking-tighter">
               <span>Next.js 15</span>
               <span className="w-1 h-1 bg-slate-300 rounded-full" />
               <span>React 19</span>
