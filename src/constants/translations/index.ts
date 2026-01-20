@@ -3,12 +3,14 @@
 import { pt } from './pt';
 import { en } from './en';
 import { es } from './es';
-import { Locale } from '@/i18n-config';
+
+// Correção do Warning do Log: Importando explicitamente como tipo
+import type { Locale } from '@/i18n-config';
 
 /**
  * DICIONÁRIO ESTRUTURADO DE TRADUÇÕES
  * Centraliza os arquivos de idiomas. 
- * O 'as const' é vital para manter a imutabilidade e inferência de tipos.
+ * O 'as const' garante imutabilidade e inferência de tipos literal.
  */
 export const translations = { 
   pt, 
@@ -18,33 +20,33 @@ export const translations = {
 
 /**
  * ENGENHARIA DE TIPOS (Type Safety)
- * Utilizamos o 'pt' como contrato mestre. 
- * Se uma chave for deletada ou renomeada em 'pt.ts', o VS Code marcará erro nos outros arquivos.
+ * Utilizamos o 'pt' como contrato mestre (Source of Truth). 
+ * Isso garante que EN e ES sigam exatamente a mesma estrutura.
  */
 export type TranslationContent = typeof pt;
 export type ITranslations = typeof translations;
 
 /**
  * HELPER DE ACESSO SEGURO (Type Guard)
- * Verifica se uma string de idioma é suportada pelo sistema.
+ * Verifica se uma string de idioma é suportada pelo dicionário.
  */
 export function isSupportedLang(lang: string): lang is keyof ITranslations {
-  return lang in translations;
+  return Object.keys(translations).includes(lang);
 }
 
 /**
- * GET TRANSLATIONS
- * Recupera o dicionário de tradução com fallback automático.
- * * @param lang - Código do idioma vindo da URL ou configuração
- * @returns O dicionário de termos traduzidos
+ * GET TRANSLATIONS (Otimizado para Next.js 15)
+ * Recupera o dicionário de tradução com fallback para o idioma padrão.
+ * * @param lang - Código do idioma (pt, en ou es)
+ * @returns O dicionário de termos traduzidos com tipagem forte
  */
 export const getTranslations = (lang: string | Locale): TranslationContent => {
-  // Se o idioma for suportado, retorna o dicionário correspondente
+  // Verificação rigorosa para garantir que o acesso ao objeto seja seguro
   if (isSupportedLang(lang)) {
-    return translations[lang];
+    return translations[lang as keyof ITranslations];
   }
 
-  // Fallback estratégico: Se o idioma solicitado não existir, 
-  // retornamos Português para garantir que o usuário veja conteúdo.
+  // Fallback estratégico: Se o idioma solicitado for inválido (ex: /fr), 
+  // retornamos Português para manter o portfólio funcional.
   return translations.pt;
 };
