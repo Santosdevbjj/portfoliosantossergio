@@ -10,82 +10,81 @@ interface ArticlesSectionProps {
 }
 
 /**
- * ARTICLES SECTION
- * Lista de publicações técnicas e artigos premiados.
- * Totalmente responsivo, multilingue e com tratamento de erros de objeto.
+ * ARTICLES SECTION - HUB DE PENSAMENTO TÉCNICO
+ * Exibe publicações e artigos. Totalmente responsivo e orientado ao dicionário.
  */
 export const ArticlesSection = ({ lang, dict }: ArticlesSectionProps) => {
-  // Garantimos que o acesso ao conteúdo do portfólio seja seguro
-  // Ajustado para buscar de dict.portfolio (onde costumam estar os artigos)
-  const portfolioData = dict?.portfolio || {};
-  const featured = dict?.featuredArticle || portfolioData?.featuredArticle;
+  // Acesso seguro aos dados do dicionário
+  const articlesDict = dict?.articles || {};
+  const featured = articlesDict?.featured;
   
-  // Título da seção com tratamento para o formato "03. Artigos"
-  const sectionTitle = dict?.categories?.articles?.includes('.') 
-    ? dict.categories.articles.split('.')[1].trim() 
-    : (dict?.categories?.articles || {
-        pt: 'Artigos',
-        en: 'Articles',
-        es: 'Artículos'
-      }[lang]);
-
-  // Tradução do subtítulo centralizada para consistência
-  const subtitle = {
-    pt: 'Insights técnicos e liderança em Data Science',
-    en: 'Technical insights and leadership in Data Science',
-    es: 'Conocimientos técnicos y liderazgo en Ciência de Datos'
-  }[lang];
+  // Título e subtítulo extraídos diretamente do JSON para evitar hardcoding
+  const sectionTitle = dict?.nav?.articles || 'Articles';
+  const subtitle = articlesDict?.subtitle || 'Technical insights and leadership in Data Science';
 
   return (
-    <section id="articles-list" className="py-20 lg:py-32 bg-white dark:bg-slate-900 px-4 sm:px-6 lg:px-8 transition-colors duration-500">
+    <section id="articles" className="py-20 lg:py-32 bg-white dark:bg-slate-900 px-4 sm:px-6 lg:px-8 transition-colors duration-500">
       <div className="max-w-7xl mx-auto">
         
-        {/* Cabeçalho da Seção - Totalmente Responsivo */}
+        {/* Cabeçalho da Seção - Design Responsivo Sênior */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6 mb-12 md:mb-20">
-          <div className="w-12 h-12 md:w-14 md:h-14 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm flex-shrink-0">
-            <BookText className="w-6 h-6 md:w-7 md:h-7" />
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-500/20 flex-shrink-0 group-hover:rotate-3 transition-transform">
+            <BookText className="w-6 h-6 md:w-8 md:h-8" />
           </div>
           <div className="space-y-1">
-            <h2 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">
               {sectionTitle}
             </h2>
-            <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 font-medium">
+            <p className="text-base md:text-lg text-slate-500 dark:text-slate-400 font-medium">
               {subtitle}
             </p>
           </div>
         </div>
 
-        {/* Grid de Artigos: 1 col (mobile), 2 cols (tablet), 3 cols (desktop) */}
+        {/* Grid de Conteúdo: Layout adaptativo (1 col mobile, 3 cols desktop) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
           
-          {/* Renderização Condicional Segura do Artigo Principal */}
+          {/* Renderização do Artigo Principal vindo do JSON */}
           {featured ? (
-            <FeaturedArticle 
-              title={featured.title}
-              description={featured.description}
-              links={featured.links}
-              lang={lang}
-            />
+            <div className="lg:col-span-1">
+              <FeaturedArticle 
+                title={featured.title}
+                description={featured.description}
+                links={featured.links}
+                lang={lang}
+                dict={dict}
+              />
+            </div>
           ) : (
-            // Fallback visual caso o artigo não seja encontrado no JSON
-            <div className="p-8 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center">
-               <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">
-                 {lang === 'pt' ? 'Conteúdo em atualização...' : lang === 'es' ? 'Contenido en actualización...' : 'Content being updated...'}
+            /* Estado de carregamento/vazio traduzido */
+            <div className="p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-800/30 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center min-h-[300px]">
+               <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] text-center">
+                 {articlesDict?.loading || 'Content being updated...'}
                </p>
             </div>
           )}
           
-          {/* Cards de Placeholder - Mantêm a estrutura visual do Grid no Desktop */}
-          <div className="hidden md:flex flex-col justify-center p-8 rounded-[2.5rem] border-2 border-dashed border-slate-100 dark:border-slate-800/50 opacity-40">
-            <p className="text-slate-400 text-sm font-bold text-center italic">
-              {lang === 'pt' ? 'Novos artigos em breve...' : lang === 'es' ? 'Próximamente más artículos...' : 'New articles coming soon...'}
-            </p>
+          {/* Placeholders Visuais - Mantêm o equilíbrio do grid e incentivam o follow */}
+          <div className="flex flex-col justify-center p-8 rounded-[2.5rem] border-2 border-dashed border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-transparent transition-opacity hover:opacity-100 opacity-60">
+            <div className="space-y-3 text-center">
+              <div className="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto flex items-center justify-center">
+                <span className="text-slate-400 text-lg">✍️</span>
+              </div>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-bold italic leading-relaxed">
+                {articlesDict?.comingSoon || 'New articles coming soon...'}
+              </p>
+            </div>
           </div>
 
-          <div className="hidden lg:flex flex-col justify-center p-8 rounded-[2.5rem] border-2 border-dashed border-slate-100 dark:border-slate-800/50 opacity-40">
-            <p className="text-slate-400 text-sm font-bold text-center italic">
-              {lang === 'pt' ? 'Siga no Medium para mais' : lang === 'es' ? 'Sígueme en Medium' : 'Follow on Medium for more'}
-            </p>
+          <div className="hidden lg:flex flex-col justify-center p-8 rounded-[2.5rem] border-2 border-dashed border-slate-100 dark:border-slate-800/50 opacity-40 hover:opacity-80 transition-opacity">
+            <div className="space-y-3 text-center">
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-black uppercase tracking-widest">
+                Medium & LinkedIn
+              </p>
+              <p className="text-slate-400 text-xs font-medium">
+                {articlesDict?.followPrompt || 'Follow for technical deep dives'}
+              </p>
+            </div>
           </div>
         </div>
       </div>
