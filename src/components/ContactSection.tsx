@@ -10,7 +10,7 @@ interface ContactSectionProps {
 
 /**
  * CONTACT SECTION - FOCO EM CONVERSÃO E LEADS
- * Layout estilo "Enterprise Card" com suporte total a i18n e acessibilidade.
+ * Corrigido para evitar erro de JSX Namespace e garantir responsividade total.
  */
 export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
   const [copied, setCopied] = useState(false);
@@ -19,7 +19,7 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
   const linkedinUrl = "https://www.linkedin.com/in/santossergioluiz";
   const githubUrl = "https://github.com/Santosdevbjj";
 
-  // Mapeamento dinâmico via dicionário com fallbacks tipados
+  // Mapeamento dinâmico via dicionário com fallbacks tipados por idioma
   const content = dict?.contact || {};
   
   const texts = {
@@ -89,16 +89,14 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              {/* Botão de E-mail */}
               <a 
                 href={`mailto:${email}`}
                 className="group flex items-center justify-center gap-3 bg-white text-blue-600 px-8 py-4 md:px-10 md:py-5 rounded-2xl font-black text-base md:text-lg hover:bg-blue-50 transition-all active:scale-95 shadow-xl shadow-blue-900/20"
               >
-                <Mail size={20} className="group-hover:-rotate-12 transition-transform" />
+                <Mail className="w-5 h-5 md:w-6 md:h-6 group-hover:-rotate-12 transition-transform" />
                 {texts.emailBtn}
               </a>
               
-              {/* Botão de Copiar */}
               <button 
                 onClick={copyToClipboard}
                 title={texts.copyHint}
@@ -106,12 +104,12 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
               >
                 {copied ? (
                   <>
-                    <Check size={18} className="text-emerald-300 animate-in zoom-in" />
+                    <Check className="w-5 h-5 text-emerald-300 animate-in zoom-in" />
                     <span className="text-sm font-mono text-emerald-300">{texts.copiedMsg}</span>
                   </>
                 ) : (
                   <>
-                    <Copy size={18} className="opacity-70 group-hover:opacity-100" />
+                    <Copy className="w-5 h-5 opacity-70 group-hover:opacity-100" />
                     <span className="text-xs md:text-sm font-mono tracking-tight truncate">{email}</span>
                   </>
                 )}
@@ -134,8 +132,8 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
                   className="group relative p-5 md:p-6 bg-white text-blue-600 hover:text-white rounded-2xl md:rounded-3xl transition-all hover:-translate-y-2 hover:bg-blue-600 shadow-xl"
                   aria-label="LinkedIn Profile"
                 >
-                  <Linkedin size={32} md:size={40} fill="currentColor" />
-                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-black text-white/0 group-hover:text-white/100 transition-all uppercase tracking-widest hidden md:block">LinkedIn</span>
+                  <Linkedin className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" />
+                  <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-[10px] font-black text-white opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-widest hidden md:block">LinkedIn</span>
                 </a>
                 
                 <a 
@@ -145,8 +143,8 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
                   className="group relative p-5 md:p-6 bg-slate-900 text-white hover:bg-black rounded-2xl md:rounded-3xl transition-all hover:-translate-y-2 shadow-xl"
                   aria-label="GitHub Profile"
                 >
-                  <Github size={32} md:size={40} />
-                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-black text-white/0 group-hover:text-white/100 transition-all uppercase tracking-widest hidden md:block">GitHub</span>
+                  <Github className="w-8 h-8 md:w-10 md:h-10" />
+                  <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-[10px] font-black text-white opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-widest hidden md:block">GitHub</span>
                 </a>
               </div>
             </div>
