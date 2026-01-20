@@ -7,8 +7,8 @@ import { Locale } from '@/i18n-config';
 
 /**
  * DICIONÁRIO ESTRUTURADO DE TRADUÇÕES
- * Centraliza os arquivos pt.ts, en.ts e es.ts.
- * O uso de 'as const' garante que as chaves sejam tratadas como valores literais e imutáveis.
+ * Centraliza os arquivos de idiomas. 
+ * O 'as const' é vital para manter a imutabilidade e inferência de tipos.
  */
 export const translations = { 
   pt, 
@@ -18,33 +18,33 @@ export const translations = {
 
 /**
  * ENGENHARIA DE TIPOS (Type Safety)
- * Define que a estrutura de referência para todo o site é o arquivo pt.ts.
- * Isso força a consistência: se uma chave de projeto existe em PT, 
- * o TypeScript exigirá sua existência em EN e ES.
+ * Utilizamos o 'pt' como contrato mestre. 
+ * Se uma chave for deletada ou renomeada em 'pt.ts', o VS Code marcará erro nos outros arquivos.
  */
 export type TranslationContent = typeof pt;
-
-/**
- * TIPO DE ACESSO AOS IDIOMAS
- * Define que as chaves válidas são estritamente as definidas no dicionário.
- */
 export type ITranslations = typeof translations;
 
 /**
- * HELPER DE ACESSO SEGURO
- * @param lang - Código do idioma (pt, en, es)
- * @returns O objeto de tradução correspondente ou o padrão (pt)
- * * Este helper é usado tanto em Client Components quanto em Server Components
- * para garantir que o layout nunca renderize sem texto (fallback).
+ * HELPER DE ACESSO SEGURO (Type Guard)
+ * Verifica se uma string de idioma é suportada pelo sistema.
  */
-export const getTranslations = (lang: string): TranslationContent => {
-  // Verifica se o idioma passado é uma das chaves válidas do nosso dicionário
-  const isSupportedLocale = Object.keys(translations).includes(lang);
-  
-  if (isSupportedLocale) {
-    return translations[lang as keyof ITranslations];
+export function isSupportedLang(lang: string): lang is keyof ITranslations {
+  return lang in translations;
+}
+
+/**
+ * GET TRANSLATIONS
+ * Recupera o dicionário de tradução com fallback automático.
+ * * @param lang - Código do idioma vindo da URL ou configuração
+ * @returns O dicionário de termos traduzidos
+ */
+export const getTranslations = (lang: string | Locale): TranslationContent => {
+  // Se o idioma for suportado, retorna o dicionário correspondente
+  if (isSupportedLang(lang)) {
+    return translations[lang];
   }
 
-  // Fallback de segurança para o idioma padrão
+  // Fallback estratégico: Se o idioma solicitado não existir, 
+  // retornamos Português para garantir que o usuário veja conteúdo.
   return translations.pt;
 };
