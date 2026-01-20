@@ -17,51 +17,62 @@ interface ThemeContextValue {
   toggleTheme: () => void;
   resetTheme: () => void;
   applyTheme: (newTheme: Theme) => void;
+  mounted: boolean; // Útil para componentes que precisam evitar erros de hidratação
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
+/**
+ * PROVIDER DE TEMA - GERENCIAMENTO DE DARK MODE
+ * Implementa suporte a cookies para renderização híbrida (SSR/Client).
+ */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("system");
   const [isDark, setIsDark] = useState<boolean>(false);
   const [mounted, setMounted] = useState(false);
 
-  // Função para manipular o DOM de forma segura
+  // Função otimizada para manipular o DOM sem causar reflows desnecessários
   const applyToDOM = useCallback((dark: boolean) => {
-    if (typeof window !== "undefined") {
-      const root = document.documentElement;
-      if (dark) {
-        root.classList.add("dark");
-      } else {
-        root.classList.remove("dark");
-      }
-      root.style.colorScheme = dark ? "dark" : "light";
+    if (typeof window === "undefined") return;
+    
+    const root = document.documentElement;
+    if (dark) {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
     }
+    root.style.colorScheme = dark ? "dark" : "light";
   }, []);
 
-  // 1. Carregamento Inicial (Hydration Fix)
+  // 1. Carregamento Inicial: Sincroniza LocalStorage e Cookies
   useEffect(() => {
-    const storedTheme = (
-      document.cookie
+    const getInitialTheme = (): Theme => {
+      if (typeof window === "undefined") return "system";
+      
+      const stored = localStorage.getItem("theme") as Theme;
+      if (stored && ["light", "dark", "system"].includes(stored)) return stored;
+      
+      const cookieTheme = document.cookie
         .split("; ")
         .find((row) => row.startsWith("theme="))
-        ?.split("=")[1] || localStorage.getItem("theme")
-    ) as Theme | undefined;
+        ?.split("=")[1] as Theme;
+        
+      return (cookieTheme && ["light", "dark", "system"].includes(cookieTheme)) 
+        ? cookieTheme 
+        : "system";
+    };
 
-    if (storedTheme && ["light", "dark", "system"].includes(storedTheme)) {
-      setTheme(storedTheme);
-    }
-    
+    setTheme(getInitialTheme());
     setMounted(true);
   }, []);
 
-  // 2. Efeito Central: Reage ao estado 'theme' e ao sistema
+  // 2. Efeito Reativo: Responde a mudanças de tema e preferência do sistema
   useEffect(() => {
     if (!mounted) return;
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     
-    const updateTheme = () => {
+    const handleSystemChange = () => {
       const shouldBeDark = 
         theme === "dark" || (theme === "system" && mediaQuery.matches);
       
@@ -69,14 +80,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       applyToDOM(shouldBeDark);
     };
 
-    updateTheme();
+    handleSystemChange();
 
-    // Listener para quando o usuário muda o tema no sistema operacional/celular
-    mediaQuery.addEventListener("change", updateTheme);
-    return () => mediaQuery.removeEventListener("change", updateTheme);
+    // Listener para mudanças dinâmicas no SO (ex: agendamento de modo noturno)
+    mediaQuery.addEventListener("change", handleSystemChange);
+    return () => mediaQuery.removeEventListener("change", handleSystemChange);
   }, [theme, mounted, applyToDOM]);
 
-  // 3. Salvar preferência (Cookie + LocalStorage)
+  // 3. Persistência de Dados
   const saveThemePreference = useCallback((newTheme: Theme) => {
     setTheme(newTheme);
     
@@ -86,7 +97,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       } else {
         localStorage.setItem("theme", newTheme);
       }
-      // Cookie é importante para o Next.js ler no servidor antes de renderizar
+      
+      // Expira em 1 ano. Lax é necessário para segurança e performance no Next.js 15
       document.cookie = `theme=${newTheme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
     }
   }, []);
@@ -104,14 +116,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     saveThemePreference("system");
   }, [saveThemePreference]);
 
-  // No celular, é vital evitar o 'flicker'. 
-  // Retornamos um container invisível ou o próprio children mas com visibilidade controlada
-  // para que o layout não "pule" quando o JS carregar.
   return (
     <ThemeContext.Provider
-      value={{ theme, isDark, toggleTheme, resetTheme, applyTheme }}
+      value={{ theme, isDark, toggleTheme, resetTheme, applyTheme, mounted }}
     >
-      <div style={{ visibility: mounted ? "visible" : "hidden" }}>
+      {/* Usamos uma transição suave de opacidade em vez de 'visibility' 
+          para que o carregamento pareça mais fluido no mobile.
+      */}
+      <div 
+        className={`transition-opacity duration-300 ${mounted ? "opacity-100" : "opacity-0"}`}
+      >
         {children}
       </div>
     </ThemeContext.Provider>
