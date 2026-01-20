@@ -45,6 +45,14 @@
         "availabilityLabel": "Disponibilidad",
         "automationValue": "2.9K",
         "automationLabel": "Horas/Año"
+      },
+      "stack": {
+        "title": "Stack Tecnológico",
+        "items": [
+          { "label": "Lenguajes", "description": "Python, SQL, R" },
+          { "label": "Big Data", "description": "Azure Databricks, Spark, ADF" },
+          { "label": "Analytics", "description": "Power BI, Machine Learning, Scikit-learn" }
+        ]
       }
     }
   },
@@ -78,6 +86,8 @@
     "title": "Proyectos Destacados",
     "description": "Soluciones analíticas documentadas bajo la óptica de problema, solución y valor entregado.",
     "all": "Todos",
+    "mainCaseLabel": "Caso Principal",
+    "noDescription": "Documentación técnica en proceso de actualización.",
     "categories": {
       "data-science": "Ciencia de Datos",
       "big-data": "Big Data",
