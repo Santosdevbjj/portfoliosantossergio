@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { ProjectCard } from './ProjectCard';
-import { GitHubRepo } from '@/lib/github';
+import type { GitHubRepo } from '@/lib/github';
 import { Filter, FolderOpen, SearchX } from 'lucide-react';
 
 interface ProjectSectionProps {
@@ -18,21 +18,23 @@ interface ProjectSectionProps {
 export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   
+  // Acesso seguro aos dicionários
   const t = dict?.portfolio || {};
-  const categoriesDict = dict?.categories || {};
+  const categoriesDict = useMemo(() => dict?.categories || {}, [dict]);
 
   // Centralização de textos de interface para garantir multilinguismo limpo
-  const uiStrings = {
+  const uiStrings = useMemo(() => ({
     pt: { filter: 'Filtrar Especialidade', all: 'Todos', empty: 'Nenhum projeto encontrado', portfolio: 'Portfólio de Soluções' },
     en: { filter: 'Filter Specialty', all: 'All', empty: 'No projects found', portfolio: 'Solutions Portfolio' },
     es: { filter: 'Filtrar Especialidad', all: 'Todos', empty: 'Ningún proyecto encontrado', portfolio: 'Portafolio de Soluciones' }
-  }[lang];
+  }[lang]), [lang]);
 
-  // 1. Extração e Ordenação de Categorias
+  // 1. Extração e Ordenação de Categorias (Corrigido para evitar avisos do Hook)
   const categories = useMemo(() => {
     const cats = new Set<string>();
     projects.forEach(repo => {
       repo.topics?.forEach(topic => {
+        // Só adiciona se o tópico estiver mapeado no dicionário de categorias
         if (categoriesDict[topic]) cats.add(topic);
       });
     });
@@ -40,22 +42,23 @@ export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) =>
     return Array.from(cats).sort((a, b) => {
       const labelA = categoriesDict[a] || '';
       const labelB = categoriesDict[b] || '';
-      return labelA.localeCompare(labelB, lang, { numeric: true });
+      return labelA.localeCompare(labelB, lang);
     });
   }, [projects, categoriesDict, lang]);
 
   // 2. Filtro e Priorização (Business Logic)
   const filteredProjects = useMemo(() => {
+    // Mantém apenas projetos marcados com 'portfolio' no GitHub
     let base = projects.filter(p => p.topics?.includes('portfolio'));
     
     if (activeCategory !== 'all') {
       base = base.filter(repo => repo.topics?.includes(activeCategory.toLowerCase()));
     }
 
-    // Ordenação: 1. Peso (primeiro/destaque) | 2. Recência
+    // Ordenação: 1. Peso (Primeiro/Destaque) | 2. Data de Atualização
     return base.sort((a, b) => {
-      const weightA = (a.topics?.includes('primeiro') ? 20 : 0) + (a.topics?.includes('destaque') ? 10 : 0);
-      const weightB = (b.topics?.includes('primeiro') ? 20 : 0) + (b.topics?.includes('destaque') ? 10 : 0);
+      const weightA = (a.topics?.includes('primeiro') ? 100 : 0) + (a.topics?.includes('destaque') ? 50 : 0);
+      const weightB = (b.topics?.includes('primeiro') ? 100 : 0) + (b.topics?.includes('destaque') ? 50 : 0);
       
       if (weightA !== weightB) return weightB - weightA;
       return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
@@ -87,8 +90,8 @@ export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) =>
             {uiStrings.filter}
           </div>
           
-          {/* Scroll Horizontal no Mobile com Fade de indicação */}
           <div className="relative">
+            {/* Scroll Horizontal no Mobile com 'no-scrollbar' para design limpo */}
             <div className="flex flex-nowrap lg:flex-wrap gap-2 overflow-x-auto pb-4 lg:pb-0 no-scrollbar snap-x -mx-6 px-6 lg:mx-0 lg:px-0">
               <button
                 onClick={() => setActiveCategory('all')}
@@ -109,7 +112,7 @@ export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) =>
                     activeCategory === cat
                       ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-600/30'
                       : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-blue-500/50'
-                  }`}
+                }`}
                 >
                   {categoriesDict[cat] || cat}
                 </button>
