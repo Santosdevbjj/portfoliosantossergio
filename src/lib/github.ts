@@ -7,7 +7,7 @@
 export interface GitHubRepo {
   id: number;
   name: string;
-  description: string; // Garantimos string para evitar erros de tipagem na UI
+  description: string;
   html_url: string;
   homepage: string | null;
   topics: string[];
@@ -19,7 +19,7 @@ export interface GitHubRepo {
  * SERVIÇO DE INTEGRAÇÃO GITHUB (Server-Side Only)
  * Busca, filtra e ordena repositórios com lógica de prioridade.
  */
-export async function getGitHubProjects(): Promise<GitHubRepo[]> {
+export async function getGitHubProjects(lang: string = 'pt'): Promise<GitHubRepo[]> {
   const token = process.env.GITHUB_ACCESS_TOKEN;
   const username = "Santosdevbjj";
   
@@ -31,14 +31,13 @@ export async function getGitHubProjects(): Promise<GitHubRepo[]> {
   try {
     const response = await fetch(url, {
       headers: {
-        ...(token && { Authorization: `Bearer ${token}` }), // Padrão Bearer recomendado
+        ...(token && { Authorization: `Bearer ${token}` }),
         'Accept': 'application/vnd.github.v3+json',
         'User-Agent': 'Portfolio-Sergio-Santos-Data-Science',
       },
       /**
        * NEXT.JS 15 CACHING (ISR)
-       * Revalidação em background a cada 1 hora. 
-       * Mantém o site rápido mesmo se a API do GitHub estiver lenta.
+       * Revalidação em background a cada 1 hora.
        */
       next: { revalidate: 3600 }, 
     });
@@ -56,47 +55,55 @@ export async function getGitHubProjects(): Promise<GitHubRepo[]> {
     }
 
     /**
-     * FILTRAGEM E TRANSFORMAÇÃO
+     * FILTRAGEM E TRANSFORMAÇÃO MULTILINGUE
      * 1. Remove forks.
      * 2. Filtra apenas projetos com a tag 'portfolio'.
+     * 3. Trata descrições multilingues (formato: "Desc PT | Desc EN | Desc ES")
      */
     const filteredRepos = repos
       .filter((repo: any) => !repo.fork && repo.topics?.includes("portfolio"))
-      .map((repo: any): GitHubRepo => ({
-        id: repo.id,
-        name: repo.name, 
-        description: repo.description ?? "", // Fallback para string vazia (Evita erro de build)
-        html_url: repo.html_url,
-        homepage: repo.homepage ?? null,
-        topics: repo.topics ?? [],
-        updated_at: repo.updated_at,
-        stargazers_count: repo.stargazers_count ?? 0,
-      }));
+      .map((repo: any): GitHubRepo => {
+        // Lógica de Tradução de Descrição via Pipe (|)
+        let finalDescription = repo.description ?? "";
+        if (finalDescription.includes('|')) {
+          const parts = finalDescription.split('|').map((p: string) => p.trim());
+          // Ordem esperada na descrição do GitHub: PT (0) | EN (1) | ES (2)
+          if (lang === 'en' && parts[1]) finalDescription = parts[1];
+          else if (lang === 'es' && parts[2]) finalDescription = parts[2];
+          else finalDescription = parts[0];
+        }
+
+        return {
+          id: repo.id,
+          name: repo.name.replace(/-/g, ' ').replace(/_/g, ' '), // Nome mais limpo para UI
+          description: finalDescription,
+          html_url: repo.html_url,
+          homepage: repo.homepage ?? null,
+          topics: repo.topics ?? [],
+          updated_at: repo.updated_at,
+          stargazers_count: repo.stargazers_count ?? 0,
+        };
+      });
 
     /**
      * ORDENAÇÃO ESTRATÉGICA (Ranking System)
-     * Prioridade máxima para tags específicas de destaque.
      */
     return filteredRepos.sort((a, b) => {
       const getWeight = (repo: GitHubRepo) => {
-        if (repo.topics.includes('primeiro')) return 2;
-        if (repo.topics.includes('destaque')) return 1;
+        if (repo.topics.includes('destaque') || repo.topics.includes('featured')) return 2;
+        if (repo.topics.includes('data-science')) return 1;
         return 0;
       };
 
       const weightA = getWeight(a);
       const weightB = getWeight(b);
 
-      if (weightA !== weightB) {
-        return weightB - weightA;
-      }
+      if (weightA !== weightB) return weightB - weightA;
 
-      // Critério de desempate: Data de atualização
       return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
     });
     
   } catch (error) {
-    // Degradação graciosa: Loga o erro mas retorna array vazio para não quebrar a página
     console.error("[GitHub Fatal Error] Falha na conexão:", error);
     return [];
   }
