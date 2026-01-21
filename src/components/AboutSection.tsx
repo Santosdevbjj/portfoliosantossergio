@@ -12,10 +12,10 @@ interface AboutSectionProps {
 
 /**
  * SEÇÃO SOBRE - FOCO EM AUTORIDADE, GOVERNANÇA E MÉTRICAS
- * Otimizada para SEO e performance de renderização.
+ * Otimizada para SEO e performance. Adaptada para os novos ativos na pasta public.
  */
 export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
-  // Acesso centralizado aos dados do dicionário
+  // Acesso seguro aos dados do dicionário
   const about = dict?.about || {};
   const sections = about.sections || {};
   const common = dict?.common || {};
@@ -25,7 +25,8 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
           
-          {/* COLUNA 1: NARRATIVA (Aparece primeiro no Mobile) */}
+          {/* COLUNA 1: NARRATIVA (Mobile: Ordem 2 para priorizar a imagem se desejar, ou 1 para texto) */}
+          {/* Mantive order-1 para que o recrutador leia quem você é antes de ver os detalhes técnicos */}
           <div className="flex flex-col space-y-12 order-1">
             <header>
               <span className="inline-block text-blue-600 dark:text-blue-400 font-black uppercase tracking-[0.3em] text-[10px] mb-4 px-3 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -41,10 +42,10 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
               </div>
             </header>
 
-            {/* Componente de KPIs de Impacto */}
+            {/* Componente de KPIs (Anos, Projetos, etc) */}
             <CareerHighlights dict={dict} />
 
-            {/* Governança e Diferenciais */}
+            {/* Governança e Diferenciais Estratégicos */}
             <div className="space-y-6">
               <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-sm uppercase tracking-widest">
                 <ShieldCheck className="text-blue-600 w-5 h-5" />
@@ -73,7 +74,7 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
               </div>
             </div>
 
-            {/* Stack de Especialidades */}
+            {/* Stack de Especialidades Técnicas */}
             <div className="space-y-6 pt-6">
               <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-sm uppercase tracking-widest">
                 <Database className="text-blue-600 w-5 h-5" />
@@ -94,29 +95,29 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
             </div>
           </div>
 
-          {/* COLUNA 2: VISUAL (Sticky no Desktop, Segunda no Mobile) */}
+          {/* COLUNA 2: VISUAL (Sticky no Desktop para manter o rosto visível durante a leitura) */}
           <div className="relative group lg:sticky lg:top-32 order-2">
-            {/* Efeito Visual de Brilho de Fundo */}
+            {/* Glow effect decorativo */}
             <div className="absolute -inset-4 bg-gradient-to-tr from-blue-600/20 to-indigo-500/20 rounded-[3rem] opacity-30 blur-2xl group-hover:opacity-50 transition-all duration-700" />
             
             <div className="relative bg-slate-200 dark:bg-slate-800/40 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-slate-800 aspect-[4/5] sm:aspect-square lg:aspect-[4/5] shadow-2xl">
                <Image 
                  src="/images/sergio-santos-profile.png" 
-                 alt={`Sérgio Santos - Data Specialist`}
+                 alt={`Sérgio Santos - Data Specialist Portfolio`}
                  fill
                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 45vw, 600px"
                  className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                 priority={false}
+                 priority
                />
                
-               {/* Badge de Senioridade: Atualizado para 20+ Anos */}
+               {/* Badge de Senioridade - 20+ Anos de Trajetória */}
                <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 p-4 md:p-6 bg-white/95 dark:bg-slate-950/90 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-blue-900/20 shadow-2xl">
                   <div className="flex items-baseline gap-1">
                     <span className="text-blue-600 dark:text-blue-400 font-black text-4xl md:text-5xl leading-none">20</span>
                     <span className="text-blue-600 dark:text-blue-400 font-bold text-xl md:text-2xl">+</span>
                   </div>
                   <p className="text-slate-900 dark:text-slate-100 text-[10px] font-black uppercase tracking-[0.2em] mt-2 leading-tight">
-                    {sections.highlights?.title || "Years of Experience"}
+                    {sections.experience_label || "Years of Impact"}
                   </p>
                </div>
             </div>
