@@ -3,12 +3,14 @@
   "extends": [
     "next/core-web-vitals",
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jsx-a11y/recommended"
   ],
   "plugins": [
     "@typescript-eslint",
     "unused-imports",
-    "import"
+    "import",
+    "jsx-a11y"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -24,13 +26,14 @@
     }
   },
   "rules": {
-    /* React & Next.js: Flexibilidade para o Build */
+    /* SEGURANÇA E HIGIENE (Next.js 15.5.7) */
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
     "react/no-unescaped-entities": "off",
     "@next/next/no-img-element": "warn",
+    "@next/next/no-html-link-for-pages": "error",
 
-    /* Clean Code: Transformado em WARN para não travar o build */
+    /* CLEAN CODE: Gestão de Variáveis e Imports */
     "@typescript-eslint/no-unused-vars": "off",
     "unused-imports/no-unused-imports": "warn",
     "unused-imports/no-unused-vars": [
@@ -43,24 +46,31 @@
       }
     ],
 
-    /* Organização de Imports: Desativado o bloqueio de build */
-    "import/order": "off",
-
-    /* TypeScript: Compatibilidade com TS 5.7+ sem rigor excessivo no CI */
-    "@typescript-eslint/no-explicit-any": "off",
+    /* ORGANIZAÇÃO: Imports e Tipagem */
+    "import/order": [
+      "warn",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+        "newlines-between": "always",
+        "alphabetize": { "order": "asc", "caseInsensitive": true }
+      }
+    ],
     "@typescript-eslint/consistent-type-imports": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-non-null-assertion": "warn",
     "@typescript-eslint/ban-ts-comment": "off",
 
-    /* Acessibilidade: Mantido como aviso para SEO */
-    "jsx-a11y/alt-text": "warn",
+    /* ACESSIBILIDADE E SEO (Foco em Rankeamento Google) */
+    "jsx-a11y/alt-text": "error",
     "jsx-a11y/anchor-is-valid": "warn",
-    "jsx-a11y/aria-props": "warn",
-    "jsx-a11y/aria-proptypes": "warn",
+    "jsx-a11y/aria-props": "error",
+    "jsx-a11y/role-has-required-aria-props": "error",
+    "jsx-a11y/no-redundant-roles": "warn",
 
-    /* Logs e Debugging */
-    "no-console": "off",
-    "no-debugger": "error"
+    /* DESENVOLVIMENTO E LOGS */
+    "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
+    "no-debugger": "error",
+    "no-duplicate-imports": "error"
   },
   "overrides": [
     {
