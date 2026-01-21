@@ -2,30 +2,28 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // Segurança: Impede que o Next.js exponha informações da tecnologia no header HTTP
+  // Segurança: Impede a exposição da tecnologia no header HTTP
   poweredByHeader: false,
 
-  // Rigor Técnico: Garante que o deploy só ocorra se o código estiver perfeito
-  // Nota: O ESLint agora é gerenciado via CLI (eslint.config.mjs), 
-  // por isso removemos a chave 'eslint' daqui para conformidade com a v16.
+  // Rigor Técnico: Garante que o deploy pare se houver erros de tipo
   typescript: {
     ignoreBuildErrors: false, 
   },
 
-  // Estabilização: typedRoutes agora é padrão e melhora o DX com TS
+  // Next.js 16: typedRoutes melhora a segurança de navegação com TS
   typedRoutes: true,
 
   // Otimizações do Compilador (SWC)
   compiler: {
-    // Remove console.log em produção para maior performance e privacidade
+    // Limpeza de logs em produção para performance e privacidade
     removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
   },
 
   images: {
-    // Formatos de próxima geração (AVIF é superior ao WebP em compressão)
+    // AVIF é prioridade em 2026 para melhores notas de LCP (Web Vitals)
     formats: ['image/avif', 'image/webp'],
     
-    // Configuração robusta para assets externos (GitHub e Unsplash)
+    // Remote Patterns para ativos externos
     remotePatterns: [
       {
         protocol: 'https',
@@ -52,7 +50,7 @@ const nextConfig = {
     minimumCacheTTL: 3600,
   },
 
-  // Recursos de Performance 2026
+  // Recursos de Performance e Modernização Node 24
   experimental: {
     optimizePackageImports: [
       'lucide-react', 
@@ -60,11 +58,10 @@ const nextConfig = {
       'clsx', 
       'tailwind-merge'
     ],
-    // Node 24 lida melhor com source maps internamente
     serverSourceMaps: false,
   },
 
-  // Cabeçalhos de Segurança e Gerenciamento de Assets
+  // Cabeçalhos de Segurança e Gestão de Cache
   async headers() {
     return [
       {
@@ -82,6 +79,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline';",
               "img-src 'self' blob: data: https://github.com https://*.githubusercontent.com https://images.unsplash.com https://vercel.com;",
               "font-src 'self' data:;",
+              // Adicionado suporte para Web Vitals e Insights da Vercel
               "connect-src 'self' https://api.github.com https://*.vercel-analytics.com https://*.vitals.vercel-insights.com;",
               "frame-ancestors 'none';",
             ].join(' '),
@@ -89,7 +87,7 @@ const nextConfig = {
         ],
       },
       {
-        // Cache agressivo para imagens e assets estáticos
+        // Regex aprimorada para cache imutável de assets (Otimização de Performance)
         source: '/:path*((?!(?:api|_next)).*\\.(?:png|ico|jpg|webp|avif|svg))',
         headers: [
           {
@@ -99,17 +97,11 @@ const nextConfig = {
         ],
       },
       {
-        // Ajuste no source do PDF
+        // Tratamento específico para o currículo em PDF
         source: '/:file(cv-sergio-santos-.*\\.pdf)',
         headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/pdf',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400, must-revalidate',
-          },
+          { key: 'Content-Type', value: 'application/pdf' },
+          { key: 'Cache-Control', value: 'public, max-age=86400, must-revalidate' },
         ],
       },
     ];
