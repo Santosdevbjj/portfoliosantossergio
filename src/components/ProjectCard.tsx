@@ -17,14 +17,15 @@ interface ProjectProps {
 }
 
 /**
- * PROJECT CARD - ESTRUTURA DE PROVA TÉCNICA
- * Converte metadados do GitHub em narrativas de Problema/Solução/Impacto.
+ * PROJECT CARD - NARRATIVA DE ENGENHARIA
+ * Converte metadados do GitHub em business cases (Problema/Solução/Impacto).
+ * Totalmente responsivo e multilingue.
  */
 export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
-  // Acesso seguro aos labels do dicionário revisado
-  const labels = dict?.portfolio?.projectLabels || {};
+  const portfolioDict = dict?.portfolio || {};
+  const labels = portfolioDict.projectLabels || {};
   
-  // Tags internas que controlam lógica de UI mas não devem ser exibidas como skills
+  // Tags de controle que não devem aparecer como "Skills" no card
   const internalTopics = [
     'portfolio', 'destaque', 'primeiro', 'data-science', 'python', 
     'databricks', 'primeiro-projeto', 'data', 'science', 'featured', 'highlight'
@@ -32,18 +33,18 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
   
   const displayTopics = project.topics.filter(topic => !internalTopics.includes(topic.toLowerCase()));
   
-  // Flags de prioridade visual
+  // Flags de prioridade visual para destaque de cases principais
   const isMain = project.topics.includes('featured') || project.topics.includes('primeiro');
   const isHighlight = project.topics.includes('destaque') || project.topics.includes('highlight');
 
-  // Formatação de tags (ex: machine-learning -> Machine Learning)
+  // Formatação de tags para exibição limpa
   const formatTopic = (topic: string) => {
     return topic.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
   /**
-   * FRAMEWORK DE DESCRIÇÃO ESTRUTURADA
-   * Divide: Problema | Solução | Impacto
+   * LÓGICA DE NARRATIVA ESTRUTURADA
+   * Tenta dividir a descrição do GitHub usando o pipe '|'
    */
   const descriptionParts = project.description?.split('|') || [];
   const hasStructuredDesc = descriptionParts.length >= 2;
@@ -55,20 +56,20 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
         ? 'border-blue-500/30 bg-gradient-to-b from-blue-50/40 to-white dark:from-blue-900/10 dark:to-slate-900/50 shadow-xl' 
         : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm'
       }
-      hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2
+      hover:shadow-2xl hover:shadow-blue-500/15 hover:-translate-y-2
     `}>
       
-      {/* Badge de Destaque: Posicionamento fixo para não quebrar headline */}
+      {/* Badge de Destaque: Posicionamento absoluto responsivo */}
       {(isHighlight || isMain) && (
         <div className="absolute -top-3 right-6 md:right-8 z-10">
-          <span className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 md:px-4 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] shadow-lg ring-4 ring-white dark:ring-slate-950">
+          <span className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] shadow-lg ring-4 ring-white dark:ring-slate-950">
             <Star className="w-3 h-3 text-amber-300" fill="currentColor" />
-            {isMain ? (dict?.portfolio?.mainCaseLabel || "Main Case") : "Featured"}
+            {isMain ? (portfolioDict.mainCaseLabel || "Main Case") : (portfolioDict.featuredLabel || "Featured")}
           </span>
         </div>
       )}
 
-      {/* Header do Card: Ícone e Links de Ação */}
+      {/* Header: Ícone e Ações */}
       <div className="flex justify-between items-start mb-6 md:mb-8">
         <div className={`
           p-3 md:p-4 rounded-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3
@@ -82,7 +83,7 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
             target="_blank" 
             rel="noopener noreferrer" 
             className="p-2.5 md:p-3 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all active:scale-90"
-            aria-label="GitHub Repository"
+            title="GitHub"
           >
             <Github className="w-5 h-5" />
           </a>
@@ -92,7 +93,7 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
               target="_blank" 
               rel="noopener noreferrer" 
               className="p-2.5 md:p-3 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all active:scale-90"
-              aria-label="Live Demo"
+              title="Live Demo"
             >
               <ExternalLink className="w-5 h-5" />
             </a>
@@ -100,21 +101,21 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
         </div>
       </div>
 
-      {/* Título: Ajustado para snake_case do GitHub */}
+      {/* Título do Projeto */}
       <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-4 md:mb-5 tracking-tighter capitalize leading-tight">
         {project.name.replace(/[_-]/g, ' ')}
       </h3>
 
-      {/* Corpo da Narrativa: Problema/Solução/Impacto */}
-      <div className="space-y-4 md:space-y-5 mb-8 flex-grow">
+      {/* Grid de Narrativa: Problema/Solução/Impacto */}
+      <div className="space-y-4 md:space-y-6 mb-8 flex-grow">
         {hasStructuredDesc ? (
-          <div className="flex flex-col gap-4 md:gap-5">
-            {/* Problema */}
-            <div className="flex gap-3 md:gap-4">
+          <div className="flex flex-col gap-4">
+            {/* Seção: Problema */}
+            <div className="flex gap-3">
               <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                 <Target className="w-3 h-3 text-blue-600 dark:text-blue-400" />
               </div>
-              <div>
+              <div className="flex-1">
                 <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1">
                   {labels.problem || 'Problem'}
                 </span>
@@ -124,12 +125,12 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
               </div>
             </div>
             
-            {/* Solução */}
-            <div className="flex gap-3 md:gap-4">
+            {/* Seção: Solução */}
+            <div className="flex gap-3">
               <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                 <Lightbulb className="w-3 h-3 text-amber-600 dark:text-amber-400" />
               </div>
-              <div>
+              <div className="flex-1">
                 <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1">
                   {labels.solution || 'Solution'}
                 </span>
@@ -139,7 +140,7 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
               </div>
             </div>
 
-            {/* Impacto */}
+            {/* Seção: Impacto (Opcional - aparece se houver 3 partes) */}
             {descriptionParts[2] && (
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-start gap-3">
                 <TrendingUp className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
@@ -150,18 +151,19 @@ export const ProjectCard = ({ project, lang, dict }: ProjectProps) => {
             )}
           </div>
         ) : (
-          <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium italic">
-            {project.description || (dict?.portfolio?.noDescription || 'Technical documentation in progress.')}
+          /* Fallback para descrições não estruturadas */
+          <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium italic opacity-80">
+            {project.description || (portfolioDict.noDescription || 'Technical documentation in progress.')}
           </p>
         )}
       </div>
 
-      {/* Rodapé: Tags Técnicas Otimizadas */}
-      <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100 dark:border-slate-800/40">
+      {/* Footer: Tech Stack (Skills) */}
+      <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100 dark:border-slate-800/40 mt-auto">
         {displayTopics.slice(0, 4).map((topic) => (
           <span 
             key={topic} 
-            className="px-2.5 py-1 text-[9px] font-black bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 rounded-md border border-slate-200/50 dark:border-slate-700 uppercase tracking-tight"
+            className="px-2.5 py-1 text-[9px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 rounded-md border border-slate-200/50 dark:border-slate-700 uppercase tracking-tight"
           >
             {formatTopic(topic)}
           </span>
