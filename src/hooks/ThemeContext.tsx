@@ -6,11 +6,12 @@ import React, {
   useEffect,
   useState,
   useCallback,
+  type ReactNode // Corrigido: Importação de tipo unificada para evitar duplicidade
 } from "react";
 
-// Correção do Warning do Log: Importando como 'type'
-import type { ReactNode } from "react";
-
+/**
+ * DEFINIÇÕES DE TIPO - RIGOR TÉCNICO
+ */
 export type Theme = "light" | "dark" | "system";
 
 interface ThemeContextValue {
@@ -25,28 +26,24 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 /**
- * PROVIDER DE TEMA - GERENCIAMENTO DE DARK MODE
- * Otimizado para Next.js 15 e prevenção de Hydration Mismatch.
+ * THEME CONTEXT PROVIDER - ARQUITETURA NEXT.JS 15.5.9
+ * Gerencia a experiência visual responsiva e persiste a escolha do usuário.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("system");
   const [isDark, setIsDark] = useState<boolean>(false);
   const [mounted, setMounted] = useState(false);
 
-  // Função para manipular o DOM de forma segura no Next.js
+  // Manipulação segura do DOM para evitar inconsistências de Hydration
   const applyToDOM = useCallback((dark: boolean) => {
     if (typeof window === "undefined") return;
     
     const root = document.documentElement;
-    if (dark) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    root.classList.toggle("dark", dark);
     root.style.colorScheme = dark ? "dark" : "light";
   }, []);
 
-  // 1. Carregamento Inicial: Sincroniza LocalStorage e Cookies
+  // 1. Carregamento Inicial: Sincronização de Estado (LocalStorage + Cookies)
   useEffect(() => {
     const getInitialTheme = (): Theme => {
       if (typeof window === "undefined") return "system";
@@ -69,7 +66,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setMounted(true);
   }, []);
 
-  // 2. Efeito Reativo: Responde a mudanças de tema e preferência do SO
+  // 2. Efeito Reativo: Escuta o Sistema Operacional (Responsividade Visual)
   useEffect(() => {
     if (!mounted) return;
 
@@ -89,7 +86,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => mediaQuery.removeEventListener("change", handleSystemChange);
   }, [theme, mounted, applyToDOM]);
 
-  // 3. Persistência de Dados (localStorage + Cookies para SSR)
+  // 3. Persistência e Governança de Preferências
   const saveThemePreference = useCallback((newTheme: Theme) => {
     setTheme(newTheme);
     
@@ -100,14 +97,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("theme", newTheme);
       }
       
-      // Cookie com expiração de 1 ano e SameSite=Lax para compatibilidade Vercel
+      // Cookie SameSite=Lax para segurança e persistência no SSR da Vercel
       document.cookie = `theme=${newTheme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
     }
   }, []);
 
   const toggleTheme = useCallback(() => {
-    const nextTheme = isDark ? "light" : "dark";
-    saveThemePreference(nextTheme);
+    saveThemePreference(isDark ? "light" : "dark");
   }, [isDark, saveThemePreference]);
 
   const applyTheme = useCallback((newTheme: Theme) => {
@@ -122,11 +118,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     <ThemeContext.Provider
       value={{ theme, isDark, toggleTheme, resetTheme, applyTheme, mounted }}
     >
-      {/* A transição de opacidade evita o "flash" de hidratação.
-          No mobile, isso garante que o conteúdo só apareça quando o tema estiver decidido.
-      */}
       <div 
         className={`min-h-screen transition-opacity duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}
+        aria-hidden={!mounted}
       >
         {children}
       </div>
@@ -134,6 +128,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Hook customizado para acesso ao tema
+ */
 export function useThemeContext() {
   const context = useContext(ThemeContext);
   if (!context) {
