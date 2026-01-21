@@ -1,16 +1,14 @@
 import type { MetadataRoute } from 'next';
-
 import { i18n } from '@/i18n-config';
 
 /**
  * GERADOR DE SITEMAP DINÂMICO - NEXT.JS 15.5.9
  * Governança de SEO: Implementa hreflang (alternates) para PT, EN e ES.
- * Estratégia: Indexa as rotas localizadas e os documentos PDF estratégicos.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Garantia de URL absoluta para SEO impecável
+  // CORREÇÃO CRÍTICA: Acesso via index signature para evitar erro no build
   const baseUrl = (
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app'
+    process.env['NEXT_PUBLIC_SITE_URL'] || 'https://portfoliosantossergio.vercel.app'
   ).replace(/\/$/, '');
   
   const lastModified = new Date();
@@ -27,27 +25,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const localeEntries: MetadataRoute.Sitemap = i18n.locales.map((locale) => ({
     url: `${baseUrl}/${locale}`,
     lastModified,
-    changeFrequency: 'monthly',
+    changeFrequency: 'monthly' as const, // Cast necessário para satisfazer o tipo literal
     priority: locale === 'pt' ? 1.0 : 0.8,
     alternates: {
       languages: languagesMap,
     },
   }));
 
-  // 2. Indexação dos Currículos (Assets Técnicos)
-  // Indexar PDFs aumenta a relevância para buscas específicas de "Sérgio Santos Curriculum"
+  // 2. Indexação dos Currículos (Assets Técnicos em PDF)
   const cvEntries: MetadataRoute.Sitemap = ['pt', 'en', 'es'].map((lang) => ({
     url: `${baseUrl}/cv-sergio-santos-${lang}.pdf`,
     lastModified,
-    changeFrequency: 'monthly',
+    changeFrequency: 'monthly' as const,
     priority: 0.6,
   }));
 
-  // 3. Entrada da raiz (Canonical)
+  // 3. Entrada da raiz (Redirecionamento/Canonical)
   const rootEntry: MetadataRoute.Sitemap[0] = {
     url: baseUrl,
     lastModified,
-    changeFrequency: 'monthly',
+    changeFrequency: 'monthly' as const,
     priority: 1.0,
     alternates: {
       languages: languagesMap,
