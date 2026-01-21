@@ -25,6 +25,7 @@ interface PageProps {
 
 /**
  * METADADOS DINÂMICOS (SEO Internacional)
+ * Implementa lógica rigorosa para indexação e busca internacional.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
@@ -32,7 +33,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const currentLang = lang as Locale;
   const dict = await getDictionary(currentLang);
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
+  
+  // CORREÇÃO CRÍTICA: Acesso via index signature para evitar erro no build da Vercel
+  const baseUrl = (process.env['NEXT_PUBLIC_SITE_URL'] || 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
   
   const pageTitle = dict.about?.headline || 'Data & Critical Systems Specialist';
   const pageDesc = dict.about?.bio?.substring(0, 160) || 'Portfólio Profissional de Sérgio Santos';
@@ -46,6 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'pt': `${baseUrl}/pt`,
         'en': `${baseUrl}/en`,
         'es': `${baseUrl}/es`,
+        'x-default': `${baseUrl}/pt`,
       },
     },
     openGraph: {
@@ -69,7 +73,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 /**
  * PÁGINA PRINCIPAL - NEXT.JS 15 SERVER COMPONENT
- * Orquestra a composição da SPA com injeção de i18n e dados do GitHub.
+ * Orquestra a composição da SPA com injeção de i18n e dados do GitHub de forma assíncrona.
  */
 export default async function Page({ params }: PageProps) {
   const { lang } = await params;
@@ -80,7 +84,7 @@ export default async function Page({ params }: PageProps) {
 
   const currentLang = lang as Locale;
 
-  // FETCH PARALELO: Carrega o dicionário e os projetos do GitHub simultaneamente
+  // FETCH PARALELO: Otimiza o tempo de resposta do servidor (TTFB)
   const [dict, allProjects] = await Promise.all([
     getDictionary(currentLang),
     getGitHubProjects()
