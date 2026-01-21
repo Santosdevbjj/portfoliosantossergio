@@ -10,7 +10,7 @@ import {
   Trophy
 } from 'lucide-react';
 
-// Interface robusta para eliminar warnings de 'any' e garantir Rigor Bancário
+// Interface flexível para evitar erros de 'exactOptionalPropertyTypes'
 interface HighlightItem {
   label: string;
   description: string;
@@ -21,16 +21,16 @@ interface CareerHighlightsProps {
     about?: {
       sections?: {
         highlights?: {
-          title: string;
-          items: HighlightItem[];
+          title?: string;
+          items?: HighlightItem[];
         };
         metrics?: {
-          title: string;
-          subtitle: string;
-          availabilityValue: string;
-          availabilityLabel: string;
-          automationValue: string;
-          automationLabel: string;
+          title?: string;
+          subtitle?: string;
+          availabilityValue?: string;
+          availabilityLabel?: string;
+          automationValue?: string;
+          automationLabel?: string;
         };
       };
     };
@@ -39,7 +39,7 @@ interface CareerHighlightsProps {
 
 /**
  * CAREER HIGHLIGHTS - MÉTRICAS DE IMPACTO E GOVERNANÇA
- * Exibe KPIs técnicos com foco em Data-Driven Design e Responsividade.
+ * Exibe KPIs técnicos com foco em Data-Driven Design.
  */
 export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
   const highlights = dict?.about?.sections?.highlights;
@@ -49,7 +49,7 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
 
   const items = highlights.items || [];
 
-  // Mapeamento de ícones com chaves únicas para o Reconciliation do React
+  // Mapeamento de ícones para o Reconciliation do React
   const icons = [
     <Clock key="icon-clock" className="w-6 h-6" />,
     <Server key="icon-server" className="w-6 h-6" />,
@@ -62,11 +62,11 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
       <div className="flex items-center gap-4 mb-10">
         <div className="h-8 w-2 bg-blue-600 rounded-full" />
         <h4 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
-          {highlights.title}
+          {highlights.title || 'Highlights'}
         </h4>
       </div>
 
-      {/* GRID DE DESTAQUES */}
+      {/* GRID DE DESTAQUES - Responsivo: 1 col mobile, 3 col desktop */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {items.map((item, i) => (
           <div 
@@ -117,7 +117,7 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-16 w-full lg:w-auto">
             <div className="text-center">
               <span className="block text-4xl md:text-6xl font-black mb-1 tracking-tighter">
-                {metrics?.availabilityValue}
+                {metrics?.availabilityValue || '100%'}
               </span>
               <span className="text-blue-100 text-[10px] font-black uppercase tracking-widest opacity-80 block">
                 {metrics?.availabilityLabel}
@@ -126,7 +126,7 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
             
             <div className="text-center sm:border-l border-white/10 sm:pl-8 md:pl-16">
               <span className="block text-4xl md:text-6xl font-black mb-1 tracking-tighter">
-                {metrics?.automationValue}
+                {metrics?.automationValue || '0%'}
               </span>
               <span className="text-blue-100 text-[10px] font-black uppercase tracking-widest opacity-80 block">
                 {metrics?.automationLabel}
