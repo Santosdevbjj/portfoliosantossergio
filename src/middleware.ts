@@ -1,25 +1,22 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server'; // Unificado para evitar erro de duplicidade
 import { i18n } from './i18n-config';
 import { match as matchLocale } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 
 /**
  * DETECÇÃO DE IDIOMA (LOCALE)
- * Analisa as preferências do navegador do usuário para decidir entre PT, EN ou ES.
+ * Analisa as preferências do navegador para decidir entre PT, EN ou ES.
  */
 function getLocale(request: NextRequest): string {
   const negotiatorHeaders: Record<string, string> = {};
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
 
-  // Locales suportados pelo seu portfólio
   const locales: string[] = [...i18n.locales];
-  
-  // Obtém os idiomas preferidos do cabeçalho 'accept-language'
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
 
   try {
-    // Tenta encontrar o melhor match, senão retorna o padrão (pt)
+    // Retorna o melhor match baseado no peso (q-factor) dos idiomas do navegador
     return matchLocale(languages, locales, i18n.defaultLocale);
   } catch (error) {
     return i18n.defaultLocale;
@@ -27,59 +24,49 @@ function getLocale(request: NextRequest): string {
 }
 
 /**
- * MIDDLEWARE DE ROTEAMENTO
- * Garante que cada requisição seja direcionada para o prefixo de idioma correto.
+ * MIDDLEWARE DE ROTEAMENTO - NEXT.JS 15.5.9
+ * Governança de acesso e internacionalização.
  */
 export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+  const { pathname, search } = request.nextUrl;
 
-  // 1. FILTRO DE EXCEÇÕES (Arquivos da pasta /public)
-  // Ignora explicitamente arquivos de SEO, imagens e currículos para não causar 404
-  const isPublicFile = [
-    '/robots.txt',
-    '/sitemap.xml',
-    '/favicon.ico',
-    '/manifest.json'
-  ].includes(pathname) || 
-  pathname.match(/\.(png|jpg|jpeg|gif|webp|avif|svg|pdf|ico)$/i);
-
+  // 1. FILTRO DE ATIVOS ESTÁTICOS E PÚBLICOS
+  // Protege o fluxo para que arquivos de imagem e PDFs não sejam redirecionados
+  const isPublicFile = pathname.match(/\.(png|jpg|jpeg|gif|webp|avif|svg|pdf|ico|xml|txt)$/i);
+  
   if (isPublicFile) {
     return NextResponse.next();
   }
 
-  // 2. VERIFICAÇÃO DE PREFIXO DE IDIOMA
-  // Checa se o pathname já começa com /pt, /en ou /es
+  // 2. VERIFICAÇÃO DE PREFIXO
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
 
-  // 3. REDIRECIONAMENTO INTELIGENTE
+  // 3. REDIRECIONAMENTO ESTRATÉGICO
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
 
-    // Constrói a nova URL preservando slugs (ex: /projects -> /pt/projects)
-    // e preservando Query Params (ex: ?source=linkedin)
-    return NextResponse.redirect(
-      new URL(
-        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}${request.nextUrl.search}`,
-        request.url
-      )
+    // Preserva o caminho original e todos os Query Params (ex: ?ref=linkedin)
+    const redirectUrl = new URL(
+      `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}${search}`,
+      request.url
     );
+    
+    return NextResponse.redirect(redirectUrl);
   }
 
   return NextResponse.next();
 }
 
 /**
- * CONFIGURAÇÃO DO MATCHER (Next.js 15 Otimizado)
- * Define quais caminhos o middleware deve observar.
+ * CONFIGURAÇÃO DO MATCHER (Rigor de Performance)
  */
 export const config = {
   matcher: [
-    // Pula todas as rotas internas (_next) e estáticos (arquivos com ponto)
-    // Mas captura a raiz e rotas de página
+    // Pula rotas internas, API e arquivos estáticos conhecidos
+    // Captura a raiz e todas as subpáginas para garantir i18n
     '/((?!api|_next/static|_next/image|images|icons|assets|favicon.ico|sw.js|.*\\..*).*)',
-    // Garante que a raiz '/' sempre passe pelo middleware
     '/',
   ],
 };
