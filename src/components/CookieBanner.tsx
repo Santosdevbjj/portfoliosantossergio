@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 /**
  * COMPONENTE DE GOVERNANÇA (LGPD/GDPR)
  * Exibe o consentimento de dados com foco em transparência técnica.
+ * FIX: Ajustado o retorno do useEffect para conformidade com TS 5.x.
  */
 export const CookieBanner = () => {
   const [showBanner, setShowBanner] = useState(false)
@@ -40,13 +41,17 @@ export const CookieBanner = () => {
 
   useEffect(() => {
     // Verifica se o usuário já deu consentimento anteriormente
-    const hasConsent = localStorage.getItem('cookie-consent-sergio')
+    const hasConsent = localStorage.getItem('cookie-consent-sergio');
+    
     if (!hasConsent) {
-      // Delay estratégico para priorizar o carregamento do conteúdo principal (LCP)
-      const timer = setTimeout(() => setShowBanner(true), 2500)
-      return () => clearTimeout(timer)
+      const timer = setTimeout(() => setShowBanner(true), 2500);
+      // Retorno de limpeza dentro da condição
+      return () => clearTimeout(timer);
     }
-  }, [])
+    
+    // Retorno explícito vazio para satisfazer o rigor do TypeScript ("Not all code paths return a value")
+    return undefined;
+  }, []);
 
   const handleAccept = () => {
     localStorage.setItem('cookie-consent-sergio', 'true')
@@ -63,7 +68,7 @@ export const CookieBanner = () => {
       <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-5 md:p-6 rounded-[2rem] shadow-2xl ring-1 ring-black/5">
         <div className="flex items-start gap-4">
           {/* Ícone de Escudo: Reforça a autoridade em segurança */}
-          <div className="hidden xs:flex p-3 bg-blue-600/10 rounded-2xl text-blue-600 dark:text-blue-400">
+          <div className="hidden sm:flex p-3 bg-blue-600/10 rounded-2xl text-blue-600 dark:text-blue-400">
             <ShieldCheck size={24} />
           </div>
           
@@ -85,10 +90,10 @@ export const CookieBanner = () => {
               {currentContent.text}
             </p>
 
-            <div className="flex flex-col xs:flex-row items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <button
                 onClick={handleAccept}
-                className="w-full xs:flex-1 bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold py-3 px-4 rounded-xl hover:bg-slate-800 dark:hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-500/20"
+                className="w-full sm:flex-1 bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold py-3 px-4 rounded-xl hover:bg-slate-800 dark:hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-500/20"
               >
                 {currentContent.accept}
               </button>
