@@ -1,18 +1,21 @@
 module.exports = {
   plugins: {
-    // Permite o uso de aninhamento (nesting) nativo do CSS seguindo a especificação W3C
+    // 1. Ativa o suporte a aninhamento (nesting) compatível com o Tailwind
+    // Essencial para manter o código CSS limpo e legível
     'tailwindcss/nesting': {},
     
-    // Processador principal do Tailwind CSS
+    // 2. O motor do Tailwind CSS
     tailwindcss: {},
     
-    // Garante compatibilidade com browsers antigos adicionando prefixos automaticamente
+    // 3. Autoprefixer: Adiciona prefixos (ex: -webkit, -moz) automaticamente
+    // Configurado para garantir que seu Grid e Flexbox sejam responsivos em todos os devices
     autoprefixer: {
       flexbox: 'no-2009',
-      grid: 'autoplace', // Importante para garantir que o Grid do seu Portfolio funcione em browsers legados
+      grid: 'autoplace', 
     },
     
-    // Otimização extrema para Produção
+    // 4. CSSNano: Minificação profissional para Produção
+    // Reduz o tamanho do arquivo final removendo espaços e comentários inúteis
     ...(process.env.NODE_ENV === 'production' 
       ? { 
           cssnano: { 
@@ -20,6 +23,7 @@ module.exports = {
               'default', 
               { 
                 discardComments: { removeAll: true },
+                convertValues: true,
                 normalizeWhitespace: true,
               }
             ] 
