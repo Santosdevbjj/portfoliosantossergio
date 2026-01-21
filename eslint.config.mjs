@@ -6,16 +6,15 @@ import unusedImports from 'eslint-plugin-unused-imports';
 
 /**
  * FLAT CONFIG - RIGOR TÉCNICO E GOVERNANÇA (2026)
- * Correção definitiva para o erro "Plugin '' not found" e integração Next.js 15.
+ * Solução definitiva para "Plugin '' not found" via espalhamento de config e mapping.
  */
 const eslintConfig = defineConfig([
-  // Injeção direta das configurações base do Next.js
-  nextVitals,
-  nextTs,
+  // Injeção via spread para garantir que o array de objetos do Next seja achatado corretamente
+  ...nextVitals,
+  ...nextTs,
   prettier,
   {
-    // Registro nomeado do plugin. 
-    // Nota: O ESLint 9 exige que o objeto do plugin tenha uma estrutura interna válida.
+    // Mapeamento explícito: O motor do ESLint 9 exige que o plugin tenha um nome de namespace
     plugins: {
       'unused-imports': unusedImports,
     },
@@ -26,7 +25,6 @@ const eslintConfig = defineConfig([
       'no-debugger': 'error',
 
       // --- GESTÃO DE VARIÁVEIS E CLEAN CODE ---
-      // Desativamos a regra do TS para que o plugin especializado assuma o controle
       '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error', 
       'unused-imports/no-unused-vars': [
@@ -51,7 +49,6 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    // Overrides específicos para evitar falso-positivos em arquivos de estrutura do Next.js
     files: ['**/*.tsx', '**/*.ts'],
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
@@ -64,7 +61,7 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     'public/**',
     'node_modules/**',
-    'eslint.config.mjs' // Evita que o ESLint tente validar a própria configuração
+    'eslint.config.mjs'
   ]),
 ]);
 
