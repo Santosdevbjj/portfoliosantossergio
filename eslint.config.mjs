@@ -6,13 +6,14 @@ import unusedImports from 'eslint-plugin-unused-imports';
 
 /**
  * FLAT CONFIG - RIGOR TÉCNICO E GOVERNANÇA (2026)
- * Correção: Removido o spread operator (...) das configurações do Next.js.
+ * Fix: Mapeamento explícito de plugins e remoção de spread em objetos não-iteráveis.
  */
 const eslintConfig = defineConfig([
-  nextVitals, // CORREÇÃO: Removido '...' pois não é iterável no Next 15
-  nextTs,     // CORREÇÃO: Removido '...'
+  nextVitals, 
+  nextTs,     
   prettier,
   {
+    // Identificação explícita do plugin para evitar o erro "Plugin '' not found"
     plugins: {
       'unused-imports': unusedImports,
     },
@@ -23,8 +24,9 @@ const eslintConfig = defineConfig([
       'no-debugger': 'error',
 
       // --- GESTÃO DE VARIÁVEIS E CLEAN CODE ---
+      // Desativamos a regra padrão para que o plugin 'unused-imports' assuma o controle
       '@typescript-eslint/no-unused-vars': 'off',
-      'unused-imports/no-unused-imports': 'warn',
+      'unused-imports/no-unused-imports': 'error', 
       'unused-imports/no-unused-vars': [
         'warn',
         {
