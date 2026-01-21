@@ -2,13 +2,16 @@
   "common": {
     "language": "English",
     "contact": "Contact",
-    "viewProject": "Repo",
-    "liveDemo": "Demo",
+    "viewProject": "Repository",
+    "liveDemo": "Live Demo",
     "repoTitle": "Source Code",
-    "portfolioTitle": "Data Solutions",
+    "portfolioTitle": "Solutions & Data",
     "governance": "Technical Rigor",
     "backToTop": "Top",
-    "menu_aria": "Open Menu"
+    "menu_aria": "Open Menu",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "close": "Close"
   },
   "nav": {
     "about": "About",
@@ -16,11 +19,16 @@
     "articles": "Articles",
     "projects": "Projects",
     "contact": "Contact",
-    "changeLang": "Language"
+    "changeLang": "Language",
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   },
   "about": {
     "title": "About Me",
-    "headline": "Applying banking resilience to strategic data intelligence.",
+    "headline": "Applying mission-critical system resilience to strategic data intelligence.",
     "bio": "With over 20 years of experience in mission-critical systems at Banco Bradesco, I specialized in ensuring technology supports high-stakes decisions with operational rigor. Today, I leverage this foundation to lead Data Science projects, connecting complex infrastructures to actionable insights.",
     "sections": {
       "highlights": {
@@ -32,7 +40,7 @@
           },
           {
             "label": "Availability",
-            "description": "Infrastructure management for 500+ users with 99.5% uptime."
+            "description": "Management of critical infrastructure with 99.5% uptime."
           },
           {
             "label": "Governance",
@@ -49,11 +57,11 @@
         "automationLabel": "Hours/Year"
       },
       "stack": {
-        "title": "Tech Stack",
+        "title": "Technologies",
         "items": [
           { "label": "Data", "description": "Python, SQL, R, Machine Learning" },
-          { "label": "Cloud", "description": "Azure Databricks, Spark, ADF" },
-          { "label": "Analytics", "description": "Power BI, Scikit-learn, Statistics" }
+          { "label": "Cloud & Big Data", "description": "Azure Databricks, Spark, ADF" },
+          { "label": "Business Intelligence", "description": "Power BI, Strategic Dashboards" }
         ]
       }
     }
@@ -71,11 +79,11 @@
         "company": "Data Consultancy",
         "role": "Data Scientist",
         "period": "2023 – Present",
-        "solving": "Construction schedule uncertainty and financial penalties for engineering delays.",
-        "impact": "61% improvement in logistics accuracy and estimated $80k/year savings.",
+        "solving": "Engineering schedule uncertainty and financial penalties for delays.",
+        "impact": "61% improvement in logistics accuracy and annual savings of R$ 420k.",
         "description": [
-          "Development of ML models for financial risk mitigation and forecasting.",
-          "Creation of real-time monitoring pipelines and automated alert bots.",
+          "Development of predictive models for financial risk mitigation.",
+          "Creation of real-time data pipelines and automated monitoring bots.",
           "Optimization of logistics processes through advanced statistical analysis."
         ],
         "techs": ["Python", "Scikit-Learn", "Pandas", "Power BI", "APIs"]
@@ -87,7 +95,7 @@
         "solving": "Requirement for high availability and automation in critical banking processes.",
         "impact": "Saved 2,920 hours/year with 99.5% environment stability.",
         "description": [
-          "Technical leadership for 500+ users in a highly regulated environment.",
+          "Technical leadership in infrastructure for 500+ users in a regulated environment.",
           "Implementation of banking systems focused on continuity and security.",
           "Development of large-scale data processing automation routines."
         ],
@@ -113,14 +121,14 @@
       "azure": "Azure"
     },
     "projectLabels": {
-      "problem": "Problem",
-      "solution": "Solution",
-      "impact": "Business Impact",
+      "problem": "The Problem",
+      "solution": "The Solution",
+      "impact": "Economic Impact",
       "technologies": "Tech Stack"
     }
   },
   "contact": {
-    "title": "Get in Touch",
+    "title": "Contact",
     "subtitle": "Available for technical leadership, data consultancy, and strategic projects.",
     "emailBtn": "Email",
     "socialLabel": "LinkedIn & GitHub",
@@ -129,7 +137,9 @@
       "name": "Full Name",
       "email": "Email Address",
       "message": "How can I help?",
-      "send": "Send Message"
+      "send": "Send Message",
+      "success": "Message sent successfully!",
+      "error": "Error sending message. Please try again."
     }
   },
   "footer": {
