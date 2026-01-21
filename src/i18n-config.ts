@@ -1,5 +1,5 @@
 /**
- * CONFIGURAÇÃO GLOBAL DE IDIOMAS - NEXT.JS 15
+ * CONFIGURAÇÃO GLOBAL DE IDIOMAS - NEXT.JS 15.5.9 / 2026
  * Centraliza a lógica de internacionalização (i18n) para PT, EN e ES.
  */
 
@@ -12,7 +12,7 @@ export type Locale = (typeof i18n)['locales'][number];
 
 /**
  * METADADOS DE IDIOMA
- * Utilizado pelo LanguageSwitcher e tags de SEO (hreflang).
+ * Estrutura imutável para LanguageSwitcher e tags de SEO (hreflang).
  */
 export interface LocaleDetail {
   readonly name: string;   
@@ -22,7 +22,7 @@ export interface LocaleDetail {
   readonly ariaLabel: string;
 }
 
-export const localeMetadata: Record<Locale, LocaleDetail> = {
+export const localeMetadata: Readonly<Record<Locale, LocaleDetail>> = {
   pt: { 
     name: 'Português', 
     region: 'pt-BR', 
@@ -48,15 +48,15 @@ export const localeMetadata: Record<Locale, LocaleDetail> = {
 
 /**
  * VALIDADO DE LOCALE (Type Guard)
- * Garante segurança em tempo de execução contra URLs inválidas.
+ * Segurança em tempo de execução para rotas e middleware.
  */
-export function isValidLocale(locale: string | undefined | null): locale is Locale {
-  return !!locale && (i18n.locales as readonly string[]).includes(locale);
+export function isValidLocale(locale: unknown): locale is Locale {
+  return typeof locale === 'string' && (i18n.locales as readonly string[]).includes(locale);
 }
 
 /**
  * ESTRATÉGIA DE FALLBACK
- * Retorna o idioma padrão se a entrada for inválida.
+ * Garante que o usuário nunca caia em uma página quebrada.
  */
 export function getSafeLocale(locale: string | undefined | null): Locale {
   return isValidLocale(locale) ? locale : i18n.defaultLocale;
@@ -64,9 +64,9 @@ export function getSafeLocale(locale: string | undefined | null): Locale {
 
 /**
  * CARREGAMENTO DINÂMICO DE DICIONÁRIOS (Lazy Loading)
- * Implementa o carregamento sob demanda para reduzir o bundle inicial.
+ * Reduz o bundle size inicial carregando apenas o idioma necessário.
  */
-const dictionaries = {
+const dictionaries: Record<Locale, () => Promise<any>> = {
   pt: () => import('@/dictionaries/pt.json').then((module) => module.default),
   en: () => import('@/dictionaries/en.json').then((module) => module.default),
   es: () => import('@/dictionaries/es.json').then((module) => module.default),
@@ -74,24 +74,26 @@ const dictionaries = {
 
 /**
  * OBTÉM O DICIONÁRIO
- * Função otimizada para Server Components.
+ * Função otimizada para Server Components com tratamento de erro resiliente.
  */
 export const getDictionary = async (locale: Locale) => {
   const safeLocale = getSafeLocale(locale);
   
   try {
-    return await dictionaries[safeLocale]();
+    const loadDictionary = dictionaries[safeLocale];
+    return await loadDictionary();
   } catch (error) {
-    console.error(`[i18n] Erro ao carregar dicionário (${safeLocale}):`, error);
-    // Fallback definitivo: sempre retorna o português se houver falha no arquivo
-    return dictionaries[i18n.defaultLocale]();
+    console.error(`[i18n] Falha crítica ao carregar dicionário (${safeLocale}):`, error);
+    // Fallback de segurança para o idioma padrão
+    const fallbackLoad = dictionaries[i18n.defaultLocale];
+    return await fallbackLoad();
   }
 };
 
 /**
  * HELPERS PARA SEO E ACESSIBILIDADE
  */
-export const getRegion = (locale: Locale): string => localeMetadata[locale]?.region ?? 'pt-BR';
+export const getRegion = (locale: Locale): string => localeMetadata[locale].region;
 
 export const getAlternateLocales = (currentLocale: Locale) => {
   return i18n.locales.filter((locale) => locale !== currentLocale);
