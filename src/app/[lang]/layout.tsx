@@ -6,7 +6,6 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n } from '@/i18n-config';
 
-// Fonte otimizada: Inter é excelente para leitura de dados e dashboards
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -24,10 +23,6 @@ type LocaleContent = {
   es: string;
 };
 
-/**
- * CONFIGURAÇÃO DE VIEWPORT
- * Garante que o site não tenha zoom indesejado no mobile e respeite o tema do sistema.
- */
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
@@ -36,10 +31,11 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  userScalable: true,
 };
 
 /**
- * SEO MULTILINGUE DINÂMICO
+ * SEO MULTILINGUE & AUTORIDADE
  */
 export async function generateMetadata({ 
   params 
@@ -73,7 +69,7 @@ export async function generateMetadata({
     description: description,
     metadataBase: new URL(siteUrl),
     
-    // Verificação de Propriedade do Google
+    // TAG DE VERIFICAÇÃO DO GOOGLE (MANTIDA RIGOROSAMENTE)
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
@@ -81,10 +77,10 @@ export async function generateMetadata({
     alternates: {
       canonical: `${siteUrl}/${lang}`,
       languages: {
-        'pt-BR': `${siteUrl}/pt`,
-        'en-US': `${siteUrl}/en`,
-        'es-ES': `${siteUrl}/es`,
-        'x-default': `${siteUrl}/en`, // Recomendado Inglês como fallback global
+        'pt': `${siteUrl}/pt`,
+        'en': `${siteUrl}/en`,
+        'es': `${siteUrl}/es`,
+        'x-default': `${siteUrl}/pt`,
       },
     },
 
@@ -95,14 +91,22 @@ export async function generateMetadata({
       siteName: "Sérgio Santos Portfolio",
       locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
-      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: title }],
+      images: [
+        {
+          // PUXA A IMAGEM OTIMIZADA CONFORME O IDIOMA
+          url: `/og-image-${lang}.png`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
 
     twitter: {
       card: 'summary_large_image',
       title: title,
       description: description,
-      images: ['/og-image.png'],
+      images: [`/og-image-${lang}.png`],
     },
 
     robots: {
@@ -127,12 +131,16 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
       className="scroll-smooth"
     >
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        {/* ÍCONES OTIMIZADOS DA NOVA ESTRUTURA PUBLIC/ICONS/ */}
+        <link rel="icon" href="/icons/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icons/icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body 
-        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased min-h-screen flex flex-col selection:bg-blue-500/30`}
+        className={`${inter.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased min-h-screen flex flex-col selection:bg-blue-600 selection:text-white`}
       >
         <ThemeProvider 
           attribute="class" 
@@ -140,14 +148,13 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           enableSystem 
           disableTransitionOnChange
         >
-          {/* Container Raiz Otimizado para Responsividade */}
+          {/* WRAPPER DE RESPONSIVIDADE E OVERFLOW */}
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <main className="flex-grow w-full">
               {children}
             </main>
           </div>
           
-          {/* Banner de Cookies traduzido via componente interno */}
           <CookieBanner />
         </ThemeProvider>
       </body>
