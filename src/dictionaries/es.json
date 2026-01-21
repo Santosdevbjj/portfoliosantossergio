@@ -2,26 +2,34 @@
   "common": {
     "language": "Español",
     "contact": "Contacto",
-    "viewProject": "Repo",
+    "viewProject": "Repositorio",
     "liveDemo": "Demo",
     "repoTitle": "Código Fuente",
-    "portfolioTitle": "Soluciones de Datos",
+    "portfolioTitle": "Soluciones y Datos",
     "governance": "Rigor Técnico",
     "backToTop": "Inicio",
-    "menu_aria": "Abrir Menú"
+    "menu_aria": "Abrir Menú",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "close": "Cerrar"
   },
   "nav": {
     "about": "Sobre Mí",
-    "experience": "Carrera",
+    "experience": "Trayectoria",
     "articles": "Artículos",
     "projects": "Proyectos",
     "contact": "Contacto",
-    "changeLang": "Idioma"
+    "changeLang": "Idioma",
+    "theme": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    }
   },
   "about": {
     "title": "Sobre Mí",
-    "headline": "Resiliencia bancaria aplicada a la inteligencia de datos estratégica.",
-    "bio": "Con más de 20 años de experiencia en sistemas críticos en el sector bancario (Bradesco), me especialicé en asegurar que la tecnología respalde decisiones de alto riesgo. Hoy, lidero proyectos de Ciencia de Datos conectando infraestructuras complejas con insights accionables.",
+    "headline": "Resiliencia de sistemas críticos aplicada a la inteligencia de datos estratégica.",
+    "bio": "Con más de 20 años de experiencia en sistemas de misión crítica en el sector bancario (Bradesco), me especialicé en asegurar que la tecnología respalde decisiones de alto riesgo con rigor operacional. Hoy, utilizo esa base sólida para liderar proyectos de Ciencia de Datos, conectando infraestructuras complejas con insights accionables.",
     "sections": {
       "highlights": {
         "title": "Hitos",
@@ -32,7 +40,7 @@
           },
           {
             "label": "Disponibilidad",
-            "description": "Gestión de infraestructura crítica con 99,5% de disponibilidad."
+            "description": "Gestión de infraestructura crítica con 99,5% de disponibilidad (uptime)."
           },
           {
             "label": "Gobernanza",
@@ -44,7 +52,7 @@
         "title": "Rendimiento",
         "subtitle": "KPIs e IMPACTO",
         "availabilityValue": "99.5%",
-        "availabilityLabel": "Uptime",
+        "availabilityLabel": "Disponibilidad",
         "automationValue": "2.9K",
         "automationLabel": "Horas/Año"
       },
@@ -52,8 +60,8 @@
         "title": "Tecnologías",
         "items": [
           { "label": "Datos", "description": "Python, SQL, R, Machine Learning" },
-          { "label": "Big Data", "description": "Azure Databricks, Spark, ADF" },
-          { "label": "Analytics", "description": "Power BI, Dashboards Estratégicos" }
+          { "label": "Cloud & Big Data", "description": "Azure Databricks, Spark, ADF" },
+          { "label": "Business Intelligence", "description": "Power BI, Dashboards Estratégicos" }
         ]
       }
     }
@@ -72,11 +80,11 @@
         "role": "Científico de Datos",
         "period": "2023 – Presente",
         "solving": "Incertidumbre en cronogramas de obra y multas por retrasos en ingeniería.",
-        "impact": "Mejora del 61% en precisión logística y ahorro de R$ 420k/año.",
+        "impact": "Mejora del 61% en precisión logística y ahorro de R$ 420 mil/año.",
         "description": [
-          "Modelos de Machine Learning para mitigación de riesgos financieros.",
-          "Pipelines de datos y bots de monitoreo en tiempo real vía API.",
-          "Optimización logística mediante análisis estadístico avanzado."
+          "Desarrollo de modelos predictivos para mitigación de riesgos financieros.",
+          "Creación de pipelines de datos y bots de monitoreo en tiempo real.",
+          "Optimización de procesos logísticos mediante análisis estadístico avanzado."
         ],
         "techs": ["Python", "Scikit-Learn", "Pandas", "Power BI", "APIs"]
       },
@@ -84,11 +92,11 @@
         "company": "Banco Bradesco S.A.",
         "role": "Analista Senior de Sistemas",
         "period": "1985 – 2008",
-        "solving": "Necesidad de alta disponibilidad y automatización en procesos bancarios.",
+        "solving": "Necesidad de alta disponibilidad y automatización en procesos bancarios críticos.",
         "impact": "Ahorro de 2.920 horas/año con estabilidad del 99,5% del entorno.",
         "description": [
-          "Liderazgo técnico en infraestructura para más de 500 usuarios.",
-          "Sistemas bancarios enfocados en continuidad, seguridad y auditoría.",
+          "Liderazgo técnico en infraestructura para más de 500 usuarios en entorno regulado.",
+          "Implementación de sistemas bancarios enfocados en continuidad y seguridad.",
           "Automatización de procesos para procesamiento de datos a gran escala."
         ],
         "techs": ["Sistemas Críticos", "Mainframe", "Automatización", "Gobernanza", "SQL"]
@@ -116,7 +124,7 @@
       "problem": "El Problema",
       "solution": "La Solución",
       "impact": "Impacto Económico",
-      "technologies": "Stack Técnico"
+      "technologies": "Stack Técnica"
     }
   },
   "contact": {
@@ -129,7 +137,9 @@
       "name": "Su Nombre",
       "email": "Su Correo",
       "message": "¿Cómo puedo ayudar?",
-      "send": "Enviar Mensaje"
+      "send": "Enviar Mensaje",
+      "success": "¡Mensaje enviado con éxito!",
+      "error": "Error al enviar. Intente de nuevo."
     }
   },
   "footer": {
