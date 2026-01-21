@@ -8,7 +8,10 @@
     "portfolioTitle": "Soluções e Dados",
     "governance": "Rigor Técnico",
     "backToTop": "Topo",
-    "menu_aria": "Abrir Menu"
+    "menu_aria": "Abrir Menu",
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "close": "Fechar"
   },
   "nav": {
     "about": "Sobre",
@@ -16,7 +19,12 @@
     "articles": "Artigos",
     "projects": "Projetos",
     "contact": "Contato",
-    "changeLang": "Idioma"
+    "changeLang": "Idioma",
+    "theme": {
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    }
   },
   "about": {
     "title": "Sobre Mim",
@@ -32,7 +40,7 @@
           },
           {
             "label": "Disponibilidade",
-            "description": "Gestão de infraestrutura crítica com 99,5% de disponibilidade."
+            "description": "Gestão de infraestrutura crítica com 99,5% de uptime."
           },
           {
             "label": "Governança",
@@ -52,8 +60,8 @@
         "title": "Tecnologias",
         "items": [
           { "label": "Dados", "description": "Python, SQL, R, Machine Learning" },
-          { "label": "Big Data", "description": "Azure Databricks, Spark, ADF" },
-          { "label": "BI", "description": "Power BI, Dashboards Estratégicos" }
+          { "label": "Cloud & Big Data", "description": "Azure Databricks, Spark, ADF" },
+          { "label": "Business Intelligence", "description": "Power BI, Dashboards Estratégicos" }
         ]
       }
     }
@@ -129,7 +137,9 @@
       "name": "Seu Nome",
       "email": "Seu E-mail",
       "message": "Como posso ajudar?",
-      "send": "Enviar Mensagem"
+      "send": "Enviar Mensagem",
+      "success": "Mensagem enviada com sucesso!",
+      "error": "Erro ao enviar. Tente novamente."
     }
   },
   "footer": {
