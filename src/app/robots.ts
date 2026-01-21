@@ -1,48 +1,49 @@
-// src/app/robots.ts
 import type { MetadataRoute } from 'next'
 
 /**
- * CONFIGURAÇÃO DINÂMICA DE ROBOTS - NEXT.JS 15
- * Gerencia a visibilidade do portfólio para motores de busca (Google, Bing) e bots de IA.
- * Otimizado para indexação multilingue (PT, EN, ES).
+ * CONFIGURAÇÃO DE ROBOTS - NEXT.JS 15 (2026)
+ * Controla o comportamento de rastreamento para Google, Bing e Bots de IA.
+ * Estruturado para suportar o SEO multilingue (i18n) e proteção de assets.
  */
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app'
+  // Fallback seguro para a URL de produção
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://portfoliosantossergio.vercel.app'
 
   return {
     rules: [
       {
         userAgent: '*',
         allow: [
-          '/',              
-          '/pt',            
-          '/en',            
-          '/es',            
-          '/images/',       
-          '/assets/',       
-          '/favicon.ico'    
+          '/',              // Home (Redirect)
+          '/pt',            // Versão Português
+          '/en',            // Versão Inglês
+          '/es',            // Versão Espanhol
+          '/images/',       // Imagens dos projetos e perfil
+          '/icons/',        // Favicons e Apple Icons
+          '/cv-*.pdf',      // Permite indexação direta dos seus currículos
         ],
         disallow: [
-          '/api/',          
-          '/_next/',        
-          '/private/',      
-          '/admin/',        // Segurança: Bloqueia pastas administrativas
-          '/*.json$',       // Evita indexação de arquivos de configuração JSON
+          '/api/',          // Rotas de servidor (Segurança)
+          '/_next/',        // Arquivos internos do Next.js
+          '/static/',       // Evita redundância de arquivos estáticos compilados
+          '/admin/',        // Segurança de rotas administrativas
+          '/private/',      // Pastas privadas
+          '/*.json$',       // Bloqueia indexação de manifestos e configs JSON
         ],
       },
       {
         /**
-         * POLÍTICA PARA IA (GPTBot, Claude-bot, etc.)
-         * Permite a leitura do portfólio para que IA possa recomendar seu perfil,
-         * mas restringe o acesso a dados de servidor.
+         * POLÍTICA ESPECÍFICA PARA BOTS DE INTELIGÊNCIA ARTIFICIAL
+         * Permite que modelos como GPT-4 e Claude indexem seu portfólio.
+         * Isso ajuda o seu perfil a aparecer em recomendações de IA para vagas.
          */
-        userAgent: ['GPTBot', 'CCBot', 'Claude-bot'],
+        userAgent: ['GPTBot', 'ChatGPT-User', 'Claude-bot', 'Google-Extended'],
         allow: ['/pt', '/en', '/es'],
-        disallow: ['/api/', '/_next/'],
+        disallow: ['/api/'],
       }
     ],
-    // Caminho absoluto para o sitemap (Crucial para SEO multilingue)
-    sitemap: `${baseUrl.replace(/\/$/, '')}/sitemap.xml`,
+    // Vinculação com o Sitemap (Essencial para SEO multilingue)
+    sitemap: `${baseUrl}/sitemap.xml`,
     host: baseUrl,
   }
 }
