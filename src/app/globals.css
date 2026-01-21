@@ -2,32 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Importação das animações síncronas com o design system */
+@import "../styles/animations.css";
+
 @layer base {
   :root {
-    --brand-blue: #026fc7;
+    /* Cores de governança de marca (Enterprise) */
+    --brand-blue: #0e8ce9;
     --brand-blue-hover: #0358a1;
+    --background-light: #f8fafc; /* slate-50 */
+    --background-dark: #020617;  /* slate-950 OLED */
     color-scheme: light dark;
   }
 
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
-    /* Melhora o scroll em dispositivos iOS */
+    /* Suporte a Safe Areas (Entalhes de dispositivos móveis) */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     -webkit-overflow-scrolling: touch;
     @apply bg-slate-50 dark:bg-[#020617];
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased transition-colors duration-500;
+    /* Transição suave de cores (Ajustada para performance no Node 24) */
+    @apply bg-slate-50 text-slate-900 antialiased transition-colors duration-300;
     @apply dark:bg-[#020617] dark:text-slate-100;
     
-    /* RESILIÊNCIA TEXTUAL MULTILÍNGUE */
-    /* Garante que o layout não quebre com palavras longas em PT/ES */
+    /* RESILIÊNCIA TEXTUAL (Crucial para i18n em PT/ES) */
     overflow-wrap: break-word;
     word-wrap: break-word;
     hyphens: auto; 
     
-    /* Otimização de renderização para dashboards e dados */
+    /* Motor de renderização de fontes de 2026 */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -35,89 +42,74 @@
 }
 
 @layer components {
-  /* Container Responsivo Dinâmico */
+  /* Container Responsivo Dinâmico com Padding Lógico */
   .main-container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 w-full;
   }
 
-  /* Efeito de Vidro (Glassmorphism) Refinado */
+  /* Glassmorphism de Alta Fidelidade (Blur de 2026) */
   .glass-effect {
-    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-800/50 shadow-2xl;
+    @apply bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl border border-white/20 dark:border-slate-800/40 shadow-2xl;
   }
 
-  /* Esconder scrollbar mantendo funcionalidade (Mobile UX) */
-  .no-scrollbar::-webkit-scrollbar { display: none; }
+  /* Card de Projeto Estilo Sênior (UX Dinâmica) */
+  .project-card-gradient {
+    @apply relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/50 transition-all duration-500;
+    @apply hover:shadow-[0_20px_50px_-12px_rgba(14,140,233,0.15)] hover:border-blue-500/40;
+  }
+
+  /* Utility para esconder scrollbar sem perder acessibilidade */
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-
-  /* Card de Projeto Estilo Enterprise */
-  .project-card-gradient {
-    @apply relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/50 transition-all duration-500 hover:shadow-2xl hover:border-blue-500/30;
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
 
-/* --- SISTEMA DE ANIMAÇÕES SÊNIOR --- */
+/* --- INTERFACE E ACESSIBILIDADE --- */
 
-/* Keyframes para o Cookie Banner e Seções */
-@keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Scrollbar Tech (Invisível no fundo, visível no thumb) */
+::-webkit-scrollbar {
+  width: 6px;
 }
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
 }
-
-/* Keyframe para o efeito de SCAN na página 404 */
-@keyframes scanLine {
-  0% { transform: translateY(0); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateY(100px); opacity: 0; }
-}
-
-/* Keyframe para o efeito de PULSE suave em governança */
-@keyframes softPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(0.98); }
-}
-
-/* Classes de Utilidade para Animação */
-.animate-slide-up { animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-.animate-scan { animation: scanLine 3s linear infinite; }
-.animate-soft { animation: softPulse 4s ease-in-out infinite; }
-
-/* Staggered Load (Carregamento em cascata para listas) */
-.stagger-load > * {
-  @apply opacity-0;
-  animation: slideUpFade 0.6s ease-out forwards;
-}
-.stagger-load > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-load > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-load > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-load > *:nth-child(4) { animation-delay: 0.4s; }
-
-/* --- ELEMENTOS DE INTERFACE --- */
-
-/* Scrollbar Customizada (Minimalista e Tech) */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { @apply bg-transparent; }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-800 rounded-full hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors;
+  @apply bg-slate-300/60 dark:bg-slate-700/50 rounded-full hover:bg-blue-500 transition-colors;
 }
 
-/* Seleção de Texto Personalizada */
+/* Seleção de Texto (Branding Sync) */
 ::selection {
-  @apply bg-blue-600/20 text-blue-700 dark:text-blue-300;
+  @apply bg-blue-600/30 text-blue-900 dark:text-blue-100;
 }
 
-/* Ajustes de Mídia */
-img, svg { @apply select-none max-w-full h-auto; }
-
-/* Foco de Acessibilidade (Visibilidade em todos os idiomas) */
+/* Foco de Acessibilidade (Ajustado para o Tema Escuro OLED) */
 :focus-visible {
-  @apply outline-none ring-2 ring-blue-600 ring-offset-2 dark:ring-offset-[#020617];
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-[#020617];
+}
+
+/* --- ANIMAÇÕES DE UTILIDADE (Globais) --- */
+
+@keyframes scanLine {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+.animate-scan {
+  position: relative;
+  overflow: hidden;
+}
+.animate-scan::after {
+  content: "";
+  @apply absolute inset-0 w-full h-1 bg-blue-500/30 blur-sm;
+  animation: scanLine 3s linear infinite;
+}
+
+/* Animação suave para o Cookie Banner e Toasts */
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
