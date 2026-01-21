@@ -1,39 +1,56 @@
-import { defineConfig, globalIgnores } from 'eslint/config';
+// @ts-check
+
+import eslint from '@eslint/js';
+import { defineConfig } from 'eslint/config';
+import tseslint from 'typescript-eslint';
 import nextVitals from 'eslint-config-next/core-web-vitals';
-import nextTs from 'eslint-config-next/typescript';
 import prettier from 'eslint-config-prettier/flat';
 import unusedImports from 'eslint-plugin-unused-imports';
 import reactHooks from 'eslint-plugin-react-hooks';
 
 /**
  * FLAT CONFIG - RIGOR TÉCNICO MÁXIMO (2026)
- * Versão Final: Next.js 16.1.4 + React Hooks 7.0.1 + Node 24.x
+ * Configuração: Next.js 16.1.4 + React Hooks 7.0.1 + Typed Linting (Strict)
  */
-const eslintConfig = defineConfig([
-  // 1. Configurações Base do Next.js (Spread obrigatório na v16)
+export default defineConfig([
+  // 1. Base do ESLint
+  eslint.configs.recommended,
+
+  // 2. Presets TYPE-CHECKED (O nível máximo de segurança do typescript-eslint)
+  ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
+
+  // 3. Configurações do Next.js 16.1.4 (Spread obrigatório)
   ...nextVitals,
-  ...nextTs,
-  
-  // 2. Integração Nativa React Hooks v7.0.1 (Flat Config)
-  // Isso já ativa 'rules-of-hooks' e 'exhaustive-deps' automaticamente
+
+  // 4. React Hooks 7.0.1 (Nativo para Flat Config)
   reactHooks.configs.flat.recommended,
-  
-  // 3. Prettier para governança de estilo
+
+  // 5. Prettier (Sempre por último para evitar conflitos de estilo)
   prettier,
-  
+
   {
-    // 4. Customização e Governança de Código Limpo
+    // 6. Configuração do Parser para Typed Linting (Project Service 2026)
+    languageOptions: {
+      parserOptions: {
+        // Ativa o serviço de tipos do TypeScript para análise profunda
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     plugins: {
       'unused-imports': unusedImports,
     },
     rules: {
-      // --- SEGURANÇA E INTEGRIDADE ---
+      // --- SEGURANÇA E INTEGRIDADE (Typed-Aware) ---
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/await-thenable': 'error',
+      '@typescript-eslint/consistent-return': 'error', // Resolve o erro de caminhos de retorno
       'no-duplicate-imports': 'error',
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       'no-debugger': 'error',
-      
+
       // --- GESTÃO DE VARIÁVEIS (CLEAN CODE) ---
-      // Desativamos a regra padrão para usar a versão otimizada do plugin de imports
       '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error', 
       'unused-imports/no-unused-vars': [
@@ -50,21 +67,26 @@ const eslintConfig = defineConfig([
       'react/no-unescaped-entities': 'off',
       '@next/next/no-img-element': 'warn',
       '@next/next/no-html-link-for-pages': 'error',
+
+      // --- AJUSTES DE ESTILO ---
+      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
+      '@typescript-eslint/no-explicit-any': 'warn',
     },
   },
 
-  // 5. Definições Globais de Exclusão (Performance de Linting)
-  globalIgnores([
-    '.next/**',
-    'out/**',
-    'build/**',
-    'next-env.d.ts',
-    'public/**',
-    'node_modules/**',
-    'eslint.config.mjs',
-    'package.json',
-    'package-lock.json'
-  ]),
+  {
+    // 7. Definições Globais de Exclusão
+    ignores: [
+      '.next/**',
+      'out/**',
+      'build/**',
+      'next-env.d.ts',
+      'public/**',
+      'node_modules/**',
+      'eslint.config.mjs',
+      'next.config.mjs',
+      'tailwind.config.ts',
+      'package.json'
+    ],
+  },
 ]);
-
-export default eslintConfig;
