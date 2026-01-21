@@ -1,12 +1,12 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
-import nextVitals from 'eslint-config-next/core-web-vitals';
-import nextTs from 'eslint-config-next/typescript';
+import nextVitals from 'eslint-config-next/core-web-vitals.js'; // Ajuste crítico: Adicionado .js
+import nextTs from 'eslint-config-next/typescript.js';       // Ajuste crítico: Adicionado .js
 import prettier from 'eslint-config-prettier/flat';
 import unusedImports from 'eslint-plugin-unused-imports';
 
 /**
  * FLAT CONFIG - RIGOR TÉCNICO E GOVERNANÇA (2026)
- * Este arquivo unifica as regras de Core Web Vitals, TypeScript e Acessibilidade.
+ * Versão otimizada para resolver o erro de resolução de módulo na Vercel.
  */
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -18,7 +18,7 @@ const eslintConfig = defineConfig([
     },
     rules: {
       // --- SEGURANÇA E INTEGRIDADE ---
-      'no-duplicate-imports': 'error', // Impede o erro fatal que vimos no seu log
+      'no-duplicate-imports': 'error',
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       'no-debugger': 'error',
 
@@ -36,8 +36,6 @@ const eslintConfig = defineConfig([
       ],
 
       // --- COMPATIBILIDADE E TRANSIÇÃO ---
-      // Permitimos 'any' como 'warn' para não travar seu build agora, 
-      // mas sinalizar onde precisamos de tipagem forte (Rigor Bancário).
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/consistent-type-imports': 'warn',
       'react/no-unescaped-entities': 'off',
@@ -46,9 +44,7 @@ const eslintConfig = defineConfig([
       '@next/next/no-img-element': 'warn',
       '@next/next/no-html-link-for-pages': 'error',
       
-      // --- ORGANIZAÇÃO (Ajustado conforme o log) ---
-      // Desativamos a ordem rígida temporariamente para evitar erros de build
-      // enquanto você organiza os componentes.
+      // --- ORGANIZAÇÃO ---
       'import/order': 'off', 
     },
   },
@@ -66,6 +62,7 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     'public/**',
     'node_modules/**',
+    '*.config.mjs',
     '*.config.js'
   ]),
 ]);
