@@ -1,16 +1,16 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
-import nextVitals from 'eslint-config-next/core-web-vitals.js'; // Ajuste crítico: Adicionado .js
-import nextTs from 'eslint-config-next/typescript.js';       // Ajuste crítico: Adicionado .js
+import nextVitals from 'eslint-config-next/core-web-vitals.js';
+import nextTs from 'eslint-config-next/typescript.js';
 import prettier from 'eslint-config-prettier/flat';
 import unusedImports from 'eslint-plugin-unused-imports';
 
 /**
  * FLAT CONFIG - RIGOR TÉCNICO E GOVERNANÇA (2026)
- * Versão otimizada para resolver o erro de resolução de módulo na Vercel.
+ * Correção: Removido o spread operator (...) das configurações do Next.js.
  */
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
+  nextVitals, // CORREÇÃO: Removido '...' pois não é iterável no Next 15
+  nextTs,     // CORREÇÃO: Removido '...'
   prettier,
   {
     plugins: {
