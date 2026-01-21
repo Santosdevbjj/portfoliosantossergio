@@ -1,49 +1,49 @@
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next';
 
 /**
- * CONFIGURAÇÃO DE ROBOTS - NEXT.JS 15 (2026)
- * Controla o comportamento de rastreamento para Google, Bing e Bots de IA.
- * Estruturado para suportar o SEO multilingue (i18n) e proteção de assets.
+ * CONFIGURAÇÃO DE ROBOTS - NEXT.JS 15.5.9 (2026)
+ * Governança de SEO: Controle de rastreamento para buscadores e modelos de LLM.
+ * Estrutura: Otimizada para i18n e proteção de rotas de servidor.
  */
 export default function robots(): MetadataRoute.Robots {
-  // Fallback seguro para a URL de produção
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://portfoliosantossergio.vercel.app'
+  // Garantia de URL base absoluta e limpa
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app'
+  ).replace(/\/$/, '');
 
   return {
     rules: [
       {
         userAgent: '*',
         allow: [
-          '/',              // Home (Redirect)
-          '/pt',            // Versão Português
-          '/en',            // Versão Inglês
-          '/es',            // Versão Espanhol
-          '/images/',       // Imagens dos projetos e perfil
-          '/icons/',        // Favicons e Apple Icons
-          '/cv-*.pdf',      // Permite indexação direta dos seus currículos
+          '/',              // Home e Redirecionamentos
+          '/pt',            // Localidade PT
+          '/en',            // Localidade EN
+          '/es',            // Localidade ES
+          '/images/',       // Assets visuais
+          '/cv-*.pdf',      // Currículos estratégicos
         ],
         disallow: [
-          '/api/',          // Rotas de servidor (Segurança)
-          '/_next/',        // Arquivos internos do Next.js
-          '/static/',       // Evita redundância de arquivos estáticos compilados
-          '/admin/',        // Segurança de rotas administrativas
-          '/private/',      // Pastas privadas
-          '/*.json$',       // Bloqueia indexação de manifestos e configs JSON
+          '/api/',          // Endpoints de API
+          '/_next/',        // Cache interno do Next.js
+          '/_next/static/', // Arquivos de build estáticos
+          '/private/',      // Conteúdo restrito
+          '/*.json$',       // Bloqueio de arquivos de configuração
         ],
       },
       {
         /**
-         * POLÍTICA ESPECÍFICA PARA BOTS DE INTELIGÊNCIA ARTIFICIAL
-         * Permite que modelos como GPT-4 e Claude indexem seu portfólio.
-         * Isso ajuda o seu perfil a aparecer em recomendações de IA para vagas.
+         * IA BOT GOVERNANCE
+         * Permite que agentes de IA (OpenAI, Anthropic, Google) processem seu perfil.
+         * Aumenta a visibilidade em buscas semânticas e assistentes de recrutamento.
          */
         userAgent: ['GPTBot', 'ChatGPT-User', 'Claude-bot', 'Google-Extended'],
         allow: ['/pt', '/en', '/es'],
-        disallow: ['/api/'],
+        disallow: ['/api/', '/_next/'],
       }
     ],
-    // Vinculação com o Sitemap (Essencial para SEO multilingue)
+    // Vinculação com o Sitemap para facilitar a descoberta de rotas alternates (hreflang)
     sitemap: `${baseUrl}/sitemap.xml`,
     host: baseUrl,
-  }
+  };
 }
