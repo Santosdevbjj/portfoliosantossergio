@@ -5,7 +5,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n } from '@/i18n-config';
 
-// Fontes de alta performance para 2026
+// Fontes de alta performance otimizadas para 2026
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -21,10 +21,8 @@ const montserrat = Montserrat({
 /**
  * NOTA TÉCNICA DE SEGURANÇA E GOVERNANÇA:
  * Este projeto implementa medidas rigorosas contra vulnerabilidades de Dia Zero.
- * * FIX: CVE-2025-66478 (React2Shell)
- * Status: Patched - Next.js 15.5.7+
- * Integridade: Protocolo RSC endurecido para prevenir Remote Code Execution (RCE).
- * Data da Auditoria Técnica: 21 de Janeiro de 2026
+ * Status: Patched - Next.js 15.5.9
+ * Auditoria Técnica: 21 de Janeiro de 2026
  */
 
 interface RootLayoutProps {
@@ -38,7 +36,7 @@ type LocaleContent = {
   es: string;
 };
 
-// Configuração de Viewport para Responsividade Total
+// Configuração de Viewport para Responsividade Adaptativa
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
@@ -51,7 +49,7 @@ export const viewport: Viewport = {
 };
 
 /**
- * SEO MULTILINGUE & AUTORIDADE DINÂMICA
+ * SEO MULTILINGUE & METADADOS DINÂMICOS
  */
 export async function generateMetadata({ 
   params 
@@ -70,10 +68,11 @@ export async function generateMetadata({
   const descriptions: LocaleContent = {
     pt: "Analista Sênior com 20+ anos em sistemas críticos (Bradesco). Especialista em Ciência de Dados, Azure e Eficiência Operacional.",
     en: "Senior Analyst with 20+ years in critical systems (Bradesco). Specialist in Data Science, Azure, and Operational Efficiency.",
-    es: "Analista Sénior con 20+ años en sistemas críticos (Bradesco). Especialista en Ciencia de Datos, Azure y Eficiencia Operativa."
+    es: "Analista Sénior con 20+ años en sistemas críticos (Bradesco). Especialista en Ciencia de Dados, Azure y Eficiencia Operativa."
   };
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
+  // CORREÇÃO CRÍTICA: Acesso via index signature para satisfazer o TypeScript do Next.js 15+
+  const siteUrl = process.env['NEXT_PUBLIC_SITE_URL'] || "https://portfoliosantossergio.vercel.app";
   const title = titles[lang] || titles.pt;
   const description = descriptions[lang] || descriptions.pt;
 
@@ -85,7 +84,7 @@ export async function generateMetadata({
     description: description,
     metadataBase: new URL(siteUrl),
     
-    // TAG DE VERIFICAÇÃO DO GOOGLE (MANTIDA RIGOROSAMENTE)
+    // TAG DE VERIFICAÇÃO DO GOOGLE (PRESERVADA)
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
@@ -127,11 +126,12 @@ export async function generateMetadata({
 }
 
 export default async function RootLayout({ children, params }: RootLayoutProps) {
-  const { lang } = await params;
+  const resolvedParams = await params;
+  const lang = resolvedParams.lang;
 
-  // Log de Segurança Ativa para auditoria em ambiente de servidor (Vercel)
+  // Auditoria de Segurança Ativa no Build
   if (process.env.NODE_ENV === 'production') {
-    console.info(`[Security Audit] V24-LTS | Next.js 15.5.7 Patch CVE-2025-66478 Active.`);
+    console.info(`[Security Monitor] Node 24.x | Next.js 15.5.9 | Shields Active.`);
   }
 
   return (
@@ -157,7 +157,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           enableSystem 
           disableTransitionOnChange
         >
-          {/* Estrutura Responsiva com tratamento de overflow horizontal */}
+          {/* Estrutura Responsiva: min-h-screen evita saltos de layout (CLS) */}
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <main className="flex-grow w-full">
               {children}
