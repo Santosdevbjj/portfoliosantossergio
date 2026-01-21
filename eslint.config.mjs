@@ -6,15 +6,15 @@ import unusedImports from 'eslint-plugin-unused-imports';
 
 /**
  * FLAT CONFIG - RIGOR TÉCNICO E GOVERNANÇA (2026)
- * Solução definitiva para "Plugin '' not found" via espalhamento de config e mapping.
+ * Fix: Removido espalhamento (spread) para evitar erro de iterabilidade.
  */
 const eslintConfig = defineConfig([
-  // Injeção via spread para garantir que o array de objetos do Next seja achatado corretamente
-  ...nextVitals,
-  ...nextTs,
+  // Injeção direta: Next.js 15 trata essas configs como objetos de configuração únicos
+  nextVitals,
+  nextTs,
   prettier,
   {
-    // Mapeamento explícito: O motor do ESLint 9 exige que o plugin tenha um nome de namespace
+    // Mapeamento explícito do plugin para evitar o erro "Plugin '' not found"
     plugins: {
       'unused-imports': unusedImports,
     },
@@ -37,18 +37,19 @@ const eslintConfig = defineConfig([
         }
       ],
 
-      // --- COMPATIBILIDADE ---
+      // --- COMPATIBILIDADE E TRANSIÇÃO ---
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/consistent-type-imports': 'warn',
       'react/no-unescaped-entities': 'off',
       
-      // --- REGRAS NEXT.JS ---
+      // --- REGRAS NEXT.JS ESPECÍFICAS ---
       '@next/next/no-img-element': 'warn',
       '@next/next/no-html-link-for-pages': 'error',
       'import/order': 'off', 
     },
   },
   {
+    // Overrides para arquivos TypeScript
     files: ['**/*.tsx', '**/*.ts'],
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
