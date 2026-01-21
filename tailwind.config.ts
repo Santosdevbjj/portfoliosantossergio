@@ -1,5 +1,7 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from 'tailwindcss';
+import typography from '@tailwindcss/typography';
+
+const config: Config = {
   // Ativa o modo escuro via classe para sincronia total com 'next-themes'
   darkMode: 'class',
   
@@ -12,7 +14,7 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        // Breakpoint para dispositivos ultra-compactos (iPhone SE / relógios inteligentes)
+        // Breakpoint para dispositivos ultra-compactos (iPhone SE / Smartwatches)
         'xs': '375px',
       },
       colors: {
@@ -36,7 +38,7 @@ module.exports = {
         }
       },
       fontFamily: {
-        // Inter para leitura de dados e Montserrat para títulos de autoridade
+        // Variáveis CSS integradas com next/font (Inter e Montserrat)
         sans: ["var(--font-inter)", "ui-sans-serif", "system-ui"],
         heading: ["var(--font-montserrat)", "sans-serif"],
       },
@@ -83,12 +85,14 @@ module.exports = {
         'glow': '0 0 20px rgba(14, 140, 233, 0.3)',
       },
       backgroundImage: {
-        // Padrão de grade que remete a "Data & Grid systems"
+        // Padrão de grade otimizado (SVG inline com opacidade controlada)
         'grid-pattern': "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm1 1h38v38H1V1z' fill='%2394a3b8' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E\")",
       }
     }
   },
   plugins: [
-    require('@tailwindcss/typography'), 
+    typography, 
   ],
 };
+
+export default config;
