@@ -1,30 +1,32 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
-import nextVitals from 'eslint-config-next/core-web-vitals.js';
-import nextTs from 'eslint-config-next/typescript.js';
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTs from 'eslint-config-next/typescript';
 import prettier from 'eslint-config-prettier/flat';
 import unusedImports from 'eslint-plugin-unused-imports';
 
 /**
- * FLAT CONFIG - RIGOR TÉCNICO E GOVERNANÇA (2026)
- * Fix: Removido espalhamento (spread) para evitar erro de iterabilidade.
+ * FLAT CONFIG - NEXT.JS 16.1.4 (LATEST 2026)
+ * Ajustado para a remoção do 'next lint' e uso direto da CLI.
  */
 const eslintConfig = defineConfig([
-  // Injeção direta: Next.js 15 trata essas configs como objetos de configuração únicos
-  nextVitals,
-  nextTs,
+  // No Next.js 16, essas configs são arrays de objetos. 
+  // O spread (...) é obrigatório para achatar a estrutura no defineConfig.
+  ...nextVitals,
+  ...nextTs,
   prettier,
+  
   {
-    // Mapeamento explícito do plugin para evitar o erro "Plugin '' not found"
+    // Registro nomeado do plugin para evitar "Plugin '' not found"
     plugins: {
       'unused-imports': unusedImports,
     },
     rules: {
-      // --- SEGURANÇA E INTEGRIDADE ---
+      // --- SEGURANÇA E GOVERNANÇA ---
       'no-duplicate-imports': 'error',
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       'no-debugger': 'error',
 
-      // --- GESTÃO DE VARIÁVEIS E CLEAN CODE ---
+      // --- CLEAN CODE (Configuração de 2026) ---
       '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error', 
       'unused-imports/no-unused-vars': [
@@ -37,24 +39,22 @@ const eslintConfig = defineConfig([
         }
       ],
 
-      // --- COMPATIBILIDADE E TRANSIÇÃO ---
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/consistent-type-imports': 'warn',
+      // --- COMPATIBILIDADE REACT/NEXT 16 ---
       'react/no-unescaped-entities': 'off',
-      
-      // --- REGRAS NEXT.JS ESPECÍFICAS ---
       '@next/next/no-img-element': 'warn',
       '@next/next/no-html-link-for-pages': 'error',
-      'import/order': 'off', 
     },
   },
+
+  // Overrides de arquivos
   {
-    // Overrides para arquivos TypeScript
-    files: ['**/*.tsx', '**/*.ts'],
+    files: ['**/*.ts', '**/*.tsx'],
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
     },
   },
+
+  // Ignores Globais atualizados para Next.js 16
   globalIgnores([
     '.next/**',
     'out/**',
