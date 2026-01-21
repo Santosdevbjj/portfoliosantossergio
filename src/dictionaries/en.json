@@ -2,7 +2,8 @@
   "common": {
     "language": "English",
     "contact": "Get in touch",
-    "viewProject": "View Project",
+    "viewProject": "View Repo",
+    "liveDemo": "Live Demo",
     "repoTitle": "Repositories",
     "portfolioTitle": "Solutions Portfolio",
     "governance": "Rigor & Governance",
@@ -14,7 +15,8 @@
     "experience": "Experience",
     "articles": "Articles",
     "projects": "Projects",
-    "contact": "Contact"
+    "contact": "Contact",
+    "changeLang": "Change Language"
   },
   "about": {
     "title": "About Me",
@@ -58,52 +60,64 @@
   },
   "experience": {
     "title": "Career & Impact",
-    "subtitle": "Critical Systems Experience & Data Intelligence",
-    "solving": "Business Problem",
-    "impact": "Measurable Impact",
-    "items": {
-      "data_consultant": {
-        "company": "Independent Consultant — Data Science",
+    "subtitle": "Critical Systems & Data Intelligence",
+    "labels": {
+      "solving": "Business Challenge",
+      "impact": "Key Result",
+      "techs": "Competencies"
+    },
+    "items": [
+      {
+        "company": "Independent Consultant",
         "role": "Data Scientist",
         "period": "2023 – Present",
         "solving": "Uncertainty in construction schedules and late delivery penalties in engineering.",
-        "impact": "61% improvement in logistics accuracy. Estimated savings of R$ 420k/year.",
-        "desc1": "Development of Machine Learning algorithms for financial risk mitigation.",
-        "desc2": "Creation of operational dashboards and real-time alert bots."
+        "impact": "61% improvement in logistics accuracy and estimated savings of $80k/year.",
+        "description": [
+          "Development of Machine Learning models for financial risk mitigation.",
+          "Creation of operational dashboards and real-time alert bots via API.",
+          "Route and schedule optimization using predictive analytics."
+        ],
+        "techs": ["Python", "Machine Learning", "Scikit-Learn", "Pandas", "Power BI"]
       },
-      "bradesco": {
+      {
         "company": "Banco Bradesco S.A.",
         "role": "Senior Systems Analyst",
         "period": "1985 – 2008",
-        "solving": "Inefficiency in manual processes and need for high banking availability.",
-        "impact": "Automation saving 2,920 hours/year. Maintained 99.5% availability.",
-        "desc1": "Technical leadership and support for 500+ users in a regulated environment.",
-        "desc2": "System implementation with a strict focus on traceability and operational continuity."
+        "solving": "Need for high availability and elimination of bottlenecks in critical manual processes.",
+        "impact": "Workflow automation saving 2,920 hours/year with 99.5% uptime.",
+        "description": [
+          "Technical leadership and support for 500+ users in a regulated environment.",
+          "Implementation of banking systems focused on traceability and continuity.",
+          "Development of automation routines for large-scale data processing."
+        ],
+        "techs": ["Critical Systems", "Mainframe", "Automation", "Governance", "SQL"]
       }
-    }
+    ]
   },
   "portfolio": {
-    "title": "Featured Projects",
-    "description": "Analytical solutions documented through the lens of problem, solution, and business value.",
+    "title": "Portfolio",
+    "description": "Analytical solutions documented through the lens of problem, solution, and delivered value.",
     "all": "All",
     "mainCaseLabel": "Main Case",
+    "resultsLabel": "Results",
+    "filterLabel": "Filter Technology",
     "noDescription": "Technical documentation in progress.",
+    "empty": "No projects found in this category.",
     "categories": {
       "data-science": "Data Science",
       "big-data": "Big Data",
       "automation": "Automation",
       "governance": "Governance",
       "machine-learning": "Machine Learning",
-      "azure": "Azure Cloud",
-      "portfolio": "Featured"
+      "azure": "Azure Cloud"
     },
     "projectLabels": {
-      "problem": "The Problem",
-      "solution": "The Solution",
-      "impact": "Business Impact",
+      "problem": "Problem",
+      "solution": "Solution",
+      "impact": "Impact",
       "technologies": "Technologies"
-    },
-    "empty": "No projects found for this category."
+    }
   },
   "contact": {
     "title": "Let's talk?",
@@ -119,8 +133,8 @@
     }
   },
   "footer": {
-    "social": "Social",
-    "contact": "Contact",
+    "socialTitle": "Social Media",
+    "contactTitle": "Contact",
     "location": "Brazil",
     "builtBy": "Developed by",
     "rights": "Sérgio Santos • All rights reserved"
