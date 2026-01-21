@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useState, useCallback } from 'react';
 import { Mail, Linkedin, Github, Copy, Check } from 'lucide-react';
@@ -9,10 +9,10 @@ interface ContactSectionProps {
 }
 
 /**
- * CONTACT SECTION - FOCO EM CONVERSÃO
- * Design premium com alta responsividade e feedback instantâneo ao usuário.
+ * CONTACT SECTION - FOCO EM CONVERSÃO (2026)
+ * Design premium com alta responsividade e correção para o erro de 'unused variable'.
  */
-export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
+export const ContactSection = ({ lang: _lang, dict }: ContactSectionProps) => {
   const [copied, setCopied] = useState(false);
   
   const email = "santossergiorealbjj@outlook.com";
