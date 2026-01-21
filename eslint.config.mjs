@@ -7,21 +7,22 @@ import reactHooks from 'eslint-plugin-react-hooks';
 
 /**
  * FLAT CONFIG - RIGOR TÉCNICO MÁXIMO (2026)
- * Integração: Next.js 16.1.4 + React Hooks 7.0.1 (Flat Config Native)
+ * Versão Final: Next.js 16.1.4 + React Hooks 7.0.1 + Node 24.x
  */
 const eslintConfig = defineConfig([
-  // 1. Configurações Base do Next.js (Versão 16 usa spread)
+  // 1. Configurações Base do Next.js (Spread obrigatório na v16)
   ...nextVitals,
   ...nextTs,
   
-  // 2. Novo Padrão React Hooks v7.0.1 (Flat Config recomendado)
+  // 2. Integração Nativa React Hooks v7.0.1 (Flat Config)
+  // Isso já ativa 'rules-of-hooks' e 'exhaustive-deps' automaticamente
   reactHooks.configs.flat.recommended,
   
-  // 3. Prettier para evitar conflitos de formatação
+  // 3. Prettier para governança de estilo
   prettier,
   
   {
-    // 4. Plugins Adicionais e Governança
+    // 4. Customização e Governança de Código Limpo
     plugins: {
       'unused-imports': unusedImports,
     },
@@ -29,8 +30,10 @@ const eslintConfig = defineConfig([
       // --- SEGURANÇA E INTEGRIDADE ---
       'no-duplicate-imports': 'error',
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+      'no-debugger': 'error',
       
       // --- GESTÃO DE VARIÁVEIS (CLEAN CODE) ---
+      // Desativamos a regra padrão para usar a versão otimizada do plugin de imports
       '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error', 
       'unused-imports/no-unused-vars': [
@@ -46,14 +49,11 @@ const eslintConfig = defineConfig([
       // --- COMPATIBILIDADE REACT 19 / NEXT 16 ---
       'react/no-unescaped-entities': 'off',
       '@next/next/no-img-element': 'warn',
-      
-      // Garantindo regras de Hooks do React Compiler (v7.0.1)
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn'
+      '@next/next/no-html-link-for-pages': 'error',
     },
   },
 
-  // 5. Definições Globais de Exclusão
+  // 5. Definições Globais de Exclusão (Performance de Linting)
   globalIgnores([
     '.next/**',
     'out/**',
@@ -61,7 +61,9 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     'public/**',
     'node_modules/**',
-    'eslint.config.mjs'
+    'eslint.config.mjs',
+    'package.json',
+    'package-lock.json'
   ]),
 ]);
 
