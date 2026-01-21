@@ -14,6 +14,9 @@ const nextConfig = {
     ignoreDuringBuilds: false,
   },
 
+  // Estabilização do Next.js 15: typedRoutes saiu de experimental
+  typedRoutes: true,
+
   // Otimizações do Compilador (SWC)
   compiler: {
     // Remove console.log em produção para maior performance e privacidade
@@ -51,9 +54,8 @@ const nextConfig = {
     minimumCacheTTL: 3600,
   },
 
-  // Recursos Avançados do Next.js 15
+  // Recursos de Performance
   experimental: {
-    typedRoutes: true,
     optimizePackageImports: [
       'lucide-react', 
       'framer-motion', 
@@ -63,15 +65,15 @@ const nextConfig = {
     serverSourceMaps: false,
   },
 
-  // Cabeçalhos de Segurança e Gerenciamento de Assets (Pasta Public)
+  // Cabeçalhos de Segurança e Gerenciamento de Assets
   async headers() {
     return [
       {
-        // Regras Gerais de Segurança para todas as rotas
-        source: '/(.*)',
+        // Regras Gerais de Segurança: Uso de :path* para evitar erro de parsing
+        source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-Frame-Options', value: 'DENY' }, // Alterado para DENY (mais seguro que SAMEORIGIN)
           { key: 'X-XSS-Protection', value: '1; mode=block' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
@@ -80,7 +82,6 @@ const nextConfig = {
               "default-src 'self';",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com;",
               "style-src 'self' 'unsafe-inline';",
-              // Note que adicionamos 'self' para permitir as imagens da sua própria pasta /public
               "img-src 'self' blob: data: https://github.com https://*.githubusercontent.com https://images.unsplash.com;",
               "font-src 'self' data:;",
               "connect-src 'self' https://api.github.com https://*.vercel-analytics.com;",
@@ -90,8 +91,8 @@ const nextConfig = {
         ],
       },
       {
-        // Cache agressivo para Imagens, Ícones e OG Images (1 ano)
-        source: '/(images|icons|og-image-).*\\.(png|ico|jpg|webp|avif)',
+        // Correção Crítica do Erro de Build: Uso de unnamed parameter para Regex de assets
+        source: '/:path*((?:images|icons|og-image-).*\\.(?:png|ico|jpg|webp|avif))',
         headers: [
           {
             key: 'Cache-Control',
@@ -100,9 +101,8 @@ const nextConfig = {
         ],
       },
       {
-        // Configuração específica para os Currículos (PDFs)
-        // Isso garante que o navegador saiba que é um arquivo para visualização/download
-        source: '/cv-sergio-santos-:lang(pt|en|es).pdf',
+        // Ajuste no source do PDF para evitar conflitos de rota
+        source: '/:file(cv-sergio-santos-.*\\.pdf)',
         headers: [
           {
             key: 'Content-Type',
@@ -110,7 +110,7 @@ const nextConfig = {
           },
           {
             key: 'Cache-Control',
-            value: 'public, max-age=86400, must-revalidate', // Cache de 1 dia para PDFs (mais fácil de atualizar)
+            value: 'public, max-age=86400, must-revalidate',
           },
         ],
       },
