@@ -22,7 +22,7 @@
         "name": "next"
       }
     ],
-    /* Rigor Técnico e Governança de Código */
+    /* Rigor Técnico e Governança de Código (Configuração 2026) */
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -34,9 +34,8 @@
     "checkJs": false,
     "verbatimModuleSyntax": true,
     
-    /* Configurações Adicionais para Node.js 24 e Next.js 15 */
+    /* Otimizações para Node.js 24 e Typed Linting */
     "moduleDetection": "force",
-    "allowImportingTsExtensions": false,
     "noPropertyAccessFromIndexSignature": true,
     "skipDefaultLibCheck": true
   },
@@ -45,7 +44,8 @@
     "**/*.ts", 
     "**/*.tsx", 
     ".next/types/**/*.ts",
-    "src/i18n-config.ts"
+    "eslint.config.mjs",
+    "next.config.mjs"
   ],
   "exclude": ["node_modules"]
 }
