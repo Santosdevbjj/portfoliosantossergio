@@ -1,4 +1,3 @@
-// src/middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { i18n } from './i18n-config';
@@ -6,18 +5,21 @@ import { match as matchLocale } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 
 /**
- * DETECÇÃO DE LOCALE
- * Analisa os headers do navegador para sugerir o idioma mais adequado.
+ * DETECÇÃO DE IDIOMA (LOCALE)
+ * Analisa as preferências do navegador do usuário para decidir entre PT, EN ou ES.
  */
 function getLocale(request: NextRequest): string {
   const negotiatorHeaders: Record<string, string> = {};
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
 
-  // @ts-ignore: Tipagem do Negotiator vs Readonly locales
+  // Locales suportados pelo seu portfólio
   const locales: string[] = [...i18n.locales];
+  
+  // Obtém os idiomas preferidos do cabeçalho 'accept-language'
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
 
   try {
+    // Tenta encontrar o melhor match, senão retorna o padrão (pt)
     return matchLocale(languages, locales, i18n.defaultLocale);
   } catch (error) {
     return i18n.defaultLocale;
@@ -25,66 +27,59 @@ function getLocale(request: NextRequest): string {
 }
 
 /**
- * MIDDLEWARE DE ROTEAMENTO INTERNACIONAL
+ * MIDDLEWARE DE ROTEAMENTO
+ * Garante que cada requisição seja direcionada para o prefixo de idioma correto.
  */
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // 1. IGNORAR ARQUIVOS PÚBLICOS E ESTÁTICOS
-  // Protege imagens, robotos.txt, sitemaps e favicon de serem redirecionados
-  const publicFiles = [
-    '/favicon.ico',
+  // 1. FILTRO DE EXCEÇÕES (Arquivos da pasta /public)
+  // Ignora explicitamente arquivos de SEO, imagens e currículos para não causar 404
+  const isPublicFile = [
     '/robots.txt',
     '/sitemap.xml',
-    '/manifest.json',
-    '/og-image.png',
-    '/apple-touch-icon.png',
-    '/icon.png',
-  ];
+    '/favicon.ico',
+    '/manifest.json'
+  ].includes(pathname) || 
+  pathname.match(/\.(png|jpg|jpeg|gif|webp|avif|svg|pdf|ico)$/i);
 
-  if (
-    publicFiles.includes(pathname) ||
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.includes('.') // Ignora qualquer arquivo com extensão (ex: .pdf, .jpg)
-  ) {
+  if (isPublicFile) {
     return NextResponse.next();
   }
 
-  // 2. VERIFICA SE O IDIOMA JÁ ESTÁ PRESENTE NA URL
+  // 2. VERIFICAÇÃO DE PREFIXO DE IDIOMA
+  // Checa se o pathname já começa com /pt, /en ou /es
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
 
-  // 3. REDIRECIONAMENTO SE O IDIOMA ESTIVER AUSENTE
+  // 3. REDIRECIONAMENTO INTELIGENTE
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
 
-    // Preserva o caminho original e os query params (importante para campanhas/ads)
-    const redirectUrl = new URL(
-      `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}${request.nextUrl.search}`,
-      request.url
+    // Constrói a nova URL preservando slugs (ex: /projects -> /pt/projects)
+    // e preservando Query Params (ex: ?source=linkedin)
+    return NextResponse.redirect(
+      new URL(
+        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}${request.nextUrl.search}`,
+        request.url
+      )
     );
-
-    return NextResponse.redirect(redirectUrl);
   }
 
   return NextResponse.next();
 }
 
 /**
- * MATCHER DE ALTA PERFORMANCE
- * Exclui rotas técnicas para garantir que o middleware só rode em requisições de páginas.
+ * CONFIGURAÇÃO DO MATCHER (Next.js 15 Otimizado)
+ * Define quais caminhos o middleware deve observar.
  */
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - all items inside public folder
-     */
-    '/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js|.*\\..*).*)',
+    // Pula todas as rotas internas (_next) e estáticos (arquivos com ponto)
+    // Mas captura a raiz e rotas de página
+    '/((?!api|_next/static|_next/image|images|icons|assets|favicon.ico|sw.js|.*\\..*).*)',
+    // Garante que a raiz '/' sempre passe pelo middleware
+    '/',
   ],
 };
