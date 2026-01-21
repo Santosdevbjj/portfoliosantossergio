@@ -1,5 +1,5 @@
-# EditorConfig ajuda a manter estilos consistentes entre diferentes IDEs e editores
-# Para um Engenheiro Sênior, garante que o código seja "agnóstico" ao editor.
+# EditorConfig: Padronização Universal de Código - Sérgio Santos Portfolio
+# Garante consistência entre IDEs e previne "diffs" sujos no Git.
 root = true
 
 [*]
@@ -10,59 +10,56 @@ indent_size = 2
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-# Tipografia e Documentação técnica (MD/MDX)
+# Tipografia, Documentação Técnica e README (Padrão Markdown)
 [*.{md,mdx}]
-# No Markdown, dois espaços no final da linha significam quebra de linha <br>
-# Por isso, desativamos o trim para preservar a formatação do texto.
+# Preservamos espaços no final para permitir quebras de linha (<br>) nativas do MD.
 trim_trailing_whitespace = false
 indent_size = 2
 
-# Engenharia de Dados e Backend (Python e SQL)
-# Respeito à PEP8 (4 espaços) para manter o padrão profissional de Data Science.
+# Engenharia de Dados e Backend (Python, SQL, Jupyter Notebooks)
+# Aplicação da PEP8 e rigor em consultas SQL para legibilidade de dados.
 [*.{py,sql,ipynb}]
 indent_style = space
 indent_size = 4
 
-# Web Development (Frontend, Configurações e Scripts)
-# Padronização Next.js 15 e Ecossistema JavaScript/TypeScript
+# Desenvolvimento Web Moderno (Next.js 15, TypeScript 5.7+)
+# Sincronia total com as regras de Linter e Prettier revisadas.
 [*.{js,jsx,ts,tsx,cjs,mjs,cts,mts,json,css,scss,html,yml,yaml,toml}]
 indent_style = space
 indent_size = 2
 
-# Metadados e Verificação (Google Search Console e Manifests)
-# Garante a integridade de arquivos lidos por bots e crawlers.
+# Metadados de Infraestrutura e SEO (Google Verification & Crawlers)
+# Mantém a integridade de arquivos estruturados lidos por robôs.
 [*.{xml,json,webmanifest}]
 indent_style = space
 indent_size = 2
 
-# Variáveis de ambiente (Segurança e Integridade)
+# Variáveis de Ambiente e Segredos (Segurança e Integridade)
+# Previne que a limpeza automática corrompa valores sensíveis.
 [*.env*]
 indent_style = space
 indent_size = 2
 trim_trailing_whitespace = false
 
-# Scripts de terminal e Automação de Pipeline
-[*.{sh,bash,zsh}]
+# Scripts de Terminal, Automação de Infra (CI/CD) e Docker
+[*.{sh,bash,zsh,Dockerfile}]
 indent_style = space
-indent_size = 2
+indent_size = 4
 
-# Configuração de Makefile e arquivos que exigem TABS (Padrão Unix/Build)
+# Configurações de Build System e Makefiles
+# Ferramentas Unix exigem TABS reais para execução correta.
 [Makefile]
 indent_style = tab
 indent_size = 4
 
-# Dados e Logs (Preservação de integridade de caracteres)
-# Evita corrupção de arquivos CSV durante a edição automática.
+# Preservação de Dados Brutos e Logs
+# Evita corrupção em arquivos CSV ou registros de erro durante inspeção manual.
 [*.{csv,log,lock}]
 trim_trailing_whitespace = false
+insert_final_newline = false
 
-# Ativos Binários e Estáticos
-# Desativamos edições automáticas para não corromper arquivos não-texto.
+# Ativos Binários, Estáticos e Currículos (PDFs)
+# Bloqueio total de edição automática para evitar corrupção de arquivos binários.
 [*.{png,jpg,jpeg,gif,webp,ico,pdf,woff,woff2}]
 insert_final_newline = false
 trim_trailing_whitespace = false
-
-# Configurações de Docker (caso utilize para o ambiente de Dados)
-[Dockerfile]
-indent_style = space
-indent_size = 4
