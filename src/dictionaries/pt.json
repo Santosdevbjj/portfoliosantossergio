@@ -2,7 +2,8 @@
   "common": {
     "language": "Português",
     "contact": "Entre em contato",
-    "viewProject": "Ver Projeto",
+    "viewProject": "Ver Repositório",
+    "liveDemo": "Ver Demonstração",
     "repoTitle": "Repositórios",
     "portfolioTitle": "Portfólio de Soluções",
     "governance": "Rigor e Governança",
@@ -14,7 +15,8 @@
     "experience": "Trajetória",
     "articles": "Artigos",
     "projects": "Projetos",
-    "contact": "Contato"
+    "contact": "Contato",
+    "changeLang": "Alterar Idioma"
   },
   "about": {
     "title": "Sobre Mim",
@@ -58,52 +60,64 @@
   },
   "experience": {
     "title": "Trajetória & Impacto",
-    "subtitle": "Experiência em Sistemas Críticos e Inteligência de Dados",
-    "solving": "Problema de Negócio",
-    "impact": "Impacto Mensurável",
-    "items": {
-      "data_consultant": {
-        "company": "Consultor Independente — Ciência de Dados",
+    "subtitle": "Sistemas Críticos e Inteligência de Dados",
+    "labels": {
+      "solving": "Desafio de Negócio",
+      "impact": "Resultado Chave",
+      "techs": "Competências"
+    },
+    "items": [
+      {
+        "company": "Consultoria Independente",
         "role": "Cientista de Dados",
         "period": "2023 – Presente",
         "solving": "Incerteza no cronograma de obras e multas por atraso em engenharia.",
-        "impact": "Melhoria de 61% na precisão logística. Economia estimada de R$ 420 mil/ano.",
-        "desc1": "Desenvolvimento de algoritmos de Machine Learning para mitigação de riscos financeiros.",
-        "desc2": "Criação de dashboards operacionais e bots de alerta em tempo real."
+        "impact": "Melhoria de 61% na precisão logística e economia estimada de R$ 420 mil/ano.",
+        "description": [
+          "Desenvolvimento de modelos de Machine Learning para mitigação de riscos financeiros.",
+          "Criação de dashboards operacionais e bots de alerta em tempo real via API.",
+          "Otimização de rotas e cronogramas utilizando análise preditiva."
+        ],
+        "techs": ["Python", "Machine Learning", "Scikit-Learn", "Pandas", "Power BI"]
       },
-      "bradesco": {
+      {
         "company": "Banco Bradesco S.A.",
         "role": "Analista de Sistemas Sênior",
         "period": "1985 – 2008",
-        "solving": "Ineficiência em processos manuais e necessidade de alta disponibilidade bancária.",
-        "impact": "Automação economizando 2.920 horas/ano. Manutenção de 99,5% de disponibilidade.",
-        "desc1": "Liderança técnica e suporte para 500+ usuários em ambiente regulado.",
-        "desc2": "Implementação de sistemas com foco em rastreabilidade e continuidade operacional."
+        "solving": "Necessidade de alta disponibilidade e eliminação de gargalos em processos manuais críticos.",
+        "impact": "Automação de fluxos economizando 2.920 horas/ano com 99,5% de disponibilidade.",
+        "description": [
+          "Liderança técnica e suporte para infraestrutura de 500+ usuários em ambiente regulado.",
+          "Implementação de sistemas bancários com foco em rastreabilidade e continuidade.",
+          "Desenvolvimento de rotinas de automação para processamento de dados em larga escala."
+        ],
+        "techs": ["Sistemas Críticos", "Mainframe", "Automação", "Governança", "SQL"]
       }
-    }
+    ]
   },
   "portfolio": {
-    "title": "Projetos em Destaque",
+    "title": "Portfólio",
     "description": "Soluções analíticas documentadas sob a ótica de problema, solução e valor entregue.",
     "all": "Todos",
     "mainCaseLabel": "Caso Principal",
+    "resultsLabel": "Resultados",
+    "filterLabel": "Filtrar Tecnologia",
     "noDescription": "Documentação técnica em processo de atualização.",
+    "empty": "Nenhum projeto encontrado nesta categoria.",
     "categories": {
       "data-science": "Ciência de Dados",
       "big-data": "Big Data",
       "automation": "Automação",
       "governance": "Governança",
       "machine-learning": "Machine Learning",
-      "azure": "Azure Cloud",
-      "portfolio": "Destaque"
+      "azure": "Azure Cloud"
     },
     "projectLabels": {
-      "problem": "O Problema",
-      "solution": "A Solução",
-      "impact": "Impacto de Negócio",
+      "problem": "Problema",
+      "solution": "Solução",
+      "impact": "Impacto",
       "technologies": "Tecnologias"
-    },
-    "empty": "Nenhum projeto encontrado para esta categoria."
+    }
   },
   "contact": {
     "title": "Vamos conversar?",
@@ -119,8 +133,8 @@
     }
   },
   "footer": {
-    "social": "Social",
-    "contact": "Contato",
+    "socialTitle": "Redes Sociais",
+    "contactTitle": "Contato",
     "location": "Brasil",
     "builtBy": "Desenvolvido por",
     "rights": "Sérgio Santos • Todos os direitos reservados"
