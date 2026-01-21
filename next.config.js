@@ -6,15 +6,13 @@ const nextConfig = {
   poweredByHeader: false,
 
   // Rigor Técnico: Garante que o deploy só ocorra se o código estiver perfeito
+  // Nota: O ESLint agora é gerenciado via CLI (eslint.config.mjs), 
+  // por isso removemos a chave 'eslint' daqui para conformidade com a v16.
   typescript: {
     ignoreBuildErrors: false, 
   },
-  
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
 
-  // Estabilização do Next.js 15: typedRoutes saiu de experimental
+  // Estabilização: typedRoutes agora é padrão e melhora o DX com TS
   typedRoutes: true,
 
   // Otimizações do Compilador (SWC)
@@ -54,7 +52,7 @@ const nextConfig = {
     minimumCacheTTL: 3600,
   },
 
-  // Recursos de Performance
+  // Recursos de Performance 2026
   experimental: {
     optimizePackageImports: [
       'lucide-react', 
@@ -62,6 +60,7 @@ const nextConfig = {
       'clsx', 
       'tailwind-merge'
     ],
+    // Node 24 lida melhor com source maps internamente
     serverSourceMaps: false,
   },
 
@@ -69,30 +68,29 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // Regras Gerais de Segurança: Uso de :path* para evitar erro de parsing
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'DENY' }, // Alterado para DENY (mais seguro que SAMEORIGIN)
+          { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self';",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com;",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com https://vercel.live;",
               "style-src 'self' 'unsafe-inline';",
-              "img-src 'self' blob: data: https://github.com https://*.githubusercontent.com https://images.unsplash.com;",
+              "img-src 'self' blob: data: https://github.com https://*.githubusercontent.com https://images.unsplash.com https://vercel.com;",
               "font-src 'self' data:;",
-              "connect-src 'self' https://api.github.com https://*.vercel-analytics.com;",
+              "connect-src 'self' https://api.github.com https://*.vercel-analytics.com https://*.vitals.vercel-insights.com;",
               "frame-ancestors 'none';",
             ].join(' '),
           },
         ],
       },
       {
-        // Correção Crítica do Erro de Build: Uso de unnamed parameter para Regex de assets
-        source: '/:path*((?:images|icons|og-image-).*\\.(?:png|ico|jpg|webp|avif))',
+        // Cache agressivo para imagens e assets estáticos
+        source: '/:path*((?!(?:api|_next)).*\\.(?:png|ico|jpg|webp|avif|svg))',
         headers: [
           {
             key: 'Cache-Control',
@@ -101,7 +99,7 @@ const nextConfig = {
         ],
       },
       {
-        // Ajuste no source do PDF para evitar conflitos de rota
+        // Ajuste no source do PDF
         source: '/:file(cv-sergio-santos-.*\\.pdf)',
         headers: [
           {
@@ -118,4 +116,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
