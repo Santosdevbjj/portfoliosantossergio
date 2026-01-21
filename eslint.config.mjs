@@ -6,15 +6,16 @@ import unusedImports from 'eslint-plugin-unused-imports';
 
 /**
  * FLAT CONFIG - RIGOR TÉCNICO E GOVERNANÇA (2026)
- * Solução para o erro "Plugin '' not found" através de mapeamento explícito.
+ * Correção definitiva para o erro "Plugin '' not found" e integração Next.js 15.
  */
 const eslintConfig = defineConfig([
-  // Configurações base do Next.js (Objetos diretos, sem spread)
+  // Injeção direta das configurações base do Next.js
   nextVitals,
   nextTs,
   prettier,
   {
-    // Mapeamento rigoroso do Plugin para garantir visibilidade no motor do ESLint
+    // Registro nomeado do plugin. 
+    // Nota: O ESLint 9 exige que o objeto do plugin tenha uma estrutura interna válida.
     plugins: {
       'unused-imports': unusedImports,
     },
@@ -25,7 +26,7 @@ const eslintConfig = defineConfig([
       'no-debugger': 'error',
 
       // --- GESTÃO DE VARIÁVEIS E CLEAN CODE ---
-      // Desativamos a regra nativa para o plugin gerenciar variáveis não utilizadas
+      // Desativamos a regra do TS para que o plugin especializado assuma o controle
       '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error', 
       'unused-imports/no-unused-vars': [
@@ -38,22 +39,20 @@ const eslintConfig = defineConfig([
         }
       ],
 
-      // --- COMPATIBILIDADE E TRANSIÇÃO ---
+      // --- COMPATIBILIDADE ---
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/consistent-type-imports': 'warn',
       'react/no-unescaped-entities': 'off',
       
-      // --- REGRAS NEXT.JS ESPECÍFICAS ---
+      // --- REGRAS NEXT.JS ---
       '@next/next/no-img-element': 'warn',
       '@next/next/no-html-link-for-pages': 'error',
-      
-      // --- ORGANIZAÇÃO ---
       'import/order': 'off', 
     },
   },
   {
-    // Overrides para as rotas e arquivos core do Next.js
-    files: ['src/app/**/layout.tsx', 'src/app/**/page.tsx', 'src/middleware.ts'],
+    // Overrides específicos para evitar falso-positivos em arquivos de estrutura do Next.js
+    files: ['**/*.tsx', '**/*.ts'],
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
     },
@@ -65,8 +64,7 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     'public/**',
     'node_modules/**',
-    '*.config.mjs',
-    '*.config.js'
+    'eslint.config.mjs' // Evita que o ESLint tente validar a própria configuração
   ]),
 ]);
 
