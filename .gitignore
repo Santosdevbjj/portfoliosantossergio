@@ -1,4 +1,4 @@
-# --- DEPENDÊNCIAS ---
+# --- DEPENDÊNCIAS (Node.js 24) ---
 node_modules/
 .pnp
 .pnp.js
@@ -10,9 +10,10 @@ build/
 dist/
 .vercel/
 *.tsbuildinfo
+next-env.d.ts
 
 # --- CONFIGURAÇÕES DE AMBIENTE (SEGURANÇA CRÍTICA) ---
-# Jamais versionar segredos. Isso protege suas chaves do GitHub/Azure.
+# Jamais versionar segredos. Proteção contra vazamento de chaves (Azure/GitHub).
 .env
 .env.local
 .env.development.local
@@ -20,7 +21,7 @@ dist/
 .env.production.local
 .env*.local
 
-# Permite versionar apenas o modelo de configuração
+# Permite versionar apenas o modelo de exemplo para documentação
 !.env.example
 
 # --- LOGS E PERFORMANCE ---
@@ -30,6 +31,7 @@ yarn-error.log*
 .pnpm-debug.log*
 lerna-debug.log*
 *.log
+pnpm-lock.yaml
 
 # --- SISTEMA OPERACIONAL ---
 .DS_Store
@@ -38,11 +40,15 @@ lerna-debug.log*
 Thumbs.db
 desktop.ini
 
-# --- IDE E FERRAMENTAS ---
+# --- IDE E FERRAMENTAS (VS Code / JetBrains) ---
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+!.vscode/launch.json
 .idea/
+*.iws
+*.iml
+*.ipr
 .history
 *.sublime-project
 *.sublime-workspace
@@ -58,20 +64,31 @@ desktop.ini
 .stylelintcache
 .turbo/
 
-# --- ESPECÍFICO NEXT.JS / TURBOPACK ---
-# Otimização para quem usa Next.js 15 com o novo motor de build
+# --- ESPECÍFICO NEXT.JS / TURBOPACK / TELEMETRY ---
+# Otimização para o novo motor de build do Next.js 15
 .next/cache/
 .next/trace
+.next/types
 
-# --- TYPESCRIPT ---
-# Mantemos o env.d.ts para garantir que o build na Vercel reconheça os tipos
-# Mas ignoramos informações temporárias de build
-*.tsbuildinfo
+# --- CI/CD E INFRAESTRUTURA ---
+.terraform/
+*.tfstate
+*.tfstate.backup
 
-# --- ARQUIVOS TEMPORÁRIOS DE DADOS ---
-# Útil para cientistas de dados: evita subir datasets pesados sem querer
+# --- CIÊNCIA DE DADOS E BACKEND ---
+# Evita o versionamento de datasets pesados e ambientes virtuais Python
 *.csv
-*.json.tmp
+*.xlsx
 *.sqlite
+*.db
 .python-version
+.venv/
+env/
+venv/
+ENV/
 __pycache__/
+.ipynb_checkpoints/
+
+# --- ARQUIVOS TEMPORÁRIOS ---
+*.tmp
+*.temp
