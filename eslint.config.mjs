@@ -6,14 +6,15 @@ import unusedImports from 'eslint-plugin-unused-imports';
 
 /**
  * FLAT CONFIG - RIGOR TÉCNICO E GOVERNANÇA (2026)
- * Fix: Mapeamento explícito de plugins e remoção de spread em objetos não-iteráveis.
+ * Solução para o erro "Plugin '' not found" através de mapeamento explícito.
  */
 const eslintConfig = defineConfig([
-  nextVitals, 
-  nextTs,     
+  // Configurações base do Next.js (Objetos diretos, sem spread)
+  nextVitals,
+  nextTs,
   prettier,
   {
-    // Identificação explícita do plugin para evitar o erro "Plugin '' not found"
+    // Mapeamento rigoroso do Plugin para garantir visibilidade no motor do ESLint
     plugins: {
       'unused-imports': unusedImports,
     },
@@ -24,7 +25,7 @@ const eslintConfig = defineConfig([
       'no-debugger': 'error',
 
       // --- GESTÃO DE VARIÁVEIS E CLEAN CODE ---
-      // Desativamos a regra padrão para que o plugin 'unused-imports' assuma o controle
+      // Desativamos a regra nativa para o plugin gerenciar variáveis não utilizadas
       '@typescript-eslint/no-unused-vars': 'off',
       'unused-imports/no-unused-imports': 'error', 
       'unused-imports/no-unused-vars': [
@@ -51,7 +52,7 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    // Overrides para arquivos que seguem padrões específicos do Next.js
+    // Overrides para as rotas e arquivos core do Next.js
     files: ['src/app/**/layout.tsx', 'src/app/**/page.tsx', 'src/middleware.ts'],
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
