@@ -10,17 +10,38 @@ import {
   Trophy
 } from 'lucide-react';
 
+// Interface robusta para eliminar warnings de 'any' e garantir Rigor Bancário
+interface HighlightItem {
+  label: string;
+  description: string;
+}
+
 interface CareerHighlightsProps {
-  dict: any;
+  dict: {
+    about?: {
+      sections?: {
+        highlights?: {
+          title: string;
+          items: HighlightItem[];
+        };
+        metrics?: {
+          title: string;
+          subtitle: string;
+          availabilityValue: string;
+          availabilityLabel: string;
+          automationValue: string;
+          automationLabel: string;
+        };
+      };
+    };
+  };
 }
 
 /**
- * CAREER HIGHLIGHTS - MÉTRICAS DE IMPACTO
- * Exibe conquistas e KPIs técnicos. 
- * Design responsivo com foco em legibilidade de dados (Data-Driven Design).
+ * CAREER HIGHLIGHTS - MÉTRICAS DE IMPACTO E GOVERNANÇA
+ * Exibe KPIs técnicos com foco em Data-Driven Design e Responsividade.
  */
 export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
-  // Acesso seguro aos dicionários conforme estrutura revisada
   const highlights = dict?.about?.sections?.highlights;
   const metrics = dict?.about?.sections?.metrics; 
   
@@ -28,15 +49,15 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
 
   const items = highlights.items || [];
 
-  // Mapeamento de ícones (Uso de className para consistência com o Tailwind)
+  // Mapeamento de ícones com chaves únicas para o Reconciliation do React
   const icons = [
-    <Clock key="icon-0" className="w-6 h-6" />,
-    <Server key="icon-1" className="w-6 h-6" />,
-    <ShieldCheck key="icon-2" className="w-6 h-6" />
+    <Clock key="icon-clock" className="w-6 h-6" />,
+    <Server key="icon-server" className="w-6 h-6" />,
+    <ShieldCheck key="icon-shield" className="w-6 h-6" />
   ];
 
   return (
-    <div className="mt-16 space-y-12">
+    <div className="mt-16 space-y-12 antialiased">
       {/* CABEÇALHO DA SEÇÃO */}
       <div className="flex items-center gap-4 mb-10">
         <div className="h-8 w-2 bg-blue-600 rounded-full" />
@@ -45,14 +66,13 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
         </h4>
       </div>
 
-      {/* GRID DE DESTAQUES: Adaptativo para 1 col (mobile) a 3 col (desktop) */}
+      {/* GRID DE DESTAQUES */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {items.map((item: any, i: number) => (
+        {items.map((item, i) => (
           <div 
-            key={`highlight-${i}`}
+            key={`highlight-item-${i}`}
             className="group relative p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800 hover:border-blue-500/50 transition-all duration-500 shadow-sm hover:shadow-xl"
           >
-            {/* Overlay de gradiente no hover para profundidade visual */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem]" />
 
             <div className="relative z-10">
@@ -72,21 +92,19 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
         ))}
       </div>
 
-      {/* BANNER DE IMPACTO (KPIs de Governança e Eficiência) */}
-      <div className="relative overflow-hidden p-8 md:p-12 rounded-[3rem] bg-blue-600 text-white shadow-2xl shadow-blue-600/40">
-        {/* Gráfico decorativo de fundo (Simbolizando monitoramento em tempo real) */}
+      {/* BANNER DE IMPACTO (KPIs de Eficiência) */}
+      <div className="relative overflow-hidden p-8 md:p-12 rounded-[3rem] bg-blue-600 text-white shadow-2xl shadow-blue-600/40 transition-transform duration-500 hover:scale-[1.01]">
         <Activity className="absolute -right-12 -top-12 text-white/5 w-64 h-64 rotate-12 pointer-events-none" />
         
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
           
-          {/* Identificação da Métrica Principal */}
           <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
             <div className="p-4 md:p-5 bg-white/10 rounded-3xl backdrop-blur-md border border-white/20 shrink-0">
               <BarChart3 className="w-10 h-10 text-white" />
             </div>
             <div>
               <p className="text-blue-100 text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-80">
-                {metrics?.subtitle}
+                {metrics?.subtitle || 'Metrics'}
               </p>
               <h4 className="text-2xl md:text-3xl font-black tracking-tighter leading-tight">
                 {metrics?.title}
@@ -94,10 +112,8 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
             </div>
           </div>
           
-          {/* Divisor Visual (Oculto no mobile) */}
           <div className="hidden lg:block h-16 w-px bg-white/20" />
           
-          {/* GRID DE VALORES NUMÉRICOS: Sincronizado com os dados de impacto do Bradesco */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-16 w-full lg:w-auto">
             <div className="text-center">
               <span className="block text-4xl md:text-6xl font-black mb-1 tracking-tighter">
