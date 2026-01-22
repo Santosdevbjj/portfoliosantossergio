@@ -1,13 +1,11 @@
-// src/lib/github.ts
-
 /**
  * Interface rigorosa para os dados do GitHub.
- * Garante que o TypeScript valide o contrato de dados entre a API e a UI.
+ * Sincronizada com ProjectCard para evitar erros de build 'Property missing'.
  */
 export interface GitHubRepo {
   id: number;
   name: string;
-  description: string;
+  description: string | null;
   html_url: string;
   homepage: string | null;
   topics: string[];
@@ -20,7 +18,11 @@ export interface GitHubRepo {
  * Busca, filtra e ordena repositórios com lógica de prioridade.
  */
 export async function getGitHubProjects(lang: string = 'pt'): Promise<GitHubRepo[]> {
-  const token = process.env.GITHUB_ACCESS_TOKEN;
+  /**
+   * CORREÇÃO CRÍTICA PARA VERCEL:
+   * Em configurações rigorosas de TS (Index Signature), o acesso deve ser via ['CHAVE'].
+   */
+  const token = process.env['GITHUB_ACCESS_TOKEN'];
   const username = "Santosdevbjj";
   
   // URL dinâmica baseada na presença do Token (Segurança e Limite de Requisições)
@@ -58,16 +60,16 @@ export async function getGitHubProjects(lang: string = 'pt'): Promise<GitHubRepo
      * FILTRAGEM E TRANSFORMAÇÃO MULTILINGUE
      * 1. Remove forks.
      * 2. Filtra apenas projetos com a tag 'portfolio'.
-     * 3. Trata descrições multilingues (formato: "Desc PT | Desc EN | Desc ES")
      */
     const filteredRepos = repos
       .filter((repo: any) => !repo.fork && repo.topics?.includes("portfolio"))
       .map((repo: any): GitHubRepo => {
         // Lógica de Tradução de Descrição via Pipe (|)
+        // Ordem esperada na descrição do GitHub: PT (0) | EN (1) | ES (2)
         let finalDescription = repo.description ?? "";
+        
         if (finalDescription.includes('|')) {
           const parts = finalDescription.split('|').map((p: string) => p.trim());
-          // Ordem esperada na descrição do GitHub: PT (0) | EN (1) | ES (2)
           if (lang === 'en' && parts[1]) finalDescription = parts[1];
           else if (lang === 'es' && parts[2]) finalDescription = parts[2];
           else finalDescription = parts[0];
@@ -75,8 +77,8 @@ export async function getGitHubProjects(lang: string = 'pt'): Promise<GitHubRepo
 
         return {
           id: repo.id,
-          name: repo.name.replace(/-/g, ' ').replace(/_/g, ' '), // Nome mais limpo para UI
-          description: finalDescription,
+          name: repo.name.replace(/-/g, ' ').replace(/_/g, ' '), 
+          description: finalDescription || null,
           html_url: repo.html_url,
           homepage: repo.homepage ?? null,
           topics: repo.topics ?? [],
@@ -90,8 +92,9 @@ export async function getGitHubProjects(lang: string = 'pt'): Promise<GitHubRepo
      */
     return filteredRepos.sort((a, b) => {
       const getWeight = (repo: GitHubRepo) => {
-        if (repo.topics.includes('destaque') || repo.topics.includes('featured')) return 2;
-        if (repo.topics.includes('data-science')) return 1;
+        const topics = repo.topics.map(t => t.toLowerCase());
+        if (topics.includes('destaque') || topics.includes('featured') || topics.includes('primeiro')) return 2;
+        if (topics.includes('data-science') || topics.includes('python')) return 1;
         return 0;
       };
 
