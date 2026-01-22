@@ -2,10 +2,25 @@
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import prettier from "eslint-config-prettier/flat";
+import globals from "globals";
 
 export default [
   /**
-   * 1. Next.js Core Web Vitals
+   * 1. Ambiente global
+   * Define explicitamente browser + Node.js
+   * (Flat Config NÃO assume isso automaticamente)
+   */
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node
+      }
+    }
+  },
+
+  /**
+   * 2. Next.js Core Web Vitals
    * Inclui:
    * - React
    * - React Hooks
@@ -15,15 +30,17 @@ export default [
   ...nextVitals,
 
   /**
-   * 2. Next.js + TypeScript
-   * Integra @typescript-eslint com o App Router
+   * 3. Next.js + TypeScript
+   * Integra @typescript-eslint com App Router
    */
   ...nextTs,
 
   /**
-   * 3. Overrides específicos do projeto
+   * 4. Overrides específicos do projeto
+   * Aplicados somente a arquivos TS/TSX
    */
   {
+    files: ["**/*.ts", "**/*.tsx"],
     rules: {
       // Next.js
       "@next/next/no-img-element": "warn",
@@ -31,7 +48,7 @@ export default [
       // React
       "react/no-unescaped-entities": "off",
 
-      // TypeScript — relaxamentos conscientes (dados dinâmicos / APIs)
+      // TypeScript — relaxamentos conscientes (APIs, MDX, dados dinâmicos)
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
@@ -46,13 +63,13 @@ export default [
   },
 
   /**
-   * 4. Prettier (SEMPRE POR ÚLTIMO)
-   * Desativa regras conflitantes de formatação
+   * 5. Prettier (SEMPRE POR ÚLTIMO entre regras)
+   * Desativa conflitos de formatação
    */
   prettier,
 
   /**
-   * 5. Arquivos e pastas ignoradas
+   * 6. Arquivos e pastas ignoradas
    */
   {
     ignores: [
