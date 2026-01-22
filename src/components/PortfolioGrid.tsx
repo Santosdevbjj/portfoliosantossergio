@@ -6,14 +6,13 @@ import { Filter, Database, FolderSearch } from 'lucide-react';
 
 /**
  * INTERFACE DE DADOS DO GITHUB
- * Refatorada para garantir compatibilidade total com o ProjectCard e evitar erros de build.
  */
 interface GitHubRepository {
   id: number;
   name: string;
-  description: string | null; // Garantido como nulo se não existir
-  html_url: string;           // URL do repositório
-  homepage?: string | null;   // URL do site/deploy
+  description: string | null;
+  html_url: string;
+  homepage?: string | null;
   topics: string[];
   updated_at: string;
   stargazers_count?: number;
@@ -46,10 +45,6 @@ interface PortfolioGridProps {
   };
 }
 
-/**
- * PORTFOLIO GRID - MOTOR DE FILTRAGEM E EXIBIÇÃO
- * Totalmente Responsivo e Multilingue (PT, EN, ES).
- */
 export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
   const [activeCategory, setActiveCategory] = useState('all');
 
@@ -57,15 +52,9 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
   const categoriesDict = portfolio.categories || {};
   const categoriesEntries = Object.entries(categoriesDict);
 
-  /**
-   * LÓGICA DE FILTRAGEM E ORDENAÇÃO
-   * Filtra por categoria e prioriza destaques (tags 'featured' ou 'primeiro').
-   */
   const filteredProjects = useMemo(() => {
-    // 1. Filtra apenas repositórios marcados para o portfolio
     let result = projects.filter(p => p.topics?.includes('portfolio'));
     
-    // 2. Filtra pela categoria ativa (comparação normalizada)
     if (activeCategory !== 'all') {
       result = result.filter(p => 
         p.topics?.some((topic: string) => {
@@ -76,7 +65,6 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
       );
     }
 
-    // 3. Ordenação Inteligente
     return result.sort((a, b) => {
       const aPriority = (a.topics?.includes('featured') || a.topics?.includes('primeiro')) ? 0 : 1;
       const bPriority = (b.topics?.includes('featured') || b.topics?.includes('primeiro')) ? 0 : 1;
@@ -90,7 +78,7 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
     <section id="projects" className="py-24 lg:py-32 bg-slate-50/50 dark:bg-[#020617]/40 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
-        {/* CABEÇALHO E FILTROS */}
+        {/* CABEÇALHO */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-16 gap-10">
           <div className="flex-1 w-full">
             <div className="flex items-center gap-3 mb-4">
@@ -108,7 +96,7 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
             </p>
           </div>
           
-          {/* NAVEGAÇÃO DE FILTROS: Snap-scroll para mobile */}
+          {/* FILTROS */}
           <div className="w-full lg:w-auto overflow-hidden">
             <div className="flex items-center gap-2 mb-4 text-slate-500 font-bold text-[10px] uppercase tracking-widest px-1">
               <Filter className="text-blue-600 w-3.5 h-3.5" />
@@ -142,22 +130,22 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
                   </button>
                 ))}
               </div>
-              {/* Gradiente de scroll para mobile */}
               <div className="absolute right-0 top-0 bottom-4 w-8 bg-gradient-to-l from-slate-50 dark:from-[#020617] pointer-events-none lg:hidden" />
             </div>
           </div>
         </div>
 
-        {/* GRID DE CARDS: Layout Fluido (1 col mobile, 2 tablet, 3 desktop) */}
+        {/* GRID DE CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 min-h-[400px]">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => (
               <div 
                 key={project.id} 
-                className="flex h-full animate-in fade-in slide-in-from-bottom-6 duration-700"
-                style={{ animationDelay: `${index * 50}ms`, fillMode: 'both' }}
+                // CORREÇÃO: Removido style={{ fillMode: 'both' }} que causava erro de build
+                // Adicionada a classe fill-mode-both do Tailwind
+                className="flex h-full animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both"
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                {/* Repassando os dados com garantia de tipo para o ProjectCard */}
                 <ProjectCard 
                   project={{
                     name: project.name,
