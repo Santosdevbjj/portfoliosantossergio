@@ -6,6 +6,7 @@ import { Filter, Database, FolderSearch } from 'lucide-react';
 
 /**
  * INTERFACE DE DADOS DO GITHUB
+ * Sincronizada com o ProjectCard para evitar erros de compilação na Vercel.
  */
 interface GitHubRepository {
   id: number;
@@ -15,18 +16,12 @@ interface GitHubRepository {
   homepage?: string | null;
   topics: string[];
   updated_at: string;
-  stargazers_count?: number;
-  forks_count?: number;
 }
 
 interface PortfolioGridProps {
   projects: GitHubRepository[];
   lang: 'pt' | 'en' | 'es';
   dict: {
-    common: {
-      viewProject: string;
-      liveDemo: string;
-    };
     portfolio: {
       title: string;
       resultsLabel: string;
@@ -35,6 +30,7 @@ interface PortfolioGridProps {
       empty: string;
       mainCaseLabel: string;
       noDescription: string;
+      featuredLabel: string;
       categories: Record<string, string>;
       projectLabels: {
         problem: string;
@@ -45,6 +41,10 @@ interface PortfolioGridProps {
   };
 }
 
+/**
+ * PORTFOLIO GRID - GERENCIADOR DE PROJETOS RESPONSIVO
+ * Corrigido para garantir que 'homepage' nunca seja 'undefined', resolvendo o erro de build.
+ */
 export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
   const [activeCategory, setActiveCategory] = useState('all');
 
@@ -52,6 +52,10 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
   const categoriesDict = portfolio.categories || {};
   const categoriesEntries = Object.entries(categoriesDict);
 
+  /**
+   * FILTRAGEM E ORDENAÇÃO
+   * Prioriza projetos com tags 'featured' ou 'primeiro'.
+   */
   const filteredProjects = useMemo(() => {
     let result = projects.filter(p => p.topics?.includes('portfolio'));
     
@@ -78,7 +82,7 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
     <section id="projects" className="py-24 lg:py-32 bg-slate-50/50 dark:bg-[#020617]/40 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         
-        {/* CABEÇALHO */}
+        {/* CABEÇALHO E FILTROS - FLEXÍVEL PARA MOBILE */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-16 gap-10">
           <div className="flex-1 w-full">
             <div className="flex items-center gap-3 mb-4">
@@ -96,20 +100,20 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
             </p>
           </div>
           
-          {/* FILTROS */}
+          {/* NAVEGAÇÃO DE FILTROS - SNAP SCROLL PARA TOUCH */}
           <div className="w-full lg:w-auto overflow-hidden">
             <div className="flex items-center gap-2 mb-4 text-slate-500 font-bold text-[10px] uppercase tracking-widest px-1">
               <Filter className="text-blue-600 w-3.5 h-3.5" />
               <span>{portfolio.filterLabel}</span>
             </div>
             
-            <div className="relative">
+            <div className="relative group">
               <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar snap-x -mx-6 px-6 lg:mx-0 lg:px-0">
                 <button
                   onClick={() => setActiveCategory('all')}
                   className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 whitespace-nowrap snap-start touch-manipulation ${
                     activeCategory === 'all' 
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-lg' 
+                      ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/30' 
                       : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-blue-500/40'
                   }`}
                 >
@@ -122,7 +126,7 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
                     onClick={() => setActiveCategory(key)}
                     className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 whitespace-nowrap snap-start touch-manipulation ${
                       activeCategory === key 
-                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg' 
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/30' 
                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-blue-500/40'
                     }`}
                   >
@@ -130,19 +134,18 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
                   </button>
                 ))}
               </div>
-              <div className="absolute right-0 top-0 bottom-4 w-8 bg-gradient-to-l from-slate-50 dark:from-[#020617] pointer-events-none lg:hidden" />
+              {/* Gradiente de indicação de scroll mobile */}
+              <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-slate-50 dark:from-[#020617] pointer-events-none lg:hidden" />
             </div>
           </div>
         </div>
 
-        {/* GRID DE CARDS */}
+        {/* GRID DE CARDS - DINÂMICO (1, 2 OU 3 COLUNAS) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 min-h-[400px]">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => (
               <div 
                 key={project.id} 
-                // CORREÇÃO: Removido style={{ fillMode: 'both' }} que causava erro de build
-                // Adicionada a classe fill-mode-both do Tailwind
                 className="flex h-full animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
@@ -151,7 +154,8 @@ export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
                     name: project.name,
                     description: project.description,
                     html_url: project.html_url,
-                    homepage: project.homepage,
+                    // SOLUÇÃO DO ERRO: homepage recebe null se for undefined
+                    homepage: project.homepage ?? null,
                     topics: project.topics
                   }} 
                   lang={lang} 
