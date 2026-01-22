@@ -1,4 +1,4 @@
-/* globals.css */
+/* globals.css - Next.js 16 + Tailwind 3 */
 
 /* Tailwind base */
 @tailwind base;
@@ -29,17 +29,17 @@
     --text-dark: #f1f5f9;
 
     /* Cartões e vidro */
-    --card-bg-light: rgba(255,255,255,0.9);
-    --card-bg-dark: rgba(15,23,42,0.6);
-    --glass-border-light: rgba(255,255,255,0.2);
-    --glass-border-dark: rgba(71,85,105,0.4);
+    --card-bg-light: rgba(255, 255, 255, 0.9);
+    --card-bg-dark: rgba(15, 23, 42, 0.6);
+    --glass-border-light: rgba(255, 255, 255, 0.2);
+    --glass-border-dark: rgba(71, 85, 105, 0.4);
 
     /* Scrollbar */
-    --scroll-thumb-light: rgba(203,213,225,0.6);
-    --scroll-thumb-dark: rgba(71,85,105,0.5);
+    --scroll-thumb-light: rgba(203, 213, 225, 0.6);
+    --scroll-thumb-dark: rgba(71, 85, 105, 0.5);
 
     /* Seleção de texto */
-    --selection-light-bg: rgba(14,140,233,0.3);
+    --selection-light-bg: rgba(14, 140, 233, 0.3);
     --selection-light-color: #1e3a8a;
     --selection-dark-color: #e0f2fe;
   }
@@ -61,7 +61,7 @@
     --card-bg: var(--card-bg-dark);
     --glass-border: var(--glass-border-dark);
     --scroll-thumb: var(--scroll-thumb-dark);
-    --selection-bg: rgba(14,140,233,0.3);
+    --selection-bg: rgba(14, 140, 233, 0.3);
     --selection-color: var(--selection-dark-color);
   }
 
@@ -105,7 +105,7 @@
   }
 
   /* ------------------------------------------ */
-  /* Scrollbar */
+  /* Scrollbar customizada */
   /* ------------------------------------------ */
   .no-scrollbar {
     -ms-overflow-style: none;
@@ -148,13 +148,15 @@
   .project-card-gradient {
     @apply relative overflow-hidden rounded-[2.5rem] transition-all duration-500;
     background-color: var(--card-bg);
-    border: 1px solid rgba(203,213,225,0.6);
+    border: 1px solid rgba(203, 213, 225, 0.6);
   }
+
   [data-theme="dark"] .project-card-gradient {
-    border: 1px solid rgba(31,41,55,0.5);
+    border: 1px solid rgba(31, 41, 55, 0.5);
   }
+
   .project-card-gradient:hover {
-    box-shadow: 0 20px 50px -12px rgba(14,140,233,0.15);
+    box-shadow: 0 20px 50px -12px rgba(14, 140, 233, 0.15);
     border-color: var(--brand-blue-hover);
   }
 }
