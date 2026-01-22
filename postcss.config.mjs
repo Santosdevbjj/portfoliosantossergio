@@ -1,37 +1,42 @@
 /** @type {import('postcss-load-config').Config} */
 const config = {
   plugins: {
-    // 1. Ativa o suporte a aninhamento (nesting) compatível com o Tailwind
-    // Essencial para manter o código CSS limpo e legível em 2026
-    'tailwindcss/nesting': {},
-    
-    // 2. O motor do Tailwind CSS (Processamento JIT otimizado)
+    /**
+     * 1. Nesting CSS padrão (PostCSS oficial)
+     * Mais estável e compatível com Turbopack e Next.js 16
+     */
+    "postcss-nesting": {},
+
+    /**
+     * 2. Tailwind CSS (JIT engine)
+     */
     tailwindcss: {},
-    
-    // 3. Autoprefixer: Garante compatibilidade retroativa (Safari/Chrome antigos)
-    // Configurado para o rigor técnico de Grid e Flexbox
+
+    /**
+     * 3. Autoprefixer
+     * Compatibilidade automática baseada em browserslist
+     * (Evita CSS inflado e hacks desnecessários)
+     */
     autoprefixer: {
-      flexbox: 'no-2009',
-      grid: 'autoplace', 
+      flexbox: "no-2009",
     },
-    
-    // 4. CSSNano: Minificação extrema para Produção (Foco em Core Web Vitals)
-    // Isso reduz o tempo de carregamento do CSS, melhorando o LCP
-    ...(process.env.NODE_ENV === 'production' 
-      ? { 
-          cssnano: { 
+
+    /**
+     * 4. CSSNano (somente em produção)
+     * Minificação segura, sem quebrar layouts ou animações
+     */
+    ...(process.env.NODE_ENV === "production"
+      ? {
+          cssnano: {
             preset: [
-              'default', 
-              { 
+              "default",
+              {
                 discardComments: { removeAll: true },
-                convertValues: true,
-                normalizeWhitespace: true,
-              }
-            ] 
-          } 
-        } 
-      : {}
-    ),
+              },
+            ],
+          },
+        }
+      : {}),
   },
 };
 
