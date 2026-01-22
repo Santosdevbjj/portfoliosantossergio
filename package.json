@@ -1,34 +1,25 @@
 {
   "name": "portfolio-sergio-vercel-final",
-  "version": "12.12.4",
+  "version": "12.12.5",
   "private": true,
   "engines": {
     "node": "24.x"
   },
   "scripts": {
-    "dev": "next dev",
-    
-    // Força usar Webpack no build (compatível Termux / WASM bindings)
-    "build": "NEXT_EXPERIMENTAL_TURBOPACK=0 next build",
-    
+    "dev": "next dev --no-turbo",          // local: evita Turbopack no Termux
+    "build": "next build",                 // Vercel: build normal (Turbopack OK)
+    "build:local": "next build --no-turbo", // opção extra para build local
     "start": "next start",
-    
-    // ESLint com Flat Config
-    "lint": "eslint . --ext .ts,.tsx",
-    
-    // Lint fix automático
-    "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "next": "16.1.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-
     "@formatjs/intl-localematcher": "0.5.4",
     "negotiator": "1.0.0",
-
     "lucide-react": "0.479.0",
     "clsx": "2.1.1",
     "tailwind-merge": "2.6.0",
@@ -39,23 +30,18 @@
     "eslint": "8.57.0",
     "eslint-config-next": "16.1.0",
     "eslint-config-prettier": "10.0.1",
-
     "@typescript-eslint/parser": "8.20.0",
     "@typescript-eslint/eslint-plugin": "8.20.0",
-
     "@types/node": "24.0.0",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
     "@types/negotiator": "0.6.3",
-
     "typescript": "5.7.3",
-
     "tailwindcss": "3.4.17",
     "@tailwindcss/typography": "0.5.16",
     "postcss": "8.5.1",
     "autoprefixer": "10.4.20",
     "cssnano": "7.0.6",
-
     "prettier": "3.4.2",
     "prettier-plugin-tailwindcss": "0.6.10"
   }
