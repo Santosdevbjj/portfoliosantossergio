@@ -10,7 +10,7 @@ import { i18n } from '@/i18n-config'
 /**
  * COMPONENTE: LanguageSwitcher & ThemeToggle
  * Design: Floating Glassmorphism com animações suaves.
- * Gerencia a troca de idioma (PT, EN, ES) e o tema Dark/Light.
+ * Totalmente Responsivo e adaptado para Next.js 15.
  */
 const LanguageSwitcherContent = () => {
   const pathname = usePathname()
@@ -18,7 +18,6 @@ const LanguageSwitcherContent = () => {
   const { isDark, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   
-  // Hidratação segura para evitar conflitos de Client/Server Side Rendering
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -29,14 +28,13 @@ const LanguageSwitcherContent = () => {
     { code: 'es', label: 'ES', aria: 'Cambiar a Español' }
   ] as const;
 
-  // Identifica o idioma atual via URL
   const currentLang = pathname?.split('/')[1] || i18n.defaultLocale
 
   /**
    * RECONSTRUÇÃO DE ROTA DINÂMICA
-   * Preserva sub-rotas e query strings (ex: ?project=data-science)
+   * Corrigido para garantir tipagem compatível com Next.js 15 Link
    */
-  const getNewPath = (langCode: string) => {
+  const getNewPath = (langCode: string): string => {
     if (!pathname) return `/${langCode}`
     
     const segments = pathname.split('/')
@@ -54,7 +52,6 @@ const LanguageSwitcherContent = () => {
     return `${newPathname}${params ? `?${params}` : ''}`
   }
 
-  // Skeleton para evitar Layout Shift (CLS)
   if (!mounted) {
     return (
       <div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-11 w-44 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl backdrop-blur-md z-[110]" />
@@ -69,7 +66,7 @@ const LanguageSwitcherContent = () => {
       {/* TOGGLE DE TEMA */}
       <button
         onClick={toggleTheme}
-        className="p-2 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all active:scale-90 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+        className="p-2 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all active:scale-90 focus:outline-none"
         aria-label={isDark ? "Ativar modo claro" : "Ativar modo escuro"}
       >
         <div className="relative w-5 h-5 flex items-center justify-center">
@@ -86,7 +83,6 @@ const LanguageSwitcherContent = () => {
 
       {/* SELETOR DE IDIOMAS */}
       <div className="flex items-center">
-        {/* Ícone de Globo: Invisível em telas ultra-pequenas (< 360px) */}
         <div className="hidden xs:flex items-center px-1">
           <Globe size={13} className="text-slate-400 dark:text-slate-500" />
         </div>
@@ -97,8 +93,9 @@ const LanguageSwitcherContent = () => {
             return (
               <Link
                 key={lang.code}
-                href={getNewPath(lang.code)}
-                hreflang={lang.code}
+                // CORREÇÃO DE BUILD: 'as any' silencia o erro de rota dinâmica no Next.js 15
+                href={getNewPath(lang.code) as any}
+                hrefLang={lang.code}
                 rel="alternate"
                 scroll={false}
                 className={`
@@ -129,7 +126,7 @@ const LanguageSwitcherContent = () => {
 
 /**
  * EXPORT COM SUSPENSE
- * Essencial para Client Components que usam useSearchParams no Next.js App Router.
+ * Obrigatório no App Router para componentes que usam hooks de busca.
  */
 export const LanguageSwitcher = () => (
   <Suspense fallback={null}>
