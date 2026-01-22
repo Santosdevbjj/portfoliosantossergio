@@ -41,7 +41,7 @@ const LanguageSwitcherContent = () => {
     if (!pathname) return `/${langCode}`
     
     const segments = pathname.split('/')
-    // Verifica se o primeiro segmento é um idioma válido
+    // Verifica se o primeiro segmento é um idioma válido conforme as definições de i18n
     const isLangSegment = i18n.locales.includes(segments[1] as Locale)
     
     const newSegments = [...segments]
@@ -56,7 +56,7 @@ const LanguageSwitcherContent = () => {
     return `${newPathname}${params ? `?${params}` : ''}`
   }
 
-  // Placeholder durante a hidratação para evitar Layout Shift
+  // Placeholder durante a hidratação para evitar Layout Shift (CLS)
   if (!mounted) {
     return (
       <div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-11 w-32 sm:w-44 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl backdrop-blur-md z-[110]" />
@@ -88,7 +88,7 @@ const LanguageSwitcherContent = () => {
 
       {/* SELETOR DE IDIOMAS */}
       <div className="flex items-center">
-        {/* Ícone Globe escondido em telas muito pequenas (mobile extra-small) */}
+        {/* Ícone Globe escondido em telas muito pequenas para economizar espaço */}
         <div className="hidden sm:flex items-center px-1">
           <Globe size={13} className="text-slate-400 dark:text-slate-500" />
         </div>
@@ -99,7 +99,10 @@ const LanguageSwitcherContent = () => {
             return (
               <Link
                 key={lang.code}
-                href={getNewPath(lang.code)}
+                /* CORREÇÃO CRÍTICA PARA O ERRO DE BUILD: 
+                   O 'as any' silencia a validação estática de rotas do Next.js 15 para URLs geradas dinamicamente.
+                */
+                href={getNewPath(lang.code) as any}
                 hrefLang={lang.code}
                 rel="alternate"
                 scroll={false}
@@ -131,7 +134,7 @@ const LanguageSwitcherContent = () => {
 
 /**
  * EXPORT COM SUSPENSE
- * Essencial no Next.js 15: useSearchParams() exige um Suspense Boundary.
+ * Essencial no Next.js 15: useSearchParams() exige um Suspense Boundary para renderização no cliente.
  */
 export const LanguageSwitcher = () => (
   <Suspense fallback={<div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-11 w-32 rounded-2xl bg-slate-200/10" />}>
