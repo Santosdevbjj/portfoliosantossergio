@@ -1,3 +1,4 @@
+// src/proxy.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { i18n } from './i18n-config';
@@ -10,25 +11,29 @@ import Negotiator from 'negotiator';
  */
 function getLocale(request: NextRequest): string {
   try {
+    // Converte headers do NextRequest para objeto padrão
     const headers: Record<string, string> = {};
     request.headers.forEach((value, key) => (headers[key] = value));
 
+    // Obtém idiomas preferidos do usuário
     const userLanguages = new Negotiator({ headers }).languages();
+
+    // Retorna o idioma compatível ou padrão
     return matchLocale(userLanguages, i18n.locales, i18n.defaultLocale);
   } catch (err) {
-    console.error('[Middleware] Erro ao detectar idioma:', err);
+    console.error('[Proxy] Erro ao detectar idioma:', err);
     return i18n.defaultLocale;
   }
 }
 
 /**
- * MIDDLEWARE DE ROTEAMENTO
+ * PROXY DE ROTEAMENTO
  * Redireciona automaticamente para /pt, /en ou /es caso não haja prefixo na URL.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  // Ignora rotas internas do Next.js, API, assets ou arquivos específicos
+  // Rotas, assets e arquivos a serem ignorados
   const ignoredPaths = [
     '/_next',
     '/api',
@@ -37,9 +42,11 @@ export function middleware(request: NextRequest) {
     '/sitemap.xml',
     '/sw.js',
   ];
+
+  // Ignora rotas internas, arquivos públicos ou qualquer arquivo com extensão
   if (
     ignoredPaths.some((path) => pathname.startsWith(path)) ||
-    pathname.includes('.') // arquivos com extensão
+    pathname.includes('.')
   ) {
     return NextResponse.next();
   }
@@ -53,7 +60,7 @@ export function middleware(request: NextRequest) {
     const locale = getLocale(request);
     const cleanPath = pathname.replace(/^\/+/, ''); // remove barras iniciais extras
     const redirectUrl = new URL(`/${locale}/${cleanPath}${search}`, request.url);
-    return NextResponse.redirect(redirectUrl, 307); // SEO-friendly
+    return NextResponse.redirect(redirectUrl, 307); // redirecionamento temporário (SEO-friendly)
   }
 
   return NextResponse.next();
@@ -61,7 +68,7 @@ export function middleware(request: NextRequest) {
 
 /**
  * CONFIGURAÇÃO DO MATCHER
- * Define quais rotas passam pelo middleware
+ * Define quais rotas passam pelo proxy
  */
 export const config = {
   matcher: [
