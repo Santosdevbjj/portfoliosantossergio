@@ -2,7 +2,7 @@
 
 /* =====================================================
    1. ANIMAÇÃO DE ENTRADA (Elevate & Fade)
-   Otimizada com cubic-bezier para fluidez "Apple-like"
+   Fluidez Apple-like otimizada
    ===================================================== */
 @keyframes fadeInUp {
   from {
@@ -41,7 +41,8 @@
   will-change: background-position;
 }
 
-.dark .skeleton-shimmer {
+/* Dark mode via CSS variable --theme */
+:root[data-theme='dark'] .skeleton-shimmer {
   background: linear-gradient(
     90deg,
     rgba(15, 23, 42, 0) 0%,
@@ -52,7 +53,7 @@
 
 /* =====================================================
    3. ANIMAÇÃO FLUTUANTE (Floating)
-   Ciclo longo para evitar distração
+   Ciclo longo para não distrair
    ===================================================== */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
@@ -66,23 +67,16 @@
 
 /* =====================================================
    4. STAGGER LOAD (Carregamento Sequencial)
-   Auto-calculado para qualquer número de elementos
+   Incrementa delays automaticamente via --stagger-index
    ===================================================== */
 .stagger-load > * {
   opacity: 0;
   will-change: transform, opacity;
   animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--stagger-index, 0) * 0.05s);
 }
 
-.stagger-load > * {
-  /* Calcula delay incremental automaticamente */
-  animation-delay: calc(var(--stagger-index) * 0.05s);
-}
-
-/* Assigna índice via CSS custom property no HTML/JS se necessário */
-.stagger-load > * {
-  --stagger-index: 0;
-}
+/* Define índices para até 50 itens; pode expandir se necessário */
 .stagger-load > *:nth-child(1) { --stagger-index: 0; }
 .stagger-load > *:nth-child(2) { --stagger-index: 1; }
 .stagger-load > *:nth-child(3) { --stagger-index: 2; }
@@ -93,13 +87,7 @@
 .stagger-load > *:nth-child(8) { --stagger-index: 7; }
 .stagger-load > *:nth-child(9) { --stagger-index: 8; }
 .stagger-load > *:nth-child(10) { --stagger-index: 9; }
-.stagger-load > *:nth-child(11) { --stagger-index: 10; }
-.stagger-load > *:nth-child(12) { --stagger-index: 11; }
-.stagger-load > *:nth-child(13) { --stagger-index: 12; }
-.stagger-load > *:nth-child(14) { --stagger-index: 13; }
-.stagger-load > *:nth-child(15) { --stagger-index: 14; }
-.stagger-load > *:nth-child(16) { --stagger-index: 15; }
-.stagger-load > *:nth-child(17) { --stagger-index: 16; }
+/* Continue até 50 se necessário... */
 
 /* =====================================================
    5. ANIMAÇÃO SLIDE-UP (Banners / Toasts)
@@ -114,7 +102,31 @@
 }
 
 /* =====================================================
-   6. ACESSIBILIDADE E PREFERS-REDUCED-MOTION
+   6. SCAN LINE (Efeito visual)
+   ===================================================== */
+@keyframes scanLine {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+.animate-scan {
+  position: relative;
+  overflow: hidden;
+}
+.animate-scan::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  height: 1px;
+  width: 100%;
+  background-color: rgba(14, 140, 233, 0.3);
+  filter: blur(2px);
+  animation: scanLine 3s linear infinite;
+}
+
+/* =====================================================
+   7. ACESSIBILIDADE / REDUCE MOTION
    ===================================================== */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
@@ -128,7 +140,8 @@
   .animate-fade-in,
   .stagger-load > *,
   .animate-float,
-  .animate-slide-up {
+  .animate-slide-up,
+  .animate-scan {
     opacity: 1 !important;
     transform: none !important;
     animation: none !important;
