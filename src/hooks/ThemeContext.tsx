@@ -26,17 +26,18 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 /**
- * THEME CONTEXT PROVIDER - ARQUITETURA NEXT.JS
- * Gerencia a lógica de estados visuais, persistência em camadas e sincronização com o SO.
+ * THEME CONTEXT PROVIDER - ARQUITETURA NEXT.JS 15
+ * Resolve erros de "cascading renders" e sincroniza preferências do SO.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  // Inicializamos com valores padrão para evitar erros de hidratação
   const [theme, setTheme] = useState<Theme>("system");
   const [isDark, setIsDark] = useState<boolean>(false);
   const [mounted, setMounted] = useState(false);
 
   /**
-   * MANIPULAÇÃO DO DOM: Aplicação de classes e metadados.
-   * Otimizado para evitar repaints desnecessários.
+   * MANIPULAÇÃO DO DOM
+   * Aplica a classe .dark no elemento raiz para ativar o Tailwind Dark Mode.
    */
   const applyToDOM = useCallback((dark: boolean) => {
     if (typeof window === "undefined") return;
@@ -47,74 +48,89 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       root.classList.remove("dark");
     }
-    // Suporte nativo para elementos de UI do navegador (scrollbars, inputs)
     root.style.colorScheme = dark ? "dark" : "light";
   }, []);
 
-  // 1. CARREGAMENTO INICIAL: Estratégia de Hidratação Segura
+  /**
+   * CARREGAMENTO INICIAL (Efeito Único)
+   * CORREÇÃO: Agrupamos os estados para evitar múltiplos renders síncronos (erro do log).
+   */
   useEffect(() => {
-    const getInitialTheme = (): Theme => {
+    const getStoredTheme = (): Theme => {
       try {
-        const stored = localStorage.getItem("theme") as Theme;
-        if (stored && ["light", "dark", "system"].includes(stored)) return stored;
+        const stored = localStorage.getItem("theme");
+        if (stored === "light" || stored === "dark" || stored === "system") {
+          return stored;
+        }
         
         const cookieTheme = document.cookie
           .split("; ")
           .find((row) => row.startsWith("theme="))
-          ?.split("=")[1] as Theme;
-          
-        return (cookieTheme && ["light", "dark", "system"].includes(cookieTheme)) 
-          ? cookieTheme 
-          : "system";
-      } catch (e) {
-        return "system";
+          ?.split("=")[1];
+
+        if (cookieTheme === "light" || cookieTheme === "dark" || cookieTheme === "system") {
+          return cookieTheme;
+        }
+      } catch (err) {
+        console.error("Erro ao ler preferência de tema:", err);
       }
+      return "system";
     };
 
-    setTheme(getInitialTheme());
-    setMounted(true);
-  }, []);
+    const initialTheme = getStoredTheme();
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const initialIsDark = initialTheme === "dark" || (initialTheme === "system" && mediaQuery.matches);
 
-  // 2. REATIVIDADE: Sincronização com Preferências do Sistema
+    // Atualização em lote para evitar o erro react-hooks/set-state-in-effect
+    setTheme(initialTheme);
+    setIsDark(initialIsDark);
+    applyToDOM(initialIsDark);
+    setMounted(true);
+  }, [applyToDOM]);
+
+  /**
+   * REATIVIDADE: Escuta mudanças no Sistema Operacional
+   */
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || theme !== "system") return;
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     
-    const computeTheme = () => {
-      const shouldBeDark = 
-        theme === "dark" || (theme === "system" && mediaQuery.matches);
-      
-      setIsDark(shouldBeDark);
-      applyToDOM(shouldBeDark);
+    const handleChange = () => {
+      if (theme === "system") {
+        setIsDark(mediaQuery.matches);
+        applyToDOM(mediaQuery.matches);
+      }
     };
 
-    computeTheme();
-
-    // Listener moderno para mudanças de tema no SO em tempo real
-    mediaQuery.addEventListener("change", computeTheme);
-    return () => mediaQuery.removeEventListener("change", computeTheme);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme, mounted, applyToDOM]);
 
-  // 3. PERSISTÊNCIA: Governança de Cookies e LocalStorage
+  /**
+   * PERSISTÊNCIA
+   */
   const saveThemePreference = useCallback((newTheme: Theme) => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const shouldBeDark = newTheme === "dark" || (newTheme === "system" && mediaQuery.matches);
+
     setTheme(newTheme);
+    setIsDark(shouldBeDark);
+    applyToDOM(shouldBeDark);
     
-    if (typeof window !== "undefined") {
-      try {
-        if (newTheme === "system") {
-          localStorage.removeItem("theme");
-        } else {
-          localStorage.setItem("theme", newTheme);
-        }
-        
-        // Persistência via Cookie para suporte a SSR e Edge Config
-        document.cookie = `theme=${newTheme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax; Secure`;
-      } catch (err) {
-        console.error("Falha ao persistir tema:", err);
+    try {
+      if (newTheme === "system") {
+        localStorage.removeItem("theme");
+      } else {
+        localStorage.setItem("theme", newTheme);
       }
+      
+      // Cookie para evitar o flash branco no carregamento da página (SSR)
+      document.cookie = `theme=${newTheme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax; Secure`;
+    } catch (err) {
+      console.error("Falha ao salvar tema:", err);
     }
-  }, []);
+  }, [applyToDOM]);
 
   const toggleTheme = useCallback(() => {
     saveThemePreference(isDark ? "light" : "dark");
@@ -132,10 +148,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     <ThemeContext.Provider
       value={{ theme, isDark, toggleTheme, resetTheme, applyTheme, mounted }}
     >
-      {/* Wrapper de prevenção de FOUC (Flash of Unstyled Content) */}
+      {/* ESTRATÉGIA ANTI-FLASH (FOUC):
+          O conteúdo inicia invisível e faz o fade-in apenas quando o tema está aplicado.
+      */}
       <div 
-        className={`min-h-screen transition-opacity duration-700 ${mounted ? "opacity-100" : "opacity-0"}`}
-        aria-hidden={!mounted && theme === "system"}
+        className={`min-h-screen transition-opacity duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}
       >
         {children}
       </div>
