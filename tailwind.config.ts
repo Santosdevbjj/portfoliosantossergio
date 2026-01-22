@@ -2,8 +2,8 @@ import type { Config } from "tailwindcss";
 import typography from "@tailwindcss/typography";
 
 const config: Config = {
-  // Modo escuro controlado por classe (next-themes)
-  darkMode: "class",
+  // Modo escuro agora controlado via CSS Variable '--theme'
+  darkMode: false, // Desabilitado porque usamos variável CSS
 
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -18,39 +18,34 @@ const config: Config = {
   theme: {
     extend: {
       screens: {
-        // Ultra-compact devices (ex: iPhone SE)
-        xs: "375px",
+        xs: "375px", // Ultra-compact devices (ex: iPhone SE)
       },
 
       colors: {
-        // Paleta Enterprise Intelligence
+        // Branding dinâmico via CSS Variables
         brand: {
-          50: "#f0f7ff",
-          100: "#e0effe",
-          200: "#bae2fd",
-          300: "#7cc8fb",
-          400: "#38a9f8",
-          500: "#0e8ce9", // Cor principal
-          600: "#026fc7",
-          700: "#0358a1",
-          800: "#074b85",
-          900: "#0c3f6d",
-          DEFAULT: "#0e8ce9",
+          50: "var(--brand-blue-50, #f0f7ff)",
+          100: "var(--brand-blue-100, #e0effe)",
+          200: "var(--brand-blue-200, #bae2fd)",
+          300: "var(--brand-blue-300, #7cc8fb)",
+          400: "var(--brand-blue-400, #38a9f8)",
+          500: "var(--brand-blue, #0e8ce9)",
+          600: "var(--brand-blue-600, #026fc7)",
+          700: "var(--brand-blue-700, #0358a1)",
+          800: "var(--brand-blue-800, #074b85)",
+          900: "var(--brand-blue-900, #0c3f6d)",
+          DEFAULT: "var(--brand-blue, #0e8ce9)",
         },
-
-        // Escuro profundo (OLED-friendly)
         slate: {
-          950: "#020617",
+          950: "#020617", // Escuro profundo (OLED-friendly)
         },
       },
 
       fontFamily: {
-        // Integrado com next/font
         sans: ["var(--font-inter)", "ui-sans-serif", "system-ui"],
         heading: ["var(--font-montserrat)", "sans-serif"],
       },
 
-      // Sistema de Motion UX (60fps, previsível)
       animation: {
         "fade-in": "fadeIn 0.6s ease-out forwards",
         "slide-up": "slideUp 0.5s ease-out forwards",
