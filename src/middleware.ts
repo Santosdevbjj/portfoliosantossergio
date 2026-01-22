@@ -6,19 +6,17 @@ import Negotiator from 'negotiator';
 
 /**
  * DETECÇÃO DE IDIOMA (LOCALE)
- * Analisa as preferências do navegador do usuário e cruza com os idiomas suportados (PT, EN, ES).
+ * Analisa as preferências do navegador do usuário e cruza com os idiomas suportados.
  */
 function getLocale(request: NextRequest): string {
-  const negotiatorHeaders: Record<string, string> = {};
-  request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
-
-  const locales: string[] = [...i18n.locales];
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
-
   try {
-    return matchLocale(languages, locales, i18n.defaultLocale);
+    const headers: Record<string, string> = {};
+    request.headers.forEach((value, key) => (headers[key] = value));
+
+    const userLanguages = new Negotiator({ headers }).languages();
+    return matchLocale(userLanguages, i18n.locales, i18n.defaultLocale);
   } catch (err) {
-    console.error('Erro ao detectar idioma:', err);
+    console.error('[Middleware] Erro ao detectar idioma:', err);
     return i18n.defaultLocale;
   }
 }
@@ -30,28 +28,32 @@ function getLocale(request: NextRequest): string {
 export function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  // Ignora arquivos internos, API e assets
-  const isInternalFile =
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.includes('.') ||
-    pathname === '/robots.txt' ||
-    pathname === '/sitemap.xml' ||
-    pathname === '/favicon.ico' ||
-    pathname === '/sw.js';
+  // Ignora rotas internas do Next.js, API, assets ou arquivos específicos
+  const ignoredPaths = [
+    '/_next',
+    '/api',
+    '/favicon.ico',
+    '/robots.txt',
+    '/sitemap.xml',
+    '/sw.js',
+  ];
+  if (
+    ignoredPaths.some((path) => pathname.startsWith(path)) ||
+    pathname.includes('.') // arquivos com extensão
+  ) {
+    return NextResponse.next();
+  }
 
-  if (isInternalFile) return NextResponse.next();
-
-  // Redireciona se não houver prefixo de idioma
-  const pathnameIsMissingLocale = i18n.locales.every(
+  // Verifica se a URL já contém um prefixo de idioma
+  const isMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
 
-  if (pathnameIsMissingLocale) {
+  if (isMissingLocale) {
     const locale = getLocale(request);
     const cleanPath = pathname.replace(/^\/+/, ''); // remove barras iniciais extras
     const redirectUrl = new URL(`/${locale}/${cleanPath}${search}`, request.url);
-    return NextResponse.redirect(redirectUrl, 307); // redirecionamento temporário (SEO-friendly)
+    return NextResponse.redirect(redirectUrl, 307); // SEO-friendly
   }
 
   return NextResponse.next();
