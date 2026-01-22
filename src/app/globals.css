@@ -1,12 +1,14 @@
-/* globals.css - Next.js 16 + Tailwind 3 */
+/* globals.css - Next.js 16 + Tailwind 3 + Turbopack */
+
+/* ------------------------------------------ */
+/* Imports externos */
+/* ------------------------------------------ */
+@import "../styles/animations.css"; /* Animações externas */
 
 /* Tailwind base */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Animações externas */
-@import "../styles/animations.css";
 
 /* ------------------------------------------ */
 /* Variáveis CSS globais e configuração de tema */
@@ -111,6 +113,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -118,14 +121,17 @@
   ::-webkit-scrollbar {
     width: 6px;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+
   ::-webkit-scrollbar-thumb {
     background-color: var(--scroll-thumb);
     border-radius: 9999px;
     transition: background-color 0.2s;
   }
+
   ::-webkit-scrollbar-thumb:hover {
     background-color: var(--brand-blue);
   }
@@ -142,7 +148,7 @@
   .glass-effect {
     background-color: var(--card-bg);
     border: 1px solid var(--glass-border);
-    @apply backdrop-blur-2xl shadow-2xl rounded-xl;
+    @apply backdrop-blur-2xl shadow-2xl rounded-xl transition-all duration-300;
   }
 
   .project-card-gradient {
@@ -158,5 +164,21 @@
   .project-card-gradient:hover {
     box-shadow: 0 20px 50px -12px rgba(14, 140, 233, 0.15);
     border-color: var(--brand-blue-hover);
+  }
+}
+
+/* ------------------------------------------ */
+/* Responsividade e ajustes multilíngue (PT/EN/ES) */
+/* ------------------------------------------ */
+html[lang="pt"], html[lang="en"], html[lang="es"] {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  .main-container {
+    @apply px-2 sm:px-4;
   }
 }
