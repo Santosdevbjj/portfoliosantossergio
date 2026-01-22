@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Layers, ChevronRight, Languages } from 'lucide-react'
+// Removido 'Languages' que não estava sendo usado na renderização
+import { Menu, X, Layers, ChevronRight } from 'lucide-react'
 import type { Locale } from '@/i18n-config'
 
 interface NavbarProps {
@@ -21,34 +22,24 @@ interface NavbarProps {
 }
 
 /**
- * NAVBAR PROFISSIONAL E MULTILINGUE - NEXT.JS 15 READY
- * Design: Glassmorphism responsivo com tratamento de rotas dinâmicas.
+ * NAVBAR PROFISSIONAL - NEXT.JS 15 READY
+ * Corrigido: Removido imports não utilizados para passar no build da Vercel.
  */
 export const Navbar = ({ dict, lang }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
-  // Controle de transparência no scroll para legibilidade
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock scroll para evitar scroll duplo quando menu mobile está aberto
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'unset'
   }, [isMobileMenuOpen])
 
-  /**
-   * RECONSTRUÇÃO DE PATHNAME (CORREÇÃO DE BUILD)
-   * Resolve o erro 'Type string is not assignable to UrlObject'
-   */
   const redirectedPathName = (locale: string) => {
     if (!pathname) return `/${locale}`
     const segments = pathname.split('/')
@@ -166,7 +157,7 @@ export const Navbar = ({ dict, lang }: NavbarProps) => {
           ))}
         </nav>
 
-        {/* Seleção de Idioma Mobile (Toque Otimizado) */}
+        {/* Seleção de Idioma Mobile */}
         <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800">
           <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-4 text-center">
             {dict.nav.changeLang || 'Language / Idioma'}
