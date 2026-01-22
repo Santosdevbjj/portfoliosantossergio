@@ -3,23 +3,34 @@
   "framework": "nextjs",
   "cleanUrls": true,
   "trailingSlash": false,
-
   "regions": ["gru1"],
 
   "github": {
     "silent": true
   },
 
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/pt"
+    }
+  ],
+
   "headers": [
     {
-      "source": "/(pt|en|es)/(.*)",
+      "source": "/:locale(pt|en|es)/:path*",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
-        { "key": "Content-Language", "value": "auto" }
+        { "key": "Content-Language", "value": "auto" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https://*.githubusercontent.com https://images.unsplash.com; font-src 'self' data:; connect-src 'self' https://api.github.com https://*.vercel-analytics.com https://*.vitals.vercel-insights.com https://vercel.live; frame-ancestors 'none'; upgrade-insecure-requests;"
+        }
       ]
     },
     {
@@ -38,16 +49,6 @@
       "source": "/fonts/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    },
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
       ]
     }
   ]
