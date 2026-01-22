@@ -31,16 +31,16 @@ interface FeaturedProjectProps {
 
 /**
  * FEATURED PROJECT - FLAGSHIP CASE
- * Layout premium para o projeto de maior impacto.
- * Totalmente responsivo e blindado contra erros de tradução.
+ * Corrigido para prevenir erros de build (Object is possibly undefined).
+ * Design responsivo mobile-first com foco em conversão técnica.
  */
 export const FeaturedProject = ({ project, dict }: FeaturedProjectProps) => {
   const { portfolio, common } = dict;
   const labels = portfolio.projectLabels;
 
-  // Lógica de narrativa estruturada baseada no separador '|'
-  const descriptionParts = project.description?.split('|') || [];
-  const hasStructuredDesc = descriptionParts.length >= 2;
+  // Lógica de narrativa estruturada: [0] Problema, [1] Solução, [2] Impacto
+  const descriptionParts = project.description ? project.description.split('|') : [];
+  const hasStructuredDesc = descriptionParts.length >= 1;
 
   // Filtra tags de controle para exibir apenas a Tech Stack real
   const displayTopics = project.topics.filter((t) => 
@@ -51,12 +51,11 @@ export const FeaturedProject = ({ project, dict }: FeaturedProjectProps) => {
     <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] lg:rounded-[3.5rem] border-2 border-blue-500/20 overflow-hidden group shadow-2xl shadow-blue-500/5 transition-all duration-500 hover:border-blue-500/40">
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[500px]">
         
-        {/* LADO VISUAL: Branding & Iconography */}
+        {/* LADO VISUAL: Branding & Iconography (Order 1 no Mobile, 1 no Desktop) */}
         <div className="relative h-64 sm:h-80 lg:h-auto bg-slate-100 dark:bg-slate-800/50 overflow-hidden flex items-center justify-center order-1">
-          {/* Gradiente de profundidade */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-transparent to-transparent z-10" />
           
-          {/* Badge de Destaque Sênior */}
+          {/* Badge de Destaque */}
           <div className="absolute top-6 left-6 md:top-8 md:left-8 z-20">
             <div className="bg-blue-600 text-white px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 shadow-2xl ring-4 ring-white/10">
               <Star size={12} fill="currentColor" className="text-amber-300" />
@@ -73,16 +72,16 @@ export const FeaturedProject = ({ project, dict }: FeaturedProjectProps) => {
           </div>
         </div>
 
-        {/* LADO CONTEÚDO: Storytelling de Negócio */}
+        {/* LADO CONTEÚDO: Storytelling (Order 2) */}
         <div className="p-8 md:p-12 lg:p-16 flex flex-col justify-center order-2 bg-white dark:bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-slate-800">
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tighter capitalize leading-[1.1] group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             {project.name.replace(/[_-]/g, ' ')}
           </h3>
           
           <div className="space-y-6 mb-10">
-            {hasStructuredDesc ? (
+            {hasStructuredDesc && descriptionParts[0] ? (
               <div className="space-y-6">
-                {/* Seção Problema */}
+                {/* Seção Problema - Renderização Segura */}
                 <div className="relative pl-6 border-l-2 border-blue-500/30">
                   <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase mb-2 tracking-[0.2em]">
                     {labels.problem}
@@ -92,7 +91,7 @@ export const FeaturedProject = ({ project, dict }: FeaturedProjectProps) => {
                   </p>
                 </div>
 
-                {/* Resultado/Impacto Gerado */}
+                {/* Resultado/Impacto Gerado - Renderização Opcional Segura */}
                 {descriptionParts[2] && (
                   <div className="inline-flex items-center gap-3 px-5 py-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-2xl text-sm font-bold border border-emerald-100 dark:border-emerald-800/50 shadow-sm transition-transform duration-500 group-hover:translate-x-2">
                     <ArrowRight size={18} className="shrink-0" />
