@@ -47,8 +47,8 @@ export const localeMetadata: Readonly<Record<Locale, LocaleDetail>> = {
 };
 
 /**
- * VALIDADO DE LOCALE (Type Guard)
- * Segurança em tempo de execução para rotas e middleware.
+ * VALIDADOR DE LOCALE (Type Guard)
+ * Segurança em tempo de execução para rotas, middleware e componentes.
  */
 export function isValidLocale(locale: unknown): locale is Locale {
   return typeof locale === 'string' && (i18n.locales as readonly string[]).includes(locale);
@@ -56,15 +56,15 @@ export function isValidLocale(locale: unknown): locale is Locale {
 
 /**
  * ESTRATÉGIA DE FALLBACK
- * Garante que o usuário nunca caia em uma página quebrada.
+ * Garante que o sistema sempre retorne um idioma válido.
  */
 export function getSafeLocale(locale: string | undefined | null): Locale {
   return isValidLocale(locale) ? locale : i18n.defaultLocale;
 }
 
 /**
- * CARREGAMENTO DINÂMICO DE DICIONÁRIOS (Lazy Loading)
- * Reduz o bundle size inicial carregando apenas o idioma necessário.
+ * CARREGAMENTO DINÂMICO DE DICIONÁRIOS (Lazy Loading / Code Splitting)
+ * Melhora a performance em dispositivos móveis carregando apenas o JSON necessário.
  */
 const dictionaries: Record<Locale, () => Promise<any>> = {
   pt: () => import('@/dictionaries/pt.json').then((module) => module.default),
@@ -74,23 +74,30 @@ const dictionaries: Record<Locale, () => Promise<any>> = {
 
 /**
  * OBTÉM O DICIONÁRIO
- * Função otimizada para Server Components com tratamento de erro resiliente.
+ * Função assíncrona para Server e Client Components com tratamento de erro.
  */
 export const getDictionary = async (locale: Locale) => {
-  // Garantia de que o locale é válido antes de acessar o dicionário
-  const safeLocale = isValidLocale(locale) ? locale : i18n.defaultLocale;
+  const safeLocale = getSafeLocale(locale);
   
   try {
     const loadDictionary = dictionaries[safeLocale];
-    if (!loadDictionary) throw new Error(`Dictionary not found for locale: ${safeLocale}`);
+    
+    if (!loadDictionary) {
+      throw new Error(`Dicionário não encontrado para: ${safeLocale}`);
+    }
     
     return await loadDictionary();
   } catch (error) {
-    console.error(`[i18n] Falha ao carregar dicionário (${safeLocale}):`, error);
+    console.error(`[i18n-error] Falha ao carregar idioma (${safeLocale}):`, error);
     
-    // Fallback definitivo para Português em caso de erro no import dinâmico
-    const fallbackLoad = dictionaries[i18n.defaultLocale];
-    return await fallbackLoad();
+    // Fallback de última instância para o idioma padrão (PT)
+    if (safeLocale !== i18n.defaultLocale) {
+      const fallback = dictionaries[i18n.defaultLocale];
+      return await fallback();
+    }
+    
+    // Retorna objeto vazio para evitar que o site quebre totalmente
+    return {};
   }
 };
 
