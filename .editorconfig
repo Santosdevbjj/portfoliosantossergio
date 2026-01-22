@@ -1,0 +1,65 @@
+# EditorConfig: Padronização Universal de Código - Sérgio Santos Portfolio
+# Garante consistência entre IDEs e previne "diffs" sujos no Git.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Tipografia, Documentação Técnica e README (Padrão Markdown)
+[*.{md,mdx}]
+# Preservamos espaços no final para permitir quebras de linha (<br>) nativas do MD.
+trim_trailing_whitespace = false
+indent_size = 2
+
+# Engenharia de Dados e Backend (Python, SQL, Jupyter Notebooks)
+# Aplicação da PEP8 e rigor em consultas SQL para legibilidade de dados.
+[*.{py,sql,ipynb}]
+indent_style = space
+indent_size = 4
+
+# Desenvolvimento Web Moderno (Next.js 15, TypeScript 5.7+)
+# Sincronia total com as regras de Linter e Prettier revisadas.
+[*.{js,jsx,ts,tsx,cjs,mjs,cts,mts,json,css,scss,html,yml,yaml,toml}]
+indent_style = space
+indent_size = 2
+
+# Metadados de Infraestrutura e SEO (Google Verification & Crawlers)
+# Mantém a integridade de arquivos estruturados lidos por robôs.
+[*.{xml,json,webmanifest}]
+indent_style = space
+indent_size = 2
+
+# Variáveis de Ambiente e Segredos (Segurança e Integridade)
+# Previne que a limpeza automática corrompa valores sensíveis.
+[*.env*]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+# Scripts de Terminal, Automação de Infra (CI/CD) e Docker
+[*.{sh,bash,zsh,Dockerfile}]
+indent_style = space
+indent_size = 4
+
+# Configurações de Build System e Makefiles
+# Ferramentas Unix exigem TABS reais para execução correta.
+[Makefile]
+indent_style = tab
+indent_size = 4
+
+# Preservação de Dados Brutos e Logs
+# Evita corrupção em arquivos CSV ou registros de erro durante inspeção manual.
+[*.{csv,log,lock}]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+# Ativos Binários, Estáticos e Currículos (PDFs)
+# Bloqueio total de edição automática para evitar corrupção de arquivos binários.
+[*.{png,jpg,jpeg,gif,webp,ico,pdf,woff,woff2}]
+insert_final_newline = false
+trim_trailing_whitespace = false
