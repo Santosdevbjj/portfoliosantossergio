@@ -5,7 +5,6 @@ import { Github, ExternalLink, Folder, Star, Target, Lightbulb, TrendingUp } fro
 
 /**
  * Interface estrita para garantir compatibilidade com o retorno da API do GitHub
- * e evitar erros de build 'Property missing' no Next.js 15.
  */
 interface GitHubProject {
   id?: number;
@@ -36,7 +35,6 @@ interface ProjectCardProps {
 /**
  * PROJECT CARD - NARRATIVA DE ENGENHARIA
  * Converte metadados do GitHub em business cases (Problema/Solução/Impacto).
- * Totalmente Responsivo e Multilingue.
  */
 export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
   const { portfolio } = dict;
@@ -50,18 +48,17 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
   
   const displayTopics = project.topics?.filter(topic => !internalTopics.includes(topic.toLowerCase())) || [];
   
-  // Identificação de prioridade visual
   const isMain = project.topics?.includes('featured') || project.topics?.includes('primeiro');
   const isHighlight = project.topics?.includes('destaque') || project.topics?.includes('highlight');
 
-  // Formatação de tags (ex: react-js -> React Js)
   const formatTopic = (topic: string) => {
     return topic.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
   /**
    * LÓGICA DE NARRATIVA ESTRUTURADA
-   * Divide a descrição do GitHub pelo pipe '|' (Ex: Problema | Solução | Impacto)
+   * Divide a descrição do GitHub pelo pipe '|'.
+   * Opcional chaining (?.) usado para evitar erro "Object is possibly undefined" no build.
    */
   const descriptionParts = project.description?.split('|') || [];
   const hasStructuredDesc = descriptionParts.length >= 2;
@@ -76,7 +73,7 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
       hover:shadow-2xl hover:shadow-blue-500/15 hover:-translate-y-2
     `}>
       
-      {/* Badge de Destaque Estratégico */}
+      {/* Badge de Destaque */}
       {(isHighlight || isMain) && (
         <div className="absolute -top-3 right-4 md:right-8 z-10">
           <span className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] shadow-lg ring-4 ring-white dark:ring-slate-950">
@@ -100,7 +97,6 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
             target="_blank" 
             rel="noopener noreferrer" 
             className="p-2 md:p-3 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all active:scale-90"
-            aria-label="GitHub Repository"
           >
             <Github className="w-5 h-5" />
           </a>
@@ -110,7 +106,6 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
               target="_blank" 
               rel="noopener noreferrer" 
               className="p-2 md:p-3 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all active:scale-90"
-              aria-label="Live Demo"
             >
               <ExternalLink className="w-5 h-5" />
             </a>
@@ -123,11 +118,11 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
         {project.name.replace(/[_-]/g, ' ')}
       </h3>
 
-      {/* Conteúdo Narrative */}
+      {/* Narrative Section */}
       <div className="space-y-4 md:space-y-6 mb-8 flex-grow">
         {hasStructuredDesc ? (
           <div className="flex flex-col gap-4">
-            {/* Problema */}
+            {/* Problema - Protegido com ?. */}
             <div className="flex gap-3">
               <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                 <Target className="w-3 h-3 text-blue-600 dark:text-blue-400" />
@@ -137,12 +132,12 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
                   {labels.problem}
                 </span>
                 <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3 font-medium">
-                  {descriptionParts[0].trim()}
+                  {descriptionParts[0]?.trim() || ""}
                 </p>
               </div>
             </div>
             
-            {/* Solução */}
+            {/* Solução - Protegido com ?. */}
             <div className="flex gap-3">
               <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                 <Lightbulb className="w-3 h-3 text-amber-600 dark:text-amber-400" />
@@ -152,17 +147,17 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
                   {labels.solution}
                 </span>
                 <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3 font-medium">
-                  {descriptionParts[1].trim()}
+                  {descriptionParts[1]?.trim() || ""}
                 </p>
               </div>
             </div>
 
-            {/* Impacto */}
+            {/* Impacto - Protegido com ?. */}
             {descriptionParts[2] && (
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-start gap-3">
                 <TrendingUp className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
                 <p className="text-sm text-slate-900 dark:text-slate-200 font-bold leading-snug">
-                   {descriptionParts[2].trim()}
+                   {descriptionParts[2]?.trim()}
                 </p>
               </div>
             )}
