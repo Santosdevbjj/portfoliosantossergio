@@ -8,7 +8,27 @@ import { Filter, FolderOpen, SearchX } from 'lucide-react';
 interface ProjectSectionProps {
   projects: GitHubRepo[];
   lang: 'pt' | 'en' | 'es';
-  dict: any;
+  dict: {
+    common: {
+      portfolioTitle: string;
+    };
+    portfolio: {
+      title: string;
+      description: string;
+      all: string;
+      empty: string;
+      categories: Record<string, string>;
+      projectLabels: {
+        technologies: string;
+        problem: string;
+        solution: string;
+        impact?: string;
+      };
+      noDescription: string;
+      mainCaseLabel: string;
+      featuredLabel: string;
+    };
+  };
 }
 
 /**
@@ -18,10 +38,9 @@ interface ProjectSectionProps {
 export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   
-  // Acesso centralizado e seguro aos dicionários
-  const portfolioDict = dict?.portfolio || {};
-  const categoriesDict = portfolioDict.categories || {};
-  const commonDict = dict?.common || {};
+  // Acesso centralizado e seguro aos dicionários (sem any)
+  const { portfolio, common } = dict;
+  const categoriesDict = portfolio.categories || {};
 
   // 1. EXTRAÇÃO DINÂMICA DE CATEGORIAS (Traduzidas via JSON)
   const categories = useMemo(() => {
@@ -50,7 +69,7 @@ export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) =>
       base = base.filter(repo => repo.topics?.includes(activeCategory.toLowerCase()));
     }
 
-    // Ordenação Sênior: Featured (tag 'primeiro') > Destaque > Data
+    // Ordenação Sênior: Featured (tag 'primeiro' ou 'featured') > Destaque > Data
     return base.sort((a, b) => {
       const weightA = (a.topics?.includes('primeiro') || a.topics?.includes('featured') ? 100 : 0) + 
                       (a.topics?.includes('destaque') || a.topics?.includes('highlight') ? 50 : 0);
@@ -70,26 +89,26 @@ export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) =>
         <div className="max-w-2xl">
           <div className="flex items-center gap-3 text-blue-600 dark:text-blue-400 font-black mb-4 uppercase tracking-[0.3em] text-[10px]">
             <FolderOpen className="w-4 h-4" />
-            {commonDict.portfolioTitle || "Portfolio"}
+            {common.portfolioTitle}
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tighter leading-[0.95] mb-6">
-            {portfolioDict.title}
+            {portfolio.title}
           </h2>
           <p className="text-slate-600 dark:text-slate-400 font-medium text-lg md:text-xl leading-relaxed">
-            {portfolioDict.description}
+            {portfolio.description}
           </p>
         </div>
 
-        {/* NAVEGAÇÃO DE CATEGORIAS: Otimizada para Mobile Scroll */}
+        {/* NAVEGAÇÃO DE FILTROS: Otimizada para Mobile e Desktop */}
         <div className="w-full lg:max-w-md xl:max-w-xl">
           <div className="flex items-center gap-2 mb-4 text-slate-400 dark:text-slate-500 font-black text-[10px] uppercase tracking-[0.2em]">
             <Filter className="w-3 h-3" />
-            {portfolioDict.projectLabels?.technologies || "Tech Filter"}
+            {portfolio.projectLabels.technologies}
           </div>
           
           <div className="relative group">
             {/* Scroll Horizontal no Mobile, Wrap no Desktop */}
-            <div className="flex flex-nowrap lg:flex-wrap gap-2 overflow-x-auto pb-4 lg:pb-0 scrollbar-hide snap-x -mx-6 px-6 lg:mx-0 lg:px-0">
+            <div className="flex flex-nowrap lg:flex-wrap gap-2 overflow-x-auto pb-4 lg:pb-0 no-scrollbar snap-x -mx-6 px-6 lg:mx-0 lg:px-0">
               <button
                 onClick={() => setActiveCategory('all')}
                 className={`snap-start whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black transition-all duration-300 uppercase tracking-widest border-2 ${
@@ -98,7 +117,7 @@ export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) =>
                     : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800 hover:border-blue-500/40'
                 }`}
               >
-                {portfolioDict.all || "All"}
+                {portfolio.all}
               </button>
               
               {categories.map(cat => (
@@ -115,7 +134,7 @@ export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) =>
                 </button>
               ))}
             </div>
-            {/* Gradiente de continuidade para indicar scroll no mobile */}
+            {/* Gradiente de continuidade para Mobile */}
             <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-white dark:from-[#020617] pointer-events-none lg:hidden" />
           </div>
         </div>
@@ -124,8 +143,12 @@ export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) =>
       {/* GRID DE CARDS: Layout adaptativo (1, 2 ou 3 colunas) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 min-h-[400px]">
         {filteredProjects.length > 0 ? (
-          filteredProjects.map((project) => (
-            <div key={project.id} className="flex h-full">
+          filteredProjects.map((project, index) => (
+            <div 
+              key={project.id} 
+              className="flex h-full animate-in fade-in slide-in-from-bottom-5 duration-700"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
               <ProjectCard 
                 project={project} 
                 lang={lang}
@@ -134,13 +157,13 @@ export const ProjectSection = ({ projects, lang, dict }: ProjectSectionProps) =>
             </div>
           ))
         ) : (
-          /* ESTADO VAZIO: Feedback visual caso não encontre projetos na categoria */
+          /* ESTADO VAZIO: Feedback visual caso não encontre projetos */
           <div className="col-span-full py-24 text-center rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800/50 bg-slate-50/30 dark:bg-slate-900/10 transition-all">
              <div className="text-slate-300 dark:text-slate-700 mb-6 flex justify-center">
                 <SearchX className="w-16 h-16 animate-pulse" strokeWidth={1} />
              </div>
              <p className="text-slate-500 dark:text-slate-400 text-lg font-black uppercase tracking-widest px-6">
-                {portfolioDict.empty || "No projects found in this category"}
+                {portfolio.empty}
              </p>
           </div>
         )}
