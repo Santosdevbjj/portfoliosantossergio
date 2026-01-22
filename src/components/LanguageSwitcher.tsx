@@ -10,7 +10,7 @@ import { i18n } from '@/i18n-config'
 /**
  * COMPONENTE: LanguageSwitcher & ThemeToggle
  * Design: Floating Glassmorphism com animações suaves.
- * Gerencia a troca de idioma e o tema Dark/Light preservando rotas e parâmetros.
+ * Gerencia a troca de idioma (PT, EN, ES) e o tema Dark/Light.
  */
 const LanguageSwitcherContent = () => {
   const pathname = usePathname()
@@ -18,7 +18,7 @@ const LanguageSwitcherContent = () => {
   const { isDark, toggleTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   
-  // Hidratação segura: essencial para evitar conflitos entre Server e Client Side
+  // Hidratação segura para evitar conflitos de Client/Server Side Rendering
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -29,17 +29,17 @@ const LanguageSwitcherContent = () => {
     { code: 'es', label: 'ES', aria: 'Cambiar a Español' }
   ] as const;
 
-  // Identifica o idioma atual de forma segura
+  // Identifica o idioma atual via URL
   const currentLang = pathname?.split('/')[1] || i18n.defaultLocale
 
   /**
-   * RECONSTRUÇÃO DE ROTA: Troca o locale preservando o restante do caminho
+   * RECONSTRUÇÃO DE ROTA DINÂMICA
+   * Preserva sub-rotas e query strings (ex: ?project=data-science)
    */
   const getNewPath = (langCode: string) => {
     if (!pathname) return `/${langCode}`
     
     const segments = pathname.split('/')
-    // Verifica se o primeiro segmento é um locale válido
     const isLangSegment = i18n.locales.includes(segments[1] as any)
     
     const newSegments = [...segments]
@@ -49,27 +49,27 @@ const LanguageSwitcherContent = () => {
       newSegments.splice(1, 0, langCode)
     }
     
-    const newPathname = newSegments.join('/')
+    const newPathname = newSegments.join('/') || '/'
     const params = searchParams?.toString()
     return `${newPathname}${params ? `?${params}` : ''}`
   }
 
-  // Fallback de carregamento para evitar saltos visuais (CLS)
+  // Skeleton para evitar Layout Shift (CLS)
   if (!mounted) {
     return (
-      <div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-10 w-40 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-xl backdrop-blur-md" />
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-11 w-44 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl backdrop-blur-md z-[110]" />
     )
   }
 
   return (
     <nav 
       aria-label="Language and theme settings"
-      className="fixed top-4 right-4 sm:top-6 sm:right-8 z-[110] flex items-center gap-1 p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-2xl ring-1 ring-black/5 transition-all duration-300"
+      className="fixed top-4 right-4 sm:top-6 sm:right-8 z-[110] flex items-center gap-1 p-1 sm:p-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-2xl ring-1 ring-black/5 transition-all duration-500"
     >
-      {/* TOGGLE DE TEMA (DARK/LIGHT) */}
+      {/* TOGGLE DE TEMA */}
       <button
         onClick={toggleTheme}
-        className="p-2 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all active:scale-90 focus:outline-none"
+        className="p-2 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all active:scale-90 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
         aria-label={isDark ? "Ativar modo claro" : "Ativar modo escuro"}
       >
         <div className="relative w-5 h-5 flex items-center justify-center">
@@ -81,14 +81,14 @@ const LanguageSwitcherContent = () => {
         </div>
       </button>
 
-      {/* Divisor Visual */}
-      <div className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-1" aria-hidden="true" />
+      {/* Divisor */}
+      <div className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-0.5 sm:mx-1" aria-hidden="true" />
 
       {/* SELETOR DE IDIOMAS */}
       <div className="flex items-center">
-        {/* Ícone de Globo: Oculto em telas muito pequenas para economizar espaço */}
-        <div className="hidden sm:flex items-center px-1.5">
-          <Globe size={14} className="text-slate-400" />
+        {/* Ícone de Globo: Invisível em telas ultra-pequenas (< 360px) */}
+        <div className="hidden xs:flex items-center px-1">
+          <Globe size={13} className="text-slate-400 dark:text-slate-500" />
         </div>
         
         <div className="flex gap-0.5">
@@ -99,9 +99,10 @@ const LanguageSwitcherContent = () => {
                 key={lang.code}
                 href={getNewPath(lang.code)}
                 hreflang={lang.code}
-                scroll={false} // Evita pular para o topo ao trocar idioma
+                rel="alternate"
+                scroll={false}
                 className={`
-                  relative px-2.5 py-1.5 text-[10px] font-black rounded-lg transition-all duration-300 uppercase tracking-widest
+                  relative px-2.5 py-1.5 text-[10px] font-black rounded-lg transition-all duration-300 uppercase tracking-tighter sm:tracking-widest
                   ${isActive 
                     ? 'text-white' 
                     : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -128,7 +129,7 @@ const LanguageSwitcherContent = () => {
 
 /**
  * EXPORT COM SUSPENSE
- * Obrigatório no Next.js ao usar hooks como useSearchParams em Client Components.
+ * Essencial para Client Components que usam useSearchParams no Next.js App Router.
  */
 export const LanguageSwitcher = () => (
   <Suspense fallback={null}>
