@@ -7,15 +7,15 @@ import { usePathname } from 'next/navigation'
 
 /**
  * THEME TOGGLE (Acessibilidade Sênior)
- * Componente para alternância de tema com suporte multilingue para ARIA labels.
+ * Componente isolado para alternância de tema com suporte multilingue via roteamento.
  */
 export function ThemeToggle() {
-  // O hook useTheme agora centraliza a lógica de 'isDark' e 'mounted'
   const { isDark, toggleTheme, mounted } = useTheme()
   const pathname = usePathname()
 
-  // Extração segura do idioma da rota para acessibilidade internacional
-  const lang = (pathname?.split('/')[1] || 'pt') as 'pt' | 'en' | 'es'
+  // Extração robusta do idioma: procura o primeiro segmento após a barra
+  const langMatch = pathname?.match(/^\/([a-z]{2})/)
+  const lang = (langMatch ? langMatch[1] : 'pt') as 'pt' | 'en' | 'es'
 
   const labels = {
     pt: { dark: 'Ativar modo escuro', light: 'Ativar modo claro' },
@@ -23,14 +23,13 @@ export function ThemeToggle() {
     es: { dark: 'Activar modo oscuro', light: 'Activar modo claro' }
   }
 
-  // Fallback para português caso a rota não corresponda
   const t = labels[lang] || labels.pt
 
-  // Renderiza um placeholder invisível com o mesmo tamanho para evitar CLS
+  // Placeholder estável para evitar CLS (Cumulative Layout Shift)
   if (!mounted) {
     return (
       <div 
-        className="w-[42px] h-[42px] p-2.5 border border-transparent" 
+        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 animate-pulse" 
         aria-hidden="true" 
       />
     )
@@ -40,20 +39,20 @@ export function ThemeToggle() {
     <button
       onClick={toggleTheme}
       type="button"
-      className="p-2.5 sm:p-2 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-200/60 dark:border-slate-800/60 shadow-lg backdrop-blur-md text-slate-600 dark:text-blue-400 hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center group"
+      className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/50 dark:border-slate-800/50 shadow-xl backdrop-blur-md text-slate-600 dark:text-blue-400 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-500/30 transition-all duration-300 flex items-center justify-center group active:scale-90"
       aria-label={isDark ? t.light : t.dark}
       title={isDark ? t.light : t.dark}
     >
-      <div className="relative w-5 h-5 flex items-center justify-center overflow-hidden">
+      <div className="relative w-5 h-5 flex items-center justify-center">
         {isDark ? (
           <Sun 
             size={20} 
-            className="text-yellow-500 animate-in fade-in slide-in-from-bottom-2 duration-500" 
+            className="text-amber-500 transform transition-all duration-500 rotate-0 scale-100 group-hover:rotate-90 animate-in zoom-in-50" 
           />
         ) : (
           <Moon 
             size={20} 
-            className="text-blue-600 animate-in fade-in slide-in-from-top-2 -rotate-12 duration-500" 
+            className="text-blue-600 transform transition-all duration-500 -rotate-12 scale-100 group-hover:rotate-0 animate-in zoom-in-50" 
           />
         )}
       </div>
