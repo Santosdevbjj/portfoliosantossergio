@@ -1,10 +1,20 @@
-# --- DEPENDÊNCIAS (Node.js 24) ---
+# =====================================================
+# --- DEPENDÊNCIAS (Node.js 24 / NPM / Yarn / PNPM) ---
+# =====================================================
 node_modules/
 .pnp
 .pnp.js
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
-# --- BUILD E SAÍDA (NEXT.JS 15 + VERCEL) ---
+# =====================================================
+# --- BUILD E SAÍDA (NEXT.JS 15/16 + VERCEL) ---
+# =====================================================
 .next/
+.next/cache/
+.next/trace
+.next/types
 out/
 build/
 dist/
@@ -12,8 +22,10 @@ dist/
 *.tsbuildinfo
 next-env.d.ts
 
+# =====================================================
 # --- CONFIGURAÇÕES DE AMBIENTE (SEGURANÇA CRÍTICA) ---
-# Jamais versionar segredos. Proteção contra vazamento de chaves (Azure/GitHub).
+# =====================================================
+# Jamais versionar segredos
 .env
 .env.local
 .env.development.local
@@ -21,26 +33,37 @@ next-env.d.ts
 .env.production.local
 .env*.local
 
-# Permite versionar apenas o modelo de exemplo para documentação
+# Permite versionar apenas modelo de exemplo
 !.env.example
 
+# =====================================================
 # --- LOGS E PERFORMANCE ---
+# =====================================================
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 lerna-debug.log*
 *.log
-pnpm-lock.yaml
+.cache/
+coverage/
+.nyc_output/
+.eslintcache
+.stylelintcache
+.turbo/
 
+# =====================================================
 # --- SISTEMA OPERACIONAL ---
+# =====================================================
 .DS_Store
 .DS_Store?
 ._*
 Thumbs.db
 desktop.ini
 
-# --- IDE E FERRAMENTAS (VS Code / JetBrains) ---
+# =====================================================
+# --- IDE E FERRAMENTAS (VS Code / JetBrains / Sublime) ---
+# =====================================================
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
@@ -56,27 +79,18 @@ desktop.ini
 .settings/
 .swp
 
-# --- CACHE E TESTES ---
-.cache/
-/coverage
-.nyc_output
-.eslintcache
-.stylelintcache
-.turbo/
-
-# --- ESPECÍFICO NEXT.JS / TURBOPACK / TELEMETRY ---
-# Otimização para o novo motor de build do Next.js 15
-.next/cache/
-.next/trace
-.next/types
-
+# =====================================================
 # --- CI/CD E INFRAESTRUTURA ---
+# =====================================================
 .terraform/
 *.tfstate
 *.tfstate.backup
+*.log
 
+# =====================================================
 # --- CIÊNCIA DE DADOS E BACKEND ---
-# Evita o versionamento de datasets pesados e ambientes virtuais Python
+# =====================================================
+# Evita versionamento de datasets pesados e ambientes virtuais Python
 *.csv
 *.xlsx
 *.sqlite
@@ -89,6 +103,19 @@ ENV/
 __pycache__/
 .ipynb_checkpoints/
 
+# =====================================================
 # --- ARQUIVOS TEMPORÁRIOS ---
+# =====================================================
 *.tmp
 *.temp
+*.swp
+*.bak
+*.old
+
+# =====================================================
+# --- CACHE DE FERRAMENTAS MODERNAS ---
+# =====================================================
+# Tailwind / PostCSS / Turbopack / Build cache
+.cache/
+.next/cache/
+node_modules/.cache/
