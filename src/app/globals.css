@@ -18,23 +18,21 @@
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
-    /* Suporte a Safe Areas (Entalhes de dispositivos móveis) */
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     -webkit-overflow-scrolling: touch;
     @apply bg-slate-50 dark:bg-[#020617];
   }
 
   body {
-    /* Transição suave de cores (Ajustada para performance no Node 24) */
-    @apply bg-slate-50 text-slate-900 antialiased transition-colors duration-300;
-    @apply dark:bg-[#020617] dark:text-slate-100;
-    
-    /* RESILIÊNCIA TEXTUAL (Crucial para i18n em PT/ES) */
+    @apply antialiased transition-colors duration-300;
+    @apply bg-slate-50 text-slate-900 dark:bg-[#020617] dark:text-slate-100;
+
+    /* Quebra de palavras para i18n */
     overflow-wrap: break-word;
     word-wrap: break-word;
-    hyphens: auto; 
-    
-    /* Motor de renderização de fontes de 2026 */
+    hyphens: auto;
+
+    /* Renderização de fontes */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -47,12 +45,12 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 w-full;
   }
 
-  /* Glassmorphism de Alta Fidelidade (Blur de 2026) */
+  /* Glassmorphism de Alta Fidelidade */
   .glass-effect {
     @apply bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl border border-white/20 dark:border-slate-800/40 shadow-2xl;
   }
 
-  /* Card de Projeto Estilo Sênior (UX Dinâmica) */
+  /* Card de Projeto Estilo Sênior */
   .project-card-gradient {
     @apply relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/50 transition-all duration-500;
     @apply hover:shadow-[0_20px_50px_-12px_rgba(14,140,233,0.15)] hover:border-blue-500/40;
@@ -70,7 +68,7 @@
 
 /* --- INTERFACE E ACESSIBILIDADE --- */
 
-/* Scrollbar Tech (Invisível no fundo, visível no thumb) */
+/* Scrollbar Tech */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -86,7 +84,7 @@
   @apply bg-blue-600/30 text-blue-900 dark:text-blue-100;
 }
 
-/* Foco de Acessibilidade (Ajustado para o Tema Escuro OLED) */
+/* Foco de Acessibilidade */
 :focus-visible {
   @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-[#020617];
 }
@@ -109,7 +107,11 @@
   animation: scanLine 3s linear infinite;
 }
 
-/* Animação suave para o Cookie Banner e Toasts */
+/* Animação suave para Cookie Banner e Toasts */
+@keyframes slideUp {
+  from { transform: translateY(1rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
 .animate-slide-up {
   animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
