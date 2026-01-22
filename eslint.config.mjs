@@ -1,17 +1,17 @@
 // eslint.config.mjs
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
-import prettier from "eslint-config-prettier/flat";
+import prettier from "eslint-config-prettier";
 import globals from "globals";
 
 export default [
   /**
    * 1. Ambiente global
-   * Define explicitamente browser + Node.js
-   * (Flat Config NÃO assume isso automaticamente)
+   * Flat Config NÃO assume browser/node automaticamente
    */
   {
     languageOptions: {
+      ecmaVersion: "latest",
       globals: {
         ...globals.browser,
         ...globals.node
@@ -30,14 +30,12 @@ export default [
   ...nextVitals,
 
   /**
-   * 3. Next.js + TypeScript
-   * Integra @typescript-eslint com App Router
+   * 3. Next.js + TypeScript (App Router ready)
    */
   ...nextTs,
 
   /**
    * 4. Overrides específicos do projeto
-   * Aplicados somente a arquivos TS/TSX
    */
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -48,7 +46,7 @@ export default [
       // React
       "react/no-unescaped-entities": "off",
 
-      // TypeScript — relaxamentos conscientes (APIs, MDX, dados dinâmicos)
+      // TypeScript — relaxamentos conscientes
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
@@ -57,14 +55,14 @@ export default [
       "@typescript-eslint/no-unnecessary-condition": "off",
       "@typescript-eslint/restrict-template-expressions": "off",
 
-      // Bibliotecas modernas (lucide-react, etc.)
+      // Bibliotecas modernas (lucide-react, framer-motion, etc.)
       "@typescript-eslint/no-deprecated": "off"
     }
   },
 
   /**
-   * 5. Prettier (SEMPRE POR ÚLTIMO entre regras)
-   * Desativa conflitos de formatação
+   * 5. Prettier
+   * SEMPRE por último — desativa regras de formatação conflitantes
    */
   prettier,
 
@@ -78,7 +76,7 @@ export default [
       "out/**",
       "build/**",
       "next-env.d.ts",
-      "public/**"
+      "public/**" // assets estáticos, decisão consciente
     ]
   }
 ];
