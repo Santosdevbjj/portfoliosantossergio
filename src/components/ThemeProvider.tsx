@@ -1,42 +1,74 @@
 'use client';
 
 import * as React from 'react';
-import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from 'next-themes';
 
 /**
- * THEME PROVIDER - ARQUITETURA NEXT.JS 15.5.9 & REACT 19
- * * Responsividade: Sincronia total com 'System Preference' (Media Queries de SO).
- * Multilingue: Infraestrutura agnóstica de idioma, preparada para suporte LTR/RTL.
- * Rigor Técnico: Resolvido erro de 'no-duplicate-imports' identificado no build da Vercel.
+ * THEME PROVIDER AVANÇADO
+ * Sincroniza tema global via CSS variable `--theme` no :root
+ * Compatível Next 16 + Node 24 + Tailwind 16
  */
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false);
+  const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
 
-  // O useEffect é crucial para evitar erros de hidratação (Hydration Mismatch)
-  // comuns no Next.js quando o tema do servidor difere do tema do cliente.
+  // Detecta preferências do sistema na primeira renderização
   React.useEffect(() => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const initialTheme = stored ?? (prefersDark ? 'dark' : 'light');
+
+    setTheme(initialTheme);
+    document.documentElement.setAttribute('data-theme', initialTheme);
+    document.documentElement.style.setProperty('--theme', initialTheme);
+
     setMounted(true);
   }, []);
 
+  // Função para alternar tema global
+  const toggleTheme = React.useCallback(() => {
+    setTheme(prev => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      document.documentElement.style.setProperty('--theme', next);
+      localStorage.setItem('theme', next);
+      return next;
+    });
+  }, []);
+
+  // Expor toggleTheme via contexto React se desejar
+  const contextValue = React.useMemo(() => ({ theme, toggleTheme, mounted }), [theme, toggleTheme, mounted]);
+
   return (
-    <NextThemesProvider 
-      attribute="class" 
-      defaultTheme="system" 
-      enableSystem
-      disableTransitionOnChange 
-      {...props}
-    >
-      {/* Estratégia de Exibição Segura:
-          Mantemos o conteúdo acessível para SEO, mas aplicamos uma transição suave
-          apenas após a montagem para garantir que o tema correto seja aplicado 
-          sem "piscar" a tela em branco ou preta.
-      */}
-      <div 
+    <ThemeContext.Provider value={contextValue}>
+      <div
         className={mounted ? "opacity-100 transition-opacity duration-300" : "opacity-0"}
         aria-hidden={!mounted}
       >
         {children}
       </div>
-    </NextThemesProvider>
+    </ThemeContext.Provider>
   );
+}
+
+/**
+ * CONTEXTO PARA ACESSO GLOBAL DO TEMA
+ * Permite que o ThemeToggle ou qualquer componente acesse theme/toggleTheme
+ */
+export const ThemeContext = React.createContext<{
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+  mounted: boolean;
+}>({
+  theme: 'light',
+  toggleTheme: () => {},
+  mounted: false,
+});
+
+/**
+ * HOOK PERSONALIZADO
+ * Para consumir facilmente em qualquer componente:
+ * const { theme, toggleTheme } = useTheme();
+ */
+export function useTheme() {
+  return React.useContext(ThemeContext);
 }
