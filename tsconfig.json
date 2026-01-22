@@ -2,48 +2,37 @@
   "compilerOptions": {
     /* Base moderna (Node.js 24 + Next.js 16) */
     "target": "ESNext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "preserve",
 
-    /* Projeto TypeScript estrito e previsível */
+    /* Tipagem estrita e confiável */
     "strict": true,
-    "noEmit": true,
     "isolatedModules": true,
+    "noEmit": true,
 
-    /* Interoperabilidade ESM */
+    /* Interoperabilidade ESM e JSON */
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
 
-    /* Qualidade e governança */
+    /* Segurança adicional */
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-
-    /* Evita bugs silenciosos (segurança real) */
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    "noPropertyAccessFromIndexSignature": true,
 
-    /* Evita ruído excessivo em libs externas */
+    /* Evita ruído de libs externas */
     "skipLibCheck": true,
 
-    /* Organização do projeto */
+    /* Organização de paths */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
 
-    /* Plugin oficial do Next.js */
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    /* Plugin oficial Next.js */
+    "plugins": [{ "name": "next" }]
   },
 
   "include": [
@@ -51,8 +40,7 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     ".next/types/**/*.ts",
-    "middleware.ts",
-    "proxy.ts",
+    "src/proxy.ts",
     "eslint.config.mjs",
     "next.config.mjs"
   ],
