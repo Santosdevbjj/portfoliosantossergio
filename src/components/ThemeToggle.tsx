@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 /**
  * THEME TOGGLE AVANÇADO
  * Sincroniza com variável CSS `--theme` no :root, sem depender de classes dark.
- * Permite controle dinâmico e animações suaves.
+ * Permite controle dinâmico, animações suaves e persistência em localStorage.
  */
 export function ThemeToggle() {
   const pathname = usePathname()
@@ -23,25 +23,40 @@ export function ThemeToggle() {
   }
   const t = labels[lang] || labels.pt
 
-  const [theme, setTheme] = React.useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      // Detecta tema salvo no localStorage ou preferências do sistema
-      const stored = localStorage.getItem('theme') as 'light' | 'dark' | null
-      if (stored) return stored
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    }
-    return 'light'
-  })
+  // Estado do tema
+  const [theme, setTheme] = React.useState<'light' | 'dark' | null>(null)
 
-  // Sincroniza variável CSS --theme no :root
+  // Montagem: define tema inicial sem causar CLS
   React.useEffect(() => {
-    const root = document.documentElement
-    root.style.setProperty('--theme', theme)
+    if (typeof window === 'undefined') return
+    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null
+    const systemPref = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    const initialTheme = stored || systemPref
+    setTheme(initialTheme)
+    document.documentElement.setAttribute('data-theme', initialTheme)
+    document.documentElement.style.setProperty('--theme', initialTheme)
+  }, [])
+
+  // Sincroniza variável CSS e localStorage ao mudar tema
+  React.useEffect(() => {
+    if (!theme) return
+    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.style.setProperty('--theme', theme)
     localStorage.setItem('theme', theme)
   }, [theme])
 
   // Alterna tema
   const toggleTheme = () => setTheme(prev => (prev === 'light' ? 'dark' : 'light'))
+
+  // Placeholder estável enquanto monta
+  if (!theme) {
+    return (
+      <div
+        className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-100/50 animate-pulse dark:bg-slate-800/50"
+        aria-hidden="true"
+      />
+    )
+  }
 
   return (
     <button
