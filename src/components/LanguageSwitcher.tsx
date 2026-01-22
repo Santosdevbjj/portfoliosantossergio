@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Moon, Sun, Globe } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
-import { i18n } from '@/i18n-config'
+import { i18n, type Locale } from '@/i18n-config'
 
 /**
  * COMPONENTE: LanguageSwitcher & ThemeToggle
@@ -16,6 +16,8 @@ const LanguageSwitcherContent = () => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { isDark, toggleTheme } = useTheme()
+  
+  // Controle de hidratação para evitar erro de inconsistência entre Server e Client
   const [mounted, setMounted] = useState(false)
   
   useEffect(() => {
@@ -28,17 +30,19 @@ const LanguageSwitcherContent = () => {
     { code: 'es', label: 'ES', aria: 'Cambiar a Español' }
   ] as const;
 
-  const currentLang = pathname?.split('/')[1] || i18n.defaultLocale
+  // Extração segura do idioma atual da URL
+  const currentLang = (pathname?.split('/')[1] ?? i18n.defaultLocale) as Locale
 
   /**
    * RECONSTRUÇÃO DE ROTA DINÂMICA
-   * Corrigido para garantir tipagem compatível com Next.js 15 Link
+   * Mantém parâmetros de busca (query strings) ao trocar de idioma.
    */
   const getNewPath = (langCode: string): string => {
     if (!pathname) return `/${langCode}`
     
     const segments = pathname.split('/')
-    const isLangSegment = i18n.locales.includes(segments[1] as any)
+    // Verifica se o primeiro segmento é um idioma válido
+    const isLangSegment = i18n.locales.includes(segments[1] as Locale)
     
     const newSegments = [...segments]
     if (isLangSegment) {
@@ -52,9 +56,10 @@ const LanguageSwitcherContent = () => {
     return `${newPathname}${params ? `?${params}` : ''}`
   }
 
+  // Placeholder durante a hidratação para evitar Layout Shift
   if (!mounted) {
     return (
-      <div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-11 w-44 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl backdrop-blur-md z-[110]" />
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-11 w-32 sm:w-44 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl backdrop-blur-md z-[110]" />
     )
   }
 
@@ -65,8 +70,8 @@ const LanguageSwitcherContent = () => {
     >
       {/* TOGGLE DE TEMA */}
       <button
-        onClick={toggleTheme}
-        className="p-2 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all active:scale-90 focus:outline-none"
+        onClick={() => toggleTheme()}
+        className="p-2 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all active:scale-90 focus:outline-none focus:ring-2 focus:ring-blue-500"
         aria-label={isDark ? "Ativar modo claro" : "Ativar modo escuro"}
       >
         <div className="relative w-5 h-5 flex items-center justify-center">
@@ -78,12 +83,13 @@ const LanguageSwitcherContent = () => {
         </div>
       </button>
 
-      {/* Divisor */}
+      {/* Divisor Visual */}
       <div className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-0.5 sm:mx-1" aria-hidden="true" />
 
       {/* SELETOR DE IDIOMAS */}
       <div className="flex items-center">
-        <div className="hidden xs:flex items-center px-1">
+        {/* Ícone Globe escondido em telas muito pequenas (mobile extra-small) */}
+        <div className="hidden sm:flex items-center px-1">
           <Globe size={13} className="text-slate-400 dark:text-slate-500" />
         </div>
         
@@ -93,13 +99,12 @@ const LanguageSwitcherContent = () => {
             return (
               <Link
                 key={lang.code}
-                // CORREÇÃO DE BUILD: 'as any' silencia o erro de rota dinâmica no Next.js 15
-                href={getNewPath(lang.code) as any}
+                href={getNewPath(lang.code)}
                 hrefLang={lang.code}
                 rel="alternate"
                 scroll={false}
                 className={`
-                  relative px-2.5 py-1.5 text-[10px] font-black rounded-lg transition-all duration-300 uppercase tracking-tighter sm:tracking-widest
+                  relative px-2 sm:px-2.5 py-1.5 text-[10px] font-black rounded-lg transition-all duration-300 uppercase tracking-tighter
                   ${isActive 
                     ? 'text-white' 
                     : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -126,10 +131,10 @@ const LanguageSwitcherContent = () => {
 
 /**
  * EXPORT COM SUSPENSE
- * Obrigatório no App Router para componentes que usam hooks de busca.
+ * Essencial no Next.js 15: useSearchParams() exige um Suspense Boundary.
  */
 export const LanguageSwitcher = () => (
-  <Suspense fallback={null}>
+  <Suspense fallback={<div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-11 w-32 rounded-2xl bg-slate-200/10" />}>
     <LanguageSwitcherContent />
   </Suspense>
 )
