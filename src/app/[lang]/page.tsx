@@ -11,7 +11,7 @@ import { Navbar } from '@/components/Navbar';
 import { PageWrapper } from '@/components/PageWrapper';
 import { ProjectSection } from '@/components/ProjectSection';
 import { getDictionary, isValidLocale, type Locale } from '@/i18n-config';
-import { getGitHubProjects, type GitHubRepo } from '@/lib/github';
+import { getGitHubProjects } from '@/lib/github';
 
 /**
  * ISR (Incremental Static Regeneration)
@@ -34,7 +34,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const currentLang = lang as Locale;
   const dict = await getDictionary(currentLang);
   
-  // CORREÇÃO CRÍTICA: Acesso via index signature e fallback robusto com ??
   const baseUrl = (process.env['NEXT_PUBLIC_SITE_URL'] ?? 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
   
   const pageTitle = dict.about?.headline ?? 'Data & Critical Systems Specialist';
@@ -73,7 +72,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 /**
  * PÁGINA PRINCIPAL - NEXT.JS 15 SERVER COMPONENT
- * Orquestra a composição da SPA com injeção de i18n e dados do GitHub de forma assíncrona.
+ * Orquestra a composição da SPA com injeção de i18n e dados do GitHub.
  */
 export default async function Page({ params }: PageProps) {
   const { lang } = await params;
@@ -86,7 +85,7 @@ export default async function Page({ params }: PageProps) {
 
   /**
    * FETCH PARALELO: Otimiza o tempo de resposta do servidor (TTFB)
-   * CORREÇÃO: Passando 'currentLang' para getGitHubProjects para ativar o multilingue nos repositórios.
+   * CORREÇÃO: Removido o import não utilizado de GitHubRepo para satisfazer o Linter.
    */
   const [dict, allProjects] = await Promise.all([
     getDictionary(currentLang),
@@ -98,39 +97,39 @@ export default async function Page({ params }: PageProps) {
       <Navbar dict={dict} lang={currentLang} />
 
       {/* CONTAINER RESPONSIVO: 
-          - overflow-x-hidden evita quebras de layout em celulares.
-          - antialiased melhora a renderização de fontes.
+          - overflow-x-hidden evita scroll lateral indesejado em dispositivos móveis.
+          - mx-auto e max-w-7xl garantem centralização em telas ultra-wide.
       */}
       <main className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white antialiased transition-colors duration-500 dark:bg-[#020617]">
         
-        {/* HERO SECTION - Landing principal */}
+        {/* HERO SECTION */}
         <HeroSection lang={currentLang} dict={dict} />
 
-        {/* ABOUT SECTION - Responsividade garantida pelo mx-auto e px-4/6/8 */}
+        {/* ABOUT SECTION */}
         <section id="about" className="mx-auto w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:px-8 lg:scroll-mt-32">
           <AboutSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* EXPERIENCE SECTION - Fundo sutil para separação visual */}
+        {/* EXPERIENCE SECTION */}
         <section id="experience" className="scroll-mt-20 bg-slate-50/50 py-12 dark:bg-slate-900/10 lg:py-24 lg:scroll-mt-32">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
             <ExperienceSection lang={currentLang} dict={dict} />
           </div>
         </section>
 
-        {/* FEATURED ARTICLES - Seção de publicações técnicas */}
+        {/* FEATURED ARTICLES */}
         <section id="featured" className="mx-auto w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:px-8 lg:scroll-mt-32">
           <FeaturedArticleSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* PROJECTS SECTION - Aqui entram os dados processados do GitHub */}
+        {/* PROJECTS SECTION */}
         <section id="projects" className="py-12 scroll-mt-20 lg:py-24 lg:scroll-mt-32">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
             <ProjectSection projects={allProjects} lang={currentLang} dict={dict} />
           </div>
         </section>
 
-        {/* CONTACT SECTION - Final da jornada do usuário */}
+        {/* CONTACT SECTION */}
         <section id="contact" className="mx-auto mb-12 w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:mb-24 lg:px-8 lg:scroll-mt-32">
           <ContactSection lang={currentLang} dict={dict} />
         </section>
