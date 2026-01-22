@@ -1,51 +1,60 @@
 {
   "compilerOptions": {
+    /* Base moderna (Node.js 24 + Next.js 15) */
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+
+    /* Projeto TypeScript estrito e previsível */
     "strict": true,
     "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
     "incremental": true,
+
+    /* Interoperabilidade ESM */
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "auto",
+
+    /* Qualidade e governança */
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* Evita bugs silenciosos (segurança real) */
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    /* Evita ruído excessivo em libs externas */
+    "skipLibCheck": true,
+
+    /* Organização do projeto */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
+
+    /* Plugin oficial do Next.js */
     "plugins": [
       {
         "name": "next"
       }
-    ],
-    /* Rigor Técnico e Governança de Código (Configuração 2026) */
-    "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "checkJs": false,
-    "verbatimModuleSyntax": true,
-    
-    /* Otimizações para Node.js 24 e Typed Linting */
-    "moduleDetection": "force",
-    "noPropertyAccessFromIndexSignature": true,
-    "skipDefaultLibCheck": true
+    ]
   },
+
   "include": [
-    "next-env.d.ts", 
-    "**/*.ts", 
-    "**/*.tsx", 
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts",
     "eslint.config.mjs",
     "next.config.mjs"
   ],
+
   "exclude": ["node_modules"]
 }
