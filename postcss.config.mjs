@@ -2,11 +2,10 @@
 const config = {
   plugins: {
     /**
-     * 1. Nesting CSS oficial do PostCSS
-     * Permite aninhamento de seletores sem depender de preprocessadores externos
-     * Totalmente compatível com Next.js 16 + Tailwind 16 + Turbopack
+     * 1. Nesting CSS oficial compatível com Tailwind
+     * Permite aninhamento de seletores sem preprocessadores externos
      */
-    "postcss-nesting": {},
+    "tailwindcss/nesting": {},
 
     /**
      * 2. Tailwind CSS JIT
@@ -34,6 +33,7 @@ const config = {
               "default",
               {
                 discardComments: { removeAll: true },
+                normalizeWhitespace: false, // evita quebrar Tailwind
               },
             ],
           },
