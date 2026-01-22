@@ -6,9 +6,9 @@
     "node": "24.x"
   },
   "scripts": {
-    "dev": "next dev --no-turbo",          
-    "build": "next build",                 
-    "build:local": "next build --no-turbo", 
+    "dev": "next dev --no-turbo",
+    "build": "next build",
+    "build:local": "next build --no-turbo",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
