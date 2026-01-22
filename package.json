@@ -7,10 +7,18 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build --no-turbo",
+    
+    // Força usar Webpack no build (compatível Termux / WASM bindings)
+    "build": "NEXT_EXPERIMENTAL_TURBOPACK=0 next build",
+    
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    
+    // ESLint com Flat Config
+    "lint": "eslint . --ext .ts,.tsx",
+    
+    // Lint fix automático
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
