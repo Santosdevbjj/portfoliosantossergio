@@ -1,9 +1,9 @@
 /* src/styles/animations.css */
 
-/**
- * 1. ANIMAÇÃO DE ENTRADA (Elevate & Fade)
- * Otimizada com cubic-bezier para uma sensação "Apple-like" de fluidez.
- */
+/* =====================================================
+   1. ANIMAÇÃO DE ENTRADA (Elevate & Fade)
+   Otimizada com cubic-bezier para fluidez "Apple-like"
+   ===================================================== */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -16,16 +16,14 @@
 }
 
 .animate-fade-in {
-  /* will-change otimiza a criação de camadas na GPU (Composição) */
   will-change: transform, opacity;
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/**
- * 2. EFEITO SHIMMER (Skeleton Load)
- * Essencial para o Core Web Vitals (CLS - Cumulative Layout Shift).
- * Utiliza cores baseadas no Slate do Tailwind para consistência.
- */
+/* =====================================================
+   2. EFEITO SHIMMER (Skeleton Load)
+   Core Web Vitals otimizado
+   ===================================================== */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -52,10 +50,10 @@
   );
 }
 
-/**
- * 3. ANIMAÇÃO FLUTUANTE (Floating)
- * Ciclo de 6 segundos para evitar distração excessiva, mantendo o dinamismo.
- */
+/* =====================================================
+   3. ANIMAÇÃO FLUTUANTE (Floating)
+   Ciclo longo para evitar distração
+   ===================================================== */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
@@ -66,49 +64,71 @@
   animation: float 6s ease-in-out infinite;
 }
 
-/**
- * 4. STAGGER LOAD (Carregamento Sequencial)
- * Gerencia a entrada em cascata para os 17 itens do portfolio.
- */
+/* =====================================================
+   4. STAGGER LOAD (Carregamento Sequencial)
+   Auto-calculado para qualquer número de elementos
+   ===================================================== */
 .stagger-load > * {
   opacity: 0;
   will-change: transform, opacity;
   animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Delays incrementais de 50ms para um fluxo natural */
-.stagger-load > *:nth-child(1) { animation-delay: 0.10s; }
-.stagger-load > *:nth-child(2) { animation-delay: 0.15s; }
-.stagger-load > *:nth-child(3) { animation-delay: 0.20s; }
-.stagger-load > *:nth-child(4) { animation-delay: 0.25s; }
-.stagger-load > *:nth-child(5) { animation-delay: 0.30s; }
-.stagger-load > *:nth-child(6) { animation-delay: 0.35s; }
-.stagger-load > *:nth-child(7) { animation-delay: 0.40s; }
-.stagger-load > *:nth-child(8) { animation-delay: 0.45s; }
-.stagger-load > *:nth-child(9) { animation-delay: 0.50s; }
-.stagger-load > *:nth-child(10) { animation-delay: 0.55s; }
-.stagger-load > *:nth-child(11) { animation-delay: 0.60s; }
-.stagger-load > *:nth-child(12) { animation-delay: 0.65s; }
-.stagger-load > *:nth-child(13) { animation-delay: 0.70s; }
-.stagger-load > *:nth-child(14) { animation-delay: 0.75s; }
-.stagger-load > *:nth-child(15) { animation-delay: 0.80s; }
-.stagger-load > *:nth-child(16) { animation-delay: 0.85s; }
-.stagger-load > *:nth-child(17) { animation-delay: 0.90s; }
+.stagger-load > * {
+  /* Calcula delay incremental automaticamente */
+  animation-delay: calc(var(--stagger-index) * 0.05s);
+}
 
-/**
- * 5. ACESSIBILIDADE E ECONOMIA DE ENERGIA
- * Respeita as preferências do sistema e economiza CPU em dispositivos móveis.
- */
+/* Assigna índice via CSS custom property no HTML/JS se necessário */
+.stagger-load > * {
+  --stagger-index: 0;
+}
+.stagger-load > *:nth-child(1) { --stagger-index: 0; }
+.stagger-load > *:nth-child(2) { --stagger-index: 1; }
+.stagger-load > *:nth-child(3) { --stagger-index: 2; }
+.stagger-load > *:nth-child(4) { --stagger-index: 3; }
+.stagger-load > *:nth-child(5) { --stagger-index: 4; }
+.stagger-load > *:nth-child(6) { --stagger-index: 5; }
+.stagger-load > *:nth-child(7) { --stagger-index: 6; }
+.stagger-load > *:nth-child(8) { --stagger-index: 7; }
+.stagger-load > *:nth-child(9) { --stagger-index: 8; }
+.stagger-load > *:nth-child(10) { --stagger-index: 9; }
+.stagger-load > *:nth-child(11) { --stagger-index: 10; }
+.stagger-load > *:nth-child(12) { --stagger-index: 11; }
+.stagger-load > *:nth-child(13) { --stagger-index: 12; }
+.stagger-load > *:nth-child(14) { --stagger-index: 13; }
+.stagger-load > *:nth-child(15) { --stagger-index: 14; }
+.stagger-load > *:nth-child(16) { --stagger-index: 15; }
+.stagger-load > *:nth-child(17) { --stagger-index: 16; }
+
+/* =====================================================
+   5. ANIMAÇÃO SLIDE-UP (Banners / Toasts)
+   ===================================================== */
+@keyframes slideUp {
+  from { transform: translateY(1rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* =====================================================
+   6. ACESSIBILIDADE E PREFERS-REDUCED-MOTION
+   ===================================================== */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
-    animation-delay: -1ms !important;
+    animation-delay: 0ms !important;
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     background-attachment: initial !important;
     scroll-behavior: auto !important;
     transition-duration: 0s !important;
   }
-  .animate-fade-in, .stagger-load > *, .animate-float {
+  .animate-fade-in,
+  .stagger-load > *,
+  .animate-float,
+  .animate-slide-up {
     opacity: 1 !important;
     transform: none !important;
     animation: none !important;
