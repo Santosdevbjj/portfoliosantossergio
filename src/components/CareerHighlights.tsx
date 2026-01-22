@@ -10,7 +10,7 @@ import {
   Trophy
 } from 'lucide-react';
 
-// Interface flexível para evitar erros de 'exactOptionalPropertyTypes'
+// Tipagem rigorosa para 2026: evita erros de propriedade opcional no build
 interface HighlightItem {
   label: string;
   description: string;
@@ -18,19 +18,19 @@ interface HighlightItem {
 
 interface CareerHighlightsProps {
   dict: {
-    about?: {
-      sections?: {
-        highlights?: {
-          title?: string;
-          items?: HighlightItem[];
+    about: {
+      sections: {
+        highlights: {
+          title: string;
+          items: HighlightItem[];
         };
-        metrics?: {
-          title?: string;
-          subtitle?: string;
-          availabilityValue?: string;
-          availabilityLabel?: string;
-          automationValue?: string;
-          automationLabel?: string;
+        metrics: {
+          title: string;
+          subtitle: string;
+          availabilityValue: string;
+          availabilityLabel: string;
+          automationValue: string;
+          automationLabel: string;
         };
       };
     };
@@ -39,17 +39,15 @@ interface CareerHighlightsProps {
 
 /**
  * CAREER HIGHLIGHTS - MÉTRICAS DE IMPACTO E GOVERNANÇA
- * Exibe KPIs técnicos com foco em Data-Driven Design.
+ * Sincronizado com ESLint Flat Config 2026.
  */
 export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
-  const highlights = dict?.about?.sections?.highlights;
-  const metrics = dict?.about?.sections?.metrics; 
+  // Desestruturação segura baseada na estrutura dos seus JSONs
+  const { highlights, metrics } = dict.about.sections;
   
-  if (!highlights) return null;
-
   const items = highlights.items || [];
 
-  // Mapeamento de ícones para o Reconciliation do React
+  // Mapeamento fixo de ícones para manter a integridade visual
   const icons = [
     <Clock key="icon-clock" className="w-6 h-6" />,
     <Server key="icon-server" className="w-6 h-6" />,
@@ -62,17 +60,18 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
       <div className="flex items-center gap-4 mb-10">
         <div className="h-8 w-2 bg-blue-600 rounded-full" />
         <h4 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
-          {highlights.title || 'Highlights'}
+          {highlights.title}
         </h4>
       </div>
 
-      {/* GRID DE DESTAQUES - Responsivo: 1 col mobile, 3 col desktop */}
+      {/* GRID DE DESTAQUES - Responsividade: 1 col (mobile) -> 3 col (md+) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {items.map((item, i) => (
           <div 
             key={`highlight-item-${i}`}
             className="group relative p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800 hover:border-blue-500/50 transition-all duration-500 shadow-sm hover:shadow-xl"
           >
+            {/* Efeito de Glow no Hover */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem]" />
 
             <div className="relative z-10">
@@ -82,7 +81,7 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
 
               <h5 className="text-xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
                 {item.label}
-              </h5>
+              </h3>
 
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm font-medium">
                 {item.description}
@@ -92,8 +91,9 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
         ))}
       </div>
 
-      {/* BANNER DE IMPACTO (KPIs de Eficiência) */}
+      {/* BANNER DE IMPACTO (KPIs de Eficiência Bancária) */}
       <div className="relative overflow-hidden p-8 md:p-12 rounded-[3rem] bg-blue-600 text-white shadow-2xl shadow-blue-600/40 transition-transform duration-500 hover:scale-[1.01]">
+        {/* Background Icon Decorativo */}
         <Activity className="absolute -right-12 -top-12 text-white/5 w-64 h-64 rotate-12 pointer-events-none" />
         
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
@@ -104,32 +104,33 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
             </div>
             <div>
               <p className="text-blue-100 text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-80">
-                {metrics?.subtitle || 'Metrics'}
+                {metrics.subtitle}
               </p>
               <h4 className="text-2xl md:text-3xl font-black tracking-tighter leading-tight">
-                {metrics?.title}
+                {metrics.title}
               </h4>
             </div>
           </div>
           
           <div className="hidden lg:block h-16 w-px bg-white/20" />
           
+          {/* Métricas de Performance vindas do JSON */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-16 w-full lg:w-auto">
             <div className="text-center">
               <span className="block text-4xl md:text-6xl font-black mb-1 tracking-tighter">
-                {metrics?.availabilityValue || '100%'}
+                {metrics.availabilityValue}
               </span>
               <span className="text-blue-100 text-[10px] font-black uppercase tracking-widest opacity-80 block">
-                {metrics?.availabilityLabel}
+                {metrics.availabilityLabel}
               </span>
             </div>
             
             <div className="text-center sm:border-l border-white/10 sm:pl-8 md:pl-16">
               <span className="block text-4xl md:text-6xl font-black mb-1 tracking-tighter">
-                {metrics?.automationValue || '0%'}
+                {metrics.automationValue}
               </span>
               <span className="text-blue-100 text-[10px] font-black uppercase tracking-widest opacity-80 block">
-                {metrics?.automationLabel}
+                {metrics.automationLabel}
               </span>
             </div>
           </div>
