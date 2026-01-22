@@ -6,9 +6,9 @@
     "node": "24.x"
   },
   "scripts": {
-    "dev": "next dev --no-turbo",          // local: evita Turbopack no Termux
-    "build": "next build",                 // Vercel: build normal (Turbopack OK)
-    "build:local": "next build --no-turbo", // opção extra para build local
+    "dev": "next dev --no-turbo",          
+    "build": "next build",                 
+    "build:local": "next build --no-turbo", 
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
