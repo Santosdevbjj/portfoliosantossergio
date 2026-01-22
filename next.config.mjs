@@ -23,14 +23,10 @@ const nextConfig = {
     minimumCacheTTL: 3600 // 1 hora
   },
   experimental: {
-    optimizePackageImports: ["lucide-react", "clsx", "tailwind-merge"], // Otimiza bundles
-    serverSourceMaps: false // Reduz tamanho do build
+    optimizePackageImports: ["lucide-react", "clsx", "tailwind-merge"] // Otimiza bundles
+    // serverSourceMaps removido
   },
-  i18n: {
-    locales: ["pt", "en", "es"],
-    defaultLocale: "pt",
-    localeDetection: true // Detecta automaticamente idioma do navegador
-  },
+  // i18n removido do App Router; se precisar, use roteamento manual via layouts ou middleware
   async headers() {
     return [
       {
@@ -42,14 +38,12 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-          // Cabeçalhos opcionais para CSP mínimo (melhora segurança)
           { key: "Content-Security-Policy", value: "default-src 'self'; img-src 'self' data: https:; script-src 'self'; style-src 'self' 'unsafe-inline'" }
         ]
       }
     ];
-  },
-  // Configuração opcional de SWC minify para builds ainda mais rápidos
-  swcMinify: true,
+  }
+  // swcMinify removido; Turbopack já minifica automaticamente
 };
 
 export default nextConfig;
