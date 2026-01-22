@@ -11,7 +11,7 @@ import { Navbar } from '@/components/Navbar';
 import { PageWrapper } from '@/components/PageWrapper';
 import { ProjectSection } from '@/components/ProjectSection';
 import { getDictionary, isValidLocale, type Locale } from '@/i18n-config';
-import { getGitHubProjects } from '@/lib/github';
+import { getGitHubProjects, type GitHubRepo } from '@/lib/github';
 
 /**
  * ISR (Incremental Static Regeneration)
@@ -34,11 +34,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const currentLang = lang as Locale;
   const dict = await getDictionary(currentLang);
   
-  // CORREÇÃO CRÍTICA: Acesso via index signature para evitar erro no build da Vercel
-  const baseUrl = (process.env['NEXT_PUBLIC_SITE_URL'] || 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
+  // CORREÇÃO CRÍTICA: Acesso via index signature e fallback robusto com ??
+  const baseUrl = (process.env['NEXT_PUBLIC_SITE_URL'] ?? 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
   
-  const pageTitle = dict.about?.headline || 'Data & Critical Systems Specialist';
-  const pageDesc = dict.about?.bio?.substring(0, 160) || 'Portfólio Profissional de Sérgio Santos';
+  const pageTitle = dict.about?.headline ?? 'Data & Critical Systems Specialist';
+  const pageDesc = dict.about?.bio?.substring(0, 160) ?? 'Portfólio Profissional de Sérgio Santos';
   
   return {
     title: `Sérgio Santos | ${pageTitle}`,
@@ -84,46 +84,53 @@ export default async function Page({ params }: PageProps) {
 
   const currentLang = lang as Locale;
 
-  // FETCH PARALELO: Otimiza o tempo de resposta do servidor (TTFB)
+  /**
+   * FETCH PARALELO: Otimiza o tempo de resposta do servidor (TTFB)
+   * CORREÇÃO: Passando 'currentLang' para getGitHubProjects para ativar o multilingue nos repositórios.
+   */
   const [dict, allProjects] = await Promise.all([
     getDictionary(currentLang),
-    getGitHubProjects()
+    getGitHubProjects(currentLang) 
   ]);
 
   return (
     <PageWrapper>
       <Navbar dict={dict} lang={currentLang} />
 
+      {/* CONTAINER RESPONSIVO: 
+          - overflow-x-hidden evita quebras de layout em celulares.
+          - antialiased melhora a renderização de fontes.
+      */}
       <main className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white antialiased transition-colors duration-500 dark:bg-[#020617]">
         
-        {/* HERO SECTION */}
+        {/* HERO SECTION - Landing principal */}
         <HeroSection lang={currentLang} dict={dict} />
 
-        {/* ABOUT SECTION */}
+        {/* ABOUT SECTION - Responsividade garantida pelo mx-auto e px-4/6/8 */}
         <section id="about" className="mx-auto w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:px-8 lg:scroll-mt-32">
           <AboutSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* EXPERIENCE SECTION */}
+        {/* EXPERIENCE SECTION - Fundo sutil para separação visual */}
         <section id="experience" className="scroll-mt-20 bg-slate-50/50 py-12 dark:bg-slate-900/10 lg:py-24 lg:scroll-mt-32">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
             <ExperienceSection lang={currentLang} dict={dict} />
           </div>
         </section>
 
-        {/* FEATURED ARTICLES */}
+        {/* FEATURED ARTICLES - Seção de publicações técnicas */}
         <section id="featured" className="mx-auto w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:px-8 lg:scroll-mt-32">
           <FeaturedArticleSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* PROJECTS SECTION */}
+        {/* PROJECTS SECTION - Aqui entram os dados processados do GitHub */}
         <section id="projects" className="py-12 scroll-mt-20 lg:py-24 lg:scroll-mt-32">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
             <ProjectSection projects={allProjects} lang={currentLang} dict={dict} />
           </div>
         </section>
 
-        {/* CONTACT SECTION */}
+        {/* CONTACT SECTION - Final da jornada do usuário */}
         <section id="contact" className="mx-auto mb-12 w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:mb-24 lg:px-8 lg:scroll-mt-32">
           <ContactSection lang={currentLang} dict={dict} />
         </section>
