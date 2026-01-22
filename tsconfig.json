@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    /* Base moderna (Node.js 24 + Next.js 15) */
+    /* Base moderna (Node.js 24 + Next.js 16) */
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "ESNext",
@@ -11,13 +11,12 @@
     "strict": true,
     "noEmit": true,
     "isolatedModules": true,
-    "incremental": true,
 
     /* Interoperabilidade ESM */
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
-    "moduleDetection": "auto",
+    "moduleDetection": "force",
 
     /* Qualidade e governança */
     "forceConsistentCasingInFileNames": true,
@@ -52,6 +51,8 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     ".next/types/**/*.ts",
+    "middleware.ts",
+    "proxy.ts",
     "eslint.config.mjs",
     "next.config.mjs"
   ],
