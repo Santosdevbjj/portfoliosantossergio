@@ -4,29 +4,47 @@ import React, { useState, useMemo } from 'react';
 import { ProjectCard } from './ProjectCard';
 import { Filter, Database, FolderSearch } from 'lucide-react';
 
+// Interface para garantir integridade dos dados vindos do GitHub
+interface GitHubRepository {
+  id: number;
+  name: string;
+  topics: string[];
+  updated_at: string;
+  [key: string]: any; // Permite outras propriedades da API sem quebrar
+}
+
 interface PortfolioGridProps {
-  projects: any[];
+  projects: GitHubRepository[];
   lang: 'pt' | 'en' | 'es';
-  dict: any;
+  dict: {
+    portfolio: {
+      title: string;
+      resultsLabel: string;
+      filterLabel: string;
+      all: string;
+      empty: string;
+      categories: Record<string, string>;
+    };
+  };
 }
 
 /**
  * PORTFOLIO GRID - MOTOR DE FILTRAGEM E EXIBIÇÃO
- * Componente central que organiza a exibição de repositórios do GitHub.
- * Totalmente responsivo, acessível e multilingue.
+ * Componente central que organiza a exibição de repositórios.
+ * Otimizado para 2026: Filtros com snap scroll e ordenação inteligente.
  */
-export const PortfolioGrid = ({ projects, lang, dict }: PortfolioGridProps) => {
+export const PortfolioGrid = ({ projects, dict, lang }: PortfolioGridProps) => {
   const [activeCategory, setActiveCategory] = useState('all');
 
-  // Acesso seguro aos dicionários
-  const portfolioDict = dict?.portfolio || {};
-  const categoriesDict = portfolioDict.categories || {};
+  // Acesso seguro e tipado aos dicionários
+  const { portfolio } = dict;
+  const categoriesDict = portfolio.categories || {};
   const categoriesEntries = Object.entries(categoriesDict);
 
   /**
    * LÓGICA DE FILTRAGEM E PRIORIZAÇÃO
    * 1. Filtra apenas repositórios com a tag 'portfolio'.
-   * 2. Filtra pela categoria (tech stack) selecionada.
+   * 2. Filtra pela categoria selecionada.
    * 3. Ordena por relevância (tags 'featured'/'primeiro') e depois por data.
    */
   const filteredProjects = useMemo(() => {
@@ -64,26 +82,26 @@ export const PortfolioGrid = ({ projects, lang, dict }: PortfolioGridProps) => {
                 <Database className="text-white w-6 h-6" />
               </div>
               <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter uppercase truncate">
-                {portfolioDict.title || 'Portfolio'}
+                {portfolio.title}
               </h2>
             </div>
             <div className="w-20 h-1.5 bg-blue-600 rounded-full mb-6" />
             
             <p className="text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-[0.2em] bg-slate-200/50 dark:bg-slate-800/50 px-3 py-1.5 inline-block rounded-md border border-slate-200 dark:border-slate-700">
-               {filteredProjects.length} {portfolioDict.resultsLabel || (lang === 'pt' ? 'Resultados' : 'Results')}
+               {filteredProjects.length} {portfolio.resultsLabel}
             </p>
           </div>
           
-          {/* NAVEGAÇÃO DE FILTROS: Otimizada para scroll lateral no mobile */}
+          {/* NAVEGAÇÃO DE FILTROS: Otimizada para mobile com snap-scroll */}
           <div className="w-full lg:w-auto">
             <div className="flex items-center gap-2 mb-4 text-slate-500 font-bold text-[10px] uppercase tracking-widest px-1">
               <Filter className="text-blue-600 w-3.5 h-3.5" />
-              <span>{portfolioDict.filterLabel || (lang === 'pt' ? 'Filtrar Tecnologia' : 'Filter Technology')}</span>
+              <span>{portfolio.filterLabel}</span>
             </div>
             
             <div className="relative group overflow-hidden">
                <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar snap-x -mx-6 px-6 lg:mx-0 lg:px-0 scroll-smooth">
-                {/* Botão Reset (All) */}
+                {/* Botão Dinâmico "Todos" (vindo do JSON) */}
                 <button
                   onClick={() => setActiveCategory('all')}
                   className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 whitespace-nowrap snap-start touch-manipulation ${
@@ -92,11 +110,11 @@ export const PortfolioGrid = ({ projects, lang, dict }: PortfolioGridProps) => {
                       : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-blue-500/40'
                   }`}
                 >
-                  {portfolioDict.all || 'All'}
+                  {portfolio.all}
                 </button>
                 
-                {/* Mapeamento das Categorias do Dicionário */}
-                {categoriesEntries.map(([key, label]: [string, any]) => (
+                {/* Categorias Dinâmicas do Dicionário */}
+                {categoriesEntries.map(([key, label]) => (
                   <button
                     key={key}
                     onClick={() => setActiveCategory(key)}
@@ -110,32 +128,32 @@ export const PortfolioGrid = ({ projects, lang, dict }: PortfolioGridProps) => {
                   </button>
                 ))}
               </div>
-              {/* Overlay de gradiente para mobile (indica que há mais filtros) */}
+              {/* Overlay de gradiente para mobile */}
               <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-slate-50 dark:from-[#020617] pointer-events-none lg:hidden" />
             </div>
           </div>
         </div>
 
-        {/* GRID DE CARDS: Otimizado para 1, 2 ou 3 colunas */}
+        {/* GRID DE CARDS: Layout Fluido (1 -> 2 -> 3 colunas) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 min-h-[400px]">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => (
               <div 
                 key={project.id} 
                 className="flex h-full animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both"
-                style={{ animationDelay: `${index * 80}ms` }}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
                 <ProjectCard project={project} lang={lang} dict={dict} />
               </div>
             ))
           ) : (
-            /* ESTADO VAZIO: Feedback de Busca */
+            /* ESTADO VAZIO: Feedback visual quando não há projetos no filtro */
             <div className="col-span-full flex flex-col items-center justify-center py-24 bg-white/40 dark:bg-slate-900/20 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 transition-all duration-500">
               <div className="p-6 bg-slate-100 dark:bg-slate-800 rounded-full mb-6">
                 <FolderSearch className="text-slate-400 w-10 h-10 animate-pulse" />
               </div>
               <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs text-center px-6 leading-loose">
-                {portfolioDict.empty || (lang === 'pt' ? 'Nenhum projeto encontrado nesta categoria' : 'No projects found in this category')}
+                {portfolio.empty}
               </p>
             </div>
           )}
