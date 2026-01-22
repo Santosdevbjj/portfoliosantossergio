@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
 
-  // Segurança: Remove header que expõe tecnologia
+  // Segurança: remove header que expõe tecnologia
   poweredByHeader: false,
 
   // Rigor técnico: build falha se houver erro de tipos
@@ -10,7 +10,7 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
 
-  // Next.js 15+: navegação tipada
+  // Next.js 15+/16: navegação tipada
   typedRoutes: true,
 
   // Otimizações do compilador
@@ -45,14 +45,12 @@ const nextConfig = {
   },
 
   experimental: {
+    // Otimização segura para tree-shaking
     optimizePackageImports: [
       "lucide-react",
-      "framer-motion",
       "clsx",
       "tailwind-merge",
     ],
-    // Evita overhead de memória no build
-    serverSourceMaps: false,
   },
 
   async headers() {
@@ -75,7 +73,7 @@ const nextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self';",
-              "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://vercel.live;",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://vercel.live;",
               "style-src 'self' 'unsafe-inline';",
               "img-src 'self' blob: data: https://*.githubusercontent.com https://images.unsplash.com;",
               "font-src 'self' data:;",
