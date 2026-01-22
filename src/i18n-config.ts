@@ -77,14 +77,18 @@ const dictionaries: Record<Locale, () => Promise<any>> = {
  * Função otimizada para Server Components com tratamento de erro resiliente.
  */
 export const getDictionary = async (locale: Locale) => {
-  const safeLocale = getSafeLocale(locale);
+  // Garantia de que o locale é válido antes de acessar o dicionário
+  const safeLocale = isValidLocale(locale) ? locale : i18n.defaultLocale;
   
   try {
     const loadDictionary = dictionaries[safeLocale];
+    if (!loadDictionary) throw new Error(`Dictionary not found for locale: ${safeLocale}`);
+    
     return await loadDictionary();
   } catch (error) {
-    console.error(`[i18n] Falha crítica ao carregar dicionário (${safeLocale}):`, error);
-    // Fallback de segurança para o idioma padrão
+    console.error(`[i18n] Falha ao carregar dicionário (${safeLocale}):`, error);
+    
+    // Fallback definitivo para Português em caso de erro no import dinâmico
     const fallbackLoad = dictionaries[i18n.defaultLocale];
     return await fallbackLoad();
   }
@@ -93,7 +97,9 @@ export const getDictionary = async (locale: Locale) => {
 /**
  * HELPERS PARA SEO E ACESSIBILIDADE
  */
-export const getRegion = (locale: Locale): string => localeMetadata[locale].region;
+export const getRegion = (locale: Locale): string => {
+  return localeMetadata[locale]?.region || 'pt-BR';
+};
 
 export const getAlternateLocales = (currentLocale: Locale) => {
   return i18n.locales.filter((locale) => locale !== currentLocale);
