@@ -1,6 +1,6 @@
 /**
  * Interface rigorosa para os dados do GitHub.
- * Sincronizada com ProjectCard para evitar erros de build 'Property missing'.
+ * Sincronizada com ProjectCard para evitar erros de build.
  */
 export interface GitHubRepo {
   id: number;
@@ -14,18 +14,28 @@ export interface GitHubRepo {
 }
 
 /**
+ * Interface para a resposta bruta da API do GitHub (Evita o erro de 'any')
+ */
+interface RawGitHubRepo {
+  id: number;
+  name: string;
+  fork: boolean;
+  description: string | null;
+  html_url: string;
+  homepage: string | null;
+  topics?: string[];
+  updated_at: string;
+  stargazers_count: number;
+}
+
+/**
  * SERVIÇO DE INTEGRAÇÃO GITHUB (Server-Side Only)
  * Busca, filtra e ordena repositórios com lógica de prioridade.
  */
 export async function getGitHubProjects(lang: string = 'pt'): Promise<GitHubRepo[]> {
-  /**
-   * CORREÇÃO CRÍTICA PARA VERCEL:
-   * Em configurações rigorosas de TS (Index Signature), o acesso deve ser via ['CHAVE'].
-   */
   const token = process.env['GITHUB_ACCESS_TOKEN'];
   const username = "Santosdevbjj";
   
-  // URL dinâmica baseada na presença do Token (Segurança e Limite de Requisições)
   const url = token 
     ? `https://api.github.com/user/repos?sort=updated&direction=desc&per_page=100&affiliation=owner`
     : `https://api.github.com/users/${username}/repos?sort=updated&direction=desc&per_page=100`;
@@ -37,10 +47,6 @@ export async function getGitHubProjects(lang: string = 'pt'): Promise<GitHubRepo
         'Accept': 'application/vnd.github.v3+json',
         'User-Agent': 'Portfolio-Sergio-Santos-Data-Science',
       },
-      /**
-       * NEXT.JS 15 CACHING (ISR)
-       * Revalidação em background a cada 1 hora.
-       */
       next: { revalidate: 3600 }, 
     });
 
@@ -49,7 +55,7 @@ export async function getGitHubProjects(lang: string = 'pt'): Promise<GitHubRepo
       return []; 
     }
 
-    const repos = await response.json();
+    const repos = (await response.json()) as RawGitHubRepo[];
 
     if (!Array.isArray(repos)) {
       console.warn("[GitHub Warning] Resposta da API inválida.");
@@ -62,23 +68,27 @@ export async function getGitHubProjects(lang: string = 'pt'): Promise<GitHubRepo
      * 2. Filtra apenas projetos com a tag 'portfolio'.
      */
     const filteredRepos = repos
-      .filter((repo: any) => !repo.fork && repo.topics?.includes("portfolio"))
-      .map((repo: any): GitHubRepo => {
+      .filter((repo) => !repo.fork && (repo.topics?.includes("portfolio") ?? false))
+      .map((repo): GitHubRepo => {
         // Lógica de Tradução de Descrição via Pipe (|)
-        // Ordem esperada na descrição do GitHub: PT (0) | EN (1) | ES (2)
+        // Ordem esperada: PT | EN | ES
         let finalDescription = repo.description ?? "";
         
         if (finalDescription.includes('|')) {
-          const parts = finalDescription.split('|').map((p: string) => p.trim());
-          if (lang === 'en' && parts[1]) finalDescription = parts[1];
-          else if (lang === 'es' && parts[2]) finalDescription = parts[2];
-          else finalDescription = parts[0];
+          const parts = finalDescription.split('|').map((p) => p.trim());
+          if (lang === 'en' && (parts[1] ?? "").length > 0) {
+            finalDescription = parts[1] ?? "";
+          } else if (lang === 'es' && (parts[2] ?? "").length > 0) {
+            finalDescription = parts[2] ?? "";
+          } else {
+            finalDescription = parts[0] ?? "";
+          }
         }
 
         return {
           id: repo.id,
           name: repo.name.replace(/-/g, ' ').replace(/_/g, ' '), 
-          description: finalDescription || null,
+          description: finalDescription.length > 0 ? finalDescription : null,
           html_url: repo.html_url,
           homepage: repo.homepage ?? null,
           topics: repo.topics ?? [],
@@ -93,7 +103,8 @@ export async function getGitHubProjects(lang: string = 'pt'): Promise<GitHubRepo
     return filteredRepos.sort((a, b) => {
       const getWeight = (repo: GitHubRepo) => {
         const topics = repo.topics.map(t => t.toLowerCase());
-        if (topics.includes('destaque') || topics.includes('featured') || topics.includes('primeiro')) return 2;
+        // Prioridade máxima para tags 'featured' ou 'destaque'
+        if (topics.includes('featured') || topics.includes('destaque')) return 2;
         if (topics.includes('data-science') || topics.includes('python')) return 1;
         return 0;
       };
