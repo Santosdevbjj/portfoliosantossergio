@@ -1,14 +1,85 @@
 {
+  // ======================================================
+  // Formatação Geral
+  // ======================================================
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // ======================================================
+  // ESLint (Flat Config)
+  // ======================================================
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": true
   },
+  "eslint.useFlatConfig": true,
   "eslint.validate": [
     "javascript",
     "javascriptreact",
     "typescript",
     "typescriptreact"
   ],
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "eslint.useFlatConfig": true
+
+  // ======================================================
+  // Prettier
+  // ======================================================
+  "prettier.requireConfig": true,
+  "prettier.useEditorConfig": true,
+
+  // ======================================================
+  // Tailwind CSS DX
+  // ======================================================
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "tailwindCSS.classAttributes": ["class", "className"],
+  "tailwindCSS.experimental.classRegex": [
+    "clsx\\(([^)]*)\\)",
+    "twMerge\\(([^)]*)\\)",
+    "cn\\(([^)]*)\\)"
+  ],
+
+  // ======================================================
+  // Controle por Linguagem
+  // ======================================================
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ======================================================
+  // Arquivos Sensíveis (não formatar automaticamente)
+  // ======================================================
+  "[env]": {
+    "editor.formatOnSave": false
+  },
+  "[dotenv]": {
+    "editor.formatOnSave": false
+  },
+  "[csv]": {
+    "editor.formatOnSave": false
+  },
+  "[log]": {
+    "editor.formatOnSave": false
+  },
+
+  // ======================================================
+  // Qualidade de Vida
+  // ======================================================
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
 }
