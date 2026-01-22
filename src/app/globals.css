@@ -2,28 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Importação das animações síncronas com o design system */
 @import "../styles/animations.css";
 
 @layer base {
   :root {
-    /* --- Variáveis Dinâmicas de Branding e Tema --- */
-    --theme: light; /* light | dark */
-
+    --theme: light;
     --brand-blue: #0e8ce9;
     --brand-blue-hover: #0358a1;
-
     --background-light: #f8fafc;
     --background-dark: #020617;
-
-    --text-light: #1f2937; /* slate-900 */
-    --text-dark: #f1f5f9;  /* slate-100 */
-
-    --card-bg-light: rgba(255, 255, 255, 0.9);
-    --card-bg-dark: rgba(15, 23, 42, 0.6);
-
-    --glass-border-light: rgba(255, 255, 255, 0.2);
-    --glass-border-dark: rgba(71, 85, 105, 0.4);
+    --text-light: #1f2937;
+    --text-dark: #f1f5f9;
+    --card-bg-light: rgba(255,255,255,0.9);
+    --card-bg-dark: rgba(15,23,42,0.6);
+    --glass-border-light: rgba(255,255,255,0.2);
+    --glass-border-dark: rgba(71,85,105,0.4);
   }
 
   html {
@@ -31,148 +24,61 @@
     overflow-x: hidden;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     -webkit-overflow-scrolling: touch;
-
-    /* Background dinâmico via CSS variables e tema */
     background-color: var(--background-light);
-    color: var(--text-light);
-    transition: background-color 0.3s, color 0.3s;
   }
 
   body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-
-    /* Quebra de palavras para i18n */
+    color: var(--text-light);
+    background-color: var(--background-light);
+    transition: background-color 0.3s, color 0.3s;
     overflow-wrap: break-word;
     word-wrap: break-word;
     hyphens: auto;
-
-    /* Renderização de fontes */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Variáveis CSS dinâmicas para dark mode via JS */
-  :root[data-theme='dark'] {
-    --background: var(--background-dark);
-    --text-color: var(--text-dark);
-    --card-bg: var(--card-bg-dark);
-    --glass-border: var(--glass-border-dark);
-  }
-
-  :root[data-theme='light'] {
-    --background: var(--background-light);
-    --text-color: var(--text-light);
-    --card-bg: var(--card-bg-light);
-    --glass-border: var(--glass-border-light);
-  }
-
-  html {
-    background-color: var(--background);
-    color: var(--text-color);
+  [data-theme="dark"], :root[style*="--theme: dark"] body {
+    color: var(--text-dark);
+    background-color: var(--background-dark);
   }
 }
 
 @layer components {
-  /* Container Responsivo */
-  .main-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 w-full;
-  }
-
-  /* Glassmorphism Dinâmico */
+  .main-container { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 w-full; }
   .glass-effect {
-    background-color: var(--card-bg);
-    border: 1px solid var(--glass-border);
-    @apply backdrop-blur-2xl shadow-2xl rounded-xl transition-colors duration-300;
+    background-color: var(--card-bg-light);
+    border: 1px solid var(--glass-border-light);
+    @apply backdrop-blur-2xl shadow-2xl rounded-xl;
   }
-
-  /* Card de Projeto com Gradiente e Hover */
+  [data-theme="dark"] .glass-effect, :root[style*="--theme: dark"] .glass-effect {
+    background-color: var(--card-bg-dark);
+    border: 1px solid var(--glass-border-dark);
+  }
   .project-card-gradient {
     @apply relative overflow-hidden rounded-[2.5rem] transition-all duration-500;
-    background-color: var(--card-bg);
-    border: 1px solid rgba(203, 213, 225, 0.6); /* fallback light */
+    background-color: var(--card-bg-light);
+    border: 1px solid rgba(203,213,225,0.6);
   }
-  .project-card-gradient:hover {
-    box-shadow: 0 20px 50px -12px rgba(14, 140, 233, 0.15);
-    border-color: var(--brand-blue-hover);
+  [data-theme="dark"] .project-card-gradient, :root[style*="--theme: dark"] .project-card-gradient {
+    background-color: var(--card-bg-dark);
+    border: 1px solid rgba(31,41,55,0.5);
   }
-
-  /* Utility: ocultar scrollbar sem perder acessibilidade */
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
+  .project-card-gradient:hover { box-shadow: 0 20px 50px -12px rgba(14,140,233,0.15); border-color: var(--brand-blue-hover); }
+  .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+  .no-scrollbar::-webkit-scrollbar { display:none; }
 }
 
-/* --- Scrollbars Dinâmicas --- */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background-color: rgba(203, 213, 225, 0.6);
-  border-radius: 9999px;
-  transition: background-color 0.2s;
-}
-:root[data-theme='dark'] ::-webkit-scrollbar-thumb {
-  background-color: rgba(71, 85, 105, 0.5);
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--brand-blue);
-}
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background-color: rgba(203,213,225,0.6); border-radius:9999px; transition: background-color 0.2s; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb, :root[style*="--theme: dark"] ::-webkit-scrollbar-thumb { background-color: rgba(71,85,105,0.5); }
+::-webkit-scrollbar-thumb:hover { background-color: var(--brand-blue); }
 
-/* --- Seleção de Texto Dinâmica --- */
-::selection {
-  background-color: rgba(14, 140, 233, 0.3);
-  color: #1e3a8a;
-}
-:root[data-theme='dark'] ::selection {
-  color: #e0f2fe;
-}
+::selection { background-color: rgba(14,140,233,0.3); color: #1e3a8a; }
+[data-theme="dark"] ::selection, :root[style*="--theme: dark"] ::selection { color:#e0f2fe; }
 
-/* --- Foco Acessível Dinâmico --- */
-:focus-visible {
-  outline: none;
-  ring-offset-width: 2px;
-  ring: 2px solid var(--brand-blue);
-  ring-offset-color: var(--background-light);
-  transition: ring-offset-color 0.3s;
-}
-:root[data-theme='dark'] :focus-visible {
-  ring-offset-color: var(--background-dark);
-}
-
-/* --- Animações --- */
-@keyframes scanLine {
-  0% { transform: translateY(-100%); opacity: 0; }
-  50% { opacity: 0.5; }
-  100% { transform: translateY(100%); opacity: 0; }
-}
-.animate-scan {
-  position: relative;
-  overflow: hidden;
-}
-.animate-scan::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  height: 1px;
-  width: 100%;
-  background-color: rgba(14, 140, 233, 0.3);
-  filter: blur(2px);
-  animation: scanLine 3s linear infinite;
-}
-
-/* Slide-up animation para banners/toasts */
-@keyframes slideUp {
-  from { transform: translateY(1rem); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.animate-slide-up {
-  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+:focus-visible { outline:none; ring-offset-width:2px; ring:2px solid var(--brand-blue); ring-offset-color: var(--background-light); }
+[data-theme="dark"] :focus-visible, :root[style*="--theme: dark"] :focus-visible { ring-offset-color: var(--background-dark); }
