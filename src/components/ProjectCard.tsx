@@ -4,7 +4,7 @@ import React from 'react';
 import { Github, ExternalLink, Folder, Star, Target, Lightbulb, TrendingUp } from 'lucide-react';
 
 /**
- * Interface estrita para garantir compatibilidade com o retorno da API do GitHub
+ * Interface estrita sincronizada com o serviço lib/github.ts
  */
 interface GitHubProject {
   id?: number;
@@ -34,13 +34,13 @@ interface ProjectCardProps {
 
 /**
  * PROJECT CARD - NARRATIVA DE ENGENHARIA
- * Converte metadados do GitHub em business cases (Problema/Solução/Impacto).
+ * Converte metadados do GitHub em business cases (Problema | Solução | Impacto).
  */
 export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
   const { portfolio } = dict;
   const labels = portfolio.projectLabels;
   
-  // Tópicos internos que não devem ser exibidos como "Tech Skills"
+  // Tópicos internos que não devem ser exibidos como badges de tecnologias
   const internalTopics = [
     'portfolio', 'destaque', 'primeiro', 'data-science', 'python', 
     'databricks', 'primeiro-projeto', 'data', 'science', 'featured', 'highlight'
@@ -48,6 +48,7 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
   
   const displayTopics = project.topics?.filter(topic => !internalTopics.includes(topic.toLowerCase())) || [];
   
+  // Lógica de prioridade visual baseada em Tags do GitHub
   const isMain = project.topics?.includes('featured') || project.topics?.includes('primeiro');
   const isHighlight = project.topics?.includes('destaque') || project.topics?.includes('highlight');
 
@@ -57,15 +58,15 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
 
   /**
    * LÓGICA DE NARRATIVA ESTRUTURADA
-   * Divide a descrição do GitHub pelo pipe '|'.
-   * Opcional chaining (?.) usado para evitar erro "Object is possibly undefined" no build.
+   * A descrição já chega aqui traduzida pelo lib/github.ts.
+   * Esperamos o formato: "O Problema | A Solução | O Impacto"
    */
-  const descriptionParts = project.description?.split('|') || [];
+  const descriptionParts = project.description?.split('|').map(part => part.trim()) || [];
   const hasStructuredDesc = descriptionParts.length >= 2;
 
   return (
     <div className={`
-      group relative flex flex-col h-full p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border transition-all duration-500
+      group relative flex flex-col h-full p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border transition-all duration-500
       ${isMain 
         ? 'border-blue-500/30 bg-gradient-to-b from-blue-50/40 to-white dark:from-blue-900/10 dark:to-slate-900/50 shadow-xl' 
         : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm'
@@ -73,7 +74,7 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
       hover:shadow-2xl hover:shadow-blue-500/15 hover:-translate-y-2
     `}>
       
-      {/* Badge de Destaque */}
+      {/* Badge de Destaque (Featured Tag) */}
       {(isHighlight || isMain) && (
         <div className="absolute -top-3 right-4 md:right-8 z-10">
           <span className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] shadow-lg ring-4 ring-white dark:ring-slate-950">
@@ -83,8 +84,8 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
         </div>
       )}
 
-      {/* Header: Ícone e Links */}
-      <div className="flex justify-between items-start mb-6 md:mb-8">
+      {/* Header: Ícone e Links de Ação */}
+      <div className="flex justify-between items-start mb-6">
         <div className={`
           p-3 md:p-4 rounded-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3
           ${isMain ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400'}
@@ -96,6 +97,7 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
             href={project.html_url} 
             target="_blank" 
             rel="noopener noreferrer" 
+            title="GitHub Repository"
             className="p-2 md:p-3 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all active:scale-90"
           >
             <Github className="w-5 h-5" />
@@ -105,6 +107,7 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
               href={project.homepage} 
               target="_blank" 
               rel="noopener noreferrer" 
+              title="Live Demo"
               className="p-2 md:p-3 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all active:scale-90"
             >
               <ExternalLink className="w-5 h-5" />
@@ -113,16 +116,16 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
         </div>
       </div>
 
-      {/* Título */}
-      <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-4 md:mb-5 tracking-tighter capitalize leading-tight">
+      {/* Título do Projeto */}
+      <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter capitalize leading-tight">
         {project.name.replace(/[_-]/g, ' ')}
       </h3>
 
-      {/* Narrative Section */}
+      {/* Seção de Narrativa (Problema | Solução | Impacto) */}
       <div className="space-y-4 md:space-y-6 mb-8 flex-grow">
         {hasStructuredDesc ? (
           <div className="flex flex-col gap-4">
-            {/* Problema - Protegido com ?. */}
+            {/* Bloco: Problema */}
             <div className="flex gap-3">
               <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                 <Target className="w-3 h-3 text-blue-600 dark:text-blue-400" />
@@ -131,13 +134,13 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
                 <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1">
                   {labels.problem}
                 </span>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3 font-medium">
-                  {descriptionParts[0]?.trim() || ""}
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 font-medium">
+                  {descriptionParts[0]}
                 </p>
               </div>
             </div>
             
-            {/* Solução - Protegido com ?. */}
+            {/* Bloco: Solução */}
             <div className="flex gap-3">
               <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                 <Lightbulb className="w-3 h-3 text-amber-600 dark:text-amber-400" />
@@ -146,42 +149,43 @@ export const ProjectCard = ({ project, dict }: ProjectCardProps) => {
                 <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1">
                   {labels.solution}
                 </span>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3 font-medium">
-                  {descriptionParts[1]?.trim() || ""}
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 font-medium">
+                  {descriptionParts[1]}
                 </p>
               </div>
             </div>
 
-            {/* Impacto - Protegido com ?. */}
+            {/* Bloco: Impacto (Opcional) */}
             {descriptionParts[2] && (
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-start gap-3">
                 <TrendingUp className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
                 <p className="text-sm text-slate-900 dark:text-slate-200 font-bold leading-snug">
-                   {descriptionParts[2]?.trim()}
+                   {descriptionParts[2]}
                 </p>
               </div>
             )}
           </div>
         ) : (
+          /* Fallback para descrições sem o separador Pipe */
           <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium italic opacity-80">
             {project.description || portfolio.noDescription}
           </p>
         )}
       </div>
 
-      {/* Footer: Tech Stack */}
+      {/* Footer: Tech Stack (Skills detectadas via Tags do GitHub) */}
       <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-100 dark:border-slate-800/40 mt-auto">
-        {displayTopics.slice(0, 4).map((topic) => (
+        {displayTopics.slice(0, 5).map((topic) => (
           <span 
             key={topic} 
-            className="px-2.5 py-1 text-[9px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 rounded-md border border-slate-200/50 dark:border-slate-700 uppercase tracking-tight"
+            className="px-2.5 py-1 text-[9px] font-black bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-300 rounded-lg border border-slate-200/50 dark:border-slate-700 uppercase tracking-tight transition-colors hover:border-blue-500/50"
           >
             {formatTopic(topic)}
           </span>
         ))}
-        {displayTopics.length > 4 && (
+        {displayTopics.length > 5 && (
           <span className="text-[9px] font-bold text-slate-400 self-center ml-1">
-            +{displayTopics.length - 4}
+            +{displayTopics.length - 5}
           </span>
         )}
       </div>
