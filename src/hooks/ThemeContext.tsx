@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useState,
   useCallback,
-  type ReactNode // Corrigido: Importação de tipo unificada para evitar duplicidade
+  type ReactNode
 } from "react";
 
 /**
@@ -26,53 +26,62 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 /**
- * THEME CONTEXT PROVIDER - ARQUITETURA NEXT.JS 15.5.9
- * Gerencia a experiência visual responsiva e persiste a escolha do usuário.
+ * THEME CONTEXT PROVIDER - ARQUITETURA NEXT.JS
+ * Gerencia a lógica de estados visuais, persistência em camadas e sincronização com o SO.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("system");
   const [isDark, setIsDark] = useState<boolean>(false);
   const [mounted, setMounted] = useState(false);
 
-  // Manipulação segura do DOM para evitar inconsistências de Hydration
+  /**
+   * MANIPULAÇÃO DO DOM: Aplicação de classes e metadados.
+   * Otimizado para evitar repaints desnecessários.
+   */
   const applyToDOM = useCallback((dark: boolean) => {
     if (typeof window === "undefined") return;
     
     const root = document.documentElement;
-    root.classList.toggle("dark", dark);
+    if (dark) {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    // Suporte nativo para elementos de UI do navegador (scrollbars, inputs)
     root.style.colorScheme = dark ? "dark" : "light";
   }, []);
 
-  // 1. Carregamento Inicial: Sincronização de Estado (LocalStorage + Cookies)
+  // 1. CARREGAMENTO INICIAL: Estratégia de Hidratação Segura
   useEffect(() => {
     const getInitialTheme = (): Theme => {
-      if (typeof window === "undefined") return "system";
-      
-      const stored = localStorage.getItem("theme") as Theme;
-      if (stored && ["light", "dark", "system"].includes(stored)) return stored;
-      
-      const cookieTheme = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("theme="))
-        ?.split("=")[1] as Theme;
+      try {
+        const stored = localStorage.getItem("theme") as Theme;
+        if (stored && ["light", "dark", "system"].includes(stored)) return stored;
         
-      return (cookieTheme && ["light", "dark", "system"].includes(cookieTheme)) 
-        ? cookieTheme 
-        : "system";
+        const cookieTheme = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("theme="))
+          ?.split("=")[1] as Theme;
+          
+        return (cookieTheme && ["light", "dark", "system"].includes(cookieTheme)) 
+          ? cookieTheme 
+          : "system";
+      } catch (e) {
+        return "system";
+      }
     };
 
-    const initial = getInitialTheme();
-    setTheme(initial);
+    setTheme(getInitialTheme());
     setMounted(true);
   }, []);
 
-  // 2. Efeito Reativo: Escuta o Sistema Operacional (Responsividade Visual)
+  // 2. REATIVIDADE: Sincronização com Preferências do Sistema
   useEffect(() => {
     if (!mounted) return;
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     
-    const handleSystemChange = () => {
+    const computeTheme = () => {
       const shouldBeDark = 
         theme === "dark" || (theme === "system" && mediaQuery.matches);
       
@@ -80,25 +89,30 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       applyToDOM(shouldBeDark);
     };
 
-    handleSystemChange();
+    computeTheme();
 
-    mediaQuery.addEventListener("change", handleSystemChange);
-    return () => mediaQuery.removeEventListener("change", handleSystemChange);
+    // Listener moderno para mudanças de tema no SO em tempo real
+    mediaQuery.addEventListener("change", computeTheme);
+    return () => mediaQuery.removeEventListener("change", computeTheme);
   }, [theme, mounted, applyToDOM]);
 
-  // 3. Persistência e Governança de Preferências
+  // 3. PERSISTÊNCIA: Governança de Cookies e LocalStorage
   const saveThemePreference = useCallback((newTheme: Theme) => {
     setTheme(newTheme);
     
     if (typeof window !== "undefined") {
-      if (newTheme === "system") {
-        localStorage.removeItem("theme");
-      } else {
-        localStorage.setItem("theme", newTheme);
+      try {
+        if (newTheme === "system") {
+          localStorage.removeItem("theme");
+        } else {
+          localStorage.setItem("theme", newTheme);
+        }
+        
+        // Persistência via Cookie para suporte a SSR e Edge Config
+        document.cookie = `theme=${newTheme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax; Secure`;
+      } catch (err) {
+        console.error("Falha ao persistir tema:", err);
       }
-      
-      // Cookie SameSite=Lax para segurança e persistência no SSR da Vercel
-      document.cookie = `theme=${newTheme}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
     }
   }, []);
 
@@ -118,9 +132,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     <ThemeContext.Provider
       value={{ theme, isDark, toggleTheme, resetTheme, applyTheme, mounted }}
     >
+      {/* Wrapper de prevenção de FOUC (Flash of Unstyled Content) */}
       <div 
-        className={`min-h-screen transition-opacity duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}
-        aria-hidden={!mounted}
+        className={`min-h-screen transition-opacity duration-700 ${mounted ? "opacity-100" : "opacity-0"}`}
+        aria-hidden={!mounted && theme === "system"}
       >
         {children}
       </div>
@@ -128,13 +143,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * Hook customizado para acesso ao tema
- */
 export function useThemeContext() {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error("useThemeContext deve ser usado dentro de ThemeProvider");
+    throw new Error("useThemeContext deve ser usado dentro de um ThemeProvider");
   }
   return context;
 }
