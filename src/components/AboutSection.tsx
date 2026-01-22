@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { CheckCircle2, Database, ShieldCheck } from 'lucide-react';
 import { CareerHighlights } from './CareerHighlights';
 
-// Interfaces estritas para garantir o Rigor Técnico no build
+// Interfaces sincronizadas com o dicionário JSON e componentes filhos
 interface HighlightItem {
   label: string;
   description: string;
@@ -31,6 +31,14 @@ interface AboutSectionProps {
           title: string;
           items: HighlightItem[];
         };
+        metrics: { // Adicionado para satisfazer a tipagem do CareerHighlights
+          title: string;
+          subtitle: string;
+          availabilityValue: string;
+          availabilityLabel: string;
+          automationValue: string;
+          automationLabel: string;
+        };
         stack: {
           title: string;
           items: TechStackItem[];
@@ -42,10 +50,9 @@ interface AboutSectionProps {
 
 /**
  * SEÇÃO SOBRE - FOCO EM AUTORIDADE E GOVERNANÇA
- * Otimizada para 2026: Imagem com priority loading e tipagem sem 'any'.
+ * Totalmente responsiva e preparada para localização PT/EN/ES.
  */
 export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
-  // Desestruturação segura para evitar erros de 'undefined' no build da Vercel
   const { about, common } = dict;
   const { sections } = about;
 
@@ -54,7 +61,7 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
           
-          {/* COLUNA 1: NARRATIVA E MÉTRICAS (Aparece depois da imagem no mobile) */}
+          {/* COLUNA 1: NARRATIVA E CONTEXTO */}
           <div className="flex flex-col space-y-12 order-2 lg:order-1">
             <header>
               <span className="inline-block text-blue-600 dark:text-blue-400 font-black uppercase tracking-[0.3em] text-[10px] mb-4 px-3 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -70,10 +77,10 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
               </div>
             </header>
 
-            {/* KPI Section - Componente de métricas estratégicas */}
+            {/* KPI Section - Injeta o dicionário completo validado pelas interfaces */}
             <CareerHighlights dict={dict} />
 
-            {/* Seção de Governança e Rigor Técnico */}
+            {/* Detalhes de Governança */}
             <div className="space-y-6">
               <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-sm uppercase tracking-widest">
                 <ShieldCheck className="text-blue-600 w-5 h-5" />
@@ -102,7 +109,7 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
               </div>
             </div>
 
-            {/* Tech Stack Horizontal (Dados, Cloud, BI) */}
+            {/* Tech Stack Resumida */}
             <div className="space-y-6 pt-6">
               <h4 className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-sm uppercase tracking-widest">
                 <Database className="text-blue-600 w-5 h-5" />
@@ -123,21 +130,20 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
             </div>
           </div>
 
-          {/* COLUNA 2: VISUAL (Imagem com efeito sticky no Desktop) */}
+          {/* COLUNA 2: IMAGEM E BADGE DE EXPERIÊNCIA */}
           <div className="relative group lg:sticky lg:top-32 order-1 lg:order-2">
             <div className="absolute -inset-4 bg-gradient-to-tr from-blue-600/20 to-indigo-500/20 rounded-[3rem] opacity-30 blur-2xl group-hover:opacity-50 transition-all duration-700" />
             
             <div className="relative bg-slate-200 dark:bg-slate-800/40 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-slate-800 aspect-[4/5] sm:aspect-square lg:aspect-[4/5] shadow-2xl">
                <Image 
                  src="/images/sergio-santos-profile.png" 
-                 alt={`Sérgio Santos - Data & Critical Systems Specialist`}
+                 alt="Sérgio Santos - Data Specialist"
                  fill
                  sizes="(max-width: 768px) 100vw, 45vw"
                  className="object-cover transition-transform duration-1000 group-hover:scale-105"
                  priority
                />
                
-               {/* Badge de Senioridade - 20+ Anos */}
                <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 p-4 md:p-6 bg-white/95 dark:bg-slate-950/90 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-blue-900/20 shadow-2xl">
                   <div className="flex items-baseline gap-1">
                     <span className="text-blue-600 dark:text-blue-400 font-black text-4xl md:text-5xl leading-none">20</span>
