@@ -3,9 +3,9 @@ import { Inter, Montserrat } from 'next/font/google';
 import '../globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider'; 
 import { CookieBanner } from '@/components/CookieBanner'; 
-import { i18n } from '@/i18n-config';
+import { i18n, type Locale } from '@/i18n-config';
 
-// Fontes de alta performance otimizadas para 2026
+// Fontes otimizadas para performance e legibilidade em 2026
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -19,24 +19,9 @@ const montserrat = Montserrat({
 });
 
 /**
- * NOTA TÉCNICA DE SEGURANÇA E GOVERNANÇA:
- * Este projeto implementa medidas rigorosas contra vulnerabilidades de Dia Zero.
- * Status: Patched - Next.js 15.5.9
- * Auditoria Técnica: 21 de Janeiro de 2026
+ * CONFIGURAÇÃO DE VIEWPORT
+ * Garante que o site seja adaptável em qualquer dispositivo (Mobile, Tablet, Desktop).
  */
-
-interface RootLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{ lang: string }>;
-}
-
-type LocaleContent = {
-  pt: string;
-  en: string;
-  es: string;
-};
-
-// Configuração de Viewport para Responsividade Adaptativa
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
@@ -49,39 +34,38 @@ export const viewport: Viewport = {
 };
 
 /**
- * SEO MULTILINGUE & METADADOS DINÂMICOS
+ * GENERATE METADATA - SEO MULTILINGUE DINÂMICO
+ * Alinhado com a documentação do Next.js 15: params é uma Promise.
  */
-export async function generateMetadata({ 
-  params 
-}: { 
-  params: Promise<{ lang: string }> 
-}): Promise<Metadata> {
-  const resolvedParams = await params;
-  const lang = (resolvedParams.lang || i18n.defaultLocale) as keyof LocaleContent;
+export async function generateMetadata(props: LayoutProps<'/[lang]'>): Promise<Metadata> {
+  const { lang } = await props.params;
+  const currentLang = (lang || i18n.defaultLocale) as Locale;
   
-  const titles: LocaleContent = {
-    pt: "Sérgio Santos | Especialista em Dados e Sistemas Críticos",
-    en: "Sérgio Santos | Data & Critical Systems Specialist",
-    es: "Sérgio Santos | Especialista en Datos y Sistemas Críticos"
-  };
-
-  const descriptions: LocaleContent = {
-    pt: "Analista Sênior com 20+ anos em sistemas críticos (Bradesco). Especialista em Ciência de Dados, Azure e Eficiência Operacional.",
-    en: "Senior Analyst with 20+ years in critical systems (Bradesco). Specialist in Data Science, Azure, and Operational Efficiency.",
-    es: "Analista Sénior con 20+ años en sistemas críticos (Bradesco). Especialista en Ciencia de Dados, Azure y Eficiencia Operativa."
-  };
-
-  // CORREÇÃO CRÍTICA: Acesso via index signature para satisfazer o TypeScript do Next.js 15+
   const siteUrl = process.env['NEXT_PUBLIC_SITE_URL'] || "https://portfoliosantossergio.vercel.app";
-  const title = titles[lang] || titles.pt;
-  const description = descriptions[lang] || descriptions.pt;
+
+  const content = {
+    pt: {
+      title: "Sérgio Santos | Especialista em Dados e Sistemas Críticos",
+      desc: "Analista Sênior com 20+ anos em sistemas críticos. Especialista em Ciência de Dados, Azure e Eficiência Operacional."
+    },
+    en: {
+      title: "Sérgio Santos | Data & Critical Systems Specialist",
+      desc: "Senior Analyst with 20+ years in critical systems. Specialist in Data Science, Azure, and Operational Efficiency."
+    },
+    es: {
+      title: "Sérgio Santos | Especialista en Datos y Sistemas Críticos",
+      desc: "Analista Sénior con 20+ años en sistemas críticos. Especialista en Ciencia de Datos, Azure y Eficiencia Operativa."
+    }
+  };
+
+  const currentContent = content[currentLang] || content.pt;
 
   return {
     title: {
-      default: title,
+      default: currentContent.title,
       template: `%s | Sérgio Santos`
     },
-    description: description,
+    description: currentContent.desc,
     metadataBase: new URL(siteUrl),
     
     // TAG DE VERIFICAÇÃO DO GOOGLE (PRESERVADA)
@@ -90,7 +74,7 @@ export async function generateMetadata({
     },
 
     alternates: {
-      canonical: `${siteUrl}/${lang}`,
+      canonical: `${siteUrl}/${currentLang}`,
       languages: {
         'pt': `${siteUrl}/pt`,
         'en': `${siteUrl}/en`,
@@ -100,38 +84,41 @@ export async function generateMetadata({
     },
 
     openGraph: {
-      title: title,
-      description: description,
-      url: `${siteUrl}/${lang}`,
+      title: currentContent.title,
+      description: currentContent.desc,
+      url: `${siteUrl}/${currentLang}`,
       siteName: "Sérgio Santos Portfolio",
-      locale: lang === 'pt' ? 'pt_BR' : lang === 'es' ? 'es_ES' : 'en_US',
+      locale: currentLang === 'pt' ? 'pt_BR' : currentLang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
       images: [
         {
-          url: `/og-image-${lang}.png`,
+          url: `/og-image-${currentLang}.png`,
           width: 1200,
           height: 630,
-          alt: title,
+          alt: currentContent.title,
         },
       ],
     },
 
     twitter: {
       card: 'summary_large_image',
-      title: title,
-      description: description,
-      images: [`/og-image-${lang}.png`],
+      title: currentContent.title,
+      description: currentContent.desc,
+      images: [`/og-image-${currentLang}.png`],
     },
   };
 }
 
-export default async function RootLayout({ children, params }: RootLayoutProps) {
-  const resolvedParams = await params;
-  const lang = resolvedParams.lang;
+/**
+ * ROOT LAYOUT - A estrutura mestre da aplicação
+ */
+export default async function RootLayout(props: LayoutProps<'/[lang]'>) {
+  const { children } = props;
+  const { lang } = await props.params;
 
-  // Auditoria de Segurança Ativa no Build
+  // Auditoria de Segurança Silenciosa no Servidor
   if (process.env.NODE_ENV === 'production') {
-    console.info(`[Security Monitor] Node 24.x | Next.js 15.5.9 | Shields Active.`);
+    console.info(`[System] Shield Active: Next.js 15.5.9 | Language: ${lang}`);
   }
 
   return (
@@ -149,7 +136,12 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body 
-        className={`${inter.variable} ${montserrat.variable} ${inter.className} bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased min-h-screen flex flex-col selection:bg-blue-600 selection:text-white`}
+        className={`
+          ${inter.variable} ${montserrat.variable} ${inter.className} 
+          bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 
+          antialiased min-h-screen flex flex-col 
+          selection:bg-blue-600 selection:text-white
+        `}
       >
         <ThemeProvider 
           attribute="class" 
@@ -157,7 +149,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           enableSystem 
           disableTransitionOnChange
         >
-          {/* Estrutura Responsiva: min-h-screen evita saltos de layout (CLS) */}
+          {/* Wrapper Responsivo: overflow-x-hidden evita quebras em mobile */}
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <main className="flex-grow w-full">
               {children}
