@@ -43,7 +43,7 @@
   "about": {
     "title": "Professional Journey",
     "headline": "Merging Banking Governance with Data Intelligence",
-    "bio": "Senior specialist with deep-rooted expertise in the banking sector, operating where security and high availability are non-negotiable. Merging IT governance with AI's analytical potential to solve real financial bottlenecks.",
+    "bio": "Senior specialist with deep-rooted expertise in the banking sector, operating where security and high availability are non-negotiable. Merging IT governance with AI’s analytical potential to solve real financial bottlenecks.",
     "sections": {
       "highlights": {
         "title": "Differentiators",
@@ -58,7 +58,7 @@
           },
           {
             "label": "Graph Intelligence",
-            "description": "Mastery of Neo4j and Azure Databricks for anomaly detection and decision flow optimization."
+            "description": "Mastery of Neo4J and Azure Databricks for anomaly detection and decision flow optimization."
           }
         ]
       },
@@ -73,9 +73,18 @@
       "stack": {
         "title": "Technical Domain",
         "items": [
-          { "label": "Data Science", "description": "Python, High-Performance SQL, Neo4j, Machine Learning" },
-          { "label": "Cloud & Big Data", "description": "Azure Databricks, PySpark, Data Factory" },
-          { "label": "Modern Stack", "description": "Power BI, Generative AI, Data Governance" }
+          {
+            "label": "Data Science",
+            "description": "Python, High-Performance SQL, Neo4J, Machine Learning"
+          },
+          {
+            "label": "Cloud & Big Data",
+            "description": "Azure Databricks, PySpark, Data Factory"
+          },
+          {
+            "label": "Modern Stack",
+            "description": "Power BI, Generative AI, Data Governance"
+          }
         ]
       }
     }
@@ -109,7 +118,7 @@
     "categories": {
       "data-science": "Data Science",
       "databricks": "Azure Databricks",
-      "neo4j": "Neo4j & Graphs",
+      "neo4j": "Neo4J & Graphs",
       "power-bi": "Analytics",
       "database": "Data Engineering",
       "python": "Automation",
