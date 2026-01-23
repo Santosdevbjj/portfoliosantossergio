@@ -3,22 +3,35 @@ import type { Locale } from '@/i18n-config';
 
 /**
  * MOTOR DE DICIONÁRIOS — INFRAESTRUTURA DE DADOS
- * Gerencia o carregamento assíncrono e a segurança estrutural das traduções.
+ * Gerencia carregamento assíncrono, fallback seguro e integridade estrutural.
  */
 
-interface DictionaryShape {
+/* ===========================
+ * TIPOS BASE
+ * =========================== */
+
+export interface DictionaryShape {
   nav: {
     about: string;
     experience: string;
     articles: string;
     projects: string;
     contact: string;
-    [key: string]: any;
+    changeLang?: string;
+    theme?: {
+      light?: string;
+      dark?: string;
+      system?: string;
+    };
+    [key: string]: unknown;
   };
   common: {
     viewProject: string;
     liveDemo: string;
-    [key: string]: any;
+    backToTop?: string;
+    loading?: string;
+    error?: string;
+    [key: string]: unknown;
   };
   about: {
     sections: {
@@ -30,93 +43,115 @@ interface DictionaryShape {
         automationValue: string;
         automationLabel: string;
       };
-      [key: string]: any;
+      [key: string]: unknown;
     };
-    [key: string]: any;
+    [key: string]: unknown;
   };
-  articles: {
-    featured: any;
-    [key: string]: any;
+  articles?: {
+    featured?: unknown;
+    [key: string]: unknown;
   };
-  [key: string]: any;
+  portfolio?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
-/**
- * Estrutura Base de Segurança (Last Line of Defense)
- * Evita erros de "undefined" se chaves específicas faltarem no JSON.
- */
-const BASE_DICTIONARY: Partial<DictionaryShape> = {
+/* ===========================
+ * BASE DE SEGURANÇA (FALLBACK)
+ * =========================== */
+
+const BASE_DICTIONARY: DictionaryShape = {
   nav: {
-    about: "About",
-    experience: "Experience",
-    articles: "Articles",
-    projects: "Projects",
-    contact: "Contact"
+    about: 'About',
+    experience: 'Experience',
+    articles: 'Articles',
+    projects: 'Projects',
+    contact: 'Contact',
   },
   common: {
-    viewProject: "GitHub",
-    liveDemo: "Live Demo"
+    viewProject: 'GitHub',
+    liveDemo: 'Live Demo',
+    backToTop: 'Top',
+    loading: 'Loading...',
+    error: 'Unexpected error',
   },
   about: {
     sections: {
       metrics: {
-        title: "Impact",
-        subtitle: "KPIs",
-        availabilityValue: "100%",
-        availabilityLabel: "Uptime",
-        automationValue: "0",
-        automationLabel: "Hours"
-      }
-    }
-  }
+        title: 'Impact',
+        subtitle: 'KPIs',
+        availabilityValue: '100%',
+        availabilityLabel: 'Uptime',
+        automationValue: '0',
+        automationLabel: 'Hours',
+      },
+    },
+  },
 };
 
-/**
- * Loader de Dicionários - Otimizado para Next.js 16
- */
-const dictionaries: Record<Locale, () => Promise<any>> = {
-  pt: () => import('../dictionaries/pt.json').then((m) => m.default),
-  en: () => import('../dictionaries/en.json').then((m) => m.default),
-  es: () => import('../dictionaries/es.json').then((m) => m.default),
+/* ===========================
+ * LOADERS DE IDIOMA
+ * =========================== */
+
+const dictionaries: Record<Locale, () => Promise<unknown>> = {
+  pt: async () => (await import('../dictionaries/pt.json')).default,
+  en: async () => (await import('../dictionaries/en.json')).default,
+  es: async () => (await import('../dictionaries/es.json')).default,
 };
 
-/**
- * Função de Normalização Profunda
- */
+/* ===========================
+ * NORMALIZAÇÃO PROFUNDA
+ * =========================== */
+
 function normalize(raw: any): DictionaryShape {
   return {
     ...BASE_DICTIONARY,
     ...raw,
-    nav: { ...BASE_DICTIONARY.nav, ...(raw?.nav || {}) },
-    common: { ...BASE_DICTIONARY.common, ...(raw?.common || {}) },
-    about: {
-      ...raw?.about,
-      sections: {
-        ...(raw?.about?.sections || {}),
-        metrics: { 
-          ...BASE_DICTIONARY.about?.sections?.metrics, 
-          ...(raw?.about?.sections?.metrics || {}) 
-        }
-      }
+
+    nav: {
+      ...BASE_DICTIONARY.nav,
+      ...(raw?.nav ?? {}),
     },
-    articles: { ...raw?.articles }
-  } as DictionaryShape;
+
+    common: {
+      ...BASE_DICTIONARY.common,
+      ...(raw?.common ?? {}),
+    },
+
+    about: {
+      ...(raw?.about ?? {}),
+      sections: {
+        ...(raw?.about?.sections ?? {}),
+        metrics: {
+          ...BASE_DICTIONARY.about.sections.metrics,
+          ...(raw?.about?.sections?.metrics ?? {}),
+        },
+      },
+    },
+
+    articles: raw?.articles ?? {},
+    portfolio: raw?.portfolio ?? {},
+  };
 }
 
-export const getDictionary = async (locale: Locale): Promise<DictionaryShape> => {
+/* ===========================
+ * API PÚBLICA
+ * =========================== */
+
+export async function getDictionary(locale: Locale): Promise<DictionaryShape> {
   try {
-    const loadLanguage = dictionaries[locale] || dictionaries.pt;
-    const content = await loadLanguage();
+    const loader = dictionaries[locale] ?? dictionaries.pt;
+    const content = await loader();
     return normalize(content);
   } catch (error) {
-    console.error(`[i18n] Erro crítico ao carregar dicionário (${locale}):`, error);
+    console.error(`[i18n] Erro ao carregar dicionário (${locale})`, error);
+
     try {
       const fallback = await dictionaries.pt();
       return normalize(fallback);
     } catch {
-      return BASE_DICTIONARY as DictionaryShape;
+      return BASE_DICTIONARY;
     }
   }
-};
+}
 
 export type Dictionary = DictionaryShape;
