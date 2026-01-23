@@ -24,7 +24,7 @@
     "changeLang": "Cambiar Idioma",
     "theme": {
       "light": "Modo Claro",
-      "dark": "Modo Oscuro",
+      "dark": "Modo Escuro",
       "system": "Sistema"
     }
   },
@@ -39,7 +39,7 @@
   "about": {
     "title": "Sobre Mí",
     "headline": "Resiliencia de sistemas críticos aplicada a la inteligencia estratégica.",
-    "bio": "Con más de 20 años de experiencia en sistemas de misión crítica en el sector bancario, me especialicé en asegurar que la tecnología respalde decisiones de alto riesgo con rigor operacional. Hoy, utilizo esa base sólida para liderar proyectos de Ciencia de Datos, conectando infraestructuras complejas con insights accionables.",
+    "bio": "Con más de 20 años de experiencia en sistemas de misión crítica en el sector bancário, me especialicé en asegurar que la tecnología respalde decisiones de alto riesgo con rigor operacional. Hoy, utilizo esa base sólida para liderar proyectos de Ciencia de Datos, conectando infraestructuras complejas con insights acionables.",
     "sections": {
       "highlights": {
         "title": "Diferenciales",
@@ -61,10 +61,10 @@
       "metrics": {
         "title": "Rendimiento Logístico",
         "subtitle": "KPIs e IMPACTO",
-        "accuracyValue": "61%",
-        "accuracyLabel": "Aumento de Precisión",
-        "savingsValue": "R$ 420K",
-        "savingsLabel": "Ahorro Anual"
+        "availabilityValue": "61%",
+        "availabilityLabel": "Mejora de Precisión",
+        "automationValue": "R$ 420K",
+        "automationLabel": "Ahorro Anual"
       },
       "stack": {
         "title": "Dominio Técnico",
@@ -107,7 +107,7 @@
         "description": [
           "Liderazgo técnico en infraestructura para más de 500 usuarios en entorno regulado.",
           "Implementación de sistemas bancarios enfocados en continuidad y seguridad de datos.",
-          "Desarrollo de rutinas de automatización para procesamiento a gran escala."
+          "Desarrollo de rotinas de automatización para procesamiento a gran escala."
         ],
         "techs": ["Sistemas Críticos", "Mainframe", "Gobernanza", "SQL", "Automatización"]
       }
@@ -132,7 +132,7 @@
     },
     "projectLabels": {
       "problem": "El Problema",
-      "solution": "La Solución",
+      "solution": "A Solução",
       "impact": "Impacto Económico",
       "technologies": "Stack Técnica"
     }
