@@ -7,47 +7,48 @@ interface PageWrapperProps {
 }
 
 /**
- * PAGE WRAPPER - ESTRUTURA BASE DA APLICAÇÃO
- * Controla a transição global, o gerenciamento de cores (Dark Mode)
- * e o espaçamento crítico para a Navbar fixa.
+ * PAGE WRAPPER - ARQUITETURA DE EXPERIÊNCIA DO USUÁRIO
+ * Componente mestre que gerencia transições, background dinâmico e 
+ * integridade estrutural em todos os dispositivos.
  */
 export const PageWrapper = ({ children }: PageWrapperProps) => {
   return (
-    <main 
-      className="relative min-h-screen flex flex-col bg-white dark:bg-[#020617] transition-colors duration-500 overflow-x-hidden"
+    <div 
+      className="relative min-h-screen flex flex-col bg-white dark:bg-[#020617] transition-colors duration-700 overflow-x-hidden"
     >
-      {/* CONTAINER DE ANIMAÇÃO: 
-          Aplica um Fade-In suave em toda a página ao carregar.
+      {/* ANIMAÇÃO DE ENTRADA (Staggered Entrance)
+          Aplica um efeito de surgimento suave e leve subida para sensação de profundidade.
       */}
       <div 
-        className="flex-grow animate-in fade-in duration-1000 ease-out fill-mode-both"
-        style={{
-          animationFillMode: 'both'
-        }}
+        className="flex-grow animate-in fade-in slide-in-from-bottom-2 duration-1000 ease-out fill-mode-both"
       >
-        {/* ESPAÇAMENTO DA NAVBAR:
-            O pt-20 (mobile) e pt-24 (desktop) garantem que a Navbar 'fixed'
-            não sobreponha o título da Hero Section.
+        {/* COMPENSAÇÃO DA NAVBAR FIXA
+            pt-20 (80px) em mobile | pt-28 (112px) em desktop
+            Garante que o conteúdo da Hero nunca comece "atrás" do menu superior.
         */}
-        <div className="w-full h-full pt-20 md:pt-24">
+        <div className="w-full h-full pt-20 md:pt-28">
           {children}
         </div>
       </div>
 
-      {/* CAMADA DE GOVERNANÇA VISUAL (Background Decorativo):
-          Gradiente sutil que melhora o contraste em telas OLED e monitores 4K.
+      {/* GOVERNANÇA VISUAL (Background Decorativo)
+          Gradiente radial fixo para reduzir a fadiga visual em Dark Mode e 
+          dar profundidade estética sem impactar o carregamento.
       */}
-      <div className="fixed inset-0 -z-[50] pointer-events-none opacity-40 dark:opacity-20 will-change-transform">
+      <div 
+        className="fixed inset-0 -z-10 pointer-events-none opacity-50 dark:opacity-30 will-change-opacity"
+        aria-hidden="true"
+      >
         <div 
-          className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.08),transparent_50%)]" 
-          aria-hidden="true"
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.1),transparent_70%)]" 
         />
       </div>
       
-      {/* BARRA DE PROGRESSO DE CARREGAMENTO (OPCIONAL):
-          Dica visual de que a página está ativa.
+      {/* INDICADOR DE TOPO (Linha de Acabamento)
+          Uma linha ultra-fina de 1px que ajuda a definir o limite superior da página 
+          durante o scroll inicial.
       */}
-      <div className="fixed top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent z-[120] pointer-events-none" />
-    </main>
+      <div className="fixed top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/10 to-transparent z-[100] pointer-events-none" />
+    </div>
   );
 };
