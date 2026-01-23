@@ -5,7 +5,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n, type Locale } from '@/i18n-config';
 
-// Definição das fontes para 2026: Montserrat para títulos, Inter para leitura técnica
+// Fontes otimizadas: Montserrat para autoridade em títulos, Inter para legibilidade técnica
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -19,29 +19,29 @@ const montserrat = Montserrat({
 });
 
 /**
- * CONFIGURAÇÃO DE VIEWPORT
- * Essencial para responsividade e suporte a PWA (Progressive Web App).
+ * VIEWPORT & PWA BEHAVIOR
+ * Sincronizado com manifest.json para experiência nativa em mobile.
  */
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+    { media: '(prefers-color-scheme: light)', color: '#2563eb' }, // Azul vibrante do branding
     { media: '(prefers-color-scheme: dark)', color: '#020617' },
   ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  viewportFit: 'cover', // Garante preenchimento total em telas com notch (iPhone)
 };
 
-// Interface para garantir tipagem correta no Next.js 15
 interface LayoutProps {
   children: React.ReactNode;
   params: Promise<{ lang: string }>;
 }
 
 /**
- * SEO MULTILINGUE DINÂMICO
- * Configura títulos e descrições conforme o idioma atual.
+ * SEO & META DATA GENERATOR
+ * Configuração dinâmica para autoridade global em PT, EN e ES.
  */
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
@@ -52,15 +52,15 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const content = {
     pt: {
       title: "Sérgio Santos | Especialista em Dados e Sistemas Críticos",
-      desc: "Especialista em Dados com 20+ anos em sistemas bancários críticos. Azure, Python, Governança e Eficiência Operacional."
+      desc: "Especialista em Dados com 20+ anos de experiência. Foco em Azure, Python, Governança Operacional e Eficiência Financeira."
     },
     en: {
       title: "Sérgio Santos | Data & Critical Systems Specialist",
-      desc: "Data Specialist with 20+ years in critical banking systems. Azure, Python, Governance, and Operational Efficiency."
+      desc: "Data Specialist with 20+ years of experience. Focus on Azure, Python, Operational Governance, and Financial Efficiency."
     },
     es: {
       title: "Sérgio Santos | Especialista en Datos y Sistemas Críticos",
-      desc: "Especialista en Datos con 20+ años en sistemas críticos. Azure, Python, Gobernanza y Eficiencia Operativa."
+      desc: "Especialista en Datos con 20+ años de experiencia. Enfoque en Azure, Python, Gobernanza Operativa y Eficiencia Financiera."
     }
   };
 
@@ -112,11 +112,22 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       description: currentContent.desc,
       images: [`/og-image-${currentLang}.png`],
     },
+    
+    // Configurações Adicionais para Mobile/PWA
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'default',
+      title: "Sérgio.Data",
+    },
+    formatDetection: {
+      telephone: false, // Evita que números de ID pareçam links de telefone
+    },
   };
 }
 
 /**
- * ROOT LAYOUT - A ESTRUTURA MESTRE
+ * ROOT LAYOUT
+ * O container mestre que aplica fontes, temas e proteções de overflow.
  */
 export default async function RootLayout({ children, params }: LayoutProps) {
   const { lang } = await params;
@@ -127,14 +138,6 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       suppressHydrationWarning 
       className={`scroll-smooth ${montserrat.variable} ${inter.variable}`}
     >
-      <head>
-        <link rel="icon" href="/icons/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icons/icon.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-      </head>
       <body 
         className={`
           ${inter.className} 
@@ -149,9 +152,12 @@ export default async function RootLayout({ children, params }: LayoutProps) {
           enableSystem 
           disableTransitionOnChange
         >
-          {/* O wrapper global garante que nada 'estoure' a tela no mobile */}
+          {/* Wrapper de Segurança: 
+            w-full + overflow-x-hidden é essencial para responsividade 
+            em dispositivos com resoluções não padronizadas.
+          */}
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
-            <main className="flex-grow w-full">
+            <main className="flex-grow w-full relative">
               {children}
             </main>
           </div>
