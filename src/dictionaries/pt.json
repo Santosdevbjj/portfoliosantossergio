@@ -61,10 +61,10 @@
       "metrics": {
         "title": "Performance Logística",
         "subtitle": "KPIs & IMPACTO",
-        "accuracyValue": "61%",
-        "accuracyLabel": "Aumento de Precisão",
-        "savingsValue": "R$ 420K",
-        "savingsLabel": "Economia Anual"
+        "availabilityValue": "61%",
+        "availabilityLabel": "Aumento de Precisão",
+        "automationValue": "R$ 420K",
+        "automationLabel": "Economia Anual"
       },
       "stack": {
         "title": "Domínio Técnico",
