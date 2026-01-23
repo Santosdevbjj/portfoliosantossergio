@@ -2,15 +2,17 @@
   "common": {
     "language": "Español",
     "contact": "Contacto",
-    "viewProject": "Repositorio",
-    "liveDemo": "Demo",
+    "viewProject": "Ver Repositorio",
+    "liveDemo": "Demo en Vivo",
     "repoTitle": "Código Fuente",
     "portfolioTitle": "Soluciones y Datos",
     "governance": "Rigor Técnico",
     "backToTop": "Inicio",
-    "menu_aria": "Abrir Menú",
-    "loading": "Cargando...",
-    "error": "Ocurrió un error",
+    "menu_aria": "Abrir menú de navegación",
+    "close_aria": "Cerrar",
+    "scroll_top_aria": "Volver al inicio",
+    "loading": "Sincronizando datos...",
+    "error": "Ocurrió una inestabilidad en el sistema",
     "close": "Cerrar"
   },
   "nav": {
@@ -19,56 +21,64 @@
     "articles": "Artículos",
     "projects": "Proyectos",
     "contact": "Contacto",
-    "changeLang": "Idioma",
+    "changeLang": "Cambiar Idioma",
     "theme": {
-      "light": "Claro",
-      "dark": "Oscuro",
+      "light": "Modo Claro",
+      "dark": "Modo Oscuro",
       "system": "Sistema"
     }
   },
+  "hero": {
+    "badge": "Experto en Sistemas Críticos",
+    "title": "Transformando Datos Complejos en",
+    "titleAccent": "Decisiones de Alto Valor",
+    "description": "Ingeniero de Datos y Analista Senior con más de 20 años de experiencia en infraestructura bancaria (Bradesco). Especializado en Ciencia de Datos, eficiencia operativa y mitigación de riesgos financieros.",
+    "cta_primary": "Ver Proyectos",
+    "cta_secondary": "LinkedIn"
+  },
   "about": {
     "title": "Sobre Mí",
-    "headline": "Resiliencia de sistemas críticos aplicada a la inteligencia de datos estratégica.",
-    "bio": "Con más de 20 años de experiencia en sistemas de misión crítica en el sector bancario (Bradesco), me especialicé en asegurar que la tecnología respalde decisiones de alto riesgo con rigor operacional. Hoy, utilizo esa base sólida para liderar proyectos de Ciencia de Datos, conectando infraestructuras complejas con insights accionables.",
+    "headline": "Resiliencia de sistemas críticos aplicada a la inteligencia estratégica.",
+    "bio": "Con más de 20 años de experiencia en sistemas de misión crítica en el sector bancario, me especialicé en asegurar que la tecnología respalde decisiones de alto riesgo con rigor operacional. Hoy, utilizo esa base sólida para liderar proyectos de Ciencia de Datos, conectando infraestructuras complejas con insights accionables.",
     "sections": {
       "highlights": {
-        "title": "Hitos",
+        "title": "Diferenciales",
         "items": [
           {
-            "label": "Eficiencia",
+            "label": "Eficiencia Operativa",
             "description": "Automatización que eliminó 2.920 horas anuales de tareas manuales."
           },
           {
-            "label": "Disponibilidad",
-            "description": "Gestión de infraestructura crítica con 99,5% de disponibilidad (uptime)."
+            "label": "Alta Disponibilidad",
+            "description": "Gestión de infraestructura crítica con un historial de 99,5% de uptime."
           },
           {
-            "label": "Gobernanza",
-            "description": "Sistemas enfocados en trazabilidad y cumplimiento normativo."
+            "label": "Gobernanza y Riesgo",
+            "description": "Sistemas diseñados bajo estrictos criterios de cumplimiento y trazabilidad."
           }
         ]
       },
       "metrics": {
-        "title": "Rendimiento",
+        "title": "Rendimiento Logístico",
         "subtitle": "KPIs e IMPACTO",
-        "availabilityValue": "99.5%",
-        "availabilityLabel": "Disponibilidad",
-        "automationValue": "2.9K",
-        "automationLabel": "Horas/Año"
+        "accuracyValue": "61%",
+        "accuracyLabel": "Aumento de Precisión",
+        "savingsValue": "R$ 420K",
+        "savingsLabel": "Ahorro Anual"
       },
       "stack": {
-        "title": "Tecnologías",
+        "title": "Dominio Técnico",
         "items": [
-          { "label": "Datos", "description": "Python, SQL, R, Machine Learning" },
-          { "label": "Cloud & Big Data", "description": "Azure Databricks, Spark, ADF" },
-          { "label": "Business Intelligence", "description": "Power BI, Dashboards Estratégicos" }
+          { "label": "Data Science", "description": "Python, SQL, R, Machine Learning, Scikit-Learn" },
+          { "label": "Cloud Architecture", "description": "Azure Databricks, Spark, Azure Data Factory" },
+          { "label": "Visual Intelligence", "description": "Power BI, Dashboards para C-Level" }
         ]
       }
     }
   },
   "experience": {
     "title": "Trayectoria",
-    "subtitle": "Experiencia en Sistemas Críticos y Ciencia de Datos",
+    "subtitle": "Experiencia en Ingeniería y Ciencia de Datos",
     "labels": {
       "solving": "Desafío",
       "impact": "Resultado",
@@ -76,49 +86,49 @@
     },
     "items": [
       {
-        "company": "Consultoría de Datos",
+        "company": "Consultoría Estratégica",
         "role": "Científico de Datos",
         "period": "2023 – Presente",
-        "solving": "Incertidumbre en cronogramas de obra y multas por retrasos en ingeniería.",
-        "impact": "Mejora del 61% en precisión logística y ahorro de R$ 420 mil/año.",
+        "solving": "Incertidumbre en cronogramas de ingeniería y multas por retrasos contractuales.",
+        "impact": "Mejora del 61% en la precisión logística y ahorro anual de R$ 420 mil.",
         "description": [
-          "Desarrollo de modelos predictivos para mitigación de riesgos financieros.",
+          "Desarrollo de modelos predictivos para la mitigación de riesgos financieros.",
           "Creación de pipelines de datos y bots de monitoreo en tiempo real.",
           "Optimización de procesos logísticos mediante análisis estadístico avanzado."
         ],
-        "techs": ["Python", "Scikit-Learn", "Pandas", "Power BI", "APIs"]
+        "techs": ["Python", "Machine Learning", "Azure", "Power BI", "Pandas"]
       },
       {
         "company": "Banco Bradesco S.A.",
         "role": "Analista Senior de Sistemas",
         "period": "1985 – 2008",
         "solving": "Necesidad de alta disponibilidad y automatización en procesos bancarios críticos.",
-        "impact": "Ahorro de 2.920 horas/año con estabilidad del 99,5% del entorno.",
+        "impact": "Ahorro de 2.920 horas de esfuerzo manual/año con estabilidad del 99,5%.",
         "description": [
           "Liderazgo técnico en infraestructura para más de 500 usuarios en entorno regulado.",
-          "Implementación de sistemas bancarios enfocados en continuidad y seguridad.",
-          "Automatización de procesos para procesamiento de datos a gran escala."
+          "Implementación de sistemas bancarios enfocados en continuidad y seguridad de datos.",
+          "Desarrollo de rutinas de automatización para procesamiento a gran escala."
         ],
-        "techs": ["Sistemas Críticos", "Mainframe", "Automatización", "Gobernanza", "SQL"]
+        "techs": ["Sistemas Críticos", "Mainframe", "Gobernanza", "SQL", "Automatización"]
       }
     ]
   },
   "portfolio": {
     "title": "Proyectos",
-    "description": "Soluciones analíticas enfocadas en resolver problemas y entregar valor económico.",
+    "description": "Soluciones analíticas enfocadas en resolver problemas complejos y entregar valor económico.",
     "all": "Todos",
     "mainCaseLabel": "Destacado",
-    "resultsLabel": "Resultados",
-    "filterLabel": "Tecnología",
-    "noDescription": "Documentación en fase de actualización.",
-    "empty": "No hay proyectos en esta categoría.",
+    "resultsLabel": "Resultados Obtenidos",
+    "filterLabel": "Filtrar por Tecnología",
+    "noDescription": "Documentación técnica en proceso de actualización.",
+    "empty": "No se encontraron proyectos en esta categoría.",
     "categories": {
       "data-science": "Ciencia de Datos",
       "big-data": "Big Data",
       "automation": "Automatización",
       "governance": "Gobernanza",
-      "machine-learning": "ML",
-      "azure": "Azure"
+      "machine-learning": "Machine Learning",
+      "azure": "Azure Cloud"
     },
     "projectLabels": {
       "problem": "El Problema",
@@ -129,24 +139,25 @@
   },
   "contact": {
     "title": "Contacto",
-    "subtitle": "Disponible para liderazgo técnico, consultoría de datos y proyectos estratégicos.",
-    "emailBtn": "Email",
+    "subtitle": "Disponible para liderazgo técnico, consultoría de datos y alianzas estratégicas.",
+    "emailBtn": "Enviar Email",
     "socialLabel": "LinkedIn y GitHub",
     "status": "Activo en 2026",
     "form": {
       "name": "Su Nombre",
       "email": "Su Correo",
-      "message": "¿Cómo puedo ayudar?",
+      "message": "¿Cómo puedo ayudar con su desafío?",
       "send": "Enviar Mensaje",
-      "success": "¡Mensaje enviado con éxito!",
-      "error": "Error al enviar. Intente de nuevo."
+      "sending": "Enviando...",
+      "success": "¡Mensaje enviado con éxito! Me pondré en contacto pronto.",
+      "error": "Error al enviar. Por favor, intente de nuevo o use el email directo."
     }
   },
   "footer": {
     "socialTitle": "Social",
     "contactTitle": "Contacto",
     "location": "Brasil",
-    "builtBy": "Por",
+    "builtBy": "Desarrollado por",
     "rights": "Sérgio Santos • Todos los derechos reservados"
   }
 }
