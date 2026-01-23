@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { motion, type HTMLMotionProps } from 'framer-motion';
 
 type Props = {
