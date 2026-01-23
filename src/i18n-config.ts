@@ -1,6 +1,7 @@
 /**
  * CONFIGURAÇÃO GLOBAL DE IDIOMAS - NEXT.JS 16 / 2026
  * Centraliza a lógica de internacionalização (i18n) para PT, EN e ES.
+ * Este arquivo alimenta o Proxy, o SEO e os Dicionários.
  */
 
 export const i18n = {
@@ -13,7 +14,6 @@ export type Locale = (typeof i18n)['locales'][number];
 /**
  * METADADOS DE IDIOMA
  * Estrutura imutável para LanguageSwitcher e tags de SEO (hreflang).
- * Design focado em acessibilidade e suporte multilingue completo.
  */
 export interface LocaleDetail {
   readonly name: string;   
@@ -49,7 +49,6 @@ export const localeMetadata: Readonly<Record<Locale, LocaleDetail>> = {
 
 /**
  * VALIDADOR DE LOCALE (Type Guard)
- * Segurança em tempo de execução para rotas, middleware e componentes.
  */
 export function isValidLocale(locale: unknown): locale is Locale {
   return typeof locale === 'string' && (i18n.locales as readonly string[]).includes(locale);
@@ -57,16 +56,14 @@ export function isValidLocale(locale: unknown): locale is Locale {
 
 /**
  * ESTRATÉGIA DE FALLBACK
- * Garante que o sistema sempre retorne um idioma válido.
  */
 export function getSafeLocale(locale: string | undefined | null): Locale {
   return isValidLocale(locale) ? locale : i18n.defaultLocale;
 }
 
 /**
- * CARREGAMENTO DINÂMICO DE DICIONÁRIOS (Lazy Loading / Code Splitting)
- * AJUSTE: Usando caminhos relativos para compatibilidade com o Runtime da Vercel.
- * Isso resolve o erro "Cannot find module" identificado nos logs de execução.
+ * CARREGAMENTO DINÂMICO (Code Splitting)
+ * Gerencia o carregamento sob demanda dos arquivos JSON.
  */
 const dictionaries: Record<Locale, () => Promise<any>> = {
   pt: () => import('./dictionaries/pt.json').then((module) => module.default),
@@ -74,9 +71,11 @@ const dictionaries: Record<Locale, () => Promise<any>> = {
   es: () => import('./dictionaries/es.json').then((module) => module.default),
 };
 
+
+
 /**
  * OBTÉM O DICIONÁRIO
- * Função assíncrona para Server e Client Components com tratamento de erro robusto.
+ * Centralizado aqui para uso em Server Components.
  */
 export const getDictionary = async (locale: Locale) => {
   const safeLocale = getSafeLocale(locale);
@@ -90,19 +89,18 @@ export const getDictionary = async (locale: Locale) => {
     
     return await loadDictionary();
   } catch (error) {
-    console.error(`[i18n-error] Falha ao carregar idioma (${safeLocale}):`, error);
+    console.error(`[i18n-critical] Falha ao carregar idioma (${safeLocale}):`, error);
     
-    // Fallback de última instância para o idioma padrão (PT)
+    // Fallback para o idioma padrão se o solicitado falhar
     if (safeLocale !== i18n.defaultLocale) {
       try {
-        const fallback = dictionaries[i18n.defaultLocale];
-        return await fallback();
+        return await dictionaries[i18n.defaultLocale]();
       } catch (fallbackError) {
-        console.error(`[i18n-critical] Falha total no fallback:`, fallbackError);
+        console.error(`[i18n-panic] Falha total no sistema de idiomas.`, fallbackError);
       }
     }
     
-    // Retorna objeto vazio para evitar o "Erro de Execução" na tela do usuário
+    // Retorna objeto vazio para manter a aplicação estável
     return {};
   }
 };
