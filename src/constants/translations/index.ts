@@ -3,14 +3,12 @@
 import { pt } from './pt';
 import { en } from './en';
 import { es } from './es';
-
-// Correção do Warning do Log: Importando explicitamente como tipo
 import type { Locale } from '@/i18n-config';
 
 /**
- * DICIONÁRIO ESTRUTURADO DE TRADUÇÕES
- * Centraliza os arquivos de idiomas. 
- * O 'as const' garante imutabilidade e inferência de tipos literal.
+ * AGREGADOR DE TRADUÇÕES (Central de Idiomas)
+ * Gerencia a disponibilidade dos dicionários no sistema.
+ * O 'as const' é fundamental para inferência de tipos em tempo de design.
  */
 export const translations = { 
   pt, 
@@ -20,33 +18,37 @@ export const translations = {
 
 /**
  * ENGENHARIA DE TIPOS (Type Safety)
- * Utilizamos o 'pt' como contrato mestre (Source of Truth). 
- * Isso garante que EN e ES sigam exatamente a mesma estrutura.
+ * Definimos 'pt' como o contrato mestre (Source of Truth). 
+ * Qualquer mudança em pt.ts exigirá atualização em en.ts e es.ts.
  */
 export type TranslationContent = typeof pt;
 export type ITranslations = typeof translations;
 
 /**
- * HELPER DE ACESSO SEGURO (Type Guard)
- * Verifica se uma string de idioma é suportada pelo dicionário.
+ * TYPE GUARD DE SEGURANÇA
+ * Garante que o código só acesse chaves existentes no objeto de traduções.
  */
 export function isSupportedLang(lang: string): lang is keyof ITranslations {
-  return Object.keys(translations).includes(lang);
+  return lang in translations;
 }
 
 /**
- * GET TRANSLATIONS (Otimizado para Next.js 15)
- * Recupera o dicionário de tradução com fallback para o idioma padrão.
- * * @param lang - Código do idioma (pt, en ou es)
- * @returns O dicionário de termos traduzidos com tipagem forte
+ * GET TRANSLATIONS (Arquitetura Next.js 15+)
+ * Função síncrona para recuperar o conteúdo traduzido.
+ * Projetada para ser utilizada tanto em Client quanto Server Components.
+ * * @param lang - Código do idioma extraído da URL ou Config
+ * @returns Objeto de tradução tipado e validado
  */
 export const getTranslations = (lang: string | Locale): TranslationContent => {
-  // Verificação rigorosa para garantir que o acesso ao objeto seja seguro
-  if (isSupportedLang(lang)) {
-    return translations[lang as keyof ITranslations];
+  // Verificação de suporte para evitar erros de 'undefined' no acesso à chave
+  if (typeof lang === 'string' && isSupportedLang(lang)) {
+    return translations[lang];
   }
 
-  // Fallback estratégico: Se o idioma solicitado for inválido (ex: /fr), 
-  // retornamos Português para manter o portfólio funcional.
+  /**
+   * FALLBACK ESTRATÉGICO
+   * Se o idioma não for suportado (ex: /fr), retorna Português.
+   * Isso garante que a interface sempre terá conteúdo renderizável.
+   */
   return translations.pt;
 };
