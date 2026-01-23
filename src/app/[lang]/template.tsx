@@ -1,14 +1,14 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion/client';
 import type { PropsWithChildren } from 'react';
 
 /**
  * Template Component
  * -------------------------------------------------------
- * PT: Remontado a cada navegação para animações suaves
- * EN: Remounted on every navigation for smooth transitions
- * ES: Reensamblado en cada navegación para transiciones suaves
+ * PT: Recriado a cada navegação para transições suaves
+ * EN: Remounted on each navigation for smooth transitions
+ * ES: Recreado en cada navegación para transiciones suaves
  */
 export default function Template({ children }: PropsWithChildren) {
   return (
