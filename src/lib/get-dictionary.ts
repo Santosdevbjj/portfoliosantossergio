@@ -2,39 +2,44 @@ import 'server-only';
 import type { Locale } from '@/i18n-config';
 
 /**
- * MOTOR DE DICIONÁRIOS — NEXT.JS 16 (SERVER-SIDE)
- * ------------------------------------------------
- * - Garante carregamento lazy dos JSONs
- * - Evita envio de dicionários ao client
- * - Normaliza a estrutura para prevenir erros de SSR
+ * MOTOR DE DICIONÁRIOS — INFRAESTRUTURA DE DADOS
+ * Gerencia o carregamento assíncrono e a segurança estrutural das traduções.
  */
 
 /**
- * Estrutura mínima garantida do dicionário.
- * Isso evita erros como:
- * "Cannot destructure property 'featured' of 'articles' as it is undefined"
+ * Define a forma mínima que o dicionário deve ter.
+ * Essencial para evitar erros de renderização em componentes complexos como FeaturedArticle.
  */
-type DictionaryShape = {
-  articles: {
-    featured: unknown[];
-    [key: string]: unknown;
+interface DictionaryShape {
+  common: {
+    viewProject: string;
+    liveDemo: string;
+    [key: string]: string;
   };
-  [key: string]: unknown;
-};
+  articles: {
+    featured: any;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
 
 /**
- * Dicionário base de segurança (fallback estrutural)
- * ⚠️ NUNCA deve ser vazio
+ * Estrutura Base de Segurança (Last Line of Defense)
+ * Garante que chaves críticas existam mesmo se o JSON estiver corrompido.
  */
 const BASE_DICTIONARY: DictionaryShape = {
-  articles: {
-    featured: [],
+  common: {
+    viewProject: "View GitHub",
+    liveDemo: "Live Demo"
   },
+  articles: {
+    featured: null
+  }
 };
 
 /**
- * Loaders de dicionário por idioma
- * Caminhos relativos para compatibilidade total com Vercel
+ * Loader de Dicionários com Lazy Loading
+ * Otimizado para Next.js 15/16 e Vercel Edge Functions.
  */
 const dictionaries: Record<Locale, () => Promise<any>> = {
   pt: () => import('../dictionaries/pt.json').then((m) => m.default),
@@ -43,60 +48,45 @@ const dictionaries: Record<Locale, () => Promise<any>> = {
 };
 
 /**
- * Normaliza o dicionário para garantir shape estável
+ * Função de Normalização
+ * Mescla o conteúdo carregado com a estrutura base para evitar erros de 'undefined'.
  */
-function normalizeDictionary(raw: any): DictionaryShape {
+function normalize(raw: any): DictionaryShape {
   return {
     ...BASE_DICTIONARY,
     ...raw,
-    articles: {
-      ...BASE_DICTIONARY.articles,
-      ...(raw?.articles ?? {}),
-      featured: Array.isArray(raw?.articles?.featured)
-        ? raw.articles.featured
-        : [],
-    },
+    common: { ...BASE_DICTIONARY.common, ...(raw?.common || {}) },
+    articles: { ...BASE_DICTIONARY.articles, ...(raw?.articles || {}) }
   };
 }
 
 /**
  * getDictionary
- * ------------------------------------------------
- * - Nunca retorna undefined
- * - Nunca retorna objeto sem articles.featured
- * - Sempre retorna um dicionário seguro para SSR
+ * Ponto de entrada único para buscar traduções no servidor.
  */
-export const getDictionary = async (locale: Locale) => {
+export const getDictionary = async (locale: Locale): Promise<DictionaryShape> => {
   try {
-    const loader = dictionaries[locale] ?? dictionaries.pt;
-    const rawDict = await loader();
-
-    return normalizeDictionary(rawDict);
+    // Tenta carregar o idioma solicitado ou cai para o português
+    const loadLanguage = dictionaries[locale] || dictionaries.pt;
+    const content = await loadLanguage();
+    
+    return normalize(content);
   } catch (error) {
-    console.error(
-      `[Dictionary Error] Falha ao carregar idioma: ${locale}`,
-      error
-    );
+    console.error(`[i18n] Erro ao carregar dicionário (${locale}):`, error);
 
+    // Tentativa de recuperação automática (Fallback para PT)
     try {
       const fallback = await dictionaries.pt();
-      return normalizeDictionary(fallback);
-    } catch (criticalError) {
-      console.error(
-        '[Dictionary Critical] Falha total ao carregar fallback PT',
-        criticalError
-      );
-
-      // Última linha de defesa — site NUNCA quebra
+      return normalize(fallback);
+    } catch {
+      // Falha total: Retorna estrutura mínima de emergência
       return BASE_DICTIONARY;
     }
   }
 };
 
 /**
- * Tipo utilitário para uso nos componentes
- * Exemplo:
- * const dict = await getDictionary(lang);
- * dict.articles.featured // sempre seguro
+ * Tipo exportado para tipagem de Props em componentes
+ * Ex: interface Props { dict: Dictionary }
  */
-export type Dictionary = Awaited<ReturnType<typeof getDictionary>>;
+export type Dictionary = DictionaryShape;
