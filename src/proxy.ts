@@ -1,4 +1,3 @@
-// src/proxy.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { i18n } from './i18n-config';
@@ -6,34 +5,38 @@ import { match as matchLocale } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 
 /**
- * DETECÇÃO DE IDIOMA (LOCALE)
- * Analisa as preferências do navegador do usuário e cruza com os idiomas suportados.
+ * DETECÇÃO DE IDIOMA (LOCALE) - SEGURA PARA PRODUÇÃO
+ * Resolve o erro 'reading split' tratando cabeçalhos ausentes.
  */
 function getLocale(request: NextRequest): string {
   try {
-    // Converte headers do NextRequest para objeto padrão
-    const headers: Record<string, string> = {};
-    request.headers.forEach((value, key) => (headers[key] = value));
+    const acceptLanguage = request.headers.get('accept-language');
+    
+    // Fallback imediato se o header não existir, evitando erro de processamento
+    if (!acceptLanguage) {
+      return i18n.defaultLocale;
+    }
 
-    // Obtém idiomas preferidos do usuário
+    const headers: Record<string, string> = { 'accept-language': acceptLanguage };
     const userLanguages = new Negotiator({ headers }).languages();
 
-    // Retorna o idioma compatível ou padrão
-    return matchLocale(userLanguages, i18n.locales, i18n.defaultLocale);
+    // Valida compatibilidade com as línguas suportadas: pt, en, es
+    return matchLocale(userLanguages, i18n.locales as unknown as string[], i18n.defaultLocale);
   } catch (err) {
+    // Captura falhas inesperadas no parser e garante a continuidade da execução
     console.error('[Proxy] Erro ao detectar idioma:', err);
     return i18n.defaultLocale;
   }
 }
 
 /**
- * PROXY DE ROTEAMENTO
- * Redireciona automaticamente para /pt, /en ou /es caso não haja prefixo na URL.
+ * PROXY DE ROTEAMENTO (MIDDLEWARE)
+ * Gerencia o direcionamento multilingue e protege rotas de sistema.
  */
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  // Rotas, assets e arquivos a serem ignorados
+  // Lista de arquivos e caminhos de sistema que não devem sofrer redirecionamento
   const ignoredPaths = [
     '/_next',
     '/api',
@@ -41,9 +44,10 @@ export function proxy(request: NextRequest) {
     '/robots.txt',
     '/sitemap.xml',
     '/sw.js',
+    '/assets',
   ];
 
-  // Ignora rotas internas, arquivos públicos ou qualquer arquivo com extensão
+  // Filtro de segurança: ignora arquivos estáticos e rotas de sistema
   if (
     ignoredPaths.some((path) => pathname.startsWith(path)) ||
     pathname.includes('.')
@@ -51,28 +55,34 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Verifica se a URL já contém um prefixo de idioma
+  // Verifica se a URL atual já possui um dos idiomas suportados (pt|en|es)
   const isMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
 
   if (isMissingLocale) {
     const locale = getLocale(request);
-    const cleanPath = pathname.replace(/^\/+/, ''); // remove barras iniciais extras
-    const redirectUrl = new URL(`/${locale}/${cleanPath}${search}`, request.url);
-    return NextResponse.redirect(redirectUrl, 307); // redirecionamento temporário (SEO-friendly)
+    
+    // Construção robusta da URL usando o objeto nativo do Next.js
+    const redirectUrl = request.nextUrl.clone();
+    
+    // Ajusta o caminho injetando o idioma detectado na frente da rota
+    redirectUrl.pathname = `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`;
+    
+    // Redirecionamento 307 (Temporário) - Melhor prática para SEO e troca de idiomas
+    return NextResponse.redirect(redirectUrl, 307);
   }
 
   return NextResponse.next();
 }
 
 /**
- * CONFIGURAÇÃO DO MATCHER
- * Define quais rotas passam pelo proxy
+ * CONFIGURAÇÃO DO MATCHER (NEXT.JS 16)
+ * Define quais rotas serão processadas pelo proxy.
  */
 export const config = {
   matcher: [
-    // Todas as rotas, exceto APIs, _next/static, imagens e arquivos públicos
+    // Processa todas as rotas de usuário, ignorando assets e arquivos internos
     '/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js|.*\\..*).*)',
   ],
 };
