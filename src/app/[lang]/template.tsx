@@ -1,29 +1,55 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 
 /**
- * TEMPLATE COMPONENT - NEXT.JS 15
- * Diferente do layout.tsx, o template.tsx é remontado a cada navegação de rota.
- * Proporciona uma transição fluida de "Fade & Slide" reforçando a modernidade.
- * * FIX: Removido 'AnimatePresence' não utilizado para satisfazer o rigor do build.
+ * TEMPLATE COMPONENT — NEXT.JS 16
+ *
+ * PT: Este componente é remontado a cada navegação de rota,
+ *     permitindo transições suaves entre páginas.
+ *
+ * EN: This component is remounted on every route navigation,
+ *     enabling smooth page transitions.
+ *
+ * ES: Este componente se vuelve a montar en cada navegación,
+ *     permitiendo transiciones fluidas entre páginas.
  */
-export default function Template({ children }: { children: React.ReactNode }) {
+export default function Template({ children }: { children: ReactNode }) {
   return (
-    <motion.div
-      // Estado inicial: Invisível e levemente abaixo da posição final
-      initial={{ opacity: 0, y: 15 }}
-      // Estado ativo: Totalmente visível na posição original
+    <motion.div<HTMLDivElement>
+      /**
+       * Estado inicial | Initial state | Estado inicial
+       * Levemente deslocado e invisível para efeito "fade + slide"
+       */
+      initial={{ opacity: 0, y: 16 }}
+
+      /**
+       * Estado final | Final state | Estado final
+       * Totalmente visível na posição original
+       */
       animate={{ opacity: 1, y: 0 }}
-      // Configuração de transição: Curva Bézier personalizada para suavidade premium
-      transition={{ 
-        duration: 0.7, 
-        ease: [0.22, 1, 0.36, 1], 
-        delay: 0.1 
+
+      /**
+       * Transição | Transition | Transición
+       * Curva Bézier premium para UX suave e profissional
+       */
+      transition={{
+        duration: 0.7,
+        ease: [0.22, 1, 0.36, 1],
+        delay: 0.08,
       }}
-      // Otimização de performance: Indica ao navegador para usar a GPU
-      style={{ style: { willChange: 'opacity, transform' } } as any}
-      // Garante integridade responsiva e evita scroll lateral em animações
+
+      /**
+       * Performance hint
+       * PT/EN/ES: Indica ao navegador otimizações de renderização
+       */
+      style={{ willChange: 'opacity, transform' }}
+
+      /**
+       * Responsividade total
+       * Evita scroll horizontal durante animações
+       */
       className="relative flex min-h-screen w-full flex-col overflow-x-hidden"
     >
       {children}
