@@ -8,16 +8,15 @@ import { useTheme } from '@/hooks/useTheme'
 import { i18n, type Locale } from '@/i18n-config'
 
 /**
- * COMPONENTE: LanguageSwitcher & ThemeToggle
- * Design: Floating Glassmorphism com animações suaves.
- * Totalmente Responsivo e adaptado para Next.js 15.
+ * COMPONENTE: LanguageSwitcherContent
+ * Gerencia a lógica de internacionalização e alternância de tema Dark/Light.
  */
 const LanguageSwitcherContent = () => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { isDark, toggleTheme } = useTheme()
   
-  // Controle de hidratação para evitar erro de inconsistência entre Server e Client
+  // Controle de hidratação para evitar mismatch entre Client e Server
   const [mounted, setMounted] = useState(false)
   
   useEffect(() => {
@@ -35,19 +34,20 @@ const LanguageSwitcherContent = () => {
 
   /**
    * RECONSTRUÇÃO DE ROTA DINÂMICA
-   * Mantém parâmetros de busca (query strings) ao trocar de idioma.
+   * Preserva a página atual e os parâmetros de busca ao trocar o idioma.
    */
   const getNewPath = (langCode: string): string => {
     if (!pathname) return `/${langCode}`
     
     const segments = pathname.split('/')
-    // Verifica se o primeiro segmento é um idioma válido conforme as definições de i18n
+    // O idioma é sempre o segundo segmento (índice 1) em rotas /pt/...
     const isLangSegment = i18n.locales.includes(segments[1] as Locale)
     
     const newSegments = [...segments]
     if (isLangSegment) {
       newSegments[1] = langCode
     } else {
+      // Se por algum motivo não houver segmento de idioma, insere no início
       newSegments.splice(1, 0, langCode)
     }
     
@@ -56,77 +56,70 @@ const LanguageSwitcherContent = () => {
     return `${newPathname}${params ? `?${params}` : ''}`
   }
 
-  // Placeholder durante a hidratação para evitar Layout Shift (CLS)
+  // Placeholder estável durante a hidratação (evita saltos visuais)
   if (!mounted) {
     return (
-      <div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-11 w-32 sm:w-44 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl backdrop-blur-md z-[110]" />
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-10 w-36 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-xl backdrop-blur-md z-[110]" />
     )
   }
 
   return (
     <nav 
       aria-label="Language and theme settings"
-      className="fixed top-4 right-4 sm:top-6 sm:right-8 z-[110] flex items-center gap-1 p-1 sm:p-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-200/50 dark:border-slate-800/50 shadow-2xl ring-1 ring-black/5 transition-all duration-500"
+      className="fixed top-4 right-4 sm:top-6 sm:right-8 z-[110] flex items-center gap-1 p-1 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-xl border border-slate-200/50 dark:border-slate-800/50 shadow-2xl ring-1 ring-black/5 transition-all duration-500"
     >
-      {/* TOGGLE DE TEMA */}
+      {/* TOGGLE DE TEMA: Dark / Light */}
       <button
         onClick={() => toggleTheme()}
-        className="p-2 rounded-xl text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all active:scale-90 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="p-2 rounded-lg text-slate-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all active:scale-90"
         aria-label={isDark ? "Ativar modo claro" : "Ativar modo escuro"}
       >
-        <div className="relative w-5 h-5 flex items-center justify-center">
+        <div className="relative w-4 h-4 flex items-center justify-center">
           {isDark ? (
-            <Sun size={18} className="text-amber-500 animate-in zoom-in spin-in-180 duration-500" />
+            <Sun size={16} className="text-amber-500 animate-in zoom-in spin-in-90 duration-500" />
           ) : (
-            <Moon size={18} className="text-blue-600 animate-in zoom-in spin-in-180 duration-500" />
+            <Moon size={16} className="text-blue-600 animate-in zoom-in spin-in-90 duration-500" />
           )}
         </div>
       </button>
 
       {/* Divisor Visual */}
-      <div className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-0.5 sm:mx-1" aria-hidden="true" />
+      <div className="w-px h-3 bg-slate-200 dark:bg-slate-800 mx-1" aria-hidden="true" />
 
       {/* SELETOR DE IDIOMAS */}
-      <div className="flex items-center">
-        {/* Ícone Globe escondido em telas muito pequenas para economizar espaço */}
-        <div className="hidden sm:flex items-center px-1">
-          <Globe size={13} className="text-slate-400 dark:text-slate-500" />
+      <div className="flex items-center gap-0.5">
+        <div className="hidden sm:flex items-center px-1 opacity-40">
+          <Globe size={12} />
         </div>
         
-        <div className="flex gap-0.5">
-          {languages.map((lang) => {
-            const isActive = currentLang === lang.code
-            return (
-              <Link
-                key={lang.code}
-                /* CORREÇÃO CRÍTICA PARA O ERRO DE BUILD: 
-                   O 'as any' silencia a validação estática de rotas do Next.js 15 para URLs geradas dinamicamente.
-                */
-                href={getNewPath(lang.code) as any}
-                hrefLang={lang.code}
-                rel="alternate"
-                scroll={false}
-                className={`
-                  relative px-2 sm:px-2.5 py-1.5 text-[10px] font-black rounded-lg transition-all duration-300 uppercase tracking-tighter
-                  ${isActive 
-                    ? 'text-white' 
-                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                  }
-                `}
-                aria-label={lang.aria}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                <span className="relative z-10">{lang.label}</span>
-                {isActive && (
-                  <div 
-                    className="absolute inset-0 bg-blue-600 rounded-lg z-0 animate-in fade-in zoom-in-95 duration-500 shadow-lg shadow-blue-600/30" 
-                    aria-hidden="true"
-                  />
-                )}
-              </Link>
-            )
-          })}
-        </div>
+        {languages.map((lang) => {
+          const isActive = currentLang === lang.code
+          return (
+            <Link
+              key={lang.code}
+              href={getNewPath(lang.code) as any}
+              hrefLang={lang.code}
+              rel="alternate"
+              scroll={false}
+              className={`
+                relative px-2.5 py-1.5 text-[10px] font-black rounded-lg transition-all duration-300 uppercase tracking-tighter
+                ${isActive 
+                  ? 'text-white' 
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }
+              `}
+              aria-label={lang.aria}
+            >
+              <span className="relative z-10">{lang.label}</span>
+              {isActive && (
+                <div 
+                  className="absolute inset-0 bg-blue-600 rounded-lg z-0 animate-in fade-in zoom-in-95 duration-500 shadow-md shadow-blue-600/20" 
+                  aria-hidden="true"
+                />
+              )}
+            </Link>
+          )
+        })}
       </div>
     </nav>
   )
@@ -134,10 +127,10 @@ const LanguageSwitcherContent = () => {
 
 /**
  * EXPORT COM SUSPENSE
- * Essencial no Next.js 15: useSearchParams() exige um Suspense Boundary para renderização no cliente.
+ * Obrigatório no Next.js 15 quando se usa useSearchParams em componentes Client.
  */
 export const LanguageSwitcher = () => (
-  <Suspense fallback={<div className="fixed top-4 right-4 sm:top-6 sm:right-8 h-11 w-32 rounded-2xl bg-slate-200/10" />}>
+  <Suspense fallback={null}>
     <LanguageSwitcherContent />
   </Suspense>
 )
