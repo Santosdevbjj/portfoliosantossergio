@@ -2,48 +2,101 @@ import 'server-only';
 import type { Locale } from '@/i18n-config';
 
 /**
- * MOTOR DE DICIONÁRIOS - NEXT.JS 16 (SERVER-SIDE)
- * A diretiva 'server-only' garante que os JSONs de tradução não sejam 
- * enviados ao cliente desnecessariamente, melhorando a segurança e performance.
+ * MOTOR DE DICIONÁRIOS — NEXT.JS 16 (SERVER-SIDE)
+ * ------------------------------------------------
+ * - Garante carregamento lazy dos JSONs
+ * - Evita envio de dicionários ao client
+ * - Normaliza a estrutura para prevenir erros de SSR
  */
 
-const dictionaries = {
-  /**
-   * Lazy loading com Caminhos Relativos:
-   * AJUSTE: Alterado de '@/' para '../' para garantir que a Vercel localize os arquivos 
-   * no ambiente de produção, corrigindo o erro de "Cannot find module".
-   */
-  pt: () => import('../dictionaries/pt.json').then((module) => module.default),
-  en: () => import('../dictionaries/en.json').then((module) => module.default),
-  es: () => import('../dictionaries/es.json').then((module) => module.default),
+/**
+ * Estrutura mínima garantida do dicionário.
+ * Isso evita erros como:
+ * "Cannot destructure property 'featured' of 'articles' as it is undefined"
+ */
+type DictionaryShape = {
+  articles: {
+    featured: unknown[];
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
 };
 
 /**
- * getDictionary: Busca o conteúdo traduzido.
- * @param locale - Idioma detectado (pt | en | es)
- * @returns Objeto de tradução completo para o idioma solicitado.
+ * Dicionário base de segurança (fallback estrutural)
+ * ⚠️ NUNCA deve ser vazio
+ */
+const BASE_DICTIONARY: DictionaryShape = {
+  articles: {
+    featured: [],
+  },
+};
+
+/**
+ * Loaders de dicionário por idioma
+ * Caminhos relativos para compatibilidade total com Vercel
+ */
+const dictionaries: Record<Locale, () => Promise<any>> = {
+  pt: () => import('../dictionaries/pt.json').then((m) => m.default),
+  en: () => import('../dictionaries/en.json').then((m) => m.default),
+  es: () => import('../dictionaries/es.json').then((m) => m.default),
+};
+
+/**
+ * Normaliza o dicionário para garantir shape estável
+ */
+function normalizeDictionary(raw: any): DictionaryShape {
+  return {
+    ...BASE_DICTIONARY,
+    ...raw,
+    articles: {
+      ...BASE_DICTIONARY.articles,
+      ...(raw?.articles ?? {}),
+      featured: Array.isArray(raw?.articles?.featured)
+        ? raw.articles.featured
+        : [],
+    },
+  };
+}
+
+/**
+ * getDictionary
+ * ------------------------------------------------
+ * - Nunca retorna undefined
+ * - Nunca retorna objeto sem articles.featured
+ * - Sempre retorna um dicionário seguro para SSR
  */
 export const getDictionary = async (locale: Locale) => {
   try {
-    // Tenta carregar o dicionário solicitado ou cai no fallback (pt)
-    const loader = dictionaries[locale] || dictionaries.pt;
-    return await loader();
+    const loader = dictionaries[locale] ?? dictionaries.pt;
+    const rawDict = await loader();
+
+    return normalizeDictionary(rawDict);
   } catch (error) {
-    console.error(`[Dictionary Error] Falha ao carregar idioma: ${locale}`, error);
-    
-    // Fallback crítico: se o arquivo JSON estiver corrompido ou faltando,
-    // retorna o padrão para evitar que o site quebre.
+    console.error(
+      `[Dictionary Error] Falha ao carregar idioma: ${locale}`,
+      error
+    );
+
     try {
-      return await dictionaries.pt();
+      const fallback = await dictionaries.pt();
+      return normalizeDictionary(fallback);
     } catch (criticalError) {
-      console.error("[Dictionary Critical] Falha total ao carregar fallback PT", criticalError);
-      return {}; // Retorna objeto vazio como última instância
+      console.error(
+        '[Dictionary Critical] Falha total ao carregar fallback PT',
+        criticalError
+      );
+
+      // Última linha de defesa — site NUNCA quebra
+      return BASE_DICTIONARY;
     }
   }
 };
 
 /**
- * Utilitário de Tipo para TypeScript
- * Permite usar: interface Props { dict: Dictionary } nos seus componentes.
+ * Tipo utilitário para uso nos componentes
+ * Exemplo:
+ * const dict = await getDictionary(lang);
+ * dict.articles.featured // sempre seguro
  */
-export type Dictionary = Awaited<ReturnType<typeof dictionaries.pt>>;
+export type Dictionary = Awaited<ReturnType<typeof getDictionary>>;
