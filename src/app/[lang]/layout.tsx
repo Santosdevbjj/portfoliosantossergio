@@ -5,7 +5,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n, type Locale } from '@/i18n-config';
 
-// Fontes otimizadas para performance e legibilidade em 2026
+// Definição das fontes para 2026: Montserrat para títulos, Inter para leitura técnica
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -20,7 +20,7 @@ const montserrat = Montserrat({
 
 /**
  * CONFIGURAÇÃO DE VIEWPORT
- * Garante que o site seja adaptável em qualquer dispositivo (Mobile, Tablet, Desktop).
+ * Essencial para responsividade e suporte a PWA (Progressive Web App).
  */
 export const viewport: Viewport = {
   themeColor: [
@@ -33,12 +33,18 @@ export const viewport: Viewport = {
   userScalable: true,
 };
 
+// Interface para garantir tipagem correta no Next.js 15
+interface LayoutProps {
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+}
+
 /**
- * GENERATE METADATA - SEO MULTILINGUE DINÂMICO
- * Alinhado com a documentação do Next.js 15: params é uma Promise.
+ * SEO MULTILINGUE DINÂMICO
+ * Configura títulos e descrições conforme o idioma atual.
  */
-export async function generateMetadata(props: LayoutProps<'/[lang]'>): Promise<Metadata> {
-  const { lang } = await props.params;
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
   const currentLang = (lang || i18n.defaultLocale) as Locale;
   
   const siteUrl = process.env['NEXT_PUBLIC_SITE_URL'] || "https://portfoliosantossergio.vercel.app";
@@ -46,15 +52,15 @@ export async function generateMetadata(props: LayoutProps<'/[lang]'>): Promise<M
   const content = {
     pt: {
       title: "Sérgio Santos | Especialista em Dados e Sistemas Críticos",
-      desc: "Analista Sênior com 20+ anos em sistemas críticos. Especialista em Ciência de Dados, Azure e Eficiência Operacional."
+      desc: "Especialista em Dados com 20+ anos em sistemas bancários críticos. Azure, Python, Governança e Eficiência Operacional."
     },
     en: {
       title: "Sérgio Santos | Data & Critical Systems Specialist",
-      desc: "Senior Analyst with 20+ years in critical systems. Specialist in Data Science, Azure, and Operational Efficiency."
+      desc: "Data Specialist with 20+ years in critical banking systems. Azure, Python, Governance, and Operational Efficiency."
     },
     es: {
       title: "Sérgio Santos | Especialista en Datos y Sistemas Críticos",
-      desc: "Analista Sénior con 20+ años en sistemas críticos. Especialista en Ciencia de Datos, Azure y Eficiencia Operativa."
+      desc: "Especialista en Datos con 20+ años en sistemas críticos. Azure, Python, Gobernanza y Eficiencia Operativa."
     }
   };
 
@@ -68,7 +74,7 @@ export async function generateMetadata(props: LayoutProps<'/[lang]'>): Promise<M
     description: currentContent.desc,
     metadataBase: new URL(siteUrl),
     
-    // TAG DE VERIFICAÇÃO DO GOOGLE (PRESERVADA)
+    // TAG DE VERIFICAÇÃO DO GOOGLE - PRESERVADA E PROTEGIDA
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
@@ -110,22 +116,16 @@ export async function generateMetadata(props: LayoutProps<'/[lang]'>): Promise<M
 }
 
 /**
- * ROOT LAYOUT - A estrutura mestre da aplicação
+ * ROOT LAYOUT - A ESTRUTURA MESTRE
  */
-export default async function RootLayout(props: LayoutProps<'/[lang]'>) {
-  const { children } = props;
-  const { lang } = await props.params;
-
-  // Auditoria de Segurança Silenciosa no Servidor
-  if (process.env.NODE_ENV === 'production') {
-    console.info(`[System] Shield Active: Next.js 16.1.0 | Language: ${lang}`);
-  }
+export default async function RootLayout({ children, params }: LayoutProps) {
+  const { lang } = await params;
 
   return (
     <html 
       lang={lang} 
       suppressHydrationWarning 
-      className="scroll-smooth"
+      className={`scroll-smooth ${montserrat.variable} ${inter.variable}`}
     >
       <head>
         <link rel="icon" href="/icons/favicon.ico" sizes="any" />
@@ -137,7 +137,7 @@ export default async function RootLayout(props: LayoutProps<'/[lang]'>) {
       </head>
       <body 
         className={`
-          ${inter.variable} ${montserrat.variable} ${inter.className} 
+          ${inter.className} 
           bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 
           antialiased min-h-screen flex flex-col 
           selection:bg-blue-600 selection:text-white
@@ -149,7 +149,7 @@ export default async function RootLayout(props: LayoutProps<'/[lang]'>) {
           enableSystem 
           disableTransitionOnChange
         >
-          {/* Wrapper Responsivo: overflow-x-hidden evita quebras em mobile */}
+          {/* O wrapper global garante que nada 'estoure' a tela no mobile */}
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <main className="flex-grow w-full">
               {children}
