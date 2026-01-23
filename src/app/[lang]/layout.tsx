@@ -118,7 +118,7 @@ export default async function RootLayout(props: LayoutProps<'/[lang]'>) {
 
   // Auditoria de Segurança Silenciosa no Servidor
   if (process.env.NODE_ENV === 'production') {
-    console.info(`[System] Shield Active: Next.js 15.5.9 | Language: ${lang}`);
+    console.info(`[System] Shield Active: Next.js 16.1.0 | Language: ${lang}`);
   }
 
   return (
