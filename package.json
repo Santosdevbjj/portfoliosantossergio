@@ -6,6 +6,7 @@
     "node": "24.x"
   },
   "scripts": {
+    "preinstall": "npm config set legacy-peer-deps true",
     "dev": "next dev --no-turbo",
     "dev:turbo": "next dev --turbo",
     "build": "next build",
