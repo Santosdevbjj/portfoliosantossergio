@@ -22,7 +22,7 @@ interface FooterProps {
 /**
  * COMPONENTE: Footer
  * Totalmente responsivo e multilingue.
- * Centraliza networking, contato e stack tecnológica do projeto.
+ * Blindado contra erros de renderização (Safe Access) para garantir estabilidade no deploy.
  */
 export const Footer = ({ lang, dict }: FooterProps) => {
   const currentYear = new Date().getFullYear()
@@ -32,38 +32,40 @@ export const Footer = ({ lang, dict }: FooterProps) => {
   const linkedinUrl = "https://www.linkedin.com/in/santossergioluiz"
   const githubUrl = "https://github.com/Santosdevbjj"
 
-  const { about, footer } = dict;
+  // SEGURANÇA: Previne erros se o dicionário falhar
+  const about = dict?.about || {};
+  const footer = dict?.footer || {};
 
-  // Fallbacks locais para segurança extrema durante o carregamento
+  // Fallbacks locais para segurança extrema (Fail-Safe Mechanism)
   const localFallbacks = {
-    pt: { location: "Brasil", builtBy: "Desenvolvido por", contact: "Contato", social: "Redes Sociais" },
-    en: { location: "Brazil", builtBy: "Developed by", contact: "Contact", social: "Social Media" },
-    es: { location: "Brasil", builtBy: "Desarrollado por", contact: "Contacto", social: "Redes Sociales" }
-  }[lang];
+    pt: { location: "Brasil", builtBy: "Desenvolvido por", contact: "Contato", social: "Redes Sociais", rights: "Todos os direitos reservados" },
+    en: { location: "Brazil", builtBy: "Developed by", contact: "Contact", social: "Social Media", rights: "All rights reserved" },
+    es: { location: "Brasil", builtBy: "Desarrollado por", contact: "Contacto", social: "Redes Sociales", rights: "Todos los derechos reservados" }
+  }[lang] || { location: "Brazil", builtBy: "Developed by", contact: "Contact", social: "Social Media", rights: "All rights reserved" };
 
   return (
     <footer className="bg-slate-50 dark:bg-[#020617] pt-20 pb-10 border-t border-slate-200 dark:border-slate-800/50 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           
-          {/* Coluna 1: Marca e Posicionamento */}
+          {/* Coluna 1: Marca e Posicionamento (Ocupa 2 colunas no MD) */}
           <div className="md:col-span-2">
             <span className="font-black text-2xl md:text-3xl tracking-tighter text-slate-900 dark:text-white mb-6 block uppercase group cursor-default">
               Sérgio<span className="text-blue-600 group-hover:drop-shadow-[0_0_8px_rgba(37,99,235,0.4)] transition-all">Santos</span>
             </span>
             <p className="text-slate-600 dark:text-slate-400 max-w-sm leading-relaxed font-medium text-sm md:text-base mb-8">
-              {about.headline}
+              {about?.headline || "Data Specialist & Governance Expert"}
             </p>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">
               <Globe className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
-              {footer.location || localFallbacks.location}
+              {footer?.location || localFallbacks.location}
             </div>
           </div>
 
           {/* Coluna 2: Redes Sociais */}
           <div>
             <h4 className="font-black text-slate-900 dark:text-white mb-8 uppercase tracking-[0.2em] text-[10px] opacity-70">
-              {footer.socialTitle || localFallbacks.social}
+              {footer?.socialTitle || localFallbacks.social}
             </h4>
             <ul className="flex flex-col gap-5">
               <li>
@@ -102,7 +104,7 @@ export const Footer = ({ lang, dict }: FooterProps) => {
           {/* Coluna 3: Contato Direto */}
           <div>
             <h4 className="font-black text-slate-900 dark:text-white mb-8 uppercase tracking-[0.2em] text-[10px] opacity-70">
-              {footer.contactTitle || localFallbacks.contact}
+              {footer?.contactTitle || localFallbacks.contact}
             </h4>
             <a href={`mailto:${email}`} className="group flex flex-col gap-4" aria-label="Send me an email">
               <div className="flex items-center gap-3 text-slate-500 group-hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-bold text-sm">
@@ -118,20 +120,20 @@ export const Footer = ({ lang, dict }: FooterProps) => {
           </div>
         </div>
 
-        {/* Linha Final: Direitos e Tech Stack */}
+        {/* Linha Final: Direitos e Tech Stack (Responsividade Crítica aqui) */}
         <div className="pt-8 border-t border-slate-200 dark:border-slate-800/80 flex flex-col xl:flex-row justify-between items-center gap-8">
           
           <div className="flex flex-col gap-2 items-center xl:items-start text-[10px] font-black uppercase tracking-widest text-slate-400 text-center xl:text-left">
-            <p>© {currentYear} • {footer.rights}</p>
+            <p>© {currentYear} • {footer?.rights || localFallbacks.rights}</p>
             <p className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
               <Code2 className="w-3.5 h-3.5" />
-              {footer.builtBy || localFallbacks.builtBy} <span className="text-slate-900 dark:text-white ml-1">Sérgio Santos</span>
+              {footer?.builtBy || localFallbacks.builtBy} <span className="text-slate-900 dark:text-white ml-1">Sérgio Santos</span>
             </p>
           </div>
           
-          {/* Badge de Tecnologias (Totalmente Responsiva) */}
+          {/* Badge de Tecnologias: Melhorada para Mobile-First */}
           <div className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-slate-900 px-6 py-4 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl shadow-blue-500/5">
-            <div className="flex items-center gap-2 pr-0 sm:pr-4 border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-800 pb-2 sm:pb-0">
+            <div className="flex items-center gap-2 pr-0 sm:pr-4 border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-800 pb-2 sm:pb-0 w-full sm:w-auto justify-center">
               <Blocks className="w-4 h-4 text-blue-600" />
               <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-tighter">Tech Stack</span>
             </div>
