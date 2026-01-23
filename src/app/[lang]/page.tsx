@@ -15,20 +15,16 @@ import { getGitHubProjects } from '@/lib/github';
 
 /**
  * ISR (Incremental Static Regeneration)
- * Otimização: Revalida o conteúdo a cada 1 hora para manter os projetos do GitHub atualizados.
+ * Revalida o conteúdo a cada 1 hora para capturar novos repositórios ou estrelas no GitHub.
  */
 export const revalidate = 3600; 
 
-interface PageProps {
-  params: Promise<{ lang: string }>;
-}
-
 /**
- * METADADOS DINÂMICOS (SEO Internacional)
- * Implementa lógica rigorosa para indexação e busca internacional.
+ * METADADOS DINÂMICOS (SEO Internacional 2026)
+ * Alinhado com a Metadata API do Next.js 15.
  */
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { lang } = await params;
+export async function generateMetadata(props: PageProps<'/[lang]'>): Promise<Metadata> {
+  const { lang } = await props.params;
   if (!isValidLocale(lang)) return {};
 
   const currentLang = lang as Locale;
@@ -36,8 +32,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   
   const baseUrl = (process.env['NEXT_PUBLIC_SITE_URL'] ?? 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
   
-  const pageTitle = dict.about?.headline ?? 'Data & Critical Systems Specialist';
-  const pageDesc = dict.about?.bio?.substring(0, 160) ?? 'Portfólio Profissional de Sérgio Santos';
+  const pageTitle = dict.about?.headline ?? 'Data Engineering Specialist';
+  // Limpeza de descrição para evitar caracteres especiais no HTML Head
+  const pageDesc = (dict.about?.bio ?? 'Portfólio Profissional de Sérgio Santos').substring(0, 160).replace(/\n/g, ' ');
   
   return {
     title: `Sérgio Santos | ${pageTitle}`,
@@ -67,15 +64,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         },
       ],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: `Sérgio Santos | ${pageTitle}`,
+      description: pageDesc,
+    }
   };
 }
 
 /**
- * PÁGINA PRINCIPAL - NEXT.JS 15 SERVER COMPONENT
- * Orquestra a composição da SPA com injeção de i18n e dados do GitHub.
+ * PÁGINA PRINCIPAL - SERVER COMPONENT
+ * Implementa fetch de dados assíncrono e composição de seções.
  */
-export default async function Page({ params }: PageProps) {
-  const { lang } = await params;
+export default async function Page(props: PageProps<'/[lang]'>) {
+  // Acesso assíncrono ao parâmetro de idioma (Next.js 15 Requirement)
+  const { lang } = await props.params;
   
   if (!isValidLocale(lang)) {
     notFound();
@@ -84,8 +87,8 @@ export default async function Page({ params }: PageProps) {
   const currentLang = lang as Locale;
 
   /**
-   * FETCH PARALELO: Otimiza o tempo de resposta do servidor (TTFB)
-   * CORREÇÃO: Removido o import não utilizado de GitHubRepo para satisfazer o Linter.
+   * DATA FETCHING PARALELO
+   * Executa a carga do dicionário e a API do GitHub simultaneamente.
    */
   const [dict, allProjects] = await Promise.all([
     getDictionary(currentLang),
@@ -96,40 +99,40 @@ export default async function Page({ params }: PageProps) {
     <PageWrapper>
       <Navbar dict={dict} lang={currentLang} />
 
-      {/* CONTAINER RESPONSIVO: 
-          - overflow-x-hidden evita scroll lateral indesejado em dispositivos móveis.
-          - mx-auto e max-w-7xl garantem centralização em telas ultra-wide.
+      {/* MAIN CONTAINER 
+          overflow-x-hidden: Proteção crítica contra quebra de layout por animações laterais.
+          antialiased: Melhora a renderização de fontes em telas de alta densidade (Retina).
       */}
       <main className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white antialiased transition-colors duration-500 dark:bg-[#020617]">
         
-        {/* HERO SECTION */}
+        {/* SEÇÃO HERO: Primeira dobra */}
         <HeroSection lang={currentLang} dict={dict} />
 
-        {/* ABOUT SECTION */}
+        {/* SEÇÃO SOBRE: Conteúdo centralizado */}
         <section id="about" className="mx-auto w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:px-8 lg:scroll-mt-32">
           <AboutSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* EXPERIENCE SECTION */}
+        {/* SEÇÃO EXPERIÊNCIA: Fundo contrastante sutil para separar blocos */}
         <section id="experience" className="scroll-mt-20 bg-slate-50/50 py-12 dark:bg-slate-900/10 lg:py-24 lg:scroll-mt-32">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
             <ExperienceSection lang={currentLang} dict={dict} />
           </div>
         </section>
 
-        {/* FEATURED ARTICLES */}
+        {/* ARTIGOS EM DESTAQUE: Autoridade técnica */}
         <section id="featured" className="mx-auto w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:px-8 lg:scroll-mt-32">
           <FeaturedArticleSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* PROJECTS SECTION */}
+        {/* PORTFÓLIO: Grid de projetos vindo do GitHub */}
         <section id="projects" className="py-12 scroll-mt-20 lg:py-24 lg:scroll-mt-32">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
             <ProjectSection projects={allProjects} lang={currentLang} dict={dict} />
           </div>
         </section>
 
-        {/* CONTACT SECTION */}
+        {/* CONTATO: Call to Action final */}
         <section id="contact" className="mx-auto mb-12 w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:mb-24 lg:px-8 lg:scroll-mt-32">
           <ContactSection lang={currentLang} dict={dict} />
         </section>
