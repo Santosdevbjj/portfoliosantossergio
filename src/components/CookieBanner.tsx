@@ -6,14 +6,14 @@ import { usePathname } from 'next/navigation'
 
 /**
  * COMPONENTE DE GOVERNANÇA (LGPD/GDPR)
- * Exibe o consentimento de dados com foco em transparência técnica.
- * FIX: Ajustado o retorno do useEffect para conformidade com TS 5.x.
+ * Totalmente responsivo e multilingue. 
+ * Projetado para conformidade 2026 com foco em transparência de dados.
  */
 export const CookieBanner = () => {
   const [showBanner, setShowBanner] = useState(false)
   const pathname = usePathname()
   
-  // Identifica o idioma para conformidade regional específica
+  // Extrai o idioma da URL de forma segura (ex: /en/about -> en)
   const lang = pathname?.split('/')[1] || 'pt'
 
   const contentMap = {
@@ -37,20 +37,17 @@ export const CookieBanner = () => {
     }
   };
 
+  // Garante que se o idioma for desconhecido, use o fallback em Português
   const currentContent = contentMap[lang as keyof typeof contentMap] || contentMap.pt;
 
   useEffect(() => {
-    // Verifica se o usuário já deu consentimento anteriormente
-    const hasConsent = localStorage.getItem('cookie-consent-sergio');
+    // Verifica consentimento prévio no localStorage (apenas no cliente)
+    const hasConsent = typeof window !== 'undefined' ? localStorage.getItem('cookie-consent-sergio') : null;
     
     if (!hasConsent) {
       const timer = setTimeout(() => setShowBanner(true), 2500);
-      // Retorno de limpeza dentro da condição
       return () => clearTimeout(timer);
     }
-    
-    // Retorno explícito vazio para satisfazer o rigor do TypeScript ("Not all code paths return a value")
-    return undefined;
   }, []);
 
   const handleAccept = () => {
@@ -67,8 +64,9 @@ export const CookieBanner = () => {
     >
       <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-5 md:p-6 rounded-[2rem] shadow-2xl ring-1 ring-black/5">
         <div className="flex items-start gap-4">
-          {/* Ícone de Escudo: Reforça a autoridade em segurança */}
-          <div className="hidden sm:flex p-3 bg-blue-600/10 rounded-2xl text-blue-600 dark:text-blue-400">
+          
+          {/* Ícone: Reforça a autoridade visual em segurança */}
+          <div className="hidden sm:flex p-3 bg-blue-600/10 rounded-2xl text-blue-600 dark:text-blue-400 shrink-0">
             <ShieldCheck size={24} />
           </div>
           
@@ -79,7 +77,7 @@ export const CookieBanner = () => {
               </h4>
               <button 
                 onClick={() => setShowBanner(false)}
-                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors touch-manipulation"
                 aria-label="Fechar"
               >
                 <X size={18} />
@@ -90,26 +88,27 @@ export const CookieBanner = () => {
               {currentContent.text}
             </p>
 
+            {/* Ações: Adaptáveis para toque no celular */}
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <button
                 onClick={handleAccept}
-                className="w-full sm:flex-1 bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold py-3 px-4 rounded-xl hover:bg-slate-800 dark:hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-500/20"
+                className="w-full sm:flex-1 bg-slate-900 dark:bg-blue-600 text-white text-xs font-bold py-3.5 px-4 rounded-xl hover:bg-slate-800 dark:hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-500/10 touch-manipulation"
               >
                 {currentContent.accept}
               </button>
-              <button className="text-[11px] font-bold text-slate-500 dark:text-slate-400 underline underline-offset-4 hover:text-blue-600 transition-colors py-2">
+              <button className="text-[11px] font-bold text-slate-500 dark:text-slate-400 underline underline-offset-4 hover:text-blue-600 transition-colors py-2 touch-manipulation">
                 {currentContent.policy}
               </button>
             </div>
           </div>
         </div>
         
-        {/* Assinatura de Compliance: Reforça o ano corrente (2026) */}
+        {/* Rodapé de Compliance Técnico */}
         <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Cookie size={12} className="text-slate-400" />
             <span className="text-[9px] font-mono text-slate-400 uppercase tracking-widest">
-              Data Governance Protocol
+              Security Protocol Enabled
             </span>
           </div>
           <span className="text-[9px] font-bold text-blue-500/60 dark:text-blue-400/60">
