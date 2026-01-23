@@ -15,16 +15,21 @@ import { getGitHubProjects } from '@/lib/github';
 
 /**
  * ISR (Incremental Static Regeneration)
- * Revalida o conteúdo a cada 1 hora para capturar novos repositórios ou estrelas no GitHub.
+ * Atualiza o conteúdo a cada 1 hora sem necessidade de novo deploy.
  */
 export const revalidate = 3600; 
 
+// Interface estrita para o Next.js 15
+interface PageProps {
+  params: Promise<{ lang: string }>;
+}
+
 /**
- * METADADOS DINÂMICOS (SEO Internacional 2026)
- * Alinhado com a Metadata API do Next.js 15.
+ * GENERATE METADATA - SEO AVANÇADO
+ * Personaliza a aba do navegador e o card de compartilhamento por idioma.
  */
-export async function generateMetadata(props: PageProps<'/[lang]'>): Promise<Metadata> {
-  const { lang } = await props.params;
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { lang } = await params;
   if (!isValidLocale(lang)) return {};
 
   const currentLang = lang as Locale;
@@ -32,9 +37,8 @@ export async function generateMetadata(props: PageProps<'/[lang]'>): Promise<Met
   
   const baseUrl = (process.env['NEXT_PUBLIC_SITE_URL'] ?? 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
   
-  const pageTitle = dict.about?.headline ?? 'Data Engineering Specialist';
-  // Limpeza de descrição para evitar caracteres especiais no HTML Head
-  const pageDesc = (dict.about?.bio ?? 'Portfólio Profissional de Sérgio Santos').substring(0, 160).replace(/\n/g, ' ');
+  const pageTitle = dict.about?.headline ?? 'Data Specialist';
+  const pageDesc = (dict.about?.bio ?? 'Portfolio de Sérgio Santos').substring(0, 160).replace(/\n/g, ' ');
   
   return {
     title: `Sérgio Santos | ${pageTitle}`,
@@ -55,30 +59,16 @@ export async function generateMetadata(props: PageProps<'/[lang]'>): Promise<Met
       siteName: 'Sérgio Santos Portfolio',
       locale: currentLang === 'pt' ? 'pt_BR' : currentLang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
-      images: [
-        {
-          url: `${baseUrl}/og-image-${currentLang}.png`,
-          width: 1200,
-          height: 630,
-          alt: `Sérgio Santos | ${pageTitle}`,
-        },
-      ],
     },
-    twitter: {
-      card: 'summary_large_image',
-      title: `Sérgio Santos | ${pageTitle}`,
-      description: pageDesc,
-    }
   };
 }
 
 /**
- * PÁGINA PRINCIPAL - SERVER COMPONENT
- * Implementa fetch de dados assíncrono e composição de seções.
+ * PÁGINA PRINCIPAL
+ * Renderizada no servidor para máxima performance e SEO.
  */
-export default async function Page(props: PageProps<'/[lang]'>) {
-  // Acesso assíncrono ao parâmetro de idioma (Next.js 15 Requirement)
-  const { lang } = await props.params;
+export default async function Page({ params }: PageProps) {
+  const { lang } = await params;
   
   if (!isValidLocale(lang)) {
     notFound();
@@ -87,8 +77,8 @@ export default async function Page(props: PageProps<'/[lang]'>) {
   const currentLang = lang as Locale;
 
   /**
-   * DATA FETCHING PARALELO
-   * Executa a carga do dicionário e a API do GitHub simultaneamente.
+   * CARGA DE DADOS PARALELA
+   * Otimiza o Time-to-First-Byte (TTFB).
    */
   const [dict, allProjects] = await Promise.all([
     getDictionary(currentLang),
@@ -97,48 +87,46 @@ export default async function Page(props: PageProps<'/[lang]'>) {
 
   return (
     <PageWrapper>
+      {/* Navegação Fixa */}
       <Navbar dict={dict} lang={currentLang} />
 
-      {/* MAIN CONTAINER 
-          overflow-x-hidden: Proteção crítica contra quebra de layout por animações laterais.
-          antialiased: Melhora a renderização de fontes em telas de alta densidade (Retina).
-      */}
-      <main className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white antialiased transition-colors duration-500 dark:bg-[#020617]">
+      <main className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] transition-colors duration-500 antialiased">
         
-        {/* SEÇÃO HERO: Primeira dobra */}
+        {/* 1. HERO: Captura de atenção imediata */}
         <HeroSection lang={currentLang} dict={dict} />
 
-        {/* SEÇÃO SOBRE: Conteúdo centralizado */}
-        <section id="about" className="mx-auto w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:px-8 lg:scroll-mt-32">
+        {/* 2. SOBRE: Bio e Destaques (Highlights) */}
+        <section id="about" className="mx-auto w-full max-w-7xl px-6 sm:px-10 scroll-mt-24 lg:scroll-mt-32">
           <AboutSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* SEÇÃO EXPERIÊNCIA: Fundo contrastante sutil para separar blocos */}
-        <section id="experience" className="scroll-mt-20 bg-slate-50/50 py-12 dark:bg-slate-900/10 lg:py-24 lg:scroll-mt-32">
-          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* 3. EXPERIÊNCIA: Timeline profissional com fundo sutil */}
+        <section id="experience" className="mt-24 scroll-mt-24 bg-slate-50/50 dark:bg-slate-900/10 py-24 lg:scroll-mt-32">
+          <div className="mx-auto w-full max-w-7xl px-6 sm:px-10">
             <ExperienceSection lang={currentLang} dict={dict} />
           </div>
         </section>
 
-        {/* ARTIGOS EM DESTAQUE: Autoridade técnica */}
-        <section id="featured" className="mx-auto w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:px-8 lg:scroll-mt-32">
+        {/* 4. ARTIGOS: Blog/Pensamento técnico */}
+        <section id="featured" className="mx-auto w-full max-w-7xl px-6 sm:px-10 scroll-mt-24 py-24 lg:scroll-mt-32">
           <FeaturedArticleSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* PORTFÓLIO: Grid de projetos vindo do GitHub */}
-        <section id="projects" className="py-12 scroll-mt-20 lg:py-24 lg:scroll-mt-32">
-          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* 5. PORTFÓLIO: Projetos reais do GitHub */}
+        <section id="projects" className="scroll-mt-24 py-12 lg:py-24 lg:scroll-mt-32">
+          <div className="mx-auto w-full max-w-7xl px-6 sm:px-10">
             <ProjectSection projects={allProjects} lang={currentLang} dict={dict} />
           </div>
         </section>
 
-        {/* CONTATO: Call to Action final */}
-        <section id="contact" className="mx-auto mb-12 w-full max-w-7xl px-4 scroll-mt-20 sm:px-6 lg:mb-24 lg:px-8 lg:scroll-mt-32">
+        {/* 6. CONTATO: Fechamento e CTA */}
+        <section id="contact" className="mx-auto mb-24 w-full max-w-7xl px-6 sm:px-10 scroll-mt-24 lg:scroll-mt-32">
           <ContactSection lang={currentLang} dict={dict} />
         </section>
         
       </main>
 
+      {/* Rodapé Informativo */}
       <Footer lang={currentLang} dict={dict} />
     </PageWrapper>
   );
