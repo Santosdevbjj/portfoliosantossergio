@@ -61,10 +61,10 @@
       "metrics": {
         "title": "Logistics Performance",
         "subtitle": "KPIs & IMPACT",
-        "accuracyValue": "61%",
-        "accuracyLabel": "Accuracy Increase",
-        "savingsValue": "$ 420K",
-        "savingsLabel": "Annual Savings"
+        "availabilityValue": "61%",
+        "availabilityLabel": "Accuracy Improvement",
+        "automationValue": "$ 420K",
+        "automationLabel": "Annual Savings"
       },
       "stack": {
         "title": "Technical Domain",
