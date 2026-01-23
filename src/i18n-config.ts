@@ -1,5 +1,5 @@
 /**
- * CONFIGURAÇÃO GLOBAL DE IDIOMAS - NEXT.JS 15.5.9 / 2026
+ * CONFIGURAÇÃO GLOBAL DE IDIOMAS - NEXT.JS 16 / 2026
  * Centraliza a lógica de internacionalização (i18n) para PT, EN e ES.
  */
 
@@ -13,6 +13,7 @@ export type Locale = (typeof i18n)['locales'][number];
 /**
  * METADADOS DE IDIOMA
  * Estrutura imutável para LanguageSwitcher e tags de SEO (hreflang).
+ * Design focado em acessibilidade e suporte multilingue completo.
  */
 export interface LocaleDetail {
   readonly name: string;   
@@ -64,17 +65,18 @@ export function getSafeLocale(locale: string | undefined | null): Locale {
 
 /**
  * CARREGAMENTO DINÂMICO DE DICIONÁRIOS (Lazy Loading / Code Splitting)
- * Melhora a performance em dispositivos móveis carregando apenas o JSON necessário.
+ * AJUSTE: Usando caminhos relativos para compatibilidade com o Runtime da Vercel.
+ * Isso resolve o erro "Cannot find module" identificado nos logs de execução.
  */
 const dictionaries: Record<Locale, () => Promise<any>> = {
-  pt: () => import('@/dictionaries/pt.json').then((module) => module.default),
-  en: () => import('@/dictionaries/en.json').then((module) => module.default),
-  es: () => import('@/dictionaries/es.json').then((module) => module.default),
+  pt: () => import('./dictionaries/pt.json').then((module) => module.default),
+  en: () => import('./dictionaries/en.json').then((module) => module.default),
+  es: () => import('./dictionaries/es.json').then((module) => module.default),
 };
 
 /**
  * OBTÉM O DICIONÁRIO
- * Função assíncrona para Server e Client Components com tratamento de erro.
+ * Função assíncrona para Server e Client Components com tratamento de erro robusto.
  */
 export const getDictionary = async (locale: Locale) => {
   const safeLocale = getSafeLocale(locale);
@@ -92,11 +94,15 @@ export const getDictionary = async (locale: Locale) => {
     
     // Fallback de última instância para o idioma padrão (PT)
     if (safeLocale !== i18n.defaultLocale) {
-      const fallback = dictionaries[i18n.defaultLocale];
-      return await fallback();
+      try {
+        const fallback = dictionaries[i18n.defaultLocale];
+        return await fallback();
+      } catch (fallbackError) {
+        console.error(`[i18n-critical] Falha total no fallback:`, fallbackError);
+      }
     }
     
-    // Retorna objeto vazio para evitar que o site quebre totalmente
+    // Retorna objeto vazio para evitar o "Erro de Execução" na tela do usuário
     return {};
   }
 };
