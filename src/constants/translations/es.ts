@@ -1,41 +1,63 @@
 // src/constants/translations/es.ts
 
 export const es = {
-  // UX Microcopy: Headline de Alto Impacto (Enfoque en Seniority y Negocios)
-  role: "Especialista en Datos | Ingeniería de Sistemas y Gobernanza Operativa",
+  // Navegación y Microcopy de UI
+  nav: {
+    about: "Sobre mí",
+    projects: "Portafolio",
+    articles: "Artículos",
+    contact: "Contacto"
+  },
+
+  role: "Especialista en Datos | Ingeniería de Sistemas y Gobernanza",
   headline: "Transformando datos complejos en activos estratégicos con el rigor de más de 15 años en sistemas bancarios de misión crítica.",
   
-  // Sección Sobre (Narrativa Profesional para el mercado hispano)
+  // Sección Sobre (Storytelling Sénior)
   about: {
     title: "Trayectoria Profesional",
     photoAlt: "Foto profesional de Sérgio Santos",
-    description: `Soy un especialista sénior con más de 15 años de trayectoria consolidada en el sector bancario (Bradesco), operando en ecosistemas donde la seguridad, la alta disponibilidad y la regulación estricta son los pilares fundamentales.
+    subtitle: "Convergencia entre Gobernanza Bancaria e Inteligencia de Datos",
+    description: `Soy un especialista sénior con más de 15 años de trayectoria consolidada en el sector bancario (Bradesco), operando en ecosistemas donde la seguridad, la alta disponibilidad y la regulación estricta son pilares innegociables.
 
-Mi misión actual es fusionar esta sólida cultura de gobernanza y continuidad del negocio con el potencial analítico de la Ciencia de Datos e IA. A diferencia de perfiles puramente académicos, entrego soluciones que resuelven cuellos de botella financieros reales, uniendo la visión de negocio con una arquitectura de datos resiliente y escalable.
+Mi misión es fusionar la sólida cultura de gobernanza y continuidad del negocio con el potencial analítico de la IA. A diferencia de perfiles académicos, entrego soluciones para cuellos de botella financieros reales mediante arquitecturas de datos resilientes y escalables.
 
-Especialista en el ecosistema Azure Databricks, SQL de alto rendimiento y Grafos (Neo4j) para la optimización de flujos de decisión y detección de anomalías.`,
+Experto en Azure Databricks, SQL de alto rendimiento y Grafos (Neo4j) para optimizar flujos de decisión y detección de anomalías.`,
   },
 
-  // Framework Meigarom: Autoridad -> Prueba Social -> Especialidad
-  aboutText: `👨‍💻 CONFIABILIDAD Y MISIÓN CRÍTICA
-Gestioné infraestructuras donde la tolerancia a fallos era inexistente. Este bagaje me permite diseñar pipelines de datos y modelos de Machine Learning con un estándar de seguridad, auditoría y documentación superior al promedio del mercado.
+  // Framework de Autoridad (Método Meigarom)
+  aboutText: `👨‍💻 CONFIABILIDAD Y SISTEMAS CRÍTICOS
+Gestioné infraestructuras donde la tolerancia a fallos era inexistente. Este bagaje me permite diseñar pipelines de datos y modelos de Machine Learning con estándares de seguridad, auditoría y cumplimiento (LGPD/GDPR) superiores al promedio.
 
-📈 IMPACTO MEDIBLE EN EL NEGOCIO
-• Eficiencia Operativa: Automatización de flujos complejos que resultó en un ahorro directo de 2.920 horas/año de trabajo manual.
-• Cumplimiento y Gobernanza: Liderazgo técnico en la implementación de sistemas jurídicos sensibles bajo total conformidad regulatoria (LGPD/GDPR).
+📈 IMPACTO MEDIBLE
+• Eficiencia Operativa: Automatización de flujos resultando en un ahorro directo de 2.920 horas/año.
+• Cumplimiento y Seguridad: Liderazgo técnico en sistemas jurídicos sensibles bajo total conformidad regulatoria.
 • Gestión a Escala: Administración de sistemas críticos para más de 500 usuarios simultáneos en entornos de alta presión.
 
-🎯 ENFOQUE TECNOLÓGICO Y ESTRATÉGICO
-Consultor estratégico desde 2008, hoy enfocado en la modernización de stacks analíticos (Python, PySpark, Azure). Mi especialidad radica en la arquitectura de soluciones que utilizan Inteligencia de Datos para predecir riesgos y optimizar el retorno de inversión (ROI).
+🎯 STACK Y ENFOQUE ESTRATÉGICO
+Enfocado en la modernización de stacks analíticos (Python, PySpark, Azure). Especialista en arquitectura de soluciones que utilizan Inteligencia de Datos para predecir riesgos y optimizar el ROI.
 
 🚀 OBJETIVO PROFESIONAL
-Actuar en proyectos de modernización de datos, gobernanza corporativa e implementación de IA en entornos regulados, donde la precisión técnica y el impacto financiero sean los pilares del éxito.`,
+Actuar en proyectos de modernización de datos e implementación de IA en entornos regulados, donde la precisión técnica y el retorno financiero son las métricas de éxito.`,
 
-  cvButton: "Descargar CV (Español)",
-  cvLink: "/cv-sergio-santos-es.pdf",
-  repoTitle: "Ecosistema de Proyectos y Soluciones",
-  
-  // Categorías Sincronizadas (1-17 conforme regla de prioridad)
+  // Componentes de Interfaz Compartidos
+  common: {
+    viewProject: "GitHub",
+    liveDemo: "Demo en Vivo",
+    articlesTitle: "Artículo Premiado",
+    readMore: "Leer Contenido Completo"
+  },
+
+  portfolio: {
+    mainCaseLabel: "Proyecto Destacado",
+    noDescription: "Documentación técnica en proceso.",
+    projectLabels: {
+      problem: "Desafío de Negocio",
+      solution: "Estrategia Técnica",
+      impact: "Resultado Medible"
+    }
+  },
+
+  // Categorías Sincronizadas
   categories: {
     "data-science": "1. Ciencia de Datos",
     "databricks": "2. Azure Databricks",
@@ -56,21 +78,32 @@ Actuar en proyectos de modernización de datos, gobernanza corporativa e impleme
     "articles": "17. Artículos y Insights"
   },
 
-  featuredArticle: {
-    title: "Ganador 35ª Competición DIO",
-    description: "Artículo elegido como el mejor del mes: 'Low-Code en la Salud: Cómo Crear Apps Médicas en Semanas'. Un análisis sobre agilidad y cumplimiento.",
-    links: {
-      pt: "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
-      en: "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
-      es: "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-en-semanas-5474e7dddfad"
+  // Prueba Social y Artículos
+  articles: {
+    subtitle: "Insights sobre Tecnología y Datos",
+    loading: "Cargando biblioteca...",
+    comingSoon: "Nuevos artículos técnicos en revisión.",
+    followPrompt: "Siga las publicaciones semanales en Medium y LinkedIn.",
+    badge: "Elegido Mejor del Mes",
+    readMore: "Acceder al Artículo",
+    featured: {
+      title: "Ganador 35ª Competición DIO",
+      description: "Artículo premiado: 'Low-Code en la Salud'. Un análisis profundo sobre cómo equilibrar la agilidad de desarrollo con las normas de cumplimiento médico.",
+      summaryTitle: "Destacado en DIO",
+      summarySnippet: "Un análisis sobre agilidad y cumplimiento regulatorio en apps médicas.",
+      badge: "Artículo del Mes",
+      rank: "Top 1 Ganador",
+      date: "Ene 2026",
+      readMore: "Ver en Medium",
+      links: {
+        pt: "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
+        en: "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
+        es: "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-en-semanas-5474e7dddfad"
+      }
     }
   },
 
-  // Etiquetas para el ProjectCard (Framework Meigarom)
-  projectLabels: {
-    problem: "Problema de Negocio",
-    solution: "Estrategia Técnica",
-    impact: "Impacto y Resultados",
-    viewProject: "Ver Repositorio"
-  }
+  cvButton: "Descargar CV (Español)",
+  cvLink: "/cv-sergio-santos-es.pdf", 
+  repoTitle: "Ecosistema de Proyectos",
 };
