@@ -6,15 +6,33 @@ import type { Locale } from '@/i18n-config';
  * Gerencia o carregamento assíncrono e a segurança estrutural das traduções.
  */
 
-/**
- * Define a forma mínima que o dicionário deve ter.
- * Essencial para evitar erros de renderização em componentes complexos como FeaturedArticle.
- */
 interface DictionaryShape {
+  nav: {
+    about: string;
+    experience: string;
+    articles: string;
+    projects: string;
+    contact: string;
+    [key: string]: any;
+  };
   common: {
     viewProject: string;
     liveDemo: string;
-    [key: string]: string;
+    [key: string]: any;
+  };
+  about: {
+    sections: {
+      metrics: {
+        title: string;
+        subtitle: string;
+        availabilityValue: string;
+        availabilityLabel: string;
+        automationValue: string;
+        automationLabel: string;
+      };
+      [key: string]: any;
+    };
+    [key: string]: any;
   };
   articles: {
     featured: any;
@@ -25,21 +43,36 @@ interface DictionaryShape {
 
 /**
  * Estrutura Base de Segurança (Last Line of Defense)
- * Garante que chaves críticas existam mesmo se o JSON estiver corrompido.
+ * Evita erros de "undefined" se chaves específicas faltarem no JSON.
  */
-const BASE_DICTIONARY: DictionaryShape = {
+const BASE_DICTIONARY: Partial<DictionaryShape> = {
+  nav: {
+    about: "About",
+    experience: "Experience",
+    articles: "Articles",
+    projects: "Projects",
+    contact: "Contact"
+  },
   common: {
-    viewProject: "View GitHub",
+    viewProject: "GitHub",
     liveDemo: "Live Demo"
   },
-  articles: {
-    featured: null
+  about: {
+    sections: {
+      metrics: {
+        title: "Impact",
+        subtitle: "KPIs",
+        availabilityValue: "100%",
+        availabilityLabel: "Uptime",
+        automationValue: "0",
+        automationLabel: "Hours"
+      }
+    }
   }
 };
 
 /**
- * Loader de Dicionários com Lazy Loading
- * Otimizado para Next.js 15/16 e Vercel Edge Functions.
+ * Loader de Dicionários - Otimizado para Next.js 16
  */
 const dictionaries: Record<Locale, () => Promise<any>> = {
   pt: () => import('../dictionaries/pt.json').then((m) => m.default),
@@ -48,45 +81,42 @@ const dictionaries: Record<Locale, () => Promise<any>> = {
 };
 
 /**
- * Função de Normalização
- * Mescla o conteúdo carregado com a estrutura base para evitar erros de 'undefined'.
+ * Função de Normalização Profunda
  */
 function normalize(raw: any): DictionaryShape {
   return {
     ...BASE_DICTIONARY,
     ...raw,
+    nav: { ...BASE_DICTIONARY.nav, ...(raw?.nav || {}) },
     common: { ...BASE_DICTIONARY.common, ...(raw?.common || {}) },
-    articles: { ...BASE_DICTIONARY.articles, ...(raw?.articles || {}) }
-  };
+    about: {
+      ...raw?.about,
+      sections: {
+        ...(raw?.about?.sections || {}),
+        metrics: { 
+          ...BASE_DICTIONARY.about?.sections?.metrics, 
+          ...(raw?.about?.sections?.metrics || {}) 
+        }
+      }
+    },
+    articles: { ...raw?.articles }
+  } as DictionaryShape;
 }
 
-/**
- * getDictionary
- * Ponto de entrada único para buscar traduções no servidor.
- */
 export const getDictionary = async (locale: Locale): Promise<DictionaryShape> => {
   try {
-    // Tenta carregar o idioma solicitado ou cai para o português
     const loadLanguage = dictionaries[locale] || dictionaries.pt;
     const content = await loadLanguage();
-    
     return normalize(content);
   } catch (error) {
-    console.error(`[i18n] Erro ao carregar dicionário (${locale}):`, error);
-
-    // Tentativa de recuperação automática (Fallback para PT)
+    console.error(`[i18n] Erro crítico ao carregar dicionário (${locale}):`, error);
     try {
       const fallback = await dictionaries.pt();
       return normalize(fallback);
     } catch {
-      // Falha total: Retorna estrutura mínima de emergência
-      return BASE_DICTIONARY;
+      return BASE_DICTIONARY as DictionaryShape;
     }
   }
 };
 
-/**
- * Tipo exportado para tipagem de Props em componentes
- * Ex: interface Props { dict: Dictionary }
- */
 export type Dictionary = DictionaryShape;
