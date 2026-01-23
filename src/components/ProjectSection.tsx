@@ -4,10 +4,11 @@ import React, { useState, useMemo } from 'react';
 import { ProjectCard } from './ProjectCard';
 import type { GitHubRepo } from '@/lib/github';
 import { Filter, FolderOpen, SearchX } from 'lucide-react';
+import type { Locale } from '@/i18n-config';
 
 interface ProjectSectionProps {
   projects: GitHubRepo[];
-  lang: 'pt' | 'en' | 'es';
+  lang: Locale;
   dict: {
     common: {
       portfolioTitle: string;
@@ -33,49 +34,45 @@ interface ProjectSectionProps {
 
 /**
  * PROJECT SECTION - GALERIA DE SOLUÇÕES ESTRATÉGICAS
- * Gerencia a filtragem por especialidade e a lógica de ranking de autoridade.
+ * Sistema de filtragem dinâmica baseado em tags do GitHub com ranking de prioridade.
  */
 export const ProjectSection = ({ projects = [], lang, dict }: ProjectSectionProps) => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   
-  // Acesso seguro aos dicionários para evitar erros de runtime
   const portfolio = dict?.portfolio || {};
   const common = dict?.common || {};
   const categoriesDict = portfolio.categories || {};
 
-  // 1. EXTRAÇÃO DINÂMICA DE CATEGORIAS (Apenas as que possuem tradução no JSON)
+  // 1. EXTRAÇÃO DINÂMICA E FILTRADA DE CATEGORIAS
   const categories = useMemo(() => {
     const cats = new Set<string>();
     projects.forEach(repo => {
       repo.topics?.forEach(topic => {
-        // Controle de Qualidade: Só exibe a categoria se você a definiu no seu dicionário i18n
-        if (categoriesDict[topic]) cats.add(topic);
+        // Excluímos a tag de controle 'portfolio' e só incluímos o que está no dicionário
+        if (topic !== 'portfolio' && categoriesDict[topic]) {
+          cats.add(topic);
+        }
       });
     });
 
-    return Array.from(cats).sort((a, b) => {
-      const labelA = categoriesDict[a] || a;
-      const labelB = categoriesDict[b] || b;
-      return labelA.localeCompare(labelB, lang);
-    });
+    return Array.from(cats).sort((a, b) => 
+      (categoriesDict[a] || a).localeCompare(categoriesDict[b] || b, lang)
+    );
   }, [projects, categoriesDict, lang]);
 
-  // 2. LÓGICA DE FILTRAGEM E RANKING DE PRIORIDADE
+  // 2. LÓGICA DE RANKING E FILTRAGEM
   const filteredProjects = useMemo(() => {
-    // Regra de Ouro: Apenas projetos com a tag 'portfolio' no GitHub aparecem no site
+    // Filtro base: apenas o que você marcou como 'portfolio' no GitHub
     let base = projects.filter(p => p.topics?.includes('portfolio'));
     
-    // Filtragem por categoria selecionada
     if (activeCategory !== 'all') {
       base = base.filter(repo => repo.topics?.includes(activeCategory.toLowerCase()));
     }
 
-    // Ordenação Estratégica: Destaques (Featured) > Mais Recentes
+    // Ordenação: Destaques (Peso 100) > Recentes
     return base.sort((a, b) => {
-      const weightA = (a.topics?.includes('primeiro') || a.topics?.includes('featured') ? 100 : 0) + 
-                      (a.topics?.includes('destaque') || a.topics?.includes('highlight') ? 50 : 0);
-      const weightB = (b.topics?.includes('primeiro') || b.topics?.includes('featured') ? 100 : 0) + 
-                      (b.topics?.includes('destaque') || b.topics?.includes('highlight') ? 50 : 0);
+      const weightA = (a.topics?.includes('featured') || a.topics?.includes('main-case') ? 100 : 0);
+      const weightB = (b.topics?.includes('featured') || b.topics?.includes('main-case') ? 100 : 0);
       
       if (weightA !== weightB) return weightB - weightA;
       return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
@@ -84,18 +81,18 @@ export const ProjectSection = ({ projects = [], lang, dict }: ProjectSectionProp
 
   return (
     <section 
-      className="py-24 px-6 sm:px-10 lg:px-8 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800/50 transition-colors duration-500" 
+      className="py-24 px-6 sm:px-10 lg:px-8 max-w-7xl mx-auto transition-colors duration-500" 
       id="projects"
     >
       
-      {/* HEADER DA SEÇÃO */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-10">
+      {/* HEADER: Título e Filtros */}
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-20 gap-12">
         <div className="max-w-2xl">
           <div className="flex items-center gap-3 text-blue-600 dark:text-blue-400 font-black mb-4 uppercase tracking-[0.3em] text-[10px]">
-            <FolderOpen className="w-4 h-4" />
+            <FolderOpen className="w-5 h-5" />
             {common.portfolioTitle || 'Portfolio'}
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tighter leading-[0.95] mb-6">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tighter leading-[0.95] mb-8">
             {portfolio.title}
           </h2>
           <p className="text-slate-600 dark:text-slate-400 font-medium text-lg md:text-xl leading-relaxed">
@@ -103,21 +100,21 @@ export const ProjectSection = ({ projects = [], lang, dict }: ProjectSectionProp
           </p>
         </div>
 
-        {/* NAVEGAÇÃO DE CATEGORIAS (Snap Scroll Mobile / Wrap Desktop) */}
+        {/* NAVEGAÇÃO DE CATEGORIAS (Snap-Scroll Mobile) */}
         <div className="w-full lg:max-w-md xl:max-w-xl">
-          <div className="flex items-center gap-2 mb-4 text-slate-400 dark:text-slate-500 font-black text-[10px] uppercase tracking-[0.2em]">
-            <Filter className="w-3 h-3" />
-            {portfolio.projectLabels?.technologies || 'Categories'}
+          <div className="flex items-center gap-2 mb-5 text-slate-400 dark:text-slate-500 font-black text-[10px] uppercase tracking-[0.2em]">
+            <Filter className="w-4 h-4" />
+            {portfolio.projectLabels?.technologies || 'Filtros'}
           </div>
           
-          <div className="relative group">
-            <div className="flex flex-nowrap lg:flex-wrap gap-2 overflow-x-auto pb-4 lg:pb-0 no-scrollbar snap-x -mx-6 px-6 lg:mx-0 lg:px-0">
+          <div className="relative">
+            <div className="flex flex-nowrap lg:flex-wrap gap-2 overflow-x-auto pb-4 lg:pb-0 no-scrollbar snap-x touch-pan-x -mx-6 px-6 lg:mx-0 lg:px-0">
               <button
                 onClick={() => setActiveCategory('all')}
                 className={`snap-start whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black transition-all duration-300 uppercase tracking-widest border-2 ${
                   activeCategory === 'all'
-                    ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/30'
-                    : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800 hover:border-blue-500/40'
+                    ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-600/30'
+                    : 'bg-white dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-blue-500/40'
                 }`}
               >
                 {portfolio.all || 'All'}
@@ -129,28 +126,28 @@ export const ProjectSection = ({ projects = [], lang, dict }: ProjectSectionProp
                   onClick={() => setActiveCategory(cat)}
                   className={`snap-start whitespace-nowrap px-6 py-3 rounded-xl text-[10px] font-black transition-all duration-300 uppercase tracking-widest border-2 ${
                     activeCategory === cat
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/30'
-                      : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800 hover:border-blue-500/40'
+                      ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-600/30'
+                      : 'bg-white dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-blue-500/40'
                 }`}
                 >
                   {categoriesDict[cat] || cat}
                 </button>
               ))}
             </div>
-            {/* Indicador visual de que há mais categorias para scroll no mobile */}
-            <div className="absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-white dark:from-[#020617] pointer-events-none lg:hidden opacity-70" />
+            {/* Gradiente de indicação de scroll mobile */}
+            <div className="absolute top-0 right-0 h-full w-16 bg-gradient-to-l from-white dark:from-[#020617] pointer-events-none lg:hidden" />
           </div>
         </div>
       </div>
 
-      {/* GRID DE RESULTADOS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 min-h-[400px]">
+      {/* GRID DE CARDS COM ANIMAÇÃO STAGGERED */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 min-h-[400px]">
         {filteredProjects.length > 0 ? (
           filteredProjects.map((project, index) => (
             <div 
-              key={project.id || index} 
-              className="flex h-full animate-in fade-in slide-in-from-bottom-5 duration-700"
-              style={{ animationDelay: `${index * 50}ms` }}
+              key={project.id} 
+              className="flex h-full animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               <ProjectCard 
                 project={project} 
@@ -160,13 +157,11 @@ export const ProjectSection = ({ projects = [], lang, dict }: ProjectSectionProp
             </div>
           ))
         ) : (
-          /* ESTADO VAZIO (Filtro sem resultados) */
-          <div className="col-span-full py-24 text-center rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800/50 bg-slate-50/30 dark:bg-slate-900/10">
-             <div className="text-slate-300 dark:text-slate-700 mb-6 flex justify-center">
-                <SearchX className="w-16 h-16 animate-pulse" strokeWidth={1} />
-             </div>
-             <p className="text-slate-500 dark:text-slate-400 text-lg font-black uppercase tracking-widest px-6">
-                {portfolio.empty || 'No projects found'}
+          /* ESTADO VAZIO: Quando nenhum projeto atende ao filtro */
+          <div className="col-span-full py-32 flex flex-col items-center justify-center rounded-[3rem] border-4 border-dashed border-slate-100 dark:border-slate-900 bg-slate-50/50 dark:bg-slate-900/10">
+             <SearchX className="w-20 h-20 text-slate-300 dark:text-slate-700 mb-6" strokeWidth={1} />
+             <p className="text-slate-500 dark:text-slate-400 text-sm font-black uppercase tracking-[0.4em]">
+                {portfolio.empty || 'Nenhum projeto encontrado'}
              </p>
           </div>
         )}
