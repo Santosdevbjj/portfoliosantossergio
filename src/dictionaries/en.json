@@ -2,9 +2,9 @@
   "common": {
     "language": "English",
     "contact": "Contact",
-    "viewProject": "View Repository",
+    "viewProject": "GitHub",
     "liveDemo": "Live Demo",
-    "repoTitle": "Source Code",
+    "repoTitle": "Project Ecosystem",
     "portfolioTitle": "Solutions & Data",
     "governance": "Technical Rigor",
     "backToTop": "Top",
@@ -13,13 +13,17 @@
     "scroll_top_aria": "Back to top",
     "loading": "Syncing data...",
     "error": "A system instability occurred",
-    "close": "Close"
+    "close": "Close",
+    "articlesTitle": "Award-Winning Article",
+    "readMore": "Read Full Content",
+    "cvButton": "Download CV (English)",
+    "cvLink": "/cv-sergio-santos-en.pdf"
   },
   "nav": {
     "about": "About",
     "experience": "Career",
     "articles": "Articles",
-    "projects": "Projects",
+    "projects": "Portfolio",
     "contact": "Contact",
     "changeLang": "Change Language",
     "theme": {
@@ -30,134 +34,87 @@
   },
   "hero": {
     "badge": "Mission-Critical Systems Expert",
-    "title": "Transforming Complex Data into",
-    "titleAccent": "High-Value Decisions",
-    "description": "Data Engineer and Senior Analyst with 20+ years of experience in banking infrastructure (Bradesco). Focused on Data Science, operational efficiency, and financial risk mitigation.",
+    "title": "Transforming complex data into",
+    "titleAccent": "Strategic Assets",
+    "description": "Data Engineer and Senior Analyst with 20+ years of experience at Bradesco. Focused on Data Science and risk mitigation with the rigor of mission-critical banking systems.",
     "cta_primary": "View Projects",
     "cta_secondary": "LinkedIn"
   },
   "about": {
-    "title": "About Me",
-    "headline": "Mission-critical resilience applied to strategic intelligence.",
-    "bio": "With over 20 years of experience in mission-critical systems at Banco Bradesco, I specialized in ensuring technology supports high-stakes decisions with operational rigor. Today, I leverage this foundation to lead Data Science projects, connecting complex infrastructures to actionable insights.",
+    "title": "Professional Journey",
+    "headline": "Merging Banking Governance with Data Intelligence",
+    "bio": "Senior specialist with deep-rooted expertise in the banking sector, operating where security and high availability are non-negotiable. Merging IT governance with AI's analytical potential to solve real financial bottlenecks.",
     "sections": {
       "highlights": {
         "title": "Differentiators",
         "items": [
           {
-            "label": "Operational Efficiency",
-            "description": "Automation that eliminated 2,920 annual hours of manual tasks."
+            "label": "Reliability & Mission-Critical",
+            "description": "Infrastructure management with zero fault tolerance and superior compliance standards (LGPD/GDPR)."
           },
           {
-            "label": "High Availability",
-            "description": "Critical infrastructure management with a 99.5% uptime record."
+            "label": "Measurable Impact",
+            "description": "Workflow automation resulting in direct savings of 2,920 manual hours per year."
           },
           {
-            "label": "Governance & Risk",
-            "description": "Systems designed under strict compliance and traceability criteria."
+            "label": "Graph Intelligence",
+            "description": "Mastery of Neo4j and Azure Databricks for anomaly detection and decision flow optimization."
           }
         ]
       },
       "metrics": {
-        "title": "Logistics Performance",
-        "subtitle": "KPIs & IMPACT",
-        "availabilityValue": "61%",
-        "availabilityLabel": "Accuracy Improvement",
-        "automationValue": "$ 420K",
-        "automationLabel": "Annual Savings"
+        "title": "Operational Impact",
+        "subtitle": "KPIs & RESULTS",
+        "availabilityValue": "99.5%",
+        "availabilityLabel": "System Uptime",
+        "automationValue": "2.9k",
+        "automationLabel": "Annual Hours Saved"
       },
       "stack": {
         "title": "Technical Domain",
         "items": [
-          { "label": "Data Science", "description": "Python, SQL, R, Machine Learning, Scikit-Learn" },
-          { "label": "Cloud Architecture", "description": "Azure Databricks, Spark, Azure Data Factory" },
-          { "label": "Visual Intelligence", "description": "Power BI, Dashboards for C-Level" }
+          { "label": "Data Science", "description": "Python, High-Performance SQL, Neo4j, Machine Learning" },
+          { "label": "Cloud & Big Data", "description": "Azure Databricks, PySpark, Data Factory" },
+          { "label": "Modern Stack", "description": "Power BI, Generative AI, Data Governance" }
         ]
       }
     }
   },
-  "experience": {
-    "title": "Career Path",
-    "subtitle": "Engineering & Data Science Experience",
-    "labels": {
-      "solving": "Challenge",
-      "impact": "Outcome",
-      "techs": "Stack"
-    },
-    "items": [
-      {
-        "company": "Strategic Consultancy",
-        "role": "Data Scientist",
-        "period": "2023 – Present",
-        "solving": "Engineering schedule uncertainty and financial penalties for delays.",
-        "impact": "61% improvement in logistics accuracy and annual savings of $420k.",
-        "description": [
-          "Development of predictive models for financial risk mitigation.",
-          "Creation of real-time data pipelines and automated monitoring bots.",
-          "Optimization of logistics processes through advanced statistical analysis."
-        ],
-        "techs": ["Python", "Machine Learning", "Azure", "Power BI", "Pandas"]
-      },
-      {
-        "company": "Banco Bradesco S.A.",
-        "role": "Sr. Systems Analyst",
-        "period": "1985 – 2008",
-        "solving": "Requirement for high availability and automation in critical banking processes.",
-        "impact": "Saved 2,920 manual effort hours/year with 99.5% environment stability.",
-        "description": [
-          "Technical leadership in infrastructure for 500+ users in a regulated environment.",
-          "Implementation of banking systems focused on continuity and data security.",
-          "Development of large-scale data processing automation routines."
-        ],
-        "techs": ["Critical Systems", "Mainframe", "Governance", "SQL", "Automation"]
-      }
-    ]
+  "articles": {
+    "title": "Articles & Insights",
+    "subtitle": "Shared knowledge on Technology and Data",
+    "loading": "Loading library...",
+    "comingSoon": "New technical articles under review.",
+    "followPrompt": "Follow publications on Medium and LinkedIn.",
+    "badge": "35th DIO Competition Winner",
+    "featured": {
+      "title": "Low-Code in Healthcare: Agility vs Compliance",
+      "description": "Award-winning deep analysis on balancing development agility with rigorous medical compliance standards.",
+      "date": "Jan 2026",
+      "rank": "Top 1 Winner",
+      "link": "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77"
+    }
   },
   "portfolio": {
-    "title": "Projects",
+    "title": "Portfolio",
     "description": "Analytical solutions focused on solving complex problems and delivering economic value.",
     "all": "All",
-    "mainCaseLabel": "Featured",
-    "resultsLabel": "Key Results",
-    "filterLabel": "Filter by Tech",
-    "noDescription": "Technical documentation currently being updated.",
-    "empty": "No projects found in this category.",
+    "mainCaseLabel": "Featured Project",
+    "resultsLabel": "Measurable Result",
+    "projectLabels": {
+      "problem": "Business Challenge",
+      "solution": "Technical Strategy",
+      "impact": "Economic Impact"
+    },
     "categories": {
       "data-science": "Data Science",
-      "big-data": "Big Data",
-      "automation": "Automation",
-      "governance": "Governance",
+      "databricks": "Azure Databricks",
+      "neo4j": "Neo4j & Graphs",
+      "power-bi": "Analytics",
+      "database": "Data Engineering",
+      "python": "Automation",
       "machine-learning": "Machine Learning",
-      "azure": "Azure Cloud"
-    },
-    "projectLabels": {
-      "problem": "The Problem",
-      "solution": "The Solution",
-      "impact": "Economic Impact",
-      "technologies": "Technical Stack"
+      "cybersecurity": "Security & Compliance"
     }
-  },
-  "contact": {
-    "title": "Contact",
-    "subtitle": "Available for technical leadership, data consultancy, and strategic partnerships.",
-    "emailBtn": "Send Email",
-    "socialLabel": "LinkedIn & GitHub",
-    "status": "Active in 2026",
-    "form": {
-      "name": "Full Name",
-      "email": "Email Address",
-      "message": "How can I help with your challenge?",
-      "send": "Send Message",
-      "sending": "Sending...",
-      "success": "Message sent successfully! I will get back to you soon.",
-      "error": "Error sending. Please try again or use direct email."
-    }
-  },
-  "footer": {
-    "socialTitle": "Social",
-    "contactTitle": "Contact",
-    "location": "Brazil",
-    "builtBy": "Developed by",
-    "rights": "Sérgio Santos • All rights reserved"
   }
 }
