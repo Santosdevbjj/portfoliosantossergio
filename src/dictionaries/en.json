@@ -2,15 +2,17 @@
   "common": {
     "language": "English",
     "contact": "Contact",
-    "viewProject": "Repository",
+    "viewProject": "View Repository",
     "liveDemo": "Live Demo",
     "repoTitle": "Source Code",
     "portfolioTitle": "Solutions & Data",
     "governance": "Technical Rigor",
     "backToTop": "Top",
-    "menu_aria": "Open Menu",
-    "loading": "Loading...",
-    "error": "An error occurred",
+    "menu_aria": "Open Navigation Menu",
+    "close_aria": "Close",
+    "scroll_top_aria": "Back to top",
+    "loading": "Syncing data...",
+    "error": "A system instability occurred",
     "close": "Close"
   },
   "nav": {
@@ -19,56 +21,64 @@
     "articles": "Articles",
     "projects": "Projects",
     "contact": "Contact",
-    "changeLang": "Language",
+    "changeLang": "Change Language",
     "theme": {
-      "light": "Light",
-      "dark": "Dark",
+      "light": "Light Mode",
+      "dark": "Dark Mode",
       "system": "System"
     }
   },
+  "hero": {
+    "badge": "Mission-Critical Systems Expert",
+    "title": "Transforming Complex Data into",
+    "titleAccent": "High-Value Decisions",
+    "description": "Data Engineer and Senior Analyst with 20+ years of experience in banking infrastructure (Bradesco). Focused on Data Science, operational efficiency, and financial risk mitigation.",
+    "cta_primary": "View Projects",
+    "cta_secondary": "LinkedIn"
+  },
   "about": {
     "title": "About Me",
-    "headline": "Applying mission-critical system resilience to strategic data intelligence.",
+    "headline": "Mission-critical resilience applied to strategic intelligence.",
     "bio": "With over 20 years of experience in mission-critical systems at Banco Bradesco, I specialized in ensuring technology supports high-stakes decisions with operational rigor. Today, I leverage this foundation to lead Data Science projects, connecting complex infrastructures to actionable insights.",
     "sections": {
       "highlights": {
-        "title": "Highlights",
+        "title": "Differentiators",
         "items": [
           {
-            "label": "Efficiency",
+            "label": "Operational Efficiency",
             "description": "Automation that eliminated 2,920 annual hours of manual tasks."
           },
           {
-            "label": "Availability",
-            "description": "Management of critical infrastructure with 99.5% uptime."
+            "label": "High Availability",
+            "description": "Critical infrastructure management with a 99.5% uptime record."
           },
           {
-            "label": "Governance",
-            "description": "Systems focused on traceability and regulatory compliance."
+            "label": "Governance & Risk",
+            "description": "Systems designed under strict compliance and traceability criteria."
           }
         ]
       },
       "metrics": {
-        "title": "Performance",
+        "title": "Logistics Performance",
         "subtitle": "KPIs & IMPACT",
-        "availabilityValue": "99.5%",
-        "availabilityLabel": "Uptime",
-        "automationValue": "2.9K",
-        "automationLabel": "Hours/Year"
+        "accuracyValue": "61%",
+        "accuracyLabel": "Accuracy Increase",
+        "savingsValue": "$ 420K",
+        "savingsLabel": "Annual Savings"
       },
       "stack": {
-        "title": "Technologies",
+        "title": "Technical Domain",
         "items": [
-          { "label": "Data", "description": "Python, SQL, R, Machine Learning" },
-          { "label": "Cloud & Big Data", "description": "Azure Databricks, Spark, ADF" },
-          { "label": "Business Intelligence", "description": "Power BI, Strategic Dashboards" }
+          { "label": "Data Science", "description": "Python, SQL, R, Machine Learning, Scikit-Learn" },
+          { "label": "Cloud Architecture", "description": "Azure Databricks, Spark, Azure Data Factory" },
+          { "label": "Visual Intelligence", "description": "Power BI, Dashboards for C-Level" }
         ]
       }
     }
   },
   "experience": {
     "title": "Career Path",
-    "subtitle": "Critical Systems & Data Science Experience",
+    "subtitle": "Engineering & Data Science Experience",
     "labels": {
       "solving": "Challenge",
       "impact": "Outcome",
@@ -76,77 +86,78 @@
     },
     "items": [
       {
-        "company": "Data Consultancy",
+        "company": "Strategic Consultancy",
         "role": "Data Scientist",
         "period": "2023 – Present",
         "solving": "Engineering schedule uncertainty and financial penalties for delays.",
-        "impact": "61% improvement in logistics accuracy and annual savings of R$ 420k.",
+        "impact": "61% improvement in logistics accuracy and annual savings of $420k.",
         "description": [
           "Development of predictive models for financial risk mitigation.",
           "Creation of real-time data pipelines and automated monitoring bots.",
           "Optimization of logistics processes through advanced statistical analysis."
         ],
-        "techs": ["Python", "Scikit-Learn", "Pandas", "Power BI", "APIs"]
+        "techs": ["Python", "Machine Learning", "Azure", "Power BI", "Pandas"]
       },
       {
         "company": "Banco Bradesco S.A.",
         "role": "Sr. Systems Analyst",
         "period": "1985 – 2008",
         "solving": "Requirement for high availability and automation in critical banking processes.",
-        "impact": "Saved 2,920 hours/year with 99.5% environment stability.",
+        "impact": "Saved 2,920 manual effort hours/year with 99.5% environment stability.",
         "description": [
           "Technical leadership in infrastructure for 500+ users in a regulated environment.",
-          "Implementation of banking systems focused on continuity and security.",
+          "Implementation of banking systems focused on continuity and data security.",
           "Development of large-scale data processing automation routines."
         ],
-        "techs": ["Critical Systems", "Mainframe", "Automation", "Governance", "SQL"]
+        "techs": ["Critical Systems", "Mainframe", "Governance", "SQL", "Automation"]
       }
     ]
   },
   "portfolio": {
     "title": "Projects",
-    "description": "Analytical solutions focused on problem-solving and financial value delivery.",
+    "description": "Analytical solutions focused on solving complex problems and delivering economic value.",
     "all": "All",
     "mainCaseLabel": "Featured",
-    "resultsLabel": "Results",
-    "filterLabel": "Technology",
-    "noDescription": "Documentation in progress.",
+    "resultsLabel": "Key Results",
+    "filterLabel": "Filter by Tech",
+    "noDescription": "Technical documentation currently being updated.",
     "empty": "No projects found in this category.",
     "categories": {
       "data-science": "Data Science",
       "big-data": "Big Data",
       "automation": "Automation",
       "governance": "Governance",
-      "machine-learning": "ML",
-      "azure": "Azure"
+      "machine-learning": "Machine Learning",
+      "azure": "Azure Cloud"
     },
     "projectLabels": {
       "problem": "The Problem",
       "solution": "The Solution",
       "impact": "Economic Impact",
-      "technologies": "Tech Stack"
+      "technologies": "Technical Stack"
     }
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "Available for technical leadership, data consultancy, and strategic projects.",
-    "emailBtn": "Email",
+    "subtitle": "Available for technical leadership, data consultancy, and strategic partnerships.",
+    "emailBtn": "Send Email",
     "socialLabel": "LinkedIn & GitHub",
     "status": "Active in 2026",
     "form": {
       "name": "Full Name",
       "email": "Email Address",
-      "message": "How can I help?",
+      "message": "How can I help with your challenge?",
       "send": "Send Message",
-      "success": "Message sent successfully!",
-      "error": "Error sending message. Please try again."
+      "sending": "Sending...",
+      "success": "Message sent successfully! I will get back to you soon.",
+      "error": "Error sending. Please try again or use direct email."
     }
   },
   "footer": {
     "socialTitle": "Social",
     "contactTitle": "Contact",
     "location": "Brazil",
-    "builtBy": "By",
+    "builtBy": "Developed by",
     "rights": "Sérgio Santos • All rights reserved"
   }
 }
