@@ -1,25 +1,26 @@
 {
-  "name": "Sérgio Santos | Portfolio",
+  "name": "Sérgio Santos | Data & Systems Specialist",
   "short_name": "Sérgio.Data",
-  "description": "Portfólio de Ciência de Dados e Engenharia de Sistemas de Missão Crítica",
+  "description": "Especialista em Dados e Engenharia de Sistemas de Missão Crítica - Portfólio Global",
   "lang": "pt-BR",
-  "start_url": "/pt",
-  "id": "portfolio-santos-sergio-2026",
+  "start_url": "/",
+  "id": "portfolio-santos-sergio-v2-2026",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
+  "prefer_related_applications": false,
   "scope": "/",
   "categories": ["business", "education", "developer", "productivity"],
   "icons": [
     {
-      "src": "/icons/icon.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -32,41 +33,41 @@
   ],
   "screenshots": [
     {
-      "src": "/og-image-pt.png",
-      "sizes": "1200x630",
+      "src": "/screenshots/desktop-home.png",
+      "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Sérgio Santos Data Portfolio Desktop"
+      "label": "Data Strategy Dashboard - Desktop View"
     },
     {
-      "src": "/og-image-pt.png",
-      "sizes": "1200x630",
+      "src": "/screenshots/mobile-home.png",
+      "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Sérgio Santos Data Portfolio Mobile"
+      "label": "Technical Portfolio - Mobile View"
     }
   ],
   "shortcuts": [
     {
-      "name": "Projetos (PT)",
+      "name": "Projetos (Português)",
       "short_name": "Projetos",
-      "description": "Ver portfólio em Português",
+      "description": "Explorar ecossistema de dados em PT",
       "url": "/pt#projects",
-      "icons": [{ "src": "/icons/icon.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Projects (EN)",
+      "name": "Projects (English)",
       "short_name": "Projects",
-      "description": "View English portfolio",
+      "description": "Explore data ecosystem in EN",
       "url": "/en#projects",
-      "icons": [{ "src": "/icons/icon.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Proyectos (ES)",
+      "name": "Proyectos (Español)",
       "short_name": "Proyectos",
-      "description": "Ver portafolio en Español",
+      "description": "Explorar ecosistema de datos en ES",
       "url": "/es#projects",
-      "icons": [{ "src": "/icons/icon.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
