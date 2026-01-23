@@ -1,27 +1,27 @@
 {
   "common": {
-    "language": "Português",
-    "contact": "Contato",
-    "viewProject": "Ver Repositório",
-    "liveDemo": "Demo Online",
-    "repoTitle": "Código-Fonte",
-    "portfolioTitle": "Soluções e Dados",
+    "language": "Español",
+    "contact": "Contacto",
+    "viewProject": "Ver Repositorio",
+    "liveDemo": "Demo en Vivo",
+    "repoTitle": "Código Fuente",
+    "portfolioTitle": "Soluciones y Datos",
     "governance": "Rigor Técnico",
-    "backToTop": "Topo",
-    "menu_aria": "Abrir Menu de Navegação",
-    "close_aria": "Fechar",
-    "scroll_top_aria": "Voltar ao topo da página",
-    "loading": "Sincronizando dados...",
-    "error": "Ocorreu uma instabilidade no sistema",
-    "close": "Fechar"
+    "backToTop": "Inicio",
+    "menu_aria": "Abrir menú de navegación",
+    "close_aria": "Cerrar",
+    "scroll_top_aria": "Volver al inicio",
+    "loading": "Sincronizando datos...",
+    "error": "Ocurrió una inestabilidad en el sistema",
+    "close": "Cerrar"
   },
   "nav": {
-    "about": "Sobre",
-    "experience": "Trajetória",
-    "articles": "Artigos",
-    "projects": "Projetos",
-    "contact": "Contato",
-    "changeLang": "Alterar Idioma",
+    "about": "Sobre Mí",
+    "experience": "Trayectoria",
+    "articles": "Artículos",
+    "projects": "Proyectos",
+    "contact": "Contacto",
+    "changeLang": "Cambiar Idioma",
     "theme": {
       "light": "Modo Claro",
       "dark": "Modo Escuro",
@@ -29,45 +29,45 @@
     }
   },
   "hero": {
-    "badge": "Especialista em Sistemas Críticos",
-    "title": "Transformando Dados Complexos em",
-    "titleAccent": "Decisões de Alto Valor",
-    "description": "Engenheiro de Dados e Analista Sênior com 20+ anos de experiência em infraestrutura bancária (Bradesco). Foco em Ciência de Dados, eficiência operacional e mitigação de riscos financeiros.",
-    "cta_primary": "Ver Projetos",
+    "badge": "Experto en Sistemas Críticos",
+    "title": "Transformando Datos Complejos en",
+    "titleAccent": "Decisiones de Alto Valor",
+    "description": "Ingeniero de Datos y Analista Senior con más de 20 años de experiencia en infraestructura bancaria (Bradesco). Especializado en Ciencia de Datos, eficiencia operativa y mitigación de riesgos financieros.",
+    "cta_primary": "Ver Proyectos",
     "cta_secondary": "LinkedIn"
   },
   "about": {
-    "title": "Sobre Mim",
-    "headline": "A resiliência de sistemas críticos aplicada à inteligência estratégica.",
-    "bio": "Com mais de 20 anos de experiência em sistemas de missão crítica no setor bancário, especializei-me em garantir que a tecnologia sustente decisões de alto risco com rigor operacional. Hoje, utilizo essa base sólida para liderar projetos de Ciência de Dados, conectando infraestruturas complexas a insights acionáveis.",
+    "title": "Sobre Mí",
+    "headline": "Resiliencia de sistemas críticos aplicada a la inteligencia estratégica.",
+    "bio": "Con más de 20 años de experiencia en sistemas de misión crítica en el sector bancário, me especialicé en asegurar que la tecnología respalde decisiones de alto riesgo con rigor operacional. Hoy, utilizo esa base sólida para liderar proyectos de Ciencia de Datos, conectando infraestructuras complejas con insights acionables.",
     "sections": {
       "highlights": {
-        "title": "Diferenciais",
+        "title": "Diferenciales",
         "items": [
           {
-            "label": "Eficiência Operacional",
-            "description": "Automação que eliminou 2.920 horas anuais de tarefas manuais."
+            "label": "Eficiencia Operativa",
+            "description": "Automatización que eliminó 2.920 horas anuales de tareas manuales."
           },
           {
-            "label": "Alta Disponibilidade",
-            "description": "Gestão de infraestrutura crítica com histórico de 99,5% de uptime."
+            "label": "Alta Disponibilidad",
+            "description": "Gestión de infraestructura crítica con un historial de 99,5% de uptime."
           },
           {
-            "label": "Governança & Risco",
-            "description": "Sistemas desenhados sob rigorosos critérios de conformidade e rastreabilidade."
+            "label": "Gobernanza y Riesgo",
+            "description": "Sistemas diseñados bajo estrictos criterios de cumplimiento y trazabilidad."
           }
         ]
       },
       "metrics": {
-        "title": "Performance Logística",
-        "subtitle": "KPIs & IMPACTO",
+        "title": "Rendimiento Logístico",
+        "subtitle": "KPIs e IMPACTO",
         "availabilityValue": "61%",
-        "availabilityLabel": "Aumento de Precisão",
+        "availabilityLabel": "Mejora de Precisión",
         "automationValue": "R$ 420K",
-        "automationLabel": "Economia Anual"
+        "automationLabel": "Ahorro Anual"
       },
       "stack": {
-        "title": "Domínio Técnico",
+        "title": "Dominio Técnico",
         "items": [
           { "label": "Data Science", "description": "Python, SQL, R, Machine Learning, Scikit-Learn" },
           { "label": "Cloud Architecture", "description": "Azure Databricks, Spark, Azure Data Factory" },
@@ -77,87 +77,87 @@
     }
   },
   "experience": {
-    "title": "Trajetória",
-    "subtitle": "Experiência em Engenharia e Ciência de Dados",
+    "title": "Trayectoria",
+    "subtitle": "Experiencia en Ingeniería y Ciencia de Datos",
     "labels": {
-      "solving": "Desafio",
+      "solving": "Desafío",
       "impact": "Resultado",
       "techs": "Stack"
     },
     "items": [
       {
-        "company": "Consultoria Estratégica",
-        "role": "Cientista de Dados",
+        "company": "Consultoría Estratégica",
+        "role": "Científico de Datos",
         "period": "2023 – Presente",
-        "solving": "Incerteza em cronogramas de engenharia e multas contratuais por atraso.",
-        "impact": "Aumento de 61% na precisão logística e economia direta de R$ 420 mil/ano.",
+        "solving": "Incertidumbre en cronogramas de ingeniería y multas por retrasos contractuales.",
+        "impact": "Mejora del 61% en la precisión logística y ahorro anual de R$ 420 mil.",
         "description": [
-          "Desenvolvimento de modelos preditivos para mitigação de riscos financeiros.",
-          "Criação de pipelines de dados e bots de monitoramento em tempo real.",
-          "Otimização de processos logísticos através de análise estatística avançada."
+          "Desarrollo de modelos predictivos para la mitigación de riesgos financieros.",
+          "Creación de pipelines de datos y bots de monitoreo en tiempo real.",
+          "Optimización de procesos logísticos mediante análisis estadístico avanzado."
         ],
         "techs": ["Python", "Machine Learning", "Azure", "Power BI", "Pandas"]
       },
       {
         "company": "Banco Bradesco S.A.",
-        "role": "Analista de Sistemas Sênior",
+        "role": "Analista Senior de Sistemas",
         "period": "1985 – 2008",
-        "solving": "Necessidade de alta disponibilidade e automação em processos bancários críticos.",
-        "impact": "Redução de 2.920 horas de esforço manual/ano com estabilidade de 99,5%.",
+        "solving": "Necesidad de alta disponibilidad y automatización en procesos bancarios críticos.",
+        "impact": "Ahorro de 2.920 horas de esfuerzo manual/año con estabilidad del 99,5%.",
         "description": [
-          "Liderança técnica em infraestrutura para 500+ usuários em ambiente regulado.",
-          "Implementação de sistemas bancários com foco em continuidade e segurança de dados.",
-          "Desenvolvimento de rotinas de automação para processamento em larga escala."
+          "Liderazgo técnico en infraestructura para más de 500 usuarios en entorno regulado.",
+          "Implementación de sistemas bancarios enfocados en continuidad y seguridad de datos.",
+          "Desarrollo de rotinas de automatización para procesamiento a gran escala."
         ],
-        "techs": ["Sistemas Críticos", "Mainframe", "Governança", "SQL", "Automação"]
+        "techs": ["Sistemas Críticos", "Mainframe", "Gobernanza", "SQL", "Automatización"]
       }
     ]
   },
   "portfolio": {
-    "title": "Projetos",
-    "description": "Soluções analíticas focadas em resolução de problemas complexos e entrega de valor econômico.",
+    "title": "Proyectos",
+    "description": "Soluciones analíticas enfocadas en resolver problemas complejos y entregar valor económico.",
     "all": "Todos",
-    "mainCaseLabel": "Destaque",
-    "resultsLabel": "Resultados Obtidos",
-    "filterLabel": "Filtrar por Tecnologia",
-    "noDescription": "Documentação técnica em processo de atualização.",
-    "empty": "Nenhum projeto encontrado nesta categoria.",
+    "mainCaseLabel": "Destacado",
+    "resultsLabel": "Resultados Obtenidos",
+    "filterLabel": "Filtrar por Tecnología",
+    "noDescription": "Documentación técnica en proceso de actualización.",
+    "empty": "No se encontraron proyectos en esta categoría.",
     "categories": {
-      "data-science": "Ciência de Dados",
+      "data-science": "Ciencia de Datos",
       "big-data": "Big Data",
-      "automation": "Automação",
-      "governance": "Governança",
+      "automation": "Automatización",
+      "governance": "Gobernanza",
       "machine-learning": "Machine Learning",
       "azure": "Azure Cloud"
     },
     "projectLabels": {
-      "problem": "O Problema",
+      "problem": "El Problema",
       "solution": "A Solução",
-      "impact": "Impacto Econômico",
+      "impact": "Impacto Económico",
       "technologies": "Stack Técnica"
     }
   },
   "contact": {
-    "title": "Contato",
-    "subtitle": "Disponível para liderança técnica, consultoria em dados e parcerias estratégicas.",
-    "emailBtn": "Enviar E-mail",
-    "socialLabel": "LinkedIn & GitHub",
-    "status": "Ativo em 2026",
+    "title": "Contacto",
+    "subtitle": "Disponible para liderazgo técnico, consultoría de datos y alianzas estratégicas.",
+    "emailBtn": "Enviar Email",
+    "socialLabel": "LinkedIn y GitHub",
+    "status": "Activo en 2026",
     "form": {
-      "name": "Seu Nome",
-      "email": "Seu E-mail",
-      "message": "Como posso ajudar no seu desafio?",
-      "send": "Enviar Mensagem",
+      "name": "Su Nombre",
+      "email": "Su Correo",
+      "message": "¿Cómo puedo ayudar con su desafío?",
+      "send": "Enviar Mensaje",
       "sending": "Enviando...",
-      "success": "Mensagem enviada com sucesso! Em breve entrarei em contato.",
-      "error": "Erro no envio. Por favor, tente novamente ou use o e-mail direto."
+      "success": "¡Mensaje enviado con éxito! Me pondré en contacto pronto.",
+      "error": "Error al enviar. Por favor, intente de nuevo o use el email directo."
     }
   },
   "footer": {
     "socialTitle": "Social",
-    "contactTitle": "Contato",
+    "contactTitle": "Contacto",
     "location": "Brasil",
-    "builtBy": "Desenvolvido por",
-    "rights": "Sérgio Santos • Todos os direitos reservados"
+    "builtBy": "Desarrollado por",
+    "rights": "Sérgio Santos • Todos los derechos reservados"
   }
 }
