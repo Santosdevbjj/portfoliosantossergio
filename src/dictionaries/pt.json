@@ -3,7 +3,7 @@
     "language": "Português",
     "contact": "Contato",
     "viewProject": "GitHub",
-    "liveDemo": "Live Demo",
+    "liveDemo": "Demo ao Vivo",
     "repoTitle": "Ecossistema de Projetos",
     "portfolioTitle": "Soluções e Dados",
     "governance": "Rigor Técnico",
@@ -73,9 +73,18 @@
       "stack": {
         "title": "Domínio Técnico",
         "items": [
-          { "label": "Data Science", "description": "Python, SQL de Alta Performance, Neo4J, Machine Learning" },
-          { "label": "Cloud & Big Data", "description": "Azure Databricks, PySpark, Data Factory" },
-          { "label": "Modern Stack", "description": "Power BI, IA Generativa, Governança de Dados" }
+          {
+            "label": "Data Science",
+            "description": "Python, SQL de Alta Performance, Neo4J, Machine Learning"
+          },
+          {
+            "label": "Cloud & Big Data",
+            "description": "Azure Databricks, PySpark, Data Factory"
+          },
+          {
+            "label": "Modern Stack",
+            "description": "Power BI, IA Generativa, Governança de Dados"
+          }
         ]
       }
     }
