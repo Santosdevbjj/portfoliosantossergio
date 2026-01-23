@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react';
-// Removido o 'Zap' para corrigir o erro de build da Vercel
 import { Briefcase, Calendar, TrendingUp, Target, ShieldCheck } from 'lucide-react';
 
 interface ExperienceItem {
@@ -32,12 +31,19 @@ interface ExperienceSectionProps {
 
 /**
  * EXPERIENCE SECTION - TRAJETÓRIA E IMPACTO ESTRATÉGICO
- * Ajustado para conformidade com ESLint Flat Config 2026.
+ * Totalmente responsivo e blindado contra erros de runtime (Safe Access).
  */
 export const ExperienceSection = ({ dict }: ExperienceSectionProps) => {
-  // Acesso seguro e tipado ao dicionário
-  const { experience } = dict;
-  const { labels, items: experiences } = experience;
+  // SEGURANÇA: Previne erro de desestruturação se o dicionário falhar
+  const experience = dict?.experience;
+  const labels = experience?.labels || { 
+    solving: 'Challenge', 
+    impact: 'Strategic Impact', 
+    techs: 'Tech Stack' 
+  };
+  const experiences = experience?.items || [];
+
+  if (!experience) return null;
 
   return (
     <section id="experience" className="py-20 lg:py-32 bg-white dark:bg-[#020617] transition-colors duration-500 overflow-hidden relative">
@@ -47,7 +53,7 @@ export const ExperienceSection = ({ dict }: ExperienceSectionProps) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* CABEÇALHO DA SEÇÃO - Responsivo */}
+        {/* CABEÇALHO DA SEÇÃO */}
         <div className="flex flex-col md:flex-row md:items-end gap-6 mb-16 md:mb-24">
           <div className="flex items-center gap-4">
             <div className="p-3 md:p-4 bg-blue-600 rounded-2xl text-white shadow-2xl shadow-blue-500/30 transform -rotate-3">
@@ -66,17 +72,17 @@ export const ExperienceSection = ({ dict }: ExperienceSectionProps) => {
           </div>
         </div>
 
-        {/* ESTRUTURA DA TIMELINE */}
+        {/* ESTRUTURA DA TIMELINE (Responsive Margin) */}
         <div className="relative border-l-2 border-slate-100 dark:border-slate-800 ml-4 md:ml-12 space-y-20 md:space-y-32">
           {experiences.map((exp, index) => (
             <div key={`${exp.company}-${index}`} className="relative pl-8 md:pl-20 group">
               
-              {/* Indicador da Timeline com Efeito Hover */}
+              {/* Indicador da Timeline */}
               <div className="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-white dark:bg-[#020617] border-4 border-blue-600 shadow-xl group-hover:scale-150 group-hover:bg-blue-600 transition-all duration-500" />
 
               <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
                 
-                {/* COLUNA ESQUERDA: Identificação e Problema */}
+                {/* COLUNA ESQUERDA: Identificação e Problema (4/12) */}
                 <div className="lg:col-span-5 xl:col-span-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-black text-[10px] uppercase tracking-widest mb-6">
                     <Calendar className="w-3.5 h-3.5" />
@@ -90,7 +96,7 @@ export const ExperienceSection = ({ dict }: ExperienceSectionProps) => {
                     {exp.role}
                   </p>
                   
-                  {/* Desafio de Negócio (Estilo Case Study) */}
+                  {/* Desafio de Negócio */}
                   <div className="bg-slate-50 dark:bg-slate-900/80 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 group-hover:border-blue-500/30 transition-all duration-500 shadow-sm">
                     <div className="flex items-center gap-2 text-slate-900 dark:text-white font-black text-[10px] uppercase mb-3 tracking-widest">
                       <Target className="w-4 h-4 text-red-500" />
@@ -102,10 +108,10 @@ export const ExperienceSection = ({ dict }: ExperienceSectionProps) => {
                   </div>
                 </div>
 
-                {/* COLUNA DIREITA: Impacto e Entregas */}
+                {/* COLUNA DIREITA: Impacto e Entregas (8/12) */}
                 <div className="lg:col-span-7 xl:col-span-8 flex flex-col">
                   
-                  {/* IMPACT BANNER: Emerald Gradient para resultados financeiros */}
+                  {/* IMPACT BANNER: Destaque de Resultados Financeiros/Técnicos */}
                   <div className="flex items-center gap-5 p-6 md:p-8 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-[2.5rem] mb-10 shadow-xl shadow-emerald-500/20 transform group-hover:-translate-y-1 transition-all duration-500">
                     <div className="p-3 bg-white/20 backdrop-blur-md rounded-2xl flex-shrink-0">
                       <TrendingUp className="w-6 h-6 md:w-8 md:h-8 text-white" />
@@ -123,7 +129,7 @@ export const ExperienceSection = ({ dict }: ExperienceSectionProps) => {
                   {/* Lista de Responsabilidades */}
                   <div className="grid md:grid-cols-1 gap-6 mb-10">
                     <ul className="space-y-4">
-                      {exp.description.map((desc, i) => (
+                      {(exp.description || []).map((desc, i) => (
                         <li key={i} className="flex items-start gap-4 text-slate-600 dark:text-slate-300 font-medium text-base md:text-lg leading-snug">
                           <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-600 flex-shrink-0" />
                           {desc}
@@ -139,7 +145,7 @@ export const ExperienceSection = ({ dict }: ExperienceSectionProps) => {
                       {labels.techs}
                     </div>
                     <div className="flex flex-wrap gap-2 md:gap-3">
-                      {exp.techs.map((tech, i) => (
+                      {(exp.techs || []).map((tech, i) => (
                         <span key={i} className="px-4 py-2 bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-400 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-wider border border-slate-200 dark:border-slate-800 group-hover:border-blue-500/20 transition-all">
                           {tech}
                         </span>
