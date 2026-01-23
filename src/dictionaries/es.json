@@ -20,7 +20,7 @@
     "cvLink": "/cv-sergio-santos-es.pdf"
   },
   "nav": {
-    "about": "Sobre mí",
+    "about": "Sobre",
     "experience": "Trayectoria",
     "articles": "Artículos",
     "projects": "Portafolio",
@@ -36,14 +36,14 @@
     "badge": "Experto en Sistemas Críticos",
     "title": "Transformando datos complejos en",
     "titleAccent": "Activos Estratégicos",
-    "description": "Ingeniero de Datos y Analista Senior con 20+ años de experiencia en Bradesco. Foco en Ciencia de Datos y mitigación de riesgos con el rigor de sistemas bancarios de misión crítica.",
+    "description": "Ingeniero de Datos y Analista Senior con más de 20 años de experiencia en Bradesco. Enfocado en Ciencia de Datos y mitigación de riesgos con el rigor de sistemas bancarios de misión crítica.",
     "cta_primary": "Ver Proyectos",
     "cta_secondary": "LinkedIn"
   },
   "about": {
     "title": "Trayectoria Profesional",
     "headline": "Convergencia entre Gobernanza Bancaria e Inteligencia de Datos",
-    "bio": "Especialista sénior con trayectoria consolidada en el sector bancario, operando donde la seguridad y la alta disponibilidad son innegociables. Fusión de cultura de gobernanza con el potencial analítico de la IA.",
+    "bio": "Especialista sénior con trayectoria consolidada en el sector bancario, operando donde la seguridad y la alta disponibilidad son innegociables. Integrando la gobernanza de TI con el potencial analítico de la IA para resolver cuellos de botella financieros reales.",
     "sections": {
       "highlights": {
         "title": "Diferenciales",
@@ -54,11 +54,11 @@
           },
           {
             "label": "Impacto Medible",
-            "description": "Automatización de flujos resultando en un ahorro directo de 2.920 horas manuales al año."
+            "description": "Automatización de flujos que resultó en un ahorro directo de 2.920 horas manuales por año."
           },
           {
             "label": "Inteligencia de Grafos",
-            "description": "Experto en Neo4j y Azure Databricks para detección de anomalías y optimización de flujos de decisión."
+            "description": "Dominio de Neo4J y Azure Databricks para detección de anomalías y optimización de flujos de decisión."
           }
         ]
       },
@@ -66,16 +66,25 @@
         "title": "Impacto Operativo",
         "subtitle": "KPIs y RESULTADOS",
         "availabilityValue": "99.5%",
-        "availabilityLabel": "Uptime de Sistemas",
+        "availabilityLabel": "Disponibilidad de Sistemas",
         "automationValue": "2.9k",
         "automationLabel": "Horas Ahorradas/Año"
       },
       "stack": {
         "title": "Dominio Técnico",
         "items": [
-          { "label": "Data Science", "description": "Python, SQL de Alto Rendimiento, Neo4j, Machine Learning" },
-          { "label": "Cloud & Big Data", "description": "Azure Databricks, PySpark, Data Factory" },
-          { "label": "Modern Stack", "description": "Power BI, IA Generativa, Gobernanza de Datos" }
+          {
+            "label": "Data Science",
+            "description": "Python, SQL de Alto Rendimiento, Neo4J, Machine Learning"
+          },
+          {
+            "label": "Cloud & Big Data",
+            "description": "Azure Databricks, PySpark, Data Factory"
+          },
+          {
+            "label": "Modern Stack",
+            "description": "Power BI, IA Generativa, Gobernanza de Datos"
+          }
         ]
       }
     }
@@ -86,10 +95,10 @@
     "loading": "Cargando biblioteca...",
     "comingSoon": "Nuevos artículos técnicos en revisión.",
     "followPrompt": "Siga las publicaciones en Medium y LinkedIn.",
-    "badge": "Ganador 35ª Competición DIO",
+    "badge": "Ganador de la 35ª Competición DIO",
     "featured": {
       "title": "Low-Code en la Salud: Agilidad vs Cumplimiento",
-      "description": "Análisis profundo premiado sobre cómo equilibrar la agilidad de desarrollo con las normas de cumplimiento médico.",
+      "description": "Análisis profundo premiado sobre cómo equilibrar la agilidad de desarrollo con rigurosas normas de cumplimiento médico.",
       "date": "Ene 2026",
       "rank": "Top 1 Ganador",
       "link": "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad"
@@ -97,7 +106,7 @@
   },
   "portfolio": {
     "title": "Portafolio",
-    "description": "Soluciones analíticas enfocadas en resolver problemas complejos y entregar valor económico.",
+    "description": "Soluciones analíticas enfocadas en resolver problemas complejos y generar valor económico.",
     "all": "Todos",
     "mainCaseLabel": "Proyecto Destacado",
     "resultsLabel": "Resultado Medible",
@@ -109,12 +118,12 @@
     "categories": {
       "data-science": "Ciencia de Datos",
       "databricks": "Azure Databricks",
-      "neo4j": "Neo4j y Grafos",
+      "neo4j": "Neo4J y Grafos",
       "power-bi": "Analytics",
       "database": "Ingeniería de Datos",
       "python": "Automatización",
       "machine-learning": "Machine Learning",
-      "cybersecurity": "Seguridad y LGPD"
+      "cybersecurity": "Seguridad y Cumplimiento"
     }
   }
 }
