@@ -38,47 +38,48 @@ interface CareerHighlightsProps {
 
 /**
  * CAREER HIGHLIGHTS - MÉTRICAS DE IMPACTO E GOVERNANÇA
- * Totalmente responsivo e blindado contra erros de carregamento de dicionário.
+ * Focado na prova social de resultados: Automação e Disponibilidade.
  */
 export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
-  // SEGURANÇA: Desestruturação com Safe Access para prevenir erro 'reading property of undefined'
+  // Segurança contra objetos indefinidos
   const highlights = dict?.about?.sections?.highlights;
   const metrics = dict?.about?.sections?.metrics;
   const items = highlights?.items || [];
 
-  // Mapeamento de ícones: Garante semântica visual independente do idioma
+  // Mapeamento semântico de ícones para reforçar a autoridade técnica
   const icons = [
-    <Clock key="icon-clock" className="w-6 h-6" />,
-    <Server key="icon-server" className="w-6 h-6" />,
-    <ShieldCheck key="icon-shield" className="w-6 h-6" />
+    <Clock key="icon-clock" className="w-6 h-6" />,   // Eficiência/Tempo
+    <Server key="icon-server" className="w-6 h-6" />, // Infraestrutura/Disponibilidade
+    <ShieldCheck key="icon-shield" className="w-6 h-6" /> // Governança/Rigor
   ];
 
   return (
     <div className="mt-16 space-y-12 antialiased">
-      {/* CABEÇALHO DA SEÇÃO */}
+      
+      {/* TÍTULO DA SUBSEÇÃO COM INDICADOR VISUAL */}
       <div className="flex items-center gap-4 mb-10">
         <div className="h-8 w-2 bg-blue-600 rounded-full shrink-0" />
-        <h4 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
-          {highlights?.title || 'Highlights'}
+        <h4 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase">
+          {highlights?.title || 'Destaques Profissionais'}
         </h4>
       </div>
 
-      {/* GRID DE DESTAQUES: Adaptável para Mobile (1 col), Tablet (2 col) e Desktop (3 col) */}
+      {/* GRID DE CARDS DE DESTAQUES */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item, i) => (
           <div 
             key={`highlight-item-${i}`}
-            className="group relative p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800 hover:border-blue-500/50 transition-all duration-500 shadow-sm hover:shadow-xl flex flex-col h-full"
+            className="group relative p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-200/50 dark:border-slate-800/50 hover:border-blue-500/50 transition-all duration-500 flex flex-col h-full shadow-sm hover:shadow-xl"
           >
-            {/* Efeito Visual de Fundo no Hover */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem] pointer-events-none" />
+            {/* Camada de Gradiente Sutil no Hover */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2.5rem] pointer-events-none" />
 
             <div className="relative z-10 flex flex-col h-full">
               <div className="mb-6 p-4 inline-flex w-fit rounded-2xl bg-white dark:bg-slate-800 text-blue-600 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                 {icons[i] || <Trophy className="w-6 h-6" />}
               </div>
 
-              <h5 className="text-xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
+              <h5 className="text-lg md:text-xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
                 {item?.label}
               </h5>
 
@@ -90,43 +91,45 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
         ))}
       </div>
 
-      {/* BANNER DE IMPACTO (KPIs): Design Otimizado para Mobile */}
-      <div className="relative overflow-hidden p-8 md:p-12 rounded-[3rem] bg-blue-600 text-white shadow-2xl shadow-blue-600/40 transition-all duration-500 hover:scale-[1.005]">
-        <Activity className="absolute -right-12 -top-12 text-white/5 w-64 h-64 rotate-12 pointer-events-none" />
+      {/* BANNER DE IMPACTO (KPIs) - O "Efeito Uau" para Recrutadores */}
+      <div className="relative overflow-hidden p-8 md:p-12 rounded-[3rem] bg-blue-600 text-white shadow-2xl shadow-blue-600/30 transition-all duration-500">
+        {/* Gráfico decorativo de fundo */}
+        <Activity className="absolute -right-16 -top-16 text-white/5 w-64 h-64 rotate-12 pointer-events-none" />
         
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
           
-          {/* Título e Subtítulo das Métricas */}
+          {/* Lado Esquerdo: Identificação da Métrica */}
           <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
             <div className="p-4 md:p-5 bg-white/10 rounded-3xl backdrop-blur-md border border-white/20 shrink-0">
               <BarChart3 className="w-10 h-10 text-white" />
             </div>
             <div className="max-w-xs">
-              <p className="text-blue-100 text-[10px] font-black uppercase tracking-[0.3em] mb-2 opacity-80">
-                {metrics?.subtitle}
+              <p className="text-blue-200 text-[10px] font-black uppercase tracking-[0.3em] mb-2">
+                {metrics?.subtitle || 'Métricas Críticas'}
               </p>
               <h4 className="text-2xl md:text-3xl font-black tracking-tighter leading-tight">
-                {metrics?.title}
+                {metrics?.title || 'Impacto Operacional'}
               </h4>
             </div>
           </div>
           
+          {/* Divisor Visual (Desktop Only) */}
           <div className="hidden lg:block h-16 w-px bg-white/20" />
           
-          {/* Grid de Números: Usa tabular-nums para alinhamento perfeito dos dígitos */}
-          <div className="grid grid-cols-1 xs:grid-cols-2 gap-8 md:gap-16 w-full lg:w-auto">
+          {/* Lado Direito: Números de Alta Performance */}
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-10 md:gap-16 w-full lg:w-auto">
             <div className="text-center">
               <span className="block text-5xl md:text-6xl font-black mb-1 tracking-tighter tabular-nums">
-                {metrics?.availabilityValue || '99.9%'}
+                {metrics?.availabilityValue}
               </span>
               <span className="text-blue-100 text-[10px] font-black uppercase tracking-widest opacity-80 block whitespace-nowrap">
                 {metrics?.availabilityLabel}
               </span>
             </div>
             
-            <div className="text-center xs:border-l border-white/10 xs:pl-8 md:pl-16">
+            <div className="text-center xs:border-l border-white/10 xs:pl-10 md:pl-16">
               <span className="block text-5xl md:text-6xl font-black mb-1 tracking-tighter tabular-nums">
-                {metrics?.automationValue || '85%'}
+                {metrics?.automationValue}
               </span>
               <span className="text-blue-100 text-[10px] font-black uppercase tracking-widest opacity-80 block whitespace-nowrap">
                 {metrics?.automationLabel}
