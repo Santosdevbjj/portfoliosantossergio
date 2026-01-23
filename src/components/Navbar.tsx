@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-// Removido 'Languages' que não estava sendo usado na renderização
 import { Menu, X, Layers, ChevronRight } from 'lucide-react'
 import type { Locale } from '@/i18n-config'
 
@@ -23,36 +22,42 @@ interface NavbarProps {
 
 /**
  * NAVBAR PROFISSIONAL - NEXT.JS 15 READY
- * Corrigido: Removido imports não utilizados para passar no build da Vercel.
+ * Totalmente responsiva, multilingue e otimizada para SEO e Performance.
  */
 export const Navbar = ({ dict, lang }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
+  // Efeito de scroll para mudar a aparência da Navbar
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Bloqueia o scroll do corpo quando o menu mobile está aberto
   useEffect(() => {
-    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'unset'
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = isMobileMenuOpen ? 'hidden' : 'unset'
+    }
   }, [isMobileMenuOpen])
 
+  // Função robusta para troca de idioma preservando a rota atual
   const redirectedPathName = (locale: string) => {
     if (!pathname) return `/${locale}`
     const segments = pathname.split('/')
     segments[1] = locale
-    return segments.join('/') || `/${locale}`
+    return segments.join('/')
   }
 
+  // Links de navegação baseados no dicionário
   const navLinks = [
-    { href: '#about', label: dict.nav.about },
-    { href: '#experience', label: dict.nav.experience },
-    { href: '#articles', label: dict.nav.articles },
-    { href: '#projects', label: dict.nav.projects },
-    { href: '#contact', label: dict.nav.contact },
+    { href: '#about', label: dict?.nav?.about || 'About' },
+    { href: '#experience', label: dict?.nav?.experience || 'Experience' },
+    { href: '#articles', label: dict?.nav?.articles || 'Articles' },
+    { href: '#projects', label: dict?.nav?.projects || 'Projects' },
+    { href: '#contact', label: dict?.nav?.contact || 'Contact' },
   ]
 
   const languages = [
@@ -71,9 +76,9 @@ export const Navbar = ({ dict, lang }: NavbarProps) => {
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-10 flex justify-between items-center">
         
-        {/* LOGO */}
+        {/* LOGO: Identidade Visual Sérgio Santos */}
         <Link 
-          href={`/${lang}` as any} 
+          href={`/${lang}`} 
           className="flex items-center gap-3 group relative z-[110]"
           onClick={() => setIsMobileMenuOpen(false)}
         >
@@ -90,13 +95,13 @@ export const Navbar = ({ dict, lang }: NavbarProps) => {
           </div>
         </Link>
 
-        {/* NAVEGAÇÃO DESKTOP */}
+        {/* NAVEGAÇÃO DESKTOP: Oculta em telas menores que 768px */}
         <div className="hidden md:flex items-center gap-8">
           <nav className="flex items-center gap-1">
             {navLinks.map((link) => (
               <Link 
                 key={link.href}
-                href={`/${lang}/${link.href}` as any}
+                href={`/${lang}/${link.href}`}
                 className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-white transition-all relative group/link"
               >
                 {link.label}
@@ -105,13 +110,13 @@ export const Navbar = ({ dict, lang }: NavbarProps) => {
             ))}
           </nav>
 
-          {/* Switcher de Idiomas Desktop */}
+          {/* Switcher de Idiomas Desktop: Minimalista */}
           <div className="flex items-center gap-3 pl-6 border-l border-slate-200 dark:border-slate-800">
             <div className="flex gap-1">
               {languages.map((l) => (
                 <Link
                   key={l.code}
-                  href={redirectedPathName(l.code) as any}
+                  href={redirectedPathName(l.code)}
                   className={`text-[10px] font-black w-8 h-8 flex items-center justify-center rounded-lg transition-all border ${
                     lang === l.code 
                       ? 'bg-blue-600 border-blue-600 text-white shadow-md' 
@@ -125,18 +130,18 @@ export const Navbar = ({ dict, lang }: NavbarProps) => {
           </div>
         </div>
 
-        {/* TRIGGER MENU MOBILE */}
+        {/* TRIGGER MENU MOBILE: Apenas visível em telas pequenas */}
         <button 
           className="md:hidden relative z-[110] p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white transition-all active:scale-90 touch-manipulation"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-expanded={isMobileMenuOpen}
-          aria-label="Toggle Menu"
+          aria-label="Menu"
         >
           {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
-      {/* OVERLAY MENU MOBILE */}
+      {/* OVERLAY MENU MOBILE: Full Screen com Blur */}
       <div 
         className={`fixed inset-0 bg-white/98 dark:bg-slate-950/98 backdrop-blur-2xl z-[100] flex flex-col p-8 transition-all duration-500 ease-in-out md:hidden ${
           isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
@@ -146,7 +151,7 @@ export const Navbar = ({ dict, lang }: NavbarProps) => {
           {navLinks.map((link, index) => (
             <Link 
               key={link.href}
-              href={`/${lang}/${link.href}` as any}
+              href={`/${lang}/${link.href}`}
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center justify-between p-5 text-lg font-black text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl active:scale-[0.98] transition-all"
               style={{ transitionDelay: `${index * 50}ms` }}
@@ -157,16 +162,16 @@ export const Navbar = ({ dict, lang }: NavbarProps) => {
           ))}
         </nav>
 
-        {/* Seleção de Idioma Mobile */}
+        {/* Seleção de Idioma Mobile: Intuitiva para o polegar */}
         <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800">
           <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-4 text-center">
-            {dict.nav.changeLang || 'Language / Idioma'}
+            {dict?.nav?.changeLang || 'Language'}
           </p>
           <div className="grid grid-cols-3 gap-3">
             {languages.map((l) => (
               <Link
                 key={l.code}
-                href={redirectedPathName(l.code) as any}
+                href={redirectedPathName(l.code)}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`py-4 rounded-xl font-black text-[10px] text-center transition-all border-2 ${
                   lang === l.code 
@@ -174,7 +179,7 @@ export const Navbar = ({ dict, lang }: NavbarProps) => {
                     : 'bg-white dark:bg-slate-800 border-transparent text-slate-500'
                 }`}
               >
-                {l.label}
+                {l.label.split(' ')[0]} {/* Pega apenas a primeira palavra p/ caber em telas pequenas */}
               </Link>
             ))}
           </div>
