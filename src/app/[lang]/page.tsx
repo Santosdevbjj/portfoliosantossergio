@@ -10,12 +10,13 @@ import { HeroSection } from '@/components/HeroSection';
 import { Navbar } from '@/components/Navbar';
 import { PageWrapper } from '@/components/PageWrapper';
 import { ProjectSection } from '@/components/ProjectSection';
-import { getDictionary, type Locale } from '@/i18n-config';
+// Importação alinhada com a nova arquitetura de dicionários
+import { getDictionary, type Dictionary } from '@/lib/get-dictionary';
 import { getGitHubProjects } from '@/lib/github';
 
 /**
  * ISR (Incremental Static Regeneration)
- * Revalida o cache a cada 1 hora para refletir novos commits/projetos do GitHub.
+ * Revalida o cache a cada 1 hora.
  */
 export const revalidate = 3600; 
 
@@ -23,26 +24,22 @@ interface PageProps {
   params: Promise<{ lang: string }>;
 }
 
+type SupportedLangs = 'pt' | 'en' | 'es';
+
 /**
  * GENERATE METADATA
- * SEO dinâmico que adapta a "vitrine" do site para cada idioma.
+ * SEO dinâmico otimizado para autoridade internacional.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
-  
-  // Fallback seguro se o idioma for inválido
-  const currentLang = (['pt', 'en', 'es'].includes(lang) ? lang : 'pt') as Locale;
+  const currentLang = (['pt', 'en', 'es'].includes(lang) ? lang : 'pt') as SupportedLangs;
   const dict = await getDictionary(currentLang);
   
   const baseUrl = (process.env['NEXT_PUBLIC_SITE_URL'] ?? 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
   
-  // Título dinâmico baseado no cargo definido no dicionário
-  const pageTitle = dict.role || 'Data Specialist';
-  const pageDesc = dict.headline || 'Especialista em Dados e Engenharia de Sistemas.';
-
   return {
-    title: `Sérgio Santos | ${pageTitle}`,
-    description: pageDesc,
+    title: `Sérgio Santos | ${dict.role || 'Data Specialist'}`,
+    description: dict.headline || 'Especialista em Dados e Engenharia de Sistemas.',
     alternates: {
       canonical: `${baseUrl}/${currentLang}`,
       languages: {
@@ -53,8 +50,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
     openGraph: {
-      title: `Sérgio Santos | ${pageTitle}`,
-      description: pageDesc,
+      title: `Sérgio Santos | ${dict.role}`,
+      description: dict.headline,
       url: `${baseUrl}/${currentLang}`,
       siteName: 'Sérgio Santos Portfolio',
       locale: currentLang === 'pt' ? 'pt_BR' : currentLang === 'es' ? 'es_ES' : 'en_US',
@@ -65,22 +62,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * PÁGINA PRINCIPAL (Server Component)
+ * PÁGINA PRINCIPAL
+ * Renderiza a arquitetura de autoridade baseada no Método Meigarom.
  */
 export default async function Page({ params }: PageProps) {
   const { lang } = await params;
   
-  // Validação rigorosa de localidade
   if (!['pt', 'en', 'es'].includes(lang)) {
     notFound();
   }
 
-  const currentLang = lang as Locale;
+  const currentLang = lang as SupportedLangs;
 
-  /**
-   * DATA PIPELINE
-   * Busca paralela: Dicionário Local + API do GitHub.
-   */
+  // Busca paralela para máxima performance no Edge
   const [dict, allProjects] = await Promise.all([
     getDictionary(currentLang),
     getGitHubProjects(currentLang) 
@@ -88,46 +82,45 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <PageWrapper>
-      {/* Navegação de Alta Fidelidade */}
-      <Navbar dict={dict} lang={currentLang} />
+      {/* Navbar recebe o dicionário tipado */}
+      <Navbar dict={dict as Dictionary} lang={currentLang} />
 
       <main className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] transition-colors duration-500 antialiased">
         
-        {/* HERO: O primeiro contato visual */}
+        {/* HERO: Badge de Especialista e CTA principal */}
         <HeroSection lang={currentLang} dict={dict} />
 
-        {/* SOBRE: Storytelling e Autoridade Técnica */}
+        {/* SOBRE: Métricas de Impacto (2.920h salvas) */}
         <section id="about" className="mx-auto w-full max-w-7xl px-6 sm:px-10 scroll-mt-24 lg:scroll-mt-32">
           <AboutSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* EXPERIÊNCIA: A prova real da senioridade bancária */}
+        {/* TRAJETÓRIA: Foco em disponibilidade bancária 99.5% */}
         <section id="experience" className="mt-24 scroll-mt-24 bg-slate-50/40 dark:bg-slate-900/20 py-24 lg:scroll-mt-32">
           <div className="mx-auto w-full max-w-7xl px-6 sm:px-10">
             <ExperienceSection lang={currentLang} dict={dict} />
           </div>
         </section>
 
-        {/* ARTIGOS: Liderança de pensamento (Winner DIO) */}
-        <section id="featured" className="mx-auto w-full max-w-7xl px-6 sm:px-10 scroll-mt-24 py-24 lg:scroll-mt-32">
+        {/* ARTIGOS: Prova social (Melhor do mês DIO) */}
+        <section id="articles" className="mx-auto w-full max-w-7xl px-6 sm:px-10 scroll-mt-24 py-24 lg:scroll-mt-32">
           <FeaturedArticleSection lang={currentLang} dict={dict} />
         </section>
 
-        {/* PORTFÓLIO: Grid de projetos dinâmicos via GitHub API */}
+        {/* PORTFÓLIO: Grid técnico com filtragem por stack */}
         <section id="projects" className="scroll-mt-24 py-12 lg:py-24 lg:scroll-mt-32">
           <div className="mx-auto w-full max-w-7xl px-6 sm:px-10">
             <ProjectSection projects={allProjects} lang={currentLang} dict={dict} />
           </div>
         </section>
 
-        {/* CONTATO: A conversão e links sociais */}
+        {/* CONTATO: Lead gen para consultoria e parcerias */}
         <section id="contact" className="mx-auto mb-24 w-full max-w-7xl px-6 sm:px-10 scroll-mt-24 lg:scroll-mt-32">
           <ContactSection lang={currentLang} dict={dict} />
         </section>
         
       </main>
 
-      {/* Footer com Sincronia de Idioma */}
       <Footer lang={currentLang} dict={dict} />
     </PageWrapper>
   );
