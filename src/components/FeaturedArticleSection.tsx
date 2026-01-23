@@ -37,17 +37,21 @@ interface FeaturedArticleSectionProps {
 
 /**
  * FEATURED ARTICLE SECTION - PROVA SOCIAL E AUTORIDADE
- * Exibe o artigo premiado com layout asimétrico e suporte multilingue completo.
+ * Totalmente responsivo e blindado contra erros de runtime.
  */
 export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionProps) => {
-  const { featured } = dict.articles;
-  const { common } = dict;
+  // SEGURANÇA: Evita erro de desestruturação se o dict vier incompleto
+  const articlesTitle = dict?.common?.articlesTitle || 'Articles';
+  const featured = dict?.articles?.featured;
+
+  // Se não houver dados do artigo, não renderiza a seção para evitar erros visuais
+  if (!featured) return null;
   
-  // Link prioritário baseado no idioma atual ou fallback para Inglês/Português
+  // Link prioritário baseado no idioma atual ou fallback seguro
   const mainLink = featured.links?.[lang] || featured.links?.en || featured.links?.pt || '#';
 
   return (
-    <section id="articles" className="py-20 lg:py-32 relative overflow-hidden px-4 sm:px-6 lg:px-8 transition-colors duration-500 bg-slate-50/50 dark:bg-transparent">
+    <section id="featured-article" className="py-20 lg:py-32 relative overflow-hidden px-4 sm:px-6 lg:px-8 transition-colors duration-500 bg-slate-50/50 dark:bg-transparent">
       
       {/* Elementos Decorativos de Background (Blur) */}
       <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-[0.03] dark:opacity-[0.08] pointer-events-none">
@@ -62,7 +66,7 @@ export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionPro
             <Trophy className="w-6 h-6 md:w-7 md:h-7" />
           </div>
           <h2 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-            {common.articlesTitle}
+            {articlesTitle}
           </h2>
         </div>
 
@@ -83,7 +87,7 @@ export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionPro
                   sizes="(max-width: 768px) 100vw, 600px"
                 />
                 
-                {/* Overlay de Gradiente para contraste do Summary */}
+                {/* Overlay de Gradiente para contraste */}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent opacity-60 md:opacity-100" />
                 
                 {/* Resumo Flutuante (Visível no Desktop) */}
@@ -95,7 +99,7 @@ export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionPro
                 </div>
               </div>
               
-              {/* Badge de Ranking (Animação suave) */}
+              {/* Badge de Ranking */}
               <div className="absolute -top-3 -right-3 md:-top-6 md:-right-6 animate-bounce duration-[4000ms]">
                 <div className="bg-amber-400 text-amber-950 font-black p-4 md:p-5 rounded-3xl shadow-2xl border-[4px] border-white dark:border-slate-900 rotate-12 flex flex-col items-center min-w-[100px]">
                   <Trophy className="w-6 h-6 mb-1 text-amber-900" />
@@ -123,7 +127,6 @@ export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionPro
 
               {/* Ações Multilingues */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                {/* Botão Principal de Leitura */}
                 <a 
                   href={mainLink} 
                   target="_blank" 
@@ -134,9 +137,9 @@ export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionPro
                   <ArrowUpRight className="w-5 h-5" />
                 </a>
                 
-                {/* Seleção de Idioma do Artigo (Fallbacks dinâmicos) */}
+                {/* Seleção de Idioma do Artigo */}
                 <div className="flex gap-2">
-                  {Object.entries(featured.links).map(([key, url]) => (
+                  {Object.entries(featured.links || {}).map(([key, url]) => (
                     url && key !== lang && (
                       <a 
                         key={key}
