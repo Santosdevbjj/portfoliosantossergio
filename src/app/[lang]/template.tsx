@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion/client';
+import { motion } from 'framer-motion';
 import type { PropsWithChildren } from 'react';
 
 /**
