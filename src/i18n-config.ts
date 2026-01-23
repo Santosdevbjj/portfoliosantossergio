@@ -1,19 +1,18 @@
 /**
  * CONFIGURAÇÃO GLOBAL DE IDIOMAS - NEXT.JS 16 / 2026
  * Centraliza a lógica de internacionalização (i18n) para PT, EN e ES.
- * Este arquivo alimenta o Proxy, o SEO e os Dicionários.
  */
 
 export const i18n = {
-  defaultLocale: 'pt',
-  locales: ['pt', 'en', 'es'],
-} as const;
+  defaultLocale: 'pt' as const,
+  locales: ['pt', 'en', 'es'] as const,
+};
 
 export type Locale = (typeof i18n)['locales'][number];
 
 /**
  * METADADOS DE IDIOMA
- * Estrutura imutável para LanguageSwitcher e tags de SEO (hreflang).
+ * Utilizado por LanguageSwitcher, Metadados de SEO e Acessibilidade.
  */
 export interface LocaleDetail {
   readonly name: string;   
@@ -29,84 +28,78 @@ export const localeMetadata: Readonly<Record<Locale, LocaleDetail>> = {
     region: 'pt-BR', 
     flag: '🇧🇷',
     label: 'PT',
-    ariaLabel: 'Alterar idioma para Português'
+    ariaLabel: 'Alterar idioma para Português (Brasil)'
   },
   en: { 
     name: 'English', 
     region: 'en-US', 
     flag: '🇺🇸',
     label: 'EN',
-    ariaLabel: 'Change language to English'
+    ariaLabel: 'Change language to English (US)'
   },
   es: { 
     name: 'Español', 
     region: 'es-ES', 
     flag: '🇪🇸',
     label: 'ES',
-    ariaLabel: 'Cambiar idioma a Español'
+    ariaLabel: 'Cambiar idioma a Español (España)'
   },
 };
 
 /**
- * VALIDADOR DE LOCALE (Type Guard)
+ * VALIDADORES E HELPERS DE SEGURANÇA
  */
 export function isValidLocale(locale: unknown): locale is Locale {
   return typeof locale === 'string' && (i18n.locales as readonly string[]).includes(locale);
 }
 
-/**
- * ESTRATÉGIA DE FALLBACK
- */
 export function getSafeLocale(locale: string | undefined | null): Locale {
   return isValidLocale(locale) ? locale : i18n.defaultLocale;
 }
 
 /**
- * CARREGAMENTO DINÂMICO (Code Splitting)
- * Gerencia o carregamento sob demanda dos arquivos JSON.
+ * CARREGAMENTO DINÂMICO DOS DICIONÁRIOS
+ * Otimizado para Server Components com Code Splitting.
  */
-const dictionaries: Record<Locale, () => Promise<any>> = {
-  pt: () => import('./dictionaries/pt.json').then((module) => module.default),
-  en: () => import('./dictionaries/en.json').then((module) => module.default),
-  es: () => import('./dictionaries/es.json').then((module) => module.default),
+const dictionaries: Record<Locale, () => Promise<Record<string, any>>> = {
+  pt: () => import('./dictionaries/pt.json').then((m) => m.default),
+  en: () => import('./dictionaries/en.json').then((m) => m.default),
+  es: () => import('./dictionaries/es.json').then((m) => m.default),
 };
 
 
 
 /**
- * OBTÉM O DICIONÁRIO
- * Centralizado aqui para uso em Server Components.
+ * OBTÉM O DICIONÁRIO (SERVER-SIDE)
+ * Função central para recuperar os textos traduzidos.
  */
 export const getDictionary = async (locale: Locale) => {
-  const safeLocale = getSafeLocale(locale);
+  const targetLocale = getSafeLocale(locale);
   
   try {
-    const loadDictionary = dictionaries[safeLocale];
+    const loadFn = dictionaries[targetLocale];
+    if (!loadFn) throw new Error(`Dicionário ausente: ${targetLocale}`);
     
-    if (!loadDictionary) {
-      throw new Error(`Dicionário não encontrado para: ${safeLocale}`);
-    }
-    
-    return await loadDictionary();
+    return await loadFn();
   } catch (error) {
-    console.error(`[i18n-critical] Falha ao carregar idioma (${safeLocale}):`, error);
+    console.error(`[i18n-critical] Erro ao carregar: ${targetLocale}. Tentando fallback.`, error);
     
-    // Fallback para o idioma padrão se o solicitado falhar
-    if (safeLocale !== i18n.defaultLocale) {
+    // Tenta carregar o idioma padrão (PT) caso o outro falhe
+    if (targetLocale !== i18n.defaultLocale) {
       try {
         return await dictionaries[i18n.defaultLocale]();
-      } catch (fallbackError) {
-        console.error(`[i18n-panic] Falha total no sistema de idiomas.`, fallbackError);
+      } catch (fatal) {
+        console.error(`[i18n-panic] Sistema de tradução offline.`, fatal);
       }
     }
     
-    // Retorna objeto vazio para manter a aplicação estável
+    // Fallback de segurança para evitar erro de runtime no componente
     return {};
   }
 };
 
 /**
- * HELPERS PARA SEO E ACESSIBILIDADE
+ * AUXILIARES DE SEO E ROTEAMENTO
  */
 export const getRegion = (locale: Locale): string => {
   return localeMetadata[locale]?.region || 'pt-BR';
