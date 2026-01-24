@@ -1,6 +1,9 @@
 {
   "common": {
     "language": "English",
+    "navigation": "Main navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "contact": "Contact",
     "viewProject": "GitHub",
     "liveDemo": "Live Demo",
@@ -8,7 +11,7 @@
     "portfolioTitle": "Solutions & Data",
     "governance": "Technical Rigor",
     "backToTop": "Top",
-    "menu_aria": "Open Navigation Menu",
+    "menu_aria": "Open navigation menu",
     "close_aria": "Close",
     "scroll_top_aria": "Back to top",
     "loading": "Syncing data...",
@@ -16,9 +19,12 @@
     "close": "Close",
     "articlesTitle": "Award-Winning Article",
     "readMore": "Read Full Content",
+    "role": "Data Engineer & Senior Analyst",
+    "footer": "© 2026 Sérgio Santos. All rights reserved.",
     "cvButton": "Download CV (English)",
     "cvLink": "/cv-sergio-santos-en.pdf"
   },
+
   "nav": {
     "about": "About",
     "experience": "Career",
@@ -32,87 +38,91 @@
       "system": "System"
     }
   },
+
   "hero": {
     "badge": "Mission-Critical Systems Expert",
     "title": "Transforming complex data into",
     "titleAccent": "Strategic Assets",
-    "description": "Data Engineer and Senior Analyst with 20+ years of experience at Bradesco. Focused on Data Science and risk mitigation with the rigor of mission-critical banking systems.",
+    "description": "Data Engineer and Senior Analyst with over 20 years of experience in the banking sector. Focused on Data Science, risk mitigation, and analytical solutions built with the rigor required by mission-critical systems.",
     "cta_primary": "View Projects",
     "cta_secondary": "LinkedIn"
   },
+
   "about": {
     "title": "Professional Journey",
     "headline": "Merging Banking Governance with Data Intelligence",
-    "bio": "Senior specialist with deep-rooted expertise in the banking sector, operating where security and high availability are non-negotiable. Merging IT governance with AI’s analytical potential to solve real financial bottlenecks.",
+    "bio": "Senior specialist with solid experience in the banking sector, operating in environments where security, traceability, and high availability are non-negotiable. Integrates IT governance, data engineering, and artificial intelligence to solve real-world financial problems with measurable impact.",
     "sections": {
       "highlights": {
-        "title": "Differentiators",
+        "title": "Key Strengths",
         "items": [
           {
-            "label": "Reliability & Mission-Critical",
-            "description": "Infrastructure management with zero fault tolerance and superior compliance standards (LGPD/GDPR)."
+            "label": "Reliability & Mission-Critical Systems",
+            "description": "Management of systems with zero tolerance for failure, aligned with compliance, data protection, and corporate governance requirements."
           },
           {
             "label": "Measurable Impact",
-            "description": "Workflow automation resulting in direct savings of 2,920 manual hours per year."
+            "description": "Process automation delivering direct savings of approximately 2,920 hours per year."
           },
           {
-            "label": "Graph Intelligence",
-            "description": "Mastery of Neo4J and Azure Databricks for anomaly detection and decision flow optimization."
+            "label": "Advanced Analytical Expertise",
+            "description": "Use of graph analytics, predictive models, and data engineering to detect anomalies and support strategic decision-making."
           }
         ]
       },
       "metrics": {
         "title": "Operational Impact",
-        "subtitle": "KPIs & RESULTS",
+        "subtitle": "KPIs & Results",
         "availabilityValue": "99.5%",
-        "availabilityLabel": "System Uptime",
+        "availabilityLabel": "System Availability",
         "automationValue": "2.9k",
-        "automationLabel": "Annual Hours Saved"
+        "automationLabel": "Hours Saved per Year"
       },
       "stack": {
-        "title": "Technical Domain",
+        "title": "Technical Expertise",
         "items": [
           {
             "label": "Data Science",
-            "description": "Python, High-Performance SQL, Neo4J, Machine Learning"
+            "description": "Python, High-Performance SQL, Machine Learning, Graph Analytics"
           },
           {
             "label": "Cloud & Big Data",
             "description": "Azure Databricks, PySpark, Data Factory"
           },
           {
-            "label": "Modern Stack",
+            "label": "Governance & Analytics",
             "description": "Power BI, Generative AI, Data Governance"
           }
         ]
       }
     }
   },
+
   "articles": {
     "title": "Articles & Insights",
-    "subtitle": "Shared knowledge on Technology and Data",
+    "subtitle": "Applied knowledge on Technology, Data, and Governance",
     "loading": "Loading library...",
-    "comingSoon": "New technical articles under review.",
+    "comingSoon": "New technical articles currently under review.",
     "followPrompt": "Follow publications on Medium and LinkedIn.",
-    "badge": "35th DIO Competition Winner",
+    "badge": "DIO Competition Winner",
     "featured": {
       "title": "Low-Code in Healthcare: Agility vs Compliance",
-      "description": "Award-winning deep analysis on balancing development agility with rigorous medical compliance standards.",
+      "description": "Award-winning analysis on balancing development speed with strict regulatory and compliance requirements in healthcare systems.",
       "date": "Jan 2026",
-      "rank": "Top 1 Winner",
+      "rank": "1st Place",
       "link": "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77"
     }
   },
+
   "portfolio": {
     "title": "Portfolio",
-    "description": "Analytical solutions focused on solving complex problems and delivering economic value.",
+    "description": "Analytical solutions focused on solving complex problems and generating economic value.",
     "all": "All",
     "mainCaseLabel": "Featured Project",
-    "resultsLabel": "Measurable Result",
+    "resultsLabel": "Generated Outcome",
     "projectLabels": {
       "problem": "Business Challenge",
-      "solution": "Technical Strategy",
+      "solution": "Technical Solution",
       "impact": "Economic Impact"
     },
     "categories": {
