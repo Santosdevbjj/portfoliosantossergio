@@ -1,6 +1,9 @@
 {
   "common": {
     "language": "Español",
+    "navigation": "Navegación principal",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
     "contact": "Contacto",
     "viewProject": "GitHub",
     "liveDemo": "Demo en Vivo",
@@ -16,9 +19,12 @@
     "close": "Cerrar",
     "articlesTitle": "Artículo Premiado",
     "readMore": "Leer Contenido Completo",
+    "role": "Ingeniero de Datos y Analista Senior",
+    "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
     "cvButton": "Descargar CV (Español)",
     "cvLink": "/cv-sergio-santos-es.pdf"
   },
+
   "nav": {
     "about": "Sobre",
     "experience": "Trayectoria",
@@ -32,94 +38,98 @@
       "system": "Sistema"
     }
   },
+
   "hero": {
-    "badge": "Experto en Sistemas Críticos",
+    "badge": "Experto en Sistemas de Misión Crítica",
     "title": "Transformando datos complejos en",
     "titleAccent": "Activos Estratégicos",
-    "description": "Ingeniero de Datos y Analista Senior con más de 20 años de experiencia en Bradesco. Enfocado en Ciencia de Datos y mitigación de riesgos con el rigor de sistemas bancarios de misión crítica.",
+    "description": "Ingeniero de Datos y Analista Senior con más de 20 años de experiencia en el sector bancario. Especializado en Ciencia de Datos, mitigación de riesgos y soluciones analíticas desarrolladas con el rigor de sistemas de misión crítica.",
     "cta_primary": "Ver Proyectos",
     "cta_secondary": "LinkedIn"
   },
+
   "about": {
     "title": "Trayectoria Profesional",
     "headline": "Convergencia entre Gobernanza Bancaria e Inteligencia de Datos",
-    "bio": "Especialista sénior con trayectoria consolidada en el sector bancario, operando donde la seguridad y la alta disponibilidad son innegociables. Integrando la gobernanza de TI con el potencial analítico de la IA para resolver cuellos de botella financieros reales.",
+    "bio": "Especialista senior con amplia experiencia en el sector bancario, actuando en entornos donde la seguridad, la trazabilidad y la alta disponibilidad son innegociables. Integra gobernanza de TI, ingeniería de datos e inteligencia artificial para resolver problemas financieros reales con impacto medible.",
     "sections": {
       "highlights": {
         "title": "Diferenciales",
         "items": [
           {
             "label": "Confiabilidad y Misión Crítica",
-            "description": "Gestión de infraestructuras con tolerancia cero a fallos y cumplimiento normativo superior (LGPD/GDPR)."
+            "description": "Gestión de sistemas con tolerancia cero a fallos, alineados con normativas de cumplimiento, protección de datos y gobernanza corporativa."
           },
           {
             "label": "Impacto Medible",
-            "description": "Automatización de flujos que resultó en un ahorro directo de 2.920 horas manuales por año."
+            "description": "Automatización de procesos que generó un ahorro directo aproximado de 2.920 horas por año."
           },
           {
-            "label": "Inteligencia de Grafos",
-            "description": "Dominio de Neo4J y Azure Databricks para detección de anomalías y optimización de flujos de decisión."
+            "label": "Inteligencia Analítica Avanzada",
+            "description": "Uso de análisis de grafos, modelos predictivos e ingeniería de datos para detección de anomalías y soporte a la toma de decisiones estratégicas."
           }
         ]
       },
       "metrics": {
         "title": "Impacto Operativo",
-        "subtitle": "KPIs y RESULTADOS",
+        "subtitle": "KPIs y Resultados",
         "availabilityValue": "99.5%",
         "availabilityLabel": "Disponibilidad de Sistemas",
         "automationValue": "2.9k",
-        "automationLabel": "Horas Ahorradas/Año"
+        "automationLabel": "Horas Ahorradas por Año"
       },
       "stack": {
         "title": "Dominio Técnico",
         "items": [
           {
             "label": "Data Science",
-            "description": "Python, SQL de Alto Rendimiento, Neo4J, Machine Learning"
+            "description": "Python, SQL de Alto Rendimiento, Machine Learning, Análisis de Grafos"
           },
           {
-            "label": "Cloud & Big Data",
+            "label": "Cloud y Big Data",
             "description": "Azure Databricks, PySpark, Data Factory"
           },
           {
-            "label": "Modern Stack",
+            "label": "Gobernanza y Analítica",
             "description": "Power BI, IA Generativa, Gobernanza de Datos"
           }
         ]
       }
     }
   },
+
   "articles": {
     "title": "Artículos e Insights",
-    "subtitle": "Conocimiento compartido sobre Tecnología y Datos",
+    "subtitle": "Conocimiento aplicado sobre Tecnología, Datos y Gobernanza",
     "loading": "Cargando biblioteca...",
-    "comingSoon": "Nuevos artículos técnicos en revisión.",
+    "comingSoon": "Nuevos artículos técnicos actualmente en revisión.",
     "followPrompt": "Siga las publicaciones en Medium y LinkedIn.",
-    "badge": "Ganador de la 35ª Competición DIO",
+    "badge": "Ganador de la Competencia DIO",
     "featured": {
       "title": "Low-Code en la Salud: Agilidad vs Cumplimiento",
-      "description": "Análisis profundo premiado sobre cómo equilibrar la agilidad de desarrollo con rigurosas normas de cumplimiento médico.",
+      "description": "Análisis premiado sobre el equilibrio entre la velocidad de desarrollo y los estrictos requisitos regulatorios en sistemas de salud.",
       "date": "Ene 2026",
-      "rank": "Top 1 Ganador",
+      "rank": "1er Lugar",
       "link": "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad"
     }
   },
+
   "portfolio": {
     "title": "Portafolio",
     "description": "Soluciones analíticas enfocadas en resolver problemas complejos y generar valor económico.",
     "all": "Todos",
     "mainCaseLabel": "Proyecto Destacado",
-    "resultsLabel": "Resultado Medible",
+    "resultsLabel": "Resultado Generado",
     "projectLabels": {
       "problem": "Desafío de Negocio",
-      "solution": "Estrategia Técnica",
+      "solution": "Solución Técnica",
       "impact": "Impacto Económico"
     },
     "categories": {
       "data-science": "Ciencia de Datos",
       "databricks": "Azure Databricks",
       "neo4j": "Neo4J y Grafos",
-      "power-bi": "Analytics",
+      "power-bi": "Analítica",
       "database": "Ingeniería de Datos",
       "python": "Automatización",
       "machine-learning": "Machine Learning",
