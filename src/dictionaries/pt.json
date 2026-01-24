@@ -1,6 +1,9 @@
 {
   "common": {
     "language": "Português",
+    "navigation": "Navegação principal",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
     "contact": "Contato",
     "viewProject": "GitHub",
     "liveDemo": "Demo ao Vivo",
@@ -8,7 +11,7 @@
     "portfolioTitle": "Soluções e Dados",
     "governance": "Rigor Técnico",
     "backToTop": "Topo",
-    "menu_aria": "Abrir Menu de Navegação",
+    "menu_aria": "Abrir menu de navegação",
     "close_aria": "Fechar",
     "scroll_top_aria": "Voltar ao topo",
     "loading": "Sincronizando dados...",
@@ -16,9 +19,12 @@
     "close": "Fechar",
     "articlesTitle": "Artigo Premiado",
     "readMore": "Ler Conteúdo Completo",
+    "role": "Engenheiro de Dados & Analista Sênior",
+    "footer": "© 2026 Sérgio Santos. Todos os direitos reservados.",
     "cvButton": "Download CV (Português)",
     "cvLink": "/cv-sergio-santos-pt.pdf"
   },
+
   "nav": {
     "about": "Sobre",
     "experience": "Trajetória",
@@ -32,81 +38,85 @@
       "system": "Sistema"
     }
   },
+
   "hero": {
     "badge": "Especialista em Sistemas Críticos",
     "title": "Transformando dados complexos em",
     "titleAccent": "Ativos Estratégicos",
-    "description": "Engenheiro de Dados e Analista Sênior com 20+ anos de experiência no Bradesco. Foco em Ciência de Dados e mitigação de riscos com o rigor de sistemas bancários de missão crítica.",
+    "description": "Engenheiro de Dados e Analista Sênior com mais de 20 anos de experiência no setor bancário. Atuação focada em Ciência de Dados, mitigação de riscos e soluções analíticas com o rigor exigido por sistemas de missão crítica.",
     "cta_primary": "Ver Projetos",
     "cta_secondary": "LinkedIn"
   },
+
   "about": {
     "title": "Trajetória Profissional",
     "headline": "Convergência entre Governança Bancária e Inteligência de Dados",
-    "bio": "Especialista sênior com atuação consolidada no setor bancário, operando onde segurança e alta disponibilidade são inegociáveis. Unindo a robustez da governança de TI ao potencial analítico da IA para resolver gargalos financeiros reais.",
+    "bio": "Especialista sênior com atuação consolidada no setor bancário, operando em ambientes onde segurança, rastreabilidade e alta disponibilidade são inegociáveis. Integra governança de TI, engenharia de dados e inteligência artificial para resolver problemas financeiros reais com impacto mensurável.",
     "sections": {
       "highlights": {
         "title": "Diferenciais",
         "items": [
           {
             "label": "Confiabilidade & Missão Crítica",
-            "description": "Gestão de infraestrutura com tolerância zero a falhas e conformidade superior (LGPD/GDPR)."
+            "description": "Gestão de sistemas com tolerância zero a falhas, alinhados às exigências de compliance, LGPD e governança corporativa."
           },
           {
             "label": "Impacto Mensurável",
-            "description": "Automação de fluxos resultando na economia direta de 2.920 horas/ano."
+            "description": "Automação de processos críticos resultando na economia direta de aproximadamente 2.920 horas por ano."
           },
           {
-            "label": "Expertise em Grafos",
-            "description": "Domínio de Neo4J e Azure Databricks para detecção de anomalias e fluxos decisórios."
+            "label": "Expertise Analítica Avançada",
+            "description": "Uso de grafos, análise preditiva e engenharia de dados para detecção de anomalias e suporte à decisão."
           }
         ]
       },
       "metrics": {
         "title": "Impacto Operacional",
-        "subtitle": "KPIs & RESULTADOS",
+        "subtitle": "KPIs & Resultados",
         "availabilityValue": "99.5%",
-        "availabilityLabel": "Uptime de Sistemas",
+        "availabilityLabel": "Disponibilidade de Sistemas",
         "automationValue": "2.9k",
-        "automationLabel": "Horas Salvas/Ano"
+        "automationLabel": "Horas Economizadas/Ano"
       },
       "stack": {
         "title": "Domínio Técnico",
         "items": [
           {
             "label": "Data Science",
-            "description": "Python, SQL de Alta Performance, Neo4J, Machine Learning"
+            "description": "Python, SQL de alta performance, Machine Learning, Grafos"
           },
           {
             "label": "Cloud & Big Data",
             "description": "Azure Databricks, PySpark, Data Factory"
           },
           {
-            "label": "Modern Stack",
+            "label": "Governança & Analytics",
             "description": "Power BI, IA Generativa, Governança de Dados"
           }
         ]
       }
     }
   },
+
   "articles": {
     "title": "Artigos & Insights",
-    "subtitle": "Conhecimento compartilhado sobre Tecnologia e Dados",
+    "subtitle": "Conhecimento aplicado sobre Tecnologia, Dados e Governança",
     "loading": "Carregando biblioteca...",
     "comingSoon": "Novos artigos técnicos em fase de revisão.",
     "followPrompt": "Acompanhe as publicações no Medium e LinkedIn.",
-    "badge": "Vencedor 35ª Competição DIO",
+    "badge": "Vencedor da Competição DIO",
     "featured": {
       "title": "Low-Code na Saúde: Agilidade vs Conformidade",
-      "description": "Análise profunda premiada sobre como equilibrar agilidade de desenvolvimento com as rigorosas normas de conformidade médica.",
+      "description": "Análise premiada sobre o equilíbrio entre velocidade de desenvolvimento e rigor regulatório em sistemas médicos.",
       "date": "Jan 2026",
-      "rank": "Top 1 Vencedor",
+      "rank": "1º Lugar",
       "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
     }
   },
+
   "portfolio": {
     "title": "Portfólio",
-    "description": "Soluções analíticas focadas em resolução de problemas complexos e entrega de valor econômico.",
+    "description": "Soluções analíticas focadas na resolução de problemas complexos e geração de valor econômico.",
     "all": "Todos",
     "mainCaseLabel": "Projeto em Destaque",
     "resultsLabel": "Resultado Gerado",
