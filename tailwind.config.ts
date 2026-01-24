@@ -2,8 +2,8 @@ import type { Config } from "tailwindcss";
 import typography from "@tailwindcss/typography";
 
 const config: Config = {
-  // Modo escuro agora controlado via CSS Variable '--theme'
-  darkMode: false, // Desabilitado porque usamos variável CSS
+  // Modo escuro controlado via classe CSS 'dark', pode ser alternado dinamicamente via variável CSS '--theme'
+  darkMode: 'class', 
 
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -22,7 +22,6 @@ const config: Config = {
       },
 
       colors: {
-        // Branding dinâmico via CSS Variables
         brand: {
           50: "var(--brand-blue-50, #f0f7ff)",
           100: "var(--brand-blue-100, #e0effe)",
