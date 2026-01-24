@@ -16,6 +16,7 @@
 
   "embeddedLanguageFormatting": "auto",
   "proseWrap": "preserve",
+  "htmlWhitespaceSensitivity": "css",
 
   "plugins": ["prettier-plugin-tailwindcss"],
 
