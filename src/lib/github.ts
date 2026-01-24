@@ -1,18 +1,29 @@
 /**
- * Serviço central de integração com GitHub
- * Totalmente tipado, multilingue (PT/EN/ES) e resiliente
+ * LIB: GitHub Integration
+ * -----------------------------------------------------------------------------
+ * Camada de acesso ao GitHub.
+ * Responsável apenas por:
+ * - Buscar dados
+ * - Normalizar para o domínio
+ * - Aplicar regras canônicas (projects.ts)
+ *
+ * NÃO renderiza UI
+ * NÃO contém textos hardcoded
  */
 
-export interface GitHubRepo {
-  id: number;
-  name: string;
-  description: string | null;
-  html_url: string;
-  homepage: string | null;
-  topics: string[];
-  updated_at: string;
-  stargazers_count: number;
-}
+import type { Locale } from '@/app/[lang]/dictionaries';
+import {
+  Project,
+  ProjectCoreTag,
+  ProjectTechnology,
+  resolveProjectFlags,
+  resolveProjectTechnology,
+  sortProjects,
+} from '@/domain/projects';
+
+/* -------------------------------------------------------------------------- */
+/* RAW GITHUB MODELS                                                          */
+/* -------------------------------------------------------------------------- */
 
 interface RawGitHubRepo {
   id: number;
@@ -26,88 +37,124 @@ interface RawGitHubRepo {
   stargazers_count: number;
 }
 
+/* -------------------------------------------------------------------------- */
+/* CONFIG                                                                     */
+/* -------------------------------------------------------------------------- */
+
+const GITHUB_USERNAME = 'Santosdevbjj';
+const REVALIDATE_SECONDS = 3600;
+
+/* -------------------------------------------------------------------------- */
+/* HELPERS                                                                    */
+/* -------------------------------------------------------------------------- */
+
 /**
- * BUSCA REPOSITÓRIOS DO GITHUB
- * @param lang - Idioma ('pt' | 'en' | 'es')
+ * Extrai descrição conforme idioma.
+ * Padrão obrigatório:
+ * PT | EN | ES
+ */
+function resolveDescription(
+  raw: string | null,
+  lang: Locale,
+): string {
+  if (!raw) return '';
+
+  if (!raw.includes('|')) return raw;
+
+  const [pt, en, es] = raw.split('|').map((p) => p.trim());
+
+  switch (lang) {
+    case 'en':
+      return en || pt;
+    case 'es':
+      return es || pt;
+    case 'pt':
+    default:
+      return pt;
+  }
+}
+
+/**
+ * Normaliza nome do repositório
+ */
+function normalizeName(name: string): string {
+  return name
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/* -------------------------------------------------------------------------- */
+/* MAIN SERVICE                                                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Retorna projetos do portfólio normalizados e tipados
  */
 export async function getGitHubProjects(
-  lang: 'pt' | 'en' | 'es' = 'pt'
-): Promise<GitHubRepo[]> {
+  lang: Locale,
+): Promise<Project[]> {
   const token = process.env.GITHUB_ACCESS_TOKEN;
-  const username = 'Santosdevbjj';
 
   const url = token
-    ? `https://api.github.com/user/repos?sort=updated&direction=desc&per_page=100&affiliation=owner`
-    : `https://api.github.com/users/${username}/repos?sort=updated&direction=desc&per_page=100`;
+    ? 'https://api.github.com/user/repos?sort=updated&direction=desc&per_page=100&affiliation=owner'
+    : `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&direction=desc&per_page=100`;
 
   try {
     const response = await fetch(url, {
       headers: {
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'portfolio-sergio-santos',
         ...(token && { Authorization: `Bearer ${token}` }),
-        Accept: 'application/vnd.github.v3+json',
-        'User-Agent': 'Portfolio-Sergio-Santos-Data-Science',
       },
-      next: { revalidate: 3600 }, // Cache 1 hora
+      next: { revalidate: REVALIDATE_SECONDS },
     });
 
     if (!response.ok) {
-      console.error(`[GitHub Service] Erro ${response.status} ao buscar repositórios`);
+      console.error(
+        `[GitHub] Erro ${response.status} ao buscar repositórios`,
+      );
       return [];
     }
 
     const repos = (await response.json()) as RawGitHubRepo[];
     if (!Array.isArray(repos)) return [];
 
-    // ---------------------------------------------------
-    // FILTRAGEM E TRADUÇÃO MULTILINGUE
-    // ---------------------------------------------------
-    const processedRepos: GitHubRepo[] = repos
-      .filter((repo) => !repo.fork && repo.topics?.includes('portfolio'))
+    const projects: Project[] = repos
+      .filter(
+        (repo) =>
+          !repo.fork &&
+          repo.topics?.includes(ProjectCoreTag.PORTFOLIO),
+      )
       .map((repo) => {
-        // MULTILÍNGUE: "Descrição PT | Descrição EN | Descrição ES"
-        let description = repo.description ?? '';
-        if (description.includes('|')) {
-          const parts = description.split('|').map((p) => p.trim());
-          if (lang === 'en') description = parts[1] || parts[0];
-          else if (lang === 'es') description = parts[2] || parts[0];
-          else description = parts[0];
+        const topics = repo.topics ?? [];
+
+        const technology = resolveProjectTechnology(topics);
+
+        if (!technology) {
+          throw new Error(
+            `[GitHub] Repositório sem tecnologia mapeada: ${repo.name}`,
+          );
         }
 
+        const flags = resolveProjectFlags(topics);
+
         return {
-          id: repo.id,
-          name: repo.name
-            .replace(/[_-]/g, ' ')
-            .replace(/\b\w/g, (l) => l.toUpperCase()),
-          description: description.length > 0 ? description : null,
-          html_url: repo.html_url,
-          homepage: repo.homepage ?? null,
-          topics: repo.topics ?? [],
-          updated_at: repo.updated_at,
-          stargazers_count: repo.stargazers_count ?? 0,
+          id: String(repo.id),
+          name: normalizeName(repo.name),
+          description: resolveDescription(repo.description, lang),
+          htmlUrl: repo.html_url,
+          homepage: repo.homepage,
+          topics,
+
+          technology,
+          ...flags,
         };
-      });
+      })
+      .sort(sortProjects);
 
-    // ---------------------------------------------------
-    // ORDENAÇÃO POR PESO / Destaque / Recência
-    // ---------------------------------------------------
-    return processedRepos.sort((a, b) => {
-      const weight = (repo: GitHubRepo) => {
-        let w = 0;
-        const topics = repo.topics.map((t) => t.toLowerCase());
-        if (topics.includes('featured') || topics.includes('destaque')) w += 100;
-        if (topics.includes('data-science')) w += 50;
-        if (topics.includes('python') || topics.includes('azure')) w += 20;
-        return w;
-      };
-
-      const diff = weight(b) - weight(a);
-      if (diff !== 0) return diff;
-
-      // fallback por data de atualização
-      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-    });
+    return projects;
   } catch (error) {
-    console.error('[GitHub Service] Falha crítica na integração', error);
+    console.error('[GitHub] Falha crítica na integração', error);
     return [];
   }
 }
