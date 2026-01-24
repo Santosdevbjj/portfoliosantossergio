@@ -5,7 +5,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner'; 
 import { i18n, type Locale } from '@/i18n-config';
 
-// Fontes otimizadas: Montserrat para autoridade em títulos, Inter para legibilidade técnica
+// Fontes otimizadas: Montserrat para títulos, Inter para textos gerais
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
@@ -19,19 +19,18 @@ const montserrat = Montserrat({
 });
 
 /**
- * VIEWPORT & PWA BEHAVIOR
- * Sincronizado com manifest.json para experiência nativa em mobile.
+ * VIEWPORT & PWA
  */
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#2563eb' }, // Azul vibrante do branding
+    { media: '(prefers-color-scheme: light)', color: '#2563eb' },
     { media: '(prefers-color-scheme: dark)', color: '#020617' },
   ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  viewportFit: 'cover', // Garante preenchimento total em telas com notch (iPhone)
+  viewportFit: 'cover',
 };
 
 interface LayoutProps {
@@ -40,16 +39,15 @@ interface LayoutProps {
 }
 
 /**
- * SEO & META DATA GENERATOR
- * Configuração dinâmica para autoridade global em PT, EN e ES.
+ * METADATA DINÂMICO MULTILÍNGUE
  */
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
-  const currentLang = (lang || i18n.defaultLocale) as Locale;
-  
-  const siteUrl = process.env['NEXT_PUBLIC_SITE_URL'] || "https://portfoliosantossergio.vercel.app";
+  const currentLang = (['pt','en','es'].includes(lang) ? lang : i18n.defaultLocale) as Locale;
 
-  const content = {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
+
+  const content: Record<Locale, { title: string; desc: string }> = {
     pt: {
       title: "Sérgio Santos | Especialista em Dados e Sistemas Críticos",
       desc: "Especialista em Dados com 20+ anos de experiência. Foco em Azure, Python, Governança Operacional e Eficiência Financeira."
@@ -67,24 +65,19 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const currentContent = content[currentLang] || content.pt;
 
   return {
-    title: {
-      default: currentContent.title,
-      template: `%s | Sérgio Santos`
-    },
+    title: { default: currentContent.title, template: `%s | Sérgio Santos` },
     description: currentContent.desc,
     metadataBase: new URL(siteUrl),
     
-    // TAG DE VERIFICAÇÃO DO GOOGLE - PRESERVADA E PROTEGIDA
-    verification: {
-      google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
-    },
+    // TAG DO GOOGLE
+    verification: { google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0' },
 
     alternates: {
       canonical: `${siteUrl}/${currentLang}`,
       languages: {
-        'pt': `${siteUrl}/pt`,
-        'en': `${siteUrl}/en`,
-        'es': `${siteUrl}/es`,
+        pt: `${siteUrl}/pt`,
+        en: `${siteUrl}/en`,
+        es: `${siteUrl}/es`,
         'x-default': `${siteUrl}/pt`,
       },
     },
@@ -96,14 +89,12 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       siteName: "Sérgio Santos Portfolio",
       locale: currentLang === 'pt' ? 'pt_BR' : currentLang === 'es' ? 'es_ES' : 'en_US',
       type: 'website',
-      images: [
-        {
-          url: `/og-image-${currentLang}.png`,
-          width: 1200,
-          height: 630,
-          alt: currentContent.title,
-        },
-      ],
+      images: [{
+        url: `/og-image-${currentLang}.png`,
+        width: 1200,
+        height: 630,
+        alt: currentContent.title,
+      }],
     },
 
     twitter: {
@@ -112,32 +103,26 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       description: currentContent.desc,
       images: [`/og-image-${currentLang}.png`],
     },
-    
-    // Configurações Adicionais para Mobile/PWA
+
     appleWebApp: {
       capable: true,
       statusBarStyle: 'default',
       title: "Sérgio.Data",
     },
-    formatDetection: {
-      telephone: false, // Evita que números de ID pareçam links de telefone
-    },
+
+    formatDetection: { telephone: false },
   };
 }
 
 /**
  * ROOT LAYOUT
- * O container mestre que aplica fontes, temas e proteções de overflow.
  */
 export default async function RootLayout({ children, params }: LayoutProps) {
   const { lang } = await params;
+  const currentLang = (['pt','en','es'].includes(lang) ? lang : i18n.defaultLocale) as Locale;
 
   return (
-    <html 
-      lang={lang} 
-      suppressHydrationWarning 
-      className={`scroll-smooth ${montserrat.variable} ${inter.variable}`}
-    >
+    <html lang={currentLang} suppressHydrationWarning className={`scroll-smooth ${montserrat.variable} ${inter.variable}`}>
       <body 
         className={`
           ${inter.className} 
@@ -152,16 +137,12 @@ export default async function RootLayout({ children, params }: LayoutProps) {
           enableSystem 
           disableTransitionOnChange
         >
-          {/* Wrapper de Segurança: 
-            w-full + overflow-x-hidden é essencial para responsividade 
-            em dispositivos com resoluções não padronizadas.
-          */}
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <main className="flex-grow w-full relative">
               {children}
             </main>
           </div>
-          
+
           <CookieBanner />
         </ThemeProvider>
       </body>
