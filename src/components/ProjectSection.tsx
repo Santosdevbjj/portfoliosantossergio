@@ -1,176 +1,174 @@
-'use client';
+'use client'
 
-import { useMemo, useState } from 'react';
-import { Filter, FolderOpen, SearchX } from 'lucide-react';
+import { useMemo, useState } from 'react'
+import { Database, Filter, FolderSearch } from 'lucide-react'
 
-import { ProjectCard } from './ProjectCard';
-
-import type { Locale } from '@/app/[lang]/dictionaries';
-import type { Dictionary } from '@/types/dictionary';
-import {
-  Project,
-  ProjectTechnology,
-  PROJECT_TECHNOLOGY_ORDER,
-} from '@/domain/projects';
-
-/* -------------------------------------------------------------------------- */
-/* TYPES                                                                      */
-/* -------------------------------------------------------------------------- */
+import { ProjectCard } from '@/components/ProjectCard'
+import type { Locale } from '@/i18n-config'
+import type { Dictionary } from '@/types/Dictionary'
+import type { Project } from '@/domain/projects'
 
 interface ProjectSectionProps {
-  lang: Locale;
-  projects: Project[];
-  dict: Pick<Dictionary, 'common' | 'portfolio'>;
+  projects: Project[]
+  lang: Locale
+  dict: Dictionary
 }
 
-/* -------------------------------------------------------------------------- */
-/* COMPONENT                                                                  */
-/* -------------------------------------------------------------------------- */
-
+/**
+ * PROJECT SECTION
+ * Arquitetura sênior: narrativa, filtro, ranking e responsividade
+ */
 export function ProjectSection({
   projects,
   lang,
   dict,
 }: ProjectSectionProps) {
-  const [activeTech, setActiveTech] = useState<ProjectTechnology | 'all'>(
-    'all',
-  );
+  const [activeCategory, setActiveCategory] = useState<'all' | string>('all')
 
-  /* ------------------------------ Guards --------------------------------- */
+  const portfolio = dict.portfolio
 
-  if (process.env.NODE_ENV !== 'production') {
-    if (!dict.portfolio || !dict.common) {
-      throw new Error(
-        '[ProjectSection] Dicionário incompleto: portfolio ou common ausente',
-      );
-    }
-  }
-
-  /* --------------------------- Derived data ------------------------------ */
+  const normalize = (value: string) =>
+    value.toLowerCase().replace(/[^a-z0-9]/g, '')
 
   /**
-   * Tecnologias realmente presentes nos projetos
-   * Mantém ordem canônica do domínio
-   */
-  const technologies = useMemo(() => {
-    const used = new Set<ProjectTechnology>(
-      projects.map((p) => p.technology),
-    );
-
-    return PROJECT_TECHNOLOGY_ORDER.filter((tech) => used.has(tech));
-  }, [projects]);
-
-  /**
-   * Filtragem por tecnologia
+   * Ranking + filtro estratégico
    */
   const filteredProjects = useMemo(() => {
-    if (activeTech === 'all') return projects;
+    let base = projects.filter((p) =>
+      p.topics.includes('portfolio')
+    )
 
-    return projects.filter(
-      (project) => project.technology === activeTech,
-    );
-  }, [projects, activeTech]);
+    if (activeCategory !== 'all') {
+      const normalizedCategory = normalize(activeCategory)
+      base = base.filter((p) =>
+        p.topics.some(
+          (topic) => normalize(topic) === normalizedCategory
+        )
+      )
+    }
 
-  /* ---------------------------------------------------------------------- */
+    return base.sort((a, b) => {
+      const aPriority = a.isMainCase ? 0 : a.isFeatured ? 1 : 2
+      const bPriority = b.isMainCase ? 0 : b.isFeatured ? 1 : 2
+
+      if (aPriority !== bPriority) return aPriority - bPriority
+      return (
+        new Date(b.updatedAt).getTime() -
+        new Date(a.updatedAt).getTime()
+      )
+    })
+  }, [projects, activeCategory])
 
   return (
     <section
       id="projects"
-      data-lang={lang}
-      className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-8 py-24 transition-colors duration-500"
+      aria-labelledby="projects-title"
+      className="py-24 lg:py-32"
     >
-      {/* ------------------------------------------------------------------ */}
-      {/* HEADER                                                             */}
-      {/* ------------------------------------------------------------------ */}
-
-      <header className="mb-20 flex flex-col gap-12 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-2xl">
-          <div className="mb-4 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400">
-            <FolderOpen className="h-5 w-5" />
-            {dict.common.portfolioTitle}
-          </div>
-
-          <h2 className="mb-8 text-5xl font-black leading-[0.95] tracking-tighter text-slate-900 dark:text-white md:text-6xl lg:text-7xl">
-            {dict.portfolio.title}
-          </h2>
-
-          <p className="text-lg font-medium leading-relaxed text-slate-600 dark:text-slate-400 md:text-xl">
-            {dict.portfolio.description}
-          </p>
-        </div>
-
-        {/* ------------------------------------------------------------------ */}
-        {/* FILTERS                                                           */}
-        {/* ------------------------------------------------------------------ */}
-
-        <div className="w-full lg:max-w-md xl:max-w-xl">
-          <div className="mb-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
-            <Filter className="h-4 w-4" />
-            {dict.portfolio.projectLabels.technologies}
-          </div>
-
-          <div className="relative">
-            <div className="-mx-6 flex snap-x gap-2 overflow-x-auto px-6 pb-4 no-scrollbar touch-pan-x lg:mx-0 lg:flex-wrap lg:px-0 lg:pb-0">
-              {/* ALL */}
-              <button
-                onClick={() => setActiveTech('all')}
-                className={`min-h-[44px] snap-start whitespace-nowrap rounded-xl border-2 px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-                  activeTech === 'all'
-                    ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-600/30'
-                    : 'border-slate-200 bg-white text-slate-500 hover:border-blue-500/40 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400'
-                }`}
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* HEADER */}
+        <header className="flex flex-col lg:flex-row justify-between gap-10 mb-16">
+          <div>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="p-3 rounded-2xl bg-blue-600 shadow-xl shadow-blue-600/20">
+                <Database className="w-7 h-7 text-white" />
+              </div>
+              <h2
+                id="projects-title"
+                className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter uppercase"
               >
-                {dict.portfolio.all}
-              </button>
-
-              {technologies.map((tech) => (
-                <button
-                  key={tech}
-                  onClick={() => setActiveTech(tech)}
-                  className={`min-h-[44px] snap-start whitespace-nowrap rounded-xl border-2 px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-                    activeTech === tech
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-600/30'
-                      : 'border-slate-200 bg-white text-slate-500 hover:border-blue-500/40 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400'
-                  }`}
-                >
-                  {dict.portfolio.categories[tech]}
-                </button>
-              ))}
+                {portfolio.title}
+              </h2>
             </div>
 
-            {/* Mobile scroll hint */}
-            <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-white to-transparent dark:from-[#020617] lg:hidden" />
-          </div>
-        </div>
-      </header>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* GRID                                                               */}
-      {/* ------------------------------------------------------------------ */}
-
-      <div className="grid min-h-[400px] grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
-        {filteredProjects.length > 0 ? (
-          filteredProjects.map((project, index) => (
-            <div
-              key={project.id}
-              style={{ animationDelay: `${index * 100}ms` }}
-              className="flex h-full animate-in slide-in-from-bottom-8 fade-in duration-700 fill-mode-both"
-            >
-              <ProjectCard project={project} lang={lang} dict={dict} />
-            </div>
-          ))
-        ) : (
-          <div className="col-span-full flex flex-col items-center justify-center rounded-[3rem] border-4 border-dashed border-slate-100 bg-slate-50/50 py-32 dark:border-slate-900 dark:bg-slate-900/10">
-            <SearchX
-              className="mb-6 h-20 w-20 text-slate-300 dark:text-slate-700"
-              strokeWidth={1}
-            />
-            <p className="text-sm font-black uppercase tracking-[0.4em] text-slate-500 dark:text-slate-400">
-              {dict.portfolio.empty}
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500">
+              {filteredProjects.length} {portfolio.resultsLabel}
             </p>
           </div>
-        )}
+
+          {/* FILTERS */}
+          <nav aria-label={portfolio.filterLabel}>
+            <div className="flex items-center gap-2 mb-4 text-[10px] font-black uppercase tracking-[0.25em]">
+              <Filter className="w-4 h-4 text-blue-600" />
+              {portfolio.filterLabel}
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto no-scrollbar">
+              <FilterButton
+                active={activeCategory === 'all'}
+                onClick={() => setActiveCategory('all')}
+                label={portfolio.all}
+              />
+
+              {Object.entries(portfolio.categories).map(
+                ([key, label]) => (
+                  <FilterButton
+                    key={key}
+                    active={activeCategory === key}
+                    onClick={() => setActiveCategory(key)}
+                    label={label}
+                  />
+                )
+              )}
+            </div>
+          </nav>
+        </header>
+
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {filteredProjects.length > 0 ? (
+            filteredProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                lang={lang}
+                dict={dict}
+              />
+            ))
+          ) : (
+            <EmptyState message={portfolio.empty} />
+          )}
+        </div>
       </div>
     </section>
-  );
+  )
+}
+
+/* ---------------------------------- */
+/* UI primitives internos (isolados)  */
+/* ---------------------------------- */
+
+function FilterButton({
+  active,
+  label,
+  onClick,
+}: {
+  active: boolean
+  label: string
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-pressed={active}
+      className={`min-h-[44px] px-6 py-3 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest transition-all ${
+        active
+          ? 'bg-blue-600 border-blue-600 text-white shadow-xl'
+          : 'border-slate-200 text-slate-500 hover:border-blue-500/40'
+      }`}
+    >
+      {label}
+    </button>
+  )
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="col-span-full flex flex-col items-center justify-center py-32 border-4 border-dashed rounded-[4rem]">
+      <FolderSearch className="w-20 h-20 text-slate-300 mb-6" />
+      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 text-center">
+        {message}
+      </p>
+    </div>
+  )
 }
