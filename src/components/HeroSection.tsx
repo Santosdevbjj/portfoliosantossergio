@@ -11,6 +11,9 @@ import {
 } from 'lucide-react';
 import type { Locale } from '@/i18n-config';
 
+/* =====================================================
+ * TYPES
+ * ===================================================== */
 interface HeroSectionProps {
   lang: Locale;
   dict: {
@@ -27,42 +30,25 @@ interface HeroSectionProps {
       viewProjects?: string;
       downloadCv?: string;
     };
-    portfolio?: {
-      title?: string;
-    };
   };
 }
 
-/**
- * HERO SECTION — MULTILÍNGUE • RESPONSIVA • ALTA CONVERSÃO
- */
+/* =====================================================
+ * COMPONENT
+ * ===================================================== */
 export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
   const about = dict?.about ?? {};
   const common = dict?.common ?? {};
-  const portfolio = dict?.portfolio ?? {};
 
-  /** Caminho do CV por idioma */
+  /* =====================================================
+   * ASSETS
+   * ===================================================== */
   const cvPath = `/cv-sergio-santos-${lang}.pdf`;
 
-  /** Fallbacks multilíngues seguros */
+  /* =====================================================
+   * FALLBACKS MULTILÍNGUES
+   * ===================================================== */
   const labels = {
-    viewProjects:
-      common.viewProjects ??
-      portfolio.title ??
-      {
-        pt: 'Ver Projetos',
-        en: 'View Projects',
-        es: 'Ver Proyectos',
-      }[lang],
-
-    downloadCv:
-      common.downloadCv ??
-      {
-        pt: 'Baixar CV',
-        en: 'Download CV',
-        es: 'Descargar CV',
-      }[lang],
-
     badge:
       about.sections?.highlights?.title ??
       {
@@ -87,6 +73,22 @@ export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
         es: 'Experiencia en sistemas críticos, ingeniería de datos y ciencia de datos con enfoque en impacto real.',
       }[lang],
 
+    viewProjects:
+      common.viewProjects ??
+      {
+        pt: 'Ver Projetos',
+        en: 'View Projects',
+        es: 'Ver Proyectos',
+      }[lang],
+
+    downloadCv:
+      common.downloadCv ??
+      {
+        pt: 'Baixar CV',
+        en: 'Download CV',
+        es: 'Descargar CV',
+      }[lang],
+
     stack: {
       azure: 'Azure Databricks',
       data:
@@ -104,8 +106,14 @@ export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
     },
   };
 
+  /* =====================================================
+   * RENDER
+   * ===================================================== */
   return (
-    <section className="relative pt-24 pb-16 lg:pt-48 lg:pb-36 overflow-hidden bg-white dark:bg-[#020617] transition-colors">
+    <section
+      aria-labelledby="hero-title"
+      className="relative pt-24 pb-16 lg:pt-48 lg:pb-36 overflow-hidden bg-white dark:bg-[#020617] transition-colors"
+    >
       {/* GRID BACKGROUND */}
       <div
         className="absolute inset-0 -z-20 opacity-[0.04] dark:opacity-[0.12] pointer-events-none"
@@ -117,12 +125,12 @@ export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
       />
 
       {/* RADIAL LIGHT */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.05),transparent_40%)] pointer-events-none" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.06),transparent_40%)] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         <div className="max-w-4xl">
           {/* BADGE */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 mb-8">
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-blue-50/60 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 mb-8">
             <Sparkles className="w-4 h-4 text-blue-600 animate-pulse" />
             <span className="text-[10px] md:text-xs font-black text-blue-800 dark:text-blue-300 uppercase tracking-[0.3em]">
               {labels.badge}
@@ -130,11 +138,12 @@ export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
           </div>
 
           {/* NAME */}
-          <h1 className="text-[13vw] sm:text-7xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white mb-8 tracking-tighter leading-[0.8]">
+          <h1
+            id="hero-title"
+            className="text-[12vw] sm:text-7xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white mb-8 tracking-tighter leading-[0.82]"
+          >
             Sérgio <br className="hidden sm:block" />
-            <span className="text-blue-600 relative inline-block">
-              Santos
-            </span>
+            <span className="text-blue-600 inline-block">Santos</span>
           </h1>
 
           {/* HEADLINE */}
@@ -151,7 +160,7 @@ export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
           <div className="flex flex-col sm:flex-row gap-5">
             <a
               href="#projects"
-              className="group flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all active:scale-95"
+              className="group min-w-[220px] flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all active:scale-95"
             >
               {labels.viewProjects}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
@@ -161,7 +170,7 @@ export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
               href={cvPath}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-2 border-slate-200 dark:border-slate-800 px-10 py-5 rounded-2xl font-bold text-lg active:scale-95"
+              className="min-w-[220px] flex items-center justify-center gap-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-2 border-slate-200 dark:border-slate-800 px-10 py-5 rounded-2xl font-bold text-lg active:scale-95"
             >
               <FileText className="w-5 h-5 text-blue-600" />
               {labels.downloadCv}
@@ -186,8 +195,8 @@ export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
         </div>
       </div>
 
-      {/* ELEMENTO VISUAL (DESKTOP XL) */}
-      <div className="absolute -right-20 top-1/2 -translate-y-1/2 opacity-[0.03] dark:opacity-[0.08] hidden 2xl:block">
+      {/* ELEMENTO VISUAL — DESKTOP XL */}
+      <div className="absolute -right-20 top-1/2 -translate-y-1/2 opacity-[0.03] dark:opacity-[0.08] hidden 2xl:block pointer-events-none">
         <Database className="w-[700px] h-[700px] text-blue-600 -rotate-12" />
       </div>
     </section>
