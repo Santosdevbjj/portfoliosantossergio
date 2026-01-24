@@ -10,7 +10,7 @@ import { HeroSection } from '@/components/HeroSection';
 import { Navbar } from '@/components/Navbar';
 import { PageWrapper } from '@/components/PageWrapper';
 import { ProjectSection } from '@/components/ProjectSection';
-import { getDictionary, type Dictionary } from '@/lib/get-dictionary';
+import { getDictionary } from '@/lib/get-dictionary';
 import { getGitHubProjects } from '@/lib/github';
 
 /** ISR: Revalida cache a cada 1 hora */
@@ -22,11 +22,19 @@ interface PageProps {
 
 type SupportedLangs = 'pt' | 'en' | 'es';
 
+/** Forma correta do dicionário para tipagem */
+interface Dictionary {
+  role: string;
+  headline: string;
+  [key: string]: any;
+}
+
 /** Metadata SEO dinâmico multilíngue */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
   const currentLang = (['pt', 'en', 'es'].includes(lang) ? lang : 'pt') as SupportedLangs;
-  const dict = await getDictionary(currentLang);
+
+  const dict: Dictionary = await getDictionary(currentLang) as Dictionary;
 
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
 
@@ -43,8 +51,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
     openGraph: {
-      title: `Sérgio Santos | ${dict.role}`,
-      description: dict.headline,
+      title: `Sérgio Santos | ${dict.role || 'Data Specialist'}`,
+      description: dict.headline || 'Especialista em Dados e Engenharia de Sistemas.',
       url: `${baseUrl}/${currentLang}`,
       siteName: 'Sérgio Santos Portfolio',
       locale: currentLang === 'pt' ? 'pt_BR' : currentLang === 'es' ? 'es_ES' : 'en_US',
@@ -63,13 +71,13 @@ export default async function Page({ params }: PageProps) {
 
   // Busca paralela para máxima performance
   const [dict, allProjects] = await Promise.all([
-    getDictionary(currentLang),
+    getDictionary(currentLang) as Promise<Dictionary>, // ✅ Tipagem explícita
     getGitHubProjects(currentLang),
   ]);
 
   return (
     <PageWrapper>
-      <Navbar dict={dict as Dictionary} lang={currentLang} />
+      <Navbar dict={dict} lang={currentLang} />
 
       <main className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] transition-colors duration-500 antialiased">
         
