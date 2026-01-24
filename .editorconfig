@@ -1,11 +1,11 @@
 # EditorConfig: Padronização Universal de Código
 # Projeto: Portfolio Sérgio Santos
-# Garante consistência entre IDEs e previne "diffs" sujos no Git.
+# Mantém consistência entre IDEs e previne diffs desnecessários no Git
 
 root = true
 
 # ======================================================
-# Configuração global
+# Configuração global (default)
 # ======================================================
 [*]
 charset = utf-8
@@ -16,22 +16,22 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 # ======================================================
-# Markdown, MDX e Conteúdo Editorial
-# Preserva espaços finais para <br> e formatação semântica
+# Markdown e MDX (preservar espaços finais para <br>)
 # ======================================================
 [*.{md,mdx}]
 trim_trailing_whitespace = false
 indent_size = 2
 
 # ======================================================
-# Engenharia de Dados e Backend
-# Python segue PEP8 | SQL legível
+# Python e SQL (PEP8 e legibilidade)
 # ======================================================
 [*.{py,sql}]
 indent_style = space
 indent_size = 4
 
-# Jupyter Notebooks (JSON – formatação externa apenas)
+# ======================================================
+# Jupyter Notebooks (JSON – não modificar trailing whitespace)
+# ======================================================
 [*.ipynb]
 indent_style = space
 indent_size = 2
@@ -39,21 +39,21 @@ trim_trailing_whitespace = false
 
 # ======================================================
 # Desenvolvimento Web Moderno
-# Next.js 15/16 • TypeScript • CSS • Infra YAML
+# Next.js 16, React 19, TypeScript, CSS, Tailwind, Infra YAML
 # ======================================================
 [*.{js,jsx,ts,tsx,cjs,mjs,cts,mts,css,scss,html,yml,yaml,toml}]
 indent_style = space
 indent_size = 2
 
 # ======================================================
-# Arquivos Estruturados e SEO
+# Arquivos estruturados (JSON, XML, WebManifest, Configs)
 # ======================================================
 [*.{json,xml,webmanifest}]
 indent_style = space
 indent_size = 2
 
 # ======================================================
-# Variáveis de Ambiente (Segurança)
+# Variáveis de ambiente (.env)
 # ======================================================
 [*.env*]
 indent_style = space
@@ -61,7 +61,7 @@ indent_size = 2
 trim_trailing_whitespace = false
 
 # ======================================================
-# Scripts de Shell e Infra
+# Shell Scripts (sh, bash, zsh)
 # ======================================================
 [*.{sh,bash,zsh}]
 indent_style = space
@@ -79,19 +79,30 @@ indent_style = tab
 indent_size = 4
 
 # ======================================================
-# Dados Brutos e Logs
+# Dados brutos e logs (não remover trailing whitespace)
 # ======================================================
 [*.{csv,log}]
 trim_trailing_whitespace = false
 insert_final_newline = false
 
-# Lockfiles (mantém newline por compatibilidade)
+# ======================================================
+# Lockfiles (manter newline por compatibilidade)
+# ======================================================
 [*.lock]
 trim_trailing_whitespace = false
 
 # ======================================================
-# Ativos Binários e Arquivos Não-Textuais
+# Arquivos binários e assets (não modificar)
 # ======================================================
 [*.{png,jpg,jpeg,gif,webp,ico,pdf,woff,woff2}]
 insert_final_newline = false
 trim_trailing_whitespace = false
+
+# ======================================================
+# Arquivos de build/config do Next.js
+# ======================================================
+[*.{next.config.mjs,tailwind.config.ts,postcss.config.mjs,eslint.config.mjs,tsconfig.json,.prettierrc.json}]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
