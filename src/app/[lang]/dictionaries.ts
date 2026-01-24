@@ -2,41 +2,61 @@ import 'server-only'
 
 /**
  * DICIONÁRIOS DINÂMICOS MULTILÍNGUE
- * 
- * Este módulo só roda no servidor para reduzir o bundle do cliente
- * e proteger a lógica de i18n.
+ *
+ * Este módulo roda exclusivamente no servidor:
+ * - reduz o bundle do cliente
+ * - evita exposição de lógica de i18n
+ * - permite code splitting por idioma
  */
-
-const dictionaries = {
-  pt: () => import('@/dictionaries/pt.json').then((mod) => mod.default),
-  en: () => import('@/dictionaries/en.json').then((mod) => mod.default),
-  es: () => import('@/dictionaries/es.json').then((mod) => mod.default),
-} as const
-
-export type Locale = keyof typeof dictionaries
 
 /**
- * Lista de idiomas suportados, usada em middlewares e geração de rotas.
+ * Lista canônica de idiomas suportados
+ * (single source of truth)
  */
-export const locales: Locale[] = ['pt', 'en', 'es']
+export const locales = ['pt', 'en', 'es'] as const
+
+export type Locale = (typeof locales)[number]
 
 /**
- * Type Guard para validar se uma string é um locale suportado.
+ * Loaders de dicionário por idioma
  */
-export const hasLocale = (locale: string): locale is Locale => {
-  return Object.keys(dictionaries).includes(locale)
+const dictionaries: Record<Locale, () => Promise<Record<string, any>>> = {
+  pt: async () => (await import('@/dictionaries/pt.json')).default,
+  en: async () => (await import('@/dictionaries/en.json')).default,
+  es: async () => (await import('@/dictionaries/es.json')).default,
 }
 
 /**
- * Busca o dicionário de forma assíncrona.
- * Retorna o dicionário padrão ('pt') caso ocorra algum erro.
+ * Type guard seguro para Locale
  */
-export const getDictionary = async (locale: Locale) => {
+export const isLocale = (value: unknown): value is Locale => {
+  return typeof value === 'string' && locales.includes(value as Locale)
+}
+
+/**
+ * Normaliza o locale recebido (rota, middleware, params)
+ */
+export const getSafeLocale = (value?: string | null): Locale => {
+  return isLocale(value) ? value : 'pt'
+}
+
+/**
+ * Carrega o dicionário de forma segura.
+ * Sempre retorna um dicionário válido para evitar crash em build.
+ */
+export const getDictionary = async (
+  locale?: string | null
+): Promise<Record<string, any>> => {
+  const safeLocale = getSafeLocale(locale)
+
   try {
-    const loadDictionary = dictionaries[locale] ?? dictionaries.pt
-    return await loadDictionary()
+    return await dictionaries[safeLocale]()
   } catch (error) {
-    console.error(`[i18n] Falha ao carregar o dicionário para: ${locale}`, error)
+    console.error(
+      `[i18n] Falha ao carregar dicionário (${safeLocale}). Fallback para PT.`,
+      error
+    )
+
     return dictionaries.pt()
   }
 }
