@@ -1,125 +1,187 @@
-'use client'
+'use client';
 
-import React, { useEffect, useState, Suspense } from 'react'
-import Link from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
-import { Moon, Sun, Globe } from 'lucide-react'
-import { useTheme } from '@/hooks/useTheme'
-import { i18n, type Locale, localeMetadata } from '@/i18n-config'
+import React, { useEffect, useState, Suspense } from 'react';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { Moon, Sun, Globe } from 'lucide-react';
 
-const LanguageSwitcherContent = () => {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const { isDark, toggleTheme } = useTheme()
-  
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+import { useTheme } from '@/hooks/useTheme';
+import { i18n, type Locale, localeMetadata } from '@/i18n-config';
 
-  const currentLang = (pathname?.split('/')[1] ?? i18n.defaultLocale) as Locale
+/* -------------------------------------------------------------------------- */
+/* CONTENT                                                                    */
+/* -------------------------------------------------------------------------- */
 
-  const handleLocaleChange = (lang: string) => {
-    document.cookie = `NEXT_LOCALE=${lang};path=/;max-age=31536000;SameSite=Lax`
-  }
+function LanguageSwitcherContent() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { isDark, toggleTheme } = useTheme();
 
-  const getNewPath = (langCode: string): string => {
-    if (!pathname) return `/${langCode}`
-    const segments = pathname.split('/')
-    const isLangSegment = i18n.locales.includes(segments[1] as Locale)
-    const newSegments = [...segments]
-    if (isLangSegment) newSegments[1] = langCode
-    else newSegments.splice(1, 0, langCode)
-    const params = searchParams?.toString()
-    return `${newSegments.join('/')}${params ? `?${params}` : ''}`
-  }
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  if (!mounted) {
-    return (
-      <div className="fixed top-4 right-4 sm:top-6 sm:right-8 md:top-8 md:right-10 h-10 w-36 md:h-12 md:w-40 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-xl backdrop-blur-md z-[110]" />
-    )
-  }
+  const currentLang: Locale =
+    (pathname?.split('/')[1] as Locale) ?? i18n.defaultLocale;
 
-  // Multilíngue para tema
+  /* ------------------------------ Helpers -------------------------------- */
+
+  const handleLocaleChange = (lang: Locale) => {
+    document.cookie = `NEXT_LOCALE=${lang};path=/;max-age=31536000;SameSite=Lax`;
+  };
+
+  const getNewPath = (lang: Locale): string => {
+    if (!pathname) return `/${lang}`;
+
+    const segments = pathname.split('/');
+    const hasLocale = i18n.locales.includes(segments[1] as Locale);
+
+    const newSegments = [...segments];
+    if (hasLocale) newSegments[1] = lang;
+    else newSegments.splice(1, 0, lang);
+
+    const params = searchParams?.toString();
+    return `${newSegments.join('/')}${params ? `?${params}` : ''}`;
+  };
+
+  /* ----------------------------- Labels ---------------------------------- */
+
   const themeLabels = {
     dark: {
       pt: 'Ativar modo escuro',
       en: 'Enable dark mode',
-      es: 'Activar modo oscuro'
+      es: 'Activar modo oscuro',
     },
     light: {
       pt: 'Ativar modo claro',
       en: 'Enable light mode',
-      es: 'Activar modo claro'
-    }
+      es: 'Activar modo claro',
+    },
+  };
+
+  if (!mounted) {
+    return (
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-8 md:top-8 md:right-10 h-10 w-36 md:h-12 md:w-40 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-xl backdrop-blur-md z-[110]" />
+    );
   }
 
   return (
-    <nav 
-      aria-label={currentLang === 'pt' ? 'Configurações de idioma e tema' : currentLang === 'es' ? 'Configuración de idioma y tema' : 'Language and theme settings'}
-      className="fixed top-4 right-4 sm:top-6 sm:right-8 md:top-8 md:right-10 z-[110] flex items-center gap-1 p-1 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-xl border border-slate-200/50 dark:border-slate-800/50 shadow-2xl transition-all duration-500 hover:bg-white/90 dark:hover:bg-slate-900/90"
+    <nav
+      aria-label={
+        currentLang === 'pt'
+          ? 'Configurações de idioma e tema'
+          : currentLang === 'es'
+          ? 'Configuración de idioma y tema'
+          : 'Language and theme settings'
+      }
+      className="
+        fixed top-4 right-4 sm:top-6 sm:right-8 md:top-8 md:right-10
+        z-[110]
+        flex items-center gap-1 p-1
+        bg-white/70 dark:bg-slate-900/70
+        backdrop-blur-xl
+        rounded-xl
+        border border-slate-200/50 dark:border-slate-800/50
+        shadow-2xl
+        transition-all duration-500
+        hover:bg-white/90 dark:hover:bg-slate-900/90
+      "
     >
-      {/* Alternador de Tema */}
+      {/* THEME TOGGLE */}
       <button
         onClick={toggleTheme}
-        className="p-2 rounded-lg text-slate-600 dark:text-blue-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all active:scale-90 group"
-        aria-label={isDark ? themeLabels.light[currentLang] : themeLabels.dark[currentLang]}
+        aria-label={
+          isDark
+            ? themeLabels.light[currentLang]
+            : themeLabels.dark[currentLang]
+        }
+        className="
+          p-2 rounded-lg
+          text-slate-600 dark:text-blue-400
+          hover:bg-slate-200/50 dark:hover:bg-slate-800/50
+          transition-all
+          active:scale-90
+        "
       >
-        <div className="relative w-4 h-4 flex items-center justify-center">
-          {isDark ? (
-            <Sun size={16} className="text-amber-500 animate-in zoom-in spin-in-90 duration-500" />
-          ) : (
-            <Moon size={16} className="text-blue-600 animate-in zoom-in spin-in-90 duration-500" />
-          )}
-        </div>
+        {isDark ? (
+          <Sun className="w-4 h-4 text-amber-500 animate-in zoom-in spin-in-90 duration-500" />
+        ) : (
+          <Moon className="w-4 h-4 text-blue-600 animate-in zoom-in spin-in-90 duration-500" />
+        )}
       </button>
 
-      {/* Divisor */}
-      <div className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-1" aria-hidden="true" />
+      {/* DIVIDER */}
+      <div
+        className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-1"
+        aria-hidden="true"
+      />
 
-      {/* Seletor de Idiomas */}
+      {/* LANGUAGE SWITCH */}
       <div className="flex items-center gap-0.5">
         <div className="hidden sm:flex items-center px-1 text-slate-400 dark:text-slate-600">
           <Globe size={13} strokeWidth={1.5} />
         </div>
-        
-        {i18n.locales.map((localeCode) => {
-          const isActive = currentLang === localeCode
-          const metadata = localeMetadata[localeCode]
-          
+
+        {i18n.locales.map((locale) => {
+          const isActive = currentLang === locale;
+          const meta = localeMetadata[locale];
+
           return (
             <Link
-              key={localeCode}
-              href={getNewPath(localeCode)}
-              hrefLang={localeCode}
+              key={locale}
+              href={getNewPath(locale)}
+              hrefLang={locale}
               rel="alternate"
-              onClick={() => handleLocaleChange(localeCode)}
+              onClick={() => handleLocaleChange(locale)}
+              aria-label={meta.ariaLabel}
+              aria-current={isActive ? 'page' : undefined}
               className={`
-                relative px-3 py-1.5 text-[10px] md:text-[11px] font-bold rounded-lg transition-all duration-300 uppercase tracking-widest
-                ${isActive 
-                  ? 'text-white' 
-                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50'
+                relative px-3 py-1.5
+                text-[10px] md:text-[11px]
+                font-bold uppercase tracking-widest
+                rounded-lg
+                transition-all duration-300
+                ${
+                  isActive
+                    ? 'text-white'
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50'
                 }
               `}
-              aria-label={metadata.ariaLabel}
             >
-              <span className="relative z-10">{metadata.label}</span>
+              <span className="relative z-10">{meta.label}</span>
+
               {isActive && (
-                <div 
-                  className="absolute inset-0 bg-blue-600 rounded-lg z-0 animate-in fade-in zoom-in-95 duration-500 shadow-lg shadow-blue-600/30" 
-                  aria-hidden="true"
+                <span
+                  aria-hidden
+                  className="
+                    absolute inset-0
+                    bg-blue-600
+                    rounded-lg
+                    z-0
+                    animate-in fade-in zoom-in-95 duration-500
+                    shadow-lg shadow-blue-600/30
+                  "
                 />
               )}
             </Link>
-          )
+          );
         })}
       </div>
     </nav>
-  )
+  );
 }
 
-export const LanguageSwitcher = () => (
-  <Suspense fallback={
-    <div className="fixed top-4 right-4 sm:top-6 sm:right-8 md:top-8 md:right-10 h-10 w-36 md:h-12 md:w-40 bg-slate-200/10 dark:bg-slate-800/10 rounded-xl" />
-  }>
-    <LanguageSwitcherContent />
-  </Suspense>
-)
+/* -------------------------------------------------------------------------- */
+/* EXPORT (Suspense wrapper)                                                  */
+/* -------------------------------------------------------------------------- */
+
+export function LanguageSwitcher() {
+  return (
+    <Suspense
+      fallback={
+        <div className="fixed top-4 right-4 sm:top-6 sm:right-8 md:top-8 md:right-10 h-10 w-36 md:h-12 md:w-40 bg-slate-200/10 dark:bg-slate-800/10 rounded-xl" />
+      }
+    >
+      <LanguageSwitcherContent />
+    </Suspense>
+  );
+}
