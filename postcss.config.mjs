@@ -2,8 +2,9 @@
 const config = {
   plugins: {
     /**
-     * 1. Nesting CSS oficial compatível com Tailwind
+     * 1. Nesting CSS oficial
      * Permite aninhamento de seletores sem preprocessadores externos
+     * Compatível com TailwindCSS JIT
      */
     "tailwindcss/nesting": {},
 
@@ -16,7 +17,7 @@ const config = {
     /**
      * 3. Autoprefixer
      * Adiciona prefixos automáticos baseados em browserslist
-     * Flexbox compatível, sem hacks antigos
+     * Flexbox compatível sem hacks antigos
      */
     autoprefixer: {
       flexbox: "no-2009",
