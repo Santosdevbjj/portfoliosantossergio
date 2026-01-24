@@ -4,38 +4,42 @@ import nextTs from "eslint-config-next/typescript";
 import prettier from "eslint-config-prettier";
 import globals from "globals";
 
+/**
+ * ESLint Flat Config - Next.js 16 + TypeScript + React 19
+ * Revisado para máxima compatibilidade com App Router e Vercel
+ */
 export default [
   /**
-   * 1. Ambiente global
-   * Flat Config NÃO assume browser/node automaticamente
+   * 1️⃣ Ambiente global
+   * Flat Config não assume automaticamente browser/node
    */
   {
     languageOptions: {
       ecmaVersion: "latest",
+      sourceType: "module",
       globals: {
         ...globals.browser,
-        ...globals.node
-      }
-    }
+        ...globals.node,
+      },
+    },
   },
 
   /**
-   * 2. Next.js Core Web Vitals
+   * 2️⃣ Next.js Core Web Vitals
    * Inclui:
-   * - React
-   * - React Hooks
-   * - @next/eslint-plugin-next
+   * - React e Hooks
    * - Regras críticas de performance
    */
   ...nextVitals,
 
   /**
-   * 3. Next.js + TypeScript (App Router ready)
+   * 3️⃣ Next.js + TypeScript
+   * Configura App Router com TS
    */
   ...nextTs,
 
   /**
-   * 4. Overrides específicos do projeto
+   * 4️⃣ Regras específicas do projeto
    */
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -55,19 +59,24 @@ export default [
       "@typescript-eslint/no-unnecessary-condition": "off",
       "@typescript-eslint/restrict-template-expressions": "off",
 
-      // Bibliotecas modernas (lucide-react, framer-motion, etc.)
-      "@typescript-eslint/no-deprecated": "off"
-    }
+      // Bibliotecas modernas (lucide-react, framer-motion, clsx, tailwind-merge)
+      "@typescript-eslint/no-deprecated": "off",
+
+      // Regras adicionais que ajudam a manter padronização
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "prefer-const": "warn",
+      "react/react-in-jsx-scope": "off", // Next 16+ não precisa importar React
+    },
   },
 
   /**
-   * 5. Prettier
-   * SEMPRE por último — desativa regras de formatação conflitantes
+   * 5️⃣ Prettier
+   * Sempre por último — desativa conflitos de formatação
    */
   prettier,
 
   /**
-   * 6. Arquivos e pastas ignoradas
+   * 6️⃣ Ignora arquivos/pastas desnecessárias
    */
   {
     ignores: [
@@ -76,7 +85,9 @@ export default [
       "out/**",
       "build/**",
       "next-env.d.ts",
-      "public/**" // assets estáticos, decisão consciente
-    ]
-  }
+      "public/**", // assets estáticos
+      "coverage/**", // relatórios de teste
+      ".turbo/**", // cache TurboRepo, se existir
+    ],
+  },
 ];
