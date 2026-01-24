@@ -50,7 +50,7 @@ export const localeMetadata: Readonly<Record<Locale, LocaleDetail>> = {
  * VALIDAÇÃO DE LOCALE
  */
 export function isValidLocale(locale: unknown): locale is Locale {
-  return typeof locale === 'string' && i18n.locales.includes(locale as Locale);
+  return typeof locale === 'string' && (i18n.locales as readonly string[]).includes(locale);
 }
 
 export function getSafeLocale(locale: string | undefined | null): Locale {
@@ -58,20 +58,42 @@ export function getSafeLocale(locale: string | undefined | null): Locale {
 }
 
 /**
+ * TIPAGEM DO DICIONÁRIO
+ * Compatível com Navbar, PageWrapper e outros componentes
+ */
+export interface Dictionary {
+  nav?: {
+    about?: string;
+    experience?: string;
+    articles?: string;
+    projects?: string;
+    contact?: string;
+  };
+  common?: {
+    navigation?: string;
+    openMenu?: string;
+    closeMenu?: string;
+    role?: string;
+    footer?: string;
+  };
+  [key: string]: any; // Permite outras traduções genéricas
+}
+
+/**
  * DICIONÁRIOS DINÂMICOS
  * Carregamento otimizado para Server Components com Code Splitting.
  */
-const dictionaries: Record<Locale, () => Promise<Record<string, any>>> = {
-  pt: async () => (await import('./dictionaries/pt.json')).default,
-  en: async () => (await import('./dictionaries/en.json')).default,
-  es: async () => (await import('./dictionaries/es.json')).default,
+const dictionaries: Record<Locale, () => Promise<Dictionary>> = {
+  pt: async () => (await import('./dictionaries/pt.json')).default as Dictionary,
+  en: async () => (await import('./dictionaries/en.json')).default as Dictionary,
+  es: async () => (await import('./dictionaries/es.json')).default as Dictionary,
 };
 
 /**
  * OBTÉM DICIONÁRIO
  * Função principal para carregar traduções
  */
-export const getDictionary = async (locale: Locale): Promise<Record<string, any>> => {
+export const getDictionary = async (locale: Locale): Promise<Dictionary> => {
   const targetLocale = getSafeLocale(locale);
 
   try {
@@ -111,4 +133,4 @@ export const getAlternateLocales = (currentLocale: Locale): Locale[] => {
  * O próprio i18n-config não controla layout, mas pode ser usado para adaptar conteúdo.
  * - Responsividade depende de CSS/Tailwind (ver componentes)
  */
-export const isResponsive = true; // Placeholder para sinalizar suporte
+export const isResponsive = true;
