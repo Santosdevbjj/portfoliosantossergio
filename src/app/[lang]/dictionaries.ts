@@ -1,62 +1,42 @@
 import 'server-only'
 
-/**
- * DICIONÁRIOS DINÂMICOS MULTILÍNGUE
- *
- * Este módulo roda exclusivamente no servidor:
- * - reduz o bundle do cliente
- * - evita exposição de lógica de i18n
- * - permite code splitting por idioma
- */
+import type { Dictionary } from '@/types/dictionary'
+import { ptDictionary, enDictionary, esDictionary } from '@/dictionaries'
 
 /**
- * Lista canônica de idiomas suportados
- * (single source of truth)
+ * Idiomas suportados (single source of truth)
  */
 export const locales = ['pt', 'en', 'es'] as const
-
 export type Locale = (typeof locales)[number]
 
 /**
- * Loaders de dicionário por idioma
+ * Dicionários já validados em build
  */
-const dictionaries: Record<Locale, () => Promise<Record<string, any>>> = {
-  pt: async () => (await import('@/dictionaries/pt.json')).default,
-  en: async () => (await import('@/dictionaries/en.json')).default,
-  es: async () => (await import('@/dictionaries/es.json')).default,
+const dictionaries: Record<Locale, Dictionary> = {
+  pt: ptDictionary,
+  en: enDictionary,
+  es: esDictionary,
 }
 
 /**
- * Type guard seguro para Locale
+ * Type guard seguro
  */
 export const isLocale = (value: unknown): value is Locale => {
   return typeof value === 'string' && locales.includes(value as Locale)
 }
 
 /**
- * Normaliza o locale recebido (rota, middleware, params)
+ * Normaliza locale vindo da rota
  */
 export const getSafeLocale = (value?: string | null): Locale => {
   return isLocale(value) ? value : 'pt'
 }
 
 /**
- * Carrega o dicionário de forma segura.
- * Sempre retorna um dicionário válido para evitar crash em build.
+ * Retorna dicionário tipado e seguro
+ * Nunca retorna undefined
  */
-export const getDictionary = async (
-  locale?: string | null
-): Promise<Record<string, any>> => {
+export const getDictionary = (locale?: string | null): Dictionary => {
   const safeLocale = getSafeLocale(locale)
-
-  try {
-    return await dictionaries[safeLocale]()
-  } catch (error) {
-    console.error(
-      `[i18n] Falha ao carregar dicionário (${safeLocale}). Fallback para PT.`,
-      error
-    )
-
-    return dictionaries.pt()
-  }
+  return dictionaries[safeLocale]
 }
