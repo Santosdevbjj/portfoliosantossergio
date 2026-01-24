@@ -22,11 +22,20 @@ interface PageProps {
 
 type SupportedLangs = 'pt' | 'en' | 'es';
 
-/** Forma correta do dicionário para tipagem */
+/** Tipagem segura do dicionário */
 interface Dictionary {
   role: string;
   headline: string;
   [key: string]: any;
+}
+
+/** Normaliza o dicionário garantindo role e headline */
+function normalizeDictionary(d: any): Dictionary {
+  return {
+    role: d?.role || 'Data Specialist',
+    headline: d?.headline || 'Especialista em Dados e Engenharia de Sistemas.',
+    ...d
+  };
 }
 
 /** Metadata SEO dinâmico multilíngue */
@@ -34,13 +43,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { lang } = await params;
   const currentLang = (['pt', 'en', 'es'].includes(lang) ? lang : 'pt') as SupportedLangs;
 
-  const dict: Dictionary = await getDictionary(currentLang) as Dictionary;
+  const dict = normalizeDictionary(await getDictionary(currentLang));
 
   const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
 
   return {
-    title: `Sérgio Santos | ${dict.role || 'Data Specialist'}`,
-    description: dict.headline || 'Especialista em Dados e Engenharia de Sistemas.',
+    title: `Sérgio Santos | ${dict.role}`,
+    description: dict.headline,
     alternates: {
       canonical: `${baseUrl}/${currentLang}`,
       languages: {
@@ -51,8 +60,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
     openGraph: {
-      title: `Sérgio Santos | ${dict.role || 'Data Specialist'}`,
-      description: dict.headline || 'Especialista em Dados e Engenharia de Sistemas.',
+      title: `Sérgio Santos | ${dict.role}`,
+      description: dict.headline,
       url: `${baseUrl}/${currentLang}`,
       siteName: 'Sérgio Santos Portfolio',
       locale: currentLang === 'pt' ? 'pt_BR' : currentLang === 'es' ? 'es_ES' : 'en_US',
@@ -70,10 +79,12 @@ export default async function Page({ params }: PageProps) {
   const currentLang = lang as SupportedLangs;
 
   // Busca paralela para máxima performance
-  const [dict, allProjects] = await Promise.all([
-    getDictionary(currentLang) as Promise<Dictionary>, // ✅ Tipagem explícita
+  const [dictRaw, allProjects] = await Promise.all([
+    getDictionary(currentLang),
     getGitHubProjects(currentLang),
   ]);
+
+  const dict = normalizeDictionary(dictRaw);
 
   return (
     <PageWrapper>
