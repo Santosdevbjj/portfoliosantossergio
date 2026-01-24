@@ -2,31 +2,35 @@
 const nextConfig = {
   reactStrictMode: true, // Modo estrito React para desenvolvimento seguro
   poweredByHeader: false, // Remove o cabeçalho X-Powered-By
+
   typescript: {
-    ignoreBuildErrors: false // Não ignora erros de build TS
+    ignoreBuildErrors: false, // Não ignora erros de build TS
   },
+
   typedRoutes: true, // Suporte a rotas tipadas (Next 16)
+
   compiler: {
     removeConsole:
       process.env.NODE_ENV === "production"
         ? { exclude: ["error", "warn"] } // Remove logs, mas mantém erros/warns críticos
-        : false
+        : false,
   },
+
   images: {
     formats: ["image/avif", "image/webp"],
+    deviceSizes: [450, 640, 750, 828, 1080, 1200, 1920],
+    minimumCacheTTL: 3600, // 1 hora
     remotePatterns: [
       { protocol: "https", hostname: "*.githubusercontent.com", pathname: "/**" },
       { protocol: "https", hostname: "raw.githubusercontent.com", pathname: "/**" },
-      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" }
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
     ],
-    deviceSizes: [450, 640, 750, 828, 1080, 1200, 1920],
-    minimumCacheTTL: 3600 // 1 hora
   },
+
   experimental: {
-    optimizePackageImports: ["lucide-react", "clsx", "tailwind-merge"] // Otimiza bundles
-    // serverSourceMaps removido
+    optimizePackageImports: ["lucide-react", "clsx", "tailwind-merge"], // Otimiza bundles
   },
-  // i18n removido do App Router; se precisar, use roteamento manual via layouts ou middleware
+
   async headers() {
     return [
       {
@@ -38,12 +42,21 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-          { key: "Content-Security-Policy", value: "default-src 'self'; img-src 'self' data: https:; script-src 'self'; style-src 'self' 'unsafe-inline'" }
-        ]
-      }
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self';",
+              "img-src 'self' data: https:;",
+              "script-src 'self';",
+              "style-src 'self' 'unsafe-inline';",
+            ].join(" "),
+          },
+        ],
+      },
     ];
-  }
-  // swcMinify removido; Turbopack já minifica automaticamente
+  },
+
+  // SWC Minify removido pois Turbopack já faz minificação automática
 };
 
 export default nextConfig;
