@@ -7,9 +7,10 @@ import { Moon, Sun, Globe } from 'lucide-react';
 
 import { useTheme } from '@/hooks/useTheme';
 import { i18n, type Locale, localeMetadata } from '@/i18n-config';
+import { LOCALE_COOKIE, LOCALE_COOKIE_OPTIONS } from '@/lib/locale-cookie';
 
 /* -------------------------------------------------------------------------- */
-/* CONTENT                                                                    */
+/* INTERNAL CONTENT                                                            */
 /* -------------------------------------------------------------------------- */
 
 function LanguageSwitcherContent() {
@@ -25,23 +26,23 @@ function LanguageSwitcherContent() {
 
   /* ------------------------------ Helpers -------------------------------- */
 
-  const handleLocaleChange = (lang: Locale) => {
-    document.cookie = `NEXT_LOCALE=${lang};path=/;max-age=31536000;SameSite=Lax`;
-  };
+  function writeLocaleCookie(locale: Locale) {
+    document.cookie = `${LOCALE_COOKIE}=${locale}; path=${LOCALE_COOKIE_OPTIONS.path}; max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}`;
+  }
 
-  const getNewPath = (lang: Locale): string => {
-    if (!pathname) return `/${lang}`;
+  function getNewPath(locale: Locale): string {
+    if (!pathname) return `/${locale}`;
 
     const segments = pathname.split('/');
     const hasLocale = i18n.locales.includes(segments[1] as Locale);
 
     const newSegments = [...segments];
-    if (hasLocale) newSegments[1] = lang;
-    else newSegments.splice(1, 0, lang);
+    if (hasLocale) newSegments[1] = locale;
+    else newSegments.splice(1, 0, locale);
 
     const params = searchParams?.toString();
     return `${newSegments.join('/')}${params ? `?${params}` : ''}`;
-  };
+  }
 
   /* ----------------------------- Labels ---------------------------------- */
 
@@ -57,6 +58,8 @@ function LanguageSwitcherContent() {
       es: 'Activar modo claro',
     },
   };
+
+  /* ------------------------------ Skeleton -------------------------------- */
 
   if (!mounted) {
     return (
@@ -131,7 +134,7 @@ function LanguageSwitcherContent() {
               href={getNewPath(locale)}
               hrefLang={locale}
               rel="alternate"
-              onClick={() => handleLocaleChange(locale)}
+              onClick={() => writeLocaleCookie(locale)}
               aria-label={meta.ariaLabel}
               aria-current={isActive ? 'page' : undefined}
               className={`
@@ -171,7 +174,7 @@ function LanguageSwitcherContent() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* EXPORT (Suspense wrapper)                                                  */
+/* EXPORT (Suspense Wrapper)                                                   */
 /* -------------------------------------------------------------------------- */
 
 export function LanguageSwitcher() {
