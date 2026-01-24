@@ -44,21 +44,28 @@ export default function NotFound() {
   const t = content[lang]
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center px-6 relative overflow-hidden transition-colors duration-500">
-      
-      {/* Camada de Fundo - Malha de Dados (Data Mesh) */}
+    <div
+      role="alert"
+      aria-live="assertive"
+      className="min-h-screen bg-slate-50 dark:bg-[#020617] flex items-center justify-center px-6 relative overflow-hidden transition-colors duration-500"
+    >
+      {/* Camada de Fundo - Malha de Dados */}
       <div 
         className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06] pointer-events-none" 
-        style={{ backgroundImage: 'radial-gradient(#3b82f6 1px, transparent 1px)', backgroundSize: '32px 32px' }} 
+        style={{ backgroundImage: 'radial-gradient(#3b82f6 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+        aria-hidden="true"
       />
       
       {/* Brilho Atmosférico */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] md:w-[600px] h-[320px] md:h-[600px] bg-blue-500/10 dark:bg-blue-600/5 rounded-full blur-[80px] md:blur-[120px] pointer-events-none" />
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] md:w-[600px] h-[320px] md:h-[600px] bg-blue-500/10 dark:bg-blue-600/5 rounded-full blur-[80px] md:blur-[120px] pointer-events-none"
+        aria-hidden="true"
+      />
       
       <div className="max-w-xl w-full text-center relative z-10 animate-in fade-in zoom-in duration-700">
         
         {/* Visual de Busca e Auditoria */}
-        <div className="relative inline-flex p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] mb-10 text-blue-600 dark:text-blue-400 shadow-2xl transition-transform hover:scale-105 group">
+        <div className="relative inline-flex p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] mb-10 text-blue-600 dark:text-blue-400 shadow-2xl transition-transform hover:scale-105 group" aria-hidden="true">
           <Search size={54} strokeWidth={1.2} className="relative z-10 group-hover:rotate-12 transition-transform duration-500" />
           
           {/* Efeito de Scan Line Animado */}
@@ -75,7 +82,7 @@ export default function NotFound() {
           {t.message}
         </p>
 
-        {/* Grupo de Ações - Totalmente Adaptável */}
+        {/* Grupo de Ações - Responsivo */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <button
             onClick={() => window.history.back()}
@@ -94,7 +101,7 @@ export default function NotFound() {
           </Link>
         </div>
 
-        {/* Rodapé de Terminal Técnico */}
+        {/* Rodapé Técnico */}
         <div className="mt-16 pt-8 border-t border-slate-200/50 dark:border-slate-800/50">
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-slate-100 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 backdrop-blur-sm">
             <Terminal size={14} className="text-blue-500" />
