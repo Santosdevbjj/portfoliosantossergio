@@ -26,7 +26,7 @@
   "prettier.useEditorConfig": true,
 
   // ======================================================
-  // Tailwind CSS DX
+  // Tailwind CSS DX e className recognition
   // ======================================================
   "editor.quickSuggestions": {
     "strings": true
@@ -39,7 +39,7 @@
   ],
 
   // ======================================================
-  // Controle por Linguagem
+  // Controle por Linguagem (overrides específicos)
   // ======================================================
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -61,7 +61,7 @@
   },
 
   // ======================================================
-  // Arquivos Sensíveis (não formatar automaticamente)
+  // Arquivos sensíveis (não formatar automaticamente)
   // ======================================================
   "[env]": {
     "editor.formatOnSave": false
@@ -77,9 +77,23 @@
   },
 
   // ======================================================
-  // Qualidade de Vida
+  // Qualidade de Vida / padronização de arquivos
   // ======================================================
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
-  "files.insertFinalNewline": true
+  "files.insertFinalNewline": true,
+
+  // ======================================================
+  // Integração TypeScript + Next.js
+  // ======================================================
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.format.enable": true,
+  "typescript.suggest.completeFunctionCalls": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  // ======================================================
+  // Integração React
+  // ======================================================
+  "javascript.suggest.autoImports": true,
+  "typescript.suggest.autoImports": true
 }
