@@ -1,125 +1,109 @@
 /**
- * TIPO CANÔNICO DO DICIONÁRIO
- * 
- * Qualquer JSON de idioma (pt/en/es) DEVE obedecer a esta estrutura.
- * Se faltar ou sobrar chave → erro de build.
+ * Dictionary — Contrato único de i18n do projeto
+ *
+ * Este arquivo define a estrutura exata que TODOS os
+ * arquivos JSON de idioma DEVEM seguir.
+ *
+ * Qualquer divergência será erro de TypeScript em build-time.
  */
 
 export interface Dictionary {
+  /**
+   * Textos globais e reutilizáveis
+   */
   common: {
-    language: string
-    contact: string
-    viewProject: string
-    liveDemo: string
-    repoTitle: string
-    portfolioTitle: string
-    governance: string
-    backToTop: string
-
-    menu_aria: string
-    close_aria: string
-    scroll_top_aria: string
-
-    loading: string
-    error: string
-    close: string
-
-    articlesTitle: string
-    readMore: string
-
-    cvButton: string
-    cvLink: string
+    navigation: string
+    openMenu: string
+    closeMenu: string
+    role: string
+    footer: string
   }
 
+  /**
+   * Navbar / Header
+   */
   nav: {
     about: string
     experience: string
     articles: string
     projects: string
     contact: string
-    changeLang: string
-
-    theme: {
-      light: string
-      dark: string
-      system: string
-    }
   }
 
+  /**
+   * Seção Hero / Home
+   */
   hero: {
-    badge: string
-    title: string
-    titleAccent: string
-    description: string
-    cta_primary: string
-    cta_secondary: string
-  }
-
-  about: {
-    title: string
-    headline: string
-    bio: string
-
-    sections: {
-      highlights: {
-        title: string
-        items: {
-          label: string
-          description: string
-        }[]
-      }
-
-      metrics: {
-        title: string
-        subtitle: string
-        availabilityValue: string
-        availabilityLabel: string
-        automationValue: string
-        automationLabel: string
-      }
-
-      stack: {
-        title: string
-        items: {
-          label: string
-          description: string
-        }[]
-      }
-    }
-  }
-
-  articles: {
     title: string
     subtitle: string
-    loading: string
-    comingSoon: string
-    followPrompt: string
-    badge: string
+    description: string
+    ctaPrimary: string
+    ctaSecondary?: string
+  }
 
-    featured: {
-      title: string
+  /**
+   * Seção Sobre
+   */
+  about: {
+    title: string
+    description: string
+    highlights: string[]
+  }
+
+  /**
+   * Experiência profissional
+   */
+  experience: {
+    title: string
+    items: Array<{
+      company: string
+      role: string
+      period: string
       description: string
-      date: string
-      rank: string
-      link: string
+    }>
+  }
+
+  /**
+   * Projetos
+   */
+  projects: {
+    title: string
+    featured: string
+    viewAll: string
+    categories: {
+      data: string
+      backend: string
+      frontend: string
+      devops: string
+      security: string
     }
   }
 
-  portfolio: {
+  /**
+   * Artigos / Conteúdo
+   */
+  articles: {
     title: string
+    readMore: string
+    publishedAt: string
+  }
+
+  /**
+   * Contato
+   */
+  contact: {
+    title: string
+    subtitle: string
+    emailLabel: string
+    cta: string
+  }
+
+  /**
+   * SEO (por página ou global)
+   */
+  seo: {
+    siteName: string
     description: string
-    all: string
-    mainCaseLabel: string
-    resultsLabel: string
-
-    projectLabels: {
-      problem: string
-      solution: string
-      impact: string
-    }
-
-    categories: {
-      [key: string]: string
-    }
+    keywords: string[]
   }
 }
