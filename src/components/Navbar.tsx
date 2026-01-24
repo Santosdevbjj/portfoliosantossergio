@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Menu, X, Layers, ChevronRight, Globe } from 'lucide-react'
+import { Menu, X, Layers, ChevronRight } from 'lucide-react'
 
 import type { Locale } from '@/i18n-config'
 import type { Dictionary } from '@/types/Dictionary'
@@ -12,6 +12,8 @@ import {
   NAV_HASH_MAP,
   NavSection,
 } from '@/domain/navigation'
+
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 /* -------------------------------------------------------------------------- */
 /* TYPES                                                                      */
@@ -32,7 +34,6 @@ export function Navbar({ lang, dict }: NavbarProps) {
   const [activeSection, setActiveSection] = useState<NavSection | null>(null)
 
   /* ------------------------------ Scroll UI ------------------------------ */
-
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 48)
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -40,7 +41,6 @@ export function Navbar({ lang, dict }: NavbarProps) {
   }, [])
 
   /* ------------------------------ ScrollSpy ------------------------------ */
-
   useEffect(() => {
     const observers: IntersectionObserver[] = []
 
@@ -50,12 +50,10 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
       const observer = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) {
-            setActiveSection(section)
-          }
+          if (entry.isIntersecting) setActiveSection(section)
         },
         {
-          rootMargin: '-40% 0px -50% 0px',
+          rootMargin: '-45% 0px -45% 0px',
           threshold: 0.1,
         }
       )
@@ -68,7 +66,6 @@ export function Navbar({ lang, dict }: NavbarProps) {
   }, [])
 
   /* ------------------------------ UX Guards ------------------------------ */
-
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? 'hidden' : ''
     return () => {
@@ -77,7 +74,6 @@ export function Navbar({ lang, dict }: NavbarProps) {
   }, [isMobileMenuOpen])
 
   /* ------------------------------ DEV Guard ------------------------------ */
-
   if (process.env.NODE_ENV !== 'production') {
     for (const section of NAV_SECTIONS) {
       if (!dict.nav[section]) {
@@ -87,15 +83,12 @@ export function Navbar({ lang, dict }: NavbarProps) {
   }
 
   /* ------------------------------ Derived -------------------------------- */
-
   const navItems = NAV_SECTIONS.map((section) => ({
     key: section,
     href: `/${lang}/${NAV_HASH_MAP[section]}`,
     label: dict.nav[section],
     active: activeSection === section,
   }))
-
-  const languages: Locale[] = ['pt', 'en', 'es']
 
   /* ---------------------------------------------------------------------- */
 
@@ -108,7 +101,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
       }`}
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-10 flex items-center justify-between">
-        {/* LOGO */}
+        {/* LOGO / BRAND */}
         <Link href={`/${lang}`} className="flex items-center gap-3 z-[120]">
           <div className="bg-blue-600 p-2 rounded-xl text-white shadow-lg">
             <Layers className="w-5 h-5 md:w-6 md:h-6" />
@@ -144,20 +137,9 @@ export function Navbar({ lang, dict }: NavbarProps) {
           ))}
         </nav>
 
-        {/* LANGUAGE SWITCH */}
-        <div className="hidden md:flex items-center gap-2">
-          <Globe className="w-4 h-4 text-slate-400" />
-          {languages.map((l) => (
-            <Link
-              key={l}
-              href={`/${l}`}
-              className={`text-xs font-bold uppercase ${
-                l === lang ? 'text-blue-600' : 'text-slate-400'
-              }`}
-            >
-              {l}
-            </Link>
-          ))}
+        {/* RIGHT SIDE (LANGUAGE SWITCHER) */}
+        <div className="hidden md:flex items-center gap-4">
+          <LanguageSwitcher currentLang={lang} />
         </div>
 
         {/* MOBILE TOGGLE */}
@@ -172,7 +154,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
       {/* MOBILE MENU */}
       <div
-        className={`fixed inset-0 z-[110] md:hidden bg-white dark:bg-slate-950 p-8 transition-all ${
+        className={`fixed inset-0 z-[110] md:hidden bg-white dark:bg-slate-950 p-8 transition-all duration-300 ${
           isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -182,7 +164,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
               key={item.key}
               href={item.href}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex justify-between p-5 rounded-xl bg-slate-50 dark:bg-slate-900 font-black"
+              className="flex justify-between items-center p-5 rounded-xl bg-slate-50 dark:bg-slate-900 font-black"
             >
               {item.label}
               <ChevronRight className="text-blue-600" />
@@ -190,18 +172,8 @@ export function Navbar({ lang, dict }: NavbarProps) {
           ))}
         </nav>
 
-        <div className="mt-10 flex justify-center gap-4">
-          {languages.map((l) => (
-            <Link
-              key={l}
-              href={`/${l}`}
-              className={`font-bold uppercase ${
-                l === lang ? 'text-blue-600' : 'text-slate-400'
-              }`}
-            >
-              {l}
-            </Link>
-          ))}
+        <div className="mt-10 flex justify-center">
+          <LanguageSwitcher currentLang={lang} />
         </div>
       </div>
     </header>
