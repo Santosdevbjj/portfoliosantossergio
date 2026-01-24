@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Menu, X, Layers, ChevronRight } from 'lucide-react';
 
 import type { Locale } from '@/i18n-config';
@@ -56,7 +55,6 @@ interface NavbarProps {
 export function Navbar({ lang, dict }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
 
   /* ------------------------------ Scroll UI ------------------------------ */
 
@@ -73,12 +71,17 @@ export function Navbar({ lang, dict }: NavbarProps) {
   /* ------------------------------ Guards --------------------------------- */
 
   /**
-   * Hard guard — se faltar chave crítica, falha em DEV
-   * Isso evita erro silencioso em produção
+   * Hard guard — falha em DEV se o dicionário estiver incompleto
    */
   if (process.env.NODE_ENV !== 'production') {
     if (!dict.nav || !dict.common) {
       throw new Error('[Navbar] Dicionário incompleto: nav ou common ausente');
+    }
+
+    for (const section of NAV_SECTIONS) {
+      if (!dict.nav[section]) {
+        throw new Error(`[Navbar] Chave nav.${section} ausente no dicionário`);
+      }
     }
   }
 
@@ -178,7 +181,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
         <footer className="mt-auto py-10 border-t border-slate-100 dark:border-slate-900 text-center">
           <p className="text-xs font-medium text-slate-400">
-            © 2026 • {dict.common.footer}
+            {dict.common.footer}
           </p>
         </footer>
       </div>
