@@ -1,139 +1,79 @@
 {
   "common": {
-    "language": "Español",
-    "navigation": "Navegación principal",
+    "navigation": "Navegación",
     "openMenu": "Abrir menú",
     "closeMenu": "Cerrar menú",
-    "contact": "Contacto",
-    "viewProject": "GitHub",
-    "liveDemo": "Demo en Vivo",
-    "repoTitle": "Ecosistema de Proyectos",
-    "portfolioTitle": "Soluciones y Datos",
-    "governance": "Rigor Técnico",
-    "backToTop": "Inicio",
-    "menu_aria": "Abrir menú de navegación",
-    "close_aria": "Cerrar",
-    "scroll_top_aria": "Volver al inicio",
-    "loading": "Sincronizando datos...",
-    "error": "Ocurrió una inestabilidad en el sistema",
-    "close": "Cerrar",
-    "articlesTitle": "Artículo Premiado",
-    "readMore": "Leer Contenido Completo",
     "role": "Ingeniero de Datos y Analista Senior",
-    "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
-    "cvButton": "Descargar CV (Español)",
-    "cvLink": "/cv-sergio-santos-es.pdf"
+    "footer": "© 2026 Sérgio Santos. Todos los derechos reservados."
   },
 
   "nav": {
-    "about": "Sobre",
-    "experience": "Trayectoria",
+    "about": "Sobre mí",
+    "experience": "Experiencia",
     "articles": "Artículos",
-    "projects": "Portafolio",
-    "contact": "Contacto",
-    "changeLang": "Cambiar Idioma",
-    "theme": {
-      "light": "Modo Claro",
-      "dark": "Modo Oscuro",
-      "system": "Sistema"
-    }
+    "projects": "Proyectos",
+    "contact": "Contacto"
   },
 
   "hero": {
-    "badge": "Experto en Sistemas de Misión Crítica",
     "title": "Transformando datos complejos en",
-    "titleAccent": "Activos Estratégicos",
-    "description": "Ingeniero de Datos y Analista Senior con más de 20 años de experiencia en el sector bancario. Especializado en Ciencia de Datos, mitigación de riesgos y soluciones analíticas desarrolladas con el rigor de sistemas de misión crítica.",
-    "cta_primary": "Ver Proyectos",
-    "cta_secondary": "LinkedIn"
+    "subtitle": "Activos Estratégicos",
+    "description": "Ingeniero de Datos y Analista Senior con más de 20 años de experiencia en sistemas críticos.",
+    "ctaPrimary": "Ver Proyectos",
+    "ctaSecondary": "LinkedIn"
   },
 
   "about": {
     "title": "Trayectoria Profesional",
-    "headline": "Convergencia entre Gobernanza Bancaria e Inteligencia de Datos",
-    "bio": "Especialista senior con amplia experiencia en el sector bancario, actuando en entornos donde la seguridad, la trazabilidad y la alta disponibilidad son innegociables. Integra gobernanza de TI, ingeniería de datos e inteligencia artificial para resolver problemas financieros reales con impacto medible.",
-    "sections": {
-      "highlights": {
-        "title": "Diferenciales",
-        "items": [
-          {
-            "label": "Confiabilidad y Misión Crítica",
-            "description": "Gestión de sistemas con tolerancia cero a fallos, alineados con normativas de cumplimiento, protección de datos y gobernanza corporativa."
-          },
-          {
-            "label": "Impacto Medible",
-            "description": "Automatización de procesos que generó un ahorro directo aproximado de 2.920 horas por año."
-          },
-          {
-            "label": "Inteligencia Analítica Avanzada",
-            "description": "Uso de análisis de grafos, modelos predictivos e ingeniería de datos para detección de anomalías y soporte a la toma de decisiones estratégicas."
-          }
-        ]
-      },
-      "metrics": {
-        "title": "Impacto Operativo",
-        "subtitle": "KPIs y Resultados",
-        "availabilityValue": "99.5%",
-        "availabilityLabel": "Disponibilidad de Sistemas",
-        "automationValue": "2.9k",
-        "automationLabel": "Horas Ahorradas por Año"
-      },
-      "stack": {
-        "title": "Dominio Técnico",
-        "items": [
-          {
-            "label": "Data Science",
-            "description": "Python, SQL de Alto Rendimiento, Machine Learning, Análisis de Grafos"
-          },
-          {
-            "label": "Cloud y Big Data",
-            "description": "Azure Databricks, PySpark, Data Factory"
-          },
-          {
-            "label": "Gobernanza y Analítica",
-            "description": "Power BI, IA Generativa, Gobernanza de Datos"
-          }
-        ]
+    "description": "Experiencia consolidada en entornos bancarios críticos, integrando gobernanza y datos.",
+    "highlights": [
+      "Sistemas de misión crítica",
+      "Automatización con impacto medible",
+      "Ingeniería de datos aplicada"
+    ]
+  },
+
+  "experience": {
+    "title": "Experiencia Profesional",
+    "items": [
+      {
+        "company": "Sector Bancario",
+        "role": "Analista de Sistemas Senior",
+        "period": "2000 – Presente",
+        "description": "Desarrollo y gobernanza de sistemas financieros críticos."
       }
+    ]
+  },
+
+  "projects": {
+    "title": "Proyectos",
+    "featured": "Proyecto Destacado",
+    "viewAll": "Ver Todos",
+    "categories": {
+      "data": "Ciencia de Datos",
+      "backend": "Back-end",
+      "frontend": "Front-end",
+      "devops": "DevOps",
+      "security": "Seguridad"
     }
   },
 
   "articles": {
-    "title": "Artículos e Insights",
-    "subtitle": "Conocimiento aplicado sobre Tecnología, Datos y Gobernanza",
-    "loading": "Cargando biblioteca...",
-    "comingSoon": "Nuevos artículos técnicos actualmente en revisión.",
-    "followPrompt": "Siga las publicaciones en Medium y LinkedIn.",
-    "badge": "Ganador de la Competencia DIO",
-    "featured": {
-      "title": "Low-Code en la Salud: Agilidad vs Cumplimiento",
-      "description": "Análisis premiado sobre el equilibrio entre la velocidad de desarrollo y los estrictos requisitos regulatorios en sistemas de salud.",
-      "date": "Ene 2026",
-      "rank": "1er Lugar",
-      "link": "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad"
-    }
+    "title": "Artículos e Ideas",
+    "readMore": "Leer más",
+    "publishedAt": "Publicado en"
   },
 
-  "portfolio": {
-    "title": "Portafolio",
-    "description": "Soluciones analíticas enfocadas en resolver problemas complejos y generar valor económico.",
-    "all": "Todos",
-    "mainCaseLabel": "Proyecto Destacado",
-    "resultsLabel": "Resultado Generado",
-    "projectLabels": {
-      "problem": "Desafío de Negocio",
-      "solution": "Solución Técnica",
-      "impact": "Impacto Económico"
-    },
-    "categories": {
-      "data-science": "Ciencia de Datos",
-      "databricks": "Azure Databricks",
-      "neo4j": "Neo4J y Grafos",
-      "power-bi": "Analítica",
-      "database": "Ingeniería de Datos",
-      "python": "Automatización",
-      "machine-learning": "Machine Learning",
-      "cybersecurity": "Seguridad y Cumplimiento"
-    }
+  "contact": {
+    "title": "Contacto",
+    "subtitle": "Hablemos de datos y sistemas críticos",
+    "emailLabel": "Email",
+    "cta": "Contactar"
+  },
+
+  "seo": {
+    "siteName": "Sérgio Santos",
+    "description": "Ingeniería de Datos, Ciencia de Datos y Sistemas Críticos.",
+    "keywords": ["ingeniería de datos", "ciencia de datos", "gobernanza", "sistemas críticos"]
   }
 }
