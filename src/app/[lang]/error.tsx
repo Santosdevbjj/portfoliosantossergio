@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
 /**
- * ERROR BOUNDARY - Otimizado para Next.js 15
- * Implementa a interface de recuperação com suporte multilingue via Pathname.
+ * ERROR BOUNDARY - Next.js 15
+ * Interface de recuperação com suporte PT/EN/ES
  */
 export default function Error({
   error,
@@ -18,7 +18,7 @@ export default function Error({
 }) {
   const pathname = usePathname()
   
-  // Extração resiliente do idioma (Fallback para 'pt' se falhar)
+  // Extração resiliente do idioma (fallback 'pt')
   const segments = pathname?.split('/') || []
   const detectedLang = segments[1] as 'pt' | 'en' | 'es'
   const lang = ['pt', 'en', 'es'].includes(detectedLang) ? detectedLang : 'pt'
@@ -50,7 +50,6 @@ export default function Error({
   const t = content[lang]
 
   useEffect(() => {
-    // Registro do erro para auditoria (preparado para telemetria externa)
     console.error('Critical Runtime Error:', {
       message: error.message,
       digest: error.digest,
@@ -59,15 +58,19 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50 dark:bg-[#020617] transition-colors duration-500 overflow-hidden relative">
-      
-      {/* Background Decorativo - Grid de Monitoramento */}
+    <div
+      role="alert"
+      aria-live="assertive"
+      className="min-h-screen w-full flex items-center justify-center p-4 bg-slate-50 dark:bg-[#020617] transition-colors duration-500 overflow-hidden relative"
+    >
+      {/* Background Decorativo */}
       <div 
         className="absolute inset-0 opacity-[0.03] dark:opacity-[0.07] pointer-events-none" 
         style={{ 
           backgroundImage: 'linear-gradient(#ef4444 1px, transparent 1px), linear-gradient(90deg, #ef4444 1px, transparent 1px)', 
           backgroundSize: '32px 32px' 
         }} 
+        aria-hidden="true"
       />
 
       <div className="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 md:p-12 rounded-[2.5rem] shadow-2xl text-center space-y-8 relative z-10 animate-in fade-in zoom-in duration-500">
@@ -81,7 +84,7 @@ export default function Error({
         </div>
 
         {/* Visual de Alerta Animado */}
-        <div className="relative mx-auto w-20 h-20 md:w-24 md:h-24 flex items-center justify-center">
+        <div className="relative mx-auto w-20 h-20 md:w-24 md:h-24 flex items-center justify-center" aria-hidden="true">
           <div className="absolute inset-0 bg-red-500/10 rounded-full animate-ping duration-[3000ms]" />
           <div className="absolute inset-0 bg-red-500/5 rounded-full animate-pulse" />
           <AlertCircle size={64} className="text-red-500 relative z-10" strokeWidth={1.5} />
@@ -97,10 +100,10 @@ export default function Error({
         </div>
 
         {/* Grupo de Ações Responsivas */}
-        <div className="flex flex-col gap-3 pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
             onClick={() => reset()}
-            className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 active:scale-[0.98] transition-all shadow-lg shadow-blue-500/20 text-lg"
+            className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 active:scale-[0.98] transition-all shadow-lg shadow-blue-500/20 text-lg"
           >
             <RotateCcw size={20} />
             {t.btnRetry}
@@ -108,14 +111,14 @@ export default function Error({
 
           <Link
             href={`/${lang}`}
-            className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-slate-100 dark:bg-slate-800/50 text-slate-700 dark:text-slate-200 font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-transparent hover:border-slate-300 dark:hover:border-slate-600"
+            className="flex-1 flex items-center justify-center gap-3 px-8 py-4 bg-slate-100 dark:bg-slate-800/50 text-slate-700 dark:text-slate-200 font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-transparent hover:border-slate-300 dark:hover:border-slate-600"
           >
             <Home size={20} />
             {t.btnHome}
           </Link>
         </div>
 
-        {/* ID de Diagnóstico para Suporte */}
+        {/* ID de Diagnóstico */}
         {error.digest && (
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
             <code className="text-[9px] text-slate-400 dark:text-slate-500 font-mono break-all">
