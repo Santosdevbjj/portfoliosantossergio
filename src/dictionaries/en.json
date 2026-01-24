@@ -1,139 +1,79 @@
 {
   "common": {
-    "language": "English",
-    "navigation": "Main navigation",
+    "navigation": "Navigation",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "contact": "Contact",
-    "viewProject": "GitHub",
-    "liveDemo": "Live Demo",
-    "repoTitle": "Project Ecosystem",
-    "portfolioTitle": "Solutions & Data",
-    "governance": "Technical Rigor",
-    "backToTop": "Top",
-    "menu_aria": "Open navigation menu",
-    "close_aria": "Close",
-    "scroll_top_aria": "Back to top",
-    "loading": "Syncing data...",
-    "error": "A system instability occurred",
-    "close": "Close",
-    "articlesTitle": "Award-Winning Article",
-    "readMore": "Read Full Content",
-    "role": "Data Engineer & Senior Analyst",
-    "footer": "© 2026 Sérgio Santos. All rights reserved.",
-    "cvButton": "Download CV (English)",
-    "cvLink": "/cv-sergio-santos-en.pdf"
+    "role": "Senior Data Engineer & Analyst",
+    "footer": "© 2026 Sérgio Santos. All rights reserved."
   },
 
   "nav": {
     "about": "About",
-    "experience": "Career",
+    "experience": "Experience",
     "articles": "Articles",
-    "projects": "Portfolio",
-    "contact": "Contact",
-    "changeLang": "Change Language",
-    "theme": {
-      "light": "Light Mode",
-      "dark": "Dark Mode",
-      "system": "System"
-    }
+    "projects": "Projects",
+    "contact": "Contact"
   },
 
   "hero": {
-    "badge": "Mission-Critical Systems Expert",
     "title": "Transforming complex data into",
-    "titleAccent": "Strategic Assets",
-    "description": "Data Engineer and Senior Analyst with over 20 years of experience in the banking sector. Focused on Data Science, risk mitigation, and analytical solutions built with the rigor required by mission-critical systems.",
-    "cta_primary": "View Projects",
-    "cta_secondary": "LinkedIn"
+    "subtitle": "Strategic Assets",
+    "description": "Senior Data Engineer and Analyst with over 20 years of experience in mission-critical systems and data science.",
+    "ctaPrimary": "View Projects",
+    "ctaSecondary": "LinkedIn"
   },
 
   "about": {
-    "title": "Professional Journey",
-    "headline": "Merging Banking Governance with Data Intelligence",
-    "bio": "Senior specialist with solid experience in the banking sector, operating in environments where security, traceability, and high availability are non-negotiable. Integrates IT governance, data engineering, and artificial intelligence to solve real-world financial problems with measurable impact.",
-    "sections": {
-      "highlights": {
-        "title": "Key Strengths",
-        "items": [
-          {
-            "label": "Reliability & Mission-Critical Systems",
-            "description": "Management of systems with zero tolerance for failure, aligned with compliance, data protection, and corporate governance requirements."
-          },
-          {
-            "label": "Measurable Impact",
-            "description": "Process automation delivering direct savings of approximately 2,920 hours per year."
-          },
-          {
-            "label": "Advanced Analytical Expertise",
-            "description": "Use of graph analytics, predictive models, and data engineering to detect anomalies and support strategic decision-making."
-          }
-        ]
-      },
-      "metrics": {
-        "title": "Operational Impact",
-        "subtitle": "KPIs & Results",
-        "availabilityValue": "99.5%",
-        "availabilityLabel": "System Availability",
-        "automationValue": "2.9k",
-        "automationLabel": "Hours Saved per Year"
-      },
-      "stack": {
-        "title": "Technical Expertise",
-        "items": [
-          {
-            "label": "Data Science",
-            "description": "Python, High-Performance SQL, Machine Learning, Graph Analytics"
-          },
-          {
-            "label": "Cloud & Big Data",
-            "description": "Azure Databricks, PySpark, Data Factory"
-          },
-          {
-            "label": "Governance & Analytics",
-            "description": "Power BI, Generative AI, Data Governance"
-          }
-        ]
+    "title": "Professional Background",
+    "description": "Strong background in critical banking environments, combining governance, data engineering, and AI.",
+    "highlights": [
+      "Mission-critical systems with high availability",
+      "Process automation with measurable impact",
+      "Data engineering for strategic decision-making"
+    ]
+  },
+
+  "experience": {
+    "title": "Professional Experience",
+    "items": [
+      {
+        "company": "Banking Sector",
+        "role": "Senior Systems Analyst",
+        "period": "2000 – Present",
+        "description": "Development and governance of critical financial systems."
       }
+    ]
+  },
+
+  "projects": {
+    "title": "Projects",
+    "featured": "Featured Project",
+    "viewAll": "View All",
+    "categories": {
+      "data": "Data Science",
+      "backend": "Back-end",
+      "frontend": "Front-end",
+      "devops": "DevOps",
+      "security": "Security"
     }
   },
 
   "articles": {
     "title": "Articles & Insights",
-    "subtitle": "Applied knowledge on Technology, Data, and Governance",
-    "loading": "Loading library...",
-    "comingSoon": "New technical articles currently under review.",
-    "followPrompt": "Follow publications on Medium and LinkedIn.",
-    "badge": "DIO Competition Winner",
-    "featured": {
-      "title": "Low-Code in Healthcare: Agility vs Compliance",
-      "description": "Award-winning analysis on balancing development speed with strict regulatory and compliance requirements in healthcare systems.",
-      "date": "Jan 2026",
-      "rank": "1st Place",
-      "link": "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77"
-    }
+    "readMore": "Read more",
+    "publishedAt": "Published at"
   },
 
-  "portfolio": {
-    "title": "Portfolio",
-    "description": "Analytical solutions focused on solving complex problems and generating economic value.",
-    "all": "All",
-    "mainCaseLabel": "Featured Project",
-    "resultsLabel": "Generated Outcome",
-    "projectLabels": {
-      "problem": "Business Challenge",
-      "solution": "Technical Solution",
-      "impact": "Economic Impact"
-    },
-    "categories": {
-      "data-science": "Data Science",
-      "databricks": "Azure Databricks",
-      "neo4j": "Neo4J & Graphs",
-      "power-bi": "Analytics",
-      "database": "Data Engineering",
-      "python": "Automation",
-      "machine-learning": "Machine Learning",
-      "cybersecurity": "Security & Compliance"
-    }
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Let’s talk about data and critical systems",
+    "emailLabel": "Email",
+    "cta": "Get in touch"
+  },
+
+  "seo": {
+    "siteName": "Sérgio Santos",
+    "description": "Data Engineering, Data Science, and Mission-Critical Systems.",
+    "keywords": ["data engineering", "data science", "governance", "critical systems"]
   }
 }
