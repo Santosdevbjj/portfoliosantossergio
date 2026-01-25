@@ -6,12 +6,13 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
   // ======================================================
-  // ESLint (Flat Config)
+  // ESLint (Flat Config - Next.js 16)
   // ======================================================
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "eslint.useFlatConfig": true,
+  "eslint.experimental.useFlatConfig": true,
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -26,20 +27,18 @@
   "prettier.useEditorConfig": true,
 
   // ======================================================
-  // Tailwind CSS DX e className recognition
+  // Tailwind CSS DX
   // ======================================================
   "editor.quickSuggestions": {
     "strings": true
   },
   "tailwindCSS.classAttributes": ["class", "className"],
   "tailwindCSS.experimental.classRegex": [
-    "clsx\\(([^)]*)\\)",
-    "twMerge\\(([^)]*)\\)",
-    "cn\\(([^)]*)\\)"
+    "(clsx|cn|twMerge)\\(([^)]*)\\)"
   ],
 
   // ======================================================
-  // Controle por Linguagem (overrides específicos)
+  // Controle por Linguagem
   // ======================================================
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -63,9 +62,6 @@
   // ======================================================
   // Arquivos sensíveis (não formatar automaticamente)
   // ======================================================
-  "[env]": {
-    "editor.formatOnSave": false
-  },
   "[dotenv]": {
     "editor.formatOnSave": false
   },
@@ -77,22 +73,15 @@
   },
 
   // ======================================================
-  // Qualidade de Vida / padronização de arquivos
-  // ======================================================
-  "files.eol": "\n",
-  "files.trimTrailingWhitespace": true,
-  "files.insertFinalNewline": true,
-
-  // ======================================================
   // Integração TypeScript + Next.js
   // ======================================================
   "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.format.enable": true,
+  "typescript.format.enable": false,
   "typescript.suggest.completeFunctionCalls": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
 
   // ======================================================
-  // Integração React
+  // Integração React / JS
   // ======================================================
   "javascript.suggest.autoImports": true,
   "typescript.suggest.autoImports": true
