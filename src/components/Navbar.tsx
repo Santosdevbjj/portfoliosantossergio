@@ -10,10 +10,11 @@ import type { Dictionary } from '@/types/Dictionary'
 import {
   NAV_SECTIONS,
   NAV_HASH_MAP,
-  NavSection,
+  type NavSection,
 } from '@/domain/navigation'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { useScrollSpy } from '@/hooks/useScrollSpy'
 
 /* -------------------------------------------------------------------------- */
 /* TYPES                                                                      */
@@ -31,39 +32,20 @@ interface NavbarProps {
 export function Navbar({ lang, dict }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState<NavSection | null>(null)
 
   /* ------------------------------ Scroll UI ------------------------------ */
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 48)
+    onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   /* ------------------------------ ScrollSpy ------------------------------ */
-  useEffect(() => {
-    const observers: IntersectionObserver[] = []
-
-    NAV_SECTIONS.forEach((section) => {
-      const el = document.getElementById(section)
-      if (!el) return
-
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveSection(section)
-        },
-        {
-          rootMargin: '-45% 0px -45% 0px',
-          threshold: 0.1,
-        }
-      )
-
-      observer.observe(el)
-      observers.push(observer)
-    })
-
-    return () => observers.forEach((o) => o.disconnect())
-  }, [])
+  const activeSection = useScrollSpy(
+    NAV_SECTIONS,
+    120
+  ) as NavSection | null
 
   /* ------------------------------ UX Guards ------------------------------ */
   useEffect(() => {
@@ -76,7 +58,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
   /* ------------------------------ DEV Guard ------------------------------ */
   if (process.env.NODE_ENV !== 'production') {
     for (const section of NAV_SECTIONS) {
-      if (!dict.nav[section]) {
+      if (!dict.nav?.[section]) {
         throw new Error(`[Navbar] nav.${section} ausente no Dictionary`)
       }
     }
@@ -102,7 +84,11 @@ export function Navbar({ lang, dict }: NavbarProps) {
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-10 flex items-center justify-between">
         {/* LOGO / BRAND */}
-        <Link href={`/${lang}`} className="flex items-center gap-3 z-[120]">
+        <Link
+          href={`/${lang}`}
+          className="flex items-center gap-3 z-[120]"
+          aria-label="Home"
+        >
           <div className="bg-blue-600 p-2 rounded-xl text-white shadow-lg">
             <Layers className="w-5 h-5 md:w-6 md:h-6" />
           </div>
@@ -126,18 +112,18 @@ export function Navbar({ lang, dict }: NavbarProps) {
               className={`relative px-4 py-2 text-sm font-bold transition-colors ${
                 item.active
                   ? 'text-blue-600'
-                  : 'text-slate-600 dark:text-slate-400'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               {item.label}
               {item.active && (
-                <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-blue-600" />
+                <span className="absolute bottom-1 left-4 right-4 h-0.5 bg-blue-600 rounded-full" />
               )}
             </Link>
           ))}
         </nav>
 
-        {/* RIGHT SIDE (LANGUAGE SWITCHER) */}
+        {/* RIGHT SIDE */}
         <div className="hidden md:flex items-center gap-4">
           <LanguageSwitcher currentLang={lang} />
         </div>
@@ -155,7 +141,9 @@ export function Navbar({ lang, dict }: NavbarProps) {
       {/* MOBILE MENU */}
       <div
         className={`fixed inset-0 z-[110] md:hidden bg-white dark:bg-slate-950 p-8 transition-all duration-300 ${
-          isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          isMobileMenuOpen
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 -translate-y-4 pointer-events-none'
         }`}
       >
         <nav className="mt-24 flex flex-col gap-4">
@@ -164,10 +152,14 @@ export function Navbar({ lang, dict }: NavbarProps) {
               key={item.key}
               href={item.href}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex justify-between items-center p-5 rounded-xl bg-slate-50 dark:bg-slate-900 font-black"
+              className={`flex justify-between items-center p-5 rounded-xl font-black transition ${
+                item.active
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-50 dark:bg-slate-900'
+              }`}
             >
               {item.label}
-              <ChevronRight className="text-blue-600" />
+              <ChevronRight />
             </Link>
           ))}
         </nav>
