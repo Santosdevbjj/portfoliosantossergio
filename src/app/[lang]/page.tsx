@@ -17,7 +17,7 @@ import { getGitHubProjects } from '@/lib/github'
 import { i18n, type Locale } from '@/i18n-config'
 
 /** ISR — revalida a cada 1 hora */
-export const revalidate = 3600
+/** export const revalidate = 3600 */
 
 interface PageProps {
   params: Promise<{ lang: Locale }>
