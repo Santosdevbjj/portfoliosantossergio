@@ -39,7 +39,7 @@ trim_trailing_whitespace = false
 
 # ======================================================
 # Desenvolvimento Web Moderno
-# Next.js 16, React 19, TypeScript, CSS, Tailwind, Infra YAML
+# Next.js, React, TypeScript, CSS, Tailwind, Infra YAML
 # ======================================================
 [*.{js,jsx,ts,tsx,cjs,mjs,cts,mts,css,scss,html,yml,yaml,toml}]
 indent_style = space
@@ -62,6 +62,7 @@ trim_trailing_whitespace = false
 
 # ======================================================
 # Shell Scripts (sh, bash, zsh)
+# Escolha consciente: spaces + 4 para legibilidade
 # ======================================================
 [*.{sh,bash,zsh}]
 indent_style = space
@@ -79,30 +80,22 @@ indent_style = tab
 indent_size = 4
 
 # ======================================================
-# Dados brutos e logs (não remover trailing whitespace)
+# Dados brutos e logs (não remover whitespace)
 # ======================================================
 [*.{csv,log}]
 trim_trailing_whitespace = false
 insert_final_newline = false
 
 # ======================================================
-# Lockfiles (manter newline por compatibilidade)
+# Lockfiles (preservar newline final)
 # ======================================================
 [*.lock]
 trim_trailing_whitespace = false
+insert_final_newline = true
 
 # ======================================================
 # Arquivos binários e assets (não modificar)
 # ======================================================
-[*.{png,jpg,jpeg,gif,webp,ico,pdf,woff,woff2}]
+[*.{png,jpg,jpeg,gif,webp,svg,ico,pdf,woff,woff2}]
 insert_final_newline = false
 trim_trailing_whitespace = false
-
-# ======================================================
-# Arquivos de build/config do Next.js
-# ======================================================
-[*.{next.config.mjs,tailwind.config.ts,postcss.config.mjs,eslint.config.mjs,tsconfig.json,.prettierrc.json}]
-indent_style = space
-indent_size = 2
-insert_final_newline = true
-trim_trailing_whitespace = true
