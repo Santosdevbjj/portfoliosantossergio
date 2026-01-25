@@ -1,3 +1,4 @@
+// src/app/[lang]/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import { Inter, Montserrat } from 'next/font/google';
 import '../globals.css';
@@ -6,9 +7,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner';
 import { i18n, type Locale } from '@/i18n-config';
 
-/**
- * FONTES OTIMIZADAS
- */
+/** FONTES OTIMIZADAS */
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
@@ -21,9 +20,7 @@ const montserrat = Montserrat({
   variable: '--font-montserrat',
 });
 
-/**
- * VIEWPORT & PWA
- */
+/** VIEWPORT & PWA */
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -36,9 +33,7 @@ export const viewport: Viewport = {
   ],
 };
 
-/**
- * METADATA DINÂMICO MULTILÍNGUE + MANIFEST POR IDIOMA
- */
+/** METADATA DINÂMICO MULTILÍNGUE + MANIFEST POR IDIOMA */
 export async function generateMetadata({
   params,
 }: {
@@ -51,18 +46,21 @@ export async function generateMetadata({
     process.env.NEXT_PUBLIC_SITE_URL ??
     'https://portfoliosantossergio.vercel.app';
 
-  const content: Record<Locale, { title: string; desc: string }> = {
+  const content: Record<Locale, { title: string; desc: string; jobTitle: string }> = {
     pt: {
       title: 'Sérgio Santos | Especialista em Dados e Sistemas Críticos',
       desc: 'Especialista em Dados com 20+ anos de experiência. Foco em Azure, Python, Governança Operacional e Eficiência Financeira.',
+      jobTitle: 'Especialista em Dados e Sistemas',
     },
     en: {
       title: 'Sérgio Santos | Data & Critical Systems Specialist',
       desc: 'Data Specialist with 20+ years of experience. Focus on Azure, Python, Operational Governance, and Financial Efficiency.',
+      jobTitle: 'Data & Systems Specialist',
     },
     es: {
       title: 'Sérgio Santos | Especialista en Datos y Sistemas Críticos',
       desc: 'Especialista en Datos con 20+ años de experiencia. Enfoque en Azure, Python, Gobernanza Operativa y Eficiencia Financiera.',
+      jobTitle: 'Especialista en Datos y Sistemas',
     },
   };
 
@@ -126,9 +124,7 @@ export async function generateMetadata({
   };
 }
 
-/**
- * ROOT LAYOUT POR IDIOMA
- */
+/** ROOT LAYOUT POR IDIOMA */
 export default function RootLayout({
   children,
   params,
@@ -142,6 +138,40 @@ export default function RootLayout({
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
     'https://portfoliosantossergio.vercel.app';
+
+  /** Schema.org ProfilePage dinâmico */
+  const schemaProfile = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    mainEntity: {
+      '@type': 'Person',
+      name: 'Sérgio Santos',
+      url: siteUrl,
+      jobTitle:
+        currentLang === 'pt'
+          ? 'Especialista em Dados e Sistemas'
+          : currentLang === 'es'
+          ? 'Especialista en Datos y Sistemas'
+          : 'Data & Systems Specialist',
+      sameAs: [
+        'https://www.linkedin.com/in/sergiosantos',
+        'https://github.com/sergiosantos',
+      ],
+      knowsAbout: [
+        'Data Architecture',
+        'Cloud Computing',
+        'Azure',
+        'Python',
+        'Governance',
+        'System Design',
+      ],
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'Professional inquiries',
+        availableLanguage: ['Portuguese', 'English', 'Spanish'],
+      },
+    },
+  };
 
   return (
     <html
@@ -164,38 +194,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Schema.org — ProfilePage + Person */}
+          {/* Schema.org JSON-LD */}
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                '@context': 'https://schema.org',
-                '@type': 'ProfilePage',
-                mainEntity: {
-                  '@type': 'Person',
-                  name: 'Sérgio Santos',
-                  url: siteUrl,
-                  jobTitle: 'Data & Systems Architect',
-                  sameAs: [
-                    'https://www.linkedin.com/in/sergiosantos',
-                    'https://github.com/sergiosantos',
-                  ],
-                  knowsAbout: [
-                    'Data Architecture',
-                    'Cloud Computing',
-                    'Azure',
-                    'Python',
-                    'Governance',
-                    'System Design',
-                  ],
-                  contactPoint: {
-                    '@type': 'ContactPoint',
-                    contactType: 'Professional inquiries',
-                    availableLanguage: ['Portuguese', 'English', 'Spanish'],
-                  },
-                },
-              }),
-            }}
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaProfile) }}
           />
 
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
