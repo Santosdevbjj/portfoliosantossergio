@@ -37,7 +37,6 @@ function detectRegion(request: NextRequest): Region {
 /* LOCALE DETECTION                                                            */
 /* -------------------------------------------------------------------------- */
 function detectLocale(request: NextRequest): string {
-  // 1️⃣ Cookie explícito
   const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value
   if (
     cookieLocale &&
@@ -46,7 +45,6 @@ function detectLocale(request: NextRequest): string {
     return cookieLocale
   }
 
-  // 2️⃣ Accept-Language
   const acceptLanguage = request.headers.get('accept-language')
   if (!acceptLanguage) return i18n.defaultLocale
 
@@ -55,6 +53,41 @@ function detectLocale(request: NextRequest): string {
   }).languages()
 
   return matchLocale(languages, i18n.locales, i18n.defaultLocale)
+}
+
+/* -------------------------------------------------------------------------- */
+/* FEATURE FLAGS (EDGE-SAFE)                                                   */
+/* -------------------------------------------------------------------------- */
+function resolveFeatureFlags(request: NextRequest, region: Region) {
+  const host = request.headers.get('host') ?? ''
+
+  return {
+    'x-feature-blog-v2':
+      host.includes('preview') || region === 'us' ? 'on' : 'off',
+
+    'x-feature-ai-search':
+      region !== 'eu' ? 'on' : 'off',
+
+    'x-feature-beta-ui':
+      host.includes('beta') ? 'on' : 'off',
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* CONSENT MODE V2 (GA4)                                                       */
+/* -------------------------------------------------------------------------- */
+function resolveConsentMode(
+  region: Region,
+  consent?: string
+) {
+  const isStrict = region === 'eu' && consent !== 'granted'
+
+  return {
+    analytics_storage: isStrict ? 'denied' : 'granted',
+    ad_storage: isStrict ? 'denied' : 'granted',
+    ad_user_data: isStrict ? 'denied' : 'granted',
+    ad_personalization: isStrict ? 'denied' : 'granted',
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -77,11 +110,14 @@ export function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  /* ----------------------------- Region logic ----------------------------- */
+  /* ----------------------------- Region / Consent -------------------------- */
   const region = detectRegion(request)
   const consent = request.cookies.get(CONSENT_COOKIE)?.value
 
-  const isGdprStrict = region === 'eu' && consent !== 'granted'
+  const gdprMode =
+    region === 'eu' && consent !== 'granted'
+      ? 'strict'
+      : 'standard'
 
   /* ------------------------- Locale normalization ------------------------- */
   const hasLocale = i18n.locales.some(
@@ -98,10 +134,6 @@ export function proxy(request: NextRequest) {
       request.url
     )
 
-    request.nextUrl.searchParams.forEach((value, key) => {
-      redirectUrl.searchParams.set(key, value)
-    })
-
     const response = NextResponse.redirect(redirectUrl, 307)
 
     response.cookies.set(LOCALE_COOKIE, locale, LOCALE_COOKIE_OPTIONS)
@@ -111,49 +143,31 @@ export function proxy(request: NextRequest) {
     })
 
     response.headers.append('Vary', 'Accept-Language')
-
     return response
   }
 
-  /* ------------------------ Request header bridge ------------------------- */
-  const requestHeaders = new Headers(request.headers)
+  /* ------------------------ Header Bridge --------------------------------- */
+  const headers = new Headers(request.headers)
 
-  requestHeaders.set('x-user-lang', pathname.split('/')[1])
-  requestHeaders.set('x-user-region', region)
-  requestHeaders.set(
-    'x-gdpr-mode',
-    isGdprStrict ? 'strict' : 'standard'
-  )
+  headers.set('x-user-lang', pathname.split('/')[1])
+  headers.set('x-user-region', region)
+  headers.set('x-gdpr-mode', gdprMode)
 
-  if (consent) {
-    requestHeaders.set('x-user-consent', consent)
-  }
-
-  const response = NextResponse.next({
-    request: { headers: requestHeaders },
+  const consentMode = resolveConsentMode(region, consent)
+  Object.entries(consentMode).forEach(([key, value]) => {
+    headers.set(`x-consent-${key}`, value)
   })
 
-  /* ------------------------- Response headers ------------------------------ */
-  response.headers.set('x-user-region', region)
-  response.headers.set(
-    'x-gdpr-mode',
-    isGdprStrict ? 'strict' : 'standard'
-  )
+  const featureFlags = resolveFeatureFlags(request, region)
+  Object.entries(featureFlags).forEach(([key, value]) => {
+    headers.set(key, value)
+  })
+
+  const response = NextResponse.next({
+    request: { headers },
+  })
 
   response.headers.append('Vary', 'Accept-Language')
-
-  /* --------------------------- Security headers ---------------------------- */
-  response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set(
-    'Referrer-Policy',
-    'strict-origin-when-cross-origin'
-  )
-  response.headers.set(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=()'
-  )
-
   return response
 }
 
