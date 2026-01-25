@@ -7,9 +7,7 @@ import { CookieBanner } from '@/components/CookieBanner';
 import { i18n, type Locale } from '@/i18n-config';
 
 /**
- * Fontes otimizadas
- * - Montserrat: títulos
- * - Inter: textos
+ * FONTES OTIMIZADAS
  */
 const inter = Inter({
   subsets: ['latin'],
@@ -27,19 +25,19 @@ const montserrat = Montserrat({
  * VIEWPORT & PWA
  */
 export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#2563eb' },
-    { media: '(prefers-color-scheme: dark)', color: '#020617' },
-  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
   viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#2563eb' },
+    { media: '(prefers-color-scheme: dark)', color: '#020617' },
+  ],
 };
 
 /**
- * METADATA DINÂMICO MULTILÍNGUE
+ * METADATA DINÂMICO MULTILÍNGUE + MANIFEST POR IDIOMA
  */
 export async function generateMetadata(
   { params }: { params: { lang: Locale } }
@@ -76,6 +74,7 @@ export async function generateMetadata(
       template: '%s | Sérgio Santos',
     },
     description: currentContent.desc,
+
     metadataBase: new URL(siteUrl),
 
     /**
@@ -94,6 +93,11 @@ export async function generateMetadata(
         'x-default': `${siteUrl}/pt`,
       },
     },
+
+    /**
+     * PWA — MANIFEST DINÂMICO POR IDIOMA
+     */
+    manifest: `/${currentLang}/manifest.webmanifest`,
 
     openGraph: {
       title: currentContent.title,
@@ -137,7 +141,7 @@ export async function generateMetadata(
 }
 
 /**
- * ROOT LAYOUT
+ * ROOT LAYOUT POR IDIOMA
  */
 export default function RootLayout(
   { children, params }: { children: React.ReactNode; params: { lang: Locale } }
@@ -172,37 +176,37 @@ export default function RootLayout(
           enableSystem
           disableTransitionOnChange
         >
-          {/* Schema.org — ProfilePage + Person (Server-side SEO) */}
+          {/* Schema.org — ProfilePage + Person */}
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "ProfilePage",
+                '@context': 'https://schema.org',
+                '@type': 'ProfilePage',
                 mainEntity: {
-                  "@type": "Person",
-                  name: "Sérgio Santos",
+                  '@type': 'Person',
+                  name: 'Sérgio Santos',
                   url: siteUrl,
-                  jobTitle: "Data & Systems Architect",
+                  jobTitle: 'Data & Systems Architect',
                   sameAs: [
-                    "https://www.linkedin.com/in/sergiosantos",
-                    "https://github.com/sergiosantos",
+                    'https://www.linkedin.com/in/sergiosantos',
+                    'https://github.com/sergiosantos',
                   ],
                   knowsAbout: [
-                    "Data Architecture",
-                    "Cloud Computing",
-                    "Azure",
-                    "Python",
-                    "Governance",
-                    "System Design",
+                    'Data Architecture',
+                    'Cloud Computing',
+                    'Azure',
+                    'Python',
+                    'Governance',
+                    'System Design',
                   ],
                   contactPoint: {
-                    "@type": "ContactPoint",
-                    contactType: "Professional inquiries",
+                    '@type': 'ContactPoint',
+                    contactType: 'Professional inquiries',
                     availableLanguage: [
-                      "Portuguese",
-                      "English",
-                      "Spanish",
+                      'Portuguese',
+                      'English',
+                      'Spanish',
                     ],
                   },
                 },
