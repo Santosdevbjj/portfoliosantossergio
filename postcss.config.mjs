@@ -2,21 +2,21 @@
 const config = {
   plugins: {
     /**
-     * 1. CSS Nesting (oficial Tailwind)
+     * 1️⃣ CSS Nesting (oficial Tailwind)
      * Permite aninhamento nativo sem preprocessadores
      * Compatível com Tailwind JIT e futuro Tailwind v4
      */
     'tailwindcss/nesting': {},
 
     /**
-     * 2. Tailwind CSS
+     * 2️⃣ Tailwind CSS
      * Geração JIT — apenas utilitários realmente usados
      * Essencial manter antes de autoprefixer e cssnano
      */
     tailwindcss: {},
 
     /**
-     * 3. Autoprefixer
+     * 3️⃣ Autoprefixer
      * Prefixos automáticos baseados em browserslist
      * Flexbox moderno, sem suporte legado desnecessário
      */
@@ -25,25 +25,23 @@ const config = {
     },
 
     /**
-     * 4. CSSNano — apenas em produção
+     * 4️⃣ CSSNano — apenas em produção
      * Minificação segura para Tailwind, animações e CSS variables
      */
     ...(process.env.NODE_ENV === 'production'
       ? {
           cssnano: {
             preset: [
-              'advanced',
+              'default', // ⚠️ Alterado de "advanced" para "default"
               {
-                discardComments: {
-                  removeAll: true,
-                },
+                discardComments: { removeAll: true },
 
-                // ⚠️ CRÍTICO para Tailwind / animações
+                // Mantém IDs e z-index para Tailwind
                 reduceIdents: false,
                 zindex: false,
                 mergeIdents: false,
 
-                // Mantém CSS variables intactas
+                // Preserva CSS variables
                 reduceVars: false,
 
                 // Evita quebrar grid/flex modernos
@@ -55,6 +53,6 @@ const config = {
         }
       : {}),
   },
-}
+};
 
-export default config
+export default config;
