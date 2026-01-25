@@ -10,6 +10,7 @@ import { HeroSection } from '@/components/HeroSection'
 import { Navbar } from '@/components/Navbar'
 import { PageWrapper } from '@/components/PageWrapper'
 import { ProjectSection } from '@/components/ProjectSection'
+import FeaturedProjectsSection from '@/components/featured/FeaturedProjectsSection'
 
 import { getDictionary } from '@/lib/get-dictionary'
 import { getGitHubProjects } from '@/lib/github'
@@ -201,7 +202,6 @@ export default async function Page({ params }: PageProps) {
         }}
       />
 
-      {/* Navbar com ScrollSpy */}
       <Navbar lang={lang} dict={dict} />
 
       <main className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased transition-colors duration-500">
@@ -223,17 +223,16 @@ export default async function Page({ params }: PageProps) {
           </div>
         </section>
 
-        <section
-          id="articles"
-          className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:scroll-mt-32 lg:px-12"
-        >
-          <FeaturedArticleSection lang={lang} dict={dict} />
-        </section>
-
+        {/* 🔥 FEATURED PROJECTS — Masonry + Editorial */}
         <section
           id="projects"
-          className="scroll-mt-24 py-12 lg:scroll-mt-32 lg:py-24"
+          className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:scroll-mt-32 lg:px-12"
         >
+          <FeaturedProjectsSection lang={lang} />
+        </section>
+
+        {/* 📦 Projetos completos (lista tradicional) */}
+        <section className="py-12 lg:py-24">
           <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12">
             <ProjectSection
               projects={projects}
@@ -241,6 +240,13 @@ export default async function Page({ params }: PageProps) {
               dict={dict}
             />
           </div>
+        </section>
+
+        <section
+          id="articles"
+          className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:scroll-mt-32 lg:px-12"
+        >
+          <FeaturedArticleSection lang={lang} dict={dict} />
         </section>
 
         <section
