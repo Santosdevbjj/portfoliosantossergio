@@ -4,14 +4,38 @@ import type { NextRequest } from 'next/server';
 
 import { i18n } from '@/i18n-config';
 import { LOCALE_COOKIE, LOCALE_COOKIE_OPTIONS } from '@/lib/locale-cookie';
+import { CONSENT_COOKIE } from '@/lib/consent';
 
 import { match as matchLocale } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 
 /* -------------------------------------------------------------------------- */
+/* REGION / GDPR DETECTION                                                     */
+/* -------------------------------------------------------------------------- */
+type Region = 'eu' | 'br' | 'us' | 'unknown';
+
+const EU_COUNTRIES = new Set([
+  'AT','BE','BG','CY','CZ','DE','DK','EE','ES','FI','FR','GR','HR','HU',
+  'IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK'
+]);
+
+function detectRegion(request: NextRequest): Region {
+  const country =
+    request.headers.get('x-vercel-ip-country') ||
+    request.headers.get('cf-ipcountry') ||
+    request.headers.get('x-country-code');
+
+  if (!country) return 'unknown';
+  if (EU_COUNTRIES.has(country)) return 'eu';
+  if (country === 'BR') return 'br';
+  if (country === 'US') return 'us';
+
+  return 'unknown';
+}
+
+/* -------------------------------------------------------------------------- */
 /* LOCALE DETECTION                                                            */
 /* -------------------------------------------------------------------------- */
-
 function getLocale(request: NextRequest): string {
   const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;
 
@@ -25,31 +49,41 @@ function getLocale(request: NextRequest): string {
   const acceptLanguage = request.headers.get('accept-language');
   if (!acceptLanguage) return i18n.defaultLocale;
 
-  const headers = { 'accept-language': acceptLanguage };
-  const languages = new Negotiator({ headers }).languages();
+  const languages = new Negotiator({
+    headers: { 'accept-language': acceptLanguage },
+  }).languages();
 
   return matchLocale(languages, i18n.locales, i18n.defaultLocale);
 }
 
 /* -------------------------------------------------------------------------- */
-/* EDGE PROXY                                                                  */
+/* PROXY                                                                       */
 /* -------------------------------------------------------------------------- */
-
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  /* ---------------------------- Ignored paths ----------------------------- */
   const isIgnored =
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/assets') ||
     /\.[^/]+$/.test(pathname);
 
-  if (isIgnored) return NextResponse.next();
+  if (isIgnored) {
+    return NextResponse.next();
+  }
 
+  /* ----------------------------- Region logic ----------------------------- */
+  const region = detectRegion(request);
+  const consent = request.cookies.get(CONSENT_COOKIE)?.value;
+
+  const isGdprStrict =
+    region === 'eu' && consent !== 'granted';
+
+  /* ------------------------- Locale normalization ------------------------- */
   const missingLocale = i18n.locales.every(
     (locale) =>
-      pathname !== `/${locale}` &&
-      !pathname.startsWith(`/${locale}/`)
+      pathname !== `/${locale}` && !pathname.startsWith(`/${locale}/`)
   );
 
   if (missingLocale) {
@@ -61,23 +95,49 @@ export function proxy(request: NextRequest) {
       request.url
     );
 
-    request.nextUrl.searchParams.forEach((v, k) =>
-      redirectUrl.searchParams.set(k, v)
-    );
+    request.nextUrl.searchParams.forEach((value, key) => {
+      redirectUrl.searchParams.set(key, value);
+    });
 
     const response = NextResponse.redirect(redirectUrl, 307);
 
     response.cookies.set(LOCALE_COOKIE, locale, LOCALE_COOKIE_OPTIONS);
-
-    // CDN correctness
-    response.headers.set('Vary', 'Accept-Language');
+    response.headers.append('Vary', 'Accept-Language');
 
     return response;
   }
 
-  const response = NextResponse.next();
+  /* ------------------------ Request header bridge ------------------------- */
+  const requestHeaders = new Headers(request.headers);
 
-  /* --------------------------- Security Headers --------------------------- */
+  requestHeaders.set('x-user-region', region);
+  requestHeaders.set(
+    'x-gdpr-mode',
+    isGdprStrict ? 'strict' : 'standard'
+  );
+
+  if (consent) {
+    requestHeaders.set('x-user-consent', consent);
+  }
+
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+
+  /* ------------------------- Response headers ------------------------------ */
+  response.headers.set('x-user-region', region);
+  response.headers.set(
+    'x-gdpr-mode',
+    isGdprStrict ? 'strict' : 'standard'
+  );
+
+  if (consent) {
+    response.headers.set('x-user-consent', consent);
+  }
+
+  response.headers.append('Vary', 'Accept-Language');
+
+  /* --------------------------- Security headers ---------------------------- */
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set(
@@ -89,12 +149,12 @@ export function proxy(request: NextRequest) {
     'camera=(), microphone=(), geolocation=()'
   );
 
-  /* --------------------------- CDN Awareness ------------------------------- */
-  response.headers.append('Vary', 'Accept-Language');
-
   return response;
 }
 
+/* -------------------------------------------------------------------------- */
+/* MATCHER                                                                     */
+/* -------------------------------------------------------------------------- */
 export const config = {
   matcher: [
     '/((?!api|_next/static|_next/image|assets|favicon.ico|sitemap.xml|robots.txt|.*\\..*).*)',
