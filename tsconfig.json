@@ -1,37 +1,56 @@
 {
   "compilerOptions": {
-    /* Base moderna (Node.js 24 + Next.js 16) */
+    /* ---------------------------------------------------------------------- */
+    /* BASE MODERNA — Next.js 16 + Node.js 24                                  */
+    /* ---------------------------------------------------------------------- */
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
+    "useDefineForClassFields": true,
 
-    /* Tipagem estrita e confiável */
+    /* ---------------------------------------------------------------------- */
+    /* STRICTNESS — Segurança máxima                                           */
+    /* ---------------------------------------------------------------------- */
     "strict": true,
     "isolatedModules": true,
     "noEmit": true,
 
-    /* Interoperabilidade ESM e JSON */
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* ---------------------------------------------------------------------- */
+    /* INTEROPERABILIDADE                                                      */
+    /* ---------------------------------------------------------------------- */
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
+    "allowJs": true,
 
-    /* Segurança adicional */
-    "forceConsistentCasingInFileNames": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    /* Evita ruído de libs externas */
+    /* ---------------------------------------------------------------------- */
+    /* PERFORMANCE / DX                                                        */
+    /* ---------------------------------------------------------------------- */
+    "incremental": true,
     "skipLibCheck": true,
 
-    /* Organização de paths */
+    /* ---------------------------------------------------------------------- */
+    /* TYPES                                                                   */
+    /* ---------------------------------------------------------------------- */
+    "types": ["node"],
+
+    /* ---------------------------------------------------------------------- */
+    /* PATH ALIASES                                                            */
+    /* ---------------------------------------------------------------------- */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
 
-    /* Plugin oficial Next.js */
+    /* ---------------------------------------------------------------------- */
+    /* NEXT.JS PLUGIN                                                          */
+    /* ---------------------------------------------------------------------- */
     "plugins": [{ "name": "next" }]
   },
 
@@ -39,7 +58,6 @@
     "next-env.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "app/**/*.{ts,tsx}",
     ".next/types/**/*.ts",
     "src/proxy.ts",
     "eslint.config.mjs",
