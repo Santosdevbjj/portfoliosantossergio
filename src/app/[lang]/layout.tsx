@@ -130,16 +130,17 @@ export default function RootLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { lang: Locale };
+  params: { lang: 'pt' | 'en' | 'es' };
 }) {
-  const currentLang: Locale =
-    ['pt', 'en', 'es'].includes(params.lang) ? params.lang : i18n.defaultLocale;
+  const currentLang: 'pt' | 'en' | 'es' =
+    ['pt', 'en', 'es'].includes(params.lang)
+      ? params.lang
+      : 'pt';
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
     'https://portfoliosantossergio.vercel.app';
 
-  /** Schema.org ProfilePage dinâmico */
   const schemaProfile = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
@@ -194,7 +195,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Schema.org JSON-LD */}
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaProfile) }}
