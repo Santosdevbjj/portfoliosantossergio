@@ -147,6 +147,10 @@ export default function RootLayout(
       ? params.lang
       : i18n.defaultLocale;
 
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    'https://portfoliosantossergio.vercel.app';
+
   return (
     <html
       lang={currentLang}
@@ -168,6 +172,44 @@ export default function RootLayout(
           enableSystem
           disableTransitionOnChange
         >
+          {/* Schema.org — ProfilePage + Person (Server-side SEO) */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "ProfilePage",
+                mainEntity: {
+                  "@type": "Person",
+                  name: "Sérgio Santos",
+                  url: siteUrl,
+                  jobTitle: "Data & Systems Architect",
+                  sameAs: [
+                    "https://www.linkedin.com/in/sergiosantos",
+                    "https://github.com/sergiosantos",
+                  ],
+                  knowsAbout: [
+                    "Data Architecture",
+                    "Cloud Computing",
+                    "Azure",
+                    "Python",
+                    "Governance",
+                    "System Design",
+                  ],
+                  contactPoint: {
+                    "@type": "ContactPoint",
+                    contactType: "Professional inquiries",
+                    availableLanguage: [
+                      "Portuguese",
+                      "English",
+                      "Spanish",
+                    ],
+                  },
+                },
+              }),
+            }}
+          />
+
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <main className="flex-grow w-full relative">
               {children}
