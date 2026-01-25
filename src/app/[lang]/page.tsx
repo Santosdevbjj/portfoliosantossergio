@@ -1,3 +1,4 @@
+// src/app/[lang]/page.tsx
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
@@ -15,12 +16,13 @@ import FeaturedProjectsSection from '@/components/featured/FeaturedProjectsSecti
 import { getDictionary } from '@/lib/get-dictionary'
 import { getGitHubProjects } from '@/lib/github'
 import { i18n, type Locale } from '@/i18n-config'
+import { ReactNode } from 'react'
 
-/** ISR — revalida a cada 1 hora */
-/** export const revalidate = 3600 */
-
+/** ============================
+ * Tipagem de Props
+ * ============================ */
 interface PageProps {
-  params: Promise<{ lang: Locale }>
+  params: { lang: 'pt' | 'en' | 'es' }
 }
 
 /** Tipagem mínima segura do dicionário */
@@ -49,7 +51,7 @@ function normalizeDictionary(d: any): Dictionary {
 export async function generateMetadata(
   { params }: PageProps
 ): Promise<Metadata> {
-  const { lang } = await params
+  const { lang } = params
 
   if (!i18n.locales.includes(lang)) notFound()
 
@@ -90,16 +92,16 @@ export async function generateMetadata(
 }
 
 /** ============================
- * Home Page
+ * Home Page — Next.js 16 App Router
  * ============================ */
 export default async function Page({ params }: PageProps) {
-  const { lang } = await params
+  const { lang } = params
 
   if (!i18n.locales.includes(lang)) notFound()
 
   /** Fetch paralelo → performance máxima */
   const [dictRaw, projects] = await Promise.all([
-    getDictionary(lang),
+    getDictionary(lang, { revalidate: 3600 }), // ISR via fetch
     getGitHubProjects(lang)
   ])
 
