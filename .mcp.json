@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "next-devtools": {
+      "description": "Next.js DevTools MCP - Auto-detecting env",
+      "command": "node",
+      "args": ["mcp-env.js"],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    "typescript-analyzer": {
+      "description": "TypeScript analysis server using MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-typescript",
+        "--project",
+        "."
+      ]
+    }
+  }
+}
