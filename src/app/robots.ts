@@ -1,43 +1,70 @@
-import type { MetadataRoute } from 'next';
+import type { MetadataRoute } from "next";
 
 /**
- * CONFIGURAÇÃO DE ROBOTS - NEXT.JS 15.5.9 (2026)
- * Governança de SEO: Controle de rastreamento para buscadores e modelos de LLM.
+ * ROBOTS.TXT — NEXT.JS 15 (2026-ready)
+ * SEO Governance + AI Bot Policy (LLMs)
  */
 export default function robots(): MetadataRoute.Robots {
-  // CORREÇÃO CRÍTICA: Acesso via index signature para evitar o erro de build da Vercel
   const baseUrl = (
-    process.env['NEXT_PUBLIC_SITE_URL'] || 'https://portfoliosantossergio.vercel.app'
-  ).replace(/\/$/, '');
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "https://portfoliosantossergio.vercel.app"
+  ).replace(/\/$/, "");
 
   return {
     rules: [
+      /**
+       * ============================
+       * Buscadores tradicionais
+       * ============================
+       */
       {
-        userAgent: '*',
+        userAgent: "*",
         allow: [
-          '/',              // Home e Redirecionamentos
-          '/pt',            // Localidade PT
-          '/en',            // Localidade EN
-          '/es',            // Localidade ES
-          '/images/',       // Assets visuais
+          "/pt/",
+          "/en/",
+          "/es/",
+          "/images/",
+          "/cv-sergio-santos-pt.pdf",
+          "/cv-sergio-santos-en.pdf",
+          "/cv-sergio-santos-es.pdf",
         ],
         disallow: [
-          '/api/',          // Endpoints de API
-          '/_next/',        // Cache interno do Next.js
-          '/private/',      // Conteúdo restrito
+          "/api/",
+          "/_next/",
+          "/private/",
         ],
       },
+
+      /**
+       * ============================
+       * Governança de IA / LLMs (2026)
+       * Permite indexação semântica do perfil
+       * ============================
+       */
       {
-        /**
-         * IA BOT GOVERNANCE (2026)
-         * Permite que agentes de IA processem seu perfil para buscas semânticas.
-         */
-        userAgent: ['GPTBot', 'ChatGPT-User', 'Claude-bot', 'Google-Extended'],
-        allow: ['/pt', '/en', '/es'],
-        disallow: ['/api/', '/_next/'],
-      }
+        userAgent: [
+          "GPTBot",
+          "ChatGPT-User",
+          "Claude-bot",
+          "Google-Extended",
+          "PerplexityBot",
+        ],
+        allow: [
+          "/pt/",
+          "/en/",
+          "/es/",
+        ],
+        disallow: [
+          "/api/",
+          "/_next/",
+          "/private/",
+        ],
+      },
     ],
-    // Vinculação com o Sitemap para facilitar a descoberta de rotas
+
+    /**
+     * Sitemap oficial
+     */
     sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
