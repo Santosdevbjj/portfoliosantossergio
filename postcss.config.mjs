@@ -2,45 +2,59 @@
 const config = {
   plugins: {
     /**
-     * 1. Nesting CSS oficial
-     * Permite aninhamento de seletores sem preprocessadores externos
-     * Compatível com TailwindCSS JIT
+     * 1. CSS Nesting (oficial Tailwind)
+     * Permite aninhamento nativo sem preprocessadores
+     * Compatível com Tailwind JIT e futuro Tailwind v4
      */
-    "tailwindcss/nesting": {},
+    'tailwindcss/nesting': {},
 
     /**
-     * 2. Tailwind CSS JIT
-     * Gera apenas o CSS necessário, garantindo builds leves e rápidos
+     * 2. Tailwind CSS
+     * Geração JIT — apenas utilitários realmente usados
+     * Essencial manter antes de autoprefixer e cssnano
      */
     tailwindcss: {},
 
     /**
      * 3. Autoprefixer
-     * Adiciona prefixos automáticos baseados em browserslist
-     * Flexbox compatível sem hacks antigos
+     * Prefixos automáticos baseados em browserslist
+     * Flexbox moderno, sem suporte legado desnecessário
      */
     autoprefixer: {
-      flexbox: "no-2009",
+      flexbox: 'no-2009',
     },
 
     /**
-     * 4. CSSNano (produção apenas)
-     * Minificação segura, preservando animações, variáveis CSS e transições
+     * 4. CSSNano — apenas em produção
+     * Minificação segura para Tailwind, animações e CSS variables
      */
-    ...(process.env.NODE_ENV === "production"
+    ...(process.env.NODE_ENV === 'production'
       ? {
           cssnano: {
             preset: [
-              "default",
+              'advanced',
               {
-                discardComments: { removeAll: true },
-                normalizeWhitespace: false, // evita quebrar Tailwind
+                discardComments: {
+                  removeAll: true,
+                },
+
+                // ⚠️ CRÍTICO para Tailwind / animações
+                reduceIdents: false,
+                zindex: false,
+                mergeIdents: false,
+
+                // Mantém CSS variables intactas
+                reduceVars: false,
+
+                // Evita quebrar grid/flex modernos
+                normalizeWhitespace: false,
+                cssDeclarationSorter: false,
               },
             ],
           },
         }
       : {}),
   },
-};
+}
 
-export default config;
+export default config
