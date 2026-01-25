@@ -1,17 +1,29 @@
 {
-  "name": "Sérgio Santos | Data & Systems Specialist",
-  "short_name": "Sérgio.Data",
-  "description": "Especialista em Dados e Engenharia de Sistemas de Missão Crítica - Portfólio Global",
-  "lang": "pt-BR",
-  "start_url": "/",
   "id": "portfolio-santos-sergio-v2-2026",
+  "name": "Sérgio Santos | Data & Systems Specialist",
+  "short_name": "SergioData",
+  "description": "Especialista em Dados, Engenharia de Sistemas e Arquiteturas de Missão Crítica. Portfólio profissional multilíngue.",
+  "lang": "pt-BR",
+
+  "start_url": "/?source=pwa",
+  "scope": "/",
+
   "display": "standalone",
+  "orientation": "any",
+
   "background_color": "#020617",
   "theme_color": "#2563eb",
-  "orientation": "portrait-primary",
+
   "prefer_related_applications": false,
-  "scope": "/",
-  "categories": ["business", "education", "developer", "productivity"],
+
+  "categories": [
+    "business",
+    "education",
+    "developer",
+    "productivity",
+    "portfolio"
+  ],
+
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -23,6 +35,12 @@
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
     },
     {
@@ -31,43 +49,60 @@
       "type": "image/png"
     }
   ],
+
   "screenshots": [
     {
       "src": "/screenshots/desktop-home.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Data Strategy Dashboard - Desktop View"
+      "label": "Professional Data & Systems Portfolio — Desktop Experience"
     },
     {
       "src": "/screenshots/mobile-home.png",
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Technical Portfolio - Mobile View"
+      "label": "Technical Portfolio — Mobile Experience"
     }
   ],
+
   "shortcuts": [
     {
       "name": "Projetos (Português)",
       "short_name": "Projetos",
-      "description": "Explorar ecossistema de dados em PT",
+      "description": "Explorar projetos e artigos técnicos em português",
       "url": "/pt#projects",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Projects (English)",
       "short_name": "Projects",
-      "description": "Explore data ecosystem in EN",
+      "description": "Explore technical projects and articles in English",
       "url": "/en#projects",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Proyectos (Español)",
       "short_name": "Proyectos",
-      "description": "Explorar ecosistema de datos en ES",
+      "description": "Explorar proyectos técnicos y artículos en español",
       "url": "/es#projects",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
