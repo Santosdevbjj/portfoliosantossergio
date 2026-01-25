@@ -1,68 +1,39 @@
 {
   "compilerOptions": {
-    /* ---------------------------------------------------------------------- */
-    /* BASE MODERNA — Next.js 16 + Node.js 24                                  */
-    /* ---------------------------------------------------------------------- */
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "useDefineForClassFields": true,
-
-    /* ---------------------------------------------------------------------- */
-    /* STRICTNESS — Segurança máxima                                           */
-    /* ---------------------------------------------------------------------- */
-    "strict": true,
-    "isolatedModules": true,
-    "noEmit": true,
-
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "forceConsistentCasingInFileNames": true,
-
-    /* ---------------------------------------------------------------------- */
-    /* INTEROPERABILIDADE                                                      */
-    /* ---------------------------------------------------------------------- */
-    "esModuleInterop": true,
     "resolveJsonModule": true,
-    "verbatimModuleSyntax": true,
-    "allowJs": true,
-
-    /* ---------------------------------------------------------------------- */
-    /* PERFORMANCE / DX                                                        */
-    /* ---------------------------------------------------------------------- */
+    "isolatedModules": true,
+    "jsx": "react-jsx",
     "incremental": true,
-    "skipLibCheck": true,
-
-    /* ---------------------------------------------------------------------- */
-    /* TYPES                                                                   */
-    /* ---------------------------------------------------------------------- */
-    "types": ["node"],
-
-    /* ---------------------------------------------------------------------- */
-    /* PATH ALIASES                                                            */
-    /* ---------------------------------------------------------------------- */
-    "baseUrl": ".",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
       "@/*": ["./src/*"]
     },
-
-    /* ---------------------------------------------------------------------- */
-    /* NEXT.JS PLUGIN                                                          */
-    /* ---------------------------------------------------------------------- */
-    "plugins": [{ "name": "next" }]
+    "baseUrl": ".",
+    /* Next.js 16 Strict Mode Options */
+    "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true
   },
-
   "include": [
     "next-env.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/proxy.ts",
-    "eslint.config.mjs",
-    "next.config.mjs"
+    ".next/dev/types/**/*.ts", 
+    "src/proxy.ts"
   ],
-
   "exclude": ["node_modules"]
 }
