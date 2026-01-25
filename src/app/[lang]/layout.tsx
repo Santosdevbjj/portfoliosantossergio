@@ -39,13 +39,13 @@ export const viewport: Viewport = {
 /**
  * METADATA DINÂMICO MULTILÍNGUE + MANIFEST POR IDIOMA
  */
-export async function generateMetadata(
-  { params }: { params: { lang: Locale } }
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { lang: Locale };
+}): Promise<Metadata> {
   const currentLang: Locale =
-    ['pt', 'en', 'es'].includes(params.lang)
-      ? params.lang
-      : i18n.defaultLocale;
+    ['pt', 'en', 'es'].includes(params.lang) ? params.lang : i18n.defaultLocale;
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
@@ -74,16 +74,10 @@ export async function generateMetadata(
       template: '%s | Sérgio Santos',
     },
     description: currentContent.desc,
-
     metadataBase: new URL(siteUrl),
-
-    /**
-     * ⚠️ TAG DO GOOGLE — MANTIDA INTACTA
-     */
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
-
     alternates: {
       canonical: `${siteUrl}/${currentLang}`,
       languages: {
@@ -93,12 +87,7 @@ export async function generateMetadata(
         'x-default': `${siteUrl}/pt`,
       },
     },
-
-    /**
-     * PWA — MANIFEST DINÂMICO POR IDIOMA
-     */
     manifest: `/${currentLang}/manifest.webmanifest`,
-
     openGraph: {
       title: currentContent.title,
       description: currentContent.desc,
@@ -120,20 +109,17 @@ export async function generateMetadata(
         },
       ],
     },
-
     twitter: {
       card: 'summary_large_image',
       title: currentContent.title,
       description: currentContent.desc,
       images: [`/og-image-${currentLang}.png`],
     },
-
     appleWebApp: {
       capable: true,
       statusBarStyle: 'default',
       title: 'Sérgio.Data',
     },
-
     formatDetection: {
       telephone: false,
     },
@@ -143,13 +129,15 @@ export async function generateMetadata(
 /**
  * ROOT LAYOUT POR IDIOMA
  */
-export default function RootLayout(
-  { children, params }: { children: React.ReactNode; params: { lang: Locale } }
-) {
+export default function RootLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: { lang: Locale };
+}) {
   const currentLang: Locale =
-    ['pt', 'en', 'es'].includes(params.lang)
-      ? params.lang
-      : i18n.defaultLocale;
+    ['pt', 'en', 'es'].includes(params.lang) ? params.lang : i18n.defaultLocale;
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
@@ -203,11 +191,7 @@ export default function RootLayout(
                   contactPoint: {
                     '@type': 'ContactPoint',
                     contactType: 'Professional inquiries',
-                    availableLanguage: [
-                      'Portuguese',
-                      'English',
-                      'Spanish',
-                    ],
+                    availableLanguage: ['Portuguese', 'English', 'Spanish'],
                   },
                 },
               }),
@@ -215,9 +199,7 @@ export default function RootLayout(
           />
 
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
-            <main className="flex-grow w-full relative">
-              {children}
-            </main>
+            <main className="flex-grow w-full relative">{children}</main>
           </div>
 
           <CookieBanner />
