@@ -27,7 +27,7 @@
     
     /* Ajuste de Rigor para Next.js 16 */
     "verbatimModuleSyntax": false,
-    "ignoreDeprecations": ["5.0"]
+    "ignoreDeprecations": ["5.1"]
   },
   "include": [
     "next-env.d.ts",
