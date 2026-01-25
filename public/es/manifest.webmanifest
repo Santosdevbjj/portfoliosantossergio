@@ -1,0 +1,96 @@
+{
+  "id": "portfolio-santos-sergio-es-2026",
+  "name": "Sérgio Santos | Especialista en Datos y Sistemas",
+  "short_name": "SergioData",
+  "description": "Portafolio profesional de Sérgio Santos — Especialista en Ingeniería de Datos, Arquitectura de Sistemas y Soluciones Críticas.",
+  "lang": "es-ES",
+
+  "start_url": "/es?source=pwa",
+  "scope": "/es",
+
+  "display": "standalone",
+  "orientation": "any",
+
+  "background_color": "#020617",
+  "theme_color": "#2563eb",
+
+  "prefer_related_applications": false,
+
+  "categories": [
+    "business",
+    "education",
+    "developer",
+    "productivity",
+    "portfolio"
+  ],
+
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Portafolio Profesional — Vista Escritorio"
+    },
+    {
+      "src": "/screenshots/mobile-home.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Portafolio Técnico — Vista Móvil"
+    }
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Proyectos",
+      "short_name": "Proyectos",
+      "description": "Explorar proyectos y estudios técnicos",
+      "url": "/es#projects",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Artículos",
+      "short_name": "Artículos",
+      "description": "Leer artículos técnicos y análisis",
+      "url": "/es#articles",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
