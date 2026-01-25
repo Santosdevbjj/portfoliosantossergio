@@ -1,18 +1,25 @@
 // eslint.config.mjs
-import nextVitals from 'eslint-config-next/core-web-vitals'
-import nextTs from 'eslint-config-next/typescript'
-import prettier from 'eslint-config-prettier'
-import globals from 'globals'
+import { FlatCompat } from '@eslint/eslintrc';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import prettier from 'eslint-config-prettier';
+import globals from 'globals';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
 
 /**
- * ESLint Flat Config
- * Next.js 16 (App Router) + TypeScript + React 18+
- * Produção-ready para Vercel
+ * ESLint v9 Flat Config - Janeiro 2026
+ * Next.js 16 (App Router) + React 19
  */
 export default [
   /**
    * 0️⃣ Arquivos ignorados
-   * Evita ruído e melhora performance do lint
+   * Reduzido para focar na segurança: agora validamos layouts e erros.
    */
   {
     ignores: [
@@ -20,25 +27,13 @@ export default [
       'node_modules/**',
       'out/**',
       'build/**',
-      'coverage/**',
-      '.turbo/**',
-
-      // Next.js gerados
-      'next-env.d.ts',
-
-      // Assets estáticos
       'public/**',
-
-      // App Router arquivos especiais
-      'app/**/layout.tsx',
-      'app/**/loading.tsx',
-      'app/**/error.tsx',
+      '**/*.d.ts',
     ],
   },
 
   /**
-   * 1️⃣ Ambiente global
-   * Flat Config não assume browser/node automaticamente
+   * 1️⃣ Ambiente e Parser
    */
   {
     languageOptions: {
@@ -52,34 +47,31 @@ export default [
   },
 
   /**
-   * 2️⃣ Next.js Core Web Vitals
-   * Inclui regras críticas de:
-   * - Performance
-   * - React
-   * - Hooks
+   * 2️⃣ Next.js & TypeScript
+   * Usando FlatCompat para garantir que o plugin do Next.js 16
+   * carregue corretamente no ESLint v9.
    */
-  ...nextVitals,
+  ...compat.extends('next/core-web-vitals', 'next/typescript'),
 
   /**
-   * 3️⃣ Next.js + TypeScript
-   * Compatível com App Router e RSC
-   */
-  ...nextTs,
-
-  /**
-   * 4️⃣ Regras específicas do projeto
+   * 3️⃣ Regras de Blindagem do Projeto
    */
   {
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
-      /* ---------------- Next.js ---------------- */
-      '@next/next/no-img-element': 'warn',
-
-      /* ---------------- React ---------------- */
-      'react/react-in-jsx-scope': 'off', // Next 13+
+      /* ---------------- Next.js 16 ---------------- */
+      // Obriga o uso do componente Image para Web Vitals
+      '@next/next/no-img-element': 'error', 
+      
+      /* ---------------- React 19 ---------------- */
+      'react/react-in-jsx-scope': 'off',
       'react/no-unescaped-entities': 'off',
+      'react/prop-types': 'off',
 
-      /* ---------------- TypeScript ---------------- */
+      /* ---------------- TypeScript Rigoroso ---------------- */
+      // Garante que não esqueçamos de tratar as Promises do Next 16
+      '@typescript-eslint/no-floating-promises': 'error',
+      
       '@typescript-eslint/consistent-type-imports': [
         'warn',
         { prefer: 'type-imports' },
@@ -90,25 +82,21 @@ export default [
         { argsIgnorePattern: '^_' },
       ],
 
-      // Relaxamentos conscientes (arquitetura sênior)
+      // Flexibilidade necessária para Data Specialist (tratamento de APIs dinâmicas)
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off',
-      '@typescript-eslint/no-unnecessary-condition': 'off',
-      '@typescript-eslint/restrict-template-expressions': 'off',
       '@typescript-eslint/no-deprecated': 'off',
 
-      /* ---------------- Qualidade ---------------- */
+      /* ---------------- Qualidade & Segurança ---------------- */
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'prefer-const': 'warn',
+      'prefer-const': 'error',
+      'no-var': 'error',
     },
   },
 
   /**
-   * 5️⃣ Prettier
-   * SEMPRE por último — desativa conflitos de formatação
+   * 4️⃣ Prettier (Sempre por último)
    */
   prettier,
-]
+];
