@@ -17,7 +17,7 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { getGitHubProjects } from '@/lib/github';
 import { i18n, type Locale } from '@/i18n-config';
 
-/** Next.js 16 exige string no contrato da Promise para evitar erro de constraint */
+/** Tipagem de Props para Next.js 16 - Aceita string para compatibilidade com Typegen */
 interface PageProps {
   params: Promise<{ lang: string }>;
 }
@@ -48,7 +48,12 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     description: dict.headline,
     alternates: {
       canonical: `${baseUrl}/${lang}`,
-      languages: { pt: `${baseUrl}/pt`, en: `${baseUrl}/en`, es: `${baseUrl}/es`, 'x-default': `${baseUrl}/pt` },
+      languages: { 
+        pt: `${baseUrl}/pt`, 
+        en: `${baseUrl}/en`, 
+        es: `${baseUrl}/es`, 
+        'x-default': `${baseUrl}/pt` 
+      },
     },
     openGraph: {
       title: `Sérgio Santos | ${dict.role}`,
@@ -64,7 +69,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 export default async function Page(props: PageProps) {
   const { lang: rawLang } = await props.params;
   
-  // Validação rigorosa
+  // Validação rigorosa do Locale
   if (!i18n.locales.includes(rawLang as any)) notFound();
   const lang = rawLang as Locale;
 
@@ -76,8 +81,10 @@ export default async function Page(props: PageProps) {
   const dict = normalizeDictionary(dictRaw);
 
   return (
-    <PageWrapper>
+    /* CORREÇÃO AQUI: Passando o 'lang' para o PageWrapper */
+    <PageWrapper lang={lang}>
       <Navbar lang={lang} dict={dict} />
+      
       <main className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
         <HeroSection lang={lang} dict={dict} />
         
@@ -109,6 +116,7 @@ export default async function Page(props: PageProps) {
           <ContactSection lang={lang} dict={dict} />
         </section>
       </main>
+
       <Footer lang={lang} dict={dict} />
     </PageWrapper>
   );
