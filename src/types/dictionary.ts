@@ -1,109 +1,131 @@
 /**
- * Dictionary — Contrato único de i18n do projeto
- *
- * Este arquivo define a estrutura exata que TODOS os
- * arquivos JSON de idioma DEVEM seguir.
- *
- * Qualquer divergência será erro de TypeScript em build-time.
+ * TYPES: Dictionary Contract
+ * -----------------------------------------------------------------------------
+ * Contrato soberano de internacionalização (i18n).
+ * * ⚠️ REGRA DE OURO: 
+ * Se uma propriedade for alterada aqui, ela DEVE ser atualizada em:
+ * 1. src/dictionaries/pt.json
+ * 2. src/dictionaries/en.json
+ * 3. src/dictionaries/es.json
  */
 
 export interface Dictionary {
   /**
-   * Textos globais e reutilizáveis
-   */
-  common: {
-    navigation: string
-    openMenu: string
-    closeMenu: string
-    role: string
-    footer: string
-  }
-
-  /**
-   * Navbar / Header
+   * Navbar / Header - Links de navegação
    */
   nav: {
-    about: string
-    experience: string
-    articles: string
-    projects: string
-    contact: string
-  }
+    about: string;
+    experience: string;
+    articles: string;
+    projects: string;
+    contact: string;
+  };
 
   /**
-   * Seção Hero / Home
+   * Seção Hero - Primeira impressão e CTA
    */
   hero: {
-    title: string
-    subtitle: string
-    description: string
-    ctaPrimary: string
-    ctaSecondary?: string
-  }
+    greeting: string;
+    role: string;
+    title: string;
+    subtitle: string;
+    headline: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
+  };
 
   /**
-   * Seção Sobre
+   * Seção Sobre - Narrativa e Métricas de Impacto
    */
   about: {
-    title: string
-    description: string
-    highlights: string[]
-  }
+    title: string;
+    description: string;
+    differentialTitle: string;
+    differentialContent: string;
+    highlights: string[];
+    stats: {
+      experience: string;
+      availability: string;
+      automation: string;
+    };
+  };
 
   /**
-   * Experiência profissional
+   * Experiência - Trajetória profissional (Bradesco / Consultoria)
    */
   experience: {
-    title: string
+    title: string;
     items: Array<{
-      company: string
-      role: string
-      period: string
-      description: string
-    }>
-  }
+      company: string;
+      role: string;
+      period: string;
+      description: string;
+    }>;
+  };
 
   /**
-   * Projetos
+   * Projetos - Vitrine de repositórios do GitHub
    */
   projects: {
-    title: string
-    featured: string
-    viewAll: string
+    title: string;
+    featuredLabel: string;
+    firstLabel: string;
+    viewProject: string;
+    viewAll: string;
+    repoLink: string;
     categories: {
-      data: string
-      backend: string
-      frontend: string
-      devops: string
-      security: string
-    }
-  }
+      dataScience: string;
+      cloud: string;
+      graphs: string;
+      analysis: string;
+      dev: string;
+      security: string;
+    };
+  };
 
   /**
-   * Artigos / Conteúdo
+   * Artigos - Conteúdo técnico e premiações (DIO / Medium)
    */
   articles: {
-    title: string
-    readMore: string
-    publishedAt: string
-  }
+    title: string;
+    awardWinner: string;
+    bestOfMonth: string;
+    readMore: string;
+    publishedAt: string;
+    mediumProfile: string;
+  };
 
   /**
-   * Contato
+   * Contato - Conversão e links sociais
    */
   contact: {
-    title: string
-    subtitle: string
-    emailLabel: string
-    cta: string
-  }
+    title: string;
+    subtitle: string;
+    emailLabel: string;
+    linkedinLabel: string;
+    cvLabel: string;
+    cta: string;
+  };
 
   /**
-   * SEO (por página ou global)
+   * Common - Elementos reutilizáveis de UI e Footer
+   */
+  common: {
+    navigation: string;
+    openMenu: string;
+    closeMenu: string;
+    role: string;
+    footer: string;
+    rights: string;
+    builtWith: string;
+  };
+
+  /**
+   * SEO - Metadados para robôs de busca e redes sociais
    */
   seo: {
-    siteName: string
-    description: string
-    keywords: string[]
-  }
+    siteName: string;
+    description: string;
+    keywords: string[];
+  };
 }
