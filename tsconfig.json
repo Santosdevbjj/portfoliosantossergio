@@ -11,7 +11,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve", 
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -25,15 +25,18 @@
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": true,
     
-    /* Ajuste de Rigor para Next.js 16 */
-    "verbatimModuleSyntax": false,
-    "ignoreDeprecations": ["5.1"]
+    /* Ajuste de Rigor: 
+       Removido 'ignoreDeprecations' para evitar o erro TS5024.
+       Em 2026, com TS 5.4+, é melhor manter o código limpo de opções obsoletas.
+    */
+    "verbatimModuleSyntax": false
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
     "src/proxy.ts"
   ],
   "exclude": ["node_modules"]
