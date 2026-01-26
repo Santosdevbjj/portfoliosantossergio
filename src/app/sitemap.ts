@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
-import { i18n } from "@/i18n-config";
 
 /**
- * SITEMAP DINÂMICO — NEXT.JS 15
- * SEO-first, multilíngue (PT / EN / ES) e compatível com Google Search Console
+ * SITEMAP DINÂMICO — NEXT.JS 15 (APP ROUTER)
+ * -----------------------------------------------------------------------------
+ * Objetivo: Indexação máxima e SEO internacional.
+ * Padrão: Protocolo XML Sitemap com suporte a Hreflang.
  */
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = (
     process.env.NEXT_PUBLIC_SITE_URL ??
@@ -12,24 +14,46 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ).replace(/\/$/, "");
 
   const lastModified = new Date();
+  const locales = ["pt", "en", "es"] as const;
 
   /**
-   * Idiomas suportados — fonte única da verdade
+   * Mapeamento de Alternates (Hreflang)
+   * Essencial para o Google não considerar conteúdo duplicado.
    */
-  const locales = i18n.locales as Array<"pt" | "en" | "es">;
-
-  /**
-   * hreflang map (SEO internacional)
-   */
-  const languagesMap: Record<string, string> = {
-    ...Object.fromEntries(
-      locales.map((locale) => [locale, `${baseUrl}/${locale}`])
-    ),
+  const languagesMap = {
+    pt: `${baseUrl}/pt`,
+    en: `${baseUrl}/en`,
+    es: `${baseUrl}/es`,
     "x-default": `${baseUrl}/pt`,
   };
 
   /**
-   * 1️⃣ Entrada raiz (canonical + redirecionamento)
+   * 1️⃣ Home Pages (Internacionalizadas)
+   * Cada entrada informa ao crawler sobre suas "irmãs" em outros idiomas.
+   */
+  const localeEntries: MetadataRoute.Sitemap = locales.map((locale) => ({
+    url: `${baseUrl}/${locale}`,
+    lastModified,
+    changeFrequency: "monthly",
+    priority: locale === "pt" ? 1.0 : 0.9, // Prioridade levemente maior para o idioma principal
+    alternates: {
+      languages: languagesMap,
+    },
+  }));
+
+  /**
+   * 2️⃣ Documentos Estratégicos (CVs)
+   * Indexar o PDF ajuda a aparecer em buscas por "Especialista em Dados Sergio Santos CV".
+   */
+  const documentEntries: MetadataRoute.Sitemap = locales.map((locale) => ({
+    url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
+    lastModified,
+    changeFrequency: "quarterly",
+    priority: 0.7,
+  }));
+
+  /**
+   * 3️⃣ Entrada Raiz (Redirect Target)
    */
   const rootEntry: MetadataRoute.Sitemap[0] = {
     url: baseUrl,
@@ -41,28 +65,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   };
 
-  /**
-   * 2️⃣ Home por idioma
-   */
-  const localeEntries: MetadataRoute.Sitemap = locales.map((locale) => ({
-    url: `${baseUrl}/${locale}`,
-    lastModified,
-    changeFrequency: "monthly",
-    priority: locale === "pt" ? 1.0 : 0.8,
-    alternates: {
-      languages: languagesMap,
-    },
-  }));
-
-  /**
-   * 3️⃣ Assets indexáveis (CVs em PDF)
-   */
-  const cvEntries: MetadataRoute.Sitemap = locales.map((locale) => ({
-    url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
-    lastModified,
-    changeFrequency: "yearly",
-    priority: 0.6,
-  }));
-
-  return [rootEntry, ...localeEntries, ...cvEntries];
+  return [rootEntry, ...localeEntries, ...documentEntries];
 }
