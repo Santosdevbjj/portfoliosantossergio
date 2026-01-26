@@ -12,6 +12,7 @@
     "title": "Transforming complex data into",
     "subtitle": "Strategic Assets",
     "headline": "Transforming complex data into strategic intelligence with the rigor of 20+ years in mission-critical systems.",
+    "description": "Data Engineer and Senior Analyst focused on automation and risk mitigation.",
     "ctaPrimary": "View Projects",
     "ctaSecondary": "LinkedIn"
   },
@@ -50,6 +51,7 @@
   },
   "projects": {
     "title": "Project Repository",
+    "featured": "Featured Project",
     "featuredLabel": "Featured",
     "firstLabel": "Head Project",
     "viewProject": "View Repository",
@@ -61,7 +63,11 @@
       "graphs": "Graph Analysis",
       "analysis": "Power BI & Data",
       "dev": "Development",
-      "security": "Security"
+      "security": "Security",
+      "data": "Data",
+      "backend": "Back-end",
+      "frontend": "Front-end",
+      "devops": "DevOps"
     }
   },
   "articles": {
@@ -92,14 +98,11 @@
   "seo": {
     "siteName": "Sérgio Santos | Portfolio",
     "description": "Data Engineering, Data Science, Artificial Intelligence, and Mission-Critical Systems.",
-    "keywords": [
-      "data engineering",
-      "data science",
-      "artificial intelligence",
-      "mission-critical systems",
-      "data governance",
-      "Azure Databricks",
-      "Neo4J"
-    ]
+    "keywords": ["data engineering", "data science", "artificial intelligence"],
+    "site": {
+      "siteName": "Sérgio Santos | Portfolio",
+      "description": "Data Engineering, Data Science, Artificial Intelligence.",
+      "keywords": ["data engineering", "data science"]
+    }
   }
 }
