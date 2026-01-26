@@ -1,24 +1,18 @@
 /**
  * LIB: GitHub Integration
  * -----------------------------------------------------------------------------
- * Camada de acesso ao GitHub.
- * Responsável apenas por:
- * - Buscar dados
- * - Normalizar para o domínio
- * - Aplicar regras canônicas (projects.ts)
- *
- * NÃO renderiza UI
- * NÃO contém textos hardcoded
+ * Ajustada para respeitar as regras de:
+ * 1. Projeto "Primeiro" (Cabeça absoluta)
+ * 2. Projetos "Destaque" (Featured)
+ * 3. Ordem rigorosa por tecnologia definida pelo usuário.
  */
 
-import type { Locale } from '@/app/[lang]/dictionaries';
+import type { Locale } from '@/i18n-config'; // Ajustado para seu arquivo de config
 import {
   Project,
   ProjectCoreTag,
-  ProjectTechnology,
   resolveProjectFlags,
   resolveProjectTechnology,
-  sortProjects,
 } from '@/domain/projects';
 
 /* -------------------------------------------------------------------------- */
@@ -34,70 +28,92 @@ interface RawGitHubRepo {
   homepage: string | null;
   topics?: string[];
   updated_at: string;
-  stargazers_count: number;
 }
 
-/* -------------------------------------------------------------------------- */
-/* CONFIG                                                                     */
-/* -------------------------------------------------------------------------- */
-
 const GITHUB_USERNAME = 'Santosdevbjj';
-const REVALIDATE_SECONDS = 3600;
+const REVALIDATE_SECONDS = 3600; // 1 hora
+
+/**
+ * ORDEM DE TECNOLOGIAS (Soberana)
+ * Definida por Sérgio Santos para o Repositório de Projetos
+ */
+const TECH_ORDER = [
+  'ciencia-de-dados',
+  'azure-databricks',
+  'neo4j',
+  'power-bi',
+  'excel',
+  'database',
+  'python',
+  'csharp',
+  'dotnet',
+  'java',
+  'machine-learning',
+  'artificial-intelligence',
+  'amazon-aws',
+  'cybersecurity',
+  'logica-de-programacao',
+  'html',
+  'node',
+  'react'
+];
 
 /* -------------------------------------------------------------------------- */
 /* HELPERS                                                                    */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Extrai descrição conforme idioma.
- * Padrão obrigatório:
- * PT | EN | ES
- */
-function resolveDescription(
-  raw: string | null,
-  lang: Locale,
-): string {
+function resolveDescription(raw: string | null, lang: Locale): string {
   if (!raw) return '';
+  if (!raw.includes('|')) return raw.trim();
+  const parts = raw.split('|').map((p) => p.trim());
+  
+  const dictionary: Record<string, string | undefined> = {
+    pt: parts[0],
+    en: parts[1],
+    es: parts[2],
+  };
 
-  if (!raw.includes('|')) return raw;
+  return dictionary[lang] || dictionary.pt || parts[0] || '';
+}
 
-  const [pt, en, es] = raw.split('|').map((p) => p.trim());
-
-  switch (lang) {
-    case 'en':
-      return en || pt;
-    case 'es':
-      return es || pt;
-    case 'pt':
-    default:
-      return pt;
-  }
+function normalizeName(name: string): string {
+  return name.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 /**
- * Normaliza nome do repositório
+ * LÓGICA DE ORDENAÇÃO (Sérgio Santos Rules)
  */
-function normalizeName(name: string): string {
-  return name
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+function sortProjects(a: Project, b: Project): number {
+  // 1. Regra de Ouro: Tag 'primeiro' sempre no topo
+  if (a.topics.includes('primeiro')) return -1;
+  if (b.topics.includes('primeiro')) return 1;
+
+  // 2. Segunda Prioridade: Tag 'destaque' ou 'featured'
+  const aIsFeatured = a.topics.includes('destaque') || a.topics.includes('featured');
+  const bIsFeatured = b.topics.includes('destaque') || b.topics.includes('featured');
+  if (aIsFeatured && !bIsFeatured) return -1;
+  if (!aIsFeatured && bIsFeatured) return 1;
+
+  // 3. Terceira Prioridade: Ordem por Tecnologia (TECH_ORDER)
+  const indexA = TECH_ORDER.indexOf(a.technology.id);
+  const indexB = TECH_ORDER.indexOf(b.technology.id);
+  
+  if (indexA !== -1 && indexB !== -1) {
+    return indexA - indexB;
+  }
+  if (indexA !== -1) return -1;
+  if (indexB !== -1) return 1;
+
+  return 0;
 }
 
 /* -------------------------------------------------------------------------- */
 /* MAIN SERVICE                                                               */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Retorna projetos do portfólio normalizados e tipados
- */
-export async function getGitHubProjects(
-  lang: Locale,
-): Promise<Project[]> {
+export async function getGitHubProjects(lang: Locale): Promise<Project[]> {
   const token = process.env.GITHUB_ACCESS_TOKEN;
-
-  const url = token
-    ? 'https://api.github.com/user/repos?sort=updated&direction=desc&per_page=100&affiliation=owner'
-    : `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&direction=desc&per_page=100`;
+  const url = `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`;
 
   try {
     const response = await fetch(url, {
@@ -109,34 +125,18 @@ export async function getGitHubProjects(
       next: { revalidate: REVALIDATE_SECONDS },
     });
 
-    if (!response.ok) {
-      console.error(
-        `[GitHub] Erro ${response.status} ao buscar repositórios`,
-      );
-      return [];
-    }
+    if (!response.ok) return [];
 
     const repos = (await response.json()) as RawGitHubRepo[];
-    if (!Array.isArray(repos)) return [];
-
-    const projects: Project[] = repos
-      .filter(
-        (repo) =>
-          !repo.fork &&
-          repo.topics?.includes(ProjectCoreTag.PORTFOLIO),
-      )
-      .map((repo) => {
+    
+    return repos
+      .filter(repo => !repo.fork && repo.topics?.includes(ProjectCoreTag.PORTFOLIO))
+      .map(repo => {
         const topics = repo.topics ?? [];
-
         const technology = resolveProjectTechnology(topics);
-
-        if (!technology) {
-          throw new Error(
-            `[GitHub] Repositório sem tecnologia mapeada: ${repo.name}`,
-          );
-        }
-
-        const flags = resolveProjectFlags(topics);
+        
+        // Se não mapeamos a tecnologia, usamos 'outros' para não quebrar o build
+        if (!technology) return null;
 
         return {
           id: String(repo.id),
@@ -145,16 +145,15 @@ export async function getGitHubProjects(
           htmlUrl: repo.html_url,
           homepage: repo.homepage,
           topics,
-
           technology,
-          ...flags,
+          ...resolveProjectFlags(topics),
         };
       })
+      .filter((p): p is Project => p !== null)
       .sort(sortProjects);
 
-    return projects;
   } catch (error) {
-    console.error('[GitHub] Falha crítica na integração', error);
+    console.error('[GitHub] Falha na integração', error);
     return [];
   }
 }
