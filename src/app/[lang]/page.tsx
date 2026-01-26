@@ -17,27 +17,30 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { getGitHubProjects } from '@/lib/github';
 import { i18n, type Locale } from '@/i18n-config';
 
-/** Tipagem de Props para Next.js 16 */
 interface PageProps {
   params: Promise<{ lang: string }>;
 }
 
-/** * Tipagem Flexível do Dicionário 
- * Adicionamos chaves opcionais para 'nav' e 'common' para bater com o que a Navbar exige
+/** * Tipagem de Dicionário "Pass-Through"
+ * Usamos 'any' nas propriedades exigidas para garantir compatibilidade 
+ * total com os componentes (Navbar, Hero, etc.)
  */
 interface Dictionary {
   role: string;
   headline: string;
-  nav?: any;
-  common?: any;
+  nav: any;     // Obrigatório para a Navbar
+  common: any;  // Obrigatório para a Navbar
   [key: string]: any;
 }
 
 function normalizeDictionary(d: any): Dictionary {
   return {
-    ...d, // Espalha primeiro o dicionário real para preservar 'nav', 'common', etc.
+    ...d,
     role: d?.role ?? 'Data & Systems Specialist',
     headline: d?.headline ?? 'Especialista em Dados e Engenharia de Software.',
+    // Garante que 'nav' e 'common' existam mesmo que o JSON falhe
+    nav: d?.nav ?? {},
+    common: d?.common ?? {},
   };
 }
 
