@@ -1,79 +1,105 @@
 {
-  "common": {
-    "navigation": "Navegación",
-    "openMenu": "Abrir menú",
-    "closeMenu": "Cerrar menú",
-    "role": "Ingeniero de Datos y Analista Senior",
-    "footer": "© 2026 Sérgio Santos. Todos los derechos reservados."
-  },
-
   "nav": {
     "about": "Sobre mí",
-    "experience": "Experiencia",
+    "experience": "Trayectoria",
     "articles": "Artículos",
     "projects": "Proyectos",
     "contact": "Contacto"
   },
-
   "hero": {
+    "greeting": "Hola, soy",
+    "role": "Sérgio Santos | Especialista en Datos",
     "title": "Transformando datos complejos en",
     "subtitle": "Activos Estratégicos",
-    "description": "Ingeniero de Datos y Analista Senior con más de 20 años de experiencia en sistemas críticos.",
+    "headline": "Transformando datos complejos en inteligencia estratégica con el rigor de más de 20 años en sistemas de misión crítica.",
     "ctaPrimary": "Ver Proyectos",
     "ctaSecondary": "LinkedIn"
   },
-
   "about": {
     "title": "Trayectoria Profesional",
-    "description": "Experiencia consolidada en entornos bancarios críticos, integrando gobernanza y datos.",
+    "description": "Analista de Ciencia de Datos con una base sólida en sistemas críticos bancarios (Bradesco). Mi enfoque es transformar datos brutos en decisiones, reducción de costos y eficiencia operativa, aplicando el rigor de entornos regulados a la Ciencia de Datos moderna.",
+    "differentialTitle": "Diferencial Estratégico",
+    "differentialContent": "Combino un profundo conocimiento en cumplimiento, seguridad y auditoría bancaria con tecnología de punta como Azure Databricks y Neo4J para modernizar infraestructuras heredadas y mitigar riesgos organizacionales.",
     "highlights": [
-      "Sistemas de misión crítica",
-      "Automatización con impacto medible",
-      "Ingeniería de datos aplicada"
-    ]
+      "Sistemas de misión crítica con alta disponibilidad",
+      "Automatización de procesos con impacto medible en el negocio",
+      "Ingeniería de datos aplicada a la toma de decisiones estratégicas"
+    ],
+    "stats": {
+      "experience": "20+ Años de Experiencia",
+      "availability": "99,5% Disponibilidad",
+      "automation": "2.920h/año Automatizadas"
+    }
   },
-
   "experience": {
     "title": "Experiencia Profesional",
     "items": [
       {
-        "company": "Sector Bancario",
+        "company": "Banco Bradesco S.A.",
         "role": "Analista de Sistemas Senior",
-        "period": "2000 – Presente",
-        "description": "Desarrollo y gobernanza de sistemas financieros críticos."
+        "period": "1985 – 2008",
+        "description": "Liderazgo técnico en sistemas financieros críticos, automatización de procesos interdepartamentales y gestión de soporte técnico para más de 500 usuarios."
+      },
+      {
+        "company": "Consultor Independiente",
+        "role": "Especialista en Datos y Sistemas",
+        "period": "2008 – Presente",
+        "description": "Enfoque en la modernización de infraestructura heredada (legacy), gobernanza de datos y desarrollo de soluciones analíticas predictivas."
       }
     ]
   },
-
   "projects": {
-    "title": "Proyectos",
-    "featured": "Proyecto Destacado",
+    "title": "Repositorio de Proyectos",
+    "featuredLabel": "Destacado",
+    "firstLabel": "Proyecto Principal",
+    "viewProject": "Ver Repositorio",
     "viewAll": "Ver Todos",
+    "repoLink": "GitHub",
     "categories": {
-      "data": "Ciencia de Datos",
-      "backend": "Back-end",
-      "frontend": "Front-end",
-      "devops": "DevOps",
+      "dataScience": "Ciencia de Datos",
+      "cloud": "Azure Databricks",
+      "graphs": "Análisis de Grafos",
+      "analysis": "Power BI y Datos",
+      "dev": "Desarrollo",
       "security": "Seguridad"
     }
   },
-
   "articles": {
-    "title": "Artículos e Ideas",
-    "readMore": "Leer más",
-    "publishedAt": "Publicado en"
+    "title": "Artículos e Insights",
+    "awardWinner": "Ganador de la 35ª Competición DIO",
+    "bestOfMonth": "Mejor Artículo de Septiembre",
+    "readMore": "Leer en Medium",
+    "publishedAt": "Publicado el",
+    "mediumProfile": "Ver Perfil Completo"
   },
-
   "contact": {
     "title": "Contacto",
-    "subtitle": "Hablemos de datos y sistemas críticos",
+    "subtitle": "Hablemos sobre datos, tecnología y soluciones de misión crítica",
     "emailLabel": "Email",
+    "linkedinLabel": "Conectar en LinkedIn",
+    "cvLabel": "Descargar CV (PDF)",
     "cta": "Contactar"
   },
-
+  "common": {
+    "navigation": "Navegación",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "role": "Especialista en Sistemas de Misión Crítica y Datos",
+    "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
+    "rights": "Todos los derechos reservados",
+    "builtWith": "Desarrollado con Next.js 16 y TypeScript"
+  },
   "seo": {
-    "siteName": "Sérgio Santos",
-    "description": "Ingeniería de Datos, Ciencia de Datos y Sistemas Críticos.",
-    "keywords": ["ingeniería de datos", "ciencia de datos", "gobernanza", "sistemas críticos"]
+    "siteName": "Sérgio Santos | Portafolio",
+    "description": "Ingeniería de Datos, Ciencia de Datos, Inteligencia Artificial y Sistemas de Misión Crítica.",
+    "keywords": [
+      "ingeniería de datos",
+      "ciencia de datos",
+      "inteligencia artificial",
+      "sistemas de misión crítica",
+      "gobernanza de datos",
+      "Azure Databricks",
+      "Neo4J"
+    ]
   }
 }
