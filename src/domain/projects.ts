@@ -1,41 +1,25 @@
 /**
  * DOMAIN: Projects
  * -----------------------------------------------------------------------------
- * Fonte única de verdade (SSOT) para categorização, ordenação e destaque
- * dos projetos vindos do GitHub.
- *
- * Integra:
- * - GitHub Topics
- * - Portfólio
- * - UI/UX (badges, destaque, primeiro)
- * - Filtros por tecnologia
- * - Testes automatizados
- *
- * ⚠️ Este arquivo NÃO contém textos visíveis (i18n via dictionaries)
+ * Fonte única de verdade (SSOT) para categorização, ordenação e destaque.
+ * Alinhado com as regras de Sérgio Santos: Rigor Bancário + Ciência de Dados.
  */
 
 /* -------------------------------------------------------------------------- */
 /* CORE TAGS (GitHub Topics)                                                   */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Tags estruturais usadas no GitHub (topics)
- */
 export enum ProjectCoreTag {
   PORTFOLIO = 'portfolio',
-  FEATURED = 'featured',
-  DESTAQUE = 'destaque',
-  PRIMEIRO = 'primeiro',
+  FEATURED = 'featured',   // Tag padrão internacional
+  DESTAQUE = 'destaque',   // Tag em português para redundância
+  PRIMEIRO = 'primeiro',   // A tag soberana para o Head Project
 }
 
 /* -------------------------------------------------------------------------- */
 /* TECHNOLOGIES (GitHub Topics)                                                */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Tecnologias suportadas no portfólio
- * Todas devem existir como topic no GitHub (lowercase)
- */
 export enum ProjectTechnology {
   DATA_SCIENCE = 'data-science',
   AZURE_DATABRICKS = 'azure-databricks',
@@ -53,7 +37,6 @@ export enum ProjectTechnology {
   PROGRAMMING_LOGIC = 'programming-logic',
   HTML = 'html',
   NODE_REACT = 'node-react',
-  ARTICLES = 'articles',
 }
 
 /* -------------------------------------------------------------------------- */
@@ -61,8 +44,8 @@ export enum ProjectTechnology {
 /* -------------------------------------------------------------------------- */
 
 /**
- * Ordem oficial de exibição das tecnologias no portfólio
- * UI, SEO e testes dependem dessa ordem
+ * Ordem oficial de prioridade das tecnologias definida pelo Sérgio.
+ * Determina qual categoria aparece primeiro no repositório de projetos.
  */
 export const PROJECT_TECHNOLOGY_ORDER: readonly ProjectTechnology[] = [
   ProjectTechnology.DATA_SCIENCE,
@@ -81,30 +64,26 @@ export const PROJECT_TECHNOLOGY_ORDER: readonly ProjectTechnology[] = [
   ProjectTechnology.PROGRAMMING_LOGIC,
   ProjectTechnology.HTML,
   ProjectTechnology.NODE_REACT,
-  ProjectTechnology.ARTICLES,
 ] as const;
 
 /* -------------------------------------------------------------------------- */
 /* DOMAIN MODELS                                                              */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Modelo normalizado de projeto após parsing do GitHub
- */
 export interface Project {
-  id: string;
-  name: string;
-  description: string;
-  htmlUrl: string;
-  homepage?: string | null;
-
-  topics: readonly string[];
-
-  technology: ProjectTechnology;
-  isPortfolio: boolean;
-  isFeatured: boolean;
-  isHighlighted: boolean;
-  isFirst: boolean;
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly htmlUrl: string;
+  readonly homepage?: string | null;
+  readonly topics: readonly string[];
+  readonly technology: {
+    id: ProjectTechnology;
+    labelKey: string; // Chave para tradução no dictionary.projects.categories
+  };
+  readonly isPortfolio: boolean;
+  readonly isFeatured: boolean;    // featured ou destaque
+  readonly isFirst: boolean;       // primeiro
 }
 
 /* -------------------------------------------------------------------------- */
@@ -112,49 +91,66 @@ export interface Project {
 /* -------------------------------------------------------------------------- */
 
 /**
- * Extrai a tecnologia principal de um projeto baseado nos topics
+ * Resolve a tecnologia principal e mapeia para a chave de tradução do i18n
  */
 export const resolveProjectTechnology = (
   topics: readonly string[],
-): ProjectTechnology | null => {
-  return (
-    PROJECT_TECHNOLOGY_ORDER.find((tech) => topics.includes(tech)) ?? null
-  );
+): Project['technology'] | null => {
+  if (!topics.length) return null;
+
+  const techId = PROJECT_TECHNOLOGY_ORDER.find((tech) => topics.includes(tech));
+
+  if (!techId) return null;
+
+  // Mapeamento de camelCase para o contrato do JSON
+  const mapping: Record<ProjectTechnology, string> = {
+    [ProjectTechnology.DATA_SCIENCE]: 'dataScience',
+    [ProjectTechnology.AZURE_DATABRICKS]: 'cloud',
+    [ProjectTechnology.NEO4J]: 'graphs',
+    [ProjectTechnology.POWER_BI]: 'analysis',
+    [ProjectTechnology.EXCEL]: 'analysis',
+    [ProjectTechnology.DATABASE]: 'analysis',
+    [ProjectTechnology.PYTHON]: 'dev',
+    [ProjectTechnology.DOTNET]: 'dev',
+    [ProjectTechnology.JAVA]: 'dev',
+    [ProjectTechnology.MACHINE_LEARNING]: 'dataScience',
+    [ProjectTechnology.ARTIFICIAL_INTELLIGENCE]: 'dataScience',
+    [ProjectTechnology.AWS]: 'cloud',
+    [ProjectTechnology.CYBERSECURITY]: 'security',
+    [ProjectTechnology.PROGRAMMING_LOGIC]: 'dev',
+    [ProjectTechnology.HTML]: 'dev',
+    [ProjectTechnology.NODE_REACT]: 'dev',
+  };
+
+  return {
+    id: techId,
+    labelKey: mapping[techId],
+  };
 };
 
-/**
- * Normaliza flags estruturais a partir dos topics
- */
-export const resolveProjectFlags = (topics: readonly string[]) => ({
+export const resolveProjectFlags = (
+  topics: readonly string[],
+): Pick<Project, 'isPortfolio' | 'isFeatured' | 'isFirst'> => ({
   isPortfolio: topics.includes(ProjectCoreTag.PORTFOLIO),
-  isFeatured: topics.includes(ProjectCoreTag.FEATURED),
-  isHighlighted: topics.includes(ProjectCoreTag.DESTAQUE),
+  isFeatured: topics.includes(ProjectCoreTag.FEATURED) || topics.includes(ProjectCoreTag.DESTAQUE),
   isFirst: topics.includes(ProjectCoreTag.PRIMEIRO),
 });
 
 /**
- * Comparator para ordenação final de projetos
- * 1️⃣ primeiro
- * 2️⃣ destaque
- * 3️⃣ featured
- * 4️⃣ ordem alfabética
+ * Comparator soberano:
+ * 1. Tag 'primeiro' sempre ganha.
+ * 2. Tag 'featured' ou 'destaque' vem em segundo.
+ * 3. Ordem de Tecnologia (PROJECT_TECHNOLOGY_ORDER).
+ * 4. Ordem alfabética.
  */
 export const sortProjects = (a: Project, b: Project): number => {
   if (a.isFirst !== b.isFirst) return a.isFirst ? -1 : 1;
-  if (a.isHighlighted !== b.isHighlighted)
-    return a.isHighlighted ? -1 : 1;
-  if (a.isFeatured !== b.isFeatured)
-    return a.isFeatured ? -1 : 1;
+  if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1;
 
-  return a.name.localeCompare(b.name);
+  const indexA = PROJECT_TECHNOLOGY_ORDER.indexOf(a.technology.id);
+  const indexB = PROJECT_TECHNOLOGY_ORDER.indexOf(b.technology.id);
+
+  if (indexA !== indexB) return indexA - indexB;
+
+  return a.name.localeCompare(b.name, 'pt-BR');
 };
-
-/* -------------------------------------------------------------------------- */
-/* I18N CONTRACT                                                              */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Contrato de categorias para dicionário
- * Garante que PT / EN / ES tenham todas as tecnologias
- */
-export type ProjectCategoryDictionary = Record<ProjectTechnology, string>;
