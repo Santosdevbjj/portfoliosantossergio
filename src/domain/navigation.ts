@@ -1,43 +1,34 @@
 /**
  * DOMAIN: Navigation
  * -----------------------------------------------------------------------------
- * Fonte única de verdade (SSOT) para seções de navegação do site.
- *
- * Usado por:
- * - Navbar
- * - Footer
- * - SEO
- * - ScrollSpy
- * - Sitemap
- * - Testes automatizados
- *
- * ⚠️ Este arquivo NÃO contém texto, UI ou idioma.
- * Ele define apenas estrutura e contratos.
+ * Fonte Única de Verdade (SSOT) para a navegação do site.
+ * * Este arquivo garante que a Navbar, o ScrollSpy e o SEO estejam 
+ * sempre em sincronia, evitando links quebrados.
  */
 
 /* -------------------------------------------------------------------------- */
-/* ENUMS                                                                      */
+/* SECTIONS (ENUM)                                                            */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Seções oficiais de navegação
- * Essas chaves DEVEM existir em todos os dicionários (pt / en / es)
+ * Seções oficiais do site.
+ * As chaves aqui devem ser idênticas às chaves do objeto 'nav' nos dicionários JSON.
  */
 export enum NavSection {
   ABOUT = 'about',
   EXPERIENCE = 'experience',
-  ARTICLES = 'articles',
   PROJECTS = 'projects',
+  ARTICLES = 'articles',
   CONTACT = 'contact',
 }
 
 /* -------------------------------------------------------------------------- */
-/* ORDER                                                                      */
+/* CANONICAL ORDER                                                           */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Ordem canônica de exibição das seções
- * Usada por Navbar, Footer, Sitemap e ScrollSpy
+ * Ordem oficial de exibição. 
+ * Alterar esta lista altera a ordem na Navbar e no Footer simultaneamente.
  */
 export const NAV_SECTIONS: readonly NavSection[] = [
   NavSection.ABOUT,
@@ -48,30 +39,42 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 ] as const;
 
 /* -------------------------------------------------------------------------- */
-/* HASH MAP                                                                   */
+/* HASH MAP (ANCHORS)                                                         */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Âncoras (hash) associadas a cada seção
- * Mantidas aqui para evitar strings mágicas nos componentes
+ * Mapeamento centralizado de IDs de âncoras para scroll suave.
+ * O prefixo '#' é garantido pelo tipo literal.
  */
 export const NAV_HASH_MAP: Readonly<Record<NavSection, `#${string}`>> = {
-  [NavSection.ABOUT]: '#about',
-  [NavSection.EXPERIENCE]: '#experience',
-  [NavSection.ARTICLES]: '#articles',
-  [NavSection.PROJECTS]: '#projects',
-  [NavSection.CONTACT]: '#contact',
+  [NavSection.ABOUT]: '#sobre',
+  [NavSection.EXPERIENCE]: '#trajetoria',
+  [NavSection.PROJECTS]: '#projetos',
+  [NavSection.ARTICLES]: '#artigos',
+  [NavSection.CONTACT]: '#contato',
 } as const;
+
+/* -------------------------------------------------------------------------- */
+/* HELPERS                                                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Retorna a âncora para uso em componentes de link.
+ */
+export const getNavHash = (section: NavSection): `#${string}` =>
+  NAV_HASH_MAP[section];
+
+/**
+ * Retorna o ID (sem o #) para uso em atributos 'id' de seções HTML.
+ */
+export const getSectionId = (section: NavSection): string =>
+  NAV_HASH_MAP[section].replace('#', '');
 
 /* -------------------------------------------------------------------------- */
 /* I18N CONTRACT                                                              */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Contrato de dicionário para navegação
- *
- * Garante em tempo de build que:
- * - PT / EN / ES tenham TODAS as seções
- * - nenhuma chave seja esquecida
+ * Contrato que obriga os dicionários (pt/en/es) a terem traduções para todas as seções.
  */
 export type NavDictionary = Record<NavSection, string>;
