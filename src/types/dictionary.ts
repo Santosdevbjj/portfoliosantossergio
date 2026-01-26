@@ -1,131 +1,158 @@
 /**
- * TYPES: Dictionary Contract
- * -----------------------------------------------------------------------------
- * Contrato soberano de internacionalização (i18n).
- * * ⚠️ REGRA DE OURO: 
- * Se uma propriedade for alterada aqui, ela DEVE ser atualizada em:
- * 1. src/dictionaries/pt.json
- * 2. src/dictionaries/en.json
- * 3. src/dictionaries/es.json
+ * Dictionary — Contrato único e tipado de i18n do projeto
+ * * Unifica a versão original com as métricas de autoridade (Bradesco/Data Science).
  */
 
 export interface Dictionary {
   /**
-   * Navbar / Header - Links de navegação
-   */
-  nav: {
-    about: string;
-    experience: string;
-    articles: string;
-    projects: string;
-    contact: string;
-  };
-
-  /**
-   * Seção Hero - Primeira impressão e CTA
-   */
-  hero: {
-    greeting: string;
-    role: string;
-    title: string;
-    subtitle: string;
-    headline: string;
-    ctaPrimary: string;
-    ctaSecondary: string;
-  };
-
-  /**
-   * Seção Sobre - Narrativa e Métricas de Impacto
-   */
-  about: {
-    title: string;
-    description: string;
-    differentialTitle: string;
-    differentialContent: string;
-    highlights: string[];
-    stats: {
-      experience: string;
-      availability: string;
-      automation: string;
-    };
-  };
-
-  /**
-   * Experiência - Trajetória profissional (Bradesco / Consultoria)
-   */
-  experience: {
-    title: string;
-    items: Array<{
-      company: string;
-      role: string;
-      period: string;
-      description: string;
-    }>;
-  };
-
-  /**
-   * Projetos - Vitrine de repositórios do GitHub
-   */
-  projects: {
-    title: string;
-    featuredLabel: string;
-    firstLabel: string;
-    viewProject: string;
-    viewAll: string;
-    repoLink: string;
-    categories: {
-      dataScience: string;
-      cloud: string;
-      graphs: string;
-      analysis: string;
-      dev: string;
-      security: string;
-    };
-  };
-
-  /**
-   * Artigos - Conteúdo técnico e premiações (DIO / Medium)
-   */
-  articles: {
-    title: string;
-    awardWinner: string;
-    bestOfMonth: string;
-    readMore: string;
-    publishedAt: string;
-    mediumProfile: string;
-  };
-
-  /**
-   * Contato - Conversão e links sociais
-   */
-  contact: {
-    title: string;
-    subtitle: string;
-    emailLabel: string;
-    linkedinLabel: string;
-    cvLabel: string;
-    cta: string;
-  };
-
-  /**
-   * Common - Elementos reutilizáveis de UI e Footer
+   * Textos globais e reutilizáveis
    */
   common: {
-    navigation: string;
-    openMenu: string;
-    closeMenu: string;
-    role: string;
-    footer: string;
-    rights: string;
-    builtWith: string;
-  };
+    navigation: string
+    openMenu: string
+    closeMenu: string
+    role: string
+    footer: string
+    rights: string
+    builtWith: string
+    loading?: string
+    error?: string
+  }
 
   /**
-   * SEO - Metadados para robôs de busca e redes sociais
+   * Navbar / Header
+   */
+  nav: {
+    about: string
+    experience: string
+    articles: string
+    projects: string
+    contact: string
+  }
+
+  /**
+   * Seção Hero / Home
+   */
+  hero: {
+    greeting: string     // Novo
+    role: string         // Novo
+    title: string
+    subtitle: string
+    headline: string     // Novo
+    description: string
+    ctaPrimary: string
+    ctaSecondary?: string
+  }
+
+  /**
+   * Seção Sobre
+   */
+  about: {
+    title: string
+    description: string
+    differentialTitle: string    // Novo
+    differentialContent: string  // Novo
+    highlights: string[]
+    stats: {                     // Novo: Métricas Bradesco
+      experience: string
+      availability: string
+      automation: string
+    }
+  }
+
+  /**
+   * Experiência profissional
+   */
+  experience: {
+    title: string
+    items: Array<{
+      company: string
+      role: string
+      period: string
+      description: string
+    }>
+  }
+
+  /**
+   * Projetos
+   */
+  projects: {
+    title: string
+    featured: string
+    featuredLabel: string // Novo
+    firstLabel: string    // Novo
+    viewProject: string   // Novo
+    viewAll: string
+    repoLink: string      // Novo
+    categories: {
+      data: string
+      dataScience: string // Novo
+      cloud: string       // Novo
+      graphs: string      // Novo
+      analysis: string    // Novo
+      dev: string         // Novo
+      backend: string
+      frontend: string
+      devops: string
+      security: string
+    }
+  }
+
+  /**
+   * Artigos / Conteúdo
+   */
+  articles: {
+    title: string
+    awardWinner: string  // Novo (DIO)
+    bestOfMonth: string  // Novo
+    readMore: string
+    publishedAt: string
+    mediumProfile: string // Novo
+    emptyState?: string
+  }
+
+  /**
+   * Contato
+   */
+  contact: {
+    title: string
+    subtitle: string
+    emailLabel: string
+    linkedinLabel: string // Novo
+    cvLabel: string       // Novo
+    cta: string
+    successMessage?: string
+  }
+
+  /**
+   * SEO global e por página (Mantido conforme original)
    */
   seo: {
-    siteName: string;
-    description: string;
-    keywords: string[];
-  };
+    siteName: string       // Simplificado para bater com os JSONs revisados
+    description: string
+    keywords: string[]
+    site: {                // Mantido para compatibilidade legado
+      siteName: string
+      description: string
+      keywords: string[]
+    }
+    pages?: {
+      home?: {
+        title?: string
+        description?: string
+      }
+      projects?: {
+        title?: string
+        description?: string
+      }
+      articles?: {
+        title?: string
+        description?: string
+      }
+      contact?: {
+        title?: string
+        description?: string
+      }
+    }
+  }
 }
