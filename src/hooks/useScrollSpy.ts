@@ -1,89 +1,93 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 /**
- * useScrollSpy
- * ------------------------------
- * Hook global para detectar seção ativa da página
- * Compatível com Navbar, ScrollSpy e layouts responsivos
- *
- * Estratégia:
- * - Usa IntersectionObserver quando disponível (mais performático)
- * - Fallback para scroll + offset em browsers antigos
+ * HOOK: useScrollSpyObserver
+ * -----------------------------------------------------------------------------
+ * Observa a visibilidade das seções no viewport e sincroniza com o Contexto.
+ * * Utiliza IntersectionObserver para alta performance.
+ * * Possui fallback para Scroll Listener em navegadores legados.
+ * * Integrado ao domínio NavSection para garantir consistência de tipos.
  */
-export function useScrollSpy(
+
+import { useEffect } from 'react'
+import { useScrollSpy } from '@/contexts/ScrollSpyContext'
+import { NavSection, NAV_HASH_MAP } from '@/domain/navigation'
+
+export function useScrollSpyObserver(
   sectionIds: string[],
-  offset: number = 120
+  offset: number = 100
 ) {
-  const [activeSection, setActiveSection] = useState<string | null>(null)
+  const { setActiveSection } = useScrollSpy()
 
   useEffect(() => {
-    if (!sectionIds || sectionIds.length === 0) return
+    // 1. Validação de segurança
+    if (typeof window === 'undefined' || !sectionIds.length) return
 
     const elements = sectionIds
       .map(id => document.getElementById(id))
-      .filter((el): el is HTMLElement => Boolean(el))
+      .filter((el): el is HTMLElement => el !== null)
 
-    if (!elements.length) return
+    if (elements.length === 0) return
 
-    /**
-     * ============================
-     * IntersectionObserver (preferencial)
-     * ============================
-     */
+    /* -------------------------------------------------------------------------- */
+    /* INTERSECTION OBSERVER (ESTRATÉGIA PRINCIPAL)                               */
+    /* -------------------------------------------------------------------------- */
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver(
-        entries => {
+        (entries) => {
+          // Filtramos apenas os elementos que estão entrando na área de visão
           const visibleEntries = entries
-            .filter(entry => entry.isIntersecting)
-            .sort(
-              (a, b) =>
-                a.boundingClientRect.top - b.boundingClientRect.top
-            )
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
 
           if (visibleEntries.length > 0) {
-            const id = visibleEntries[0].target.id
-            setActiveSection(prev => (prev !== id ? id : prev))
+            const targetId = visibleEntries[0].target.id
+            
+            // Encontramos qual NavSection corresponde ao ID do elemento HTML
+            const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
+              (key) => NAV_HASH_MAP[key] === `#${targetId}`
+            )
+
+            if (section) {
+              setActiveSection(section)
+            }
           }
         },
         {
-          root: null,
-          rootMargin: `-${offset}px 0px -60% 0px`,
-          threshold: 0.1
+          // A margem superior (offset) evita que a seção mude antes de passar pela Navbar
+          rootMargin: `-${offset}px 0px -70% 0px`,
+          threshold: [0, 0.1, 0.2]
         }
       )
 
-      elements.forEach(el => observer.observe(el))
-
+      elements.forEach((el) => observer.observe(el))
       return () => observer.disconnect()
     }
 
-    /**
-     * ============================
-     * Fallback: scroll listener
-     * ============================
-     */
-    const onScroll = () => {
-      const scrollPosition = window.scrollY + offset
+    /* -------------------------------------------------------------------------- */
+    /* FALLBACK (SCROLL LISTENER)                                                 */
+    /* -------------------------------------------------------------------------- */
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + offset + 10
 
+      // Percorre de baixo para cima para encontrar a seção atual
       for (let i = elements.length - 1; i >= 0; i--) {
         const el = elements[i]
         if (el.offsetTop <= scrollPosition) {
-          const id = el.id
-          setActiveSection(prev => (prev !== id ? id : prev))
+          const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
+            (key) => NAV_HASH_MAP[key] === `#${el.id}`
+          )
+          if (section) {
+            setActiveSection(section)
+          }
           break
         }
       }
     }
 
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // Execução imediata para definir estado inicial
 
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-    }
-  }, [sectionIds, offset])
-
-  return activeSection
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [sectionIds, offset, setActiveSection])
 }
