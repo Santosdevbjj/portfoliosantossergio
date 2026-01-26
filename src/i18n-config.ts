@@ -1,25 +1,32 @@
 /**
- * CONFIGURAÇÃO GLOBAL DE IDIOMAS - NEXT.JS 16 / 2026
- * Centraliza a lógica de internacionalização (i18n) para PT, EN e ES.
+ * CONFIGURAÇÃO GLOBAL DE IDIOMAS — NEXT.JS 16+
+ * Centraliza i18n, contratos de dicionário e helpers de SEO.
+ * * ⚠️ REGRA DE OURO: 
+ * Este arquivo é o contrato soberano. Se uma chave for definida aqui,
+ * ela DEVE existir em pt.json, en.json e es.json.
  */
+
+/* -------------------------------------------------------------------------- */
+/* LOCALES                                                                    */
+/* -------------------------------------------------------------------------- */
 
 export const i18n = {
-  defaultLocale: 'pt' as const,
-  locales: ['pt', 'en', 'es'] as const,
-};
+  defaultLocale: 'pt',
+  locales: ['pt', 'en', 'es'],
+} as const;
 
-export type Locale = (typeof i18n)['locales'][number];
+export type Locale = (typeof i18n.locales)[number];
 
-/**
- * METADADOS DE IDIOMA
- * Para LanguageSwitcher, SEO e acessibilidade.
- */
+/* -------------------------------------------------------------------------- */
+/* METADADOS DE IDIOMA                                                        */
+/* -------------------------------------------------------------------------- */
+
 export interface LocaleDetail {
-  readonly name: string;       // Nome do idioma
-  readonly region: string;     // Código de região (ex: pt-BR)
-  readonly flag: string;       // Emoji ou ícone
-  readonly label: string;      // Sigla para UI (PT, EN, ES)
-  readonly ariaLabel: string;  // Acessibilidade
+  readonly name: string;
+  readonly region: string;
+  readonly flag: string;
+  readonly label: string;
+  readonly ariaLabel: string;
 }
 
 export const localeMetadata: Readonly<Record<Locale, LocaleDetail>> = {
@@ -46,91 +53,130 @@ export const localeMetadata: Readonly<Record<Locale, LocaleDetail>> = {
   },
 };
 
-/**
- * VALIDAÇÃO DE LOCALE
- */
-export function isValidLocale(locale: unknown): locale is Locale {
-  return typeof locale === 'string' && (i18n.locales as readonly string[]).includes(locale);
+/* -------------------------------------------------------------------------- */
+/* CONTRATO CANÔNICO DO DICIONÁRIO (BLINDAGEM ENTERPRISE)                     */
+/* -------------------------------------------------------------------------- */
+
+export interface Dictionary {
+  nav: {
+    about: string;
+    experience: string;
+    articles: string;
+    projects: string;
+    contact: string;
+  };
+  hero: {
+    greeting: string;
+    role: string;
+    headline: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
+  };
+  about: {
+    title: string;
+    description: string;
+    differentialTitle: string;
+    differentialContent: string;
+    stats: {
+      experience: string;
+      availability: string;
+      automation: string;
+    };
+  };
+  projects: {
+    title: string;
+    featuredLabel: string;
+    firstLabel: string; // Para o projeto "Primeiro"
+    viewProject: string;
+    repoLink: string;
+    categories: {
+      dataScience: string;
+      cloud: string;
+      graphs: string;
+      analysis: string;
+      dev: string;
+    };
+  };
+  articles: {
+    title: string;
+    awardWinner: string;
+    bestOfMonth: string;
+    readMore: string;
+    mediumProfile: string;
+  };
+  contact: {
+    title: string;
+    description: string;
+    emailLabel: string;
+    linkedinLabel: string;
+    cvLabel: string;
+  };
+  common: {
+    navigation: string;
+    openMenu: string;
+    closeMenu: string;
+    footer: string;
+    rights: string;
+    builtWith: string;
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/* VALIDADORES                                                                */
+/* -------------------------------------------------------------------------- */
+
+export function isValidLocale(value: unknown): value is Locale {
+  return (
+    typeof value === 'string' &&
+    (i18n.locales as readonly string[]).includes(value)
+  );
 }
 
 export function getSafeLocale(locale: string | undefined | null): Locale {
-  return isValidLocale(locale) ? (locale as Locale) : i18n.defaultLocale;
+  return isValidLocale(locale) ? locale : i18n.defaultLocale;
 }
 
-/**
- * TIPAGEM DO DICIONÁRIO
- * Compatível com Navbar, PageWrapper e outros componentes
- */
-export interface Dictionary {
-  nav?: {
-    about?: string;
-    experience?: string;
-    articles?: string;
-    projects?: string;
-    contact?: string;
-  };
-  common?: {
-    navigation?: string;
-    openMenu?: string;
-    closeMenu?: string;
-    role?: string;
-    footer?: string;
-  };
-  [key: string]: any; // Permite outras traduções genéricas
-}
+/* -------------------------------------------------------------------------- */
+/* LOADER DINÂMICO DE DICIONÁRIOS                                             */
+/* -------------------------------------------------------------------------- */
 
-/**
- * DICIONÁRIOS DINÂMICOS
- * Carregamento otimizado para Server Components com Code Splitting.
- */
 const dictionaries: Record<Locale, () => Promise<Dictionary>> = {
-  pt: async () => (await import('./dictionaries/pt.json')).default as Dictionary,
-  en: async () => (await import('./dictionaries/en.json')).default as Dictionary,
-  es: async () => (await import('./dictionaries/es.json')).default as Dictionary,
+  pt: () => import('./dictionaries/pt.json').then((module) => module.default as Dictionary),
+  en: () => import('./dictionaries/en.json').then((module) => module.default as Dictionary),
+  es: () => import('./dictionaries/es.json').then((module) => module.default as Dictionary),
 };
 
-/**
- * OBTÉM DICIONÁRIO
- * Função principal para carregar traduções
- */
-export const getDictionary = async (locale: Locale): Promise<Dictionary> => {
-  const targetLocale = getSafeLocale(locale);
+export async function getDictionary(locale: Locale): Promise<Dictionary> {
+  const safeLocale = getSafeLocale(locale);
 
   try {
-    const loadFn = dictionaries[targetLocale];
-    if (!loadFn) throw new Error(`Dicionário ausente para locale: ${targetLocale}`);
-    return await loadFn();
+    return await dictionaries[safeLocale]();
   } catch (error) {
-    console.error(`[i18n-critical] Falha ao carregar: ${targetLocale}`, error);
+    console.error(`[i18n-critical] Erro ao carregar dicionário: ${safeLocale}`, error);
 
-    // Fallback para idioma padrão
-    if (targetLocale !== i18n.defaultLocale) {
-      try {
-        return await dictionaries[i18n.defaultLocale]();
-      } catch (fatal) {
-        console.error('[i18n-panic] Dicionário padrão indisponível', fatal);
-      }
+    // Fallback para o idioma padrão (PT) caso o idioma solicitado falhe
+    if (safeLocale !== i18n.defaultLocale) {
+      return await dictionaries[i18n.defaultLocale]();
     }
 
-    // Retorna objeto vazio para evitar crash
-    return {};
+    throw new Error('[i18n-fatal] Dicionário padrão não encontrado ou corrompido.');
   }
-};
+}
 
-/**
- * AUXILIARES DE SEO E ROTEAMENTO
- */
-export const getRegion = (locale: Locale): string => {
-  return localeMetadata[locale]?.region ?? i18n.defaultLocale;
-};
+/* -------------------------------------------------------------------------- */
+/* HELPERS DE SEO & ROTEAMENTO                                                */
+/* -------------------------------------------------------------------------- */
 
-export const getAlternateLocales = (currentLocale: Locale): Locale[] => {
+export function getRegion(locale: Locale): string {
+  return localeMetadata[locale].region;
+}
+
+export function getAlternateLocales(currentLocale: Locale): Locale[] {
   return i18n.locales.filter((locale) => locale !== currentLocale);
-};
+}
 
 /**
- * FLAG DE RESPONSIVIDADE
- * O próprio i18n-config não controla layout, mas pode ser usado para adaptar conteúdo.
- * - Responsividade depende de CSS/Tailwind (ver componentes)
+ * Nota Técnica:
+ * Responsividade é controlada via CSS/Tailwind nos componentes.
+ * Este arquivo garante a integridade dos dados multilingues.
  */
-export const isResponsive = true;
