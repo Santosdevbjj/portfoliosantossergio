@@ -9,55 +9,97 @@
   "hero": {
     "greeting": "Olá, eu sou",
     "role": "Sérgio Santos | Especialista em Dados",
+    "title": "Transformando dados complexos em",
+    "subtitle": "Ativos Estratégicos",
     "headline": "Transformando dados complexos em inteligência estratégica com o rigor de 20+ anos em sistemas de missão crítica.",
     "ctaPrimary": "Ver Projetos",
-    "ctaSecondary": "Download CV"
+    "ctaSecondary": "LinkedIn"
   },
   "about": {
     "title": "Trajetória Profissional",
     "description": "Analista de Ciência de Dados com base sólida em sistemas críticos bancários (Bradesco). Minha atuação foca em transformar dados brutos em decisões, redução de custos e eficiência operacional, aplicando o rigor de ambientes regulados à Ciência de Dados moderna.",
     "differentialTitle": "Diferencial Estratégico",
     "differentialContent": "Combino profundo conhecimento em compliance, segurança e auditoria bancária com tecnologia de ponta como Azure Databricks e Neo4J para modernizar infraestruturas e mitigar riscos organizacionais.",
+    "highlights": [
+      "Sistemas de missão crítica com alta disponibilidade",
+      "Automação de processos com impacto mensurável em custo e eficiência",
+      "Engenharia de dados aplicada à tomada de decisão estratégica"
+    ],
     "stats": {
       "experience": "20+ Anos de Experiência",
       "availability": "99,5% Disponibilidade",
       "automation": "2.920h/ano Automatizadas"
     }
   },
+  "experience": {
+    "title": "Experiência Profissional",
+    "items": [
+      {
+        "company": "Banco Bradesco S.A.",
+        "role": "Analista de Sistemas Sênior",
+        "period": "1985 – 2008",
+        "description": "Liderança técnica em sistemas financeiros críticos, automação de processos interdepartamentais e gestão de suporte à microinformática para 500+ usuários."
+      },
+      {
+        "company": "Consultoria Independente",
+        "role": "Especialista em Dados e Sistemas",
+        "period": "2008 – Presente",
+        "description": "Foco em modernização de infraestrutura legada, governança de dados e desenvolvimento de soluções analíticas preditivas."
+      }
+    ]
+  },
   "projects": {
     "title": "Repositório de Projetos",
     "featuredLabel": "Destaque",
     "firstLabel": "Projeto Principal",
     "viewProject": "Ver Repositório",
+    "viewAll": "Ver Todos",
     "repoLink": "GitHub",
     "categories": {
       "dataScience": "Ciência de Dados",
       "cloud": "Azure Databricks",
       "graphs": "Análise de Grafos",
       "analysis": "Power BI & Dados",
-      "dev": "Desenvolvimento"
+      "dev": "Desenvolvimento",
+      "security": "Segurança"
     }
   },
   "articles": {
-    "title": "Artigos Técnicos",
+    "title": "Artigos & Insights",
     "awardWinner": "Vencedor da 35ª Competição DIO",
     "bestOfMonth": "Melhor Artigo de Setembro",
     "readMore": "Ler no Medium",
+    "publishedAt": "Publicado em",
     "mediumProfile": "Ver Perfil Completo"
   },
   "contact": {
-    "title": "Vamos Conversar?",
-    "description": "Estou aberto a novas oportunidades e colaborações em projetos que envolvam governança, modernização e sistemas regulados.",
-    "emailLabel": "E-mail Direto",
+    "title": "Contato",
+    "subtitle": "Vamos conversar sobre dados, tecnologia e soluções críticas",
+    "emailLabel": "Email",
     "linkedinLabel": "Conectar no LinkedIn",
-    "cvLabel": "Baixar Currículo (PDF)"
+    "cvLabel": "Baixar Currículo (PDF)",
+    "cta": "Entrar em contato"
   },
   "common": {
     "navigation": "Navegação",
     "openMenu": "Abrir menu",
     "closeMenu": "Fechar menu",
-    "footer": "Sérgio Santos",
+    "role": "Especialista em Sistemas Críticos & Dados",
+    "footer": "© 2026 Sérgio Santos. Todos os direitos reservados.",
     "rights": "Todos os direitos reservados",
     "builtWith": "Desenvolvido com Next.js 16 & TypeScript"
+  },
+  "seo": {
+    "siteName": "Sérgio Santos | Portfólio",
+    "description": "Engenharia de Dados, Ciência de Dados, Inteligência Artificial e Sistemas de Missão Crítica.",
+    "keywords": [
+      "engenharia de dados",
+      "ciência de dados",
+      "inteligência artificial",
+      "sistemas críticos",
+      "governança de dados",
+      "Azure Databricks",
+      "Neo4J"
+    ]
   }
 }
