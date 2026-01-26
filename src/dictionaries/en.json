@@ -1,79 +1,105 @@
 {
-  "common": {
-    "navigation": "Navigation",
-    "openMenu": "Open menu",
-    "closeMenu": "Close menu",
-    "role": "Senior Data Engineer & Analyst",
-    "footer": "© 2026 Sérgio Santos. All rights reserved."
-  },
-
   "nav": {
     "about": "About",
-    "experience": "Experience",
+    "experience": "Career",
     "articles": "Articles",
     "projects": "Projects",
     "contact": "Contact"
   },
-
   "hero": {
+    "greeting": "Hello, I am",
+    "role": "Sérgio Santos | Data Specialist",
     "title": "Transforming complex data into",
     "subtitle": "Strategic Assets",
-    "description": "Senior Data Engineer and Analyst with over 20 years of experience in mission-critical systems and data science.",
+    "headline": "Transforming complex data into strategic intelligence with the rigor of 20+ years in mission-critical systems.",
     "ctaPrimary": "View Projects",
     "ctaSecondary": "LinkedIn"
   },
-
   "about": {
     "title": "Professional Background",
-    "description": "Strong background in critical banking environments, combining governance, data engineering, and AI.",
+    "description": "Data Science Analyst with a solid foundation in critical banking systems (Bradesco). My focus is on transforming raw data into decisions, cost reduction, and operational efficiency, applying the rigor of regulated environments to modern Data Science.",
+    "differentialTitle": "Strategic Differential",
+    "differentialContent": "I combine deep knowledge in compliance, security, and banking audit with cutting-edge technology such as Azure Databricks and Neo4J to modernize legacy infrastructures and mitigate organizational risks.",
     "highlights": [
-      "Mission-critical systems with high availability",
-      "Process automation with measurable impact",
-      "Data engineering for strategic decision-making"
-    ]
+      "High-availability mission-critical systems",
+      "Process automation with measurable business impact",
+      "Data engineering applied to strategic decision-making"
+    ],
+    "stats": {
+      "experience": "20+ Years of Experience",
+      "availability": "99.5% Availability",
+      "automation": "2,920h/year Automated"
+    }
   },
-
   "experience": {
     "title": "Professional Experience",
     "items": [
       {
-        "company": "Banking Sector",
+        "company": "Banco Bradesco S.A.",
         "role": "Senior Systems Analyst",
-        "period": "2000 – Present",
-        "description": "Development and governance of critical financial systems."
+        "period": "1985 – 2008",
+        "description": "Technical leadership in critical financial systems, interdepartmental process automation, and microcomputing support management for 500+ users."
+      },
+      {
+        "company": "Independent Consultant",
+        "role": "Data and Systems Specialist",
+        "period": "2008 – Present",
+        "description": "Focused on legacy infrastructure modernization, data governance, and development of predictive analytical solutions."
       }
     ]
   },
-
   "projects": {
-    "title": "Projects",
-    "featured": "Featured Project",
+    "title": "Project Repository",
+    "featuredLabel": "Featured",
+    "firstLabel": "Head Project",
+    "viewProject": "View Repository",
     "viewAll": "View All",
+    "repoLink": "GitHub",
     "categories": {
-      "data": "Data Science",
-      "backend": "Back-end",
-      "frontend": "Front-end",
-      "devops": "DevOps",
+      "dataScience": "Data Science",
+      "cloud": "Azure Databricks",
+      "graphs": "Graph Analysis",
+      "analysis": "Power BI & Data",
+      "dev": "Development",
       "security": "Security"
     }
   },
-
   "articles": {
     "title": "Articles & Insights",
-    "readMore": "Read more",
-    "publishedAt": "Published at"
+    "awardWinner": "35th DIO Competition Winner",
+    "bestOfMonth": "Best Article - September",
+    "readMore": "Read on Medium",
+    "publishedAt": "Published on",
+    "mediumProfile": "Full Profile"
   },
-
   "contact": {
     "title": "Contact",
-    "subtitle": "Let’s talk about data and critical systems",
+    "subtitle": "Let’s talk about data, technology, and mission-critical solutions",
     "emailLabel": "Email",
+    "linkedinLabel": "Connect on LinkedIn",
+    "cvLabel": "Download CV (PDF)",
     "cta": "Get in touch"
   },
-
+  "common": {
+    "navigation": "Navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "role": "Mission-Critical Systems & Data Specialist",
+    "footer": "© 2026 Sérgio Santos. All rights reserved.",
+    "rights": "All rights reserved",
+    "builtWith": "Built with Next.js 16 & TypeScript"
+  },
   "seo": {
-    "siteName": "Sérgio Santos",
-    "description": "Data Engineering, Data Science, and Mission-Critical Systems.",
-    "keywords": ["data engineering", "data science", "governance", "critical systems"]
+    "siteName": "Sérgio Santos | Portfolio",
+    "description": "Data Engineering, Data Science, Artificial Intelligence, and Mission-Critical Systems.",
+    "keywords": [
+      "data engineering",
+      "data science",
+      "artificial intelligence",
+      "mission-critical systems",
+      "data governance",
+      "Azure Databricks",
+      "Neo4J"
+    ]
   }
 }
