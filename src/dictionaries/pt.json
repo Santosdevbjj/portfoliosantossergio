@@ -12,6 +12,7 @@
     "title": "Transformando dados complexos em",
     "subtitle": "Ativos Estratégicos",
     "headline": "Transformando dados complexos em inteligência estratégica com o rigor de 20+ anos em sistemas de missão crítica.",
+    "description": "Engenheiro de Dados e Analista Sênior focado em automação e mitigação de riscos.",
     "ctaPrimary": "Ver Projetos",
     "ctaSecondary": "LinkedIn"
   },
@@ -19,7 +20,7 @@
     "title": "Trajetória Profissional",
     "description": "Analista de Ciência de Dados com base sólida em sistemas críticos bancários (Bradesco). Minha atuação foca em transformar dados brutos em decisões, redução de custos e eficiência operacional, aplicando o rigor de ambientes regulados à Ciência de Dados moderna.",
     "differentialTitle": "Diferencial Estratégico",
-    "differentialContent": "Combino profundo conhecimento em compliance, segurança e auditoria bancária com tecnologia de ponta como Azure Databricks e Neo4J para modernizar infraestruturas e mitigar riscos organizacionais.",
+    "differentialContent": "Combino profundo conhecimento em compliance, segurança e auditoria bancaria com tecnologia de ponta como Azure Databricks e Neo4J para modernizar infraestruturas e mitigar riscos organizacionais.",
     "highlights": [
       "Sistemas de missão crítica com alta disponibilidade",
       "Automação de processos com impacto mensurável em custo e eficiência",
@@ -50,6 +51,7 @@
   },
   "projects": {
     "title": "Repositório de Projetos",
+    "featured": "Projeto em Destaque",
     "featuredLabel": "Destaque",
     "firstLabel": "Projeto Principal",
     "viewProject": "Ver Repositório",
@@ -61,7 +63,11 @@
       "graphs": "Análise de Grafos",
       "analysis": "Power BI & Dados",
       "dev": "Desenvolvimento",
-      "security": "Segurança"
+      "security": "Segurança",
+      "data": "Dados",
+      "backend": "Back-end",
+      "frontend": "Front-end",
+      "devops": "DevOps"
     }
   },
   "articles": {
@@ -92,14 +98,11 @@
   "seo": {
     "siteName": "Sérgio Santos | Portfólio",
     "description": "Engenharia de Dados, Ciência de Dados, Inteligência Artificial e Sistemas de Missão Crítica.",
-    "keywords": [
-      "engenharia de dados",
-      "ciência de dados",
-      "inteligência artificial",
-      "sistemas críticos",
-      "governança de dados",
-      "Azure Databricks",
-      "Neo4J"
-    ]
+    "keywords": ["engenharia de dados", "ciência de dados", "inteligência artificial", "sistemas críticos"],
+    "site": {
+      "siteName": "Sérgio Santos | Portfólio",
+      "description": "Engenharia de Dados, Ciência de Dados, Inteligência Artificial e Sistemas de Missão Crítica.",
+      "keywords": ["engenharia de dados", "ciência de dados", "inteligência artificial"]
+    }
   }
 }
