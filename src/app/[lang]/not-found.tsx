@@ -1,54 +1,57 @@
 'use client'
 
-import React from 'react'
+/**
+ * NOT FOUND (404): Rota Não Localizada
+ * -----------------------------------------------------------------------------
+ * Renderizado quando uma URL não corresponde a nenhuma rota ou locale.
+ * - Estética: "High-Tech / Data Driven" combinando com o perfil de Especialista.
+ * - UX: Oferece retorno inteligente para o idioma atual do usuário.
+ */
+
 import { Search, ArrowLeft, Home, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useMemo } from 'react'
 
-/**
- * PÁGINA 404 PERSONALIZADA — NEXT.JS 15 (APP ROUTER)
- * Totalmente responsiva, acessível e multilíngue (PT / EN / ES)
- */
+type SupportedLang = 'pt' | 'en' | 'es'
+
 export default function NotFound() {
   const pathname = usePathname()
 
   /**
-   * Detecção resiliente de idioma via URL
-   * Fallback seguro para PT
+   * Detecção de idioma via URL (Memoized)
+   * Garante que se o usuário se perder em /en/qualquer-coisa,
+   * a página 404 apareça em Inglês.
    */
-  const lang = (() => {
-    const segment = pathname?.split('/')?.[1]
-    return segment === 'en' || segment === 'es' || segment === 'pt'
-      ? segment
-      : 'pt'
-  })()
+  const lang: SupportedLang = useMemo(() => {
+    const segment = pathname?.split('/')?.[1] as SupportedLang
+    const supported: SupportedLang[] = ['pt', 'en', 'es']
+    return supported.includes(segment) ? segment : 'pt'
+  }, [pathname])
 
   const content = {
     pt: {
       title: '404 — Rota Não Encontrada',
-      message:
-        'O segmento de dados que você procura não existe ou foi movido para outro diretório do sistema.',
+      message: 'O segmento de dados solicitado não existe ou foi movido para outro diretório do sistema.',
       back: 'Voltar',
       home: 'Ir para o Início',
       stack: 'Sistema: Missão Crítica',
     },
     en: {
       title: '404 — Route Not Found',
-      message:
-        'The data segment you are looking for does not exist or has been moved to another system directory.',
+      message: 'The data segment you are looking for does not exist or has been moved to another system directory.',
       back: 'Go Back',
       home: 'Go to Home',
       stack: 'System: Mission-Critical',
     },
     es: {
       title: '404 — Ruta No Encontrada',
-      message:
-        'El segmento de datos solicitado no existe o fue movido a otro directorio del sistema.',
+      message: 'El segmento de datos solicitado no existe o fue movido a otro directorio del sistema.',
       back: 'Volver',
       home: 'Ir al Inicio',
       stack: 'Sistema: Misión Crítica',
     },
-  }
+  } as const
 
   const t = content[lang]
 
@@ -56,31 +59,29 @@ export default function NotFound() {
     <div
       role="alert"
       aria-live="assertive"
-      aria-describedby="not-found-description"
-      className="relative min-h-screen flex items-center justify-center px-6 bg-slate-50 dark:bg-[#020617] overflow-hidden transition-colors duration-500"
+      className="relative min-h-[100dvh] flex items-center justify-center px-6 bg-slate-50 dark:bg-[#020617] overflow-hidden transition-colors duration-500"
     >
-      {/* Fundo decorativo — malha de dados */}
+      {/* Background Decorativo com Grid Tech */}
       <div
         aria-hidden="true"
         className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06] pointer-events-none"
         style={{
-          backgroundImage:
-            'radial-gradient(#3b82f6 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(#3b82f6 1px, transparent 1px)',
           backgroundSize: '32px 32px',
         }}
       />
 
-      {/* Glow atmosférico */}
+      {/* Brilho Atmosférico (Glow) */}
       <div
         aria-hidden="true"
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] md:w-[600px] h-[320px] md:h-[600px] bg-blue-500/10 dark:bg-blue-600/5 rounded-full blur-[80px] md:blur-[120px]"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-blue-500/10 dark:bg-blue-600/5 rounded-full blur-[100px]"
       />
 
-      <div className="relative z-10 max-w-xl w-full text-center animate-in fade-in zoom-in duration-700">
-        {/* Ícone principal */}
+      <section className="relative z-10 max-w-xl w-full text-center animate-in fade-in zoom-in duration-700">
+        {/* Ícone com Efeito de Scanner */}
         <div
           aria-hidden="true"
-          className="relative inline-flex p-8 mb-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] text-blue-600 dark:text-blue-400 shadow-2xl transition-transform hover:scale-105 group"
+          className="relative inline-flex p-8 mb-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] text-blue-600 dark:text-blue-400 shadow-2xl group"
         >
           <Search
             size={54}
@@ -88,24 +89,21 @@ export default function NotFound() {
             className="relative z-10 transition-transform duration-500 group-hover:rotate-12"
           />
 
-          {/* Scan line */}
           <div className="absolute inset-0 overflow-hidden rounded-[2.5rem]">
+            {/* Linha de Scan Animada */}
             <div className="absolute top-0 w-full h-[2px] bg-blue-500/50 animate-[scan_3s_linear_infinite]" />
           </div>
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 dark:text-white mb-6 leading-none">
+        <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 dark:text-white mb-6 leading-tight">
           {t.title}
         </h1>
 
-        <p
-          id="not-found-description"
-          className="text-base md:text-xl text-slate-600 dark:text-slate-400 mb-12 leading-relaxed font-medium"
-        >
+        <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 mb-12 leading-relaxed font-medium">
           {t.message}
         </p>
 
-        {/* Ações */}
+        {/* Ações Responsivas */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <button
             type="button"
@@ -128,16 +126,16 @@ export default function NotFound() {
           </Link>
         </div>
 
-        {/* Rodapé técnico */}
+        {/* Rodapé Técnico / Identidade Visual de Dados */}
         <div className="mt-16 pt-8 border-t border-slate-200/50 dark:border-slate-800/50">
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-slate-100 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 backdrop-blur-sm">
             <Terminal size={14} className="text-blue-500" />
             <code className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-              HTTP_STATUS: 404 | {t.stack}
+              STATUS: 404_NOT_FOUND | {t.stack}
             </code>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }
