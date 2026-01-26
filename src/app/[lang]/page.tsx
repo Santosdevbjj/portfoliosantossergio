@@ -17,22 +17,27 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { getGitHubProjects } from '@/lib/github';
 import { i18n, type Locale } from '@/i18n-config';
 
-/** Tipagem de Props para Next.js 16 - Aceita string para compatibilidade com Typegen */
+/** Tipagem de Props para Next.js 16 */
 interface PageProps {
   params: Promise<{ lang: string }>;
 }
 
+/** * Tipagem Flexível do Dicionário 
+ * Adicionamos chaves opcionais para 'nav' e 'common' para bater com o que a Navbar exige
+ */
 interface Dictionary {
   role: string;
   headline: string;
+  nav?: any;
+  common?: any;
   [key: string]: any;
 }
 
 function normalizeDictionary(d: any): Dictionary {
   return {
+    ...d, // Espalha primeiro o dicionário real para preservar 'nav', 'common', etc.
     role: d?.role ?? 'Data & Systems Specialist',
-    headline: d?.headline ?? 'Especialista em Dados e Arquitetura de Sistemas.',
-    ...d,
+    headline: d?.headline ?? 'Especialista em Dados e Engenharia de Software.',
   };
 }
 
@@ -69,7 +74,6 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 export default async function Page(props: PageProps) {
   const { lang: rawLang } = await props.params;
   
-  // Validação rigorosa do Locale
   if (!i18n.locales.includes(rawLang as any)) notFound();
   const lang = rawLang as Locale;
 
@@ -81,7 +85,6 @@ export default async function Page(props: PageProps) {
   const dict = normalizeDictionary(dictRaw);
 
   return (
-    /* CORREÇÃO AQUI: Passando o 'lang' para o PageWrapper */
     <PageWrapper lang={lang}>
       <Navbar lang={lang} dict={dict} />
       
