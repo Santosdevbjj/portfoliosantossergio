@@ -1,184 +1,162 @@
-/* globals.css - Next.js 16 + Tailwind 3 + Turbopack */
+/* src/app/globals.css */
 
 /* ------------------------------------------ */
-/* Imports externos */
+/* Imports e Tailwind */
 /* ------------------------------------------ */
-@import "../styles/animations.css"; /* Animações externas */
-
-/* Tailwind base */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ------------------------------------------ */
-/* Variáveis CSS globais e configuração de tema */
+/* Variáveis de Tema (Design Tokens) */
 /* ------------------------------------------ */
 @layer base {
   :root {
-    /* Tema inicial */
-    --theme: light;
-
-    /* Cores principais */
+    /* Brand Colors */
     --brand-blue: #0e8ce9;
     --brand-blue-hover: #0358a1;
 
-    /* Backgrounds */
-    --background-light: #f8fafc;
-    --background-dark: #020617;
-
-    /* Textos */
-    --text-light: #1f2937;
-    --text-dark: #f1f5f9;
-
-    /* Cartões e vidro */
-    --card-bg-light: rgba(255, 255, 255, 0.9);
-    --card-bg-dark: rgba(15, 23, 42, 0.6);
-    --glass-border-light: rgba(255, 255, 255, 0.2);
-    --glass-border-dark: rgba(71, 85, 105, 0.4);
-
-    /* Scrollbar */
-    --scroll-thumb-light: rgba(203, 213, 225, 0.6);
-    --scroll-thumb-dark: rgba(71, 85, 105, 0.5);
-
-    /* Seleção de texto */
-    --selection-light-bg: rgba(14, 140, 233, 0.3);
-    --selection-light-color: #1e3a8a;
-    --selection-dark-color: #e0f2fe;
+    /* Light Theme Tokens */
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --card: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(226, 232, 240, 0.8);
+    --muted: #64748b;
+    --accent: #3b82f6;
+    
+    /* Scrollbar & Selection */
+    --scroll-thumb: #cbd5e1;
+    --selection-bg: rgba(14, 140, 233, 0.2);
+    --selection-text: #1e40af;
   }
 
-  /* Tema dinâmico */
-  [data-theme="light"] {
-    --background: var(--background-light);
-    --text: var(--text-light);
-    --card-bg: var(--card-bg-light);
-    --glass-border: var(--glass-border-light);
-    --scroll-thumb: var(--scroll-thumb-light);
-    --selection-bg: var(--selection-light-bg);
-    --selection-color: var(--selection-light-color);
+  .dark {
+    /* Dark Theme Tokens */
+    --background: #020617;
+    --foreground: #f1f5f9;
+    --card: rgba(15, 23, 42, 0.6);
+    --card-border: rgba(30, 41, 59, 0.7);
+    --muted: #94a3b8;
+    --accent: #60a5fa;
+
+    --scroll-thumb: #334155;
+    --selection-bg: rgba(59, 130, 246, 0.3);
+    --selection-text: #e0f2fe;
   }
 
-  [data-theme="dark"] {
-    --background: var(--background-dark);
-    --text: var(--text-dark);
-    --card-bg: var(--card-bg-dark);
-    --glass-border: var(--glass-border-dark);
-    --scroll-thumb: var(--scroll-thumb-dark);
-    --selection-bg: rgba(14, 140, 233, 0.3);
-    --selection-color: var(--selection-dark-color);
-  }
-
-  /* ------------------------------------------ */
-  /* Reset e estilos globais */
-  /* ------------------------------------------ */
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
-
+  /* Reset e Comportamento Global */
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
+    /* Suporte a áreas seguras (Notch de Celulares) */
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    -webkit-overflow-scrolling: touch;
     background-color: var(--background);
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    color: var(--text);
+    color: var(--foreground);
     background-color: var(--background);
-    line-height: 1.5;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    hyphens: auto;
+    font-feature-settings: "rlig" 1, "calt" 1;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-h-screen;
+    display: flex;
+    flex-direction: column;
   }
+
+  /* 🌍 Tipografia por Idioma */
+  html[lang="pt"] body { hyphens: auto; text-wrap: pretty; }
+  html[lang="es"] body { hyphens: auto; text-wrap: pretty; }
+  html[lang="en"] body { hyphens: manual; text-wrap: balance; }
 
   ::selection {
     background-color: var(--selection-bg);
-    color: var(--selection-color);
+    color: var(--selection-text);
   }
 
+  /* Foco Acessível */
   :focus-visible {
     outline: 2px solid var(--brand-blue);
-    outline-offset: 2px;
+    outline-offset: 4px;
   }
 
-  /* ------------------------------------------ */
-  /* Scrollbar customizada */
-  /* ------------------------------------------ */
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: var(--scroll-thumb);
-    border-radius: 9999px;
-    transition: background-color 0.2s;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--brand-blue);
+  /* Custom Scrollbar (Desktop) */
+  @media (min-width: 1024px) {
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--scroll-thumb);
+      border-radius: 20px;
+      border: 2px solid var(--background);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: var(--brand-blue);
+    }
   }
 }
 
 /* ------------------------------------------ */
-/* Componentes e utilitários personalizados */
+/* Componentes Abstratos (BEM/Utility Mix) */
 /* ------------------------------------------ */
 @layer components {
+  /* Container responsivo com padding dinâmico */
   .main-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 w-full;
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12;
   }
 
+  /* Efeito de Vidro (Frosted Glass) */
   .glass-effect {
-    background-color: var(--card-bg);
-    border: 1px solid var(--glass-border);
-    @apply backdrop-blur-2xl shadow-2xl rounded-xl transition-all duration-300;
+    background-color: var(--card);
+    border: 1px solid var(--card-border);
+    @apply backdrop-blur-xl shadow-lg transition-all duration-300;
   }
 
-  .project-card-gradient {
-    @apply relative overflow-hidden rounded-[2.5rem] transition-all duration-500;
-    background-color: var(--card-bg);
-    border: 1px solid rgba(203, 213, 225, 0.6);
+  /* Card de Projeto (Responsividade de toque) */
+  .project-card {
+    @apply relative overflow-hidden rounded-[2rem] border transition-all duration-500;
+    background-color: var(--card);
+    border-color: var(--card-border);
   }
 
-  [data-theme="dark"] .project-card-gradient {
-    border: 1px solid rgba(31, 41, 55, 0.5);
+  @media (hover: hover) {
+    .project-card:hover {
+      @apply -translate-y-2;
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.1);
+      border-color: var(--brand-blue);
+    }
   }
 
-  .project-card-gradient:hover {
-    box-shadow: 0 20px 50px -12px rgba(14, 140, 233, 0.15);
-    border-color: var(--brand-blue-hover);
+  /* Utilitário para evitar quebra de layout por imagens */
+  .img-responsive {
+    @apply w-full h-auto object-cover;
   }
 }
 
 /* ------------------------------------------ */
-/* Responsividade e ajustes multilíngue (PT/EN/ES) */
+/* Animações e Performance */
 /* ------------------------------------------ */
-html[lang="pt"], html[lang="en"], html[lang="es"] {
-  font-size: 16px;
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
 }
 
-@media (max-width: 768px) {
-  body {
-    font-size: 14px;
-  }
-  .main-container {
-    @apply px-2 sm:px-4;
+@keyframes scan {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(300%); opacity: 0; }
+}
+
+/* Redução de Movimento (Acessibilidade) */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
