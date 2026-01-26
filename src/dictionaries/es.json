@@ -12,6 +12,7 @@
     "title": "Transformando datos complejos en",
     "subtitle": "Activos Estratégicos",
     "headline": "Transformando datos complejos en inteligencia estratégica con el rigor de más de 20 años en sistemas de misión crítica.",
+    "description": "Ingeniero de Datos y Analista Senior enfocado en automatización y mitigación de riesgos.",
     "ctaPrimary": "Ver Proyectos",
     "ctaSecondary": "LinkedIn"
   },
@@ -50,6 +51,7 @@
   },
   "projects": {
     "title": "Repositorio de Proyectos",
+    "featured": "Proyecto Destacado",
     "featuredLabel": "Destacado",
     "firstLabel": "Proyecto Principal",
     "viewProject": "Ver Repositorio",
@@ -61,7 +63,11 @@
       "graphs": "Análisis de Grafos",
       "analysis": "Power BI y Datos",
       "dev": "Desarrollo",
-      "security": "Seguridad"
+      "security": "Seguridad",
+      "data": "Datos",
+      "backend": "Back-end",
+      "frontend": "Front-end",
+      "devops": "DevOps"
     }
   },
   "articles": {
@@ -92,14 +98,11 @@
   "seo": {
     "siteName": "Sérgio Santos | Portafolio",
     "description": "Ingeniería de Datos, Ciencia de Datos, Inteligencia Artificial y Sistemas de Misión Crítica.",
-    "keywords": [
-      "ingeniería de datos",
-      "ciencia de datos",
-      "inteligencia artificial",
-      "sistemas de misión crítica",
-      "gobernanza de datos",
-      "Azure Databricks",
-      "Neo4J"
-    ]
+    "keywords": ["ingeniería de datos", "ciencia de datos", "inteligencia artificial"],
+    "site": {
+      "siteName": "Sérgio Santos | Portafolio",
+      "description": "Ingeniería de Datos, Ciencia de Datos.",
+      "keywords": ["ingeniería de datos", "ciencia de datos"]
+    }
   }
 }
