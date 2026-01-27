@@ -2,7 +2,7 @@
  * LIB: Locale Cookie
  * -----------------------------------------------------------------------------
  * Responsável por gerenciar a persistência do idioma do usuário via Cookies.
- * * Este arquivo garante que a escolha do usuário seja respeitada entre 
+ * Este arquivo garante que a escolha do usuário seja respeitada entre 
  * sessões e requisições, servindo como base para o Middleware e o LanguageSwitcher.
  */
 
@@ -15,12 +15,18 @@ import { i18n, type Locale } from '@/i18n-config';
 export const LOCALE_COOKIE_NAME = 'NEXT_LOCALE';
 
 /**
+ * ALIAS PARA COMPATIBILIDADE:
+ * Adicionado para resolver o erro de build nos componentes que buscam 'LOCALE_COOKIE'.
+ */
+export const LOCALE_COOKIE = LOCALE_COOKIE_NAME;
+
+/**
  * Reexportação do tipo para manter a independência do domínio de cookies
  */
 export type SupportedLocale = Locale;
 
 /**
- * Locale padrão obtido diretamente da configuração global (SSOT)
+ * Locale padrão obtido diretamente da configuração global (SSOT - Single Source of Truth)
  */
 export const DEFAULT_LOCALE: SupportedLocale = i18n.defaultLocale;
 
@@ -31,7 +37,7 @@ export const DEFAULT_LOCALE: SupportedLocale = i18n.defaultLocale;
 export const LOCALE_COOKIE_OPTIONS = {
   path: '/',
   sameSite: 'lax' as const,
-  httpOnly: false, // Permitir acesso ao Client Component (LanguageSwitcher)
+  httpOnly: false, // Necessário para o LanguageSwitcher (Client Side) ler/gravar
   secure: process.env.NODE_ENV === 'production',
   maxAge: 60 * 60 * 24 * 365, // 1 ano (31.536.000 segundos)
 } as const;
