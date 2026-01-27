@@ -3,15 +3,15 @@
 /**
  * PORTFOLIO GRID: O Catálogo de Engenharia
  * -----------------------------------------------------------------------------
- * - Performance: Filtragem via useMemo para evitar re-calculos desnecessários.
+ * - Performance: Filtragem via useMemo para evitar re-calculos.
  * - UX: Sistema de categorias com scroll horizontal otimizado para mobile.
- * - I18n: Suporte completo a PT, EN e ES com fallbacks inteligentes.
+ * - I18n: Totalmente alinhado com src/dictionaries/ (PT, EN, ES).
  */
 
 import React, { useState, useMemo } from 'react'
 import { ProjectCard } from './ProjectCard'
 import { Filter, Database, FolderSearch, Sparkles } from 'lucide-react'
-import type { Locale } from '@/i18n-config'
+import type { SupportedLocale } from '@/dictionaries'
 
 interface GitHubRepository {
   id: number
@@ -25,23 +25,13 @@ interface GitHubRepository {
 
 interface PortfolioGridProps {
   readonly projects: GitHubRepository[]
-  readonly lang: Locale
-  readonly dict?: {
-    portfolio?: {
-      title?: string
-      resultsLabel?: string
-      filterLabel?: string
-      all?: string
-      empty?: string
-      mainCaseLabel?: string
-      noDescription?: string
-      featuredLabel?: string
-      categories?: Record<string, string>
-      projectLabels?: {
-        problem?: string
-        solution?: string
-        impact?: string
-      }
+  readonly lang: SupportedLocale
+  readonly dict: {
+    projects: {
+      title: string
+      viewAll: string
+      categories: Record<string, string>
+      // Adicionamos fallbacks contextuais para estados vazios e filtros
     }
   }
 }
@@ -53,8 +43,8 @@ export const PortfolioGrid = ({
 }: PortfolioGridProps) => {
   const [activeCategory, setActiveCategory] = useState<'all' | string>('all')
 
-  const portfolio = dict?.portfolio ?? {}
-  const categoriesDict = portfolio.categories ?? {}
+  const projectsDict = dict.projects
+  const categoriesDict = projectsDict.categories
 
   const normalize = (value: string) =>
     value?.toLowerCase().replace(/[^a-z0-9]/g, '') ?? ''
@@ -64,7 +54,9 @@ export const PortfolioGrid = ({
    * ------------------------------------------------*/
   const filteredProjects = useMemo(() => {
     // 1. Apenas projetos marcados para o portfólio
-    let base = projects.filter((p) => p.topics?.includes('portfolio'))
+    let base = projects.filter((p) => p.topics?.some(t => 
+      ['portfolio', 'projeto', 'portfolio-item'].includes(t.toLowerCase())
+    ))
 
     // 2. Filtro por categoria (se não for 'all')
     if (activeCategory !== 'all') {
@@ -74,12 +66,10 @@ export const PortfolioGrid = ({
       )
     }
 
-    // 3. Sort: Featured primeiro, depois por data de atualização
+    // 3. Sort: Featured/Main-case primeiro, depois por data
     return base.sort((a, b) => {
-      const aPriority =
-        a.topics?.includes('featured') || a.topics?.includes('main-case') ? 0 : 1
-      const bPriority =
-        b.topics?.includes('featured') || b.topics?.includes('main-case') ? 0 : 1
+      const aPriority = a.topics?.some(t => ['featured', 'main-case', 'destaque'].includes(t.toLowerCase())) ? 0 : 1
+      const bPriority = b.topics?.some(t => ['featured', 'main-case', 'destaque'].includes(t.toLowerCase())) ? 0 : 1
 
       if (aPriority !== bPriority) return aPriority - bPriority
 
@@ -91,23 +81,13 @@ export const PortfolioGrid = ({
   }, [projects, activeCategory])
 
   /* -------------------------------------------------
-   * 🌍 FALLBACKS I18N
+   * 🌍 TRADUÇÕES DE INTERFACE (Contextuais)
    * ------------------------------------------------*/
-  const fallback = {
-    all: lang === 'en' ? 'All' : 'Todos',
-    empty: {
-      pt: 'Nenhuma solução encontrada nesta categoria',
-      es: 'Ninguna solución encontrada en esta categoría',
-      en: 'No solutions found in this category'
-    }[lang],
-    filterLabel: {
-      pt: 'Filtrar por Especialidade',
-      es: 'Filtrar por Especialidad',
-      en: 'Filter by Specialty'
-    }[lang],
-    resultsLabel: lang === 'en' ? 'Projects' : 'Projetos',
-    title: lang === 'en' ? 'Portfolio' : 'Portfólio'
-  }
+  const uiLabels = {
+    pt: { filter: 'Filtrar por Especialidade', empty: 'Nenhuma solução encontrada nesta categoria', results: 'Projetos Encontrados' },
+    en: { filter: 'Filter by Specialty', empty: 'No solutions found in this category', results: 'Projects Found' },
+    es: { filter: 'Filtrar por Especialidad', empty: 'Ninguna solución encontrada en esta categoría', results: 'Proyectos Encontrados' }
+  }[lang]
 
   return (
     <section
@@ -135,17 +115,16 @@ export const PortfolioGrid = ({
               </div>
               <h2
                 id="portfolio-title"
-                className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-[0.8]"
+                className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-[0.85]"
               >
-                {portfolio.title || fallback.title}
+                {projectsDict.title}
               </h2>
             </div>
 
             <div className="flex items-center gap-3 mt-4">
               <div className="w-12 h-1 bg-blue-600 rounded-full" />
               <p className="text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-[0.15em]">
-                {filteredProjects.length}{' '}
-                {portfolio.resultsLabel || fallback.resultsLabel}
+                {filteredProjects.length} {uiLabels.results}
               </p>
             </div>
           </div>
@@ -153,19 +132,19 @@ export const PortfolioGrid = ({
           {/* NAVEGAÇÃO DE FILTROS */}
           <nav
             className="w-full lg:w-auto"
-            aria-label={portfolio.filterLabel || fallback.filterLabel}
+            aria-label={uiLabels.filter}
           >
             <div className="flex items-center gap-2 mb-5 text-slate-400 dark:text-slate-500 font-black text-[10px] uppercase tracking-[0.2em] px-1">
               <Filter className="text-blue-600 w-4 h-4" strokeWidth={3} />
-              <span>{portfolio.filterLabel || fallback.filterLabel}</span>
+              <span>{uiLabels.filter}</span>
             </div>
 
             <div className="relative group">
-              {/* Botões de Categoria */}
               <div 
                 role="tablist"
                 className="flex gap-3 overflow-x-auto pb-6 no-scrollbar snap-x touch-pan-x -mx-6 px-6 lg:mx-0 lg:px-0"
               >
+                {/* Botão "Ver Todos" */}
                 <button
                   role="tab"
                   onClick={() => setActiveCategory('all')}
@@ -176,9 +155,10 @@ export const PortfolioGrid = ({
                       : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-blue-500/40'
                   }`}
                 >
-                  {portfolio.all || fallback.all}
+                  {projectsDict.viewAll}
                 </button>
 
+                {/* Categorias do Dicionário */}
                 {Object.entries(categoriesDict).map(([key, label]) => (
                   <button
                     key={key}
@@ -203,7 +183,7 @@ export const PortfolioGrid = ({
         </header>
 
         {/* GRID DE PROJETOS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 min-h-[500px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 min-h-[400px]">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => (
               <div
@@ -211,12 +191,13 @@ export const PortfolioGrid = ({
                 className="flex h-full animate-in fade-in zoom-in-95 duration-500 fill-mode-both"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
+                {/* Aqui passamos o dict completo para o ProjectCard tratar os rótulos internos */}
                 <ProjectCard project={project} lang={lang} dict={dict} />
               </div>
             ))
           ) : (
             /* ESTADO VAZIO */
-            <div className="col-span-full flex flex-col items-center justify-center py-40 rounded-[3.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 transition-all">
+            <div className="col-span-full flex flex-col items-center justify-center py-32 rounded-[3.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
               <div className="p-8 bg-white dark:bg-slate-800 rounded-3xl shadow-xl mb-8">
                 <FolderSearch
                   className="w-16 h-16 text-slate-300 dark:text-slate-600"
@@ -224,7 +205,7 @@ export const PortfolioGrid = ({
                 />
               </div>
               <p className="text-slate-500 dark:text-slate-400 font-black uppercase tracking-[0.3em] text-[11px] text-center max-w-xs leading-relaxed">
-                {portfolio.empty || fallback.empty}
+                {uiLabels.empty}
               </p>
             </div>
           )}
