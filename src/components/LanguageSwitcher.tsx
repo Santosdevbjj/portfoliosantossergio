@@ -5,8 +5,7 @@
  * -----------------------------------------------------------------------------
  * - UI: Floating Control Panel com Glassmorphism.
  * - UX: Persistência de idioma via Cookie e tema via LocalStorage.
- * - I18n: Suporte nativo a PT, EN, ES.
- * - Performance: Envelopado em Suspense para evitar de-optimization no Next.js.
+ * - Alinhamento: Sincronizado com src/dictionaries/index.ts.
  */
 
 import React, { useEffect, useState, Suspense } from 'react'
@@ -17,9 +16,10 @@ import { Moon, Sun, Globe } from 'lucide-react'
 import { useTheme } from '@/hooks/useTheme'
 import { i18n, type Locale, localeMetadata } from '@/i18n-config'
 import { LOCALE_COOKIE, LOCALE_COOKIE_OPTIONS } from '@/lib/locale-cookie'
+import type { SupportedLocale } from '@/dictionaries'
 
 /* -------------------------------------------------------------------------- */
-/* INTERNAL CONTENT                                                            */
+/* INTERNAL CONTENT                                                           */
 /* -------------------------------------------------------------------------- */
 
 function LanguageSwitcherContent() {
@@ -32,18 +32,18 @@ function LanguageSwitcherContent() {
 
   /* ----------------------------- Locale Logic ---------------------------- */
 
-  const pathLocale = pathname?.split('/')[1] as Locale | undefined
-  const currentLang: Locale = i18n.locales.includes(pathLocale as Locale)
-    ? (pathLocale as Locale)
-    : i18n.defaultLocale
+  const pathLocale = pathname?.split('/')[1] as SupportedLocale | undefined
+  const currentLang: SupportedLocale = i18n.locales.includes(pathLocale as Locale)
+    ? (pathLocale as SupportedLocale)
+    : (i18n.defaultLocale as SupportedLocale)
 
   /* ------------------------------ Helpers -------------------------------- */
 
-  function writeLocaleCookie(locale: Locale) {
+  function writeLocaleCookie(locale: string) {
     document.cookie = `${LOCALE_COOKIE}=${locale}; path=${LOCALE_COOKIE_OPTIONS.path}; max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}`
   }
 
-  function getNewPath(locale: Locale): string {
+  function getNewPath(locale: string): string {
     if (!pathname) return `/${locale}`
 
     const segments = pathname.split('/')
@@ -59,38 +59,30 @@ function LanguageSwitcherContent() {
   }
 
   /* ----------------------------- Labels ---------------------------------- */
-
-  const labels = {
-    nav: {
-      pt: 'Configurações de idioma e tema',
-      en: 'Language and theme settings',
-      es: 'Configuración de idioma y tema',
-    },
-    theme: {
-      dark: { pt: 'Ativar modo escuro', en: 'Enable dark mode', es: 'Activar modo oscuro' },
-      light: { pt: 'Ativar modo claro', en: 'Enable light mode', es: 'Activar modo claro' },
-    }
-  }
-
-  /* ------------------------------ Skeleton -------------------------------- */
+  // Alinhado com a estrutura semântica dos seus arquivos JSON
+  const accessibilityLabels = {
+    pt: { config: 'Configurações de idioma e tema', dark: 'Ativar modo escuro', light: 'Ativar modo claro' },
+    en: { config: 'Language and theme settings', dark: 'Enable dark mode', light: 'Enable light mode' },
+    es: { config: 'Configuración de idioma y tema', dark: 'Activar modo oscuro', light: 'Activar modo claro' },
+  }[currentLang]
 
   if (!mounted) {
     return (
       <div
         aria-hidden="true"
-        className="fixed top-4 right-4 sm:top-6 sm:right-6 h-[52px] w-[180px] bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl backdrop-blur-md z-[110] border border-transparent"
+        className="fixed top-4 right-4 sm:top-6 sm:right-6 h-[52px] w-[160px] sm:w-[180px] bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl backdrop-blur-md z-[110]"
       />
     )
   }
 
   return (
     <nav
-      aria-label={labels.nav[currentLang]}
+      aria-label={accessibilityLabels.config}
       className="
         fixed top-4 right-4 sm:top-6 sm:right-6
         z-[110]
         flex items-center gap-1 p-1.5
-        bg-white/80 dark:bg-slate-900/80
+        bg-white/80 dark:bg-slate-950/80
         backdrop-blur-2xl
         rounded-2xl
         border border-slate-200/50 dark:border-slate-800/50
@@ -102,7 +94,7 @@ function LanguageSwitcherContent() {
       {/* THEME TOGGLE */}
       <button
         onClick={toggleTheme}
-        aria-label={isDark ? labels.theme.light[currentLang] : labels.theme.dark[currentLang]}
+        aria-label={isDark ? accessibilityLabels.light : accessibilityLabels.dark}
         className="
           group flex items-center justify-center
           w-10 h-10 sm:w-11 sm:h-11
@@ -125,13 +117,13 @@ function LanguageSwitcherContent() {
 
       {/* LANGUAGE SWITCHER */}
       <div className="flex items-center gap-1">
-        <div className="hidden lg:flex items-center px-2 text-slate-400 dark:text-slate-600">
+        <div className="hidden md:flex items-center px-2 text-slate-400 dark:text-slate-600">
           <Globe size={14} strokeWidth={2} />
         </div>
 
-        {i18n.locales.map((locale) => {
+        {(i18n.locales as string[]).map((locale) => {
           const isActive = currentLang === locale
-          const meta = localeMetadata[locale]
+          const meta = localeMetadata[locale as Locale]
 
           return (
             <Link
@@ -144,11 +136,12 @@ function LanguageSwitcherContent() {
               aria-label={meta.ariaLabel}
               aria-current={isActive ? 'page' : undefined}
               className={`
-                relative px-3 py-2
-                min-w-[40px] sm:min-w-[44px]
+                relative px-2.5 py-2
+                min-w-[36px] sm:min-w-[44px]
                 text-[10px] sm:text-[11px]
                 font-black uppercase tracking-widest
                 rounded-xl
+                flex items-center justify-center
                 transition-all duration-500
                 ${
                   isActive
@@ -181,7 +174,7 @@ function LanguageSwitcherContent() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* EXPORT (Suspense Wrapper)                                                   */
+/* EXPORT (Suspense Wrapper)                                                  */
 /* -------------------------------------------------------------------------- */
 
 export function LanguageSwitcher() {
@@ -190,7 +183,7 @@ export function LanguageSwitcher() {
       fallback={
         <div
           aria-hidden="true"
-          className="fixed top-4 right-4 sm:top-6 sm:right-6 h-[52px] w-[180px] bg-slate-200/10 dark:bg-slate-800/10 rounded-2xl animate-pulse"
+          className="fixed top-4 right-4 sm:top-6 sm:right-6 h-[52px] w-[160px] sm:w-[180px] bg-slate-200/10 dark:bg-slate-800/10 rounded-2xl animate-pulse"
         />
       }
     >
