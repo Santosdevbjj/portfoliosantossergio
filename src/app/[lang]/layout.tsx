@@ -7,8 +7,8 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner';
 import { i18n, type Locale } from '@/i18n-config';
 
-// CORREÇÃO CRÍTICA: Onde a função getDictionary realmente reside
-import { getDictionary } from '@/dictionaries'; 
+// IMPORT CORRIGIDO: Nome exato da função exportada em src/dictionaries/index.ts
+import { getDictionarySync, type SupportedLocale } from '@/dictionaries'; 
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -60,10 +60,10 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
 
 export default async function RootLayout(props: { children: React.ReactNode; params: Promise<{ lang: string }> }) {
   const { lang } = await props.params;
-  const currentLang = i18n.locales.includes(lang as Locale) ? (lang as Locale) : i18n.defaultLocale;
+  const currentLang = (i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale) as SupportedLocale;
   
-  // Agora buscando do diretório correto: src/dictionaries/index.ts
-  const dict = await getDictionary(currentLang);
+  // Como a função é síncrona em src/dictionaries/index.ts, não precisa de await
+  const dict = getDictionarySync(currentLang);
 
   return (
     <html 
@@ -94,14 +94,14 @@ export default async function RootLayout(props: { children: React.ReactNode; par
           enableSystem 
           disableTransitionOnChange
         >
-          {/* Container principal garantindo 100% de largura e responsividade */}
+          {/* Container responsivo 100% */}
           <div className="relative flex flex-col min-h-screen w-full">
             <main id="main-content" role="main" className="flex-grow w-full relative focus:outline-none">
               {props.children}
             </main>
           </div>
           
-          {/* Suporte Multilingue: Banner consome as chaves do JSON correspondente */}
+          {/* Multilingue: CookieBanner recebe o dicionário correto do idioma */}
           <CookieBanner lang={currentLang} dict={dict.cookieBanner} />
         </ThemeProvider>
       </body>
