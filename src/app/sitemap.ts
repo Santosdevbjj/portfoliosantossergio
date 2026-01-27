@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
 
 /**
- * SITEMAP DINÂMICO — NEXT.JS 15 (APP ROUTER)
+ * SITEMAP DINÂMICO — NEXT.JS 15/16 (APP ROUTER)
  * -----------------------------------------------------------------------------
  * Objetivo: Indexação máxima e SEO internacional.
- * Padrão: Protocolo XML Sitemap com suporte a Hreflang.
+ * Correção: Alterado 'quarterly' para 'monthly' para cumprir a tipagem rigorosa.
  */
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -18,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   /**
    * Mapeamento de Alternates (Hreflang)
-   * Essencial para o Google não considerar conteúdo duplicado.
+   * Informa ao Google que as páginas são traduções uma da outra.
    */
   const languagesMap = {
     pt: `${baseUrl}/pt`,
@@ -29,13 +29,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   /**
    * 1️⃣ Home Pages (Internacionalizadas)
-   * Cada entrada informa ao crawler sobre suas "irmãs" em outros idiomas.
    */
   const localeEntries: MetadataRoute.Sitemap = locales.map((locale) => ({
     url: `${baseUrl}/${locale}`,
     lastModified,
-    changeFrequency: "monthly",
-    priority: locale === "pt" ? 1.0 : 0.9, // Prioridade levemente maior para o idioma principal
+    changeFrequency: "monthly" as const,
+    priority: locale === "pt" ? 1.0 : 0.9,
     alternates: {
       languages: languagesMap,
     },
@@ -43,12 +42,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   /**
    * 2️⃣ Documentos Estratégicos (CVs)
-   * Indexar o PDF ajuda a aparecer em buscas por "Especialista em Dados Sergio Santos CV".
+   * CORREÇÃO: 'quarterly' removido por não ser um valor válido na tipagem do Next.js.
    */
   const documentEntries: MetadataRoute.Sitemap = locales.map((locale) => ({
     url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
     lastModified,
-    changeFrequency: "quarterly",
+    changeFrequency: "monthly" as const, // Valor alterado para conformidade técnica
     priority: 0.7,
   }));
 
@@ -58,12 +57,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const rootEntry: MetadataRoute.Sitemap[0] = {
     url: baseUrl,
     lastModified,
-    changeFrequency: "monthly",
+    changeFrequency: "monthly" as const,
     priority: 1.0,
     alternates: {
       languages: languagesMap,
     },
   };
 
+  // Retorna a união de todas as entradas
   return [rootEntry, ...localeEntries, ...documentEntries];
 }
