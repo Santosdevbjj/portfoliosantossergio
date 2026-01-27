@@ -25,7 +25,11 @@
     --background: 248 250 252;
     --foreground: 15 23 42;
     --card: 255 255 255;
-    --card-border: 226 232 240;
+    
+    /* FIX: Mapeando explicitamente para evitar erro de 'border-border' no build */
+    --border: 226 232 240; 
+    --input: 226 232 240;
+    
     --muted: 100 116 139;
     --accent: 59 130 246;
 
@@ -38,7 +42,11 @@
     --background: 2 6 23;
     --foreground: 241 245 249;
     --card: 15 23 42;
-    --card-border: 30 41 59;
+    
+    /* FIX: Variáveis Dark para bordas */
+    --border: 30 41 59;
+    --input: 30 41 59;
+    
     --muted: 148 163 184;
     --accent: 96 165 250;
 
@@ -49,6 +57,10 @@
   /* -------------------------------------------------------------------------- */
   /* GLOBAL RESET & BEHAVIOR                                                    */
   /* -------------------------------------------------------------------------- */
+  
+  /* Aqui estava o erro: O Tailwind precisa que 'border' esteja definido 
+     no tailwind.config.ts apontando para var(--border).
+  */
   * {
     @apply border-border;
   }
@@ -81,7 +93,7 @@
     transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Melhora o rendering em containers longos (ex: Blog/Projetos) */
+  /* Performance: Content Visibility para seções fora da dobra */
   section {
     content-visibility: auto;
     contain-intrinsic-size: 1px 500px;
@@ -130,13 +142,13 @@
   .glass-effect {
     @apply backdrop-blur-xl shadow-lg transition-all duration-300;
     background-color: rgb(var(--card) / 0.8);
-    border: 1px solid rgb(var(--card-border) / 0.8);
+    border: 1px solid rgb(var(--border) / 0.8);
   }
 
   .project-card {
     @apply relative overflow-hidden rounded-[2.5rem] border transition-all duration-500;
     background-color: rgb(var(--card));
-    border-color: rgb(var(--card-border));
+    border-color: rgb(var(--border));
   }
 
   @media (hover: hover) {
