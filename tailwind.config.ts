@@ -34,6 +34,13 @@ const config: Config = {
 
       /* ------------------------------ Colors ---------------------------- */
       colors: {
+        // Cores Semânticas (Necessárias para Shadcn/UI e Reset Global)
+        border: 'rgb(var(--border) / <alpha-value>)',
+        input: 'rgb(var(--input) / <alpha-value>)',
+        ring: 'rgb(var(--ring) / <alpha-value>)',
+        background: 'rgb(var(--background) / <alpha-value>)',
+        foreground: 'rgb(var(--foreground) / <alpha-value>)',
+        
         brand: {
           50: 'rgb(var(--brand-50) / <alpha-value>)',
           100: 'rgb(var(--brand-100) / <alpha-value>)',
@@ -95,7 +102,7 @@ const config: Config = {
       boxShadow: {
         premium: '0 20px 50px -12px rgba(0, 0, 0, 0.08)',
         'premium-dark': '0 20px 50px -12px rgba(0, 0, 0, 0.4)',
-        // Glow fixado para usar o sistema de cores do Tailwind com opacidade
+        // Glow sincronizado com o sistema RGB raw
         glow: '0 0 20px rgb(var(--brand-500) / 0.3)',
       },
     },
@@ -106,7 +113,7 @@ const config: Config = {
   /* ---------------------------------------------------------------------- */
   plugins: [
     typography,
-    // Essencial para componentes Shadcn/UI e animações complexas
+    // Garanta que 'npm install tailwindcss-animate' foi executado
     require('tailwindcss-animate'),
   ],
 }
