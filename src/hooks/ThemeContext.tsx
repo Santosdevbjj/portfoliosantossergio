@@ -1,4 +1,11 @@
-"use client";
+'use client'
+
+/**
+ * THEME CONTEXT: Orquestrador de Aparência Global
+ * -----------------------------------------------------------------------------
+ * Gerencia a lógica de Dark Mode, Light Mode e Sincronização com o Sistema.
+ * Persistência dupla: LocalStorage (Cliente) + Cookies (SSR Friendly).
+ */
 
 import React, {
   createContext,
@@ -6,117 +13,183 @@ import React, {
   useEffect,
   useState,
   useCallback,
-  type ReactNode
-} from "react";
+  useMemo,
+  type ReactNode,
+} from 'react'
 
-export type Theme = "light" | "dark" | "system";
+/* -------------------------------------------------------------------------- */
+/* TYPES                                                                      */
+/* -------------------------------------------------------------------------- */
+
+export type Theme = 'light' | 'dark' | 'system'
 
 interface ThemeContextValue {
-  theme: Theme;
-  isDark: boolean;
-  toggleTheme: () => void;
-  resetTheme: () => void;
-  applyTheme: (newTheme: Theme) => void;
-  mounted: boolean; 
+  theme: Theme
+  isDark: boolean
+  mounted: boolean
+  toggleTheme: () => void
+  applyTheme: (newTheme: Theme) => void
+  resetTheme: () => void
 }
 
-const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+/* -------------------------------------------------------------------------- */
+/* CONTEXT                                                                    */
+/* -------------------------------------------------------------------------- */
 
-/**
- * THEME CONTEXT PROVIDER
- * - Next.js 16 / React 19 compatível
- * - Sincroniza com preferências do SO
- * - Evita flash branco/preto (FOUC)
- */
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
+
+/* -------------------------------------------------------------------------- */
+/* PROVIDER                                                                   */
+/* -------------------------------------------------------------------------- */
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("system");
-  const [isDark, setIsDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<Theme>('system')
+  const [isDark, setIsDark] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // Aplica tema no DOM via CSS variable
+  /* -------------------------- DOM Application --------------------------- */
+
   const applyToDOM = useCallback((dark: boolean) => {
-    if (typeof window === "undefined") return;
-    const root = document.documentElement;
-    root.style.setProperty("--theme", dark ? "dark" : "light");
-    root.style.colorScheme = dark ? "dark" : "light";
-  }, []);
+    if (typeof window === 'undefined') return
 
-  // Carregamento inicial
+    const root = document.documentElement
+    // Toggle da classe .dark para Tailwind
+    root.classList.toggle('dark', dark)
+    // Ajuste da cor da barra de status e scrollbars nativas
+    root.style.colorScheme = dark ? 'dark' : 'light'
+  }, [])
+
+  /* -------------------------- Initial Load ------------------------------ */
+
   useEffect(() => {
     const getStoredTheme = (): Theme => {
+      if (typeof window === 'undefined') return 'system'
+      
       try {
-        const stored = localStorage.getItem("theme");
-        if (stored === "light" || stored === "dark" || stored === "system") return stored;
+        // Prioridade 1: LocalStorage (Preferência explícita do usuário)
+        const stored = localStorage.getItem('theme')
+        if (stored === 'light' || stored === 'dark' || stored === 'system') {
+          return stored
+        }
+
+        // Prioridade 2: Cookies (Útil para o servidor Next.js ler antes do render)
         const cookieTheme = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("theme="))
-          ?.split("=")[1];
-        if (cookieTheme === "light" || cookieTheme === "dark" || cookieTheme === "system") return cookieTheme;
-      } catch (err) {
-        console.error("Erro ao ler preferência de tema:", err);
+          .split('; ')
+          .find((row) => row.startsWith('theme='))
+          ?.split('=')[1]
+
+        if (cookieTheme === 'light' || cookieTheme === 'dark' || cookieTheme === 'system') {
+          return cookieTheme
+        }
+      } catch (e) {
+        console.warn('[ThemeContext] Erro ao ler armazenamento:', e)
       }
-      return "system";
-    };
 
-    const initialTheme = getStoredTheme();
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const initialIsDark = initialTheme === "dark" || (initialTheme === "system" && mediaQuery.matches);
-
-    setTheme(initialTheme);
-    setIsDark(initialIsDark);
-    applyToDOM(initialIsDark);
-    setMounted(true);
-  }, [applyToDOM]);
-
-  // Escuta alterações no sistema se tema = system
-  useEffect(() => {
-    if (!mounted || theme !== "system") return;
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => {
-      if (theme === "system") {
-        setIsDark(mediaQuery.matches);
-        applyToDOM(mediaQuery.matches);
-      }
-    };
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [theme, mounted, applyToDOM]);
-
-  const saveThemePreference = useCallback((newTheme: Theme) => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const shouldBeDark = newTheme === "dark" || (newTheme === "system" && mediaQuery.matches);
-
-    setTheme(newTheme);
-    setIsDark(shouldBeDark);
-    applyToDOM(shouldBeDark);
-
-    try {
-      if (newTheme === "system") localStorage.removeItem("theme");
-      else localStorage.setItem("theme", newTheme);
-      document.cookie = `theme=${newTheme}; path=/; max-age=${60*60*24*365}; SameSite=Lax; Secure`;
-    } catch (err) {
-      console.error("Falha ao salvar tema:", err);
+      return 'system'
     }
-  }, [applyToDOM]);
 
-  const toggleTheme = useCallback(() => {
-    saveThemePreference(isDark ? "light" : "dark");
-  }, [isDark, saveThemePreference]);
+    const initialTheme = getStoredTheme()
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const shouldBeDark =
+      initialTheme === 'dark' ||
+      (initialTheme === 'system' && mediaQuery.matches)
 
-  const applyTheme = useCallback((newTheme: Theme) => saveThemePreference(newTheme), [saveThemePreference]);
-  const resetTheme = useCallback(() => saveThemePreference("system"), [saveThemePreference]);
+    setTheme(initialTheme)
+    setIsDark(shouldBeDark)
+    applyToDOM(shouldBeDark)
+    setMounted(true)
+  }, [applyToDOM])
+
+  /* ----------------------- System Theme Sync ---------------------------- */
+
+  useEffect(() => {
+    // Só sincroniza se o usuário estiver no modo 'system'
+    if (!mounted || theme !== 'system') return
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    
+    const handler = (e: MediaQueryListEvent) => {
+      setIsDark(e.matches)
+      applyToDOM(e.matches)
+    }
+
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [theme, mounted, applyToDOM])
+
+  /* ----------------------- Persistence ---------------------------------- */
+
+  const saveTheme = useCallback(
+    (newTheme: Theme) => {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+      const shouldBeDark =
+        newTheme === 'dark' ||
+        (newTheme === 'system' && mediaQuery.matches)
+
+      setTheme(newTheme)
+      setIsDark(shouldBeDark)
+      applyToDOM(shouldBeDark)
+
+      try {
+        // Persiste no LocalStorage
+        if (newTheme === 'system') {
+          localStorage.removeItem('theme')
+        } else {
+          localStorage.setItem('theme', newTheme)
+        }
+
+        // Persiste no Cookie para o Middleware/SSR
+        const isSecure = window.location.protocol === 'https:' ? 'Secure;' : ''
+        document.cookie = `theme=${newTheme}; path=/; max-age=31536000; SameSite=Lax; ${isSecure}`
+      } catch (e) {
+        console.error('[ThemeContext] Falha ao salvar tema:', e)
+      }
+    },
+    [applyToDOM]
+  )
+
+  /* ----------------------- Public API ----------------------------------- */
+
+  const toggleTheme = useCallback(
+    () => saveTheme(isDark ? 'light' : 'dark'),
+    [isDark, saveTheme]
+  )
+
+  const applyTheme = useCallback(
+    (newTheme: Theme) => saveTheme(newTheme),
+    [saveTheme]
+  )
+
+  const resetTheme = useCallback(
+    () => saveTheme('system'),
+    [saveTheme]
+  )
+
+  // Memoização do valor do contexto para evitar re-renders desnecessários
+  const value = useMemo(() => ({
+    theme,
+    isDark,
+    mounted,
+    toggleTheme,
+    applyTheme,
+    resetTheme,
+  }), [theme, isDark, mounted, toggleTheme, applyTheme, resetTheme])
 
   return (
-    <ThemeContext.Provider value={{ theme, isDark, toggleTheme, resetTheme, applyTheme, mounted }}>
-      <div className={`min-h-screen transition-opacity duration-500 ${mounted ? "opacity-100" : "opacity-0"}`}>
-        {children}
-      </div>
+    <ThemeContext.Provider value={value}>
+      {children}
     </ThemeContext.Provider>
-  );
+  )
 }
 
+/* -------------------------------------------------------------------------- */
+/* HOOK                                                                       */
+/* -------------------------------------------------------------------------- */
+
 export function useThemeContext() {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error("useThemeContext deve ser usado dentro de um ThemeProvider");
-  return context;
+  const context = useContext(ThemeContext)
+  if (!context) {
+    throw new Error('[useThemeContext] Erro: Este hook deve ser usado dentro de um <ThemeProvider />')
+  }
+  return context
 }
