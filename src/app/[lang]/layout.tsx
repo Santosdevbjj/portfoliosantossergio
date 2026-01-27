@@ -6,7 +6,9 @@ import '../globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner';
 import { i18n, type Locale } from '@/i18n-config';
-import { getDictionary } from '@/get-dictionary'; // Importação essencial para o dict
+
+// CORREÇÃO CRÍTICA: Onde a função getDictionary realmente reside
+import { getDictionary } from '@/dictionaries'; 
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -26,7 +28,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   minimumScale: 1,
-  maximumScale: 5, // Permite zoom para acessibilidade (WCAG)
+  maximumScale: 5, 
   userScalable: true,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#2563eb' },
@@ -60,7 +62,7 @@ export default async function RootLayout(props: { children: React.ReactNode; par
   const { lang } = await props.params;
   const currentLang = i18n.locales.includes(lang as Locale) ? (lang as Locale) : i18n.defaultLocale;
   
-  // Carrega as traduções para resolver o erro 'Property dict is missing'
+  // Agora buscando do diretório correto: src/dictionaries/index.ts
   const dict = await getDictionary(currentLang);
 
   return (
@@ -70,7 +72,6 @@ export default async function RootLayout(props: { children: React.ReactNode; par
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
       <head>
-        {/* Google Analytics - G-3XF5BTP58V */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
           strategy="afterInteractive"
@@ -93,13 +94,14 @@ export default async function RootLayout(props: { children: React.ReactNode; par
           enableSystem 
           disableTransitionOnChange
         >
+          {/* Container principal garantindo 100% de largura e responsividade */}
           <div className="relative flex flex-col min-h-screen w-full">
             <main id="main-content" role="main" className="flex-grow w-full relative focus:outline-none">
               {props.children}
             </main>
           </div>
           
-          {/* FIX: Agora passando o objeto 'dict' exigido pela interface do CookieBanner */}
+          {/* Suporte Multilingue: Banner consome as chaves do JSON correspondente */}
           <CookieBanner lang={currentLang} dict={dict.cookieBanner} />
         </ThemeProvider>
       </body>
