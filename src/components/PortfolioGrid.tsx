@@ -1,8 +1,16 @@
 'use client'
 
+/**
+ * PORTFOLIO GRID: O Catálogo de Engenharia
+ * -----------------------------------------------------------------------------
+ * - Performance: Filtragem via useMemo para evitar re-calculos desnecessários.
+ * - UX: Sistema de categorias com scroll horizontal otimizado para mobile.
+ * - I18n: Suporte completo a PT, EN e ES com fallbacks inteligentes.
+ */
+
 import React, { useState, useMemo } from 'react'
 import { ProjectCard } from './ProjectCard'
-import { Filter, Database, FolderSearch } from 'lucide-react'
+import { Filter, Database, FolderSearch, Sparkles } from 'lucide-react'
 import type { Locale } from '@/i18n-config'
 
 interface GitHubRepository {
@@ -16,32 +24,28 @@ interface GitHubRepository {
 }
 
 interface PortfolioGridProps {
-  projects: GitHubRepository[]
-  lang: Locale
-  dict: {
-    portfolio: {
-      title: string
-      resultsLabel: string
-      filterLabel: string
-      all: string
-      empty: string
-      mainCaseLabel: string
-      noDescription: string
-      featuredLabel: string
-      categories: Record<string, string>
-      projectLabels: {
-        problem: string
-        solution: string
+  readonly projects: GitHubRepository[]
+  readonly lang: Locale
+  readonly dict?: {
+    portfolio?: {
+      title?: string
+      resultsLabel?: string
+      filterLabel?: string
+      all?: string
+      empty?: string
+      mainCaseLabel?: string
+      noDescription?: string
+      featuredLabel?: string
+      categories?: Record<string, string>
+      projectLabels?: {
+        problem?: string
+        solution?: string
         impact?: string
       }
     }
   }
 }
 
-/**
- * PORTFOLIO GRID — GALERIA DE SOLUÇÕES ESTRATÉGICAS
- * Totalmente responsivo e multilíngue (PT, EN, ES)
- */
 export const PortfolioGrid = ({
   projects = [],
   dict,
@@ -53,36 +57,32 @@ export const PortfolioGrid = ({
   const categoriesDict = portfolio.categories ?? {}
 
   const normalize = (value: string) =>
-    value.toLowerCase().replace(/[^a-z0-9]/g, '')
+    value?.toLowerCase().replace(/[^a-z0-9]/g, '') ?? ''
 
-  /**
-   * FILTRAGEM + RANKING
-   */
+  /* -------------------------------------------------
+   * 🧠 LÓGICA DE FILTRAGEM + PRIORIZAÇÃO
+   * ------------------------------------------------*/
   const filteredProjects = useMemo(() => {
+    // 1. Apenas projetos marcados para o portfólio
     let base = projects.filter((p) => p.topics?.includes('portfolio'))
 
+    // 2. Filtro por categoria (se não for 'all')
     if (activeCategory !== 'all') {
       const normalizedCategory = normalize(activeCategory)
       base = base.filter((p) =>
-        p.topics?.some(
-          (topic) => normalize(topic) === normalizedCategory
-        )
+        p.topics?.some((topic) => normalize(topic) === normalizedCategory)
       )
     }
 
+    // 3. Sort: Featured primeiro, depois por data de atualização
     return base.sort((a, b) => {
       const aPriority =
-        a.topics?.includes('featured') ||
-        a.topics?.includes('main-case')
-          ? 0
-          : 1
+        a.topics?.includes('featured') || a.topics?.includes('main-case') ? 0 : 1
       const bPriority =
-        b.topics?.includes('featured') ||
-        b.topics?.includes('main-case')
-          ? 0
-          : 1
+        b.topics?.includes('featured') || b.topics?.includes('main-case') ? 0 : 1
 
       if (aPriority !== bPriority) return aPriority - bPriority
+
       return (
         new Date(b.updated_at).getTime() -
         new Date(a.updated_at).getTime()
@@ -90,79 +90,89 @@ export const PortfolioGrid = ({
     })
   }, [projects, activeCategory])
 
-  /**
-   * FALLBACK MULTILÍNGUE SEGURO
-   */
+  /* -------------------------------------------------
+   * 🌍 FALLBACKS I18N
+   * ------------------------------------------------*/
   const fallback = {
-    all: lang === 'pt' ? 'Todos' : lang === 'es' ? 'Todos' : 'All',
-    empty:
-      lang === 'pt'
-        ? 'Nenhuma solução encontrada nesta categoria'
-        : lang === 'es'
-        ? 'Ninguna solución encontrada en esta categoría'
-        : 'No solution found in this category',
-    filterLabel:
-      lang === 'pt'
-        ? 'Filtrar por Especialidade'
-        : lang === 'es'
-        ? 'Filtrar por Especialidad'
-        : 'Filter by Specialty',
-    resultsLabel:
-      lang === 'pt'
-        ? 'Projetos'
-        : lang === 'es'
-        ? 'Proyectos'
-        : 'Projects',
+    all: lang === 'en' ? 'All' : 'Todos',
+    empty: {
+      pt: 'Nenhuma solução encontrada nesta categoria',
+      es: 'Ninguna solución encontrada en esta categoría',
+      en: 'No solutions found in this category'
+    }[lang],
+    filterLabel: {
+      pt: 'Filtrar por Especialidade',
+      es: 'Filtrar por Especialidad',
+      en: 'Filter by Specialty'
+    }[lang],
+    resultsLabel: lang === 'en' ? 'Projects' : 'Projetos',
+    title: lang === 'en' ? 'Portfolio' : 'Portfólio'
   }
 
   return (
     <section
       id="projects"
-      className="py-24 lg:py-32 transition-colors duration-500"
       aria-labelledby="portfolio-title"
+      className="py-24 lg:py-40 bg-white dark:bg-[#020617] transition-colors duration-500"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* HEADER */}
-        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-16 gap-10">
-          <div className="flex-1 w-full">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 bg-blue-600 rounded-2xl shadow-xl shadow-blue-600/20">
-                <Database className="text-white w-7 h-7 md:w-8 md:h-8" />
+        
+        {/* HEADER DA SEÇÃO */}
+        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-20 gap-12">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+                <Sparkles size={16} />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-700 dark:text-blue-300">
+                Technical Ledger
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-8">
+              <div className="w-16 h-16 bg-blue-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl shadow-blue-500/30 shrink-0">
+                <Database className="w-8 h-8" />
               </div>
               <h2
                 id="portfolio-title"
-                className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none"
+                className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-[0.8]"
               >
-                {portfolio.title || fallback.all}
+                {portfolio.title || fallback.title}
               </h2>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-1.5 bg-blue-600 rounded-full" />
-              <p className="text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-[0.2em]">
+            <div className="flex items-center gap-3 mt-4">
+              <div className="w-12 h-1 bg-blue-600 rounded-full" />
+              <p className="text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-[0.15em]">
                 {filteredProjects.length}{' '}
                 {portfolio.resultsLabel || fallback.resultsLabel}
               </p>
             </div>
           </div>
 
-          {/* FILTROS */}
-          <nav className="w-full lg:w-auto" aria-label="Filtros de projetos">
-            <div className="flex items-center gap-2 mb-4 text-slate-400 dark:text-slate-500 font-black text-[10px] uppercase tracking-[0.2em] px-1">
+          {/* NAVEGAÇÃO DE FILTROS */}
+          <nav
+            className="w-full lg:w-auto"
+            aria-label={portfolio.filterLabel || fallback.filterLabel}
+          >
+            <div className="flex items-center gap-2 mb-5 text-slate-400 dark:text-slate-500 font-black text-[10px] uppercase tracking-[0.2em] px-1">
               <Filter className="text-blue-600 w-4 h-4" strokeWidth={3} />
-              <span>
-                {portfolio.filterLabel || fallback.filterLabel}
-              </span>
+              <span>{portfolio.filterLabel || fallback.filterLabel}</span>
             </div>
 
-            <div className="relative">
-              <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar snap-x touch-pan-x -mx-6 px-6 lg:mx-0 lg:px-0">
+            <div className="relative group">
+              {/* Botões de Categoria */}
+              <div 
+                role="tablist"
+                className="flex gap-3 overflow-x-auto pb-6 no-scrollbar snap-x touch-pan-x -mx-6 px-6 lg:mx-0 lg:px-0"
+              >
                 <button
+                  role="tab"
                   onClick={() => setActiveCategory('all')}
-                  aria-pressed={activeCategory === 'all'}
-                  className={`min-h-[44px] px-7 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 whitespace-nowrap snap-start ${
+                  aria-selected={activeCategory === 'all'}
+                  className={`min-h-[48px] px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border-2 whitespace-nowrap snap-start active:scale-95 ${
                     activeCategory === 'all'
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-600/30'
+                      ? 'bg-slate-900 border-slate-900 dark:bg-blue-600 dark:border-blue-600 text-white shadow-2xl shadow-blue-500/20'
                       : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-blue-500/40'
                   }`}
                 >
@@ -172,11 +182,12 @@ export const PortfolioGrid = ({
                 {Object.entries(categoriesDict).map(([key, label]) => (
                   <button
                     key={key}
+                    role="tab"
                     onClick={() => setActiveCategory(key)}
-                    aria-pressed={activeCategory === key}
-                    className={`min-h-[44px] px-7 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 whitespace-nowrap snap-start ${
+                    aria-selected={activeCategory === key}
+                    className={`min-h-[48px] px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border-2 whitespace-nowrap snap-start active:scale-95 ${
                       activeCategory === key
-                        ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-600/30'
+                        ? 'bg-slate-900 border-slate-900 dark:bg-blue-600 dark:border-blue-600 text-white shadow-2xl shadow-blue-500/20'
                         : 'bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-blue-500/40'
                     }`}
                   >
@@ -185,34 +196,34 @@ export const PortfolioGrid = ({
                 ))}
               </div>
 
-              <div className="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-white dark:from-[#020617] pointer-events-none lg:hidden" />
+              {/* Indicador visual de scroll (Mobile) */}
+              <div className="absolute right-0 top-0 bottom-6 w-20 bg-gradient-to-l from-white dark:from-[#020617] to-transparent pointer-events-none lg:hidden" />
             </div>
           </nav>
         </header>
 
-        {/* GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 min-h-[450px]">
+        {/* GRID DE PROJETOS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 min-h-[500px]">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => (
               <div
                 key={project.id}
-                className="flex h-full animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both"
-                style={{ animationDelay: `${index * 80}ms` }}
+                className="flex h-full animate-in fade-in zoom-in-95 duration-500 fill-mode-both"
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <ProjectCard
-                  project={project}
-                  lang={lang}
-                  dict={dict}
-                />
+                <ProjectCard project={project} lang={lang} dict={dict} />
               </div>
             ))
           ) : (
-            <div className="col-span-full flex flex-col items-center justify-center py-32 rounded-[4rem] border-4 border-dashed border-slate-100 dark:border-slate-900 bg-slate-50/50 dark:bg-slate-900/10">
-              <FolderSearch
-                className="w-16 h-16 md:w-20 md:h-20 text-slate-300 dark:text-slate-700 mb-8"
-                strokeWidth={1}
-              />
-              <p className="text-slate-500 dark:text-slate-400 font-black uppercase tracking-[0.3em] text-[10px] md:text-[11px] text-center px-10">
+            /* ESTADO VAZIO */
+            <div className="col-span-full flex flex-col items-center justify-center py-40 rounded-[3.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 transition-all">
+              <div className="p-8 bg-white dark:bg-slate-800 rounded-3xl shadow-xl mb-8">
+                <FolderSearch
+                  className="w-16 h-16 text-slate-300 dark:text-slate-600"
+                  strokeWidth={1.5}
+                />
+              </div>
+              <p className="text-slate-500 dark:text-slate-400 font-black uppercase tracking-[0.3em] text-[11px] text-center max-w-xs leading-relaxed">
                 {portfolio.empty || fallback.empty}
               </p>
             </div>
