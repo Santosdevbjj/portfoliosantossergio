@@ -1,6 +1,14 @@
-'use client';
+'use client'
 
-import React from 'react';
+/**
+ * PROJECT CARD: A unidade fundamental do Portfólio.
+ * -----------------------------------------------------------------------------
+ * - UI: Design baseado em cartões de alta densidade de informação.
+ * - UX: Diferenciação clara entre projetos comuns e "Main Cases".
+ * - I18n: Suporte tri-idioma (PT/EN/ES) com dicionário e fallbacks.
+ */
+
+import React from 'react'
 import {
   Github,
   ExternalLink,
@@ -9,275 +17,216 @@ import {
   Target,
   Lightbulb,
   TrendingUp,
-} from 'lucide-react';
-import type { Locale } from '@/i18n-config';
+} from 'lucide-react'
+import type { Locale } from '@/i18n-config'
 
 interface GitHubProject {
-  id?: number;
-  name: string;
-  description: string | null;
-  html_url: string;
-  homepage?: string | null;
-  topics: string[];
+  id?: number
+  name: string
+  description: string | null
+  html_url: string
+  homepage?: string | null
+  topics?: string[]
 }
 
 interface ProjectCardProps {
-  project: GitHubProject;
-  lang: Locale;
-  dict: {
+  readonly project: GitHubProject
+  readonly lang: Locale
+  readonly dict: {
     portfolio: {
-      noDescription: string;
-      mainCaseLabel: string;
-      featuredLabel: string;
+      noDescription?: string
+      mainCaseLabel?: string
+      featuredLabel?: string
       projectLabels: {
-        problem: string;
-        solution: string;
-        impact?: string;
-      };
-    };
-  };
+        problem?: string
+        solution?: string
+        impact?: string
+      }
+    }
+  }
 }
 
-/**
- * PROJECT CARD
- * Converte repositórios técnicos em casos de valor de negócio.
- * Totalmente responsivo, acessível e multilíngue (PT / EN / ES).
- */
 export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
-  const { portfolio } = dict;
+  const { portfolio } = dict
 
-  // ------------------------------
-  // Labels com fallback seguro
-  // ------------------------------
+  /* -------------------------------------------------
+   * 🌍 FALLBACKS I18N
+   * ------------------------------------------------*/
+  const fallback = {
+    problem: lang === 'en' ? 'Problem' : 'Problema',
+    solution: lang === 'es' ? 'Solución' : lang === 'en' ? 'Solution' : 'Solução',
+    impact: lang === 'en' ? 'Impact' : 'Impacto',
+    mainCase: lang === 'en' ? 'Flagship Case' : lang === 'es' ? 'Caso Principal' : 'Caso Principal',
+    featured: lang === 'en' ? 'Featured' : 'Destaque',
+    noDescription: lang === 'en' ? 'No description' : 'Sem descrição'
+  }
+
   const labels = {
-    problem:
-      portfolio.projectLabels.problem ??
-      (lang === 'pt' ? 'Problema' : lang === 'es' ? 'Problema' : 'Problem'),
-    solution:
-      portfolio.projectLabels.solution ??
-      (lang === 'pt' ? 'Solução' : lang === 'es' ? 'Solución' : 'Solution'),
-    impact:
-      portfolio.projectLabels.impact ??
-      (lang === 'pt' ? 'Impacto' : lang === 'es' ? 'Impacto' : 'Impact'),
-  };
+    problem: portfolio.projectLabels.problem ?? fallback.problem,
+    solution: portfolio.projectLabels.solution ?? fallback.solution,
+    impact: portfolio.projectLabels.impact ?? fallback.impact,
+  }
 
-  const mainCaseLabel =
-    portfolio.mainCaseLabel ??
-    (lang === 'pt' ? 'Caso Principal' : lang === 'es' ? 'Caso Principal' : 'Main Case');
+  /* -------------------------------------------------
+   * 🏷️ TÓPICOS & FLAGS
+   * ------------------------------------------------*/
+  const topics = project.topics ?? []
+  const ADMIN_TOPICS = new Set(['portfolio', 'featured', 'main-case', 'destaque', 'highlight', 'primeiro'])
 
-  const featuredLabel =
-    portfolio.featuredLabel ??
-    (lang === 'pt' ? 'Destaque' : lang === 'es' ? 'Destacado' : 'Featured');
+  const displayTopics = topics.filter(t => !ADMIN_TOPICS.has(t.toLowerCase()))
+  const isMainCase = topics.some(t => ['main-case', 'featured'].includes(t))
+  const isHighlight = topics.some(t => ['destaque', 'highlight'].includes(t))
 
-  // ------------------------------
-  // Topics administrativos
-  // ------------------------------
-  const adminTopics = [
-    'portfolio',
-    'featured',
-    'main-case',
-    'destaque',
-    'highlight',
-    'primeiro',
-    'primeiro-projeto',
-  ];
+  /* -------------------------------------------------
+   * 🧠 PARSING DE CONTEÚDO
+   * ------------------------------------------------*/
+  const formatTopic = (topic: string) => {
+    const uppercaseTechs = ['aws', 'ml', 'ai', 'sql', 'etl', 'genai', 'api']
+    if (uppercaseTechs.includes(topic.toLowerCase())) return topic.toUpperCase()
+    return topic.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  }
 
-  const displayTopics =
-    project.topics?.filter(
-      (topic) => !adminTopics.includes(topic.toLowerCase())
-    ) ?? [];
+  const descParts = project.description?.split('|').map(p => p.trim()) ?? []
+  const hasStructuredDesc = descParts.length >= 2
 
-  const isMainCase =
-    project.topics?.includes('main-case') ||
-    project.topics?.includes('featured');
-
-  const isHighlight =
-    project.topics?.includes('destaque') ||
-    project.topics?.includes('highlight');
-
-  // ------------------------------
-  // Helpers
-  // ------------------------------
-  const formatTopic = (topic: string) =>
-    topic
-      .split('-')
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ');
-
-  const descriptionParts =
-    project.description?.split('|').map((p) => p.trim()) ?? [];
-
-  const hasStructuredDesc = descriptionParts.length >= 2;
-
-  // ------------------------------
-  // Render
-  // ------------------------------
   return (
     <article
       className={`
-        group relative flex flex-col h-full min-h-[220px]
-        p-6 md:p-8 rounded-[2.5rem] border transition-all duration-500
+        group relative flex flex-col h-full 
+        p-7 md:p-9 rounded-[2.5rem] border transition-all duration-500
         ${
           isMainCase
-            ? 'border-blue-500/40 bg-gradient-to-br from-blue-50/50 to-white dark:from-blue-900/10 dark:to-slate-950 shadow-xl'
-            : 'border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-900/50 shadow-sm'
+            ? 'border-blue-500/30 bg-white dark:bg-slate-900 shadow-2xl shadow-blue-500/5 ring-1 ring-blue-500/10'
+            : 'border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950 shadow-sm hover:border-blue-500/20'
         }
         hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/10
       `}
     >
-      {/* Badge */}
+      {/* BADGE DE PRIORIDADE */}
       {(isMainCase || isHighlight) && (
-        <div className="absolute -top-3 right-6 z-10">
-          <span className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg ring-4 ring-white dark:ring-slate-950">
-            <Star className="w-3 h-3 text-amber-300" fill="currentColor" />
-            {isMainCase ? mainCaseLabel : featuredLabel}
+        <div className="absolute -top-3 right-8 z-10">
+          <span className="flex items-center gap-1.5 bg-blue-600 text-white px-5 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20">
+            <Star size={10} className="fill-amber-300 text-amber-300" />
+            {isMainCase ? (portfolio.mainCaseLabel ?? fallback.mainCase) : (portfolio.featuredLabel ?? fallback.featured)}
           </span>
         </div>
       )}
 
-      {/* Header */}
+      {/* HEADER: AÇÕES & ÍCONE */}
       <header className="flex justify-between items-start mb-8">
-        <div
-          className={`
-            p-3.5 rounded-2xl transition-all duration-500
-            group-hover:scale-110 group-hover:rotate-6
-            ${
-              isMainCase
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400'
-            }
-          `}
-        >
-          <Folder className="w-6 h-6 md:w-7 md:h-7" strokeWidth={2.5} />
+        <div className={`
+          p-3.5 rounded-2xl transition-all duration-500
+          ${isMainCase ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400'}
+          group-hover:rotate-6 group-hover:scale-110
+        `}>
+          <Folder size={28} strokeWidth={2.5} />
         </div>
 
-        <div className="flex gap-1.5">
+        <div className="flex gap-2">
           <a
             href={project.html_url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="GitHub"
-            className="p-2.5 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition"
+            title="GitHub"
+            className="flex items-center justify-center w-11 h-11 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
           >
-            <Github className="w-5 h-5 md:w-6 md:h-6" />
+            <Github size={22} />
           </a>
-
           {project.homepage && (
             <a
               href={project.homepage}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Live Project"
-              className="p-2.5 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition"
+              title="Live Project"
+              className="flex items-center justify-center w-11 h-11 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
             >
-              <ExternalLink className="w-5 h-5 md:w-6 md:h-6" />
+              <ExternalLink size={22} />
             </a>
           )}
         </div>
       </header>
 
-      {/* Title */}
-      <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-5 tracking-tight capitalize">
+      {/* TÍTULO */}
+      <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-6 tracking-tight leading-none group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
         {project.name.replace(/[_-]/g, ' ')}
       </h3>
 
-      {/* Body */}
-      <div className="flex-grow space-y-6 mb-8">
+      {/* CORPO DO CASE */}
+      <div className="flex-grow space-y-6">
         {hasStructuredDesc ? (
           <>
-            {/* Problema */}
-            <Section
-              icon={<Target />}
-              label={labels.problem}
-              text={descriptionParts[0]}
-              color="blue"
+            <CaseSection 
+              icon={<Target size={18} />} 
+              label={labels.problem} 
+              text={descParts[0]} 
+              type="problem" 
             />
-
-            {/* Solução */}
-            <Section
-              icon={<Lightbulb />}
-              label={labels.solution}
-              text={descriptionParts[1]}
-              color="amber"
+            <CaseSection 
+              icon={<Lightbulb size={18} />} 
+              label={labels.solution} 
+              text={descParts[1]} 
+              type="solution" 
             />
-
-            {/* Impacto */}
-            {descriptionParts[2] && (
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-center gap-3">
-                <TrendingUp className="w-5 h-5 text-emerald-500 shrink-0" />
-                <p className="font-bold text-slate-900 dark:text-slate-200">
-                  {descriptionParts[2]}
+            {descParts[2] && (
+              <div className="pt-4 mt-2 flex items-start gap-3 border-t border-slate-100 dark:border-slate-800/40">
+                <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
+                  <TrendingUp size={14} />
+                </div>
+                <p className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight italic">
+                  {descParts[2]}
                 </p>
               </div>
             )}
           </>
         ) : (
-          <p className="italic text-slate-500 dark:text-slate-400">
-            {project.description ||
-              portfolio.noDescription ||
-              (lang === 'pt'
-                ? 'Sem descrição'
-                : lang === 'es'
-                ? 'Sin descripción'
-                : 'No description')}
+          <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base leading-relaxed italic">
+            {project.description || (portfolio.noDescription ?? fallback.noDescription)}
           </p>
         )}
       </div>
 
-      {/* Tech Stack */}
-      <footer className="flex flex-wrap gap-2 pt-6 border-t border-slate-100 dark:border-slate-800/40">
-        {displayTopics.slice(0, 5).map((topic) => (
+      {/* TECH STACK FOOTER */}
+      <footer className="mt-10 pt-6 border-t border-slate-100 dark:border-slate-800/40 flex flex-wrap gap-2">
+        {displayTopics.slice(0, 4).map(topic => (
           <span
             key={topic}
-            className="px-3 py-1.5 text-[10px] font-black bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 rounded-lg uppercase tracking-wider"
+            className="px-3 py-1.5 text-[9px] font-black uppercase tracking-widest bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg border border-slate-100 dark:border-slate-700/50"
           >
             {formatTopic(topic)}
           </span>
         ))}
-        {displayTopics.length > 5 && (
-          <span className="text-[11px] font-bold text-slate-400">
-            +{displayTopics.length - 5}
+        {displayTopics.length > 4 && (
+          <span className="text-[10px] font-bold text-slate-400 self-center ml-1">
+            +{displayTopics.length - 4}
           </span>
         )}
       </footer>
     </article>
-  );
+  )
 }
 
-/**
- * Subcomponente semântico para Problema / Solução
- */
-function Section({
-  icon,
-  label,
-  text,
-  color,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  text: string;
-  color: 'blue' | 'amber';
-}) {
-  const bg =
-    color === 'blue'
-      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400'
-      : 'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400';
+/* -------------------------------------------------------------------------- */
+/* HELPER COMPONENT: CaseSection                                               */
+/* -------------------------------------------------------------------------- */
+
+function CaseSection({ icon, label, text, type }: { icon: React.ReactNode, label: string, text: string, type: 'problem' | 'solution' }) {
+  const styles = type === 'problem' 
+    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+    : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
 
   return (
-    <div className="flex gap-4">
-      <div
-        className={`mt-1 w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center ${bg}`}
-      >
+    <div className="flex gap-4 group/section">
+      <div className={`mt-1 flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-transform group-hover/section:-rotate-12 ${styles}`}>
         {icon}
       </div>
       <div>
-        <span className="block mb-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
+        <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">
           {label}
         </span>
-        <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">
+        <p className="text-sm text-slate-600 dark:text-slate-400 leading-snug font-medium line-clamp-3">
           {text}
         </p>
       </div>
     </div>
-  );
+  )
 }
