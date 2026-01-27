@@ -6,14 +6,28 @@ import '../globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner';
 import { i18n, type Locale } from '@/i18n-config';
+import { getDictionary } from '@/get-dictionary'; // Importação essencial para o dict
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const montserrat = Montserrat({ subsets: ['latin'], variable: '--font-montserrat', display: 'swap' });
+const inter = Inter({ 
+  subsets: ['latin'], 
+  variable: '--font-inter', 
+  display: 'swap',
+  preload: true 
+});
+
+const montserrat = Montserrat({ 
+  subsets: ['latin'], 
+  variable: '--font-montserrat', 
+  display: 'swap',
+  preload: true 
+});
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
+  minimumScale: 1,
+  maximumScale: 5, // Permite zoom para acessibilidade (WCAG)
+  userScalable: true,
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#2563eb' },
     { media: '(prefers-color-scheme: dark)', color: '#020617' },
@@ -31,7 +45,12 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
     metadataBase: new URL(siteUrl),
     alternates: {
       canonical: `${siteUrl}/${currentLang}`,
-      languages: { pt: `${siteUrl}/pt`, en: `${siteUrl}/en`, es: `${siteUrl}/es`, 'x-default': `${siteUrl}/pt` },
+      languages: { 
+        pt: `${siteUrl}/pt`, 
+        en: `${siteUrl}/en`, 
+        es: `${siteUrl}/es`, 
+        'x-default': `${siteUrl}/pt` 
+      },
     },
     verification: { google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0' },
   };
@@ -40,13 +59,20 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
 export default async function RootLayout(props: { children: React.ReactNode; params: Promise<{ lang: string }> }) {
   const { lang } = await props.params;
   const currentLang = i18n.locales.includes(lang as Locale) ? (lang as Locale) : i18n.defaultLocale;
+  
+  // Carrega as traduções para resolver o erro 'Property dict is missing'
+  const dict = await getDictionary(currentLang);
 
   return (
-    <html lang={currentLang} suppressHydrationWarning className={`${inter.variable} ${montserrat.variable} scroll-smooth`}>
+    <html 
+      lang={currentLang} 
+      suppressHydrationWarning 
+      className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
+    >
       <head>
-        {/* Google Analytics - Injeção Segura */}
+        {/* Google Analytics - G-3XF5BTP58V */}
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX" // Substitua pelo seu ID real
+          src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -54,20 +80,27 @@ export default async function RootLayout(props: { children: React.ReactNode; par
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-XXXXXXXXXX', {
+            gtag('config', 'G-3XF5BTP58V', {
               page_path: window.location.pathname,
             });
           `}
         </Script>
       </head>
-      <body className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased selection:bg-blue-600 selection:text-white">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
+      <body className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased selection:bg-brand-500/30 selection:text-brand-900 overflow-x-clip">
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="system" 
+          enableSystem 
+          disableTransitionOnChange
+        >
+          <div className="relative flex flex-col min-h-screen w-full">
             <main id="main-content" role="main" className="flex-grow w-full relative focus:outline-none">
               {props.children}
             </main>
           </div>
-          <CookieBanner lang={currentLang} />
+          
+          {/* FIX: Agora passando o objeto 'dict' exigido pela interface do CookieBanner */}
+          <CookieBanner lang={currentLang} dict={dict.cookieBanner} />
         </ThemeProvider>
       </body>
     </html>
