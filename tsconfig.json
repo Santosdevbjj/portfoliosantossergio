@@ -1,43 +1,70 @@
 {
   "compilerOptions": {
+    /* ---------------------------------------------------------------------- */
+    /* CORE TARGET & RUNTIME (Node 24 / TS 5.7)                               */
+    /* ---------------------------------------------------------------------- */
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": true,
-    "skipLibCheck": true,
+
+    /* ---------------------------------------------------------------------- */
+    /* STRICTNESS (ENTERPRISE LEVEL)                                           */
+    /* ---------------------------------------------------------------------- */
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true,
+
+    /* ---------------------------------------------------------------------- */
+    /* EMIT & MODULE RESOLUTION (Updated for TS 5.4+)                         */
+    /* ---------------------------------------------------------------------- */
     "noEmit": true,
-    "esModuleInterop": true,
-    "module": "ESNext",
+    "module": "preserve",
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+
+    /* ---------------------------------------------------------------------- */
+    /* INTEROP & MODERN JS                                                     */
+    /* ---------------------------------------------------------------------- */
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "useDefineForClassFields": true,
+    "verbatimModuleSyntax": true,
+
+    /* ---------------------------------------------------------------------- */
+    /* PROJECT STRUCTURE                                                       */
+    /* ---------------------------------------------------------------------- */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    /* ---------------------------------------------------------------------- */
+    /* PERFORMANCE                                                             */
+    /* ---------------------------------------------------------------------- */
     "incremental": true,
+    "skipLibCheck": true,
+
+    /* ---------------------------------------------------------------------- */
+    /* NEXT.JS PLUGIN                                                          */
+    /* ---------------------------------------------------------------------- */
     "plugins": [
       {
         "name": "next"
       }
-    ],
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "baseUrl": ".",
-    "forceConsistentCasingInFileNames": true,
-    "noUncheckedIndexedAccess": true,
-    
-    /* Ajuste de Rigor: 
-       Removido 'ignoreDeprecations' para evitar o erro TS5024.
-       Em 2026, com TS 5.4+, é melhor manter o código limpo de opções obsoletas.
-    */
-    "verbatimModuleSyntax": false
+    ]
   },
+
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "src/proxy.ts"
+    "src/proxy.ts",
+    "new-types.d.ts"
   ],
+
   "exclude": ["node_modules"]
 }
