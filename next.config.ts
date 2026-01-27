@@ -1,15 +1,18 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
   /* -------------------------------------------------------------------------- */
-  /* CORE & STABILITY                                                           */
+  /* CORE & STABILITY (Hardened for Next.js 16)                                 */
   /* -------------------------------------------------------------------------- */
   reactStrictMode: true,
   poweredByHeader: false,
-
+  
+  // No Next.js 16, estas flags saíram de 'experimental' para o topo
+  typedRoutes: true,
+  
   typescript: {
     // Garantia de integridade para o Especialista em Sistemas
     ignoreBuildErrors: false,
-    // Caminho explícito conforme novas docs de jan/2026
     tsconfigPath: 'tsconfig.json',
   },
 
@@ -24,7 +27,7 @@ const nextConfig = {
   },
 
   /* -------------------------------------------------------------------------- */
-  /* IMAGES (Hardened & Optimized)                                              */
+  /* IMAGES (Optimized for High Latency Regions like gru1)                      */
   /* -------------------------------------------------------------------------- */
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -40,13 +43,10 @@ const nextConfig = {
   },
 
   /* -------------------------------------------------------------------------- */
-  /* EXPERIMENTAL (Next.js 16 Features)                                         */
+  /* EXPERIMENTAL (Controlled Features)                                         */
   /* -------------------------------------------------------------------------- */
   experimental: {
-    // Ativa tipagem estática para rotas (Link href)
-    typedRoutes: true,
-    
-    // NOVIDADE JAN/2026: IntelliSense para variáveis de ambiente
+    // Mantendo apenas o que ainda é experimental ou requer controle fino
     typedEnv: true,
 
     optimizePackageImports: [
@@ -59,7 +59,7 @@ const nextConfig = {
   },
 
   /* -------------------------------------------------------------------------- */
-  /* SECURITY HEADERS (Padrão 2026)                                             */
+  /* SECURITY HEADERS (Padrão Enterprise 2026)                                  */
   /* -------------------------------------------------------------------------- */
   async headers() {
     return [
@@ -82,11 +82,10 @@ const nextConfig = {
             value: [
               "default-src 'self';",
               "img-src 'self' data: https:;",
-              // Adicionado suporte a frames/scripts de fontes confiáveis se necessário
               "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval';",
               "style-src 'self' 'unsafe-inline';",
               "font-src 'self' data: https:;",
-              // 'connect-src' atualizado para suportar o protocolo MCP em dev
+              // Suporte ao protocolo MCP e WebSockets em desenvolvimento
               `connect-src 'self' https: ${process.env.NODE_ENV === 'development' ? 'ws: wss:' : ''};`,
               "frame-ancestors 'none';",
               "upgrade-insecure-requests;",
