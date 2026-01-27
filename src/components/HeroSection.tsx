@@ -1,6 +1,14 @@
-'use client';
+'use client'
 
-import React from 'react';
+/**
+ * HERO SECTION: O Impacto Estratégico
+ * -----------------------------------------------------------------------------
+ * - Design: Tipografia expressiva com foco em autoridade (Sênior).
+ * - I18n: Lógica robusta de fallbacks para PT, EN e ES.
+ * - Performance: Otimizado para LCP (Largest Contentful Paint).
+ */
+
+import React from 'react'
 import {
   ArrowRight,
   Database,
@@ -8,197 +16,162 @@ import {
   FileText,
   BarChart3,
   Sparkles,
-} from 'lucide-react';
-import type { Locale } from '@/i18n-config';
+} from 'lucide-react'
+import type { Locale } from '@/i18n-config'
 
 /* =====================================================
  * TYPES
  * ===================================================== */
 interface HeroSectionProps {
-  lang: Locale;
-  dict: {
+  readonly lang: Locale
+  readonly dict?: {
     about?: {
-      headline?: string;
-      bio?: string;
+      headline?: string
+      bio?: string
       sections?: {
         highlights?: {
-          title?: string;
-        };
-      };
-    };
+          title?: string
+        }
+      }
+    }
     common?: {
-      viewProjects?: string;
-      downloadCv?: string;
-    };
-  };
+      viewProjects?: string
+      downloadCv?: string
+      roleSenior?: string
+    }
+  }
 }
 
 /* =====================================================
  * COMPONENT
  * ===================================================== */
-export const HeroSection = ({ dict, lang }: HeroSectionProps) => {
-  const about = dict?.about ?? {};
-  const common = dict?.common ?? {};
+export function HeroSection({ dict, lang }: HeroSectionProps) {
+  const about = dict?.about
+  const common = dict?.common
 
-  /* =====================================================
-   * ASSETS
-   * ===================================================== */
-  const cvPath = `/cv-sergio-santos-${lang}.pdf`;
+  const cvPath = `/cv-sergio-santos-${lang}.pdf`
 
-  /* =====================================================
-   * FALLBACKS MULTILÍNGUES
-   * ===================================================== */
-  const labels = {
-    badge:
-      about.sections?.highlights?.title ??
-      {
-        pt: 'Especialista em Dados',
-        en: 'Data Specialist',
-        es: 'Especialista en Datos',
-      }[lang],
-
-    headline:
-      about.headline ??
-      {
-        pt: 'Transformando dados em decisões estratégicas',
-        en: 'Turning data into strategic decisions',
-        es: 'Transformando datos en decisiones estratégicas',
-      }[lang],
-
-    bio:
-      about.bio ??
-      {
-        pt: 'Atuação em sistemas críticos, engenharia de dados e ciência de dados com foco em impacto real no negócio.',
-        en: 'Experience in critical systems, data engineering and data science focused on real business impact.',
-        es: 'Experiencia en sistemas críticos, ingeniería de datos y ciencia de datos con enfoque en impacto real.',
-      }[lang],
-
-    viewProjects:
-      common.viewProjects ??
-      {
-        pt: 'Ver Projetos',
-        en: 'View Projects',
-        es: 'Ver Proyectos',
-      }[lang],
-
-    downloadCv:
-      common.downloadCv ??
-      {
-        pt: 'Baixar CV',
-        en: 'Download CV',
-        es: 'Descargar CV',
-      }[lang],
-
-    stack: {
+  /* Fallback strings para resiliência de tradução */
+  const fallback = {
+    badge: { pt: 'Especialista em Dados', en: 'Data Specialist', es: 'Especialista en Datos' },
+    headline: { pt: 'Transformando dados em decisões estratégicas', en: 'Turning data into strategic decisions', es: 'Transformando datos en decisiones estratégicas' },
+    bio: { pt: 'Especialista em arquitetura de dados e sistemas críticos, focado em transformar complexidade técnica em valor de negócio real.', en: 'Expert in data architecture and critical systems, focused on turning technical complexity into real business value.', es: 'Experto en arquitectura de datos y sistemas críticos, enfocado en convertir la complejidad técnica en valor comercial real.' },
+    viewProjects: { pt: 'Ver Projetos', en: 'View Projects', es: 'Ver Proyectos' },
+    downloadCv: { pt: 'Baixar CV', en: 'Download CV', es: 'Descargar CV' },
+    stack: { 
       azure: 'Azure Databricks',
-      data:
-        {
-          pt: 'Ciência de Dados',
-          en: 'Data Science',
-          es: 'Ciencia de Datos',
-        }[lang],
-      critical:
-        {
-          pt: 'Sistemas Críticos',
-          en: 'Critical Systems',
-          es: 'Sistemas Críticos',
-        }[lang],
-    },
-  };
+      data: { pt: 'Ciência de Dados', en: 'Data Science', es: 'Ciencia de Datos' },
+      critical: { pt: 'Sistemas Críticos', en: 'Critical Systems', es: 'Sistemas Críticos' }
+    }
+  }
 
-  /* =====================================================
-   * RENDER
-   * ===================================================== */
+  const labels = {
+    badge: about?.sections?.highlights?.title ?? fallback.badge[lang],
+    headline: about?.headline ?? fallback.headline[lang],
+    bio: about?.bio ?? fallback.bio[lang],
+    viewProjects: common?.viewProjects ?? fallback.viewProjects[lang],
+    downloadCv: common?.downloadCv ?? fallback.downloadCv[lang],
+    stack: {
+      azure: fallback.stack.azure,
+      data: fallback.stack.data[lang],
+      critical: fallback.stack.critical[lang],
+    },
+  }
+
   return (
     <section
       aria-labelledby="hero-title"
-      className="relative pt-24 pb-16 lg:pt-48 lg:pb-36 overflow-hidden bg-white dark:bg-[#020617] transition-colors"
+      className="relative min-h-[90vh] flex items-center overflow-hidden bg-white pt-32 pb-20 transition-colors dark:bg-[#020617] lg:pt-48 lg:pb-36"
     >
-      {/* GRID BACKGROUND */}
-      <div
-        className="absolute inset-0 -z-20 opacity-[0.04] dark:opacity-[0.12] pointer-events-none"
-        style={{
-          backgroundImage:
-            'linear-gradient(#2563eb 1.5px, transparent 1.5px), linear-gradient(90deg, #2563eb 1.5px, transparent 1.5px)',
-          backgroundSize: '48px 48px',
-        }}
-      />
+      {/* 🏁 BACKGROUND DECORATIVO (GRID & GLOW) */}
+      <div className="absolute inset-0 -z-10">
+        <div
+          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08]"
+          style={{
+            backgroundImage: `radial-gradient(#2563eb 1px, transparent 1px)`,
+            backgroundSize: '32px 32px',
+          }}
+        />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/5 blur-[120px] rounded-full translate-y-1/2 -translate-x-1/2" />
+      </div>
 
-      {/* RADIAL LIGHT */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.06),transparent_40%)] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
         <div className="max-w-4xl">
-          {/* BADGE */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-blue-50/60 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 mb-8">
-            <Sparkles className="w-4 h-4 text-blue-600 animate-pulse" />
-            <span className="text-[10px] md:text-xs font-black text-blue-800 dark:text-blue-300 uppercase tracking-[0.3em]">
+          
+          {/* ✨ BADGE */}
+          <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-blue-100 bg-blue-50/50 px-4 py-1.5 dark:border-blue-900/30 dark:bg-blue-900/20 backdrop-blur-sm animate-fade-in">
+            <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-700 dark:text-blue-300 md:text-xs">
               {labels.badge}
             </span>
           </div>
 
-          {/* NAME */}
+          {/* 🏷️ NAME (Impactful Typography) */}
           <h1
             id="hero-title"
-            className="text-[12vw] sm:text-7xl md:text-8xl lg:text-9xl font-black text-slate-900 dark:text-white mb-8 tracking-tighter leading-[0.82]"
+            className="mb-8 text-[13vw] font-black leading-[0.85] tracking-tighter text-slate-900 dark:text-white sm:text-7xl md:text-8xl lg:text-[10rem] animate-fade-in-up"
           >
             Sérgio <br className="hidden sm:block" />
             <span className="text-blue-600 inline-block">Santos</span>
           </h1>
 
-          {/* HEADLINE */}
-          <h2 className="text-xl md:text-3xl lg:text-4xl font-bold text-slate-800 dark:text-slate-200 mb-8 max-w-3xl">
+          {/* 📢 HEADLINE */}
+          <h2 className="mb-8 max-w-3xl text-2xl font-bold text-slate-800 dark:text-slate-200 md:text-4xl lg:text-5xl tracking-tight leading-tight">
             {labels.headline}
           </h2>
 
-          {/* BIO */}
-          <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 mb-12 max-w-2xl font-medium">
+          {/* 📖 BIO */}
+          <p className="mb-12 max-w-2xl text-lg font-medium text-slate-600 dark:text-slate-400 md:text-xl leading-relaxed">
             {labels.bio}
           </p>
 
-          {/* CTA */}
-          <div className="flex flex-col sm:flex-row gap-5">
+          {/* ⚡ CALL TO ACTION */}
+          <div className="flex flex-col gap-5 sm:flex-row">
             <a
               href="#projects"
-              className="group min-w-[220px] flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-2xl font-black text-lg transition-all active:scale-95"
+              className="group flex min-w-[220px] items-center justify-center gap-3 rounded-2xl bg-blue-600 px-8 py-5 text-lg font-black text-white transition-all hover:bg-blue-700 hover:shadow-2xl hover:shadow-blue-500/20 active:scale-95 shadow-xl shadow-blue-500/10"
             >
               {labels.viewProjects}
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-2" />
             </a>
 
             <a
               href={cvPath}
               target="_blank"
               rel="noopener noreferrer"
-              className="min-w-[220px] flex items-center justify-center gap-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-2 border-slate-200 dark:border-slate-800 px-10 py-5 rounded-2xl font-bold text-lg active:scale-95"
+              className="flex min-w-[220px] items-center justify-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-8 py-5 text-lg font-bold text-slate-900 transition-all hover:border-blue-500/30 hover:bg-slate-50 active:scale-95 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800 shadow-sm"
             >
-              <FileText className="w-5 h-5 text-blue-600" />
+              <FileText className="h-5 w-5 text-blue-600" />
               {labels.downloadCv}
             </a>
           </div>
 
-          {/* STACK */}
-          <div className="mt-20 pt-10 border-t border-slate-200/60 dark:border-slate-800/60 flex flex-wrap gap-x-10 gap-y-6">
-            <div className="flex items-center gap-2.5 font-black uppercase tracking-widest text-[10px]">
-              <Database className="w-4 h-4 text-blue-600" />
+          {/* 🛠️ KEY STACK */}
+          <div className="mt-20 flex flex-wrap gap-x-12 gap-y-6 border-t border-slate-200/60 pt-12 dark:border-slate-800/60 opacity-80">
+            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              <Database className="h-4 w-4 text-blue-600" />
               {labels.stack.azure}
             </div>
-            <div className="flex items-center gap-2.5 font-black uppercase tracking-widest text-[10px]">
-              <BarChart3 className="w-4 h-4 text-blue-600" />
+            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              <BarChart3 className="h-4 w-4 text-blue-600" />
               {labels.stack.data}
             </div>
-            <div className="flex items-center gap-2.5 font-black uppercase tracking-widest text-[10px]">
-              <ShieldCheck className="w-4 h-4 text-blue-600" />
+            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              <ShieldCheck className="h-4 w-4 text-blue-600" />
               {labels.stack.critical}
             </div>
           </div>
         </div>
       </div>
 
-      {/* ELEMENTO VISUAL — DESKTOP XL */}
-      <div className="absolute -right-20 top-1/2 -translate-y-1/2 opacity-[0.03] dark:opacity-[0.08] hidden 2xl:block pointer-events-none">
-        <Database className="w-[700px] h-[700px] text-blue-600 -rotate-12" />
+      {/* 🎨 FLOATING VISUAL (Data Pattern) */}
+      <div className="pointer-events-none absolute -right-10 top-1/2 hidden -translate-y-1/2 opacity-[0.03] dark:opacity-[0.07] xl:block">
+        <div className="relative">
+           <Database className="h-[600px] w-[600px] -rotate-12 text-blue-600" />
+           <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#020617] to-transparent" />
+        </div>
       </div>
     </section>
-  );
-};
+  )
+}
