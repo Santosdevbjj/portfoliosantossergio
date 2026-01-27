@@ -1,19 +1,20 @@
 {
-  "id": "portfolio-santos-sergio-pt-2026",
+  "id": "/pt/",
   "name": "Sérgio Santos | Especialista em Dados e Sistemas",
   "short_name": "SergioData",
-  "description": "Portfólio profissional de Sérgio Santos — Especialista em Dados, Engenharia de Sistemas e Arquiteturas de Missão Crítica.",
+  "description": "Portfólio profissional de Sérgio Santos — Especialista em Dados, Engenharia de Sistemas e IA Generativa.",
   "lang": "pt-BR",
+  "dir": "ltr",
 
-  "start_url": "/pt?source=pwa",
-  "scope": "/pt",
+  "start_url": "/pt/",
+  "scope": "/pt/",
 
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui", "browser"],
-  "orientation": "natural",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
 
   "background_color": "#020617",
-  "theme_color": "#2563eb",
+  "theme_color": "#020617",
 
   "prefer_related_applications": false,
 
@@ -30,24 +31,25 @@
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "/icons/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
     }
   ],
 
@@ -57,24 +59,22 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "platform": "windows",
-      "label": "Portfólio Profissional — Visualização Desktop"
+      "label": "Interface de Engenharia — Visualização Desktop"
     },
     {
       "src": "/screenshots/mobile-home.png",
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow",
-      "platform": "android",
-      "label": "Portfólio Técnico — Visualização Mobile"
+      "label": "Interface de Engenharia — Visualização Mobile"
     }
   ],
 
   "shortcuts": [
     {
-      "name": "Projetos",
+      "name": "Projetos em Destaque",
       "short_name": "Projetos",
-      "description": "Explorar projetos e artigos técnicos",
+      "description": "Explorar o portfólio de projetos técnicos",
       "url": "/pt#projects",
       "icons": [
         {
@@ -85,9 +85,9 @@
       ]
     },
     {
-      "name": "Artigos",
+      "name": "Artigos Técnicos",
       "short_name": "Artigos",
-      "description": "Ler artigos técnicos e estudos de caso",
+      "description": "Aceder a publicações e insights sobre dados",
       "url": "/pt#articles",
       "icons": [
         {
