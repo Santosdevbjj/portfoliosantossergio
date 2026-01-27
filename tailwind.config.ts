@@ -7,10 +7,12 @@ const config: Config = {
   /* ---------------------------------------------------------------------- */
   darkMode: 'class',
   
-  // Otimizado para o motor de scan do Next.js 16
+  // Caminhos otimizados para o motor de scan do Next.js 16 / Turbopack
   content: [
-    './src/**/*.{js,ts,jsx,tsx,md,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/hooks/**/*.{js,ts,jsx,tsx}',
+    './src/styles/**/*.css',
   ],
 
   theme: {
@@ -27,7 +29,7 @@ const config: Config = {
       /* ------------------------------ Breakpoints ----------------------- */
       screens: {
         'xs': '375px',
-        '2xl': '1440px', // Padrão para monitores UltraWide de devs
+        '2xl': '1440px', 
       },
 
       /* ------------------------------ Colors ---------------------------- */
@@ -46,7 +48,7 @@ const config: Config = {
           DEFAULT: 'rgb(var(--brand-500) / <alpha-value>)',
         },
         slate: {
-          950: '#020617', // OLED Dark
+          950: '#020617', // OLED Dark Mode Pure
         },
       },
 
@@ -63,23 +65,24 @@ const config: Config = {
 
       /* ------------------------------ Animations ------------------------ */
       animation: {
-        'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-in': 'fadeIn 0.5s ease-out forwards',
+        'fade-in-up': 'fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'shimmer': 'shimmer 2.5s linear infinite',
-        'float': 'float 6s ease-in-out infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+        'float': 'float 4s ease-in-out infinite',
       },
 
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0', transform: 'translateY(8px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
-        slideUp: {
-          '0%': { transform: 'translateY(16px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(12px) scale(0.98)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
         },
         shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
         },
         float: {
@@ -92,7 +95,8 @@ const config: Config = {
       boxShadow: {
         premium: '0 20px 50px -12px rgba(0, 0, 0, 0.08)',
         'premium-dark': '0 20px 50px -12px rgba(0, 0, 0, 0.4)',
-        glow: '0 0 20px rgba(var(--brand-500), 0.3)',
+        // Glow fixado para usar o sistema de cores do Tailwind com opacidade
+        glow: '0 0 20px rgb(var(--brand-500) / 0.3)',
       },
     },
   },
@@ -102,7 +106,7 @@ const config: Config = {
   /* ---------------------------------------------------------------------- */
   plugins: [
     typography,
-    // Plugin utilitário para forçar estados de hover em dispositivos touch
+    // Essencial para componentes Shadcn/UI e animações complexas
     require('tailwindcss-animate'),
   ],
 }
