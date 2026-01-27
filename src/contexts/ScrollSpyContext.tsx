@@ -4,8 +4,8 @@
  * CONTEXT: ScrollSpy
  * -----------------------------------------------------------------------------
  * Gerencia o estado da seção ativa durante a navegação por scroll.
- * * Essencial para o feedback visual da Navbar e para a experiência do usuário.
- * * Integrado com o domínio de Navegação (NavSection).
+ * Essencial para o feedback visual da Navbar e sincronização de UI.
+ * Integrado com o domínio de Navegação (NavSection).
  */
 
 import React, {
@@ -50,28 +50,32 @@ interface ScrollSpyProviderProps {
   readonly children: React.ReactNode
 }
 
+/**
+ * Provedor de estado global para o rastreamento de scroll.
+ * Envolva o layout principal ou a PageWrapper com este componente.
+ */
 export function ScrollSpyProvider({
   children,
 }: ScrollSpyProviderProps) {
   const [activeSection, setActiveSectionState] = useState<ActiveSection>(null)
 
   /**
-   * Define a seção ativa. 
-   * Envolto em useCallback para evitar quebra de referência em componentes filhos.
+   * Define a seção ativa com proteção de referência (useCallback).
    */
   const setActiveSection = useCallback((section: NavSection) => {
-    setActiveSectionState(section)
+    setActiveSectionState((prev) => (prev === section ? prev : section))
   }, [])
 
   /**
-   * Reseta o estado (ex: ao voltar para o topo).
+   * Reseta o estado para o valor inicial.
    */
   const resetActiveSection = useCallback(() => {
     setActiveSectionState(null)
   }, [])
 
   /**
-   * Valor do contexto memorizado para performance otimizada.
+   * Valor do contexto memorizado para evitar re-renderizações desnecessárias
+   * em componentes que apenas consomem o estado.
    */
   const value = useMemo<ScrollSpyContextValue>(
     () => ({
@@ -90,21 +94,27 @@ export function ScrollSpyProvider({
 }
 
 /* -------------------------------------------------------------------------- */
-/* HOOK                                                                       */
+/* HOOKS                                                                      */
 /* -------------------------------------------------------------------------- */
 
 /**
- * Hook customizado para consumir o ScrollSpy de forma segura.
- * Lança erro descritivo se usado fora do Provider.
+ * Hook: useScrollSpyContext
+ * Recomendado para uso interno em hooks de observação para evitar colisão de nomes.
  */
-export function useScrollSpy(): ScrollSpyContextValue {
+export function useScrollSpyContext(): ScrollSpyContextValue {
   const context = useContext(ScrollSpyContext)
 
   if (!context) {
     throw new Error(
-      '[ScrollSpy] useScrollSpy deve ser utilizado dentro de um ScrollSpyProvider',
+      '[ScrollSpy] useScrollSpyContext deve ser utilizado dentro de um ScrollSpyProvider',
     )
   }
 
   return context
 }
+
+/**
+ * Hook: useScrollSpy (Alias principal)
+ * Mantido para compatibilidade com componentes de UI (Navbar, etc).
+ */
+export const useScrollSpy = useScrollSpyContext
