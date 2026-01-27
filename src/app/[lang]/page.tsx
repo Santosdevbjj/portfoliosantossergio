@@ -13,8 +13,9 @@ import { PageWrapper } from '@/components/PageWrapper';
 import { ProjectSection } from '@/components/ProjectSection';
 import FeaturedProjectsSection from '@/components/featured/FeaturedProjectsSection';
 
-// Logic
-import { getDictionary, i18n, type Locale } from '@/i18n-config';
+// Logic - IMPORT CORRIGIDO para usar o dicionário síncrono que já validamos
+import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
+import { i18n, type Locale } from '@/i18n-config';
 import { getGitHubProjects } from '@/lib/github';
 
 interface PageProps {
@@ -26,16 +27,24 @@ interface PageProps {
  */
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await props.params;
-  const lang = i18n.locales.includes(rawLang as Locale) ? (rawLang as Locale) : i18n.defaultLocale;
-  const dict = await getDictionary(lang);
+  const lang = (i18n.locales.includes(rawLang as Locale) ? rawLang : i18n.defaultLocale) as SupportedLocale;
+  
+  // Usando a função correta
+  const dict = getDictionarySync(lang) as any; 
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
 
   return {
-    title: `Sérgio Santos | ${dict.role || 'Data Specialist'}`,
-    description: dict.headline,
+    // FALLBACKS: Adicionados para evitar erros caso a chave role ou headline falte no JSON
+    title: `Sérgio Santos | ${dict.hero?.role || dict.role || 'Data Specialist'}`,
+    description: dict.hero?.headline || dict.headline || 'Sérgio Santos Portfolio',
     alternates: {
       canonical: `${siteUrl}/${lang}`,
-      languages: { pt: `${siteUrl}/pt`, en: `${siteUrl}/en`, es: `${siteUrl}/es`, 'x-default': `${siteUrl}/pt` },
+      languages: { 
+        pt: `${siteUrl}/pt`, 
+        en: `${siteUrl}/en`, 
+        es: `${siteUrl}/es`, 
+        'x-default': `${siteUrl}/pt` 
+      },
     },
   };
 }
@@ -47,29 +56,27 @@ export default async function Page(props: PageProps) {
     notFound();
   }
 
-  const lang = rawLang as Locale;
+  const lang = rawLang as SupportedLocale;
 
-  // Carregamento paralelo para performance máxima (FCP/LCP)
-  const [dict, projects] = await Promise.all([
-    getDictionary(lang),
-    getGitHubProjects(lang),
-  ]);
+  // Carregamento de dados
+  const dict = getDictionarySync(lang);
+  const projects = await getGitHubProjects(lang);
 
   return (
     <PageWrapper lang={lang}>
       <Navbar lang={lang} dict={dict} />
 
-      {/* Main Container com proteção de overflow horizontal */}
+      {/* Main Container: overflow-x-hidden é vital para responsividade mobile */}
       <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
         
         <HeroSection lang={lang} dict={dict} />
 
-        {/* Seções com espaçamento responsivo consistente */}
+        {/* Seções com max-width e padding responsivo para tablets e celulares */}
         <section id="about" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 sm:px-10 lg:px-12">
           <AboutSection lang={lang} dict={dict} />
         </section>
 
-        <section id="experience" className="mt-24 scroll-mt-24 bg-slate-50/40 py-24 dark:bg-slate-900/20">
+        <section id="experience" className="mt-24 scroll-mt-24 bg-slate-50/40 py-24 dark:bg-slate-900/10">
           <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12">
             <ExperienceSection lang={lang} dict={dict} />
           </div>
