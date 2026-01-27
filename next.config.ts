@@ -5,20 +5,16 @@ const nextConfig = {
   /* -------------------------------------------------------------------------- */
   reactStrictMode: true,
   poweredByHeader: false,
-  
-  // Habilita o novo motor de cache estável da v16
-  cacheComponents: true, 
 
   typescript: {
-    // Mantemos false para garantir que o build da Vercel só passe se o TS estiver impecável
+    // Garantia de integridade para o Especialista em Sistemas
     ignoreBuildErrors: false,
+    // Caminho explícito conforme novas docs de jan/2026
+    tsconfigPath: 'tsconfig.json',
   },
 
-  // Novo no Next.js 16: Tipagem nativa para rotas
-  typedRoutes: true,
-
   /* -------------------------------------------------------------------------- */
-  /* COMPILER & TURBOPACK                                                       */
+  /* COMPILER                                                                   */
   /* -------------------------------------------------------------------------- */
   compiler: {
     removeConsole:
@@ -27,60 +23,43 @@ const nextConfig = {
         : false,
   },
 
-  // Na v16, turbopack é configuração de primeiro nível
-  turbopack: {
-    resolveAlias: {
-      // Caso precise silenciar módulos de node em componentes client
-      // fs: { browser: './src/empty.ts' }
-    },
-  },
-
   /* -------------------------------------------------------------------------- */
-  /* IMAGES (Segurança Reforçada v16)                                            */
+  /* IMAGES (Hardened & Optimized)                                              */
   /* -------------------------------------------------------------------------- */
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [450, 640, 750, 828, 1080, 1200, 1920],
-    
-    // Atualizado: Valor padrão agora é 14400 (4h). 86400 (24h) é ótimo para seu portfólio.
-    minimumCacheTTL: 86400, 
-    
-    // Proteção contra ataques de enumeração local (Breaking Change v16)
+    minimumCacheTTL: 86400,
     dangerouslyAllowLocalIP: false,
 
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*.githubusercontent.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'raw.githubusercontent.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
+      { protocol: 'https', hostname: '*.githubusercontent.com' },
+      { protocol: 'https', hostname: 'raw.githubusercontent.com' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
 
   /* -------------------------------------------------------------------------- */
-  /* PERFORMANCE & EXPERIMENTAL                                                 */
+  /* EXPERIMENTAL (Next.js 16 Features)                                         */
   /* -------------------------------------------------------------------------- */
   experimental: {
-    // Otimização de pacotes lucide/framer-motion
+    // Ativa tipagem estática para rotas (Link href)
+    typedRoutes: true,
+    
+    // NOVIDADE JAN/2026: IntelliSense para variáveis de ambiente
+    typedEnv: true,
+
     optimizePackageImports: [
-      'lucide-react', 
-      'clsx', 
-      'tailwind-merge', 
-      'framer-motion'
+      'lucide-react',
+      'clsx',
+      'tailwind-merge',
+      'framer-motion',
+      'next-themes',
     ],
-    // Habilita o cache de sistema de arquivos para o Turbopack em dev
-    turbopackFileSystemCacheForDev: true,
   },
 
   /* -------------------------------------------------------------------------- */
-  /* SECURITY HEADERS (Patched for React2Shell)                                  */
+  /* SECURITY HEADERS (Padrão 2026)                                             */
   /* -------------------------------------------------------------------------- */
   async headers() {
     return [
@@ -96,22 +75,19 @@ const nextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
+            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
           },
           {
-            /**
-             * CSP Hardened: 
-             * - Bloqueia 'unsafe-eval' (essencial contra RCE)
-             * - Permite inline styles/scripts apenas para o Next.js runtime
-             */
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self';",
               "img-src 'self' data: https:;",
+              // Adicionado suporte a frames/scripts de fontes confiáveis se necessário
               "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval';",
               "style-src 'self' 'unsafe-inline';",
               "font-src 'self' data: https:;",
-              "connect-src 'self' https:;",
+              // 'connect-src' atualizado para suportar o protocolo MCP em dev
+              `connect-src 'self' https: ${process.env.NODE_ENV === 'development' ? 'ws: wss:' : ''};`,
               "frame-ancestors 'none';",
               "upgrade-insecure-requests;",
             ].join(' '),
