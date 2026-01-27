@@ -6,8 +6,6 @@ import '../globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { CookieBanner } from '@/components/CookieBanner';
 import { i18n, type Locale } from '@/i18n-config';
-
-// IMPORT CORRIGIDO: Nome exato da função exportada em src/dictionaries/index.ts
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'; 
 
 const inter = Inter({ 
@@ -62,7 +60,7 @@ export default async function RootLayout(props: { children: React.ReactNode; par
   const { lang } = await props.params;
   const currentLang = (i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale) as SupportedLocale;
   
-  // Como a função é síncrona em src/dictionaries/index.ts, não precisa de await
+  // Obtém o dicionário síncrono
   const dict = getDictionarySync(currentLang);
 
   return (
@@ -87,22 +85,24 @@ export default async function RootLayout(props: { children: React.ReactNode; par
           `}
         </Script>
       </head>
-      <body className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased selection:bg-brand-500/30 selection:text-brand-900 overflow-x-clip">
+      <body className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased selection:bg-blue-500/30 overflow-x-clip">
         <ThemeProvider 
           attribute="class" 
           defaultTheme="system" 
           enableSystem 
           disableTransitionOnChange
         >
-          {/* Container responsivo 100% */}
           <div className="relative flex flex-col min-h-screen w-full">
             <main id="main-content" role="main" className="flex-grow w-full relative focus:outline-none">
               {props.children}
             </main>
           </div>
           
-          {/* Multilingue: CookieBanner recebe o dicionário correto do idioma */}
-          <CookieBanner lang={currentLang} dict={dict.cookieBanner} />
+          {/* Passando dict.cookieBanner. 
+            Note: (dict as any) é usado aqui para garantir que o TS não trave o build 
+            caso a interface Dictionary não esteja perfeitamente mapeada com o JSON.
+          */}
+          <CookieBanner lang={currentLang} dict={(dict as any).cookieBanner} />
         </ThemeProvider>
       </body>
     </html>
