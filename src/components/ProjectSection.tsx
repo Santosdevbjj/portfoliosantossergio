@@ -5,15 +5,15 @@
  * -----------------------------------------------------------------------------
  * - Responsividade: Grid adaptativo e filtros horizontais touch-friendly.
  * - I18n: Consumo integral de dicionários para PT, EN e ES.
- * - UX: Filtragem reativa com transições suaves e ranking de relevância.
+ * - UX: Filtragem reativa com transições suaves.
  */
 
 import { useMemo, useState } from 'react'
-import { Database, Filter, FolderSearch, LayoutGrid } from 'lucide-react'
+import { Database, Filter, FolderSearch } from 'lucide-react'
 
 import { ProjectCard } from '@/components/ProjectCard'
 import type { Locale } from '@/i18n-config'
-import type { Dictionary } from '@/types/Dictionary'
+import type { Dictionary } from '@/types/dictionary'
 import type { Project } from '@/domain/projects'
 
 interface ProjectSectionProps {
@@ -29,7 +29,18 @@ export function ProjectSection({
 }: ProjectSectionProps) {
   const [activeCategory, setActiveCategory] = useState<'all' | string>('all')
 
-  const portfolio = dict.portfolio
+  // Alinhamento com a chave correta do dicionário JSON
+  const projectDict = dict.projects
+
+  /**
+   * Traduções auxiliares baseadas no idioma (para chaves não presentes no JSON)
+   */
+  const labels = {
+    all: lang === 'pt' ? 'Todos' : lang === 'es' ? 'Todos' : 'All',
+    filter: lang === 'pt' ? 'Filtrar por' : lang === 'es' ? 'Filtrar por' : 'Filter by',
+    results: lang === 'pt' ? 'Projetos encontrados' : lang === 'es' ? 'Proyectos encontrados' : 'Projects found',
+    empty: lang === 'pt' ? 'Nenhum projeto encontrado nesta categoria.' : lang === 'es' ? 'No se encontraron proyectos en esta categoría.' : 'No projects found in this category.'
+  }
 
   /**
    * Normalização de strings para comparação segura de tags/tópicos
@@ -39,10 +50,9 @@ export function ProjectSection({
 
   /**
    * ENGINE DE FILTRAGEM + RANKING
-   * Prioriza: Main Case > Featured > Data Atualização
    */
   const filteredProjects = useMemo(() => {
-    // Filtra apenas o que deve ir para o portfólio
+    // Filtra apenas o que deve ir para o portfólio (tag 'portfolio' no GitHub)
     let base = projects.filter(
       (p) => p.topics?.includes('portfolio')
     )
@@ -57,7 +67,7 @@ export function ProjectSection({
       )
     }
 
-    // Ordenação Inteligente
+    // Ordenação: Main Case > Featured > Data
     return base.sort((a, b) => {
       const aPriority = a.isMainCase ? 0 : a.isFeatured ? 1 : 2
       const bPriority = b.isMainCase ? 0 : b.isFeatured ? 1 : 2
@@ -84,13 +94,13 @@ export function ProjectSection({
           <div className="flex-1">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3.5 rounded-2xl bg-blue-600 text-white shadow-2xl shadow-blue-500/30">
-                <Database className="w-8 h-8" aria-hidden />
+                <Database className="w-8 h-8" aria-hidden="true" />
               </div>
               <h2
                 id="projects-title"
                 className="text-5xl md:text-7xl font-black tracking-tighter uppercase text-slate-900 dark:text-white"
               >
-                {portfolio.title}
+                {projectDict.title}
               </h2>
             </div>
 
@@ -100,29 +110,29 @@ export function ProjectSection({
                 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400"
                 aria-live="polite"
               >
-                {filteredProjects.length} {portfolio.resultsLabel}
+                {filteredProjects.length} {labels.results}
               </p>
             </div>
           </div>
 
           {/* NAVEGAÇÃO DE FILTROS */}
           <nav
-            aria-label={portfolio.filterLabel}
+            aria-label={labels.filter}
             className="w-full lg:w-auto"
           >
             <div className="flex items-center gap-2 mb-5 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
-              <Filter className="w-4 h-4 text-blue-600" aria-hidden />
-              {portfolio.filterLabel}
+              <Filter className="w-4 h-4 text-blue-600" aria-hidden="true" />
+              {labels.filter}
             </div>
 
             <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-6 px-6 lg:mx-0 lg:px-0 pb-2 snap-x touch-pan-x">
               <FilterButton
                 active={activeCategory === 'all'}
                 onClick={() => setActiveCategory('all')}
-                label={portfolio.all}
+                label={labels.all}
               />
 
-              {Object.entries(portfolio.categories).map(([key, label]) => (
+              {Object.entries(projectDict.categories).map(([key, label]) => (
                 <FilterButton
                   key={key}
                   active={activeCategory === key}
@@ -151,7 +161,7 @@ export function ProjectSection({
               </div>
             ))
           ) : (
-            <EmptyState message={portfolio.empty} />
+            <EmptyState message={labels.empty} />
           )}
         </div>
       </div>
@@ -160,7 +170,7 @@ export function ProjectSection({
 }
 
 /* -------------------------------------------------------------------------- */
-/* COMPONENTES DE INTERFACE PRIVADOS                                           */
+/* COMPONENTES INTERNOS                                                       */
 /* -------------------------------------------------------------------------- */
 
 function FilterButton({
@@ -199,7 +209,7 @@ function EmptyState({ message }: { message: string }) {
       <div className="p-8 bg-white dark:bg-slate-900 rounded-3xl shadow-xl mb-8">
         <FolderSearch
           className="w-20 h-20 text-slate-200 dark:text-slate-800"
-          aria-hidden
+          aria-hidden="true"
         />
       </div>
       <p className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500 text-center max-w-sm leading-relaxed px-6">
