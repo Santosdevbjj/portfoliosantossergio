@@ -1,35 +1,34 @@
 'use client'
 
-/**
- * COOKIE BANNER: Governança de Consentimento (LGPD / GDPR)
- * -----------------------------------------------------------------------------
- * - i18n: Suporte nativo para PT, EN e ES.
- * - UX: Animação suave e não intrusiva.
- * - A11y: Gerenciamento de foco e ARIA Roles para leitores de tela.
- */
-
 import { useEffect, useState, useCallback } from 'react'
 import { Cookie, ShieldCheck, X } from 'lucide-react'
 import type { Locale } from '@/i18n-config'
-import type { Dictionary } from '@/types/Dictionary'
 
-const CONSENT_KEY = 'santos-sergio-consent'
-
+/**
+ * Interface ajustada para bater com a estrutura do seu JSON (cookieBanner)
+ */
 interface CookieBannerProps {
   readonly lang: Locale
-  readonly dict: Dictionary['cookie']
+  readonly dict: {
+    title: string
+    description: string
+    necessaryLabel: string
+    alwaysActive: string
+    analyticsLabel: string
+    acceptAll: string
+    savePreference: string
+  }
 }
+
+const CONSENT_KEY = 'santos-sergio-consent'
 
 export function CookieBanner({ lang, dict }: CookieBannerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
 
-  /* -------------------------- Consent Logic -------------------------- */
-  
   useEffect(() => {
     const hasConsent = localStorage.getItem(CONSENT_KEY)
     if (!hasConsent) {
-      // Pequeno delay para não impactar o LCP (performance)
       const timer = setTimeout(() => setIsOpen(true), 1500)
       return () => clearTimeout(timer)
     }
@@ -44,7 +43,6 @@ export function CookieBanner({ lang, dict }: CookieBannerProps) {
     
     localStorage.setItem(CONSENT_KEY, JSON.stringify(consent))
     
-    // Define cookie para leitura no lado do servidor (SSR)
     const secure = window.location.protocol === 'https:' ? 'Secure;' : ''
     document.cookie = `${CONSENT_KEY}=${all ? 'all' : 'custom'}; path=/; max-age=31536000; SameSite=Lax; ${secure}`
     
@@ -59,15 +57,14 @@ export function CookieBanner({ lang, dict }: CookieBannerProps) {
       aria-labelledby="cookie-heading"
       aria-describedby="cookie-desc"
       className="
-        fixed bottom-6 left-6 right-6 z-[200]
+        fixed bottom-4 left-4 right-4 z-[200]
         md:left-auto md:right-8 md:bottom-8 md:max-w-md
-        bg-white dark:bg-slate-900 
+        bg-white/95 dark:bg-slate-900/95 backdrop-blur-md
         border border-slate-200 dark:border-slate-800
         rounded-[2rem] p-6 shadow-2xl shadow-blue-500/10
         animate-in slide-in-from-bottom-8 duration-700
       "
     >
-      {/* HEADER */}
       <div className="flex items-center gap-3 mb-4">
         <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
           <Cookie size={20} />
@@ -77,12 +74,10 @@ export function CookieBanner({ lang, dict }: CookieBannerProps) {
         </h2>
       </div>
 
-      {/* BODY */}
       <p id="cookie-desc" className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
         {dict.description}
       </p>
 
-      {/* OPTIONS */}
       <div className="space-y-3 mb-8">
         <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
           <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
@@ -105,31 +100,21 @@ export function CookieBanner({ lang, dict }: CookieBannerProps) {
         </label>
       </div>
 
-      {/* ACTIONS */}
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={() => handleSaveConsent(true)}
-          className="
-            flex-1 bg-blue-600 hover:bg-blue-700 text-white
-            px-5 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest
-            transition-all active:scale-95 shadow-lg shadow-blue-600/20
-          "
+          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-blue-600/20"
         >
           {dict.acceptAll}
         </button>
         <button
           onClick={() => handleSaveConsent(false)}
-          className="
-            flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700
-            text-slate-900 dark:text-white px-5 py-3.5 rounded-2xl
-            font-black text-xs uppercase tracking-widest transition-all
-          "
+          className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white px-5 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all"
         >
           {dict.savePreference}
         </button>
       </div>
 
-      {/* CLOSE ICON (OPCIONAL) */}
       <button 
         onClick={() => setIsOpen(false)}
         className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
