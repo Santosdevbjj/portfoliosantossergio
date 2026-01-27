@@ -4,38 +4,42 @@
  * FEATURED PROJECTS SECTION: A Vitrine Tecnológica
  * -----------------------------------------------------------------------------
  * - UI: Design de alta densidade com elementos decorativos em glow.
- * - I18n: Totalmente alinhado com o dicionário (PT, EN, ES).
- * - Layout: Totalmente responsivo e otimizado.
+ * - SEO: CollectionPage Schema para catalogação de projetos pelo Google.
+ * - I18n: Suporte completo para PT, EN e ES.
+ * - Layout: Totalmente responsivo e otimizado para performance.
  */
 
 import React from 'react'
 import FeaturedGrid from './FeaturedGrid'
-import { type Locale } from '@/i18n-config'
-import { type Dictionary } from '@/types/dictionary'
+import { type Locale } from './projects.data'
 
 interface FeaturedProjectsSectionProps {
   readonly lang: Locale
-  readonly dict: Dictionary
 }
 
-export default function FeaturedProjectsSection({ lang, dict }: FeaturedProjectsSectionProps) {
-  // Extraímos os dados diretamente do dicionário JSON fornecido
-  const { projects } = dict
-
-  // Labels de UI que não estão no JSON, mas seguem o idioma
-  const badgeLabel = {
-    pt: 'Portfólio',
-    en: 'Portfolio',
-    es: 'Portafolio'
+export default function FeaturedProjectsSection({ lang }: FeaturedProjectsProjectsSectionProps) {
+  const content = {
+    pt: {
+      badge: 'Portfolio',
+      title: 'Projetos em Destaque',
+      subtitle:
+        'Uma seleção estratégica de sistemas e análises que consolidam minha experiência em engenharia e ciência de dados.',
+    },
+    en: {
+      badge: 'Portfolio',
+      title: 'Featured Projects',
+      subtitle:
+        'A strategic selection of systems and analyses showcasing my expertise in data engineering and data science.',
+    },
+    es: {
+      badge: 'Portafolio',
+      title: 'Proyectos Destacados',
+      subtitle:
+        'Una selección estratégica de sistemas y análisis que consolidan mi experiencia en ingeniería y ciencia de datos.',
+    },
   }
 
-  // Subtítulo dinâmico para preencher o layout caso não esteja no JSON, 
-  // mantendo a consistência com a descrição do herói/sobre.
-  const sectionSubtitle = {
-    pt: 'Uma seleção estratégica de sistemas e análises que consolidam minha experiência em engenharia e ciência de dados.',
-    en: 'A strategic selection of systems and analyses showcasing my expertise in data engineering and data science.',
-    es: 'Una selección estratégica de sistemas y análisis que consolidan mi experiencia en ingeniería y ciencia de datos.'
-  }
+  const t = content[lang] ?? content.en
 
   return (
     <section
@@ -62,7 +66,7 @@ export default function FeaturedProjectsSection({ lang, dict }: FeaturedProjects
           <div className="flex items-center gap-3 mb-6 animate-in fade-in slide-in-from-left-4 duration-700">
             <div className="h-px w-8 bg-blue-500" />
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-500">
-              {badgeLabel[lang] || badgeLabel.en}
+              {t.badge}
             </span>
           </div>
 
@@ -70,30 +74,29 @@ export default function FeaturedProjectsSection({ lang, dict }: FeaturedProjects
             <h2
               id="projects-title"
               itemProp="name"
-              className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-[0.9]"
+              className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-white leading-[0.9]"
             >
-              {projects.title}
+              {t.title}
             </h2>
 
             <p 
               itemProp="description"
-              className="mt-8 text-lg sm:text-xl text-slate-600 dark:text-slate-400 leading-relaxed font-medium max-w-2xl"
+              className="mt-8 text-lg sm:text-xl text-slate-400 leading-relaxed font-medium max-w-2xl"
             >
-              {sectionSubtitle[lang] || sectionSubtitle.en}
+              {t.subtitle}
             </p>
           </div>
         </header>
 
         {/* GRID DE PROJETOS */}
         <div className="relative">
-          {/* O componente FeaturedGrid também precisará receber 'dict' ou 'lang' para se traduzir */}
           <FeaturedGrid lang={lang} />
         </div>
       </div>
 
       {/* Linha de Base Decorativa */}
       <div className="mt-20 sm:mt-32 mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent" />
+        <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
       </div>
     </section>
   )
