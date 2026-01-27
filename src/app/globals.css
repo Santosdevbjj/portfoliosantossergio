@@ -1,162 +1,176 @@
 /* src/app/globals.css */
 
-/* ------------------------------------------ */
-/* Imports e Tailwind */
-/* ------------------------------------------ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ------------------------------------------ */
-/* Variáveis de Tema (Design Tokens) */
-/* ------------------------------------------ */
+/* -------------------------------------------------------------------------- */
+/* DESIGN TOKENS (RGB Raw Format for Tailwind Opacity Support)               */
+/* -------------------------------------------------------------------------- */
 @layer base {
   :root {
-    /* Brand Colors */
-    --brand-blue: #0e8ce9;
-    --brand-blue-hover: #0358a1;
+    /* Brand (Raw RGB) - #0e8ce9 */
+    --brand-50: 240 247 255;
+    --brand-100: 224 239 254;
+    --brand-200: 186 226 253;
+    --brand-300: 124 200 251;
+    --brand-400: 56 169 248;
+    --brand-500: 14 140 233;
+    --brand-600: 2 111 199;
+    --brand-700: 3 88 161;
+    --brand-800: 7 75 133;
+    --brand-900: 12 63 109;
 
-    /* Light Theme Tokens */
-    --background: #f8fafc;
-    --foreground: #0f172a;
-    --card: rgba(255, 255, 255, 0.8);
-    --card-border: rgba(226, 232, 240, 0.8);
-    --muted: #64748b;
-    --accent: #3b82f6;
-    
-    /* Scrollbar & Selection */
-    --scroll-thumb: #cbd5e1;
-    --selection-bg: rgba(14, 140, 233, 0.2);
-    --selection-text: #1e40af;
+    /* Semantic Colors (Raw RGB) */
+    --background: 248 250 252;
+    --foreground: 15 23 42;
+    --card: 255 255 255;
+    --card-border: 226 232 240;
+    --muted: 100 116 139;
+    --accent: 59 130 246;
+
+    /* Interactive */
+    --selection-bg: 14 140 233;
+    --scroll-thumb: 203 213 225;
   }
 
   .dark {
-    /* Dark Theme Tokens */
-    --background: #020617;
-    --foreground: #f1f5f9;
-    --card: rgba(15, 23, 42, 0.6);
-    --card-border: rgba(30, 41, 59, 0.7);
-    --muted: #94a3b8;
-    --accent: #60a5fa;
+    --background: 2 6 23;
+    --foreground: 241 245 249;
+    --card: 15 23 42;
+    --card-border: 30 41 59;
+    --muted: 148 163 184;
+    --accent: 96 165 250;
 
-    --scroll-thumb: #334155;
-    --selection-bg: rgba(59, 130, 246, 0.3);
-    --selection-text: #e0f2fe;
+    --selection-bg: 59 130 246;
+    --scroll-thumb: 51 65 85;
   }
 
-  /* Reset e Comportamento Global */
+  /* -------------------------------------------------------------------------- */
+  /* GLOBAL RESET & BEHAVIOR                                                    */
+  /* -------------------------------------------------------------------------- */
+  * {
+    @apply border-border;
+  }
+
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
-    /* Suporte a áreas seguras (Notch de Celulares) */
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    background-color: var(--background);
+    background-color: rgb(var(--background));
     -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    color: var(--foreground);
-    background-color: var(--background);
-    font-feature-settings: "rlig" 1, "calt" 1;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    min-h-screen;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    color: rgb(var(--foreground));
+    background-color: rgb(var(--background));
+
+    /* Typography Hardening */
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-optical-sizing: auto;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Safe Area for Modern Devices */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) 
+             env(safe-area-inset-bottom) env(safe-area-inset-left);
+
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* 🌍 Tipografia por Idioma */
-  html[lang="pt"] body { hyphens: auto; text-wrap: pretty; }
-  html[lang="es"] body { hyphens: auto; text-wrap: pretty; }
-  html[lang="en"] body { hyphens: manual; text-wrap: balance; }
+  /* Melhora o rendering em containers longos (ex: Blog/Projetos) */
+  section {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 500px;
+  }
 
   ::selection {
-    background-color: var(--selection-bg);
-    color: var(--selection-text);
+    background-color: rgb(var(--selection-bg) / 0.2);
+    color: rgb(var(--brand-700));
   }
 
-  /* Foco Acessível */
+  .dark ::selection {
+    color: rgb(var(--brand-200));
+  }
+
   :focus-visible {
-    outline: 2px solid var(--brand-blue);
-    outline-offset: 4px;
+    @apply outline-none ring-2 ring-brand-500 ring-offset-4 ring-offset-background;
   }
 
-  /* Custom Scrollbar (Desktop) */
+  /* Custom Scrollbar */
   @media (min-width: 1024px) {
     ::-webkit-scrollbar {
-      width: 8px;
+      width: 10px;
     }
     ::-webkit-scrollbar-track {
       background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-      background-color: var(--scroll-thumb);
+      background-color: rgb(var(--scroll-thumb));
       border-radius: 20px;
-      border: 2px solid var(--background);
+      border: 3px solid rgb(var(--background));
     }
     ::-webkit-scrollbar-thumb:hover {
-      background-color: var(--brand-blue);
+      background-color: rgb(var(--brand-500));
     }
   }
 }
 
-/* ------------------------------------------ */
-/* Componentes Abstratos (BEM/Utility Mix) */
-/* ------------------------------------------ */
+/* -------------------------------------------------------------------------- */
+/* ABSTRACTIONS                                                               */
+/* -------------------------------------------------------------------------- */
 @layer components {
-  /* Container responsivo com padding dinâmico */
   .main-container {
     @apply w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12;
   }
 
-  /* Efeito de Vidro (Frosted Glass) */
   .glass-effect {
-    background-color: var(--card);
-    border: 1px solid var(--card-border);
     @apply backdrop-blur-xl shadow-lg transition-all duration-300;
+    background-color: rgb(var(--card) / 0.8);
+    border: 1px solid rgb(var(--card-border) / 0.8);
   }
 
-  /* Card de Projeto (Responsividade de toque) */
   .project-card {
-    @apply relative overflow-hidden rounded-[2rem] border transition-all duration-500;
-    background-color: var(--card);
-    border-color: var(--card-border);
+    @apply relative overflow-hidden rounded-[2.5rem] border transition-all duration-500;
+    background-color: rgb(var(--card));
+    border-color: rgb(var(--card-border));
   }
 
   @media (hover: hover) {
     .project-card:hover {
-      @apply -translate-y-2;
-      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.1);
-      border-color: var(--brand-blue);
+      @apply -translate-y-2 shadow-2xl;
+      border-color: rgb(var(--brand-500) / 0.5);
     }
   }
+}
 
-  /* Utilitário para evitar quebra de layout por imagens */
-  .img-responsive {
-    @apply w-full h-auto object-cover;
+/* -------------------------------------------------------------------------- */
+/* UTILITIES & ACCESSIBILITY                                                 */
+/* -------------------------------------------------------------------------- */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
   }
 }
 
-/* ------------------------------------------ */
-/* Animações e Performance */
-/* ------------------------------------------ */
-@keyframes shimmer {
-  100% { transform: translateX(100%); }
-}
-
-@keyframes scan {
-  0% { transform: translateY(-100%); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateY(300%); opacity: 0; }
-}
-
-/* Redução de Movimento (Acessibilidade) */
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *, ::before, ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Suporte para Alto Contraste (Acessibilidade 2026) */
+@media (forced-colors: active) {
+  .glass-effect, .project-card {
+    border: 2px solid ButtonText;
   }
 }
