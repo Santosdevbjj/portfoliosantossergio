@@ -1,19 +1,20 @@
 {
-  "id": "portfolio-santos-sergio-en-2026",
+  "id": "/en/",
   "name": "Sérgio Santos | Data & Systems Specialist",
   "short_name": "SergioData",
-  "description": "Professional portfolio of Sérgio Santos — Specialist in Data Engineering, Systems Architecture, and Mission-Critical Solutions.",
+  "description": "Professional portfolio of Sérgio Santos — Specialist in Data Engineering, Systems Architecture, and Generative AI solutions.",
   "lang": "en-US",
+  "dir": "ltr",
 
-  "start_url": "/en?source=pwa",
-  "scope": "/en",
+  "start_url": "/en/",
+  "scope": "/en/",
 
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui", "browser"],
-  "orientation": "natural",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
 
   "background_color": "#020617",
-  "theme_color": "#2563eb",
+  "theme_color": "#020617",
 
   "prefer_related_applications": false,
 
@@ -30,24 +31,25 @@
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "/icons/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
     }
   ],
 
@@ -57,24 +59,22 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "platform": "windows",
-      "label": "Professional Portfolio — Desktop View"
+      "label": "Engineering Portfolio — Desktop Experience"
     },
     {
       "src": "/screenshots/mobile-home.png",
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow",
-      "platform": "android",
-      "label": "Technical Portfolio — Mobile View"
+      "label": "Engineering Portfolio — Mobile Experience"
     }
   ],
 
   "shortcuts": [
     {
-      "name": "Projects",
+      "name": "Featured Projects",
       "short_name": "Projects",
-      "description": "Explore projects and technical case studies",
+      "description": "View technical case studies and software projects",
       "url": "/en#projects",
       "icons": [
         {
@@ -85,9 +85,9 @@
       ]
     },
     {
-      "name": "Articles",
+      "name": "Technical Articles",
       "short_name": "Articles",
-      "description": "Read technical articles and insights",
+      "description": "Read insights on data engineering and AI",
       "url": "/en#articles",
       "icons": [
         {
