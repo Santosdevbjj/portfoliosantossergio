@@ -3,110 +3,88 @@ import typography from '@tailwindcss/typography'
 
 const config: Config = {
   /* ---------------------------------------------------------------------- */
-  /* DARK MODE                                                              */
+  /* CORE CONFIG                                                            */
   /* ---------------------------------------------------------------------- */
   darkMode: 'class',
-
-  /* ---------------------------------------------------------------------- */
-  /* CONTENT SCAN                                                           */
-  /* ---------------------------------------------------------------------- */
+  
+  // Otimizado para o motor de scan do Next.js 16
   content: [
+    './src/**/*.{js,ts,jsx,tsx,md,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/constants/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/hooks/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/styles/**/*.{css,js,ts,jsx,tsx}',
   ],
 
-  /* ---------------------------------------------------------------------- */
-  /* THEME                                                                  */
-  /* ---------------------------------------------------------------------- */
   theme: {
     container: {
       center: true,
       padding: {
         DEFAULT: '1.5rem',
         sm: '2rem',
-        lg: '3rem',
-        xl: '4rem',
+        lg: '4rem',
       },
     },
 
     extend: {
       /* ------------------------------ Breakpoints ----------------------- */
       screens: {
-        xs: '375px', // Ultra-compact devices (iPhone SE)
+        'xs': '375px',
+        '2xl': '1440px', // Padrão para monitores UltraWide de devs
       },
 
       /* ------------------------------ Colors ---------------------------- */
       colors: {
         brand: {
-          50: 'var(--brand-blue-50, #f0f7ff)',
-          100: 'var(--brand-blue-100, #e0effe)',
-          200: 'var(--brand-blue-200, #bae2fd)',
-          300: 'var(--brand-blue-300, #7cc8fb)',
-          400: 'var(--brand-blue-400, #38a9f8)',
-          500: 'var(--brand-blue, #0e8ce9)',
-          600: 'var(--brand-blue-600, #026fc7)',
-          700: 'var(--brand-blue-700, #0358a1)',
-          800: 'var(--brand-blue-800, #074b85)',
-          900: 'var(--brand-blue-900, #0c3f6d)',
-          DEFAULT: 'var(--brand-blue, #0e8ce9)',
+          50: 'rgb(var(--brand-50) / <alpha-value>)',
+          100: 'rgb(var(--brand-100) / <alpha-value>)',
+          200: 'rgb(var(--brand-200) / <alpha-value>)',
+          300: 'rgb(var(--brand-300) / <alpha-value>)',
+          400: 'rgb(var(--brand-400) / <alpha-value>)',
+          500: 'rgb(var(--brand-500) / <alpha-value>)',
+          600: 'rgb(var(--brand-600) / <alpha-value>)',
+          700: 'rgb(var(--brand-700) / <alpha-value>)',
+          800: 'rgb(var(--brand-800) / <alpha-value>)',
+          900: 'rgb(var(--brand-900) / <alpha-value>)',
+          DEFAULT: 'rgb(var(--brand-500) / <alpha-value>)',
         },
         slate: {
-          950: '#020617', // OLED-friendly dark
+          950: '#020617', // OLED Dark
         },
       },
 
-      /* ------------------------------ Fonts ----------------------------- */
+      /* ------------------------------ Typography ------------------------ */
       fontFamily: {
         sans: [
           'var(--font-inter)',
-          'ui-sans-serif',
           'system-ui',
-          'Segoe UI',
-          'Roboto',
-          'Helvetica Neue',
+          '-apple-system',
+          'sans-serif',
         ],
         heading: ['var(--font-montserrat)', 'sans-serif'],
       },
 
       /* ------------------------------ Animations ------------------------ */
       animation: {
-        'fade-in': 'fadeIn 0.6s ease-out forwards',
-        'slide-up': 'slideUp 0.5s ease-out forwards',
-        'slide-down': 'slideDown 0.3s ease-out forwards',
-        'scale-in': 'scaleIn 0.2s ease-out forwards',
+        'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        shimmer: 'shimmer 2.5s linear infinite',
-        float: 'float 6s ease-in-out infinite',
+        'shimmer': 'shimmer 2.5s linear infinite',
+        'float': 'float 6s ease-in-out infinite',
       },
 
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '0%': { transform: 'translateY(16px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        slideDown: {
-          '0%': { transform: 'translateY(-10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        scaleIn: {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
         },
         shimmer: {
-          '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
         },
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' },
+          '50%': { transform: 'translateY(-8px)' },
         },
       },
 
@@ -114,12 +92,7 @@ const config: Config = {
       boxShadow: {
         premium: '0 20px 50px -12px rgba(0, 0, 0, 0.08)',
         'premium-dark': '0 20px 50px -12px rgba(0, 0, 0, 0.4)',
-        glow: '0 0 20px rgba(14, 140, 233, 0.3)',
-      },
-
-      backgroundImage: {
-        'grid-pattern':
-          "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm1 1h38v38H1V1z' fill='%2394a3b8' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E\")",
+        glow: '0 0 20px rgba(var(--brand-500), 0.3)',
       },
     },
   },
@@ -128,23 +101,9 @@ const config: Config = {
   /* PLUGINS                                                                */
   /* ---------------------------------------------------------------------- */
   plugins: [
-    typography(({ theme }) => ({
-      className: 'prose',
-      css: {
-        maxWidth: '100%',
-      },
-      dark: {
-        css: {
-          color: theme('colors.slate.300'),
-          h1: { color: theme('colors.white') },
-          h2: { color: theme('colors.white') },
-          h3: { color: theme('colors.white') },
-          a: { color: theme('colors.brand.400') },
-          strong: { color: theme('colors.white') },
-          code: { color: theme('colors.brand.300') },
-        },
-      },
-    })),
+    typography,
+    // Plugin utilitário para forçar estados de hover em dispositivos touch
+    require('tailwindcss-animate'),
   ],
 }
 
