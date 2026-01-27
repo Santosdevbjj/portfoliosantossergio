@@ -2,51 +2,60 @@
 const config = {
   plugins: {
     /**
-     * 1️⃣ CSS Nesting (oficial Tailwind)
-     * Permite aninhamento nativo sem preprocessadores
-     * Compatível com Tailwind JIT e futuro Tailwind v4
+     * 1️⃣ PostCSS Import
+     * Permite usar @import em arquivos CSS, organizando melhor o projeto.
+     */
+    'postcss-import': {},
+
+    /**
+     * 2️⃣ CSS Nesting (Tailwind Custom)
+     * Transpila o aninhamento antes do Tailwind processar as classes.
      */
     'tailwindcss/nesting': {},
 
     /**
-     * 2️⃣ Tailwind CSS
-     * Geração JIT — apenas utilitários realmente usados
-     * Essencial manter antes de autoprefixer e cssnano
+     * 3️⃣ Tailwind CSS
+     * O motor principal de geração de estilos.
      */
     tailwindcss: {},
 
     /**
-     * 3️⃣ Autoprefixer
-     * Prefixos automáticos baseados em browserslist
-     * Flexbox moderno, sem suporte legado desnecessário
+     * 4️⃣ Autoprefixer
+     * Adiciona prefixos necessários para browsers modernos.
+     * Configurado para a web moderna de 2026.
      */
     autoprefixer: {
       flexbox: 'no-2009',
+      grid: 'autoplace',
     },
 
     /**
-     * 4️⃣ CSSNano — apenas em produção
-     * Minificação segura para Tailwind, animações e CSS variables
+     * 5️⃣ CSSNano (Minificação em Produção)
+     * Otimiza o bundle final sem quebrar funcionalidades do Tailwind.
      */
     ...(process.env.NODE_ENV === 'production'
       ? {
           cssnano: {
             preset: [
-              'default', // ⚠️ Alterado de "advanced" para "default"
+              'default',
               {
+                /* Limpeza de código */
                 discardComments: { removeAll: true },
-
-                // Mantém IDs e z-index para Tailwind
+                
+                /* Segurança: Não renomeia IDs ou Animações (essencial para Tailwind/Framer Motion) */
                 reduceIdents: false,
-                zindex: false,
                 mergeIdents: false,
+                
+                /* Segurança: Não altera a ordem de camadas Z */
+                zindex: false,
 
-                // Preserva CSS variables
-                reduceVars: false,
-
-                // Evita quebrar grid/flex modernos
-                normalizeWhitespace: false,
-                cssDeclarationSorter: false,
+                /* Performance: Otimiza cálculos e cores de forma segura */
+                calc: true,
+                colormin: true,
+                
+                /* Preservação de lógica moderna */
+                minifyFontValues: { removeQuotes: false },
+                discardUnused: false,
               },
             ],
           },
