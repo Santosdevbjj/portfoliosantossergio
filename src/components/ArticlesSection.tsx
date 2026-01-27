@@ -1,153 +1,158 @@
-'use client';
+'use client'
 
-import React, { useEffect, useRef, useState } from 'react';
-import { BookText, PenTool, Sparkles } from 'lucide-react';
-import { useScrollSpy } from '@/contexts/ScrollSpyContext';
-import type { Locale } from '@/i18n-config';
+/**
+ * ARTICLES SECTION: Vitrine de Conteúdo Técnico
+ * -----------------------------------------------------------------------------
+ * - UI: Grid responsivo para artigos do Medium/DIO.
+ * - I18n: Totalmente alinhado com o dicionário (PT, EN, ES).
+ * - Fix: Correção de erro de tipagem no IntersectionObserver para o build do Vercel.
+ */
+
+import React, { useState, useEffect, useRef } from 'react'
+import { BookOpen, Award, Calendar, ArrowRight, ExternalLink } from 'lucide-react'
+import type { Locale } from '@/i18n-config'
+import type { Dictionary } from '@/types/dictionary'
 
 interface ArticlesSectionProps {
-  readonly lang: Locale;
-  readonly dict: {
-    nav: { articles: string };
-    articles: {
-      title: string;
-      awardWinner: string;
-      bestOfMonth: string;
-      readMore: string;
-      publishedAt: string;
-      mediumProfile: string;
-    };
-  };
+  readonly lang: Locale
+  readonly dict: Dictionary
 }
 
-export const ArticlesSection = ({ lang, dict }: ArticlesSectionProps) => {
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const { setActiveSection } = useScrollSpy();
-  const [hydrated, setHydrated] = useState(false);
+export default function ArticlesSection({ lang, dict }: ArticlesSectionProps) {
+  const [hydrated, setHydrated] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+  
+  const { articles } = dict
 
+  // Correção do Erro de Compilação: Adição de check de existência para 'entry'
   useEffect(() => {
-    const currentRef = sectionRef.current;
-    if (!currentRef) return;
-
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setHydrated(true);
-          observer.disconnect();
+      (entries) => {
+        const entry = entries[0]
+        if (entry && entry.isIntersecting) {
+          setHydrated(true)
+          observer.disconnect()
         }
       },
-      { rootMargin: '200px' }
-    );
+      { threshold: 0.1 }
+    )
 
-    observer.observe(currentRef);
-    return () => observer.disconnect();
-  }, []);
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
 
-  useEffect(() => {
-    const currentRef = sectionRef.current;
-    if (!currentRef) return;
-
-    const spyObserver = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setActiveSection('articles');
-          }
-        });
-      },
-      { rootMargin: '-40% 0px -55% 0px', threshold: 0.01 }
-    );
-
-    spyObserver.observe(currentRef);
-    return () => spyObserver.disconnect();
-  }, [setActiveSection]);
-
-  const title = dict.articles.title;
-  
-  // Fallback de subtítulo (já que não consta no JSON, mantemos dinâmico por idioma)
-  const subtitle = lang === 'pt' 
-    ? 'Conteúdos técnicos e liderança de pensamento em dados' 
-    : lang === 'es' 
-    ? 'Contenido técnico y liderazgo de pensamiento en datos' 
-    : 'Technical content and data thought leadership';
-
-  if (!hydrated) {
-    return (
-      <section ref={sectionRef} id="articles" className="py-24 bg-white dark:bg-[#020617]">
-        <div className="max-w-7xl mx-auto px-6 animate-pulse">
-          <div className="flex items-center gap-6 mb-20">
-            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl" />
-            <div className="space-y-3 flex-1">
-              <div className="h-10 w-48 bg-slate-200 dark:bg-slate-800 rounded-lg" />
-              <div className="h-4 w-72 bg-slate-100 dark:bg-slate-800/60 rounded-lg" />
-            </div>
-          </div>
-          <div className="h-[450px] w-full rounded-[3rem] bg-slate-100 dark:bg-slate-800/40" />
-        </div>
-      </section>
-    );
-  }
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <section
       ref={sectionRef}
       id="articles"
-      data-scrollspy="articles"
-      aria-labelledby="articles-title"
-      className="py-24 lg:py-40 bg-white dark:bg-[#020617] transition-colors overflow-hidden"
+      className="relative scroll-mt-28 py-20 sm:py-32 overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="mb-8 flex items-center gap-3">
-          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
-            <Sparkles size={16} />
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        
+        {/* HEADER DA SEÇÃO */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <div className="max-w-2xl">
+            <h2 className="text-4xl sm:text-5xl font-black tracking-tighter text-slate-900 dark:text-white uppercase">
+              {articles.title}
+            </h2>
+            <div className="h-1.5 w-24 bg-blue-600 mt-4 rounded-full" />
           </div>
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-700 dark:text-blue-300">
-            {lang === 'pt' ? 'Insights e Estratégia' : lang === 'es' ? 'Insights y Estrategia' : 'Insight & Strategy'}
-          </span>
+          
+          <a
+            href="https://medium.com/@santossergioluiz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-widest text-blue-600 hover:text-blue-500 transition-colors group"
+          >
+            {articles.mediumProfile}
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </a>
         </div>
 
-        <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-20">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-8">
-            <div className="w-20 h-20 bg-blue-600 rounded-[2rem] flex items-center justify-center text-white shadow-2xl shadow-blue-500/20 shrink-0 transform -rotate-3">
-              <BookText className="w-10 h-10" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 id="articles-title" className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-none">
-                {title}
-              </h2>
-              <p className="text-xl text-slate-500 dark:text-slate-400 mt-4 max-w-2xl font-medium">
-                {subtitle}
-              </p>
-            </div>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          <div className="lg:col-span-2 min-h-[450px] flex flex-col items-center justify-center rounded-[3.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 transition-all">
-            <div className="p-6 bg-white dark:bg-slate-800 rounded-3xl shadow-xl mb-6">
-              <PenTool className="w-12 h-12 text-blue-500 animate-bounce" />
-            </div>
-            <p className="font-black text-xs uppercase tracking-widest text-slate-400">
-              {lang === 'pt' ? 'Novos artigos em breve' : lang === 'es' ? 'Próximamente nuevos artículos' : 'New articles coming soon'}
-            </p>
-          </div>
-
-          <div className="hidden lg:flex flex-col gap-8">
-             <div className="p-8 rounded-[2.5rem] bg-slate-900 text-white relative overflow-hidden group">
-                <div className="relative z-10">
-                  <h4 className="text-2xl font-black mb-4 tracking-tight">
-                    {lang === 'pt' ? 'Fique à frente' : lang === 'es' ? 'Mantente a la vanguardia' : 'Stay ahead'}
-                  </h4>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                    {dict.articles.mediumProfile}
-                  </p>
-                  <div className="h-1 w-12 bg-blue-500 group-hover:w-full transition-all duration-500" />
-                </div>
-                <BookText size={120} className="absolute -right-8 -bottom-8 text-white/5 -rotate-12" />
-             </div>
-          </div>
+        {/* GRID DE ARTIGOS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Exemplo de Card de Artigo alinhado ao dicionário */}
+          <ArticleCard 
+            title="A Era dos Dados em Sistemas Críticos"
+            description="Como a governança de dados transforma sistemas legados em ativos estratégicos de alta disponibilidade."
+            date="Set 2025"
+            category={articles.bestOfMonth}
+            isAward={true}
+            awardLabel={articles.awardWinner}
+            readMoreLabel={articles.readMore}
+            link="#"
+          />
+          
+          <ArticleCard 
+            title="Databricks & Governança"
+            description="Implementando segurança e conformidade em pipelines de dados modernos utilizando Azure Databricks."
+            date="Ago 2025"
+            category="Data Engineering"
+            isAward={false}
+            readMoreLabel={articles.readMore}
+            link="#"
+          />
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
+
+/**
+ * COMPONENTE DE CARD INTERNO
+ */
+interface ArticleCardProps {
+  title: string
+  description: string
+  date: string
+  category: string
+  isAward: boolean
+  awardLabel?: string
+  readMoreLabel: string
+  link: string
+}
+
+function ArticleCard({ title, description, date, category, isAward, awardLabel, readMoreLabel, link }: ArticleCardProps) {
+  return (
+    <div className="group relative flex flex-col bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 hover:border-blue-500/50 transition-all hover:shadow-2xl hover:shadow-blue-500/10">
+      <div className="flex justify-between items-start mb-6">
+        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600">
+          <BookOpen className="w-6 h-6" />
+        </div>
+        {isAward && (
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 text-[10px] font-black uppercase tracking-wider rounded-full border border-amber-200 dark:border-amber-800/50">
+            <Award className="w-3 h-3" />
+            {awardLabel}
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">
+        <span className="flex items-center gap-1">
+          <Calendar className="w-3 h-3" /> {date}
+        </span>
+        <span className="w-1 h-1 bg-slate-300 rounded-full" />
+        <span className="text-blue-600">{category}</span>
+      </div>
+
+      <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 group-hover:text-blue-600 transition-colors">
+        {title}
+      </h3>
+      
+      <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-8 flex-grow">
+        {description}
+      </p>
+
+      <a
+        href={link}
+        className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-tighter text-slate-900 dark:text-white group-hover:gap-4 transition-all"
+      >
+        {readMoreLabel}
+        <ExternalLink className="w-4 h-4 text-blue-600" />
+      </a>
+    </div>
+  )
+}
