@@ -9,16 +9,15 @@ import {
   Globe,
   Code2,
   ExternalLink,
-  Blocks,
   ArrowRight,
 } from 'lucide-react'
 
-import type { Locale } from '@/i18n-config'
+import type { SupportedLocale } from '@/dictionaries'
 import type { Dictionary } from '@/types/dictionary'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 interface FooterProps {
-  readonly lang: Locale
+  readonly lang: SupportedLocale
   readonly dict: Dictionary
 }
 
@@ -30,11 +29,10 @@ export function Footer({ lang, dict }: FooterProps) {
 
   const { nav, contact, common } = dict
 
-  // Labels auxiliares baseadas no idioma para chaves não presentes no JSON
+  // Labels auxiliares baseadas no idioma para consistência visual
   const uiLabels = {
     sitemap: lang === 'pt' ? 'Mapa do Site' : lang === 'es' ? 'Mapa del sitio' : 'Sitemap',
     language: lang === 'pt' ? 'Idioma' : lang === 'es' ? 'Idioma' : 'Language',
-    social: lang === 'pt' ? 'Redes Sociais' : lang === 'es' ? 'Redes Sociales' : 'Social Media'
   }
 
   return (
@@ -75,7 +73,7 @@ export function Footer({ lang, dict }: FooterProps) {
               <span className="font-black text-3xl tracking-tighter text-slate-900 dark:text-white uppercase">
                 Sérgio<span className="text-blue-600">Santos</span>
               </span>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
                 {common.role}
               </p>
             </div>
@@ -93,7 +91,7 @@ export function Footer({ lang, dict }: FooterProps) {
               {Object.entries(nav).map(([key, label]) => (
                 <li key={key}>
                   <Link
-                    href={`#${key}`}
+                    href={`/${lang}#${key}`}
                     className={STYLES.footerLink}
                   >
                     {label}
@@ -107,7 +105,8 @@ export function Footer({ lang, dict }: FooterProps) {
           <div>
             <h4 className={STYLES.footerTitle}>{uiLabels.language}</h4>
             <div className="max-w-[200px]">
-               <LanguageSwitcher currentLang={lang} />
+               {/* CORREÇÃO VERCEL: Removida a prop currentLang que causava erro */}
+               <LanguageSwitcher />
             </div>
           </div>
 
