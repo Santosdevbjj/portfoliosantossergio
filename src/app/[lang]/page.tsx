@@ -20,12 +20,13 @@ interface PageProps {
 }
 
 /**
- * Metadata Dinâmica: Alinhada com SEO do Dicionário
+ * Metadata Dinâmica: Blindada contra erros de params
  */
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { lang: rawLang } = await props.params;
-  const lang = (i18n.locales.includes(rawLang as any) ? rawLang : i18n.defaultLocale) as SupportedLocale;
+  const params = await props.params;
+  const lang = (i18n.locales.includes(params.lang as any) ? params.lang : i18n.defaultLocale) as SupportedLocale;
   const dict = getDictionarySync(lang); 
+  
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
 
   return {
@@ -51,68 +52,69 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function Page(props: PageProps) {
-  const { lang: rawLang } = await props.params;
+  const params = await props.params;
+  const rawLang = params.lang;
   
-  // Validação de Idioma Suportado
+  // Validação estrita de idioma
   if (!i18n.locales.includes(rawLang as any)) {
     notFound();
   }
   
   const lang = rawLang as SupportedLocale;
   const dict = getDictionarySync(lang);
-  const projects = await getGitHubProjects(lang);
+  
+  // Busca de projetos com tratamento de erro interno na lib/github
+  // Se falhar, retorna [] e não quebra o renderizador
+  const projects = await getGitHubProjects(lang) || [];
 
-  // IDs das seções para o ScrollSpy do PageWrapper/Navbar
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact'];
 
   return (
     <PageWrapper lang={lang} sectionIds={sectionIds}>
-      {/* Navbar com injeção de dicionário */}
       <Navbar lang={lang} dict={dict} />
       
       <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
         
-        {/* HERO SECTION */}
+        {/* HERO */}
         <section id="hero" className="scroll-mt-0">
           <HeroSection lang={lang} dict={dict} />
         </section>
         
-        {/* ABOUT SECTION */}
+        {/* ABOUT */}
         <section id="about" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 sm:px-10 lg:px-12 py-12 md:py-24">
           <AboutSection lang={lang} dict={dict} />
         </section>
 
-        {/* EXPERIENCE SECTION */}
+        {/* EXPERIENCE */}
         <section id="experience" className="scroll-mt-24 bg-slate-50/40 py-24 dark:bg-slate-900/10">
           <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12">
             <ExperienceSection lang={lang} dict={dict} />
           </div>
         </section>
 
-        {/* PROJECTS SECTION */}
+        {/* PROJECTS */}
         <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12">
-          {/* Projetos em Destaque (Lógica interna customizada) */}
+          {/* Lógica de Featured (Client Component interno) */}
           <FeaturedProjectsSection lang={lang} />
           
           <div className="mt-12 md:mt-20">
-             {/* Grid Geral de Projetos vindo do GitHub */}
+             {/* Passamos o array garantido (mesmo que vazio) para evitar erro de .map() */}
              <ProjectSection projects={projects} lang={lang} dict={dict} />
           </div>
         </section>
 
-        {/* ARTICLES SECTION */}
+        {/* ARTICLES */}
         <section id="articles" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12 bg-slate-50/30 dark:bg-transparent rounded-[3rem]">
           <FeaturedArticleSection lang={lang} dict={dict} />
         </section>
 
-        {/* CONTACT SECTION */}
+        {/* CONTACT */}
         <section id="contact" className="mx-auto mb-24 w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12">
           <ContactSection lang={lang} dict={dict} />
         </section>
 
       </main>
 
-      {/* FOOTER */}
       <Footer lang={lang} dict={dict} />
     </PageWrapper>
   );
