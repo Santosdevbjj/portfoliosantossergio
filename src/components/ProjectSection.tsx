@@ -14,20 +14,10 @@ import { Database, Filter, FolderSearch } from 'lucide-react'
 import { ProjectCard } from '@/components/ProjectCard'
 import type { SupportedLocale } from '@/dictionaries'
 import type { Dictionary } from '@/types/dictionary'
-
-// Interface local para garantir compatibilidade com os dados vindos da API
-interface GitHubProject {
-  id: number
-  name: string
-  description: string | null
-  html_url: string
-  homepage?: string | null
-  topics?: string[]
-  updated_at?: string // O GitHub usa snake_case na API
-}
+import type { Project } from '@/domain/projects'
 
 interface ProjectSectionProps {
-  readonly projects: GitHubProject[]
+  readonly projects: Project[]
   readonly lang: SupportedLocale
   readonly dict: Dictionary
 }
@@ -52,21 +42,20 @@ export function ProjectSection({
   }
 
   /**
-   * Normalização de strings para comparação segura
+   * Normalização de strings para comparação segura de tags/tópicos
    */
   const normalize = (value: string) =>
     value?.toLowerCase().replace(/[^a-z0-9]/g, '') ?? ''
 
   /**
-   * ENGINE DE FILTRAGEM + RANKING (Correção do erro de propriedades inexistentes)
+   * ENGINE DE FILTRAGEM + RANKING
+   * Sincronizado com src/domain/projects.ts
    */
   const filteredProjects = useMemo(() => {
-    // 1. Filtra apenas o que deve ir para o portfólio
-    let base = projects.filter(
-      (p) => p.topics?.some(t => t.toLowerCase() === 'portfolio')
-    )
+    // 1. Filtra apenas o que deve ir para o portfólio (usando a flag do domínio)
+    let base = projects.filter((p) => p.isPortfolio)
 
-    // 2. Aplica filtro de categoria
+    // 2. Aplica filtro de categoria (mapeando contra os labels das categorias no dicionário)
     if (activeCategory !== 'all') {
       const normalizedCategory = normalize(activeCategory)
       base = base.filter((p) =>
@@ -76,26 +65,15 @@ export function ProjectSection({
       )
     }
 
-    // 3. Ordenação Corrigida: Main Case > Featured > Data
+    // 3. Ordenação: Main Case (isFirst) > Featured (isFeatured) > ID (como fallback)
     return [...base].sort((a, b) => {
-      const aTopics = a.topics?.map(t => t.toLowerCase()) ?? []
-      const bTopics = b.topics?.map(t => t.toLowerCase()) ?? []
-
-      const aIsMain = aTopics.some(t => ['main-case', 'primeiro'].includes(t))
-      const bIsMain = bTopics.some(t => ['main-case', 'primeiro'].includes(t))
-
-      const aIsFeatured = aTopics.some(t => ['featured', 'destaque', 'highlight'].includes(t))
-      const bIsFeatured = bTopics.some(t => ['featured', 'destaque', 'highlight'].includes(t))
-
-      const aPriority = aIsMain ? 0 : aIsFeatured ? 1 : 2
-      const bPriority = bIsMain ? 0 : bIsFeatured ? 1 : 2
+      const aPriority = a.isFirst ? 0 : a.isFeatured ? 1 : 2
+      const bPriority = b.isFirst ? 0 : b.isFeatured ? 1 : 2
 
       if (aPriority !== bPriority) return aPriority - bPriority
 
-      const aDate = new Date(a.updated_at || 0).getTime()
-      const bDate = new Date(b.updated_at || 0).getTime()
-
-      return bDate - aDate
+      // Fallback de ordenação por ID ou Nome se as prioridades forem iguais
+      return b.id.localeCompare(a.id)
     })
   }, [projects, activeCategory])
 
