@@ -1,27 +1,26 @@
 {
   "compilerOptions": {
     /* ---------------------------------------------------------------------- */
-    /* CORE TARGET & RUNTIME (Node 24 / TS 5.7)                               */
+    /* CORE TARGET & RUNTIME                                                  */
     /* ---------------------------------------------------------------------- */
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
 
     /* ---------------------------------------------------------------------- */
-    /* STRICTNESS (ENTERPRISE LEVEL)                                           */
+    /* STRICTNESS (Equilíbrio Sênior: Seguro mas compatível)                 */
     /* ---------------------------------------------------------------------- */
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
 
     /* ---------------------------------------------------------------------- */
-    /* EMIT & MODULE RESOLUTION (Updated for TS 5.4+)                         */
+    /* EMIT & MODULE RESOLUTION (Ajustado para Next.js 16)                    */
     /* ---------------------------------------------------------------------- */
     "noEmit": true,
-    "module": "preserve",
-    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "isolatedModules": true,
     "jsx": "react-jsx",
 
@@ -30,8 +29,8 @@
     /* ---------------------------------------------------------------------- */
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "useDefineForClassFields": true,
-    "verbatimModuleSyntax": true,
+    "allowJs": true,
+    "skipLibCheck": true,
 
     /* ---------------------------------------------------------------------- */
     /* PROJECT STRUCTURE                                                       */
@@ -45,7 +44,6 @@
     /* PERFORMANCE                                                             */
     /* ---------------------------------------------------------------------- */
     "incremental": true,
-    "skipLibCheck": true,
 
     /* ---------------------------------------------------------------------- */
     /* NEXT.JS PLUGIN                                                          */
@@ -61,9 +59,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "src/proxy.ts",
-    "new-types.d.ts"
+    ".next/types/**/*.ts"
   ],
 
   "exclude": ["node_modules"]
