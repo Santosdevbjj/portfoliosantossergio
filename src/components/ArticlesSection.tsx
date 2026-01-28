@@ -3,34 +3,33 @@
 /**
  * ARTICLES SECTION: Vitrine de Conteúdo Técnico
  * -----------------------------------------------------------------------------
- * - UI: Grid responsivo para artigos do Medium/DIO.
- * - I18n: Totalmente alinhado com o dicionário (PT, EN, ES).
- * - Fix: Correção de erro de tipagem no IntersectionObserver para o build do Vercel.
+ * - UI: Grid responsivo otimizado para leitura e legibilidade técnica.
+ * - I18n: Sincronizado com SupportedLocale (PT, EN, ES) e Dictionary.
+ * - Performance: Intersection Observer para ativação de animações apenas em view.
  */
 
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { BookOpen, Award, Calendar, ArrowRight, ExternalLink } from 'lucide-react'
-import type { Locale } from '@/i18n-config'
+import type { SupportedLocale } from '@/dictionaries'
 import type { Dictionary } from '@/types/dictionary'
 
 interface ArticlesSectionProps {
-  readonly lang: Locale
+  readonly lang: SupportedLocale
   readonly dict: Dictionary
 }
 
 export default function ArticlesSection({ lang, dict }: ArticlesSectionProps) {
-  const [hydrated, setHydrated] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
   
   const { articles } = dict
 
-  // Correção do Erro de Compilação: Adição de check de existência para 'entry'
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        const entry = entries[0]
-        if (entry && entry.isIntersecting) {
-          setHydrated(true)
+        const [entry] = entries
+        if (entry?.isIntersecting) {
+          setIsVisible(true)
           observer.disconnect()
         }
       },
@@ -48,7 +47,7 @@ export default function ArticlesSection({ lang, dict }: ArticlesSectionProps) {
     <section
       ref={sectionRef}
       id="articles"
-      className="relative scroll-mt-28 py-20 sm:py-32 overflow-hidden"
+      className="relative scroll-mt-28 py-20 sm:py-32 overflow-hidden bg-slate-50/50 dark:bg-transparent"
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         
@@ -73,27 +72,32 @@ export default function ArticlesSection({ lang, dict }: ArticlesSectionProps) {
         </div>
 
         {/* GRID DE ARTIGOS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Exemplo de Card de Artigo alinhado ao dicionário */}
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          
+          {/* NOTA: Para produção, estes dados devem vir de um array traduzido.
+              Abaixo, as labels já consomem o dicionário corretamente.
+          */}
           <ArticleCard 
-            title="A Era dos Dados em Sistemas Críticos"
-            description="Como a governança de dados transforma sistemas legados em ativos estratégicos de alta disponibilidade."
-            date="Set 2025"
+            title={lang === 'pt' ? "A Era dos Dados em Sistemas Críticos" : lang === 'en' ? "The Data Era in Critical Systems" : "La Era de los Datos en Sistemas Críticos"}
+            description={lang === 'pt' ? "Como a governança de dados transforma sistemas legados em ativos estratégicos." : lang === 'en' ? "How data governance transforms legacy systems into strategic assets." : "Cómo la gobernanza de datos transforma sistemas heredados en activos estratégicos."}
+            date="2025"
             category={articles.bestOfMonth}
             isAward={true}
             awardLabel={articles.awardWinner}
             readMoreLabel={articles.readMore}
-            link="#"
+            publishedAtLabel={articles.publishedAt}
+            link="https://medium.com/@santossergioluiz"
           />
           
           <ArticleCard 
-            title="Databricks & Governança"
-            description="Implementando segurança e conformidade em pipelines de dados modernos utilizando Azure Databricks."
-            date="Ago 2025"
+            title={lang === 'pt' ? "Databricks & Governança" : lang === 'en' ? "Databricks & Governance" : "Databricks y Gobernanza"}
+            description={lang === 'pt' ? "Segurança e conformidade em pipelines de dados modernos utilizando Azure." : lang === 'en' ? "Security and compliance in modern data pipelines using Azure." : "Seguridad y cumplimiento en pipelines de datos modernos utilizando Azure."}
+            date="2025"
             category="Data Engineering"
             isAward={false}
             readMoreLabel={articles.readMore}
-            link="#"
+            publishedAtLabel={articles.publishedAt}
+            link="https://medium.com/@santossergioluiz"
           />
         </div>
       </div>
@@ -102,7 +106,7 @@ export default function ArticlesSection({ lang, dict }: ArticlesSectionProps) {
 }
 
 /**
- * COMPONENTE DE CARD INTERNO
+ * COMPONENTE DE CARD INTERNO: Otimizado para Reuso
  */
 interface ArticleCardProps {
   title: string
@@ -112,19 +116,30 @@ interface ArticleCardProps {
   isAward: boolean
   awardLabel?: string
   readMoreLabel: string
+  publishedAtLabel: string
   link: string
 }
 
-function ArticleCard({ title, description, date, category, isAward, awardLabel, readMoreLabel, link }: ArticleCardProps) {
+function ArticleCard({ 
+  title, 
+  description, 
+  date, 
+  category, 
+  isAward, 
+  awardLabel, 
+  readMoreLabel, 
+  publishedAtLabel,
+  link 
+}: ArticleCardProps) {
   return (
-    <div className="group relative flex flex-col bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 hover:border-blue-500/50 transition-all hover:shadow-2xl hover:shadow-blue-500/10">
+    <div className="group relative flex flex-col bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-8 hover:border-blue-500/50 transition-all hover:shadow-2xl hover:shadow-blue-500/5">
       <div className="flex justify-between items-start mb-6">
-        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600">
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
           <BookOpen className="w-6 h-6" />
         </div>
         {isAward && (
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 text-[10px] font-black uppercase tracking-wider rounded-full border border-amber-200 dark:border-amber-800/50">
-            <Award className="w-3 h-3" />
+          <span className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-amber-200 dark:border-amber-800/50 shadow-sm">
+            <Award className="w-3.5 h-3.5" />
             {awardLabel}
           </span>
         )}
@@ -132,13 +147,13 @@ function ArticleCard({ title, description, date, category, isAward, awardLabel, 
 
       <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">
         <span className="flex items-center gap-1">
-          <Calendar className="w-3 h-3" /> {date}
+          <Calendar className="w-3 h-3 text-blue-500" /> {publishedAtLabel} {date}
         </span>
-        <span className="w-1 h-1 bg-slate-300 rounded-full" />
-        <span className="text-blue-600">{category}</span>
+        <span className="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full" />
+        <span className="text-blue-600 dark:text-blue-400">{category}</span>
       </div>
 
-      <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 group-hover:text-blue-600 transition-colors">
+      <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 leading-tight group-hover:text-blue-600 transition-colors">
         {title}
       </h3>
       
@@ -146,13 +161,17 @@ function ArticleCard({ title, description, date, category, isAward, awardLabel, 
         {description}
       </p>
 
-      <a
-        href={link}
-        className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-tighter text-slate-900 dark:text-white group-hover:gap-4 transition-all"
-      >
-        {readMoreLabel}
-        <ExternalLink className="w-4 h-4 text-blue-600" />
-      </a>
+      <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-blue-600 transition-all"
+        >
+          {readMoreLabel}
+          <ExternalLink className="w-4 h-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </a>
+      </div>
     </div>
   )
 }
