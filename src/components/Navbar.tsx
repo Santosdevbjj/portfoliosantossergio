@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Menu, X, Globe } from 'lucide-react'
+import type { Route } from 'next' // Importação necessária para o Next.js 16
 import type { Locale } from '@/i18n-config'
 import type { Dictionary } from '@/types/dictionary'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
@@ -25,12 +26,13 @@ export function Navbar({ lang, dict }: NavbarProps) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Aplicando casting 'as Route' para satisfazer o compilador da Vercel
   const navLinks = [
-    { href: `#about`, label: nav.about },
-    { href: `#experience`, label: nav.experience },
-    { href: `#projects`, label: nav.projects },
-    { href: `#articles`, label: nav.articles },
-    { href: `#contact`, label: nav.contact },
+    { href: `#about` as Route, label: nav.about },
+    { href: `#experience` as Route, label: nav.experience },
+    { href: `#projects` as Route, label: nav.projects },
+    { href: `#articles` as Route, label: nav.articles },
+    { href: `#contact` as Route, label: nav.contact },
   ]
 
   return (
@@ -43,7 +45,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8 flex justify-between items-center">
         {/* LOGO */}
-        <Link href={`/${lang}`} className="group">
+        <Link href={`/${lang}` as Route} className="group">
           <span className="font-black text-2xl tracking-tighter text-slate-900 dark:text-white uppercase">
             SÉRGIO<span className="text-blue-600 group-hover:text-blue-500 transition-colors">SANTOS</span>
           </span>
@@ -63,7 +65,8 @@ export function Navbar({ lang, dict }: NavbarProps) {
             ))}
           </div>
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
-          <LanguageSwitcher currentLang={lang} />
+          {/* REMOVIDO: currentLang={lang} para evitar erro de tipo */}
+          <LanguageSwitcher />
         </div>
 
         {/* MOBILE TOGGLE */}
@@ -95,7 +98,8 @@ export function Navbar({ lang, dict }: NavbarProps) {
                 <Globe size={14} className="text-blue-600" />
                 Language / Idioma
               </p>
-              <LanguageSwitcher currentLang={lang} />
+              {/* REMOVIDO: currentLang={lang} aqui também */}
+              <LanguageSwitcher />
             </div>
           </div>
         </div>
