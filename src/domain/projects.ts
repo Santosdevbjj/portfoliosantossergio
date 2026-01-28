@@ -24,24 +24,7 @@ export enum ProjectTechnology {
   NODE_REACT = 'node-react',
 }
 
-export const PROJECT_TECHNOLOGY_ORDER: readonly ProjectTechnology[] = [
-  ProjectTechnology.DATA_SCIENCE,
-  ProjectTechnology.AZURE_DATABRICKS,
-  ProjectTechnology.NEO4J,
-  ProjectTechnology.POWER_BI,
-  ProjectTechnology.EXCEL,
-  ProjectTechnology.DATABASE,
-  ProjectTechnology.PYTHON,
-  ProjectTechnology.DOTNET,
-  ProjectTechnology.JAVA,
-  ProjectTechnology.MACHINE_LEARNING,
-  ProjectTechnology.ARTIFICIAL_INTELLIGENCE,
-  ProjectTechnology.AWS,
-  ProjectTechnology.CYBERSECURITY,
-  ProjectTechnology.PROGRAMMING_LOGIC,
-  ProjectTechnology.HTML,
-  ProjectTechnology.NODE_REACT,
-] as const;
+export const PROJECT_TECHNOLOGY_ORDER: readonly ProjectTechnology[] = Object.values(ProjectTechnology);
 
 export interface Project {
   readonly id: string;
@@ -52,7 +35,7 @@ export interface Project {
   readonly topics: readonly string[];
   readonly technology: {
     id: ProjectTechnology;
-    labelKey: string;
+    labelKey: string; // Deve bater com as chaves em dictionary.projects.categories
   };
   readonly isPortfolio: boolean;
   readonly isFeatured: boolean;
@@ -60,30 +43,32 @@ export interface Project {
 }
 
 export const resolveProjectTechnology = (topics: readonly string[]) => {
-  if (!topics.length) return null;
-  const techId = PROJECT_TECHNOLOGY_ORDER.find((tech) => topics.includes(tech));
-  if (!techId) return null;
+  if (!topics || topics.length === 0) return { id: ProjectTechnology.DATA_SCIENCE, labelKey: 'dataScience' };
 
-  const mapping: Record<string, string> = {
-    'data-science': 'dataScience',
-    'azure-databricks': 'cloud',
-    'neo4j': 'graphs',
-    'power-bi': 'analysis',
-    'excel': 'analysis',
-    'database': 'analysis',
-    'python': 'dev',
-    'dotnet': 'dev',
-    'java': 'dev',
-    'machine-learning': 'dataScience',
-    'artificial-intelligence': 'dataScience',
-    'aws': 'cloud',
-    'cybersecurity': 'security',
-    'programming-logic': 'dev',
-    'html': 'dev',
-    'node-react': 'dev',
+  const techId = PROJECT_TECHNOLOGY_ORDER.find((tech) => topics.includes(tech));
+  
+  // Mapping direcionado para as chaves do seu JSON de tradução
+  const mapping: Record<ProjectTechnology, string> = {
+    [ProjectTechnology.DATA_SCIENCE]: 'dataScience',
+    [ProjectTechnology.AZURE_DATABRICKS]: 'cloud',
+    [ProjectTechnology.NEO4J]: 'graphs',
+    [ProjectTechnology.POWER_BI]: 'analysis',
+    [ProjectTechnology.EXCEL]: 'analysis',
+    [ProjectTechnology.DATABASE]: 'analysis',
+    [ProjectTechnology.PYTHON]: 'dev',
+    [ProjectTechnology.DOTNET]: 'dev',
+    [ProjectTechnology.JAVA]: 'dev',
+    [ProjectTechnology.MACHINE_LEARNING]: 'dataScience',
+    [ProjectTechnology.ARTIFICIAL_INTELLIGENCE]: 'dataScience',
+    [ProjectTechnology.AWS]: 'cloud',
+    [ProjectTechnology.CYBERSECURITY]: 'security',
+    [ProjectTechnology.PROGRAMMING_LOGIC]: 'dev',
+    [ProjectTechnology.HTML]: 'dev',
+    [ProjectTechnology.NODE_REACT]: 'dev',
   };
 
-  return { id: techId, labelKey: mapping[techId] };
+  const selectedTechId = techId || ProjectTechnology.DATA_SCIENCE;
+  return { id: selectedTechId, labelKey: mapping[selectedTechId] };
 };
 
 export const resolveProjectFlags = (topics: readonly string[]) => ({
