@@ -20,7 +20,7 @@ interface PageProps {
 }
 
 /**
- * Metadata Dinâmica: Blindada contra erros de params
+ * Metadata Dinâmica: Blindada contra erros de params e timeout
  */
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const params = await props.params;
@@ -51,11 +51,15 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   };
 }
 
+/**
+ * Componente de Página Principal (Server Component)
+ */
 export default async function Page(props: PageProps) {
+  // 1. Resolução segura dos parâmetros da URL
   const params = await props.params;
   const rawLang = params.lang;
   
-  // Validação estrita de idioma
+  // 2. Validação estrita de Idioma para evitar 404s desnecessários
   if (!i18n.locales.includes(rawLang as any)) {
     notFound();
   }
@@ -63,58 +67,61 @@ export default async function Page(props: PageProps) {
   const lang = rawLang as SupportedLocale;
   const dict = getDictionarySync(lang);
   
-  // Busca de projetos com tratamento de erro interno na lib/github
-  // Se falhar, retorna [] e não quebra o renderizador
+  // 3. Busca de projetos com proteção contra Timeout
+  // A função getGitHubProjects deve ter o AbortController para não travar a Vercel
   const projects = await getGitHubProjects(lang) || [];
 
+  // IDs para controle de navegação e ScrollSpy
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact'];
 
   return (
     <PageWrapper lang={lang} sectionIds={sectionIds}>
+      {/* Navbar fixa no topo */}
       <Navbar lang={lang} dict={dict} />
       
       <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
         
-        {/* HERO */}
+        {/* HERO SECTION */}
         <section id="hero" className="scroll-mt-0">
           <HeroSection lang={lang} dict={dict} />
         </section>
         
-        {/* ABOUT */}
+        {/* ABOUT SECTION */}
         <section id="about" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 sm:px-10 lg:px-12 py-12 md:py-24">
           <AboutSection lang={lang} dict={dict} />
         </section>
 
-        {/* EXPERIENCE */}
+        {/* EXPERIENCE SECTION */}
         <section id="experience" className="scroll-mt-24 bg-slate-50/40 py-24 dark:bg-slate-900/10">
           <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12">
             <ExperienceSection lang={lang} dict={dict} />
           </div>
         </section>
 
-        {/* PROJECTS */}
+        {/* PROJECTS SECTION */}
         <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12">
-          {/* Lógica de Featured (Client Component interno) */}
+          {/* Projetos em destaque (Client Component) */}
           <FeaturedProjectsSection lang={lang} />
           
           <div className="mt-12 md:mt-20">
-             {/* Passamos o array garantido (mesmo que vazio) para evitar erro de .map() */}
+             {/* Renderização da lista vinda do GitHub - Fallback para [] garantido acima */}
              <ProjectSection projects={projects} lang={lang} dict={dict} />
           </div>
         </section>
 
-        {/* ARTICLES */}
+        {/* ARTICLES SECTION */}
         <section id="articles" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12 bg-slate-50/30 dark:bg-transparent rounded-[3rem]">
           <FeaturedArticleSection lang={lang} dict={dict} />
         </section>
 
-        {/* CONTACT */}
+        {/* CONTACT SECTION */}
         <section id="contact" className="mx-auto mb-24 w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12">
           <ContactSection lang={lang} dict={dict} />
         </section>
 
       </main>
 
+      {/* FOOTER */}
       <Footer lang={lang} dict={dict} />
     </PageWrapper>
   );
