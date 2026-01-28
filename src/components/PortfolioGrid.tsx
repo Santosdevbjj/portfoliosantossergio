@@ -12,6 +12,8 @@ import React, { useState, useMemo } from 'react'
 import { ProjectCard } from './ProjectCard'
 import { Filter, Database, FolderSearch, Sparkles } from 'lucide-react'
 import type { SupportedLocale } from '@/dictionaries'
+// Importamos a interface oficial para garantir que o TS não reclame de propriedades faltando
+import type { Dictionary } from '@/types/dictionary'
 
 interface GitHubRepository {
   id: number
@@ -26,14 +28,7 @@ interface GitHubRepository {
 interface PortfolioGridProps {
   readonly projects: GitHubRepository[]
   readonly lang: SupportedLocale
-  readonly dict: {
-    projects: {
-      title: string
-      viewAll: string
-      categories: Record<string, string>
-      // Adicionamos fallbacks contextuais para estados vazios e filtros
-    }
-  }
+  readonly dict: Dictionary // Usando a interface completa aqui
 }
 
 export const PortfolioGrid = ({
@@ -43,6 +38,7 @@ export const PortfolioGrid = ({
 }: PortfolioGridProps) => {
   const [activeCategory, setActiveCategory] = useState<'all' | string>('all')
 
+  // Agora o TS sabe que dict.projects tem todas as propriedades (featured, viewProject, etc.)
   const projectsDict = dict.projects
   const categoriesDict = projectsDict.categories
 
@@ -144,7 +140,6 @@ export const PortfolioGrid = ({
                 role="tablist"
                 className="flex gap-3 overflow-x-auto pb-6 no-scrollbar snap-x touch-pan-x -mx-6 px-6 lg:mx-0 lg:px-0"
               >
-                {/* Botão "Ver Todos" */}
                 <button
                   role="tab"
                   onClick={() => setActiveCategory('all')}
@@ -158,7 +153,6 @@ export const PortfolioGrid = ({
                   {projectsDict.viewAll}
                 </button>
 
-                {/* Categorias do Dicionário */}
                 {Object.entries(categoriesDict).map(([key, label]) => (
                   <button
                     key={key}
@@ -176,7 +170,6 @@ export const PortfolioGrid = ({
                 ))}
               </div>
 
-              {/* Indicador visual de scroll (Mobile) */}
               <div className="absolute right-0 top-0 bottom-6 w-20 bg-gradient-to-l from-white dark:from-[#020617] to-transparent pointer-events-none lg:hidden" />
             </div>
           </nav>
@@ -191,7 +184,7 @@ export const PortfolioGrid = ({
                 className="flex h-full animate-in fade-in zoom-in-95 duration-500 fill-mode-both"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                {/* Aqui passamos o dict completo para o ProjectCard tratar os rótulos internos */}
+                {/* Agora o dict é do tipo Dictionary, compatível com o ProjectCard */}
                 <ProjectCard project={project} lang={lang} dict={dict} />
               </div>
             ))
