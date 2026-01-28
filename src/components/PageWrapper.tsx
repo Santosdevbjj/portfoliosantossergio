@@ -62,8 +62,16 @@ export function PageWrapper({
     setMounted(true)
   }, [])
 
-  const activeSection = useMemo(
-    () => (mounted ? activeSectionFromHook : null),
+  /**
+   * Correção do Erro: Type 'void | null' is not assignable.
+   * Forçamos o retorno a ser estritamente string ou null através de casting
+   * para satisfazer o rigor do TypeScript 5.4+ na Vercel.
+   */
+  const activeSection = useMemo<string | null>(
+    () => {
+      if (!mounted) return null
+      return (activeSectionFromHook as string) || null
+    },
     [mounted, activeSectionFromHook]
   )
 
