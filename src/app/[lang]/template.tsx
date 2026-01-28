@@ -3,13 +3,12 @@
 /**
  * TEMPLATE: Global [lang]
  * -----------------------------------------------------------------------------
- * Este template envolve todas as páginas dentro do grupo de idiomas.
- * Diferente do Layout, o Template remonta na navegação, sendo ideal para:
- * - Reset de scroll e estados de animação.
- * - Garantir que a estrutura base de UI seja reconstruída corretamente.
+ * Corrigido para Next.js 16 (React 19).
+ * - Removido import não utilizado de 'React' para satisfazer o tsconfig (noUnusedLocals).
+ * - Mantido o reset de scroll e estrutura de UI.
  */
 
-import React, { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect } from 'react';
 
 interface TemplateProps {
   readonly children: ReactNode;
