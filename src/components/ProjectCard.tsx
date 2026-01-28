@@ -5,7 +5,7 @@
  * -----------------------------------------------------------------------------
  * - UI: Design baseado em cartões de alta densidade, totalmente responsivo.
  * - UX: Diferenciação entre projetos comuns, destaques e casos principais.
- * - Alinhamento: Sincronizado com src/dictionaries/index.ts e os JSONs de idioma.
+ * - Alinhamento: Sincronizado com src/dictionaries/index.ts e src/types/dictionary.ts
  */
 
 import React from 'react'
@@ -19,6 +19,7 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import type { SupportedLocale } from '@/dictionaries'
+import type { Dictionary } from '@/types/dictionary'
 
 interface GitHubProject {
   id?: number
@@ -32,16 +33,7 @@ interface GitHubProject {
 interface ProjectCardProps {
   readonly project: GitHubProject
   readonly lang: SupportedLocale
-  // Alinhado com a estrutura exata do seu src/dictionaries/pt.json
-  readonly dict: {
-    projects: {
-      featured: string
-      featuredLabel: string
-      firstLabel: string
-      viewProject: string
-      repoLink: string
-    }
-  }
+  readonly dict: Dictionary
 }
 
 export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
@@ -60,8 +52,6 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
   /* -------------------------------------------------
    * 🌍 TRADUÇÃO DE SEÇÕES ESTRUTURADAS
    * ------------------------------------------------*/
-  // Como o JSON não possui chaves para "Problem/Solution", 
-  // usamos labels contextuais baseadas no idioma para manter o design estruturado
   const sectionLabels = {
     pt: { problem: 'Desafio', solution: 'Solução', impact: 'Impacto' },
     en: { problem: 'Challenge', solution: 'Solution', impact: 'Impact' },
@@ -78,7 +68,11 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
   }
 
   const descParts = project.description?.split('|').map(p => p.trim()) ?? []
-  const hasStructuredDesc = descParts.length >= 2
+  
+  // CORREÇÃO: Garantimos que descParts sempre tenha strings para evitar erro de 'undefined'
+  const problemText = descParts[0] || project.description || ''
+  const solutionText = descParts[1] || ''
+  const impactText = descParts[2] || ''
 
   return (
     <article
@@ -144,35 +138,39 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
 
       {/* CORPO DO CASE */}
       <div className="flex-grow space-y-5">
-        {hasStructuredDesc ? (
-          <>
-            <CaseSection 
-              icon={<Target size={16} />} 
-              label={sectionLabels.problem} 
-              text={descParts[0]} 
-              type="problem" 
-            />
-            <CaseSection 
-              icon={<Lightbulb size={16} />} 
-              label={sectionLabels.solution} 
-              text={descParts[1]} 
-              type="solution" 
-            />
-            {descParts[2] && (
-              <div className="pt-3 mt-1 flex items-start gap-2 border-t border-slate-100 dark:border-slate-800/40">
-                <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
-                  <TrendingUp size={12} />
-                </div>
-                <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tight italic">
-                  {descParts[2]}
-                </p>
-              </div>
-            )}
-          </>
-        ) : (
-          <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed italic">
-            {project.description || (lang === 'en' ? 'Description soon...' : 'Descrição em breve...')}
-          </p>
+        {/* Desafio / Problema */}
+        <CaseSection 
+          icon={<Target size={16} />} 
+          label={sectionLabels.problem} 
+          text={problemText} 
+          type="problem" 
+        />
+
+        {/* Solução Técnica */}
+        {solutionText && (
+          <CaseSection 
+            icon={<Lightbulb size={16} />} 
+            label={sectionLabels.solution} 
+            text={solutionText} 
+            type="solution" 
+          />
+        )}
+
+        {/* Impacto / Resultado */}
+        {impactText && (
+          <div className="pt-3 mt-1 flex items-start gap-2 border-t border-slate-100 dark:border-slate-800/40">
+            <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
+              <TrendingUp size={12} />
+            </div>
+            <div>
+               <span className="block text-[8px] font-black uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-400 mb-0.5">
+                {sectionLabels.impact}
+              </span>
+              <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tight italic">
+                {impactText}
+              </p>
+            </div>
+          </div>
         )}
       </div>
 
@@ -200,10 +198,17 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
 /* HELPER COMPONENT: CaseSection                                               */
 /* -------------------------------------------------------------------------- */
 
-function CaseSection({ icon, label, text, type }: { icon: React.ReactNode, label: string, text: string, type: 'problem' | 'solution' }) {
+interface CaseSectionProps {
+  icon: React.ReactNode
+  label: string
+  text: string
+  type: 'problem' | 'solution'
+}
+
+function CaseSection({ icon, label, text, type }: CaseSectionProps) {
   const styles = type === 'problem' 
-    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
-    : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
+    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' 
+    : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
 
   return (
     <div className="flex gap-3 group/section">
