@@ -1,17 +1,11 @@
 'use client'
 
-/**
- * LANGUAGE & THEME SWITCHER
- * -----------------------------------------------------------------------------
- * CORREÇÃO PARA VERCEL: 
- * O erro "readonly ['pt', 'en', 'es'] to type 'string[]'" é resolvido 
- * criando uma nova instância do array usando [...i18n.locales].
- */
-
 import React, { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Moon, Sun } from 'lucide-react'
+// Importação necessária para o erro de link tipado
+import type { Route } from 'next'
 
 import { useTheme } from '@/hooks/useTheme'
 import { i18n, type Locale, localeMetadata } from '@/i18n-config'
@@ -26,7 +20,6 @@ function LanguageSwitcherContent() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
-  // Determina o idioma atual via URL
   const pathLocale = pathname?.split('/')[1] as SupportedLocale | undefined
   const currentLang: SupportedLocale = i18n.locales.includes(pathLocale as Locale)
     ? (pathLocale as SupportedLocale)
@@ -36,18 +29,23 @@ function LanguageSwitcherContent() {
     document.cookie = `${LOCALE_COOKIE}=${locale}; path=${LOCALE_COOKIE_OPTIONS.path}; max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}`
   }
 
-  function getNewPath(locale: string): string {
-    if (!pathname) return `/${locale}`
+  // A função agora retorna explicitamente o tipo Route para satisfazer o Next.js 16
+  function getNewPath(locale: string): Route {
+    if (!pathname) return `/${locale}` as Route
     const segments = pathname.split('/')
     const hasLocale = i18n.locales.includes(segments[1] as Locale)
     const newSegments = [...segments]
+    
     if (hasLocale) newSegments[1] = locale
     else newSegments.splice(1, 0, locale)
+    
     const params = searchParams?.toString()
-    return `${newSegments.join('/') || '/'}${params ? `?${params}` : ''}`
+    const path = `${newSegments.join('/') || '/'}${params ? `?${params}` : ''}`
+    
+    // O segredo está aqui: "as Route" resolve o erro do log 23:48:12
+    return path as Route
   }
 
-  // Labels locais para acessibilidade
   const accessibilityLabels = {
     pt: { config: 'Configurações', dark: 'Modo escuro', light: 'Modo claro' },
     en: { config: 'Settings', dark: 'Dark mode', light: 'Light mode' },
@@ -63,6 +61,7 @@ function LanguageSwitcherContent() {
     >
       <button
         onClick={toggleTheme}
+        type="button"
         aria-label={isDark ? accessibilityLabels.light : accessibilityLabels.dark}
         className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all"
       >
@@ -72,7 +71,6 @@ function LanguageSwitcherContent() {
       <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1" aria-hidden="true" />
 
       <div className="flex items-center gap-1">
-        {/* CORREÇÃO DO ERRO DE COMPILAÇÃO AQUI: [...i18n.locales] */}
         {[...i18n.locales].map((locale) => {
           const isActive = currentLang === locale
           const meta = localeMetadata[locale as Locale]
@@ -92,7 +90,7 @@ function LanguageSwitcherContent() {
             >
               <span className="relative z-10">{meta.label}</span>
               {isActive && (
-                <span className="absolute inset-0 bg-blue-600 rounded-xl z-0 shadow-lg shadow-blue-600/40 animate-in fade-in zoom-in-90 duration-300" aria-hidden="true" />
+                <span className="absolute inset-0 bg-blue-600 rounded-xl z-0 shadow-lg shadow-blue-600/40" />
               )}
             </Link>
           )
