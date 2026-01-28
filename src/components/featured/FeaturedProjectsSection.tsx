@@ -17,7 +17,8 @@ interface FeaturedProjectsSectionProps {
   readonly lang: Locale
 }
 
-export default function FeaturedProjectsSection({ lang }: FeaturedProjectsProjectsSectionProps) {
+// CORREÇÃO: O nome da interface agora coincide exatamente com o definido acima
+export default function FeaturedProjectsSection({ lang }: FeaturedProjectsSectionProps) {
   const content = {
     pt: {
       badge: 'Portfolio',
