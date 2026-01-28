@@ -1,8 +1,9 @@
-import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
+'use client'; // Aplicando a Solution 1: Controle total via Client Side para evitar mismatch
 
-// UI Components
+import { useState, useEffect, Suspense } from 'react';
+import { notFound } from 'next/navigation';
+
+// Componentes (Importados normalmente, mas o controle de render é via isClient)
 import { AboutSection } from '@/components/AboutSection';
 import { ContactSection } from '@/components/ContactSection';
 import { ExperienceSection } from '@/components/ExperienceSection';
@@ -14,132 +15,105 @@ import { PageWrapper } from '@/components/PageWrapper';
 import { ProjectSection } from '@/components/ProjectSection';
 import FeaturedProjectsSection from '@/components/featured/FeaturedProjectsSection';
 
-// Logic & Data
+// Logic & i18n
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
 import { i18n } from '@/i18n-config';
 import { getGitHubProjects } from '@/lib/github';
+import type { Project } from '@/domain/projects';
 
 interface PageProps {
-  params: Promise<{ lang: string }>;
+  params: { lang: string }; // No 'use client', params é passado de forma direta ou via use()
 }
 
-/**
- * Metadata Dinâmica: Utiliza o dicionário tipado para SEO robusto.
- * O uso de 'await props.params' é obrigatório no Next.js 16.
- */
-export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const params = await props.params;
-  const lang = (i18n.locales.includes(params.lang as any) 
-    ? params.lang 
-    : i18n.defaultLocale) as SupportedLocale;
+export default function Page({ params }: PageProps) {
+  // Solução 1 da sua documentação: Estado de hidratação
+  const [isClient, setIsClient] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
   
-  const dict = getDictionarySync(lang);
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app').replace(/\/$/, '');
+  const lang = params.lang as SupportedLocale;
 
-  return {
-    title: dict.seo.siteName,
-    description: dict.seo.description,
-    keywords: dict.seo.keywords,
-    alternates: {
-      canonical: `${siteUrl}/${lang}`,
-      languages: {
-        pt: `${siteUrl}/pt`,
-        en: `${siteUrl}/en`,
-        es: `${siteUrl}/es`,
-        'x-default': `${siteUrl}/pt`,
-      },
-    },
-    openGraph: {
-      title: dict.seo.siteName,
-      description: dict.seo.description,
-      locale: lang,
-      type: 'website',
-      url: `${siteUrl}/${lang}`,
-      siteName: dict.seo.siteName,
-    },
-    robots: {
-      index: true,
-      follow: true,
-    },
-  };
-}
+  useEffect(() => {
+    // Marca que a hidratação terminou
+    setIsClient(true);
 
-/**
- * Page Component: Server Component robusto com tratamento de erro e performance.
- */
-export default async function Page(props: PageProps) {
-  const params = await props.params;
-  const rawLang = params.lang;
+    // Solução para FUNCTION_INVOCATION_TIMEOUT: Busca dados no cliente
+    // Isso evita que a Vercel trave esperando o GitHub no servidor
+    async function loadData() {
+      try {
+        const data = await getGitHubProjects(lang);
+        setProjects(data || []);
+      } catch (error) {
+        console.error("Erro ao carregar projetos:", error);
+      }
+    }
+    loadData();
+  }, [lang]);
 
-  // 1. Validação de Localidade
-  if (!i18n.locales.includes(rawLang as any)) {
+  // Validação de segurança para o idioma
+  if (!i18n.locales.includes(lang as any)) {
     notFound();
   }
 
-  const lang = rawLang as SupportedLocale;
   const dict = getDictionarySync(lang);
-
-  /**
-   * 2. Busca de Projetos (GitHub)
-   * Otimizado para não travar a renderização total em caso de falha na API externa.
-   */
-  const projects = await getGitHubProjects(lang).catch((err) => {
-    console.error("[Page] Erro ao buscar projetos do GitHub:", err);
-    return [];
-  }) || [];
-
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact'];
 
+  // Enquanto não hidratou, renderizamos uma casca estática idêntica (ou null)
+  // Isso mata o erro de "Text content does not match"
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-[#020617]" />
+    );
+  }
+
   return (
-    <PageWrapper lang={lang} sectionIds={sectionIds}>
-      {/* Navbar injeta o dicionário síncrono para renderização imediata */}
-      <Navbar lang={lang} dict={dict} />
+    <div suppressHydrationWarning>
+      <PageWrapper lang={lang} sectionIds={sectionIds}>
+        <Navbar lang={lang} dict={dict} />
+        
+        <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
+          
+          {/* Hero: Conteúdo Crítico */}
+          <section id="hero" className="scroll-mt-0">
+            <HeroSection lang={lang} dict={dict} />
+          </section>
+          
+          {/* About: Trajetória */}
+          <section id="about" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 sm:px-10 lg:px-12 py-12 md:py-24">
+            <AboutSection lang={lang} dict={dict} />
+          </section>
 
-      <main 
-        className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased"
-        suppressHydrationWarning // Escape hatch para pequenas variações de extensões de browser
-      >
-        {/* HERO - Prioridade Máxima (LCP) */}
-        <section id="hero" className="scroll-mt-0">
-          <HeroSection lang={lang} dict={dict} />
-        </section>
+          {/* Experience: Bradesco & Consultoria */}
+          <section id="experience" className="scroll-mt-24 bg-slate-50/40 py-24 dark:bg-slate-900/10">
+            <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12">
+              <ExperienceSection lang={lang} dict={dict} />
+            </div>
+          </section>
 
-        {/* ABOUT - Rigor Bancário e Trajetória */}
-        <section id="about" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 sm:px-10 lg:px-12 py-12 md:py-24">
-          <AboutSection lang={lang} dict={dict} />
-        </section>
+          {/* Projects: Onde o Timeout e o Mismatch aconteciam */}
+          <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12">
+            <Suspense fallback={<div className="h-64 animate-pulse bg-slate-100" />}>
+              <FeaturedProjectsSection lang={lang} />
+            </Suspense>
+            
+            <div className="mt-12 md:mt-20">
+               <ProjectSection projects={projects} lang={lang} dict={dict} />
+            </div>
+          </section>
 
-        {/* EXPERIENCE - Histórico Bradesco & Consultoria */}
-        <section id="experience" className="scroll-mt-24 bg-slate-50/40 py-24 dark:bg-slate-900/10">
-          <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12">
-            <ExperienceSection lang={lang} dict={dict} />
-          </div>
-        </section>
+          {/* Articles */}
+          <section id="articles" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12 bg-slate-50/30 dark:bg-transparent rounded-[3rem]">
+            <FeaturedArticleSection lang={lang} dict={dict} />
+          </section>
 
-        {/* PROJECTS - Grid de Tecnologia Resolvido pelo Domínio */}
-        <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12">
-          <Suspense fallback={<div className="h-96 w-full animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800" />}>
-            <FeaturedProjectsSection lang={lang} />
-          </Suspense>
+          {/* Contact */}
+          <section id="contact" className="mx-auto mb-24 w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12">
+            <ContactSection lang={lang} dict={dict} />
+          </section>
 
-          <div className="mt-12 md:mt-20">
-            {/* ProjectSection recebe os dados já filtrados e resolvidos pelo domain/projects */}
-            <ProjectSection projects={projects} lang={lang} dict={dict} />
-          </div>
-        </section>
+        </main>
 
-        {/* ARTICLES - DIO & Medium Insights */}
-        <section id="articles" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12 bg-slate-50/30 dark:bg-transparent rounded-[3rem]">
-          <FeaturedArticleSection lang={lang} dict={dict} />
-        </section>
-
-        {/* CONTACT - Conversão e Networking */}
-        <section id="contact" className="mx-auto mb-24 w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12">
-          <ContactSection lang={lang} dict={dict} />
-        </section>
-      </main>
-
-      <Footer lang={lang} dict={dict} />
-    </PageWrapper>
+        <Footer lang={lang} dict={dict} />
+      </PageWrapper>
+    </div>
   );
 }
