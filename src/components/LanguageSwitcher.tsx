@@ -1,9 +1,17 @@
 'use client'
 
+/**
+ * LANGUAGE & THEME SWITCHER
+ * -----------------------------------------------------------------------------
+ * CORREÇÃO PARA VERCEL: 
+ * O erro "readonly ['pt', 'en', 'es'] to type 'string[]'" é resolvido 
+ * criando uma nova instância do array usando [...i18n.locales].
+ */
+
 import React, { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { Moon, Sun, Globe } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
 
 import { useTheme } from '@/hooks/useTheme'
 import { i18n, type Locale, localeMetadata } from '@/i18n-config'
@@ -18,7 +26,7 @@ function LanguageSwitcherContent() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
-  // Detecta o idioma atual com base na URL
+  // Determina o idioma atual via URL
   const pathLocale = pathname?.split('/')[1] as SupportedLocale | undefined
   const currentLang: SupportedLocale = i18n.locales.includes(pathLocale as Locale)
     ? (pathLocale as SupportedLocale)
@@ -39,10 +47,11 @@ function LanguageSwitcherContent() {
     return `${newSegments.join('/') || '/'}${params ? `?${params}` : ''}`
   }
 
+  // Labels locais para acessibilidade
   const accessibilityLabels = {
-    pt: { config: 'Configurações de idioma e tema', dark: 'Ativar modo escuro', light: 'Ativar modo claro' },
-    en: { config: 'Language and theme settings', dark: 'Enable dark mode', light: 'Enable light mode' },
-    es: { config: 'Configuración de idioma y tema', dark: 'Activar modo oscuro', light: 'Activar modo claro' },
+    pt: { config: 'Configurações', dark: 'Modo escuro', light: 'Modo claro' },
+    en: { config: 'Settings', dark: 'Dark mode', light: 'Light mode' },
+    es: { config: 'Configuración', dark: 'Modo oscuro', light: 'Modo claro' },
   }[currentLang] || { config: 'Settings', dark: 'Dark', light: 'Light' }
 
   if (!mounted) return <div className="h-[52px] w-[160px] bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl" />
@@ -57,17 +66,14 @@ function LanguageSwitcherContent() {
         aria-label={isDark ? accessibilityLabels.light : accessibilityLabels.dark}
         className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all"
       >
-        {isDark ? (
-          <Sun className="w-4 h-4 text-amber-500" />
-        ) : (
-          <Moon className="w-4 h-4 text-blue-600" />
-        )}
+        {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-blue-600" />}
       </button>
 
       <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1" aria-hidden="true" />
 
       <div className="flex items-center gap-1">
-        {(i18n.locales as string[]).map((locale) => {
+        {/* CORREÇÃO DO ERRO DE COMPILAÇÃO AQUI: [...i18n.locales] */}
+        {[...i18n.locales].map((locale) => {
           const isActive = currentLang === locale
           const meta = localeMetadata[locale as Locale]
 
@@ -86,7 +92,7 @@ function LanguageSwitcherContent() {
             >
               <span className="relative z-10">{meta.label}</span>
               {isActive && (
-                <span className="absolute inset-0 bg-blue-600 rounded-xl z-0 shadow-lg shadow-blue-600/40 animate-in fade-in zoom-in-90 duration-300" />
+                <span className="absolute inset-0 bg-blue-600 rounded-xl z-0 shadow-lg shadow-blue-600/40 animate-in fade-in zoom-in-90 duration-300" aria-hidden="true" />
               )}
             </Link>
           )
