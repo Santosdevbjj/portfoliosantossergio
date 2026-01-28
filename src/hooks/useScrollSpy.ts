@@ -33,70 +33,64 @@ export function useScrollSpyObserver(
 
     if (elements.length === 0) return
 
-    /* -------------------------------------------------------------------------- */
-    /* INTERSECTION OBSERVER (ESTRATÉGIA MODERNA)                                 */
-    /* -------------------------------------------------------------------------- */
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          // Buscamos apenas os elementos que cruzaram o limiar (threshold)
-          const visibleEntries = entries
-            .filter((entry) => entry.isIntersecting)
-            // Ordenamos para garantir que a seção mais próxima do topo vença
-            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-
-          // CORREÇÃO: Uso de optional chaining [0]? para evitar erro de "possibly undefined"
-          const firstVisible = visibleEntries[0]
-          if (firstVisible) {
-            const targetId = firstVisible.target.id
-            
-            // Mapeamento dinâmico do ID HTML para o Enum de Navegação
-            const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
-              (key) => NAV_HASH_MAP[key] === `#${targetId}`
-            )
-
-            if (section) {
-              setActiveSection(section)
-            }
-          }
-        },
-        {
-          // rootMargin negativo no topo e grande no fundo foca a detecção na parte superior
-          rootMargin: `-${offset}px 0px -60% 0px`,
-          threshold: [0, 0.1] 
-        }
-      )
-
-      elements.forEach((el) => observer.observe(el))
-      return () => observer.disconnect()
-    }
+    let observer: IntersectionObserver | null = null
 
     /* -------------------------------------------------------------------------- */
-    /* FALLBACK (LEGACY SCROLL LISTENER)                                          */
+    /* ESTRATÉGIA DE DETECÇÃO                                                     */
     /* -------------------------------------------------------------------------- */
+    
+    // Fallback: Definimos a função de scroll antes para uso em ambos os casos se necessário
     const handleScroll = () => {
       const scrollPosition = window.scrollY + offset + 20
-
-      // Percorre as seções para identificar qual está sob o cursor de offset
       for (let i = elements.length - 1; i >= 0; i--) {
         const el = elements[i]
-        // Proteção extra para garantir que o elemento ainda existe no DOM
         if (el && el.offsetTop <= scrollPosition) {
           const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
             (key) => NAV_HASH_MAP[key] === `#${el.id}`
           )
-          if (section) {
-            setActiveSection(section)
-          }
+          if (section) setActiveSection(section)
           break
         }
       }
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll() // Trigger imediato para sincronizar estado inicial
+    if ('IntersectionObserver' in window) {
+      // Caso moderno: IntersectionObserver
+      observer = new IntersectionObserver(
+        (entries) => {
+          const visibleEntries = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
 
-    return () => window.removeEventListener('scroll', handleScroll)
+          const firstVisible = visibleEntries[0]
+          if (firstVisible) {
+            const targetId = firstVisible.target.id
+            const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
+              (key) => NAV_HASH_MAP[key] === `#${targetId}`
+            )
+            if (section) setActiveSection(section)
+          }
+        },
+        {
+          rootMargin: `-${offset}px 0px -60% 0px`,
+          threshold: [0, 0.1] 
+        }
+      )
+
+      elements.forEach((el) => observer?.observe(el))
+    } else {
+      // Caso legado: Scroll Listener
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      handleScroll()
+    }
+
+    return () => {
+      if (observer) {
+        observer.disconnect()
+      } else {
+        window.removeEventListener('scroll', handleScroll)
+      }
+    }
   }, [sectionIds, offset, setActiveSection])
 }
 
