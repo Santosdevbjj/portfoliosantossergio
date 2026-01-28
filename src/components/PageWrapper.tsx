@@ -1,15 +1,15 @@
 'use client'
 
 /**
- * PAGE WRAPPER: Root Experience Orchestrator
+ * PAGE WRAPPER: Orquestrador de Experiência e Layout Root
  * -----------------------------------------------------------------------------
- * - Função: Provê o contexto de ScrollSpy e estrutura base de layout.
- * - Resiliência: Proteção contra Hydration Mismatch via Safe Mounting.
- * - I18n: Alinhado com SupportedLocale (PT, EN, ES).
- * - UX: Background dinâmico otimizado para mobile e desktop.
+ * - Função: Provê o contexto de ScrollSpy e estrutura semântica base.
+ * - Resiliência: Safe Mounting para evitar Hydration Mismatch no Next.js.
+ * - I18n: Configura o atributo 'lang' dinâmico para SEO e Acessibilidade.
+ * - Estética: Background dinâmico com grid adaptativo (Light/Dark).
  */
 
-import React, {
+import {
   createContext,
   useEffect,
   useMemo,
@@ -34,8 +34,7 @@ interface PageWrapperProps {
 /* -------------------------------------------------------------------------- */
 
 /**
- * ScrollSpyContext
- * Disponibiliza a seção ativa para componentes filhos (Navbar, Sidebar, etc.)
+ * ScrollSpyContext: Exportado para que Navbar e Sidebar saibam a seção ativa.
  */
 export const ScrollSpyContext = createContext<string | null>(null)
 
@@ -50,27 +49,23 @@ export function PageWrapper({
 }: PageWrapperProps) {
   const [mounted, setMounted] = useState(false)
   
-  // O Hook de ScrollSpy monitora qual ID de seção está visível na viewport
+  // Hook customizado para monitorar a posição do scroll
   const activeSectionFromHook = useScrollSpy(sectionIds, 150)
 
-  /**
-   * Safe Hydration Pattern
-   */
+  // Garante que o componente só execute lógica de cliente após o mount
   useEffect(() => {
     setMounted(true)
   }, [])
 
   /**
-   * CORREÇÃO DEFINITIVA DO ERRO:
-   * O compilador reclama que 'void' não pode ser 'string'.
-   * Usamos a recomendação da própria Vercel: converter para 'unknown' antes.
+   * MEMOIZAÇÃO DA SEÇÃO ATIVA:
+   * Resolve a discrepância de tipos entre 'void' do hook e 'string' do context.
    */
   const activeSection = useMemo<string | null>(
     () => {
       if (!mounted) return null
-      // Se o hook retornar void/undefined/null, vira null. 
-      // O 'unknown' quebra a barreira que impedia a conversão de 'void' para 'string'.
-      return (activeSectionFromHook as unknown as string) || null
+      // Converte o retorno do hook (mesmo se for void/undefined) para string ou null
+      return (activeSectionFromHook as string | undefined) || null
     },
     [mounted, activeSectionFromHook]
   )
@@ -81,17 +76,20 @@ export function PageWrapper({
         lang={lang}
         className="relative min-h-[100dvh] flex flex-col bg-white dark:bg-[#020617] transition-colors duration-500 overflow-x-hidden"
       >
-        {/* BACKGROUND DECORATIVO */}
+        {/* ELEMENTOS DE BACKGROUND (Fixos e Decorativos) */}
         <div
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
         >
+          {/* Glow Superior Centralizado */}
           <div
             className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1400px] h-[400px] md:h-[800px] opacity-40 dark:opacity-20 transition-opacity duration-1000"
             style={{
               background: 'radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.2), transparent 70%)',
             }}
           />
+          
+          {/* Grid de Pontos (Pattern) */}
           <div 
             className="absolute inset-0 opacity-[0.12] dark:opacity-[0.05]" 
             style={{ 
@@ -101,7 +99,7 @@ export function PageWrapper({
           />
         </div>
 
-        {/* CONTEÚDO PRINCIPAL */}
+        {/* CONTEÚDO PRINCIPAL (MAIN) */}
         <main
           role="main"
           id="main-content"
@@ -110,6 +108,7 @@ export function PageWrapper({
             pt-20
             md:pt-28
             lg:pt-32
+            px-0
             motion-safe:animate-in
             motion-safe:fade-in
             motion-safe:slide-in-from-bottom-2
