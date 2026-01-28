@@ -1,7 +1,5 @@
 /**
- * PROXY (Server-side Edge Logic)
- * -----------------------------------------------------------------------------
- * Gerencia Internacionalização, GDPR, Consent Mode e Feature Flags.
+ * PROXY (Server-side Edge Logic) - Next.js 16 Compliant
  */
 import { NextRequest, NextResponse } from 'next/server';
 import Negotiator from 'negotiator';
@@ -9,9 +7,6 @@ import { match as matchLocale } from '@formatjs/intl-localematcher';
 import { i18n, type Locale } from '@/i18n-config';
 import { LOCALE_COOKIE_NAME } from '@/lib/locale-cookie';
 
-/* -------------------------------------------------------------------------- */
-/* 🌎 REGION DETECTION                                                        */
-/* -------------------------------------------------------------------------- */
 type Region = 'eu' | 'br' | 'us' | 'unknown';
 
 const EU_COUNTRIES = new Set([
@@ -28,20 +23,14 @@ function detectRegion(request: NextRequest): Region {
   return 'unknown';
 }
 
-/* -------------------------------------------------------------------------- */
-/* 🌐 LOCALE LOGIC                                                            */
-/* -------------------------------------------------------------------------- */
 function detectLocale(request: NextRequest): Locale {
   const cookieLocale = request.cookies.get(LOCALE_COOKIE_NAME)?.value as Locale | undefined;
   if (cookieLocale && (i18n.locales as readonly string[]).includes(cookieLocale)) {
     return cookieLocale;
   }
-
   const acceptLanguage = request.headers.get('accept-language');
   if (!acceptLanguage) return i18n.defaultLocale;
-
   const languages = new Negotiator({ headers: { 'accept-language': acceptLanguage } }).languages();
-  
   try {
     return matchLocale(languages, i18n.locales as unknown as string[], i18n.defaultLocale) as Locale;
   } catch {
@@ -49,28 +38,30 @@ function detectLocale(request: NextRequest): Locale {
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* 🧠 PROXY CORE                                                              */
-/* -------------------------------------------------------------------------- */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Detecção de Locale na URL
+  // 1. Ignorar arquivos estáticos explicitamente
+  if (
+    pathname.includes('.') || 
+    pathname.startsWith('/_next') || 
+    pathname.startsWith('/assets')
+  ) {
+    return NextResponse.next();
+  }
+
   const pathnameHasLocale = i18n.locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
-  // 2. Redirecionamento se não houver locale
   if (!pathnameHasLocale) {
     const locale = detectLocale(request);
     const redirectUrl = new URL(`/${locale}${pathname === '/' ? '' : pathname}`, request.url);
-    
     const response = NextResponse.redirect(redirectUrl, 307);
     response.cookies.set(LOCALE_COOKIE_NAME, locale, { path: '/', maxAge: 31536000 });
     return response;
   }
 
-  // 3. Extração de dados para Headers
   const currentLocale = pathname.split('/')[1] as Locale;
   const region = detectRegion(request);
   const consent = request.cookies.get('cookie_consent')?.value;
@@ -81,20 +72,12 @@ export function proxy(request: NextRequest) {
   requestHeaders.set('x-user-region', region);
   requestHeaders.set('x-gdpr-mode', isStrictGDPR ? 'strict' : 'standard');
 
-  // GA4 Consent Mode v2 Headers
-  const consentStatus = isStrictGDPR ? 'denied' : 'granted';
-  requestHeaders.set('x-consent-analytics_storage', consentStatus);
-  requestHeaders.set('x-consent-ad_storage', consentStatus);
-
   const response = NextResponse.next({
     request: { headers: requestHeaders },
   });
 
-  // 4. SEO: Hreflang Dinâmico
   const baseUrl = 'https://portfoliosantossergio.vercel.app';
-  response.headers.set(
-    'Link',
-    [
+  response.headers.set('Link', [
       `<${baseUrl}/pt>; rel="alternate"; hreflang="pt-BR"`,
       `<${baseUrl}/en>; rel="alternate"; hreflang="en-US"`,
       `<${baseUrl}/es>; rel="alternate"; hreflang="es-ES"`,
@@ -107,15 +90,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - assets/images (public files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata)
-     */
-    '/((?!api|_next/static|_next/image|assets|images|favicon.ico|robots.txt|sitemap.xml).*)',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|assets|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)'],
 };
