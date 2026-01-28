@@ -12,13 +12,23 @@ import { useMemo, useState } from 'react'
 import { Database, Filter, FolderSearch } from 'lucide-react'
 
 import { ProjectCard } from '@/components/ProjectCard'
-import type { Locale } from '@/i18n-config'
+import type { SupportedLocale } from '@/dictionaries'
 import type { Dictionary } from '@/types/dictionary'
-import type { Project } from '@/domain/projects'
+
+// Interface local para garantir compatibilidade com os dados vindos da API
+interface GitHubProject {
+  id: number
+  name: string
+  description: string | null
+  html_url: string
+  homepage?: string | null
+  topics?: string[]
+  updated_at?: string // O GitHub usa snake_case na API
+}
 
 interface ProjectSectionProps {
-  readonly projects: Project[]
-  readonly lang: Locale
+  readonly projects: GitHubProject[]
+  readonly lang: SupportedLocale
   readonly dict: Dictionary
 }
 
@@ -29,11 +39,10 @@ export function ProjectSection({
 }: ProjectSectionProps) {
   const [activeCategory, setActiveCategory] = useState<'all' | string>('all')
 
-  // Alinhamento com a chave correta do dicionário JSON
   const projectDict = dict.projects
 
   /**
-   * Traduções auxiliares baseadas no idioma (para chaves não presentes no JSON)
+   * Traduções auxiliares baseadas no idioma
    */
   const labels = {
     all: lang === 'pt' ? 'Todos' : lang === 'es' ? 'Todos' : 'All',
@@ -43,21 +52,21 @@ export function ProjectSection({
   }
 
   /**
-   * Normalização de strings para comparação segura de tags/tópicos
+   * Normalização de strings para comparação segura
    */
   const normalize = (value: string) =>
     value?.toLowerCase().replace(/[^a-z0-9]/g, '') ?? ''
 
   /**
-   * ENGINE DE FILTRAGEM + RANKING
+   * ENGINE DE FILTRAGEM + RANKING (Correção do erro de propriedades inexistentes)
    */
   const filteredProjects = useMemo(() => {
-    // Filtra apenas o que deve ir para o portfólio (tag 'portfolio' no GitHub)
+    // 1. Filtra apenas o que deve ir para o portfólio
     let base = projects.filter(
-      (p) => p.topics?.includes('portfolio')
+      (p) => p.topics?.some(t => t.toLowerCase() === 'portfolio')
     )
 
-    // Aplica filtro de categoria se não for 'all'
+    // 2. Aplica filtro de categoria
     if (activeCategory !== 'all') {
       const normalizedCategory = normalize(activeCategory)
       base = base.filter((p) =>
@@ -67,15 +76,24 @@ export function ProjectSection({
       )
     }
 
-    // Ordenação: Main Case > Featured > Data
-    return base.sort((a, b) => {
-      const aPriority = a.isMainCase ? 0 : a.isFeatured ? 1 : 2
-      const bPriority = b.isMainCase ? 0 : b.isFeatured ? 1 : 2
+    // 3. Ordenação Corrigida: Main Case > Featured > Data
+    return [...base].sort((a, b) => {
+      const aTopics = a.topics?.map(t => t.toLowerCase()) ?? []
+      const bTopics = b.topics?.map(t => t.toLowerCase()) ?? []
+
+      const aIsMain = aTopics.some(t => ['main-case', 'primeiro'].includes(t))
+      const bIsMain = bTopics.some(t => ['main-case', 'primeiro'].includes(t))
+
+      const aIsFeatured = aTopics.some(t => ['featured', 'destaque', 'highlight'].includes(t))
+      const bIsFeatured = bTopics.some(t => ['featured', 'destaque', 'highlight'].includes(t))
+
+      const aPriority = aIsMain ? 0 : aIsFeatured ? 1 : 2
+      const bPriority = bIsMain ? 0 : bIsFeatured ? 1 : 2
 
       if (aPriority !== bPriority) return aPriority - bPriority
 
-      const aDate = new Date(a.updatedAt || 0).getTime()
-      const bDate = new Date(b.updatedAt || 0).getTime()
+      const aDate = new Date(a.updated_at || 0).getTime()
+      const bDate = new Date(b.updated_at || 0).getTime()
 
       return bDate - aDate
     })
