@@ -1,5 +1,7 @@
 /**
- * LIB: Analytics Unified Layer - Versão Blindada
+ * LIB: Analytics Unified Layer
+ * -----------------------------------------------------------------------------
+ * Blindado contra erros de Hidratação e Runtime Exceptions.
  */
 
 import {
@@ -9,16 +11,32 @@ import {
   type ConsentPreferences,
 } from '@/lib/consent';
 
+/* -------------------------------------------------------------------------- */
+/* TYPES & GLOBAL DECLARATIONS                                                */
+/* -------------------------------------------------------------------------- */
+
+export interface AnalyticsEvent {
+  readonly name: string;
+  readonly props?: Record<string, unknown>;
+}
+
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
+    gtag?: (command: any, targetId: any, config?: any) => void;
     plausible?: (event: string, options?: { props?: any }) => void;
     posthog?: { capture: (event: string, props?: any) => void };
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/* CONSENT ENGINE                                                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Recupera o consentimento com múltiplas camadas de proteção.
+ */
 function getActiveConsent(): ConsentPreferences {
-  // Proteção contra execução no servidor
+  // 1. SSR Check: Nunca tenta ler cookies no servidor
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return DEFAULT_CONSENT;
   }
@@ -27,33 +45,49 @@ function getActiveConsent(): ConsentPreferences {
     const cookies = document.cookie.split('; ');
     const consentRow = cookies.find((row) => row.startsWith(`${CONSENT_COOKIE_NAME}=`));
 
-    if (!consentRow || !consentRow.includes('=')) return DEFAULT_CONSENT;
+    // 2. Se o cookie não existir ou estiver vazio
+    if (!consentRow || !consentRow.includes('=')) {
+      return DEFAULT_CONSENT;
+    }
 
-    const value = consentRow.split('=')[1];
-    if (!value) return DEFAULT_CONSENT;
+    const parts = consentRow.split('=');
+    if (parts.length < 2) return DEFAULT_CONSENT;
 
-    const rawValue = decodeURIComponent(value).trim();
-    
-    // Se o valor não for um JSON válido, retorna o padrão para evitar crash
-    if (!rawValue.startsWith('{')) return DEFAULT_CONSENT;
+    const rawValue = decodeURIComponent(parts[1]).trim();
+
+    // 3. Validação de formato JSON: Impede que o JSON.parse quebre o site
+    if (!rawValue || !rawValue.startsWith('{') || !rawValue.endsWith('}')) {
+      return DEFAULT_CONSENT;
+    }
 
     const parsedValue = JSON.parse(rawValue);
+    
+    // 4. Sanitização do Objeto
     return getSafeConsent(parsedValue);
   } catch (error) {
-    console.error('[Analytics] Erro ao ler consentimento:', error);
+    // 5. Fail-safe: Em caso de erro, usa o padrão restritivo e não derruba o app
+    console.warn('[Analytics] Consent recovery failed, using defaults.', error);
     return DEFAULT_CONSENT;
   }
 }
 
-export function track({ name, props }: { name: string; props?: any }): void {
+/* -------------------------------------------------------------------------- */
+/* TRACKING CORE                                                              */
+/* -------------------------------------------------------------------------- */
+
+export function track({ name, props }: AnalyticsEvent): void {
+  // Proteção: Nunca roda tracking no servidor ou se o ambiente não estiver pronto
   if (typeof window === 'undefined') return;
 
   try {
     const consent = getActiveConsent();
-    if (!consent?.analytics) return;
+    
+    // LGPD: Só rastreia se houver consentimento explícito para analytics
+    if (!consent || !consent.analytics) return;
 
     const eventProps = props || {};
 
+    // Injeção segura nos provedores
     if (typeof window.gtag === 'function') {
       window.gtag('event', name, eventProps);
     }
@@ -65,7 +99,8 @@ export function track({ name, props }: { name: string; props?: any }): void {
     if (window.posthog && typeof window.posthog.capture === 'function') {
       window.posthog.capture(name, eventProps);
     }
-  } catch (e) {
-    console.warn('[Analytics] Falha silenciosa no rastreio:', e);
+  } catch (err) {
+    // Silencia erros de tracking para não afetar a UX
+    console.error('[Analytics] Tracking error:', err);
   }
 }
