@@ -1,7 +1,25 @@
-import { Locale } from '@/i18n-config';
-import { Project, ProjectCoreTag, resolveProjectFlags, resolveProjectTechnology } from '@/domain/projects';
+import type { Locale } from '@/i18n-config';
+import { ProjectCoreTag, resolveProjectFlags, resolveProjectTechnology } from '@/domain/projects';
+import type { Project } from '@/domain/projects';
 
-const TECH_ORDER = ['data-science', 'azure-databricks', 'neo4j', 'power-bi', 'excel', 'database', 'python', 'dotnet', 'java', 'machine-learning', 'artificial-intelligence', 'aws', 'cybersecurity', 'programming-logic', 'html', 'node-react'];
+const TECH_ORDER = [
+  'data-science', 
+  'azure-databricks', 
+  'neo4j', 
+  'power-bi', 
+  'excel', 
+  'database', 
+  'python', 
+  'dotnet', 
+  'java', 
+  'machine-learning', 
+  'artificial-intelligence', 
+  'aws', 
+  'cybersecurity', 
+  'programming-logic', 
+  'html', 
+  'node-react'
+];
 
 export async function getGitHubProjects(lang: Locale): Promise<Project[]> {
   const token = process.env.GITHUB_ACCESS_TOKEN;
@@ -9,7 +27,10 @@ export async function getGitHubProjects(lang: Locale): Promise<Project[]> {
 
   try {
     const res = await fetch(url, {
-      headers: { Accept: 'application/vnd.github+json', ...(token && { Authorization: `Bearer ${token}` }) },
+      headers: { 
+        Accept: 'application/vnd.github+json', 
+        ...(token && { Authorization: `Bearer ${token}` }) 
+      },
       next: { revalidate: 3600 }
     });
 
@@ -23,26 +44,33 @@ export async function getGitHubProjects(lang: Locale): Promise<Project[]> {
         const tech = resolveProjectTechnology(topics);
         if (!tech) return null;
 
+        // Lógica de descrição baseada no Locale
+        const langIndex = lang === 'pt' ? 0 : lang === 'en' ? 1 : 2;
+        const description = repo.description?.split('|')[langIndex]?.trim() || '';
+
         return {
           id: String(repo.id),
           name: repo.name.replace(/[-_]/g, ' '),
-          description: repo.description?.split('|')[lang === 'pt' ? 0 : lang === 'en' ? 1 : 2] || '',
+          description,
           htmlUrl: repo.html_url,
           homepage: repo.homepage,
           topics,
           technology: tech,
           ...resolveProjectFlags(topics)
-        };
+        } as Project;
       })
-      .filter((p: any) => p !== null)
-      .sort((a: any, b: any) => {
-        if (a.isFirst) return -1;
-        if (b.isFirst) return 1;
-        if (a.isFeatured && !b.isFeatured) return -1;
-        if (!a.isFeatured && b.isFeatured) return 1;
+      .filter((p: Project | null): p is Project => p !== null)
+      .sort((a, b) => {
+        // Tipagem explícita para os flags de ordenação
+        const featA = (a as any).isFirst ? -1 : (a as any).isFeatured ? -0.5 : 0;
+        const featB = (b as any).isFirst ? -1 : (b as any).isFeatured ? -0.5 : 0;
+
+        if (featA !== featB) return featA - featB;
+        
         return TECH_ORDER.indexOf(a.technology.id) - TECH_ORDER.indexOf(b.technology.id);
       });
   } catch (e) {
+    console.error('[GitHub] Error fetching projects:', e);
     return [];
   }
 }
