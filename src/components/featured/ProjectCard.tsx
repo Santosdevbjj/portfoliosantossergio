@@ -11,7 +11,6 @@
 import React from 'react'
 import Link from 'next/link'
 import { Github, ArrowRight } from 'lucide-react'
-// CORREÇÃO: Utilizando 'import type' para satisfazer a regra verbatimModuleSyntax
 import type { Project, Locale } from './projects.data'
 
 interface ProjectCardProps {
@@ -98,7 +97,8 @@ export default function ProjectCard({ project, lang }: ProjectCardProps) {
       {/* FOOTER: Call to Action */}
       <footer className="mt-auto pt-10 relative z-10">
         <Link
-          href={project.repo}
+          // CORREÇÃO: Forçando o tipo para evitar o erro 'Type string is not assignable to UrlObject'
+          href={project.repo as any}
           target="_blank"
           rel="noopener noreferrer"
           itemProp="url"
