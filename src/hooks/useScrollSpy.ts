@@ -4,19 +4,14 @@
  * HOOK: useScrollSpy
  * -----------------------------------------------------------------------------
  * Observa a visibilidade das seções no viewport e sincroniza com o ScrollSpyContext.
- * * Utiliza IntersectionObserver para alta performance (O(1) no scroll).
- * * Integrado ao domínio NavSection para garantir consistência de tipos.
+ * * Correção: Implementação de guards para evitar 'type never' no build da Vercel
+ * e garantir que o código DOM só execute no cliente.
  */
 
 import { useEffect } from 'react'
-// Renomeado internamente para evitar conflito com o nome do hook deste arquivo
 import { useScrollSpy as useScrollSpyContext } from '@/contexts/ScrollSpyContext'
 import { NavSection, NAV_HASH_MAP } from '@/domain/navigation'
 
-/**
- * Hook principal para observar as seções.
- * Exportado com dois nomes para garantir compatibilidade com o build da Vercel.
- */
 export function useScrollSpyObserver(
   sectionIds: string[],
   offset: number = 100
@@ -24,39 +19,51 @@ export function useScrollSpyObserver(
   const { setActiveSection } = useScrollSpyContext()
 
   useEffect(() => {
-    // 1. Validação de segurança para SSR e IDs vazios
-    if (typeof window === 'undefined' || !sectionIds.length) return
+    // 1. Verificação fundamental: estamos no navegador?
+    if (typeof window === 'undefined') return
 
+    // 2. Verificação de elementos: as seções existem?
     const elements = sectionIds
       .map(id => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null)
 
     if (elements.length === 0) return
 
-    let observer: IntersectionObserver | null = null
+    // Variável para armazenar o observer e facilitar o cleanup
+    let observerInstance: IntersectionObserver | null = null
 
     /* -------------------------------------------------------------------------- */
-    /* ESTRATÉGIA DE DETECÇÃO                                                     */
+    /* DEFINIÇÃO DA LÓGICA DE ATUALIZAÇÃO                                         */
     /* -------------------------------------------------------------------------- */
-    
-    // Fallback: Definimos a função de scroll antes para uso em ambos os casos se necessário
-    const handleScroll = () => {
+    const updateActiveSection = (id: string) => {
+      const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
+        (key) => NAV_HASH_MAP[key] === `#${id}`
+      )
+      if (section) {
+        setActiveSection(section)
+      }
+    }
+
+    const handleScrollFallback = () => {
       const scrollPosition = window.scrollY + offset + 20
       for (let i = elements.length - 1; i >= 0; i--) {
         const el = elements[i]
         if (el && el.offsetTop <= scrollPosition) {
-          const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
-            (key) => NAV_HASH_MAP[key] === `#${el.id}`
-          )
-          if (section) setActiveSection(section)
+          updateActiveSection(el.id)
           break
         }
       }
     }
 
-    if ('IntersectionObserver' in window) {
-      // Caso moderno: IntersectionObserver
-      observer = new IntersectionObserver(
+    /* -------------------------------------------------------------------------- */
+    /* EXECUÇÃO: INTERSECTION OBSERVER OU SCROLL LISTENER                         */
+    /* -------------------------------------------------------------------------- */
+    
+    // Checagem explícita para evitar o erro de 'never' na propriedade addEventListener
+    const hasIntersectionObserver = 'IntersectionObserver' in window
+
+    if (hasIntersectionObserver) {
+      observerInstance = new IntersectionObserver(
         (entries) => {
           const visibleEntries = entries
             .filter((entry) => entry.isIntersecting)
@@ -64,11 +71,7 @@ export function useScrollSpyObserver(
 
           const firstVisible = visibleEntries[0]
           if (firstVisible) {
-            const targetId = firstVisible.target.id
-            const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
-              (key) => NAV_HASH_MAP[key] === `#${targetId}`
-            )
-            if (section) setActiveSection(section)
+            updateActiveSection(firstVisible.target.id)
           }
         },
         {
@@ -77,18 +80,21 @@ export function useScrollSpyObserver(
         }
       )
 
-      elements.forEach((el) => observer?.observe(el))
+      elements.forEach((el) => observerInstance?.observe(el))
     } else {
-      // Caso legado: Scroll Listener
-      window.addEventListener('scroll', handleScroll, { passive: true })
-      handleScroll()
+      // Caso o navegador seja antigo ou o observer falhe
+      window.addEventListener('scroll', handleScrollFallback, { passive: true })
+      handleScrollFallback()
     }
 
+    /* -------------------------------------------------------------------------- */
+    /* CLEANUP: Desativação de listeners/observers                                */
+    /* -------------------------------------------------------------------------- */
     return () => {
-      if (observer) {
-        observer.disconnect()
-      } else {
-        window.removeEventListener('scroll', handleScroll)
+      if (observerInstance) {
+        observerInstance.disconnect()
+      } else if (typeof window !== 'undefined') {
+        window.removeEventListener('scroll', handleScrollFallback)
       }
     }
   }, [sectionIds, offset, setActiveSection])
@@ -96,6 +102,6 @@ export function useScrollSpyObserver(
 
 /**
  * ALIAS: useScrollSpy
- * Resolve o erro "Export useScrollSpy doesn't exist in target module" no Vercel Build.
+ * Garante compatibilidade caso o componente use o nome antigo.
  */
-export const useScrollSpy = useScrollSpyObserver;
+export const useScrollSpy = useScrollSpyObserver
