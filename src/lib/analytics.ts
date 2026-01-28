@@ -51,9 +51,14 @@ function getActiveConsent(): ConsentPreferences {
     }
 
     const parts = consentRow.split('=');
-    if (parts.length < 2) return DEFAULT_CONSENT;
+    // Garantia para o TypeScript: extraímos o valor e checamos se ele existe
+    const valueToDecode = parts[1];
 
-    const rawValue = decodeURIComponent(parts[1]).trim();
+    if (!valueToDecode) {
+      return DEFAULT_CONSENT;
+    }
+
+    const rawValue = decodeURIComponent(valueToDecode).trim();
 
     // 3. Validação de formato JSON: Impede que o JSON.parse quebre o site
     if (!rawValue || !rawValue.startsWith('{') || !rawValue.endsWith('}')) {
