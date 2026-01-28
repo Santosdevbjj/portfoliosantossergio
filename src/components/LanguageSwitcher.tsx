@@ -4,7 +4,6 @@ import React, { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Moon, Sun } from 'lucide-react'
-// Importação necessária para o erro de link tipado
 import type { Route } from 'next'
 
 import { useTheme } from '@/hooks/useTheme'
@@ -16,9 +15,11 @@ function LanguageSwitcherContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { isDark, toggleTheme } = useTheme()
-
   const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const pathLocale = pathname?.split('/')[1] as SupportedLocale | undefined
   const currentLang: SupportedLocale = i18n.locales.includes(pathLocale as Locale)
@@ -29,22 +30,8 @@ function LanguageSwitcherContent() {
     document.cookie = `${LOCALE_COOKIE}=${locale}; path=${LOCALE_COOKIE_OPTIONS.path}; max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}`
   }
 
-  // A função agora retorna explicitamente o tipo Route para satisfazer o Next.js 16
-  function getNewPath(locale: string): Route {
-    if (!pathname) return `/${locale}` as Route
-    const segments = pathname.split('/')
-    const hasLocale = i18n.locales.includes(segments[1] as Locale)
-    const newSegments = [...segments]
-    
-    if (hasLocale) newSegments[1] = locale
-    else newSegments.splice(1, 0, locale)
-    
-    const params = searchParams?.toString()
-    const path = `${newSegments.join('/') || '/'}${params ? `?${params}` : ''}`
-    
-    // O segredo está aqui: "as Route" resolve o erro do log 23:48:12
-    return path as Route
-  }
+  // Mudança estratégica: removi a função getNewPath e coloquei a lógica direto no href 
+  // usando o casting "as Route<string>" para forçar a compatibilidade total.
 
   const accessibilityLabels = {
     pt: { config: 'Configurações', dark: 'Modo escuro', light: 'Modo claro' },
@@ -52,7 +39,9 @@ function LanguageSwitcherContent() {
     es: { config: 'Configuración', dark: 'Modo oscuro', light: 'Modo claro' },
   }[currentLang] || { config: 'Settings', dark: 'Dark', light: 'Light' }
 
-  if (!mounted) return <div className="h-[52px] w-[160px] bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl" />
+  if (!mounted) {
+    return <div className="h-[52px] w-[160px] bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl" />
+  }
 
   return (
     <nav
@@ -75,10 +64,21 @@ function LanguageSwitcherContent() {
           const isActive = currentLang === locale
           const meta = localeMetadata[locale as Locale]
 
+          // Lógica de path movida para dentro do map para garantir tipagem fresca
+          const segments = pathname?.split('/') || []
+          const hasLocale = i18n.locales.includes(segments[1] as Locale)
+          const newSegments = [...segments]
+          if (hasLocale) newSegments[1] = locale
+          else newSegments.splice(1, 0, locale)
+          
+          const params = searchParams?.toString()
+          const finalPath = `${newSegments.join('/') || '/'}${params ? `?${params}` : ''}`
+
           return (
             <Link
               key={locale}
-              href={getNewPath(locale)}
+              // O CASTING DEFINITIVO: Route<string>
+              href={finalPath as Route}
               hrefLang={locale}
               rel="alternate"
               prefetch={false}
@@ -90,7 +90,10 @@ function LanguageSwitcherContent() {
             >
               <span className="relative z-10">{meta.label}</span>
               {isActive && (
-                <span className="absolute inset-0 bg-blue-600 rounded-xl z-0 shadow-lg shadow-blue-600/40" />
+                <span 
+                  className="absolute inset-0 bg-blue-600 rounded-xl z-0 shadow-lg shadow-blue-600/40" 
+                  aria-hidden="true" 
+                />
               )}
             </Link>
           )
