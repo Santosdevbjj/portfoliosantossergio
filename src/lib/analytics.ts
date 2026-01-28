@@ -1,7 +1,5 @@
 /**
- * LIB: Analytics Unified Layer
- * -----------------------------------------------------------------------------
- * Blindado contra erros de Hidratação e Runtime Exceptions.
+ * LIB: Analytics Unified Layer (Versão Sênior - Anti-Hydration Error)
  */
 
 import {
@@ -10,10 +8,6 @@ import {
   getSafeConsent,
   type ConsentPreferences,
 } from '@/lib/consent';
-
-/* -------------------------------------------------------------------------- */
-/* TYPES & GLOBAL DECLARATIONS                                                */
-/* -------------------------------------------------------------------------- */
 
 export interface AnalyticsEvent {
   readonly name: string;
@@ -28,71 +22,53 @@ declare global {
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* CONSENT ENGINE                                                             */
-/* -------------------------------------------------------------------------- */
-
 /**
- * Recupera o consentimento com múltiplas camadas de proteção.
+ * Recupera o consentimento apenas no lado do cliente.
  */
 function getActiveConsent(): ConsentPreferences {
-  // 1. SSR Check: Nunca tenta ler cookies no servidor
-  if (typeof window === 'undefined' || typeof document === 'undefined') {
-    return DEFAULT_CONSENT;
-  }
+  // Se não estiver no navegador, retorna o padrão restritivo imediatamente
+  if (typeof window === 'undefined') return DEFAULT_CONSENT;
 
   try {
     const cookies = document.cookie.split('; ');
     const consentRow = cookies.find((row) => row.startsWith(`${CONSENT_COOKIE_NAME}=`));
 
-    // 2. Se o cookie não existir ou estiver vazio
-    if (!consentRow || !consentRow.includes('=')) {
-      return DEFAULT_CONSENT;
-    }
+    if (!consentRow || !consentRow.includes('=')) return DEFAULT_CONSENT;
 
-    const parts = consentRow.split('=');
-    // Garantia para o TypeScript: extraímos o valor e checamos se ele existe
-    const valueToDecode = parts[1];
+    const value = consentRow.split('=')[1];
+    if (!value) return DEFAULT_CONSENT;
 
-    if (!valueToDecode) {
-      return DEFAULT_CONSENT;
-    }
-
-    const rawValue = decodeURIComponent(valueToDecode).trim();
-
-    // 3. Validação de formato JSON: Impede que o JSON.parse quebre o site
-    if (!rawValue || !rawValue.startsWith('{') || !rawValue.endsWith('}')) {
-      return DEFAULT_CONSENT;
-    }
-
-    const parsedValue = JSON.parse(rawValue);
+    const rawValue = decodeURIComponent(value).trim();
     
-    // 4. Sanitização do Objeto
-    return getSafeConsent(parsedValue);
+    // Proteção crucial: Só tenta o parse se a string parecer um objeto
+    if (rawValue.startsWith('{') && rawValue.endsWith('}')) {
+      const parsedValue = JSON.parse(rawValue);
+      return getSafeConsent(parsedValue);
+    }
+    
+    return DEFAULT_CONSENT;
   } catch (error) {
-    // 5. Fail-safe: Em caso de erro, usa o padrão restritivo e não derruba o app
-    console.warn('[Analytics] Consent recovery failed, using defaults.', error);
+    console.warn('[Analytics] Consent recovery silent fail:', error);
     return DEFAULT_CONSENT;
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* TRACKING CORE                                                              */
-/* -------------------------------------------------------------------------- */
-
+/**
+ * Dispara eventos de forma segura.
+ */
 export function track({ name, props }: AnalyticsEvent): void {
-  // Proteção: Nunca roda tracking no servidor ou se o ambiente não estiver pronto
+  // 1. Bloqueio de execução no servidor (Hydration Shield)
   if (typeof window === 'undefined') return;
 
   try {
     const consent = getActiveConsent();
     
-    // LGPD: Só rastreia se houver consentimento explícito para analytics
-    if (!consent || !consent.analytics) return;
+    // 2. Só prossegue se o usuário deu ok para analytics
+    if (!consent?.analytics) return;
 
     const eventProps = props || {};
 
-    // Injeção segura nos provedores
+    // 3. Execução segura nos provedores
     if (typeof window.gtag === 'function') {
       window.gtag('event', name, eventProps);
     }
@@ -105,7 +81,7 @@ export function track({ name, props }: AnalyticsEvent): void {
       window.posthog.capture(name, eventProps);
     }
   } catch (err) {
-    // Silencia erros de tracking para não afetar a UX
-    console.error('[Analytics] Tracking error:', err);
+    // 4. Erros de tracking nunca devem derrubar a aplicação principal
+    console.error('[Analytics] Track failed:', err);
   }
 }
