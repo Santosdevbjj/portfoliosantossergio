@@ -1,10 +1,10 @@
 # =====================================================
-# DEPENDÊNCIAS — Node.js / NPM / Yarn / PNPM
+# DEPENDÊNCIAS — Node.js / NPM
 # =====================================================
 node_modules/
 .pnp
 .pnp.js
-package-lock.json
+# REMOVIDO: package-lock.json (Essencial para builds reprodutíveis)
 yarn.lock
 pnpm-lock.yaml
 
@@ -12,6 +12,7 @@ pnpm-lock.yaml
 # BUILD E SAÍDA — Next.js 16 + Vercel
 # =====================================================
 .next/
+!.next/cache/
 .next/trace
 .next/types
 out/
@@ -19,7 +20,7 @@ build/
 dist/
 .vercel/
 *.tsbuildinfo
-next-env.d.ts
+# REMOVIDO: next-env.d.ts (Recomendado manter no Git para consistência de tipos)
 
 # =====================================================
 # VARIÁVEIS DE AMBIENTE — SEGURANÇA CRÍTICA
@@ -61,9 +62,9 @@ Thumbs.db
 desktop.ini
 
 # =====================================================
-# IDEs E EDITORES
+# IDEs E EDITORES (Configurações de equipe são permitidas)
 # =====================================================
-.vscode/
+.vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
 !.vscode/launch.json
@@ -89,7 +90,7 @@ desktop.ini
 # =====================================================
 # CIÊNCIA DE DADOS / BACKEND / PYTHON
 # =====================================================
-# Evita versionamento de datasets pesados e ambientes virtuais
+# Ignora arquivos de dados, mas permite a estrutura se necessário
 *.csv
 *.xlsx
 *.sqlite
@@ -113,7 +114,7 @@ __pycache__/
 
 # =====================================================
 # CACHE DE FERRAMENTAS MODERNAS
-# Tailwind / PostCSS / Turbopack / Build cache
 # =====================================================
 node_modules/.cache/
-.next/cache/
+# Mantemos o cache do Next para builds incrementais rápidos na Vercel
+!.next/cache/
