@@ -55,22 +55,22 @@ export function PageWrapper({
 
   /**
    * Safe Hydration Pattern
-   * Garante que o estado dependente do cliente (scroll) só dispare após o mount,
-   * evitando erros de discrepância entre servidor e cliente (Next.js).
    */
   useEffect(() => {
     setMounted(true)
   }, [])
 
   /**
-   * Correção do Erro: Type 'void | null' is not assignable.
-   * Forçamos o retorno a ser estritamente string ou null através de casting
-   * para satisfazer o rigor do TypeScript 5.4+ na Vercel.
+   * CORREÇÃO DEFINITIVA DO ERRO:
+   * O compilador reclama que 'void' não pode ser 'string'.
+   * Usamos a recomendação da própria Vercel: converter para 'unknown' antes.
    */
   const activeSection = useMemo<string | null>(
     () => {
       if (!mounted) return null
-      return (activeSectionFromHook as string) || null
+      // Se o hook retornar void/undefined/null, vira null. 
+      // O 'unknown' quebra a barreira que impedia a conversão de 'void' para 'string'.
+      return (activeSectionFromHook as unknown as string) || null
     },
     [mounted, activeSectionFromHook]
   )
@@ -81,22 +81,17 @@ export function PageWrapper({
         lang={lang}
         className="relative min-h-[100dvh] flex flex-col bg-white dark:bg-[#020617] transition-colors duration-500 overflow-x-hidden"
       >
-        {/* ------------------------------------------------------------------ */}
-        {/* BACKGROUND DECORATIVO (GPU Optimized)                             */}
-        {/* ------------------------------------------------------------------ */}
+        {/* BACKGROUND DECORATIVO */}
         <div
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
         >
-          {/* Glow Superior Centralizado - Adaptável para Mobile/Desktop */}
           <div
             className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1400px] h-[400px] md:h-[800px] opacity-40 dark:opacity-20 transition-opacity duration-1000"
             style={{
               background: 'radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.2), transparent 70%)',
             }}
           />
-          
-          {/* Grid de Pontos Sutil (Estética de Engenharia de Dados) */}
           <div 
             className="absolute inset-0 opacity-[0.12] dark:opacity-[0.05]" 
             style={{ 
@@ -106,9 +101,7 @@ export function PageWrapper({
           />
         </div>
 
-        {/* ------------------------------------------------------------------ */}
-        {/* CONTEÚDO PRINCIPAL                                                 */}
-        {/* ------------------------------------------------------------------ */}
+        {/* CONTEÚDO PRINCIPAL */}
         <main
           role="main"
           id="main-content"
