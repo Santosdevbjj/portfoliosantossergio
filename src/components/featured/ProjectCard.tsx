@@ -11,7 +11,8 @@
 import React from 'react'
 import Link from 'next/link'
 import { Github, ArrowRight } from 'lucide-react'
-import { Project, Locale } from './projects.data'
+// CORREÇÃO: Utilizando 'import type' para satisfazer a regra verbatimModuleSyntax
+import type { Project, Locale } from './projects.data'
 
 interface ProjectCardProps {
   readonly project: Project
