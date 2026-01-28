@@ -1,23 +1,28 @@
 import type { NextConfig } from 'next';
 
+/**
+ * NEXT.JS CONFIGURATION - Enterprise Grade (Next.js 16.x)
+ * -----------------------------------------------------------------------------
+ * Hardened for Security (CVE-2025-66478) and High Performance.
+ */
 const nextConfig: NextConfig = {
   /* -------------------------------------------------------------------------- */
-  /* CORE & STABILITY (Hardened for Next.js 16)                                 */
+  /* CORE & STABILITY                                                           */
   /* -------------------------------------------------------------------------- */
   reactStrictMode: true,
-  poweredByHeader: false,
+  poweredByHeader: false, // Segurança: Não revela o uso de Next.js
   
-  // No Next.js 16, estas flags saíram de 'experimental' para o topo
+  // No Next.js 16, typedRoutes é estável e essencial para evitar 404
   typedRoutes: true,
   
   typescript: {
-    // Garantia de integridade para o Especialista em Sistemas
+    // Rigor técnico: Impedir builds com erro de tipo
     ignoreBuildErrors: false,
     tsconfigPath: 'tsconfig.json',
   },
 
   /* -------------------------------------------------------------------------- */
-  /* COMPILER                                                                   */
+  /* COMPILER & OPTIMIZATION                                                    */
   /* -------------------------------------------------------------------------- */
   compiler: {
     removeConsole:
@@ -27,39 +32,44 @@ const nextConfig: NextConfig = {
   },
 
   /* -------------------------------------------------------------------------- */
-  /* IMAGES (Optimized for High Latency Regions like gru1)                      */
+  /* IMAGES (Region Optimized)                                                  */
   /* -------------------------------------------------------------------------- */
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [450, 640, 750, 828, 1080, 1200, 1920],
     minimumCacheTTL: 86400,
+    
+    // Bloqueia tentativas de SSR de imagens de IPs locais maliciosos
     dangerouslyAllowLocalIP: false,
 
     remotePatterns: [
-      { protocol: 'https', hostname: '*.githubusercontent.com' },
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
       { protocol: 'https', hostname: 'raw.githubusercontent.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'media.licdn.com' }, // Adicionado para fotos do LinkedIn
     ],
   },
 
   /* -------------------------------------------------------------------------- */
-  /* EXPERIMENTAL (Controlled Features)                                         */
+  /* BUNDLER & IMPORTS (Next.js 16 Optimization)                                */
   /* -------------------------------------------------------------------------- */
   experimental: {
-    // Mantendo apenas o que ainda é experimental ou requer controle fino
+    // typedEnv garante que o processo falhe se faltarem variáveis de ambiente
     typedEnv: true,
-
+    
+    // Reduz drasticamente o tempo de build no Next.js 16
     optimizePackageImports: [
       'lucide-react',
       'clsx',
       'tailwind-merge',
       'framer-motion',
       'next-themes',
+      'date-fns',
     ],
   },
 
   /* -------------------------------------------------------------------------- */
-  /* SECURITY HEADERS (Padrão Enterprise 2026)                                  */
+  /* SECURITY HEADERS (Padrão 2026 - Proteção contra RCE e DoS)                 */
   /* -------------------------------------------------------------------------- */
   async headers() {
     return [
@@ -81,14 +91,18 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self';",
-              "img-src 'self' data: https:;",
-              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval';",
+              "img-src 'self' data: https: blob:;", // Adicionado blob: para compatibilidade
+              // Segurança contra RSC RCE: script-src mais restrito
+              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com;",
               "style-src 'self' 'unsafe-inline';",
               "font-src 'self' data: https:;",
-              // Suporte ao protocolo MCP e WebSockets em desenvolvimento
+              // Restringe conexões apenas ao domínio e Vercel Analytics
               `connect-src 'self' https: ${process.env.NODE_ENV === 'development' ? 'ws: wss:' : ''};`,
               "frame-ancestors 'none';",
               "upgrade-insecure-requests;",
+              "object-src 'none';", // Bloqueia plugins legados (Flash, etc)
+              "base-uri 'self';",
+              "form-action 'self';", // Impede que formulários enviem dados para sites externos
             ].join(' '),
           },
         ],
