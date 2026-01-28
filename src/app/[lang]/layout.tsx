@@ -1,26 +1,26 @@
-import type { Metadata, Viewport } from 'next';
-import { Inter, Montserrat } from 'next/font/google';
-import Script from 'next/script';
-import '../globals.css';
+import type { Metadata, Viewport } from 'next'
+import { Inter, Montserrat } from 'next/font/google'
+import Script from 'next/script'
+import '../globals.css'
 
-import { ThemeProvider } from '@/components/ThemeProvider';
-import { CookieBanner } from '@/components/CookieBanner';
-import { i18n, type Locale } from '@/i18n-config';
-import { getDictionarySync, type SupportedLocale } from '@/dictionaries'; 
+import { ThemeProvider } from '@/components/ThemeProvider'
+import { CookieBanner } from '@/components/CookieBanner'
+import { i18n, type Locale } from '@/i18n-config'
+import { getDictionarySync, type SupportedLocale } from '@/dictionaries' 
 
 const inter = Inter({ 
   subsets: ['latin'], 
   variable: '--font-inter', 
   display: 'swap',
   preload: true 
-});
+})
 
 const montserrat = Montserrat({ 
   subsets: ['latin'], 
   variable: '--font-montserrat', 
   display: 'swap',
   preload: true 
-});
+})
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -32,16 +32,23 @@ export const viewport: Viewport = {
     { media: '(prefers-color-scheme: light)', color: '#2563eb' },
     { media: '(prefers-color-scheme: dark)', color: '#020617' },
   ],
-};
+}
 
+// Geração de Metadados Dinâmicos alinhados com o Dicionário de cada idioma
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
-  const { lang } = await props.params;
-  const currentLang = i18n.locales.includes(lang as Locale) ? (lang as Locale) : i18n.defaultLocale;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app';
+  const { lang } = await props.params
+  const currentLang = (i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale) as SupportedLocale
+  
+  // Busca as traduções de SEO direto do dicionário correspondente
+  const dict = getDictionarySync(currentLang)
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app'
 
   return {
-    title: { default: 'Sérgio Santos | Especialista em Dados', template: '%s | Sérgio Santos' },
-    description: 'Especialista em Dados e Engenharia de Software com mais de 20 anos de experiência.',
+    title: { 
+      default: dict.seo.siteName, 
+      template: `%s | ${dict.seo.siteName}` 
+    },
+    description: dict.seo.description,
     metadataBase: new URL(siteUrl),
     alternates: {
       canonical: `${siteUrl}/${currentLang}`,
@@ -52,16 +59,24 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
         'x-default': `${siteUrl}/pt` 
       },
     },
+    keywords: dict.seo.keywords,
     verification: { google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0' },
-  };
+    openGraph: {
+      title: dict.seo.siteName,
+      description: dict.seo.description,
+      url: siteUrl,
+      siteName: dict.seo.siteName,
+      locale: currentLang,
+      type: 'website',
+    }
+  }
 }
 
 export default async function RootLayout(props: { children: React.ReactNode; params: Promise<{ lang: string }> }) {
-  const { lang } = await props.params;
-  const currentLang = (i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale) as SupportedLocale;
+  const { lang } = await props.params
+  const currentLang = (i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale) as SupportedLocale
   
-  // Obtém o dicionário síncrono
-  const dict = getDictionarySync(currentLang);
+  const dict = getDictionarySync(currentLang)
 
   return (
     <html 
@@ -70,6 +85,7 @@ export default async function RootLayout(props: { children: React.ReactNode; par
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
       <head>
+        {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
           strategy="afterInteractive"
@@ -93,18 +109,23 @@ export default async function RootLayout(props: { children: React.ReactNode; par
           disableTransitionOnChange
         >
           <div className="relative flex flex-col min-h-screen w-full">
+            {/* O "Skip to content" para acessibilidade pode ser adicionado aqui se desejar */}
             <main id="main-content" role="main" className="flex-grow w-full relative focus:outline-none">
               {props.children}
             </main>
           </div>
           
-          {/* Passando dict.cookieBanner. 
-            Note: (dict as any) é usado aqui para garantir que o TS não trave o build 
-            caso a interface Dictionary não esteja perfeitamente mapeada com o JSON.
-          */}
-          <CookieBanner lang={currentLang} dict={(dict as any).cookieBanner} />
+          {/* Banner de Cookies traduzido via dicionário common ou específico */}
+          <CookieBanner 
+            lang={currentLang} 
+            dict={(dict as any).cookieBanner || {
+              title: "Cookies",
+              description: currentLang === 'en' ? "We use cookies." : "Usamos cookies.",
+              accept: "OK"
+            }} 
+          />
         </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }
