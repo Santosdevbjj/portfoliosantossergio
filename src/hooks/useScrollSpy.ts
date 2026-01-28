@@ -45,8 +45,10 @@ export function useScrollSpyObserver(
             // Ordenamos para garantir que a seção mais próxima do topo vença
             .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
 
-          if (visibleEntries.length > 0) {
-            const targetId = visibleEntries[0].target.id
+          // CORREÇÃO: Uso de optional chaining [0]? para evitar erro de "possibly undefined"
+          const firstVisible = visibleEntries[0]
+          if (firstVisible) {
+            const targetId = firstVisible.target.id
             
             // Mapeamento dinâmico do ID HTML para o Enum de Navegação
             const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
@@ -78,7 +80,8 @@ export function useScrollSpyObserver(
       // Percorre as seções para identificar qual está sob o cursor de offset
       for (let i = elements.length - 1; i >= 0; i--) {
         const el = elements[i]
-        if (el.offsetTop <= scrollPosition) {
+        // Proteção extra para garantir que o elemento ainda existe no DOM
+        if (el && el.offsetTop <= scrollPosition) {
           const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
             (key) => NAV_HASH_MAP[key] === `#${el.id}`
           )
