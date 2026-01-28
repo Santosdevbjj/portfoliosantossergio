@@ -70,7 +70,13 @@ function getActiveConsent(): ConsentPreferences {
 
     if (!consentRow) return DEFAULT_CONSENT;
 
-    const rawValue = decodeURIComponent(consentRow.split('=')[1]);
+    // CORREÇÃO: Pegamos a parte após o '=' e garantimos que não é undefined
+    const parts = consentRow.split('=');
+    const value = parts[1];
+
+    if (!value) return DEFAULT_CONSENT;
+
+    const rawValue = decodeURIComponent(value);
     const parsedValue = JSON.parse(rawValue);
 
     return getSafeConsent(parsedValue);
@@ -116,9 +122,3 @@ export function track({ name, props }: AnalyticsEvent): void {
     window.posthog.capture(name, eventProps);
   }
 }
-
-/**
- * Nota Técnica:
- * Para uso em componentes React:
- * useEffect(() => { track({ name: 'page_view' }); }, []);
- */
