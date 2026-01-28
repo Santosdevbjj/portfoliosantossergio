@@ -1,68 +1,74 @@
-'use client'; // Aplicando a Solution 1: Controle total via Client Side para evitar mismatch
+'use client'
 
-import { useState, useEffect, Suspense } from 'react';
-import { notFound } from 'next/navigation';
+/**
+ * MAIN PAGE COMPONENT
+ * -----------------------------------------------------------------------------
+ * - Estratégia: Client-side rendering para dados dinâmicos (GitHub) evitando timeouts.
+ * - I18n: Integração total com dicionários PT, EN e ES.
+ * - UX: Gerenciamento de hidratação para evitar flicker e erros de mismatch.
+ */
 
-// Componentes (Importados normalmente, mas o controle de render é via isClient)
-import { AboutSection } from '@/components/AboutSection';
-import { ContactSection } from '@/components/ContactSection';
-import { ExperienceSection } from '@/components/ExperienceSection';
-import { FeaturedArticleSection } from '@/components/FeaturedArticleSection';
-import { Footer } from '@/components/Footer';
-import { HeroSection } from '@/components/HeroSection';
-import { Navbar } from '@/components/Navbar';
-import { PageWrapper } from '@/components/PageWrapper';
-import { ProjectSection } from '@/components/ProjectSection';
-import FeaturedProjectsSection from '@/components/featured/FeaturedProjectsSection';
+import { useState, useEffect, Suspense } from 'react'
+import { notFound } from 'next/navigation'
 
-// Logic & i18n
-import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
-import { i18n } from '@/i18n-config';
-import { getGitHubProjects } from '@/lib/github';
-import type { Project } from '@/domain/projects';
+// Componentes de UI
+import { AboutSection } from '@/components/AboutSection'
+import { ContactSection } from '@/components/ContactSection'
+import { ExperienceSection } from '@/components/ExperienceSection'
+import { FeaturedArticleSection } from '@/components/FeaturedArticleSection'
+import { Footer } from '@/components/Footer'
+import { HeroSection } from '@/components/HeroSection'
+import { Navbar } from '@/components/Navbar'
+import { PageWrapper } from '@/components/PageWrapper'
+import { ProjectSection } from '@/components/ProjectSection'
+import FeaturedProjectsSection from '@/components/featured/FeaturedProjectsSection'
+
+// Lógica e i18n
+import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
+import { i18n } from '@/i18n-config'
+import { getGitHubProjects } from '@/lib/github'
+import type { Project } from '@/domain/projects'
 
 interface PageProps {
-  params: { lang: string }; // No 'use client', params é passado de forma direta ou via use()
+  params: { lang: string }
 }
 
 export default function Page({ params }: PageProps) {
-  // Solução 1 da sua documentação: Estado de hidratação
-  const [isClient, setIsClient] = useState(false);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [isClient, setIsClient] = useState(false)
+  const [projects, setProjects] = useState<Project[]>([])
   
-  const lang = params.lang as SupportedLocale;
+  const lang = params.lang as SupportedLocale
 
   useEffect(() => {
-    // Marca que a hidratação terminou
-    setIsClient(true);
+    setIsClient(true)
 
-    // Solução para FUNCTION_INVOCATION_TIMEOUT: Busca dados no cliente
-    // Isso evita que a Vercel trave esperando o GitHub no servidor
+    // Busca de dados no cliente para contornar o limite de execução da Vercel
     async function loadData() {
       try {
-        const data = await getGitHubProjects(lang);
-        setProjects(data || []);
+        const data = await getGitHubProjects(lang)
+        setProjects(data || [])
       } catch (error) {
-        console.error("Erro ao carregar projetos:", error);
+        console.error("Falha ao carregar repositórios do GitHub:", error)
       }
     }
-    loadData();
-  }, [lang]);
+    loadData()
+  }, [lang])
 
-  // Validação de segurança para o idioma
+  // Validação rigorosa de localidade
   if (!i18n.locales.includes(lang as any)) {
-    notFound();
+    notFound()
   }
 
-  const dict = getDictionarySync(lang);
-  const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact'];
+  const dict = getDictionarySync(lang)
+  
+  // IDs sincronizados com useScrollSpy.ts e Navbar.tsx
+  const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
 
-  // Enquanto não hidratou, renderizamos uma casca estática idêntica (ou null)
-  // Isso mata o erro de "Text content does not match"
+  // Renderização inicial neutra para garantir hidratação perfeita
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#020617]" />
-    );
+      <div className="min-h-screen bg-white dark:bg-[#020617]" aria-hidden="true" />
+    )
   }
 
   return (
@@ -72,41 +78,47 @@ export default function Page({ params }: PageProps) {
         
         <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
           
-          {/* Hero: Conteúdo Crítico */}
+          {/* Seção Hero: Impacto Inicial */}
           <section id="hero" className="scroll-mt-0">
             <HeroSection lang={lang} dict={dict} />
           </section>
           
-          {/* About: Trajetória */}
-          <section id="about" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 sm:px-10 lg:px-12 py-12 md:py-24">
+          {/* Seção Sobre: Autoridade e Diferencial */}
+          <section id="about" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 sm:px-10 lg:px-12 py-16 md:py-24">
             <AboutSection lang={lang} dict={dict} />
           </section>
 
-          {/* Experience: Bradesco & Consultoria */}
-          <section id="experience" className="scroll-mt-24 bg-slate-50/40 py-24 dark:bg-slate-900/10">
+          {/* Seção Experiência: Histórico Profissional */}
+          <section id="experience" className="scroll-mt-24 bg-slate-50/50 py-20 dark:bg-slate-900/10">
             <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12">
               <ExperienceSection lang={lang} dict={dict} />
             </div>
           </section>
 
-          {/* Projects: Onde o Timeout e o Mismatch aconteciam */}
-          <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12">
-            <Suspense fallback={<div className="h-64 animate-pulse bg-slate-100" />}>
-              <FeaturedProjectsSection lang={lang} />
-            </Suspense>
-            
-            <div className="mt-12 md:mt-20">
-               <ProjectSection projects={projects} lang={lang} dict={dict} />
+          {/* Seção Projetos: Grid de Engenharia e Ciência de Dados */}
+          <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
+            <div className="space-y-24">
+              {/* Projetos Curados (Destaques Manuais) */}
+              <Suspense fallback={<div className="h-96 w-full animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800/50" />}>
+                <FeaturedProjectsSection lang={lang} />
+              </Suspense>
+              
+              {/* Repositório Geral (Vindo do GitHub via Client-side) */}
+              <div className="pt-12 border-t border-slate-200 dark:border-slate-800">
+                 <ProjectSection projects={projects} lang={lang} dict={dict} />
+              </div>
             </div>
           </section>
 
-          {/* Articles */}
-          <section id="articles" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12 bg-slate-50/30 dark:bg-transparent rounded-[3rem]">
-            <FeaturedArticleSection lang={lang} dict={dict} />
+          {/* Seção Artigos: Pensamento Técnico */}
+          <section id="articles" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
+            <div className="rounded-[3rem] bg-slate-50/40 p-1 dark:bg-slate-900/20">
+              <FeaturedArticleSection lang={lang} dict={dict} />
+            </div>
           </section>
 
-          {/* Contact */}
-          <section id="contact" className="mx-auto mb-24 w-full max-w-7xl scroll-mt-24 px-6 py-24 sm:px-10 lg:px-12">
+          {/* Seção Contato: CTA Final */}
+          <section id="contact" className="mx-auto mb-20 w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
             <ContactSection lang={lang} dict={dict} />
           </section>
 
@@ -115,5 +127,5 @@ export default function Page({ params }: PageProps) {
         <Footer lang={lang} dict={dict} />
       </PageWrapper>
     </div>
-  );
+  )
 }
