@@ -20,25 +20,18 @@
       },
       {
         "protocol": "https",
+        "hostname": "raw.githubusercontent.com"
+      },
+      {
+        "protocol": "https",
         "hostname": "images.unsplash.com"
+      },
+      {
+        "protocol": "https",
+        "hostname": "media.licdn.com"
       }
     ]
   },
-
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/pt"
-    }
-  ],
-
-  "redirects": [
-    {
-      "source": "/home",
-      "destination": "/",
-      "permanent": true
-    }
-  ],
 
   "headers": [
     {
@@ -55,7 +48,7 @@
       ]
     },
     {
-      "source": "/(assets|fonts|images)/(.*)",
+      "source": "/(assets|fonts|images|favicon.ico)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -64,15 +57,6 @@
         {
           "key": "Access-Control-Allow-Origin",
           "value": "*"
-        }
-      ]
-    },
-    {
-      "source": "/favicon.ico",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=86400, must-revalidate"
         }
       ]
     }
