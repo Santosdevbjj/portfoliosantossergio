@@ -1,17 +1,18 @@
 'use client'
 
 /**
- * MAIN PAGE COMPONENT
+ * MAIN PAGE COMPONENT - REVISÃO FINAL VERCEL
  * -----------------------------------------------------------------------------
- * - Estratégia: Client-side rendering para dados dinâmicos (GitHub) evitando timeouts.
- * - I18n: Integração total com dicionários PT, EN e ES.
- * - UX: Gerenciamento de hidratação para evitar flicker e erros de mismatch.
+ * - Fix: Named Imports para compatibilidade com Turbopack (Opção 1).
+ * - I18n: Sincronização total com dicionários PT, EN e ES via SupportedLocale.
+ * - UX: Gerenciamento de hidratação e client-side fetching para GitHub.
+ * - Responsividade: Layout estruturado em seções com max-w-7xl e padding responsivo.
  */
 
 import { useState, useEffect, Suspense } from 'react'
 import { notFound } from 'next/navigation'
 
-// Componentes de UI
+// Componentes de UI - Utilizando Named Imports para evitar erros de export default
 import { AboutSection } from '@/components/AboutSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ExperienceSection } from '@/components/ExperienceSection'
@@ -21,7 +22,9 @@ import { HeroSection } from '@/components/HeroSection'
 import { Navbar } from '@/components/Navbar'
 import { PageWrapper } from '@/components/PageWrapper'
 import { ProjectSection } from '@/components/ProjectSection'
-import FeaturedProjectsSection from '@/components/featured/FeaturedProjectsSection'
+
+// Correção do erro apontado no log da Vercel: Importação via chaves { }
+import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection'
 
 // Lógica e i18n
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
@@ -54,17 +57,18 @@ export default function Page({ params }: PageProps) {
     loadData()
   }, [lang])
 
-  // Validação rigorosa de localidade
+  // Validação rigorosa de localidade conforme configurado no i18n-config
   if (!i18n.locales.includes(lang as any)) {
     notFound()
   }
 
+  // Obtém o dicionário tipado de forma síncrona
   const dict = getDictionarySync(lang)
   
-  // IDs sincronizados com useScrollSpy.ts e Navbar.tsx
+  // IDs sincronizados para o Smooth Scroll da Navbar
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
 
-  // Renderização inicial neutra para garantir hidratação perfeita
+  // Renderização inicial neutra para garantir hidratação perfeita (Anti-Flicker)
   if (!isClient) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#020617]" aria-hidden="true" />
@@ -78,46 +82,46 @@ export default function Page({ params }: PageProps) {
         
         <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
           
-          {/* Seção Hero: Impacto Inicial */}
+          {/* Seção Hero: Foco em "Strategic Assets" conforme dicionário */}
           <section id="hero" className="scroll-mt-0">
             <HeroSection lang={lang} dict={dict} />
           </section>
           
-          {/* Seção Sobre: Autoridade e Diferencial */}
+          {/* Seção Sobre: 20+ Anos de Experiência */}
           <section id="about" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 sm:px-10 lg:px-12 py-16 md:py-24">
             <AboutSection lang={lang} dict={dict} />
           </section>
 
-          {/* Seção Experiência: Histórico Profissional */}
+          {/* Seção Experiência: Histórico Bradesco & Consultoria */}
           <section id="experience" className="scroll-mt-24 bg-slate-50/50 py-20 dark:bg-slate-900/10">
             <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12">
               <ExperienceSection lang={lang} dict={dict} />
             </div>
           </section>
 
-          {/* Seção Projetos: Grid de Engenharia e Ciência de Dados */}
+          {/* Seção Projetos: Multilingue e Curadoria */}
           <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
             <div className="space-y-24">
-              {/* Projetos Curados (Destaques Manuais) */}
+              {/* Projetos Curados (Featured): Fix do import realizado aqui */}
               <Suspense fallback={<div className="h-96 w-full animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800/50" />}>
                 <FeaturedProjectsSection lang={lang} />
               </Suspense>
               
-              {/* Repositório Geral (Vindo do GitHub via Client-side) */}
+              {/* Repositório GitHub Geral */}
               <div className="pt-12 border-t border-slate-200 dark:border-slate-800">
                  <ProjectSection projects={projects} lang={lang} dict={dict} />
               </div>
             </div>
           </section>
 
-          {/* Seção Artigos: Pensamento Técnico */}
+          {/* Seção Artigos: DIO Competition & Insights */}
           <section id="articles" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
             <div className="rounded-[3rem] bg-slate-50/40 p-1 dark:bg-slate-900/20">
               <FeaturedArticleSection lang={lang} dict={dict} />
             </div>
           </section>
 
-          {/* Seção Contato: CTA Final */}
+          {/* Seção Contato: Finalização do Funil de Conversão */}
           <section id="contact" className="mx-auto mb-20 w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
             <ContactSection lang={lang} dict={dict} />
           </section>
