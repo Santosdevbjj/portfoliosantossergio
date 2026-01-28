@@ -48,6 +48,8 @@ export async function getGitHubProjects(lang: Locale): Promise<Project[]> {
         const langIndex = lang === 'pt' ? 0 : lang === 'en' ? 1 : 2;
         const description = repo.description?.split('|')[langIndex]?.trim() || '';
 
+        const flags = resolveProjectFlags(topics);
+
         return {
           id: String(repo.id),
           name: repo.name.replace(/[-_]/g, ' '),
@@ -56,18 +58,24 @@ export async function getGitHubProjects(lang: Locale): Promise<Project[]> {
           homepage: repo.homepage,
           topics,
           technology: tech,
-          ...resolveProjectFlags(topics)
+          ...flags
         } as Project;
       })
       .filter((p: Project | null): p is Project => p !== null)
-      .sort((a, b) => {
-        // Tipagem explícita para os flags de ordenação
-        const featA = (a as any).isFirst ? -1 : (a as any).isFeatured ? -0.5 : 0;
-        const featB = (b as any).isFirst ? -1 : (b as any).isFeatured ? -0.5 : 0;
+      .sort((a: Project, b: Project) => {
+        // Tipagem explícita dos parâmetros e das propriedades estendidas
+        const aAny = a as any;
+        const bAny = b as any;
+
+        const featA = aAny.isFirst ? -1 : aAny.isFeatured ? -0.5 : 0;
+        const featB = bAny.isFirst ? -1 : bAny.isFeatured ? -0.5 : 0;
 
         if (featA !== featB) return featA - featB;
         
-        return TECH_ORDER.indexOf(a.technology.id) - TECH_ORDER.indexOf(b.technology.id);
+        const indexA = TECH_ORDER.indexOf(a.technology.id);
+        const indexB = TECH_ORDER.indexOf(b.technology.id);
+        
+        return indexA - indexB;
       });
   } catch (e) {
     console.error('[GitHub] Error fetching projects:', e);
