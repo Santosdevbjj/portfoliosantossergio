@@ -28,7 +28,6 @@ export interface AnalyticsEvent {
 
 /**
  * Extensão do objeto Window para suporte aos SDKs de terceiros.
- * Evita o uso de 'any' e melhora o IntelliSense.
  */
 declare global {
   interface Window {
@@ -58,30 +57,40 @@ declare global {
 
 /**
  * Recupera as preferências de consentimento diretamente do navegador.
- * Executa apenas no Client-side.
+ * Executa apenas no Client-side com proteções robustas contra falhas.
  */
 function getActiveConsent(): ConsentPreferences {
-  // Se estiver no servidor, retorna o padrão restritivo
-  if (typeof document === 'undefined') return DEFAULT_CONSENT;
+  // 1. Proteção absoluta contra execução no Servidor (SSR)
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return DEFAULT_CONSENT;
+  }
 
   try {
     const cookies = document.cookie.split('; ');
     const consentRow = cookies.find((row) => row.startsWith(`${CONSENT_COOKIE_NAME}=`));
 
-    if (!consentRow) return DEFAULT_CONSENT;
+    // 2. Se o cookie não existir ou for inválido, retorna padrão sem erro
+    if (!consentRow || !consentRow.includes('=')) {
+      return DEFAULT_CONSENT;
+    }
 
-    // CORREÇÃO: Pegamos a parte após o '=' e garantimos que não é undefined
-    const parts = consentRow.split('=');
-    const value = parts[1];
-
+    const value = consentRow.split('=')[1];
     if (!value) return DEFAULT_CONSENT;
 
-    const rawValue = decodeURIComponent(value);
+    const rawValue = decodeURIComponent(value).trim();
+
+    // 3. Verificação pré-parse: se não parecer um objeto JSON, aborta
+    if (!rawValue.startsWith('{') || !rawValue.endsWith('}')) {
+      return DEFAULT_CONSENT;
+    }
+
     const parsedValue = JSON.parse(rawValue);
 
+    // 4. Valida a estrutura através da lib/consent
     return getSafeConsent(parsedValue);
   } catch (error) {
-    console.warn('[Analytics] Erro ao ler cookie de consentimento, usando padrão.', error);
+    // 5. Fallback silencioso: o site continua funcionando mesmo se o cookie falhar
+    console.error('[Analytics] Erro crítico ao processar consentimento:', error);
     return DEFAULT_CONSENT;
   }
 }
@@ -98,27 +107,32 @@ export function track({ name, props }: AnalyticsEvent): void {
   // Proteção contra execução no servidor
   if (typeof window === 'undefined') return;
 
-  // Verificação de soberania do usuário (LGPD)
-  const consent = getActiveConsent();
-  if (!consent.analytics) {
-    return;
-  }
+  try {
+    // Verificação de soberania do usuário (LGPD)
+    const consent = getActiveConsent();
+    if (!consent.analytics) {
+      return;
+    }
 
-  // Sanitização de propriedades para evitar envio de dados sensíveis vazios
-  const eventProps = props || {};
+    // Sanitização de propriedades
+    const eventProps = props || {};
 
-  /* 1. Google Analytics (gtag.js) */
-  if (typeof window.gtag === 'function') {
-    window.gtag('event', name, eventProps);
-  }
+    /* 1. Google Analytics (gtag.js) */
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', name, eventProps);
+    }
 
-  /* 2. Plausible Analytics */
-  if (typeof window.plausible === 'function') {
-    window.plausible(name, { props: eventProps });
-  }
+    /* 2. Plausible Analytics */
+    if (typeof window.plausible === 'function') {
+      window.plausible(name, { props: eventProps });
+    }
 
-  /* 3. PostHog */
-  if (typeof window.posthog?.capture === 'function') {
-    window.posthog.capture(name, eventProps);
+    /* 3. PostHog */
+    if (typeof window.posthog?.capture === 'function') {
+      window.posthog.capture(name, eventProps);
+    }
+  } catch (trackError) {
+    // Garante que uma falha no rastreio não interrompa a experiência do usuário
+    console.warn('[Analytics] Falha ao disparar evento:', name, trackError);
   }
 }
