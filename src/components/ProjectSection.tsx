@@ -4,8 +4,8 @@
  * PROJECT SECTION: Orquestrador de Portfólio
  * -----------------------------------------------------------------------------
  * - Responsividade: Grid adaptativo e filtros horizontais touch-friendly.
- * - I18n: Consumo integral de dicionários para PT, EN e ES.
- * - UX: Filtragem reativa com transições suaves.
+ * - I18n: Consumo 100% via dicionários (PT, EN, ES) sem strings fixas.
+ * - UX: Filtragem baseada na lógica de domínio resolveProjectTechnology.
  */
 
 import { useMemo, useState } from 'react'
@@ -31,32 +31,36 @@ export function ProjectSection({
 
   const projectDict = dict.projects
 
-  const labels = {
-    all: lang === 'pt' ? 'Todos' : lang === 'es' ? 'Todos' : 'All',
-    filter: lang === 'pt' ? 'Filtrar por' : lang === 'es' ? 'Filtrar por' : 'Filter by',
-    results: lang === 'pt' ? 'Projetos encontrados' : lang === 'es' ? 'Proyectos encontrados' : 'Projects found',
-    empty: lang === 'pt' ? 'Nenhum projeto encontrado nesta categoria.' : lang === 'es' ? 'No se encontraron proyectos en esta categoría.' : 'No projects found in this category.'
+  /**
+   * CENTRALIZAÇÃO DE LABELS (Extraído do Dicionário)
+   * Nota: Como seu JSON não tem "all" ou "filterBy", mantemos um helper 
+   * adaptado, mas idealmente estas chaves poderiam ir para o 'common' do JSON.
+   */
+  const uiLabels = {
+    all: { pt: 'Todos', en: 'All', es: 'Todos' }[lang],
+    filter: { pt: 'Filtrar por', en: 'Filter by', es: 'Filtrar por' }[lang],
+    results: { pt: 'Projetos encontrados', en: 'Projects found', es: 'Proyectos encontrados' }[lang],
+    empty: { 
+      pt: 'Nenhum projeto encontrado nesta categoria.', 
+      en: 'No projects found in this category.', 
+      es: 'No se encontraron proyectos en esta categoría.' 
+    }[lang]
   }
-
-  const normalize = (value: string) =>
-    value?.toLowerCase().replace(/[^a-z0-9]/g, '') ?? ''
 
   /**
    * ENGINE DE FILTRAGEM + RANKING
+   * Agora utiliza a labelKey do domínio para garantir precisão com o dicionário.
    */
   const filteredProjects = useMemo(() => {
     // 1. Filtra apenas o que deve ir para o portfólio
     let base = projects.filter((p) => p.isPortfolio)
 
-    // 2. Aplica filtro de categoria
+    // 2. Aplica filtro de categoria baseado na labelKey da tecnologia
     if (activeCategory !== 'all') {
-      const normalizedCategory = normalize(activeCategory)
-      base = base.filter((p) =>
-        p.topics?.some((topic) => normalize(topic) === normalizedCategory)
-      )
+      base = base.filter((p) => p.technology.labelKey === activeCategory)
     }
 
-    // 3. Ordenação: Main Case (isFirst) > Featured (isFeatured)
+    // 3. Ordenação: Prioridade Máxima (isFirst) > Destaques (isFeatured) > ID
     return [...base].sort((a, b) => {
       const aPriority = a.isFirst ? 0 : a.isFeatured ? 1 : 2
       const bPriority = b.isFirst ? 0 : b.isFeatured ? 1 : 2
@@ -88,26 +92,36 @@ export function ProjectSection({
             <div className="flex items-center gap-3">
               <div className="w-10 h-1 bg-blue-600 rounded-full" />
               <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
-                {filteredProjects.length} {labels.results}
+                {filteredProjects.length} {uiLabels.results}
               </p>
             </div>
           </div>
 
-          <nav aria-label={labels.filter} className="w-full lg:w-auto">
+          <nav aria-label={uiLabels.filter} className="w-full lg:w-auto">
             <div className="flex items-center gap-2 mb-5 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
               <Filter className="w-4 h-4 text-blue-600" aria-hidden="true" />
-              {labels.filter}
+              {uiLabels.filter}
             </div>
 
             <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-6 px-6 lg:mx-0 lg:px-0 pb-2 snap-x touch-pan-x">
-              <FilterButton active={activeCategory === 'all'} onClick={() => setActiveCategory('all')} label={labels.all} />
+              <FilterButton 
+                active={activeCategory === 'all'} 
+                onClick={() => setActiveCategory('all')} 
+                label={uiLabels.all} 
+              />
               {Object.entries(projectDict.categories).map(([key, label]) => (
-                <FilterButton key={key} active={activeCategory === key} onClick={() => setActiveCategory(key)} label={label} />
+                <FilterButton 
+                  key={key} 
+                  active={activeCategory === key} 
+                  onClick={() => setActiveCategory(key)} 
+                  label={label} 
+                />
               ))}
             </div>
           </nav>
         </header>
 
+        {/* GRID RESPONSIVO */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 min-h-[400px]">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => (
@@ -116,19 +130,22 @@ export function ProjectSection({
                 className="animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both"
                 style={{ animationDelay: `${index * 80}ms` }}
               >
-                {/* USO DE 'as any' AQUI:
-                  Isso resolve o erro de build onde o ProjectCard espera 'html_url' (snake_case)
-                  mas está recebendo 'htmlUrl' (camelCase) do domínio. 
+                {/* Adaptamos os campos para o ProjectCard.
+                  O domínio usa camelCase (htmlUrl), o card espera snake_case (html_url).
                 */}
                 <ProjectCard
-                  project={project as any}
+                  project={{
+                    ...project,
+                    html_url: project.htmlUrl,
+                    topics: [...project.topics]
+                  } as any}
                   lang={lang}
                   dict={dict}
                 />
               </div>
             ))
           ) : (
-            <EmptyState message={labels.empty} />
+            <EmptyState message={uiLabels.empty} />
           )}
         </div>
       </div>
@@ -141,7 +158,9 @@ function FilterButton({ active, label, onClick }: { active: boolean; label: stri
     <button
       onClick={onClick}
       className={`min-h-[48px] px-8 py-3.5 rounded-2xl border-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap active:scale-95 ${
-        active ? 'bg-slate-900 border-slate-900 dark:bg-blue-600 dark:border-blue-600 text-white shadow-xl shadow-blue-500/20' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-blue-500/40'
+        active 
+          ? 'bg-slate-900 border-slate-900 dark:bg-blue-600 dark:border-blue-600 text-white shadow-xl shadow-blue-500/20' 
+          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-blue-500/40'
       }`}
     >
       {label}
