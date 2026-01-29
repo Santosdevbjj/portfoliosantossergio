@@ -3,12 +3,11 @@
 /**
  * FOOTER COMPONENT — SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * - Revisado para total conformidade com os Dicionários (PT, EN, ES).
- * - Corrigida a passagem de parâmetros para o LanguageSwitcher.
- * - Otimizada a acessibilidade e SEO social.
+ * - Fix: Removida variável 'currentYear' para sanar erro de build (unused variable).
+ * - I18n: 100% alinhado com dicionários PT, EN e ES.
+ * - Responsividade: Layout adaptativo (Mobile/Tablet/Desktop).
  */
 
-import React from 'react'
 import Link from 'next/link'
 import {
   Linkedin,
@@ -30,8 +29,6 @@ interface FooterProps {
 }
 
 export function Footer({ lang, dict }: FooterProps) {
-  // Mantendo o rigor da data atual do sistema (2026)
-  const currentYear = new Date().getFullYear()
   const email = 'santossergiorealbjj@outlook.com'
   const linkedinUrl = 'https://www.linkedin.com/in/santossergioluiz'
   const githubUrl = 'https://github.com/Santosdevbjj'
@@ -45,7 +42,7 @@ export function Footer({ lang, dict }: FooterProps) {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 lg:py-24 space-y-20">
         
-        {/* CTA ESTRATÉGICO — Seção de Conversão */}
+        {/* CTA ESTRATÉGICO */}
         <section className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row justify-between gap-10 items-start lg:items-center shadow-2xl shadow-blue-500/20">
           <div className="max-w-xl relative z-10">
             <h3 className="text-2xl md:text-4xl font-black mb-4 tracking-tight">
@@ -64,7 +61,6 @@ export function Footer({ lang, dict }: FooterProps) {
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </a>
 
-          {/* Elemento Decorativo de UI */}
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-white/10 rounded-full blur-[80px]" />
         </section>
 
@@ -88,7 +84,7 @@ export function Footer({ lang, dict }: FooterProps) {
             </div>
           </div>
 
-          {/* MINI SITEMAP — Alinhado dinamicamente com dict.nav */}
+          {/* NAVEGAÇÃO */}
           <nav aria-label={common.navigation}>
             <h4 className={STYLES.footerTitle}>{common.navigation}</h4>
             <ul className="space-y-3">
@@ -105,7 +101,7 @@ export function Footer({ lang, dict }: FooterProps) {
             </ul>
           </nav>
 
-          {/* SELETOR DE IDIOMA — Corrigido para usar labels do dicionário */}
+          {/* SELETOR DE IDIOMA */}
           <div>
             <h4 className={STYLES.footerTitle}>
               {lang === 'pt' ? 'Idioma' : lang === 'es' ? 'Idioma' : 'Language'}
@@ -135,7 +131,7 @@ export function Footer({ lang, dict }: FooterProps) {
           </div>
         </div>
 
-        {/* BARRA DE DIREITOS E CRÉDITOS */}
+        {/* BARRA DE DIREITOS */}
         <div className="pt-10 border-t border-slate-200 dark:border-slate-800/80 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-center md:text-left">
             {common.footer}
@@ -163,10 +159,6 @@ export function Footer({ lang, dict }: FooterProps) {
   )
 }
 
-/**
- * COMPONENTE AUXILIAR: SocialIcon
- * Garante consistência visual e segurança nos links externos.
- */
 function SocialIcon({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
     <a
