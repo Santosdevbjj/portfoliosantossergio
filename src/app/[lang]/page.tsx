@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * MAIN PAGE COMPONENT - REVISÃO TYPINGS
+ * MAIN PAGE COMPONENT - REVISÃO FINAL DE INTEGRAÇÃO
  * -----------------------------------------------------------------------------
- * - Fix: Adicionado 'dict' e 'projects' ao FeaturedProjectsSection para satisfazer o TS.
- * - I18n: Integração total com dicionários.
- * - Zero Import React.
+ * - Responsividade: Estrutura com max-w-7xl e paddings adaptativos.
+ * - I18n: Suporte total a PT, EN, ES via dicionários JSON.
+ * - Alinhamento: Sincronização entre GitHub Data e Featured Configuration.
  */
 
 import { useState, useEffect, Suspense } from 'react'
@@ -21,6 +21,8 @@ import { HeroSection } from '@/components/HeroSection'
 import { Navbar } from '@/components/Navbar'
 import { PageWrapper } from '@/components/PageWrapper'
 import { ProjectSection } from '@/components/ProjectSection'
+
+// Importação Nomeada para evitar erro de build no Turbopack
 import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection'
 
 // Lógica e i18n
@@ -29,8 +31,8 @@ import { i18n } from '@/i18n-config'
 import { getGitHubProjects } from '@/lib/github'
 import type { Project } from '@/domain/projects'
 
-// Import dos dados estáticos para os projetos em destaque
-import { featuredProjects } from '@/components/featured/projects.data'
+// Importação da configuração de destaque (Usando o nome exato do seu export)
+import { featuredConfig } from '@/components/featured/projects.data'
 
 interface PageProps {
   params: { lang: string }
@@ -38,7 +40,7 @@ interface PageProps {
 
 export default function Page({ params }: PageProps) {
   const [isClient, setIsClient] = useState(false)
-  const [githubProjects, setGithubProjects] = useState<Project[]>([])
+  const [allProjects, setAllProjects] = useState<Project[]>([])
   
   const lang = params.lang as SupportedLocale
 
@@ -48,7 +50,7 @@ export default function Page({ params }: PageProps) {
     async function loadData() {
       try {
         const data = await getGitHubProjects(lang)
-        setGithubProjects(data || [])
+        setAllProjects(data || [])
       } catch (error) {
         console.error("Falha ao carregar repositórios do GitHub:", error)
       }
@@ -56,12 +58,18 @@ export default function Page({ params }: PageProps) {
     loadData()
   }, [lang])
 
+  // Validação de localidade (PT, EN, ES)
   if (!i18n.locales.includes(lang as any)) {
     notFound()
   }
 
   const dict = getDictionarySync(lang)
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
+
+  // Separação dos projetos: Destaques (configurados) vs Restante
+  const featuredIds = featuredConfig.map(f => f.id)
+  const featuredProjects = allProjects.filter(p => featuredIds.includes(p.name))
+  const remainingProjects = allProjects.filter(p => !featuredIds.includes(p.name))
 
   if (!isClient) {
     return <div className="min-h-screen bg-white dark:bg-[#020617]" aria-hidden="true" />
@@ -91,7 +99,7 @@ export default function Page({ params }: PageProps) {
           <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
             <div className="space-y-24">
               
-              {/* CORREÇÃO AQUI: Passando dict e projects para o FeaturedProjectsSection */}
+              {/* Projetos em Destaque: Filtrados dinamicamente com base no featuredConfig */}
               <Suspense fallback={<div className="h-96 w-full animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800/50" />}>
                 <FeaturedProjectsSection 
                   lang={lang} 
@@ -100,8 +108,9 @@ export default function Page({ params }: PageProps) {
                 />
               </Suspense>
               
+              {/* Repositório Geral (GitHub) */}
               <div className="pt-12 border-t border-slate-200 dark:border-slate-800">
-                 <ProjectSection projects={githubProjects} lang={lang} dict={dict} />
+                 <ProjectSection projects={remainingProjects} lang={lang} dict={dict} />
               </div>
             </div>
           </section>
