@@ -3,9 +3,9 @@
 /**
  * LANGUAGE & THEME SWITCHER
  * -----------------------------------------------------------------------------
- * - Fix: Adicionada prop 'currentLang' para eliminar erro de build na Vercel.
- * - Responsividade: Glassmorphism otimizado para toque e visual mobile.
- * - Multilingue: Suporte para PT, EN, ES integrado ao i18n-config.
+ * - Responsividade: Layout inline-flex auto-ajustável.
+ * - Multilingue: PT, EN, ES com persistência via cookies.
+ * - Fix: Resolvido erro de mapeamento de tipos 'readonly' da Vercel.
  */
 
 import { useEffect, useState, Suspense } from 'react'
@@ -37,7 +37,7 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
     document.cookie = `${LOCALE_COOKIE}=${locale}; path=${LOCALE_COOKIE_OPTIONS.path}; max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}`
   }
 
-  // Alinhado com o suporte multilingue para labels de acessibilidade
+  // Labels dinâmicos baseados no dicionário de idiomas suportados
   const accessibilityLabels = {
     pt: { dark: 'Ativar modo escuro', light: 'Ativar modo claro', config: 'Configurações' },
     en: { dark: 'Toggle dark mode', light: 'Toggle light mode', config: 'Settings' },
@@ -46,14 +46,17 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
 
   if (!mounted) {
     return (
-      <div className="h-12 w-40 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl" />
+      <div className="h-10 w-40 bg-slate-200/20 dark:bg-slate-800/20 animate-pulse rounded-2xl" />
     )
   }
+
+  // SOLUÇÃO DO ERRO VERCEL: Convertendo explicitamente para um array mutável de Locales
+  const availableLocales = Array.from(i18n.locales) as Locale[]
 
   return (
     <nav
       aria-label={accessibilityLabels.config}
-      className="inline-flex items-center gap-1 p-1.5 bg-white/40 dark:bg-slate-950/40 backdrop-blur-2xl rounded-2xl border border-slate-200/50 dark:border-white/10 shadow-xl transition-all duration-300"
+      className="inline-flex items-center gap-1 p-1 bg-white/40 dark:bg-slate-950/40 backdrop-blur-2xl rounded-2xl border border-slate-200/50 dark:border-white/10 shadow-xl"
     >
       {/* TOGGLE TEMA */}
       <button
@@ -61,24 +64,24 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
         type="button"
         title={isDark ? accessibilityLabels.light : accessibilityLabels.dark}
         aria-label={isDark ? accessibilityLabels.light : accessibilityLabels.dark}
-        className="group w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all"
+        className="group w-8 h-8 flex items-center justify-center rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all"
       >
         {isDark ? (
-          <Sun className="w-4 h-4 text-amber-500 group-hover:rotate-45 transition-transform" />
+          <Sun className="w-3.5 h-3.5 text-amber-500 group-hover:rotate-45 transition-transform" />
         ) : (
-          <Moon className="w-4 h-4 text-blue-600 group-hover:-rotate-12 transition-transform" />
+          <Moon className="w-3.5 h-3.5 text-blue-600 group-hover:-rotate-12 transition-transform" />
         )}
       </button>
 
-      <div className="w-px h-5 bg-slate-300/50 dark:bg-slate-700/50 mx-1" aria-hidden="true" />
+      <div className="w-px h-4 bg-slate-300/50 dark:bg-slate-700/50 mx-0.5" aria-hidden="true" />
 
       {/* SELETOR DE IDIOMA */}
-      <div className="flex items-center gap-1">
-        {(i18n.locales as Locale[]).map((locale) => {
+      <div className="flex items-center gap-0.5">
+        {availableLocales.map((locale) => {
           const isActive = currentLang === locale
           const meta = localeMetadata[locale]
 
-          // Geração de URL robusta para troca de idioma
+          // Lógica de URL para troca de idioma
           const segments = pathname?.split('/') || []
           const newSegments = [...segments]
           
@@ -100,7 +103,7 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
               prefetch={false}
               onClick={() => writeLocaleCookie(locale)}
               className={`
-                relative px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-300
+                relative px-2.5 py-1.5 text-[10px] font-black uppercase tracking-tighter rounded-xl transition-all duration-300
                 ${isActive 
                   ? 'text-white' 
                   : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400'
@@ -110,7 +113,7 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
               <span className="relative z-10">{meta.label}</span>
               {isActive && (
                 <span 
-                  className="absolute inset-0 bg-blue-600 rounded-xl z-0 shadow-lg shadow-blue-500/30" 
+                  className="absolute inset-0 bg-blue-600 rounded-xl z-0 shadow-md shadow-blue-500/20" 
                   aria-hidden="true" 
                 />
               )}
@@ -125,7 +128,7 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
 export function LanguageSwitcher({ currentLang }: LanguageSwitcherProps) {
   return (
     <Suspense fallback={
-      <div className="h-12 w-44 bg-slate-200/10 dark:bg-slate-800/10 rounded-2xl animate-pulse border border-transparent" />
+      <div className="h-10 w-44 bg-slate-200/10 dark:bg-slate-800/10 rounded-2xl animate-pulse" />
     }>
       <LanguageSwitcherContent currentLang={currentLang} />
     </Suspense>
