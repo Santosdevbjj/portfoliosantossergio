@@ -1,42 +1,49 @@
 /**
- * DATA LAYER — Featured Projects Enrichment
+ * DATA LAYER — Featured Projects Configuration
  * -----------------------------------------------------------------------------
- * Este arquivo enriquece os dados vindos da API do GitHub.
- * As traduções reais (títulos e descrições) devem ser movidas para o dicionário JSON
- * para manter a consistência com o restante do sistema.
+ * Este arquivo define quais repositórios do GitHub serão destacados no Bento Grid.
+ * * FOCO:
+ * - Mantém a lógica de exibir apenas 3 projetos de elite.
+ * - Alinhado com o dicionário: As chaves de tradução são resolvidas no componente.
+ * - Sem erros de build: Removidos imports não utilizados.
  */
-
-import { SupportedLocale } from '@/dictionaries'
 
 export type ProjectSize = 'lg' | 'md'
 
 export interface ProjectEnrichment {
-  readonly id: string // Deve ser exatamente o nome do repositório no GitHub
+  /** * ID: Deve ser exatamente o nome do repositório no GitHub 
+   * Ex: 'analise-riscos'
+   */
+  readonly id: string 
   readonly size: ProjectSize
   readonly featured: boolean
   
-  /** * Detalhes narrativos (Opcional)
-   * As chaves apontam para o caminho no dicionário JSON: projects.details.[id].problem
+  /** * SEO & UX: Indica se o projeto deve ter uma página de detalhes expandida
+   * ou se apenas o card com link para o GitHub é suficiente.
    */
   readonly hasExtendedDetails: boolean
 }
 
 /**
  * CONFIGURAÇÃO DOS TOP 3 PROJETOS
- * Aqui definimos apenas a estrutura visual e quais IDs são elite.
+ * -----------------------------------------------------------------------------
+ * Seleção estratégica para o Bento Grid:
+ * 1. Ocupa 2 colunas (lg) - O projeto de maior impacto.
+ * 2. Ocupa 1 coluna (md)  - Segundo projeto.
+ * 3. Ocupa 1 coluna (md)  - Terceiro projeto.
  */
 export const featuredConfig: ProjectEnrichment[] = [
   {
-    id: 'analiseRiscosAtrasoObras',
+    id: 'portfoliosantossergio', // Nome exato do repositório principal
     size: 'lg',
     featured: true,
     hasExtendedDetails: true
   },
   {
-    id: 'genAIpipeETLPython',
+    id: 'genAIpipeETLPython', 
     size: 'md',
     featured: true,
-    hasExtendedDetails: true
+    hasExtendedDetails: false
   },
   {
     id: 'analiseDadosNaPratica',
@@ -47,7 +54,8 @@ export const featuredConfig: ProjectEnrichment[] = [
 ]
 
 /**
- * Helper para verificar se um projeto vindo do GitHub é um dos nossos escolhidos
+ * HELPER: getProjectConfig
+ * Filtra e retorna a configuração visual para um repositório específico.
  */
 export const getProjectConfig = (repoName: string): ProjectEnrichment | undefined => {
   return featuredConfig.find(config => config.id === repoName)
