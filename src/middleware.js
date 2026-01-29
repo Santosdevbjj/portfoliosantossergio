@@ -1,10 +1,3 @@
-/**
- * PROXY (Edge Middleware) — Next.js 16
- * Função única e segura:
- * - Redirecionar "/" para o idioma detectado (pt | en | es)
- * - NÃO interferir no App Router, RSC ou hydration
- */
-
 import { NextRequest, NextResponse } from 'next/server'
 import Negotiator from 'negotiator'
 import { match as matchLocale } from '@formatjs/intl-localematcher'
@@ -32,23 +25,22 @@ function detectLocale(request: NextRequest): Locale {
   ) as Locale
 }
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // 👉 Intercepta SOMENTE a raiz
+  // Só intercepta a raiz
   if (pathname !== '/') {
     return NextResponse.next()
   }
 
   const locale = detectLocale(request)
-
   const url = new URL(`/${locale}`, request.url)
 
   const response = NextResponse.redirect(url, 307)
 
   response.cookies.set(LOCALE_COOKIE_NAME, locale, {
     path: '/',
-    maxAge: 60 * 60 * 24 * 365, // 1 ano
+    maxAge: 60 * 60 * 24 * 365,
   })
 
   return response
