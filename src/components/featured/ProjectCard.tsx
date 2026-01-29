@@ -3,13 +3,12 @@
 /**
  * FEATURED PROJECT CARD
  * -----------------------------------------------------------------------------
- * - UI: Glassmorphism técnico com foco em legibilidade.
- * - I18n: Sincronizado com as chaves de categoria (dataScience, cloud, etc).
- * - SEO: Atributos microdata (itemProp) para SoftwareApplication.
- * - Sintonia: Perfeito para o Bento Grid do FeaturedGrid.tsx.
+ * - Fix: Uso de tag <a> para links externos, eliminando erro de tipagem do Next.js.
+ * - Responsividade: Layout adaptativo para mobile (p-6) e desktop (p-10).
+ * - I18n: Sincronizado com pt.json, en.json e es.json através do dict.projects.
+ * - SEO: Microdata SoftwareApplication para melhor indexação de projetos técnicos.
  */
 
-import Link from 'next/link'
 import { Github, ArrowRight, ExternalLink } from 'lucide-react'
 import type { Project } from '@/domain/projects'
 import type { SupportedLocale } from '@/dictionaries'
@@ -21,12 +20,12 @@ interface ProjectCardProps {
   readonly dict: Dictionary
 }
 
-export default function ProjectCard({ project, lang, dict }: ProjectCardProps) {
-  // Acesso seguro ao dicionário de projetos
+export default function ProjectCard({ project, dict }: ProjectCardProps) {
+  // Acesso seguro ao dicionário de projetos definido em src/types/dictionary.ts
   const { projects: projectDict } = dict
   
-  // Resolve a categoria traduzida usando o labelKey vindo do domínio
-  // Se a chave não existir, faz o fallback para a categoria geral
+  // Resolve a categoria traduzida usando o labelKey vindo do domínio (src/domain/projects.ts)
+  // Mapeia chaves como 'dataScience', 'cloud', 'graphs' para as traduções nos JSONs
   const categoryLabel = 
     projectDict.categories[project.technology.labelKey as keyof typeof projectDict.categories] || 
     projectDict.categories.dataScience
@@ -35,8 +34,8 @@ export default function ProjectCard({ project, lang, dict }: ProjectCardProps) {
     <article
       className="
         group relative flex h-full flex-col overflow-hidden
-        rounded-[2rem] border border-slate-200/5
-        bg-slate-950/40 backdrop-blur-md p-8 sm:p-10
+        rounded-[2rem] border border-slate-200/10
+        bg-slate-950/40 backdrop-blur-md p-6 sm:p-10
         transition-all duration-500
         hover:border-blue-500/30 hover:bg-slate-900/50
         hover:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)]
@@ -44,10 +43,10 @@ export default function ProjectCard({ project, lang, dict }: ProjectCardProps) {
       itemScope
       itemType="https://schema.org/SoftwareApplication"
     >
-      {/* Efeito Visual: Gradiente de profundidade no topo */}
+      {/* Detalhe estético: Brilho superior no hover */}
       <div className="absolute inset-x-0 -top-px h-px w-full bg-gradient-to-r from-transparent via-blue-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-      {/* HEADER: Tags e Links de Ação Rápida */}
+      {/* HEADER: Tags de Tecnologia e Ícones */}
       <header className="relative z-10 flex flex-col gap-5">
         <div className="flex items-center justify-between">
           <span className="
@@ -80,7 +79,7 @@ export default function ProjectCard({ project, lang, dict }: ProjectCardProps) {
         </p>
       </header>
 
-      {/* TECH STACK: Tópicos extraídos do GitHub */}
+      {/* TECH STACK: Tópicos extraídos do array de topics do domínio */}
       <div className="mt-8 relative z-10 flex-grow">
         <ul className="flex flex-wrap gap-2" aria-label="Tecnologias utilizadas">
           {project.topics.slice(0, 5).map((topic) => (
@@ -100,9 +99,9 @@ export default function ProjectCard({ project, lang, dict }: ProjectCardProps) {
         </ul>
       </div>
 
-      {/* FOOTER: Botão de Chamada (Sincronizado com Dicionário) */}
+      {/* FOOTER: Botão de Ação - FIX: Usando tag <a> para evitar erro de build */}
       <footer className="mt-10 relative z-10">
-        <Link
+        <a
           href={project.htmlUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -123,10 +122,10 @@ export default function ProjectCard({ project, lang, dict }: ProjectCardProps) {
             </span>
           </span>
           <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover/btn:translate-x-2" />
-        </Link>
+        </a>
       </footer>
 
-      {/* Camada de Interação de Background */}
+      {/* Overlay de gradiente sutil ao passar o mouse */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     </article>
   )
