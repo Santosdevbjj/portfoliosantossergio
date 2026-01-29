@@ -5,9 +5,10 @@
  * -----------------------------------------------------------------------------
  * Gerencia a lógica de Dark Mode, Light Mode e Sincronização com o Sistema.
  * Persistência dupla: LocalStorage (Cliente) + Cookies (SSR Friendly).
+ * * FOCO: Eliminar erro de build da Vercel (Unused React import).
  */
 
-import React, {
+import {
   createContext,
   useContext,
   useEffect,
@@ -42,7 +43,7 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
 /* PROVIDER                                                                   */
 /* -------------------------------------------------------------------------- */
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+export function ThemeProvider({ children }: { readonly children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>('system')
   const [isDark, setIsDark] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -53,7 +54,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (typeof window === 'undefined') return
 
     const root = document.documentElement
-    // Toggle da classe .dark para Tailwind
+    // Toggle da classe .dark para Tailwind (essencial para responsividade visual)
     root.classList.toggle('dark', dark)
     // Ajuste da cor da barra de status e scrollbars nativas
     root.style.colorScheme = dark ? 'dark' : 'light'
@@ -66,20 +67,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       if (typeof window === 'undefined') return 'system'
       
       try {
-        // Prioridade 1: LocalStorage (Preferência explícita do usuário)
         const stored = localStorage.getItem('theme')
         if (stored === 'light' || stored === 'dark' || stored === 'system') {
           return stored
         }
 
-        // Prioridade 2: Cookies (Útil para o servidor Next.js ler antes do render)
         const cookieTheme = document.cookie
           .split('; ')
           .find((row) => row.startsWith('theme='))
           ?.split('=')[1]
 
         if (cookieTheme === 'light' || cookieTheme === 'dark' || cookieTheme === 'system') {
-          return cookieTheme
+          return cookieTheme as Theme
         }
       } catch (e) {
         console.warn('[ThemeContext] Erro ao ler armazenamento:', e)
@@ -103,7 +102,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   /* ----------------------- System Theme Sync ---------------------------- */
 
   useEffect(() => {
-    // Só sincroniza se o usuário estiver no modo 'system'
     if (!mounted || theme !== 'system') return
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
@@ -114,13 +112,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
 
     mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
+    return () => { mediaQuery.removeEventListener('change', handler) }
   }, [theme, mounted, applyToDOM])
 
   /* ----------------------- Persistence ---------------------------------- */
 
   const saveTheme = useCallback(
     (newTheme: Theme) => {
+      if (typeof window === 'undefined') return
+
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
       const shouldBeDark =
         newTheme === 'dark' ||
@@ -131,14 +131,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       applyToDOM(shouldBeDark)
 
       try {
-        // Persiste no LocalStorage
         if (newTheme === 'system') {
           localStorage.removeItem('theme')
         } else {
           localStorage.setItem('theme', newTheme)
         }
 
-        // Persiste no Cookie para o Middleware/SSR
         const isSecure = window.location.protocol === 'https:' ? 'Secure;' : ''
         document.cookie = `theme=${newTheme}; path=/; max-age=31536000; SameSite=Lax; ${isSecure}`
       } catch (e) {
@@ -151,21 +149,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   /* ----------------------- Public API ----------------------------------- */
 
   const toggleTheme = useCallback(
-    () => saveTheme(isDark ? 'light' : 'dark'),
+    () => { saveTheme(isDark ? 'light' : 'dark') },
     [isDark, saveTheme]
   )
 
   const applyTheme = useCallback(
-    (newTheme: Theme) => saveTheme(newTheme),
+    (newTheme: Theme) => { saveTheme(newTheme) },
     [saveTheme]
   )
 
   const resetTheme = useCallback(
-    () => saveTheme('system'),
+    () => { saveTheme('system') },
     [saveTheme]
   )
 
-  // Memoização do valor do contexto para evitar re-renders desnecessários
   const value = useMemo(() => ({
     theme,
     isDark,
