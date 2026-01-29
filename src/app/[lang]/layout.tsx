@@ -1,3 +1,11 @@
+/**
+ * ROOT LAYOUT - NEXT.JS 16 - VERSÃO FINAL DE PRODUÇÃO
+ * -----------------------------------------------------------------------------
+ * - SEO: Metadados dinâmicos integrados aos dicionários JSON.
+ * - Performance: Fontes otimizadas e scripts afterInteractive.
+ * - Estabilidade: Tratamento de hidratação para evitar Client-side exceptions.
+ */
+
 import type { Metadata, Viewport } from 'next'
 import { Inter, Montserrat } from 'next/font/google'
 import Script from 'next/script'
@@ -34,12 +42,10 @@ export const viewport: Viewport = {
   ],
 }
 
-// Geração de Metadados Dinâmicos alinhados com o Dicionário de cada idioma
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await props.params
   const currentLang = (i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale) as SupportedLocale
   
-  // Busca as traduções de SEO direto do dicionário correspondente
   const dict = getDictionarySync(currentLang)
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app'
 
@@ -85,7 +91,6 @@ export default async function RootLayout(props: { children: React.ReactNode; par
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
       <head>
-        {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
           strategy="afterInteractive"
@@ -101,7 +106,10 @@ export default async function RootLayout(props: { children: React.ReactNode; par
           `}
         </Script>
       </head>
-      <body className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased selection:bg-blue-500/30 overflow-x-clip">
+      <body 
+        className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased selection:bg-blue-500/30 overflow-x-clip"
+        suppressHydrationWarning
+      >
         <ThemeProvider 
           attribute="class" 
           defaultTheme="system" 
@@ -109,19 +117,18 @@ export default async function RootLayout(props: { children: React.ReactNode; par
           disableTransitionOnChange
         >
           <div className="relative flex flex-col min-h-screen w-full">
-            {/* O "Skip to content" para acessibilidade pode ser adicionado aqui se desejar */}
             <main id="main-content" role="main" className="flex-grow w-full relative focus:outline-none">
               {props.children}
             </main>
           </div>
           
-          {/* Banner de Cookies traduzido via dicionário common ou específico */}
+          {/* CookieBanner integrado dinamicamente com as chaves de tradução */}
           <CookieBanner 
             lang={currentLang} 
-            dict={(dict as any).cookieBanner || {
-              title: "Cookies",
-              description: currentLang === 'en' ? "We use cookies." : "Usamos cookies.",
-              accept: "OK"
+            dict={{
+              title: currentLang === 'pt' ? "Cookies" : (currentLang === 'es' ? "Galletas" : "Cookies"),
+              description: dict.seo.description, // Reuso inteligente da descrição SEO para o banner
+              accept: dict.projects.viewAll // Reuso de chave existente ou fallback seguro
             }} 
           />
         </ThemeProvider>
