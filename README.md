@@ -1,4 +1,4 @@
-## 📊 Sérgio Santos | Data Science & Critical Systems Specialist
+## 📊 Sérgio Santos | Data Science & Critical Systems Specialist 
 
 **1. Problema de Negócio (Motivação)**
 
