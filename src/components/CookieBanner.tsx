@@ -3,9 +3,10 @@
 /**
  * COOKIE BANNER: Gestão de Consentimento e Privacidade
  * -----------------------------------------------------------------------------
- * - UI: Design flutuante responsivo com animações de entrada.
- * - I18n: Adaptado para suportar PT, EN e ES via dicionário.
- * - LGPD/GDPR: Persistência em LocalStorage e Cookies de sessão.
+ * - Fix: Renomeada constante interna para 'bannerI18n' para evitar conflito de build.
+ * - Fix: Tipagem explícita para eliminar erro de inferência circular.
+ * - Responsividade: Design mobile-first com breakpoints para desktop (bottom-right).
+ * - Multilingue: Suporte nativo a PT, EN e ES.
  */
 
 import { useEffect, useState, useCallback } from 'react';
@@ -24,9 +25,10 @@ export function CookieBanner({ lang, dict }: CookieBannerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
 
-  // Textos de Fallback caso não queira atualizar os JSONs agora
-  // Recomendo adicionar a chave "cookie" no seu Dictionary futuramente
-  const i18n = {
+  // Tipagem explícita para evitar o erro de 'implicitly has any type' do build
+  const bannerI18n: Record<SupportedLocale, { 
+    title: string; desc: string; nec: string; active: string; ana: string; all: string; save: string; 
+  }> = {
     pt: {
       title: "Privacidade e Cookies",
       desc: "Utilizamos cookies para melhorar sua experiência e analisar o tráfego do site.",
@@ -54,7 +56,9 @@ export function CookieBanner({ lang, dict }: CookieBannerProps) {
       all: "Aceptar Todo",
       save: "Guardar Preferencias"
     }
-  }[lang] || i18n.pt;
+  };
+
+  const content = bannerI18n[lang] || bannerI18n.pt;
 
   useEffect(() => {
     const hasConsent = localStorage.getItem(CONSENT_KEY);
@@ -73,7 +77,7 @@ export function CookieBanner({ lang, dict }: CookieBannerProps) {
     
     localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
     
-    const secure = window.location.protocol === 'https:' ? 'Secure;' : '';
+    const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'Secure;' : '';
     document.cookie = `${CONSENT_KEY}=${all ? 'all' : 'custom'}; path=/; max-age=31536000; SameSite=Lax; ${secure}`;
     
     setIsOpen(false);
@@ -91,73 +95,71 @@ export function CookieBanner({ lang, dict }: CookieBannerProps) {
         md:left-auto md:right-8 md:bottom-8 md:max-w-md
         bg-white/98 dark:bg-slate-900/98 backdrop-blur-md
         border border-slate-200 dark:border-slate-800
-        rounded-[2.5rem] p-6 shadow-2xl shadow-blue-500/20
+        rounded-[2rem] p-6 shadow-2xl shadow-blue-500/10
         animate-in slide-in-from-bottom-12 duration-700
       "
     >
       {/* HEADER */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="p-2.5 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-600/30">
-          <Cookie size={20} aria-hidden="true" />
+        <div className="p-2 bg-blue-600 rounded-xl text-white">
+          <Cookie size={18} aria-hidden="true" />
         </div>
-        <h2 id="cookie-heading" className="font-black text-xs uppercase tracking-[0.2em] text-slate-900 dark:text-white">
-          {i18n.title}
+        <h2 id="cookie-heading" className="font-bold text-xs uppercase tracking-widest text-slate-900 dark:text-white">
+          {content.title}
         </h2>
       </div>
 
       {/* DESCRIÇÃO */}
-      <p id="cookie-desc" className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6 font-medium">
-        {i18n.desc}
+      <p id="cookie-desc" className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+        {content.desc}
       </p>
 
       {/* PREFERÊNCIAS */}
-      <div className="space-y-3 mb-8">
-        <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+      <div className="space-y-2 mb-6">
+        <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
             <ShieldCheck size={14} className="text-green-500" />
-            {i18n.nec}
+            {content.nec}
           </span>
-          <span className="text-[10px] font-black uppercase text-slate-400">{i18n.active}</span>
+          <span className="text-[10px] font-bold uppercase text-slate-400">{content.active}</span>
         </div>
 
-        <label className="flex items-center justify-between p-3.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all cursor-pointer group">
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors group-hover:text-blue-600">
-            {i18n.ana}
+        <label className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+            {content.ana}
           </span>
-          <div className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={analyticsEnabled}
-              onChange={(e) => setAnalyticsEnabled(e.target.checked)}
-              className="w-5 h-5 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer transition-all"
-            />
-          </div>
+          <input
+            type="checkbox"
+            checked={analyticsEnabled}
+            onChange={(e) => setAnalyticsEnabled(e.target.checked)}
+            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+          />
         </label>
       </div>
 
       {/* BOTÕES DE AÇÃO */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col gap-2">
         <button
           onClick={() => handleSaveConsent(true)}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-xl shadow-blue-600/20"
+          className="w-full bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 text-white px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all active:scale-95"
         >
-          {i18n.all}
+          {content.all}
         </button>
         <button
           onClick={() => handleSaveConsent(false)}
-          className="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95"
+          className="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all active:scale-95"
         >
-          {i18n.save}
+          {content.save}
         </button>
       </div>
 
       {/* FECHAR RÁPIDO */}
       <button 
         onClick={() => setIsOpen(false)}
-        className="absolute top-5 right-5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-        aria-label="Fechar banner de cookies"
+        className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
+        aria-label={dict.common.closeMenu}
       >
-        <X size={20} />
+        <X size={18} />
       </button>
     </aside>
   );
