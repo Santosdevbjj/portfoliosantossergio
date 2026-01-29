@@ -4,11 +4,13 @@
  * HOOK: useScrollSpy
  * -----------------------------------------------------------------------------
  * Observa a visibilidade das seções no viewport e sincroniza com o ScrollSpyContext.
- * * Correção: Implementação de guards para evitar 'type never' no build da Vercel
- * e garantir que o código DOM só execute no cliente.
+ * * FOCO DA REVISÃO:
+ * 1. Remoção do import React (Evitar erro de build).
+ * 2. Proteção rigorosa contra acesso ao DOM no SSR (Evitar Client-side exception).
+ * 3. Sincronização lógica com os IDs definidos no domínio de navegação.
  */
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useScrollSpy as useScrollSpyContext } from '@/contexts/ScrollSpyContext'
 import { NavSection, NAV_HASH_MAP } from '@/domain/navigation'
 
@@ -17,24 +19,24 @@ export function useScrollSpyObserver(
   offset: number = 100
 ) {
   const { setActiveSection } = useScrollSpyContext()
+  // Usamos ref para evitar re-anexar listeners desnecessariamente
+  const sectionIdsRef = useRef(sectionIds)
 
   useEffect(() => {
-    // 1. Verificação fundamental: estamos no navegador?
-    if (typeof window === 'undefined') return
+    // 1. Guardião de Ambiente: Só executa no navegador
+    if (typeof window === 'undefined' || typeof document === 'undefined') return
 
-    // 2. Verificação de elementos: as seções existem?
-    const elements = sectionIds
+    const elements = sectionIdsRef.current
       .map(id => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null)
 
     if (elements.length === 0) return
 
-    // Variável para armazenar o observer e facilitar o cleanup
     let observerInstance: IntersectionObserver | null = null
 
-    /* -------------------------------------------------------------------------- */
-    /* DEFINIÇÃO DA LÓGICA DE ATUALIZAÇÃO                                         */
-    /* -------------------------------------------------------------------------- */
+    /**
+     * Sincroniza o ID do elemento DOM com a chave do dicionário/nav
+     */
     const updateActiveSection = (id: string) => {
       const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
         (key) => NAV_HASH_MAP[key] === `#${id}`
@@ -44,6 +46,9 @@ export function useScrollSpyObserver(
       }
     }
 
+    /**
+     * Fallback para navegadores que não suportam IntersectionObserver
+     */
     const handleScrollFallback = () => {
       const scrollPosition = window.scrollY + offset + 20
       for (let i = elements.length - 1; i >= 0; i--) {
@@ -55,16 +60,13 @@ export function useScrollSpyObserver(
       }
     }
 
-    /* -------------------------------------------------------------------------- */
-    /* EXECUÇÃO: INTERSECTION OBSERVER OU SCROLL LISTENER                         */
-    /* -------------------------------------------------------------------------- */
-    
-    // Checagem explícita para evitar o erro de 'never' na propriedade addEventListener
+    // Verificação de suporte à API moderna
     const hasIntersectionObserver = 'IntersectionObserver' in window
 
     if (hasIntersectionObserver) {
       observerInstance = new IntersectionObserver(
         (entries) => {
+          // Filtra apenas o que está entrando na tela, pegando o mais próximo do topo
           const visibleEntries = entries
             .filter((entry) => entry.isIntersecting)
             .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
@@ -75,6 +77,7 @@ export function useScrollSpyObserver(
           }
         },
         {
+          // Ajusta a "janela" de detecção para ser responsiva
           rootMargin: `-${offset}px 0px -60% 0px`,
           threshold: [0, 0.1] 
         }
@@ -82,26 +85,20 @@ export function useScrollSpyObserver(
 
       elements.forEach((el) => observerInstance?.observe(el))
     } else {
-      // Caso o navegador seja antigo ou o observer falhe
       window.addEventListener('scroll', handleScrollFallback, { passive: true })
       handleScrollFallback()
     }
 
-    /* -------------------------------------------------------------------------- */
-    /* CLEANUP: Desativação de listeners/observers                                */
-    /* -------------------------------------------------------------------------- */
     return () => {
       if (observerInstance) {
         observerInstance.disconnect()
-      } else if (typeof window !== 'undefined') {
-        window.removeEventListener('scroll', handleScrollFallback)
       }
+      window.removeEventListener('scroll', handleScrollFallback)
     }
-  }, [sectionIds, offset, setActiveSection])
+  }, [offset, setActiveSection])
 }
 
 /**
  * ALIAS: useScrollSpy
- * Garante compatibilidade caso o componente use o nome antigo.
  */
 export const useScrollSpy = useScrollSpyObserver
