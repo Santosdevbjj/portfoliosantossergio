@@ -1,31 +1,24 @@
 'use client'
 
-/**
- * HOOK: useScrollSpy
- * -----------------------------------------------------------------------------
- * Versão Final Otimizada - Next.js 16.1.0-canary.19
- * * CORREÇÕES REALIZADAS:
- * 1. Build Error: Removido o conflito de tipos 'never' eliminando retornos antecipados.
- * 2. Responsividade: rootMargin de -50% garante detecção perfeita em Mobile e Desktop.
- * 3. Estabilidade: Verificação de ambiente (SSR-safe) para evitar Client-side exceptions.
- */
-
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useScrollSpy as useScrollSpyContext } from '@/contexts/ScrollSpyContext'
 import { NavSection, NAV_HASH_MAP } from '@/domain/navigation'
 
-export function useScrollSpy(
-  sectionIds: string[],
-  offset: number = 100
-) {
-  const { setActiveSection } = useScrollSpyContext()
+export function useScrollSpy(sectionIds: string[], offset: number = 100) {
+  // 1. O Contexto pode ser nulo se o Provider ainda não montou devido ao erro de rota
+  const context = useScrollSpyContext()
   const sectionIdsRef = useRef(sectionIds)
+  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
-    // 1. SSR Safe: Bloqueia execução fora do navegador
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
-      return
-    }
+    // Só ativa após a hidratação completa para evitar Exception
+    setIsReady(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isReady || !context || typeof window === 'undefined') return
+
+    const { setActiveSection } = context
 
     const elements = sectionIdsRef.current
       .map(id => document.getElementById(id))
@@ -33,50 +26,31 @@ export function useScrollSpy(
 
     if (elements.length === 0) return
 
-    // Mapeia o ID do elemento para a chave de navegação (ex: 'about')
-    const updateActiveSection = (id: string) => {
-      const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
+    const updateSection = (id: string) => {
+      const sectionKey = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
         (key) => NAV_HASH_MAP[key] === `#${id}`
       )
-      if (section) {
-        setActiveSection(section)
-      }
+      if (sectionKey) setActiveSection(sectionKey)
     }
 
-    /**
-     * ESTRATÉGIA DE OBSERVAÇÃO
-     * Em 2026, IntersectionObserver é o padrão absoluto.
-     * Usamos uma estrutura única para evitar erros de inferência 'never' do TS.
-     */
-    let observerInstance: IntersectionObserver | null = null
-
-    if ('IntersectionObserver' in window) {
-      observerInstance = new IntersectionObserver(
-        (entries) => {
-          // Captura a entrada que está cruzando a zona de visualização
-          const visibleEntry = entries.find((entry) => entry.isIntersecting)
-          if (visibleEntry) {
-            updateActiveSection(visibleEntry.target.id)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            updateSection(entry.target.id)
           }
-        },
-        {
-          // Totalmente Responsivo: offset no topo e detecta ao chegar no meio da tela (-50%)
-          rootMargin: `-${offset}px 0px -50% 0px`,
-          threshold: [0, 0.1]
-        }
-      )
-
-      elements.forEach((el) => observerInstance?.observe(el))
-    }
-
-    // Cleanup: Desconecta o observer ao desmontar o componente
-    return () => {
-      if (observerInstance) {
-        observerInstance.disconnect()
+        })
+      },
+      {
+        rootMargin: `-${offset}px 0px -50% 0px`,
+        threshold: 0.1,
       }
-    }
-  }, [offset, setActiveSection])
+    )
+
+    elements.forEach((el) => observer.observe(el))
+
+    return () => observer.disconnect()
+  }, [isReady, context, offset])
 }
 
-// Exportação compatível com o restante do projeto
 export const useScrollSpyObserver = useScrollSpy
