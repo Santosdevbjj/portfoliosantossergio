@@ -7,7 +7,6 @@
  * - Parsing: Mantém lógica de parsing para descrições técnicas do GitHub.
  */
 
-import React from 'react'
 import Script from 'next/script'
 import { Github, Star, ArrowRight, ExternalLink, Database, Cpu, Zap } from 'lucide-react'
 import type { Dictionary } from '@/types/dictionary'
