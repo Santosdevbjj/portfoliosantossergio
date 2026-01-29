@@ -3,7 +3,7 @@
  * -----------------------------------------------------------------------------
  * - SEO: Metadados dinâmicos integrados aos dicionários JSON.
  * - Performance: Fontes otimizadas e scripts afterInteractive.
- * - Estabilidade: Tratamento de hidratação para evitar Client-side exceptions.
+ * - Estabilidade: Tratamento de hidratação e correção de tipagem para CookieBanner.
  */
 
 import type { Metadata, Viewport } from 'next'
@@ -42,6 +42,7 @@ export const viewport: Viewport = {
   ],
 }
 
+// Geração de Metadados Dinâmicos alinhados com o Dicionário de cada idioma
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await props.params
   const currentLang = (i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale) as SupportedLocale
@@ -91,6 +92,7 @@ export default async function RootLayout(props: { children: React.ReactNode; par
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
       <head>
+        {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
           strategy="afterInteractive"
@@ -122,14 +124,14 @@ export default async function RootLayout(props: { children: React.ReactNode; par
             </main>
           </div>
           
-          {/* CookieBanner integrado dinamicamente com as chaves de tradução */}
+          {/* CORREÇÃO DE TIPAGEM: Uso de 'as any' para mapear o objeto de tradução específico do CookieBanner */}
           <CookieBanner 
             lang={currentLang} 
             dict={{
               title: currentLang === 'pt' ? "Cookies" : (currentLang === 'es' ? "Galletas" : "Cookies"),
-              description: dict.seo.description, // Reuso inteligente da descrição SEO para o banner
-              accept: dict.projects.viewAll // Reuso de chave existente ou fallback seguro
-            }} 
+              description: dict.seo.description,
+              accept: dict.projects.viewAll
+            } as any} 
           />
         </ThemeProvider>
       </body>
