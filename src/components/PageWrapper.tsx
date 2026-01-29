@@ -4,7 +4,7 @@
  * PAGE WRAPPER: Orquestrador de Experiência e Layout Root
  * -----------------------------------------------------------------------------
  * - Função: Provê o contexto de ScrollSpy e estrutura semântica base.
- * - Resiliência: Safe Mounting para evitar Hydration Mismatch no Next.js.
+ * - Resiliência: Safe Mounting para evitar Hydration Mismatch no Next.js 16.
  * - I18n: Configura o atributo 'lang' dinâmico para SEO e Acessibilidade.
  * - Estética: Background dinâmico com grid adaptativo (Light/Dark).
  */
@@ -52,23 +52,33 @@ export function PageWrapper({
   // Hook customizado para monitorar a posição do scroll
   const activeSectionFromHook = useScrollSpy(sectionIds, 150)
 
-  // Garante que o componente só execute lógica de cliente após o mount
+  // Garante que o componente só execute lógica de cliente após o mount inicial
   useEffect(() => {
     setMounted(true)
   }, [])
 
   /**
    * MEMOIZAÇÃO DA SEÇÃO ATIVA:
-   * Resolve a discrepância de tipos entre 'void' do hook e 'string' do context.
+   * Resolve a discrepância de tipos entre o hook e o context de forma segura.
    */
   const activeSection = useMemo<string | null>(
     () => {
       if (!mounted) return null
-      // Converte o retorno do hook (mesmo se for void/undefined) para string ou null
       return (activeSectionFromHook as string | undefined) || null
     },
     [mounted, activeSectionFromHook]
   )
+
+  /**
+   * GESTÃO DE HIDRATAÇÃO:
+   * Se ainda não montou, retornamos um esqueleto estrutural neutro para evitar 
+   * a exceção de cliente (Hydration Mismatch).
+   */
+  if (!mounted) {
+    return (
+      <div className="bg-white dark:bg-[#020617] min-h-screen w-full" />
+    )
+  }
 
   return (
     <ScrollSpyContext.Provider value={activeSection}>
@@ -81,7 +91,7 @@ export function PageWrapper({
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
         >
-          {/* Glow Superior Centralizado */}
+          {/* Glow Superior Centralizado - Gradiente de Marca */}
           <div
             className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1400px] h-[400px] md:h-[800px] opacity-40 dark:opacity-20 transition-opacity duration-1000"
             style={{
@@ -89,7 +99,7 @@ export function PageWrapper({
             }}
           />
           
-          {/* Grid de Pontos (Pattern) */}
+          {/* Grid de Pontos (Pattern de Engenharia/Dados) */}
           <div 
             className="absolute inset-0 opacity-[0.12] dark:opacity-[0.05]" 
             style={{ 
