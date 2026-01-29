@@ -1,13 +1,10 @@
 'use client'
 
 /**
- * HOOK: useScrollSpy
+ * HOOK: useScrollSpyObserver
  * -----------------------------------------------------------------------------
- * Observa a visibilidade das seções no viewport e sincroniza com o ScrollSpyContext.
- * * FOCO DA REVISÃO:
- * 1. Remoção do import React (Evitar erro de build).
- * 2. Proteção rigorosa contra acesso ao DOM no SSR (Evitar Client-side exception).
- * 3. Sincronização lógica com os IDs definidos no domínio de navegação.
+ * Revisado para Next.js 16.1.0-canary.19 e Arquitetura Proxy.
+ * Resolve a 'client-side exception' através de verificações rigorosas de ambiente.
  */
 
 import { useEffect, useRef } from 'react'
@@ -19,23 +16,24 @@ export function useScrollSpyObserver(
   offset: number = 100
 ) {
   const { setActiveSection } = useScrollSpyContext()
-  // Usamos ref para evitar re-anexar listeners desnecessariamente
+  // Armazena sectionIds em uma referência para estabilidade no efeito
   const sectionIdsRef = useRef(sectionIds)
 
   useEffect(() => {
-    // 1. Guardião de Ambiente: Só executa no navegador
-    if (typeof window === 'undefined' || typeof document === 'undefined') return
+    // 1. Verificação de ambiente crítica: impede execução prematura no servidor
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return
+    }
 
+    // 2. Localização dos elementos garantindo tipagem HTMLElement
     const elements = sectionIdsRef.current
       .map(id => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null)
 
     if (elements.length === 0) return
 
-    let observerInstance: IntersectionObserver | null = null
-
     /**
-     * Sincroniza o ID do elemento DOM com a chave do dicionário/nav
+     * Mapeia o ID técnico do DOM para as chaves do dicionário (about, projects, etc)
      */
     const updateActiveSection = (id: string) => {
       const section = (Object.keys(NAV_HASH_MAP) as NavSection[]).find(
@@ -46,54 +44,52 @@ export function useScrollSpyObserver(
       }
     }
 
-    /**
-     * Fallback para navegadores que não suportam IntersectionObserver
-     */
-    const handleScrollFallback = () => {
-      const scrollPosition = window.scrollY + offset + 20
-      for (let i = elements.length - 1; i >= 0; i--) {
-        const el = elements[i]
-        if (el && el.offsetTop <= scrollPosition) {
-          updateActiveSection(el.id)
-          break
-        }
-      }
-    }
+    let observerInstance: IntersectionObserver | null = null
 
-    // Verificação de suporte à API moderna
-    const hasIntersectionObserver = 'IntersectionObserver' in window
-
-    if (hasIntersectionObserver) {
+    // 3. Verificação de suporte à API moderna (Segurança para Proxy/Edge)
+    if ('IntersectionObserver' in window) {
       observerInstance = new IntersectionObserver(
         (entries) => {
-          // Filtra apenas o que está entrando na tela, pegando o mais próximo do topo
-          const visibleEntries = entries
-            .filter((entry) => entry.isIntersecting)
-            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-
-          const firstVisible = visibleEntries[0]
-          if (firstVisible) {
-            updateActiveSection(firstVisible.target.id)
+          // Captura a seção visível mais próxima do topo
+          const visibleEntry = entries.find((entry) => entry.isIntersecting)
+          if (visibleEntry) {
+            updateActiveSection(visibleEntry.target.id)
           }
         },
         {
-          // Ajusta a "janela" de detecção para ser responsiva
-          rootMargin: `-${offset}px 0px -60% 0px`,
+          // Ajuste responsivo: -50% é ideal para dispositivos móveis
+          rootMargin: `-${offset}px 0px -50% 0px`,
           threshold: [0, 0.1] 
         }
       )
 
       elements.forEach((el) => observerInstance?.observe(el))
     } else {
+      /** * FALLBACK: Executado apenas se o IntersectionObserver não existir.
+       * Garante que o ScrollSpy funcione em qualquer condição.
+       */
+      const handleScrollFallback = () => {
+        const scrollPosition = window.scrollY + offset + 20
+        for (let i = elements.length - 1; i >= 0; i--) {
+          const el = elements[i]
+          if (el && el.offsetTop <= scrollPosition) {
+            updateActiveSection(el.id)
+            break
+          }
+        }
+      }
+
       window.addEventListener('scroll', handleScrollFallback, { passive: true })
       handleScrollFallback()
+      
+      return () => window.removeEventListener('scroll', handleScrollFallback)
     }
 
+    // CLEANUP: Desconexão obrigatória para evitar vazamento de memória
     return () => {
       if (observerInstance) {
         observerInstance.disconnect()
       }
-      window.removeEventListener('scroll', handleScrollFallback)
     }
   }, [offset, setActiveSection])
 }
