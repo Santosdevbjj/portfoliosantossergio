@@ -1,6 +1,6 @@
 /**
  * PROXY (Server-side Edge Logic) - Next.js 16 Compliant
- * Responsivo, Multilíngue (PT, EN, ES) e alinhado aos Dicionários.
+ * Foco: Eliminar erro 404 e garantir suporte Multilíngue (PT, EN, ES).
  */
 import { NextRequest, NextResponse } from 'next/server';
 import Negotiator from 'negotiator';
@@ -15,9 +15,6 @@ const EU_COUNTRIES = new Set([
   'IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK'
 ]);
 
-/**
- * Detecta a região do usuário para conformidade GDPR (Estatísticas e Cookies)
- */
 function detectRegion(request: NextRequest): Region {
   const country = request.headers.get('x-vercel-ip-country') || request.headers.get('cf-ipcountry');
   if (!country) return 'unknown';
@@ -27,24 +24,15 @@ function detectRegion(request: NextRequest): Region {
   return 'unknown';
 }
 
-/**
- * Detecta o idioma preferido baseado em Cookies ou Headers do Navegador
- */
 function detectLocale(request: NextRequest): Locale {
   const cookieLocale = request.cookies.get(LOCALE_COOKIE_NAME)?.value as Locale | undefined;
-  
-  // Se o cookie for válido e estiver nos nossos dicionários, usa ele
   if (cookieLocale && (i18n.locales as readonly string[]).includes(cookieLocale)) {
     return cookieLocale;
   }
-
   const acceptLanguage = request.headers.get('accept-language');
   if (!acceptLanguage) return i18n.defaultLocale;
-
   const languages = new Negotiator({ headers: { 'accept-language': acceptLanguage } }).languages();
-  
   try {
-    // Tenta bater os idiomas do navegador com PT, EN, ES
     return matchLocale(languages, i18n.locales as unknown as string[], i18n.defaultLocale) as Locale;
   } catch {
     return i18n.defaultLocale;
@@ -52,28 +40,30 @@ function detectLocale(request: NextRequest): Locale {
 }
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
 
-  // 1. FILTRO DE ATIVOS: Impede que o proxy intercepte arquivos estáticos (evita 404)
-  const isPublicAsset = pathname.startsWith('/_next') || 
-                        pathname.startsWith('/assets/') || 
-                        pathname.startsWith('/favicon.ico') ||
-                        pathname.startsWith('/robots.txt') ||
-                        pathname.startsWith('/sitemap.xml');
+  // 1. PROTEÇÃO CONTRA 404: Ignora arquivos internos, estáticos e requisições de dados (RSC)
+  // Se o Next.js está pedindo um arquivo de sistema ou dados, deixamos passar direto.
+  if (
+    pathname.includes('.') || 
+    pathname.startsWith('/_next') || 
+    pathname.startsWith('/api') ||
+    searchParams.has('_rsc')
+  ) {
+    return NextResponse.next();
+  }
 
-  if (isPublicAsset) return NextResponse.next();
-
-  // 2. VERIFICAÇÃO DE IDIOMA NA URL
+  // 2. VERIFICAÇÃO DE IDIOMA
   const pathnameHasLocale = i18n.locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
-  // 3. REDIRECIONAMENTO SEGURO: Se não tem idioma, detecta e redireciona (Status 307)
+  // 3. REDIRECIONAMENTO SEGURO
   if (!pathnameHasLocale) {
     const locale = detectLocale(request);
     const redirectUrl = new URL(`/${locale}${pathname === '/' ? '' : pathname}`, request.url);
     
-    // Preserva os parâmetros de busca (query strings)
+    // Preserva parâmetros (importante para não perder estado de navegação)
     redirectUrl.search = request.nextUrl.search;
 
     const response = NextResponse.redirect(redirectUrl, 307);
@@ -81,7 +71,7 @@ export function proxy(request: NextRequest) {
     return response;
   }
 
-  // 4. LÓGICA DE EXECUÇÃO PARA ROTAS COM IDIOMA
+  // 4. INJEÇÃO DE METADADOS (Alinhado com os Dicionários)
   const currentLocale = pathname.split('/')[1] as Locale;
   const region = detectRegion(request);
   const consent = request.cookies.get('cookie_consent')?.value;
@@ -96,7 +86,7 @@ export function proxy(request: NextRequest) {
     request: { headers: requestHeaders },
   });
 
-  // 5. SEO & ACESSIBILIDADE: Alinhado com os dicionários e tags hreflang
+  // 5. SEO & ACESSIBILIDADE
   const baseUrl = 'https://portfoliosantossergio.vercel.app';
   response.headers.set('Link', [
       `<${baseUrl}/pt>; rel="alternate"; hreflang="pt-BR"`,
@@ -110,19 +100,7 @@ export function proxy(request: NextRequest) {
   return response;
 }
 
-/**
- * CONFIGURAÇÃO DO MATCHER (Vercel Optimization)
- * Otimizado para Next.js 16 para evitar interceptar chamadas internas.
- */
 export const config = {
-  matcher: [
-    /*
-     * Match todas as rotas exceto:
-     * 1. api (rotas de API)
-     * 2. _next/static (arquivos estáticos)
-     * 3. _next/image (otimização de imagens)
-     * 4. favicon.ico, sitemap.xml, robots.txt
-     */
-    '/((?!api|_next/static|_next/image|assets|favicon.ico|robots.txt|sitemap.xml).*)',
-  ],
+  // Matcher refinado para Next.js 16/Turbopack
+  matcher: ['/((?!api|_next/static|_next/image|assets|favicon.ico|robots.txt|sitemap.xml).*)'],
 };
