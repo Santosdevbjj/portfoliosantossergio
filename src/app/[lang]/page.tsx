@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * MAIN PAGE COMPONENT - REVISÃO FINAL DE INTEGRAÇÃO
+ * MAIN PAGE COMPONENT - REVISÃO FINAL DE INTEGRAÇÃO (NEXT.JS 16)
  * -----------------------------------------------------------------------------
- * - Responsividade: Estrutura com max-w-7xl e paddings adaptativos.
- * - I18n: Suporte total a PT, EN, ES via dicionários JSON.
- * - Alinhamento: Sincronização entre GitHub Data e Featured Configuration.
+ * - Responsividade: Estrutura 7xl com grids fluídos.
+ * - I18n: Sincronia total com dicionários JSON (PT, EN, ES).
+ * - Hydration: Uso de suppressHydrationWarning para compatibilidade com Proxy.
  */
 
 import { useState, useEffect, Suspense } from 'react'
@@ -21,8 +21,6 @@ import { HeroSection } from '@/components/HeroSection'
 import { Navbar } from '@/components/Navbar'
 import { PageWrapper } from '@/components/PageWrapper'
 import { ProjectSection } from '@/components/ProjectSection'
-
-// Importação Nomeada para evitar erro de build no Turbopack
 import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection'
 
 // Lógica e i18n
@@ -30,35 +28,48 @@ import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
 import { i18n } from '@/i18n-config'
 import { getGitHubProjects } from '@/lib/github'
 import type { Project } from '@/domain/projects'
-
-// Importação da configuração de destaque (Usando o nome exato do seu export)
 import { featuredConfig } from '@/components/featured/projects.data'
 
+// Next.js 16 Route Segment Config para garantir dinamismo no i18n
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
-  params: { lang: string }
+  params: Promise<{ lang: string }> | { lang: string }
 }
 
 export default function Page({ params }: PageProps) {
   const [isClient, setIsClient] = useState(false)
   const [allProjects, setAllProjects] = useState<Project[]>([])
   
-  const lang = params.lang as SupportedLocale
+  // No Next.js 16, params pode ser uma Promise. Tratamos de forma segura.
+  const [resolvedParams, setResolvedParams] = useState<{ lang: string } | null>(null)
 
   useEffect(() => {
     setIsClient(true)
-
-    async function loadData() {
+    
+    async function unwrapParams() {
+      const p = await params
+      setResolvedParams(p)
+      
+      const lang = p.lang as SupportedLocale
       try {
         const data = await getGitHubProjects(lang)
         setAllProjects(data || [])
       } catch (error) {
-        console.error("Falha ao carregar repositórios do GitHub:", error)
+        console.error("Erro ao carregar dados do GitHub:", error)
       }
     }
-    loadData()
-  }, [lang])
+    
+    unwrapParams()
+  }, [params])
 
-  // Validação de localidade (PT, EN, ES)
+  if (!isClient || !resolvedParams) {
+    return <div className="min-h-screen bg-white dark:bg-[#020617]" aria-hidden="true" />
+  }
+
+  const lang = resolvedParams.lang as SupportedLocale
+
+  // Validação de localidade rigorosa
   if (!i18n.locales.includes(lang as any)) {
     notFound()
   }
@@ -66,14 +77,10 @@ export default function Page({ params }: PageProps) {
   const dict = getDictionarySync(lang)
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
 
-  // Separação dos projetos: Destaques (configurados) vs Restante
+  // Filtragem inteligente de projetos baseada no featuredConfig do domínio
   const featuredIds = featuredConfig.map(f => f.id)
   const featuredProjects = allProjects.filter(p => featuredIds.includes(p.name))
   const remainingProjects = allProjects.filter(p => !featuredIds.includes(p.name))
-
-  if (!isClient) {
-    return <div className="min-h-screen bg-white dark:bg-[#020617]" aria-hidden="true" />
-  }
 
   return (
     <div suppressHydrationWarning>
@@ -98,8 +105,6 @@ export default function Page({ params }: PageProps) {
 
           <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
             <div className="space-y-24">
-              
-              {/* Projetos em Destaque: Filtrados dinamicamente com base no featuredConfig */}
               <Suspense fallback={<div className="h-96 w-full animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800/50" />}>
                 <FeaturedProjectsSection 
                   lang={lang} 
@@ -108,7 +113,6 @@ export default function Page({ params }: PageProps) {
                 />
               </Suspense>
               
-              {/* Repositório Geral (GitHub) */}
               <div className="pt-12 border-t border-slate-200 dark:border-slate-800">
                  <ProjectSection projects={remainingProjects} lang={lang} dict={dict} />
               </div>
