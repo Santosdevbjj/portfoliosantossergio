@@ -3,9 +3,9 @@
 /**
  * NAVBAR COMPONENT — SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * - Corrigido para Next.js 16 / React 19 (Removido import React não utilizado).
- * - Totalmente Responsivo e Acessível.
- * - Integração completa com Dicionário e i18n.
+ * - Otimizado para Next.js 16 / React 19.
+ * - Prevenção de Hydration Mismatch via Safe Mounting.
+ * - Totalmente Responsivo, Acessível e Multilingue.
  */
 
 import { useState, useEffect } from 'react';
@@ -24,17 +24,19 @@ interface NavbarProps {
 export function Navbar({ lang, dict }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const { nav, common } = dict;
 
-  // Efeito de scroll para mudar a aparência da Navbar
+  // Garante que o componente só execute lógica de navegador após o mount
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Links de navegação com âncoras locais
+  // Links de navegação baseados no dicionário
   const navLinks = [
     { href: `#about` as Route, label: nav.about },
     { href: `#experience` as Route, label: nav.experience },
@@ -42,6 +44,19 @@ export function Navbar({ lang, dict }: NavbarProps) {
     { href: `#articles` as Route, label: nav.articles },
     { href: `#contact` as Route, label: nav.contact },
   ];
+
+  // Enquanto não estiver montado, renderiza uma versão simplificada para evitar erro de hidratação
+  if (!mounted) {
+    return (
+      <nav className="fixed top-0 w-full z-[100] bg-transparent py-6">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 flex justify-between items-center">
+           <div className="font-black text-xl md:text-2xl tracking-tighter text-slate-900 dark:text-white uppercase">
+            SÉRGIO<span className="text-blue-600">SANTOS</span>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav 
@@ -76,13 +91,13 @@ export function Navbar({ lang, dict }: NavbarProps) {
           
           <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
           
-          {/* O LanguageSwitcher deve receber o idioma atual para funcionar corretamente */}
+          {/* Alternador de Idioma */}
           <LanguageSwitcher currentLang={lang} />
         </div>
 
         {/* MOBILE TOGGLE */}
         <button 
-          className="lg:hidden p-2 text-slate-900 dark:text-white transition-transform active:scale-90"
+          className="lg:hidden p-2 text-slate-900 dark:text-white transition-transform active:scale-90 outline-none"
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? common.closeMenu : common.openMenu}
         >
@@ -93,9 +108,8 @@ export function Navbar({ lang, dict }: NavbarProps) {
       {/* MOBILE MENU OVERLAY & CONTENT */}
       {isOpen && (
         <>
-          {/* Fundo escurecido para fechar o menu ao clicar fora */}
           <div 
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm lg:hidden" 
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm lg:hidden z-[-1]" 
             onClick={() => setIsOpen(false)}
           />
           
