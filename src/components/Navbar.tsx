@@ -3,9 +3,9 @@
 /**
  * NAVBAR COMPONENT — SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * - Otimizado para Next.js 16 / React 19.
- * - Prevenção de Hydration Mismatch via Safe Mounting.
- * - Totalmente Responsivo, Acessível e Multilingue.
+ * - Responsividade: Total (Mobile-First).
+ * - I18n: Suporte total a PT, EN, ES através do dict prop.
+ * - UX: ScrollSpy integrado para indicar seção ativa.
  */
 
 import { useState, useEffect } from 'react';
@@ -15,6 +15,7 @@ import type { Route } from 'next';
 import type { Locale } from '@/i18n-config';
 import type { Dictionary } from '@/types/dictionary';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { useScrollSpy } from '@/hooks/useScrollSpy';
 
 interface NavbarProps {
   readonly lang: Locale;
@@ -28,7 +29,10 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
   const { nav, common } = dict;
 
-  // Garante que o componente só execute lógica de navegador após o mount
+  // IDs das seções para o ScrollSpy (Devem bater com os IDs no page.tsx)
+  const sectionIds = ['about', 'experience', 'projects', 'articles', 'contact'];
+  const activeSection = useScrollSpy(sectionIds, 100);
+
   useEffect(() => {
     setMounted(true);
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -36,39 +40,28 @@ export function Navbar({ lang, dict }: NavbarProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Links de navegação baseados no dicionário
+  // Mapeamento de links usando as chaves do dicionário
   const navLinks = [
-    { href: `#about` as Route, label: nav.about },
-    { href: `#experience` as Route, label: nav.experience },
-    { href: `#projects` as Route, label: nav.projects },
-    { href: `#articles` as Route, label: nav.articles },
-    { href: `#contact` as Route, label: nav.contact },
+    { id: 'about', href: `#about` as Route, label: nav.about },
+    { id: 'experience', href: `#experience` as Route, label: nav.experience },
+    { id: 'projects', href: `#projects` as Route, label: nav.projects },
+    { id: 'articles', href: `#articles` as Route, label: nav.articles },
+    { id: 'contact', href: `#contact` as Route, label: nav.contact },
   ];
 
-  // Enquanto não estiver montado, renderiza uma versão simplificada para evitar erro de hidratação
-  if (!mounted) {
-    return (
-      <nav className="fixed top-0 w-full z-[100] bg-transparent py-6">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 flex justify-between items-center">
-           <div className="font-black text-xl md:text-2xl tracking-tighter text-slate-900 dark:text-white uppercase">
-            SÉRGIO<span className="text-blue-600">SANTOS</span>
-          </div>
-        </div>
-      </nav>
-    );
-  }
+  if (!mounted) return null;
 
   return (
     <nav 
       className={`fixed top-0 w-full z-[100] transition-all duration-500 ${
         scrolled 
-          ? 'bg-white/90 dark:bg-[#020617]/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 py-3 shadow-sm' 
+          ? 'bg-white/95 dark:bg-[#020617]/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 py-3 shadow-md' 
           : 'bg-transparent py-6'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-10 flex justify-between items-center">
         
-        {/* LOGO — Mantém o contexto do idioma */}
+        {/* LOGO */}
         <Link href={`/${lang}` as Route} className="group outline-none">
           <span className="font-black text-xl md:text-2xl tracking-tighter text-slate-900 dark:text-white uppercase transition-opacity group-hover:opacity-80">
             SÉRGIO<span className="text-blue-600">SANTOS</span>
@@ -80,9 +73,13 @@ export function Navbar({ lang, dict }: NavbarProps) {
           <div className="flex gap-8">
             {navLinks.map((link) => (
               <Link
-                key={link.href}
+                key={link.id}
                 href={link.href}
-                className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-all"
+                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-blue-600 ${
+                  activeSection === link.id 
+                    ? 'text-blue-600 dark:text-blue-400' 
+                    : 'text-slate-500 dark:text-slate-400'
+                }`}
               >
                 {link.label}
               </Link>
@@ -91,52 +88,50 @@ export function Navbar({ lang, dict }: NavbarProps) {
           
           <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
           
-          {/* Alternador de Idioma */}
           <LanguageSwitcher currentLang={lang} />
         </div>
 
         {/* MOBILE TOGGLE */}
-        <button 
-          className="lg:hidden p-2 text-slate-900 dark:text-white transition-transform active:scale-90 outline-none"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label={isOpen ? common.closeMenu : common.openMenu}
-        >
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
+        <div className="flex items-center gap-4 lg:hidden">
+           <button 
+            className="p-2 text-slate-900 dark:text-white transition-transform active:scale-90"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? common.closeMenu : common.openMenu}
+          >
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
       </div>
 
-      {/* MOBILE MENU OVERLAY & CONTENT */}
-      {isOpen && (
-        <>
-          <div 
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm lg:hidden z-[-1]" 
-            onClick={() => setIsOpen(false)}
-          />
+      {/* MOBILE MENU */}
+      <div 
+        className={`lg:hidden absolute top-full left-0 w-full bg-white dark:bg-[#020617] border-b border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out overflow-hidden ${
+          isOpen ? 'max-h-[80vh] opacity-100 shadow-2xl' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="p-8 flex flex-col gap-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.id}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className={`text-2xl font-black tracking-tighter transition-colors ${
+                activeSection === link.id ? 'text-blue-600' : 'text-slate-900 dark:text-white'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
           
-          <div className="lg:hidden absolute top-full left-0 w-full bg-white dark:bg-[#020617] border-b border-slate-200 dark:border-slate-800 p-8 animate-in slide-in-from-top duration-500 shadow-2xl">
-            <div className="flex flex-col gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter hover:text-blue-600 transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              
-              <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6 flex items-center gap-2">
-                  <Globe size={14} className="text-blue-600" />
-                  {lang === 'pt' ? 'Idioma' : lang === 'en' ? 'Language' : 'Idioma'}
-                </p>
-                <LanguageSwitcher currentLang={lang} />
-              </div>
-            </div>
+          <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4 flex items-center gap-2">
+              <Globe size={14} className="text-blue-600" />
+              {common.navigation}
+            </p>
+            <LanguageSwitcher currentLang={lang} />
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </nav>
   );
 }
