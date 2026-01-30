@@ -10,19 +10,20 @@
     /* STRICTNESS (Rigor de Missão Crítica)                                   */
     /* ---------------------------------------------------------------------- */
     "strict": true,
-    "noUncheckedIndexedAccess": true, // Essencial para lidar com dicionários dinâmicos
+    "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
-    "noUnusedLocals": true,            // Limpeza de código em produção
-    "noUnusedParameters": false,       // Mantido falso para permitir assinaturas de Proxy/Middleware
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
 
     /* ---------------------------------------------------------------------- */
-    /* EMIT & MODULE RESOLUTION (Next.js 16 + Bundler Resolution)             */
+    /* EMIT & MODULE RESOLUTION (Next.js 16 + Motion 12 Compat)               */
     /* ---------------------------------------------------------------------- */
     "noEmit": true,
     "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "Bundler", // Essencial para reconhecer subcaminhos como 'motion/react'
+    "moduleDetection": "force",    // Garante que todo arquivo seja tratado como módulo
     "isolatedModules": true,
     "jsx": "react-jsx",
 
@@ -30,9 +31,9 @@
     /* INTEROP & MODERN JS                                                    */
     /* ---------------------------------------------------------------------- */
     "esModuleInterop": true,
-    "resolveJsonModule": true,         // Vital para src/dictionaries/*.json
+    "resolveJsonModule": true,
     "allowJs": true,
-    "skipLibCheck": true,              // Performance no build (ignora erros em node_modules)
+    "skipLibCheck": true,          // Vital para ignorar inconsistências de tipos em pacotes externos
 
     /* ---------------------------------------------------------------------- */
     /* PROJECT STRUCTURE                                                      */
@@ -43,10 +44,10 @@
     },
 
     /* ---------------------------------------------------------------------- */
-    /* PERFORMANCE & CACHE                                                    */
+    /* PERFORMANCE & CACHE (Ajustado para Termux)                             */
     /* ---------------------------------------------------------------------- */
     "incremental": true,
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo", // Organização de cache
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo",
 
     /* ---------------------------------------------------------------------- */
     /* NEXT.JS PLUGIN                                                         */
@@ -63,7 +64,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/proxy.ts" 
+    "src/proxy.ts", 
+    "src/dictionaries/*.json"
   ],
 
   "exclude": ["node_modules"]
