@@ -1,18 +1,18 @@
 import type { NextConfig } from 'next';
 
 /**
- * NEXT.JS CONFIGURATION - Hardened for 2026 (Next.js 16.1.5+)
+ * NEXT.JS CONFIGURATION - Termux & 2026 Security Hardened (Next.js 16.1.5+)
  * -----------------------------------------------------------------------------
- * Security fixes for: CVE-2025-55182 (RCE), CVE-2025-59471 (DoS), CVE-2026-23864 (RSC DoS)
+ * Fixes: turbo.createProject WASM error, CVE-2025-59471 (DoS), Motion 12 Compat
  */
 const nextConfig: NextConfig = {
   /* -------------------------------------------------------------------------- */
   /* CORE & STABILITY                                                           */
   /* -------------------------------------------------------------------------- */
   reactStrictMode: true,
-  poweredByHeader: false, // Proteção contra fingerprinting
+  poweredByHeader: false, 
   
-  // No Next.js 16.1.5, typedRoutes garante integridade na navegação
+  //typedRoutes é estável na 16.1.5 e funciona bem em WASM
   typedRoutes: true,
   
   typescript: {
@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
   /* COMPILER & OPTIMIZATION                                                    */
   /* -------------------------------------------------------------------------- */
   compiler: {
+    // Remove consoles em produção exceto erros e avisos
     removeConsole:
       process.env.NODE_ENV === 'production'
         ? { exclude: ['error', 'warn'] }
@@ -31,15 +32,15 @@ const nextConfig: NextConfig = {
   },
 
   /* -------------------------------------------------------------------------- */
-  /* IMAGES (Hardened against CVE-2025-59471)                                   */
+  /* IMAGES (Security: CVE-2025-59471 Hardened)                                 */
   /* -------------------------------------------------------------------------- */
   images: {
     formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Removido tamanhos excessivos
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     minimumCacheTTL: 86400,
     dangerouslyAllowLocalIP: false,
 
-    // CORREÇÃO CRÍTICA: Adicionado pathnames restritivos para evitar DoS de memória
+    // PATHNAMES OBRIGATÓRIOS: Evita que atacantes usem seu servidor para processar imagens gigantes
     remotePatterns: [
       { protocol: 'https', hostname: 'avatars.githubusercontent.com', pathname: '/u/**' },
       { protocol: 'https', hostname: 'raw.githubusercontent.com', pathname: '/**' },
@@ -49,24 +50,27 @@ const nextConfig: NextConfig = {
   },
 
   /* -------------------------------------------------------------------------- */
-  /* BUNDLER & IMPORTS (Next.js 16 + Framer Motion 12 Optimization)             */
+  /* BUNDLER & IMPORTS (WASM Compatible Otimizations)                           */
   /* -------------------------------------------------------------------------- */
   experimental: {
-    typedEnv: true,
-    // Otimização específica para Framer Motion 12 e Lucide
+    // DESATIVADO: typedEnv pode forçar o motor Rust que quebra no Termux
+    typedEnv: false, 
+
+    // ATUALIZADO: Usando o novo nome do pacote 'motion' para otimização
     optimizePackageImports: [
       'lucide-react',
-      'framer-motion',
+      'motion',
       'clsx',
       'tailwind-merge',
       'next-themes',
     ],
-    // Proteção contra CVE-2025-59472 (PPR Security Fix)
+    
+    // Proteção contra CVE-2025-59472 - Estável na 16.1.5
     ppr: 'incremental',
   },
 
   /* -------------------------------------------------------------------------- */
-  /* SECURITY HEADERS (Proteção contra RCE e Deserialização RSC)                */
+  /* SECURITY HEADERS (Proteção contra RCE e XSS 2026)                          */
   /* -------------------------------------------------------------------------- */
   async headers() {
     return [
@@ -89,11 +93,10 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self';",
               "img-src 'self' data: https: blob:;",
-              // script-src: 'wasm-unsafe-eval' é necessário para o motor de animação do Framer Motion 12
+              // 'wasm-unsafe-eval' é essencial para o motor de 120fps do Motion 12
               "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com;",
               "style-src 'self' 'unsafe-inline';",
               "font-src 'self' data: https:;",
-              // connect-src: Essencial para evitar o bypass do React Server Components
               `connect-src 'self' https: ${process.env.NODE_ENV === 'development' ? 'ws: wss:' : ''};`,
               "frame-ancestors 'none';",
               "upgrade-insecure-requests;",
