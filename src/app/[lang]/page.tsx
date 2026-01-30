@@ -3,11 +3,11 @@
  * -----------------------------------------------------------------------------
  * - Framework: Next.js 16.1.5 (Estável)
  * - I18n: Multilíngue (PT, EN, ES) integrado ao dicionário.
- * - Responsividade: Viewport e Layout blindados para Mobile.
- * - SEO: Integração com API post-og dinâmica.
+ * - Responsividade: Implementada via Viewport API (Padrão 2026).
+ * - SEO: Integração com API post-og dinâmica para Cards Sociais.
  */
 
-import { Metadata } from 'next'
+import { Metadata, Viewport } from 'next'
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
 import { i18n } from '@/i18n-config'
 import ProxyPage from '@/proxy'
@@ -17,8 +17,23 @@ interface PageProps {
 }
 
 /**
- * SEO DINÂMICO & RESPONSIVIDADE
- * Extrai dados do contrato único src/types/dictionary.ts
+ * CONFIGURAÇÃO DE VIEWPORT (API DEDICADA)
+ * Essencial para responsividade total e eliminação de warnings na Vercel.
+ */
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#020617' },
+  ],
+}
+
+/**
+ * SEO DINÂMICO
+ * Extrai dados do src/dictionaries/[lang].json para autoridade máxima.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params
@@ -30,7 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const description = dict.seo.description
   const siteUrl = 'https://portfoliosantossergio.vercel.app'
 
-  // Geração da URL da imagem OG usando nossa API dinâmica
+  // Geração da URL da imagem OG usando nossa API dinâmica integrada
+  // Concatenamos Title + Subtitle para um card visualmente rico
   const ogImageUrl = `${siteUrl}/api/post-og?title=${encodeURIComponent(dict.hero.title + ' ' + dict.hero.subtitle)}&description=${encodeURIComponent(dict.hero.headline)}&author=Sérgio Santos`
 
   return {
@@ -40,8 +56,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     description,
     keywords: dict.seo.keywords,
-    // Responsividade máxima para Chrome no Celular
-    viewport: 'width=device-width, initial-scale=1, maximum-scale=5', 
     alternates: {
       canonical: `${siteUrl}/${currentLang}`,
       languages: {
@@ -82,7 +96,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 /**
  * GERAÇÃO ESTÁTICA (SSG)
- * Garante que as rotas /pt, /en e /es existam fisicamente no build da Vercel.
+ * Define as rotas válidas no momento do build.
  */
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({
@@ -92,22 +106,18 @@ export async function generateStaticParams() {
 
 /**
  * COMPONENTE PRINCIPAL (SERVER COMPONENT)
- * Entrega a estrutura para o ProxyPage renderizar as seções.
  */
 export default async function HomePage({ params }: PageProps) {
-  const resolvedParams = await params
-  const { lang } = resolvedParams
+  const { lang } = await params
 
-  // Validação de segurança para garantir que o lang seja suportado
+  // Validação rigorosa de localidade
   const currentLang = (i18n.locales.includes(lang as any) 
     ? lang 
     : i18n.defaultLocale) as SupportedLocale
 
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617]">
-      {/* O ProxyPage recebe a lang resolvida e renderiza o conteúdo 
-          extraído do dicionário correspondente.
-      */}
+      {/* ProxyPage cuidará da orquestração das seções (About, Projects, etc) */}
       <ProxyPage params={Promise.resolve({ lang: currentLang })} />
     </main>
   )
