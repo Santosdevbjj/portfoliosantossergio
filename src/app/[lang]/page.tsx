@@ -1,25 +1,26 @@
 /**
- * HOME PAGE - ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS
+ * HOME PAGE — ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * - Framework: Next.js 16.1.5 (Estável)
- * - I18n: Multilíngue (PT, EN, ES) integrado ao dicionário.
- * - Responsividade: Implementada via Viewport API (Padrão 2026).
- * - SEO: Integração com API post-og dinâmica para Cards Sociais.
+ * Framework: Next.js 16.1.5
+ * I18n: PT / EN / ES (SSG)
+ * SEO: Metadata + OG dinâmico
+ * Responsividade: Viewport API (padrão moderno)
  */
 
-import { Metadata, Viewport } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
 import { i18n } from '@/i18n-config'
 import ProxyPage from '@/proxy'
 
 interface PageProps {
-  params: Promise<{ lang: string }>
+  params: {
+    lang: SupportedLocale
+  }
 }
 
-/**
- * CONFIGURAÇÃO DE VIEWPORT (API DEDICADA)
- * Essencial para responsividade total e eliminação de warnings na Vercel.
- */
+/* -------------------------------------------------------------------------- */
+/* VIEWPORT — RESPONSIVIDADE TOTAL                                             */
+/* -------------------------------------------------------------------------- */
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -31,44 +32,48 @@ export const viewport: Viewport = {
   ],
 }
 
-/**
- * SEO DINÂMICO
- * Extrai dados do src/dictionaries/[lang].json para autoridade máxima.
- */
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { lang } = await params
-  const currentLang = (i18n.locales.includes(lang as any) ? lang : i18n.defaultLocale) as SupportedLocale
-  
-  const dict = getDictionarySync(currentLang)
+/* -------------------------------------------------------------------------- */
+/* SEO & OPEN GRAPH DINÂMICO                                                   */
+/* -------------------------------------------------------------------------- */
+export async function generateMetadata(
+  { params }: PageProps
+): Promise<Metadata> {
+  const currentLang: SupportedLocale =
+    i18n.locales.includes(params.lang)
+      ? params.lang
+      : i18n.defaultLocale
 
-  const title = dict.seo.siteName
-  const description = dict.seo.description
+  const dict = getDictionarySync(currentLang)
   const siteUrl = 'https://portfoliosantossergio.vercel.app'
 
-  // Geração da URL da imagem OG usando nossa API dinâmica integrada
-  // Concatenamos Title + Subtitle para um card visualmente rico
-  const ogImageUrl = `${siteUrl}/api/post-og?title=${encodeURIComponent(dict.hero.title + ' ' + dict.hero.subtitle)}&description=${encodeURIComponent(dict.hero.headline)}&author=Sérgio Santos`
+  const ogImageUrl =
+    `${siteUrl}/api/post-og` +
+    `?title=${encodeURIComponent(`${dict.hero.title} ${dict.hero.subtitle}`)}` +
+    `&description=${encodeURIComponent(dict.hero.headline)}` +
+    `&author=Sérgio Santos`
 
   return {
     title: {
-      default: title,
-      template: `%s | ${title}`
+      default: dict.seo.siteName,
+      template: `%s | ${dict.seo.siteName}`,
     },
-    description,
+    description: dict.seo.description,
     keywords: dict.seo.keywords,
+
     alternates: {
       canonical: `${siteUrl}/${currentLang}`,
       languages: {
-        'pt-BR': '/pt',
-        'en-US': '/en',
-        'es-ES': '/es',
+        pt: '/pt',
+        en: '/en',
+        es: '/es',
       },
     },
+
     openGraph: {
-      title,
-      description,
+      title: dict.seo.siteName,
+      description: dict.seo.description,
       url: `${siteUrl}/${currentLang}`,
-      siteName: title,
+      siteName: dict.seo.siteName,
       locale: currentLang,
       type: 'website',
       images: [
@@ -76,10 +81,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: title,
-        }
+          alt: dict.seo.siteName,
+        },
       ],
     },
+
     robots: {
       index: true,
       follow: true,
@@ -90,35 +96,29 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'max-image-preview': 'large',
         'max-snippet': -1,
       },
-    }
+    },
   }
 }
 
-/**
- * GERAÇÃO ESTÁTICA (SSG)
- * Define as rotas válidas no momento do build.
- */
+/* -------------------------------------------------------------------------- */
+/* STATIC GENERATION — ROTAS DE IDIOMA                                          */
+/* -------------------------------------------------------------------------- */
 export async function generateStaticParams() {
-  return i18n.locales.map((locale) => ({
-    lang: locale,
-  }))
+  return i18n.locales.map((lang) => ({ lang }))
 }
 
-/**
- * COMPONENTE PRINCIPAL (SERVER COMPONENT)
- */
-export default async function HomePage({ params }: PageProps) {
-  const { lang } = await params
-
-  // Validação rigorosa de localidade
-  const currentLang = (i18n.locales.includes(lang as any) 
-    ? lang 
-    : i18n.defaultLocale) as SupportedLocale
+/* -------------------------------------------------------------------------- */
+/* PAGE — SERVER COMPONENT                                                     */
+/* -------------------------------------------------------------------------- */
+export default function HomePage({ params }: PageProps) {
+  const currentLang: SupportedLocale =
+    i18n.locales.includes(params.lang)
+      ? params.lang
+      : i18n.defaultLocale
 
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617]">
-      {/* ProxyPage cuidará da orquestração das seções (About, Projects, etc) */}
-      <ProxyPage params={Promise.resolve({ lang: currentLang })} />
+      <ProxyPage lang={currentLang} />
     </main>
   )
 }
