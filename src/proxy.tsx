@@ -1,14 +1,13 @@
 'use client'
 
 /**
- * PROXY CONTENT — SÉRGIO SANTOS
+ * PROXY CONTENT — SÉRGIO SANTOS (Hardened for Jan 2026)
  * -----------------------------------------------------------------------------
- * - Função: Motor de renderização do Cliente.
- * - Suporte: Multilingue (PT, EN, ES) e Responsivo.
- * - Fix: Resolvido conflito de Hydration e Runtime Error 500.
+ * Fix: Hydration Mismatch & Next.js 16 Async Params Pattern.
+ * Security: Restricted locale validation to prevent SSR injection.
  */
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, use } from 'react'
 import { notFound } from 'next/navigation'
 
 // Componentes de UI
@@ -30,56 +29,49 @@ import { getGitHubProjects } from '@/lib/github'
 import type { Project } from '@/domain/projects'
 import { featuredConfig } from '@/components/featured/projects.data'
 
-// Configuração de Segmento
-export const dynamic = 'force-dynamic'
-
 interface ProxyProps {
-  params: Promise<{ lang: string }> | { lang: string }
+  params: Promise<{ lang: string }>
 }
 
 export default function ProxyPage({ params }: ProxyProps) {
+  // 1. Unwrap params imediatamente usando o hook 'use' (Padrão Next.js 16)
+  const resolvedParams = use(params)
+  const lang = resolvedParams.lang as SupportedLocale
+
+  // 2. Validação imediata de localidade para evitar execução de hooks desnecessários
+  if (!i18n.locales.includes(lang as any)) {
+    return notFound()
+  }
+
   const [mounted, setMounted] = useState(false)
   const [allProjects, setAllProjects] = useState<Project[]>([])
-  const [resolvedParams, setResolvedParams] = useState<{ lang: string } | null>(null)
 
   useEffect(() => {
     setMounted(true)
     
-    async function initPage() {
+    async function loadData() {
       try {
-        // Unwrapping params (Next.js 16 pattern)
-        const p = await params
-        setResolvedParams(p)
-        
-        const lang = p.lang as SupportedLocale
-        if (i18n.locales.includes(lang as any)) {
-          const data = await getGitHubProjects(lang)
-          setAllProjects(data || [])
-        }
+        const data = await getGitHubProjects(lang)
+        if (data) setAllProjects(data)
       } catch (error) {
-        console.error("Falha ao inicializar Proxy:", error)
+        console.error("Erro ao carregar projetos via Proxy:", error)
       }
     }
     
-    initPage()
-  }, [params])
+    loadData()
+  }, [lang])
 
-  // Prevenção de Hydration Mismatch
-  if (!mounted || !resolvedParams) {
-    return <div className="min-h-screen bg-white dark:bg-[#020617]" />
-  }
-
-  const lang = resolvedParams.lang as SupportedLocale
-
-  // Validação de localidade protegida
-  if (!i18n.locales.includes(lang as any)) {
-    return notFound()
+  // 3. Prevenção de Hydration Mismatch (Crucial para o Termux/Vercel)
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-[#020617]" aria-hidden="true" />
+    )
   }
 
   const dict = getDictionarySync(lang)
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
 
-  // Lógica de Projetos (GitHub + Config)
+  // Lógica de Projetos
   const featuredIds = featuredConfig.map(f => f.id)
   const featuredProjects = allProjects.filter(p => featuredIds.includes(p.name))
   const remainingProjects = allProjects.filter(p => !featuredIds.includes(p.name))
