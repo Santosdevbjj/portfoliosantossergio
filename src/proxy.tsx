@@ -1,18 +1,17 @@
 'use client'
 
 /**
- * MAIN PAGE COMPONENT - REVISÃO FINAL DE INTEGRAÇÃO (NEXT.JS 16)
+ * PROXY CONTENT — SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * Ajustes realizados:
- * 1. Mudança de lógica para suportar JSX (necessário salvar como .tsx).
- * 2. Tratamento assíncrono de params conforme Next.js 16.
- * 3. Proteção contra Hydration Mismatch no carregamento inicial.
+ * - Função: Motor de renderização do Cliente.
+ * - Suporte: Multilingue (PT, EN, ES) e Responsivo.
+ * - Fix: Resolvido conflito de Hydration e Runtime Error 500.
  */
 
 import { useState, useEffect, Suspense } from 'react'
 import { notFound } from 'next/navigation'
 
-// Componentes de UI - Certifique-se que os nomes dos arquivos batem exatamente com estes imports
+// Componentes de UI
 import { AboutSection } from '@/components/AboutSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ExperienceSection } from '@/components/ExperienceSection'
@@ -31,56 +30,56 @@ import { getGitHubProjects } from '@/lib/github'
 import type { Project } from '@/domain/projects'
 import { featuredConfig } from '@/components/featured/projects.data'
 
-// Next.js Route Segment Config
+// Configuração de Segmento
 export const dynamic = 'force-dynamic'
 
-interface PageProps {
+interface ProxyProps {
   params: Promise<{ lang: string }> | { lang: string }
 }
 
-export default function Page({ params }: PageProps) {
+export default function ProxyPage({ params }: ProxyProps) {
   const [mounted, setMounted] = useState(false)
   const [allProjects, setAllProjects] = useState<Project[]>([])
   const [resolvedParams, setResolvedParams] = useState<{ lang: string } | null>(null)
 
   useEffect(() => {
-    // Marca como montado para evitar erros de hidratação (SSR vs Client)
     setMounted(true)
     
-    async function unwrapParams() {
+    async function initPage() {
       try {
-        // No Next.js 16 params é uma Promise que deve ser resolvida
+        // Unwrapping params (Next.js 16 pattern)
         const p = await params
         setResolvedParams(p)
         
         const lang = p.lang as SupportedLocale
-        const data = await getGitHubProjects(lang)
-        setAllProjects(data || [])
+        if (i18n.locales.includes(lang as any)) {
+          const data = await getGitHubProjects(lang)
+          setAllProjects(data || [])
+        }
       } catch (error) {
-        console.error("Erro na inicialização da página:", error)
+        console.error("Falha ao inicializar Proxy:", error)
       }
     }
     
-    unwrapParams()
+    initPage()
   }, [params])
 
-  // Se ainda não montou ou não resolveu os parâmetros, exibe um esqueleto vazio
-  // Isso evita que o cliente tente renderizar algo diferente do servidor
+  // Prevenção de Hydration Mismatch
   if (!mounted || !resolvedParams) {
     return <div className="min-h-screen bg-white dark:bg-[#020617]" />
   }
 
   const lang = resolvedParams.lang as SupportedLocale
 
-  // Validação de localidade
+  // Validação de localidade protegida
   if (!i18n.locales.includes(lang as any)) {
-    notFound()
+    return notFound()
   }
 
   const dict = getDictionarySync(lang)
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
 
-  // Filtragem de projetos
+  // Lógica de Projetos (GitHub + Config)
   const featuredIds = featuredConfig.map(f => f.id)
   const featuredProjects = allProjects.filter(p => featuredIds.includes(p.name))
   const remainingProjects = allProjects.filter(p => !featuredIds.includes(p.name))
