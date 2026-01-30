@@ -3,12 +3,12 @@
 /**
  * LANGUAGE & THEME SWITCHER — SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * - Responsividade: Totalmente adaptativo com design de vidro (backdrop-blur).
- * - Multilingue: PT, EN, ES com persistência via Cookie e preservação de rota.
- * - Build Fix: Removido useEffect não utilizado e corrigida tipagem do tema.
+ * - Responsividade: Totalmente adaptativo com design glassmorphism.
+ * - Multilingue: PT, EN, ES com preservação de rota e query params.
+ * - Build Fix: Removidas variáveis não utilizadas para eliminar erro no Vercel.
  */
 
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Moon, Sun } from 'lucide-react'
@@ -26,13 +26,15 @@ interface LanguageSwitcherProps {
 function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { theme, setTheme, resolvedTheme } = useTheme()
+  const { setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
-  // Garante que o componente só renderize ícones após o mount para evitar erro de hidratação
+  // useEffect garante a sincronia de hidratação no Next.js 16
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   if (!mounted) {
-    // Ativa o mounted no próximo ciclo de renderização de forma segura
-    setTimeout(() => setMounted(true), 0)
     return (
       <div className="h-9 w-44 bg-slate-200/10 dark:bg-slate-800/10 animate-pulse rounded-xl" />
     )
@@ -45,7 +47,7 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
     document.cookie = `${LOCALE_COOKIE}=${locale}; path=${LOCALE_COOKIE_OPTIONS.path}; max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}`
   }
 
-  // Mapeamento de labels para acessibilidade (UX Multilingue)
+  // Rótulos de acessibilidade alinhados com os idiomas suportados
   const labels = {
     pt: { dark: 'Ativar modo escuro', light: 'Ativar modo claro', lang: 'Mudar idioma' },
     en: { dark: 'Toggle dark mode', light: 'Toggle light mode', lang: 'Change language' },
@@ -80,7 +82,7 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
           const isActive = currentLang === locale
           const meta = localeMetadata[locale]
 
-          // Lógica de preservação de Rota
+          // Lógica de preservação de Rota e Parâmetros
           const segments = pathname?.split('/') || []
           if (segments[1] && availableLocales.includes(segments[1] as Locale)) {
             segments[1] = locale
