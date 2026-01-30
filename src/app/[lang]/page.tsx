@@ -1,36 +1,39 @@
 /**
  * HOME PAGE - ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * - Responsividade: Garantida via PageContent (Proxy) e Layout.
- * - I18n: Suporte total a PT, EN, ES integrado aos dicionários.
- * - SEO: Meta-tags dinâmicas para autoridade em Engenharia de Dados.
+ * - Framework: Next.js 16 (Turbopack)
+ * - I18n: SSR-Safe com suporte a PT, EN, ES.
+ * - Fix: Resolvido erro de chamada de Client Component no Servidor.
  */
 
 import { Metadata } from 'next'
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
 import { i18n, type Locale } from '@/i18n-config'
-import PageContent from '@/proxy'
+import ProxyPage from '@/proxy'
 
 interface PageProps {
   params: Promise<{ lang: string }>
 }
 
 /**
- * SEO Dinâmico: Gera metadados otimizados para cada idioma
+ * SEO Dinâmico: Metadados extraídos diretamente dos dicionários JSON
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const resolvedParams = await params
-  const lang = resolvedParams.lang as SupportedLocale
+  const { lang } = await params
+  const currentLang = lang as SupportedLocale
   
-  // Obtém o dicionário de forma síncrona para o servidor
-  const dict = getDictionarySync(lang)
+  // Obtém o dicionário de forma síncrona no servidor
+  const dict = getDictionarySync(currentLang)
+
+  // Fallback seguro para o título
+  const title = dict.seo?.siteName || dict.hero?.role || "Sérgio Santos | Portfólio"
 
   return {
-    title: dict.seo.siteName || dict.hero.role,
-    description: dict.seo.description,
-    keywords: dict.seo.keywords,
+    title,
+    description: dict.seo?.description,
+    keywords: dict.seo?.keywords,
     alternates: {
-      canonical: `/${lang}`,
+      canonical: `/${currentLang}`,
       languages: {
         'pt': '/pt',
         'en': '/en',
@@ -38,11 +41,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
     openGraph: {
-      title: dict.seo.siteName,
-      description: dict.seo.description,
-      url: `https://sergiosantos.com/${lang}`, // Substitua pelo seu domínio real
+      title,
+      description: dict.seo?.description,
+      url: `https://portfoliosantossergio.vercel.app/${currentLang}`,
       siteName: 'Sérgio Santos Portfolio',
-      locale: lang,
+      locale: currentLang,
       type: 'website',
     },
     robots: {
@@ -53,7 +56,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * Geração Estática (SSG): Garante performance máxima na Vercel
+ * Geração Estática (SSG): Define as rotas válidas no build
  */
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({
@@ -61,21 +64,25 @@ export async function generateStaticParams() {
   }))
 }
 
+/**
+ * Componente Principal (Server Component)
+ */
 export default async function HomePage({ params }: PageProps) {
+  // No Next.js 16, params deve ser aguardado (await)
   const resolvedParams = await params
   const { lang } = resolvedParams
 
-  // Validação rigorosa do idioma para evitar 404s ou erros de hidratação
+  // Validação de segurança para o idioma
   const currentLang = i18n.locales.includes(lang as Locale) 
     ? (lang as Locale) 
     : i18n.defaultLocale
 
   return (
     <main className="min-h-screen">
-      {/* O PageContent atua como um Proxy para componentes Client-side,
-          mantendo o page.tsx limpo para processamento no servidor (SSR).
+      {/* O ProxyPage (Client Component) recebe a Promise do params.
+          Isso resolve o erro "Attempted to call from server but it's on client".
       */}
-      <PageContent params={{ lang: currentLang }} />
+      <ProxyPage params={Promise.resolve({ lang: currentLang })} />
     </main>
   )
 }
