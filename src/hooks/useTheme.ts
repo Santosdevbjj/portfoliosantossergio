@@ -5,9 +5,13 @@
  * -----------------------------------------------------------------------------
  * Abstração lógica para consumo do estado de tema global.
  * Centraliza a inteligência de alternância e detecção de Dark Mode.
+ * * Revisão Sênior: 
+ * - Removida a dependência de Contexto customizado para evitar redundância.
+ * - Integração direta com next-themes para estabilidade no Next.js 16.
  */
 
-import { useThemeContext } from './ThemeContext'
+import { useTheme as useNextTheme } from 'next-themes'
+import { useEffect, useState, useCallback } from 'react'
 
 /* -------------------------------------------------------------------------- */
 /* TYPES                                                                      */
@@ -16,17 +20,11 @@ import { useThemeContext } from './ThemeContext'
 export type ThemeType = 'light' | 'dark' | 'system'
 
 interface UseThemeReturn {
-  /** Tema atualmente selecionado (light, dark ou system) */
   theme: ThemeType
-  /** Atalho booleano para verificar se o modo escuro está ativo */
   isDark: boolean
-  /** Indica se o componente já foi montado no cliente (evita hydration mismatch) */
   mounted: boolean
-  /** Alterna ciclicamente entre light e dark */
   toggleTheme: () => void
-  /** Aplica um tema específico */
   applyTheme: (theme: ThemeType) => void
-  /** Reseta o tema para a preferência do sistema */
   resetTheme: () => void
 }
 
@@ -34,26 +32,44 @@ interface UseThemeReturn {
 /* HOOK IMPLEMENTATION                                                        */
 /* -------------------------------------------------------------------------- */
 
-/**
- * useTheme — Hook de conveniência para acessar o ThemeProvider.
- * Garante que a lógica de UI não precise lidar com a complexidade do next-themes diretamente.
- */
 export function useTheme(): UseThemeReturn {
-  const context = useThemeContext()
+  const { theme, setTheme, resolvedTheme } = useNextTheme()
+  const [mounted, setMounted] = useState(false)
 
-  // Guard Clause: Impede o uso do hook fora do Provider, facilitando o debug.
-  if (!context) {
-    throw new Error(
-      '[useTheme] Erro crítico: Este hook deve ser utilizado obrigatoriamente dentro de um <ThemeProvider />.'
-    )
-  }
+  // Sincronização de montagem para evitar Hydration Mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  /**
+   * Alterna ciclicamente entre light e dark.
+   * Usamos useCallback para garantir estabilidade de referência.
+   */
+  const toggleTheme = useCallback(() => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+  }, [resolvedTheme, setTheme])
+
+  /**
+   * Aplica um tema específico.
+   */
+  const applyTheme = useCallback((newTheme: ThemeType) => {
+    setTheme(newTheme)
+  }, [setTheme])
+
+  /**
+   * Reseta o tema para a preferência do sistema.
+   */
+  const resetTheme = useCallback(() => {
+    setTheme('system')
+  }, [setTheme])
 
   return {
-    theme: (context.theme as ThemeType) || 'system',
-    isDark: context.isDark,
-    mounted: context.mounted,
-    toggleTheme: context.toggleTheme,
-    applyTheme: context.applyTheme,
-    resetTheme: context.resetTheme,
+    theme: (theme as ThemeType) || 'system',
+    // resolvedTheme é essencial porque ele sabe se o 'system' está dark ou light no momento
+    isDark: resolvedTheme === 'dark',
+    mounted,
+    toggleTheme,
+    applyTheme,
+    resetTheme,
   }
 }
