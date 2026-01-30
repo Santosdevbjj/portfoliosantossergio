@@ -4,7 +4,9 @@
 
 No cenário atual de tecnologia e dados, a visibilidade de um profissional sênior não pode depender apenas de uma lista de competências. 
 
+
 O mercado exige que a autoridade técnica seja acompanhada de transparência, contexto e governança.
+
 
 Este projeto foi construído para eliminar a "caixa preta" do portfólio tradicional. Ele serve como uma plataforma de auditoria onde recrutadores e especialistas técnicos podem validar simultaneamente meu raciocínio lógico, minhas decisões arquiteturais e minha capacidade de entregar soluções que resolvem problemas reais de negócio.
 
