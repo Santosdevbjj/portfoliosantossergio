@@ -3,24 +3,31 @@
 /**
  * THEME TOGGLE: Alternador de Tema com Consciência de Idioma
  * -----------------------------------------------------------------------------
- * - UX: Feedback visual imediato com micro-interações.
- * - A11y: Rótulos dinâmicos (ARIALabels) em PT, EN e ES.
- * - Performance: Prevenção de Flash of Unstyled Content (FOUC) via Skeleton.
+ * Revisão Sênior:
+ * 1. Uso direto do 'next-themes' para evitar dessincronização.
+ * 2. Lógica de i18n simplificada e resiliente.
+ * 3. Animações otimizadas para evitar "jank" em dispositivos móveis.
  */
 
 import * as React from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useTheme } from '@/hooks/useTheme'
+import { useTheme } from 'next-themes' // Recomendado usar diretamente do provider
 
 export function ThemeToggle() {
   const pathname = usePathname()
-  const { theme, toggleTheme, mounted } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = React.useState(false)
+
+  // O componente só assume sua forma final após a montagem no cliente
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   /* ------------------------------ i18n Logic ------------------------------ */
-  // Detecta o idioma para garantir que a acessibilidade seja multilíngue
   const lang = React.useMemo(() => {
-    const segment = pathname?.split('/')?.[1]
+    if (!pathname) return 'pt'
+    const segment = pathname.split('/')[1]
     return (segment === 'en' || segment === 'es' ? segment : 'pt') as 'pt' | 'en' | 'es'
   }, [pathname])
 
@@ -31,19 +38,23 @@ export function ThemeToggle() {
   }
 
   /* --------------------------- Skeleton State ----------------------------- */
-  // Evita que o botão "pule" ou mude de ícone durante a hidratação
   if (!mounted) {
     return (
       <div 
-        className="w-10 h-10 rounded-xl bg-slate-200/50 dark:bg-slate-800/50 animate-pulse border border-transparent" 
+        className="w-10 h-10 rounded-xl bg-slate-200/50 dark:bg-slate-800/50 border border-transparent" 
         aria-hidden="true"
       />
     )
   }
 
-  const isDark = theme === 'dark'
+  // Usamos resolvedTheme para lidar com o tema 'system' corretamente
+  const isDark = resolvedTheme === 'dark'
   const t = labels[lang]
   const currentLabel = isDark ? t.light : t.dark
+
+  const toggleTheme = () => {
+    setTheme(isDark ? 'light' : 'dark')
+  }
 
   return (
     <button
@@ -61,27 +72,27 @@ export function ThemeToggle() {
         hover:text-blue-600 dark:hover:text-amber-400
         hover:border-blue-500/30 dark:hover:border-amber-500/30
         transition-all duration-300
-        group active:scale-90
+        group active:scale-95
         focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500
       "
     >
       <div className="relative w-5 h-5 flex items-center justify-center overflow-hidden">
-        {/* Ícone de Sol: Aparece no Dark Mode para voltar ao Light */}
+        {/* Ícone de Sol: Visível quando o tema resolvido é escuro */}
         <Sun
           size={20}
           className={`
-            absolute transition-all duration-500 ease-spring
+            absolute transition-all duration-500 
             ${isDark 
               ? 'translate-y-0 opacity-100 rotate-0' 
               : 'translate-y-8 opacity-0 rotate-45'}
           `}
         />
         
-        {/* Ícone de Lua: Aparece no Light Mode para ir ao Dark */}
+        {/* Ícone de Lua: Visível quando o tema resolvido é claro */}
         <Moon
           size={20}
           className={`
-            absolute transition-all duration-500 ease-spring
+            absolute transition-all duration-500 
             ${!isDark 
               ? 'translate-y-0 opacity-100 rotate-0' 
               : '-translate-y-8 opacity-0 -rotate-45'}
@@ -89,8 +100,8 @@ export function ThemeToggle() {
         />
       </div>
 
-      {/* Efeito de Ring sutil no hover */}
-      <span className="absolute inset-0 rounded-xl border border-blue-500/0 group-hover:border-blue-500/10 dark:group-hover:border-amber-500/10 transition-colors" />
+      {/* Overlay de hover decorativo */}
+      <span className="absolute inset-0 rounded-xl border border-blue-500/0 group-hover:border-blue-500/10 dark:group-hover:border-amber-500/10 transition-colors pointer-events-none" />
     </button>
   )
 }
