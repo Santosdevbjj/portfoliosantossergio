@@ -26,6 +26,8 @@ Para garantir a integridade e a experiência do usuário, adotei as seguintes pr
  * Eficiência de Dados: Uso de ISR (Incremental Static Regeneration) para atualizar projetos sem sobrecarregar APIs externas.
 4. Decisões Técnicas e Stack
 A arquitetura foi escolhida para refletir o que há de mais moderno e escalável no mercado corporativo:
+
+
  * Next.js 15.5.7 (App Router): Renderização híbrida para máxima performance.
  * TypeScript 5.7: Tipagem estrita para garantir estabilidade em sistemas de dados.
  * Tailwind CSS & Framer Motion: Interface responsiva focada em legibilidade e fluidez.
