@@ -1,31 +1,31 @@
 'use client'
 
 /**
- * THEME TOGGLE: Alternador de Tema com Consciência de Idioma
+ * THEME TOGGLE — SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * Revisão Sênior:
- * 1. Uso direto do 'next-themes' para evitar dessincronização.
- * 2. Lógica de i18n simplificada e resiliente.
- * 3. Animações otimizadas para evitar "jank" em dispositivos móveis.
+ * - Responsividade: Adaptativo com feedback tátil (active:scale-95).
+ * - Multilingue: Labels em PT, EN, ES baseados na rota atual.
+ * - Build Fix: Removida variável 'theme' não utilizada para sanar erro de compilação.
  */
 
-import * as React from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useTheme } from 'next-themes' // Recomendado usar diretamente do provider
+import { useTheme } from 'next-themes'
 
 export function ThemeToggle() {
   const pathname = usePathname()
-  const { theme, setTheme, resolvedTheme } = useTheme()
-  const [mounted, setMounted] = React.useState(false)
+  // Removido 'theme' para evitar erro "declared but never read" no Vercel
+  const { setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
-  // O componente só assume sua forma final após a montagem no cliente
-  React.useEffect(() => {
+  // Garante sincronia após montagem no cliente
+  useEffect(() => {
     setMounted(true)
   }, [])
 
   /* ------------------------------ i18n Logic ------------------------------ */
-  const lang = React.useMemo(() => {
+  const lang = useMemo(() => {
     if (!pathname) return 'pt'
     const segment = pathname.split('/')[1]
     return (segment === 'en' || segment === 'es' ? segment : 'pt') as 'pt' | 'en' | 'es'
@@ -41,25 +41,20 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <div 
-        className="w-10 h-10 rounded-xl bg-slate-200/50 dark:bg-slate-800/50 border border-transparent" 
+        className="w-10 h-10 rounded-xl bg-slate-200/50 dark:bg-slate-800/50 border border-transparent animate-pulse" 
         aria-hidden="true"
       />
     )
   }
 
-  // Usamos resolvedTheme para lidar com o tema 'system' corretamente
   const isDark = resolvedTheme === 'dark'
   const t = labels[lang]
   const currentLabel = isDark ? t.light : t.dark
 
-  const toggleTheme = () => {
-    setTheme(isDark ? 'light' : 'dark')
-  }
-
   return (
     <button
       type="button"
-      onClick={toggleTheme}
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
       aria-label={currentLabel}
       aria-pressed={isDark}
       title={currentLabel}
@@ -77,7 +72,7 @@ export function ThemeToggle() {
       "
     >
       <div className="relative w-5 h-5 flex items-center justify-center overflow-hidden">
-        {/* Ícone de Sol: Visível quando o tema resolvido é escuro */}
+        {/* Ícone de Sol: Visível no Dark Mode para mudar para Light */}
         <Sun
           size={20}
           className={`
@@ -88,7 +83,7 @@ export function ThemeToggle() {
           `}
         />
         
-        {/* Ícone de Lua: Visível quando o tema resolvido é claro */}
+        {/* Ícone de Lua: Visível no Light Mode para mudar para Dark */}
         <Moon
           size={20}
           className={`
@@ -100,7 +95,7 @@ export function ThemeToggle() {
         />
       </div>
 
-      {/* Overlay de hover decorativo */}
+      {/* Overlay decorativo discreto */}
       <span className="absolute inset-0 rounded-xl border border-blue-500/0 group-hover:border-blue-500/10 dark:group-hover:border-amber-500/10 transition-colors pointer-events-none" />
     </button>
   )
