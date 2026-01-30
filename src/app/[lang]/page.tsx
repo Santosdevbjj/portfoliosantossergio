@@ -1,9 +1,9 @@
 /**
  * HOME PAGE - ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * - Framework: Next.js 16 (Turbopack)
- * - I18n: SSR-Safe com suporte a PT, EN, ES.
- * - Fix: Resolvido erro de chamada de Client Component no Servidor.
+ * - Framework: Next.js 16.1.5 (Estável)
+ * - I18n: Multilíngue (PT, EN, ES) integrado ao dicionário.
+ * - Responsividade: Viewport configurada via Metadata.
  */
 
 import { Metadata } from 'next'
@@ -16,47 +16,60 @@ interface PageProps {
 }
 
 /**
- * SEO Dinâmico: Metadados extraídos diretamente dos dicionários JSON
+ * SEO DINÂMICO & RESPONSIVIDADE
+ * Extrai dados do src/dictionaries/[lang].json para garantir autoridade máxima.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params
-  const currentLang = lang as SupportedLocale
+  const currentLang = (i18n.locales.includes(lang as any) ? lang : i18n.defaultLocale) as SupportedLocale
   
-  // Obtém o dicionário de forma síncrona no servidor
   const dict = getDictionarySync(currentLang)
 
-  // Fallback seguro para o título
-  const title = dict.seo?.siteName || dict.hero?.role || "Sérgio Santos | Portfólio"
+  // Título e descrição vindos do contrato único src/types/dictionary.ts
+  const title = dict.seo.siteName
+  const description = dict.seo.description
 
   return {
-    title,
-    description: dict.seo?.description,
-    keywords: dict.seo?.keywords,
+    title: {
+      default: title,
+      template: `%s | ${title}`
+    },
+    description,
+    keywords: dict.seo.keywords,
+    viewport: 'width=device-width, initial-scale=1, maximum-scale=5', // Garante responsividade
     alternates: {
       canonical: `/${currentLang}`,
       languages: {
-        'pt': '/pt',
-        'en': '/en',
-        'es': '/es',
+        'pt-BR': '/pt',
+        'en-US': '/en',
+        'es-ES': '/es',
       },
     },
     openGraph: {
       title,
-      description: dict.seo?.description,
+      description,
       url: `https://portfoliosantossergio.vercel.app/${currentLang}`,
-      siteName: 'Sérgio Santos Portfolio',
+      siteName: title,
       locale: currentLang,
       type: 'website',
     },
     robots: {
       index: true,
       follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     }
   }
 }
 
 /**
- * Geração Estática (SSG): Define as rotas válidas no build
+ * GERAÇÃO ESTÁTICA (SSG)
+ * Define as rotas válidas (PT, EN, ES) no momento do build.
  */
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({
@@ -65,22 +78,24 @@ export async function generateStaticParams() {
 }
 
 /**
- * Componente Principal (Server Component)
+ * COMPONENTE PRINCIPAL (SERVER COMPONENT)
+ * Sem importação de React conforme solicitado.
  */
 export default async function HomePage({ params }: PageProps) {
-  // No Next.js 16, params deve ser aguardado (await)
+  // Unwrapping params obrigatório no Next.js 16
   const resolvedParams = await params
   const { lang } = resolvedParams
 
-  // Validação de segurança para o idioma
-  const currentLang = i18n.locales.includes(lang as Locale) 
-    ? (lang as Locale) 
-    : i18n.defaultLocale
+  // Validação rigorosa de localidade
+  const currentLang = (i18n.locales.includes(lang as Locale) 
+    ? lang 
+    : i18n.defaultLocale) as SupportedLocale
 
   return (
-    <main className="min-h-screen">
-      {/* O ProxyPage (Client Component) recebe a Promise do params.
-          Isso resolve o erro "Attempted to call from server but it's on client".
+    <main className="min-h-screen w-full overflow-x-hidden overflow-y-auto bg-white dark:bg-[#020617]">
+      {/* Passamos a Promise resolvida para o ProxyPage. 
+          O ProxyPage (Client Component) cuidará da renderização das seções 
+          multilíngues e responsivas.
       */}
       <ProxyPage params={Promise.resolve({ lang: currentLang })} />
     </main>
