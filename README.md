@@ -18,9 +18,11 @@ Com uma trajetória de mais de 20 anos em sistemas críticos (setor bancário), 
 
 **3. Premissas da Solução**
 Para garantir a integridade e a experiência do usuário, adotei as seguintes premissas de engenharia:
+
  * Performance: Carregamento em menos de 1s (LCP otimizado) para retenção de audiência.
  * Segurança Nativa: Implementação rigorosa do patch de integridade CVE-2025-66478.
  * Acessibilidade: Conformidade com normas WCAG e SEO internacional para indexação global.
+   
  * Eficiência de Dados: Uso de ISR (Incremental Static Regeneration) para atualizar projetos sem sobrecarregar APIs externas.
 4. Decisões Técnicas e Stack
 A arquitetura foi escolhida para refletir o que há de mais moderno e escalável no mercado corporativo:
