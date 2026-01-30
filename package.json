@@ -1,6 +1,6 @@
 {
   "name": "portfolio-sergio-vercel-final",
-  "version": "12.13.12",
+  "version": "12.13.13",
   "private": true,
   "engines": {
     "node": "24.x"
@@ -20,13 +20,13 @@
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.5.4",
     "clsx": "2.1.1",
-    "motion": "12.29.2",
     "lucide-react": "0.479.0",
+    "motion": "12.29.2",
     "negotiator": "^1.0.0",
     "next": "16.1.5",
     "next-themes": "0.4.4",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "tailwind-merge": "2.6.0",
     "tailwindcss-animate": "^1.0.7"
   },
@@ -34,13 +34,13 @@
     "@tailwindcss/typography": "0.5.16",
     "@types/negotiator": "^0.6.3",
     "@types/node": "25.1.0",
-    "@types/react": "19.2.3",
-    "@types/react-dom": "19.2.3",
+    "@types/react": "18.2.55",
+    "@types/react-dom": "18.2.19",
     "@typescript-eslint/eslint-plugin": "8.18.0",
     "@typescript-eslint/parser": "8.18.0",
     "autoprefixer": "10.4.20",
     "cssnano": "7.0.6",
-    "eslint": "9.x",
+    "eslint": "8.57.0",
     "eslint-config-next": "16.1.5",
     "eslint-config-prettier": "10.0.1",
     "eslint-plugin-react": "7.37.0",
