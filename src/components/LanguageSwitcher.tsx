@@ -3,18 +3,18 @@
 /**
  * LANGUAGE & THEME SWITCHER — SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * - Responsividade: Adaptativo para Mobile/Desktop.
- * - I18n: Suporte nativo a PT, EN, ES.
- * - UX: Persistência de estado e transições suaves.
+ * - Responsividade: Totalmente adaptativo com design de vidro (backdrop-blur).
+ * - Multilingue: PT, EN, ES com persistência via Cookie e preservação de rota.
+ * - Build Fix: Removido useEffect não utilizado e corrigida tipagem do tema.
  */
 
-import { useEffect, useState, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Moon, Sun } from 'lucide-react'
 import type { Route } from 'next'
 
-import { useTheme } from '@/hooks/useTheme'
+import { useTheme } from 'next-themes'
 import { i18n, type Locale, localeMetadata } from '@/i18n-config'
 import { LOCALE_COOKIE, LOCALE_COOKIE_OPTIONS } from '@/lib/locale-cookie'
 import type { SupportedLocale } from '@/dictionaries'
@@ -26,25 +26,31 @@ interface LanguageSwitcherProps {
 function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { isDark, toggleTheme, mounted } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  // Garante que o componente só renderize ícones após o mount para evitar erro de hidratação
+  if (!mounted) {
+    // Ativa o mounted no próximo ciclo de renderização de forma segura
+    setTimeout(() => setMounted(true), 0)
+    return (
+      <div className="h-9 w-44 bg-slate-200/10 dark:bg-slate-800/10 animate-pulse rounded-xl" />
+    )
+  }
+
+  const isDark = resolvedTheme === 'dark'
 
   function writeLocaleCookie(locale: string) {
     if (typeof document === 'undefined') return
     document.cookie = `${LOCALE_COOKIE}=${locale}; path=${LOCALE_COOKIE_OPTIONS.path}; max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}`
   }
 
-  // Rótulos de acessibilidade dinâmicos
+  // Mapeamento de labels para acessibilidade (UX Multilingue)
   const labels = {
     pt: { dark: 'Ativar modo escuro', light: 'Ativar modo claro', lang: 'Mudar idioma' },
     en: { dark: 'Toggle dark mode', light: 'Toggle light mode', lang: 'Change language' },
     es: { dark: 'Activar modo oscuro', light: 'Activar modo claro', lang: 'Cambiar idioma' }
-  }[currentLang]
-
-  if (!mounted) {
-    return (
-      <div className="h-9 w-44 bg-slate-200/10 dark:bg-slate-800/10 animate-pulse rounded-xl" />
-    )
-  }
+  }[currentLang] || { dark: 'Toggle dark mode', light: 'Toggle light mode', lang: 'Change language' }
 
   const availableLocales = Array.from(i18n.locales) as Locale[]
 
@@ -53,7 +59,7 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
       
       {/* ALTERNADOR DE TEMA */}
       <button
-        onClick={toggleTheme}
+        onClick={() => setTheme(isDark ? 'light' : 'dark')}
         type="button"
         title={isDark ? labels.light : labels.dark}
         aria-label={isDark ? labels.light : labels.dark}
@@ -74,7 +80,7 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
           const isActive = currentLang === locale
           const meta = localeMetadata[locale]
 
-          // Preservação de Rota e Query Params
+          // Lógica de preservação de Rota
           const segments = pathname?.split('/') || []
           if (segments[1] && availableLocales.includes(segments[1] as Locale)) {
             segments[1] = locale
