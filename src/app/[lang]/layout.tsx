@@ -1,9 +1,9 @@
 /**
- * ROOT LAYOUT - NEXT.JS 16 - VERSÃO FINAL DE PRODUÇÃO
+ * ROOT LAYOUT - NEXT.JS 16 - SÉRGIO SANTOS ESTRATÉGICO
  * -----------------------------------------------------------------------------
- * - SEO: Metadados dinâmicos integrados aos dicionários JSON.
- * - Performance: Fontes otimizadas e scripts afterInteractive.
- * - Estabilidade: Tratamento de hidratação e correção de tipagem para CookieBanner.
+ * - Responsividade: Estrutura flex-col com largura total.
+ * - Multilingue: PT, EN, ES com SEO dinâmico por idioma.
+ * - Alinhamento: Consome dicionários para metadados e componentes globais.
  */
 
 import type { Metadata, Viewport } from 'next'
@@ -42,9 +42,9 @@ export const viewport: Viewport = {
   ],
 }
 
-// Geração de Metadados Dinâmicos alinhados com o Dicionário de cada idioma
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
-  const { lang } = await props.params
+  const resolvedParams = await props.params
+  const lang = resolvedParams.lang
   const currentLang = (i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale) as SupportedLocale
   
   const dict = getDictionarySync(currentLang)
@@ -58,20 +58,19 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
     description: dict.seo.description,
     metadataBase: new URL(siteUrl),
     alternates: {
-      canonical: `${siteUrl}/${currentLang}`,
+      canonical: `/${currentLang}`,
       languages: { 
-        pt: `${siteUrl}/pt`, 
-        en: `${siteUrl}/en`, 
-        es: `${siteUrl}/es`, 
-        'x-default': `${siteUrl}/pt` 
+        pt: '/pt', 
+        en: '/en', 
+        es: '/es', 
+        'x-default': '/pt' 
       },
     },
     keywords: dict.seo.keywords,
-    verification: { google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0' },
     openGraph: {
       title: dict.seo.siteName,
       description: dict.seo.description,
-      url: siteUrl,
+      url: './',
       siteName: dict.seo.siteName,
       locale: currentLang,
       type: 'website',
@@ -80,7 +79,8 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
 }
 
 export default async function RootLayout(props: { children: React.ReactNode; params: Promise<{ lang: string }> }) {
-  const { lang } = await props.params
+  const resolvedParams = await props.params
+  const lang = resolvedParams.lang
   const currentLang = (i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale) as SupportedLocale
   
   const dict = getDictionarySync(currentLang)
@@ -92,7 +92,6 @@ export default async function RootLayout(props: { children: React.ReactNode; par
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
       <head>
-        {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
           strategy="afterInteractive"
@@ -102,14 +101,12 @@ export default async function RootLayout(props: { children: React.ReactNode; par
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-3XF5BTP58V', {
-              page_path: window.location.pathname,
-            });
+            gtag('config', 'G-3XF5BTP58V');
           `}
         </Script>
       </head>
       <body 
-        className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased selection:bg-blue-500/30 overflow-x-clip"
+        className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased font-inter overflow-x-hidden"
         suppressHydrationWarning
       >
         <ThemeProvider 
@@ -118,20 +115,19 @@ export default async function RootLayout(props: { children: React.ReactNode; par
           enableSystem 
           disableTransitionOnChange
         >
-          <div className="relative flex flex-col min-h-screen w-full">
-            <main id="main-content" role="main" className="flex-grow w-full relative focus:outline-none">
+          <div className="flex flex-col min-h-screen">
+            <main id="main-content" className="flex-grow">
               {props.children}
             </main>
           </div>
           
-          {/* CORREÇÃO DE TIPAGEM: Uso de 'as any' para mapear o objeto de tradução específico do CookieBanner */}
           <CookieBanner 
             lang={currentLang} 
             dict={{
-              title: currentLang === 'pt' ? "Cookies" : (currentLang === 'es' ? "Galletas" : "Cookies"),
+              title: currentLang === 'pt' ? "Privacidade" : (currentLang === 'es' ? "Privacidad" : "Privacy"),
               description: dict.seo.description,
-              accept: dict.projects.viewAll
-            } as any} 
+              accept: dict.projects.viewAll // Reaproveitando a label de ação do dicionário
+            }} 
           />
         </ThemeProvider>
       </body>
