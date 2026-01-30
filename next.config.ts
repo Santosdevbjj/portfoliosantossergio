@@ -1,30 +1,27 @@
 import type { NextConfig } from 'next';
 
 /**
- * NEXT.JS CONFIGURATION - Termux & 2026 Security Hardened (Next.js 16.1.5+)
- * -----------------------------------------------------------------------------
- * Fixes: turbo.createProject WASM error, CVE-2025-59471 (DoS), Motion 12 Compat
+ * NEXT.JS CONFIGURATION
+ * Target: Next.js 16.1.5 + Node 24.x + Vercel + App Router (src/)
+ * Status: Production-safe / Termux-safe / CSP-hardened
  */
+
 const nextConfig: NextConfig = {
   /* -------------------------------------------------------------------------- */
-  /* CORE & STABILITY                                                           */
+  /* CORE                                                                       */
   /* -------------------------------------------------------------------------- */
   reactStrictMode: true,
-  poweredByHeader: false, 
-  
-  //typedRoutes é estável na 16.1.5 e funciona bem em WASM
-  typedRoutes: true,
-  
+  poweredByHeader: false,
+
   typescript: {
     ignoreBuildErrors: false,
     tsconfigPath: 'tsconfig.json',
   },
 
   /* -------------------------------------------------------------------------- */
-  /* COMPILER & OPTIMIZATION                                                    */
+  /* COMPILER                                                                   */
   /* -------------------------------------------------------------------------- */
   compiler: {
-    // Remove consoles em produção exceto erros e avisos
     removeConsole:
       process.env.NODE_ENV === 'production'
         ? { exclude: ['error', 'warn'] }
@@ -32,31 +29,49 @@ const nextConfig: NextConfig = {
   },
 
   /* -------------------------------------------------------------------------- */
-  /* IMAGES (Security: CVE-2025-59471 Hardened)                                 */
+  /* IMAGES                                                                     */
   /* -------------------------------------------------------------------------- */
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     minimumCacheTTL: 86400,
-    dangerouslyAllowLocalIP: false,
 
-    // PATHNAMES OBRIGATÓRIOS: Evita que atacantes usem seu servidor para processar imagens gigantes
+    // Segurança: evita uso do servidor como proxy de imagens gigantes
     remotePatterns: [
-      { protocol: 'https', hostname: 'avatars.githubusercontent.com', pathname: '/u/**' },
-      { protocol: 'https', hostname: 'raw.githubusercontent.com', pathname: '/**' },
-      { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
-      { protocol: 'https', hostname: 'media.licdn.com', pathname: '/dms/image/**' },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        pathname: '/u/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'raw.githubusercontent.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.licdn.com',
+        pathname: '/dms/image/**',
+      },
     ],
   },
 
   /* -------------------------------------------------------------------------- */
-  /* BUNDLER & IMPORTS (WASM Compatible Otimizations)                           */
+  /* EXPERIMENTAL (Next.js 16 COMPATÍVEL)                                       */
   /* -------------------------------------------------------------------------- */
   experimental: {
-    // DESATIVADO: typedEnv pode forçar o motor Rust que quebra no Termux
-    typedEnv: false, 
+    // typedRoutes ainda é experimental no 16.x
+    typedRoutes: true,
 
-    // ATUALIZADO: Usando o novo nome do pacote 'motion' para otimização
+    // Evita engine Rust que quebra no Termux
+    typedEnv: false,
+
+    // Tree-shaking agressivo e seguro
     optimizePackageImports: [
       'lucide-react',
       'motion',
@@ -64,13 +79,10 @@ const nextConfig: NextConfig = {
       'tailwind-merge',
       'next-themes',
     ],
-    
-    // Proteção contra CVE-2025-59472 - Estável na 16.1.5
-    ppr: 'incremental',
   },
 
   /* -------------------------------------------------------------------------- */
-  /* SECURITY HEADERS (Proteção contra RCE e XSS 2026)                          */
+  /* SECURITY HEADERS                                                           */
   /* -------------------------------------------------------------------------- */
   async headers() {
     return [
@@ -86,20 +98,20 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+            value: 'camera=(), microphone=(), geolocation=()',
           },
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self';",
               "img-src 'self' data: https: blob:;",
-              // 'wasm-unsafe-eval' é essencial para o motor de 120fps do Motion 12
               "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com;",
               "style-src 'self' 'unsafe-inline';",
               "font-src 'self' data: https:;",
-              `connect-src 'self' https: ${process.env.NODE_ENV === 'development' ? 'ws: wss:' : ''};`,
+              `connect-src 'self' https: ${
+                process.env.NODE_ENV === 'development' ? 'ws: wss:' : ''
+              };`,
               "frame-ancestors 'none';",
-              "upgrade-insecure-requests;",
               "object-src 'none';",
               "base-uri 'self';",
               "form-action 'self';",
