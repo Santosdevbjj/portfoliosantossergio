@@ -3,12 +3,13 @@
  * -----------------------------------------------------------------------------
  * - Framework: Next.js 16.1.5 (Estável)
  * - I18n: Multilíngue (PT, EN, ES) integrado ao dicionário.
- * - Responsividade: Viewport configurada via Metadata.
+ * - Responsividade: Viewport e Layout blindados para Mobile.
+ * - SEO: Integração com API post-og dinâmica.
  */
 
 import { Metadata } from 'next'
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
-import { i18n, type Locale } from '@/i18n-config'
+import { i18n } from '@/i18n-config'
 import ProxyPage from '@/proxy'
 
 interface PageProps {
@@ -17,7 +18,7 @@ interface PageProps {
 
 /**
  * SEO DINÂMICO & RESPONSIVIDADE
- * Extrai dados do src/dictionaries/[lang].json para garantir autoridade máxima.
+ * Extrai dados do contrato único src/types/dictionary.ts
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params
@@ -25,9 +26,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   
   const dict = getDictionarySync(currentLang)
 
-  // Título e descrição vindos do contrato único src/types/dictionary.ts
   const title = dict.seo.siteName
   const description = dict.seo.description
+  const siteUrl = 'https://portfoliosantossergio.vercel.app'
+
+  // Geração da URL da imagem OG usando nossa API dinâmica
+  const ogImageUrl = `${siteUrl}/api/post-og?title=${encodeURIComponent(dict.hero.title + ' ' + dict.hero.subtitle)}&description=${encodeURIComponent(dict.hero.headline)}&author=Sérgio Santos`
 
   return {
     title: {
@@ -36,9 +40,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     description,
     keywords: dict.seo.keywords,
-    viewport: 'width=device-width, initial-scale=1, maximum-scale=5', // Garante responsividade
+    // Responsividade máxima para Chrome no Celular
+    viewport: 'width=device-width, initial-scale=1, maximum-scale=5', 
     alternates: {
-      canonical: `/${currentLang}`,
+      canonical: `${siteUrl}/${currentLang}`,
       languages: {
         'pt-BR': '/pt',
         'en-US': '/en',
@@ -48,10 +53,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title,
       description,
-      url: `https://portfoliosantossergio.vercel.app/${currentLang}`,
+      url: `${siteUrl}/${currentLang}`,
       siteName: title,
       locale: currentLang,
       type: 'website',
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: title,
+        }
+      ],
     },
     robots: {
       index: true,
@@ -69,7 +82,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 /**
  * GERAÇÃO ESTÁTICA (SSG)
- * Define as rotas válidas (PT, EN, ES) no momento do build.
+ * Garante que as rotas /pt, /en e /es existam fisicamente no build da Vercel.
  */
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({
@@ -79,23 +92,21 @@ export async function generateStaticParams() {
 
 /**
  * COMPONENTE PRINCIPAL (SERVER COMPONENT)
- * Sem importação de React conforme solicitado.
+ * Entrega a estrutura para o ProxyPage renderizar as seções.
  */
 export default async function HomePage({ params }: PageProps) {
-  // Unwrapping params obrigatório no Next.js 16
   const resolvedParams = await params
   const { lang } = resolvedParams
 
-  // Validação rigorosa de localidade
-  const currentLang = (i18n.locales.includes(lang as Locale) 
+  // Validação de segurança para garantir que o lang seja suportado
+  const currentLang = (i18n.locales.includes(lang as any) 
     ? lang 
     : i18n.defaultLocale) as SupportedLocale
 
   return (
-    <main className="min-h-screen w-full overflow-x-hidden overflow-y-auto bg-white dark:bg-[#020617]">
-      {/* Passamos a Promise resolvida para o ProxyPage. 
-          O ProxyPage (Client Component) cuidará da renderização das seções 
-          multilíngues e responsivas.
+    <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617]">
+      {/* O ProxyPage recebe a lang resolvida e renderiza o conteúdo 
+          extraído do dicionário correspondente.
       */}
       <ProxyPage params={Promise.resolve({ lang: currentLang })} />
     </main>
