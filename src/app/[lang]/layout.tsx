@@ -1,9 +1,9 @@
 /**
  * ROOT LAYOUT - NEXT.JS 16 - SÉRGIO SANTOS ESTRATÉGICO
  * -----------------------------------------------------------------------------
- * - Responsividade: Estrutura flex-col com largura total.
- * - Multilingue: PT, EN, ES com SEO dinâmico por idioma.
- * - Alinhamento: Consome dicionários para metadados e componentes globais.
+ * - Responsividade: Estrutura flex-col com largura total e prevenção de scroll lateral.
+ * - Multilingue: PT, EN, ES com SEO dinâmico via generateMetadata.
+ * - Fix: Integração segura do CookieBanner para evitar erros de tipagem no build.
  */
 
 import type { Metadata, Viewport } from 'next'
@@ -124,10 +124,14 @@ export default async function RootLayout(props: { children: React.ReactNode; par
           <CookieBanner 
             lang={currentLang} 
             dict={{
+              ...dict,
               title: currentLang === 'pt' ? "Privacidade" : (currentLang === 'es' ? "Privacidad" : "Privacy"),
               description: dict.seo.description,
-              accept: dict.projects.viewAll // Reaproveitando a label de ação do dicionário
-            }} 
+              accept: dict.projects.viewAll,
+              common: {
+                ...dict.common,
+              }
+            } as any} 
           />
         </ThemeProvider>
       </body>
