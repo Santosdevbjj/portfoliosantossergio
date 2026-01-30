@@ -1,7 +1,8 @@
 /**
- * I18N CONFIG
+ * I18N CONFIG — ESTRUTURA SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
  * Fonte única de verdade para internacionalização (Locales e Metadata).
+ * Alinhado com Next.js 16 e os dicionários PT, EN, ES.
  */
 
 export const i18n = {
@@ -11,6 +12,10 @@ export const i18n = {
 
 export type Locale = (typeof i18n.locales)[number];
 
+/**
+ * Metadados dos Locales:
+ * Utilizados pelo componente LanguageSwitcher e para SEO (hreflang).
+ */
 export const localeMetadata = {
   pt: { 
     name: 'Português', 
@@ -36,8 +41,8 @@ export const localeMetadata = {
 } as const;
 
 /**
- * Função assíncrona para Server Components.
- * Utiliza o carregamento dinâmico para otimizar o Core Web Vitals.
+ * Carregamento Dinâmico de Dicionários (Server-Side).
+ * Otimizado para o App Router do Next.js.
  */
 export async function getDictionary(locale: Locale) {
   const dictionaries = {
@@ -46,7 +51,16 @@ export async function getDictionary(locale: Locale) {
     es: () => import('./dictionaries/es.json').then((module) => module.default),
   };
 
-  // Fallback seguro caso o locale venha corrompido ou não suportado
-  const loader = dictionaries[locale] || dictionaries[i18n.defaultLocale];
+  // Garante que, se o locale for inválido, o sistema não quebre (fallback para PT)
+  const isValidLocale = i18n.locales.includes(locale);
+  const loader = dictionaries[isValidLocale ? locale : i18n.defaultLocale];
+  
   return await loader();
+}
+
+/**
+ * Helper para validar se um locale é suportado.
+ */
+export function isSupportedLocale(locale: string): locale is Locale {
+  return i18n.locales.includes(locale as Locale);
 }
