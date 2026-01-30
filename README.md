@@ -2,12 +2,16 @@
 
 **1. Problema de Negócio (Motivação)**
 
-No cenário atual de tecnologia e dados, a visibilidade de um profissional sênior não pode depender apenas de uma lista de competências. O mercado exige que a autoridade técnica seja acompanhada de transparência, contexto e governança.
+No cenário atual de tecnologia e dados, a visibilidade de um profissional sênior não pode depender apenas de uma lista de competências. 
+
+O mercado exige que a autoridade técnica seja acompanhada de transparência, contexto e governança.
+
 Este projeto foi construído para eliminar a "caixa preta" do portfólio tradicional. Ele serve como uma plataforma de auditoria onde recrutadores e especialistas técnicos podem validar simultaneamente meu raciocínio lógico, minhas decisões arquiteturais e minha capacidade de entregar soluções que resolvem problemas reais de negócio.
 
 **2. Contexto Profissional**
 
 Com uma trajetória de mais de 20 anos em sistemas críticos (setor bancário), este portfólio consolida minha transição para a Ciência de Dados, utilizando uma infraestrutura que suporta:
+
  * Exibição Dinâmica: Projetos de IA/ML integrados em tempo real via GitHub API.
  * Alcance Global: Interface multilingue (Português, Inglês, Espanhol).
  * Rigor Enterprise: Segurança ativa com patching contra vulnerabilidades críticas de 2026.
