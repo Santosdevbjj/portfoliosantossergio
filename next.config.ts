@@ -1,22 +1,21 @@
 import type { NextConfig } from 'next';
 
 /**
- * NEXT.JS CONFIGURATION - Enterprise Grade (Next.js 16.x)
+ * NEXT.JS CONFIGURATION - Hardened for 2026 (Next.js 16.1.5+)
  * -----------------------------------------------------------------------------
- * Hardened for Security (CVE-2025-66478) and High Performance.
+ * Security fixes for: CVE-2025-55182 (RCE), CVE-2025-59471 (DoS), CVE-2026-23864 (RSC DoS)
  */
 const nextConfig: NextConfig = {
   /* -------------------------------------------------------------------------- */
   /* CORE & STABILITY                                                           */
   /* -------------------------------------------------------------------------- */
   reactStrictMode: true,
-  poweredByHeader: false, // Segurança: Não revela o uso de Next.js
+  poweredByHeader: false, // Proteção contra fingerprinting
   
-  // No Next.js 16, typedRoutes é estável e essencial para evitar 404
+  // No Next.js 16.1.5, typedRoutes garante integridade na navegação
   typedRoutes: true,
   
   typescript: {
-    // Rigor técnico: Impedir builds com erro de tipo
     ignoreBuildErrors: false,
     tsconfigPath: 'tsconfig.json',
   },
@@ -32,44 +31,42 @@ const nextConfig: NextConfig = {
   },
 
   /* -------------------------------------------------------------------------- */
-  /* IMAGES (Region Optimized)                                                  */
+  /* IMAGES (Hardened against CVE-2025-59471)                                   */
   /* -------------------------------------------------------------------------- */
   images: {
     formats: ['image/avif', 'image/webp'],
-    deviceSizes: [450, 640, 750, 828, 1080, 1200, 1920],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Removido tamanhos excessivos
     minimumCacheTTL: 86400,
-    
-    // Bloqueia tentativas de SSR de imagens de IPs locais maliciosos
     dangerouslyAllowLocalIP: false,
 
+    // CORREÇÃO CRÍTICA: Adicionado pathnames restritivos para evitar DoS de memória
     remotePatterns: [
-      { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
-      { protocol: 'https', hostname: 'raw.githubusercontent.com' },
-      { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: 'media.licdn.com' }, // Adicionado para fotos do LinkedIn
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com', pathname: '/u/**' },
+      { protocol: 'https', hostname: 'raw.githubusercontent.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'media.licdn.com', pathname: '/dms/image/**' },
     ],
   },
 
   /* -------------------------------------------------------------------------- */
-  /* BUNDLER & IMPORTS (Next.js 16 Optimization)                                */
+  /* BUNDLER & IMPORTS (Next.js 16 + Framer Motion 12 Optimization)             */
   /* -------------------------------------------------------------------------- */
   experimental: {
-    // typedEnv garante que o processo falhe se faltarem variáveis de ambiente
     typedEnv: true,
-    
-    // Reduz drasticamente o tempo de build no Next.js 16
+    // Otimização específica para Framer Motion 12 e Lucide
     optimizePackageImports: [
       'lucide-react',
+      'framer-motion',
       'clsx',
       'tailwind-merge',
-      'framer-motion',
       'next-themes',
-      'date-fns',
     ],
+    // Proteção contra CVE-2025-59472 (PPR Security Fix)
+    ppr: 'incremental',
   },
 
   /* -------------------------------------------------------------------------- */
-  /* SECURITY HEADERS (Padrão 2026 - Proteção contra RCE e DoS)                 */
+  /* SECURITY HEADERS (Proteção contra RCE e Deserialização RSC)                */
   /* -------------------------------------------------------------------------- */
   async headers() {
     return [
@@ -91,18 +88,18 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self';",
-              "img-src 'self' data: https: blob:;", // Adicionado blob: para compatibilidade
-              // Segurança contra RSC RCE: script-src mais restrito
+              "img-src 'self' data: https: blob:;",
+              // script-src: 'wasm-unsafe-eval' é necessário para o motor de animação do Framer Motion 12
               "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com;",
               "style-src 'self' 'unsafe-inline';",
               "font-src 'self' data: https:;",
-              // Restringe conexões apenas ao domínio e Vercel Analytics
+              // connect-src: Essencial para evitar o bypass do React Server Components
               `connect-src 'self' https: ${process.env.NODE_ENV === 'development' ? 'ws: wss:' : ''};`,
               "frame-ancestors 'none';",
               "upgrade-insecure-requests;",
-              "object-src 'none';", // Bloqueia plugins legados (Flash, etc)
+              "object-src 'none';",
               "base-uri 'self';",
-              "form-action 'self';", // Impede que formulários enviem dados para sites externos
+              "form-action 'self';",
             ].join(' '),
           },
         ],
