@@ -64,7 +64,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/proxy.ts", 
+    "src/proxy.tsx", 
     "src/dictionaries/*.json"
   ],
 
