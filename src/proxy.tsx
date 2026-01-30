@@ -1,10 +1,10 @@
 'use client'
 
 /**
- * PROXY CONTENT — SÉRGIO SANTOS (Hardened for Jan 2026)
+ * PROXY CONTENT — SÉRGIO SANTOS (Revisado Jan 2026)
  * -----------------------------------------------------------------------------
- * Fix: Hydration Mismatch & Next.js 16 Async Params Pattern.
- * Security: Restricted locale validation to prevent SSR injection.
+ * Rigor: Totalmente responsivo e alinhado com dicionários PT, EN, ES.
+ * Performance: Otimizado para renderização no Chrome Mobile.
  */
 
 import { useState, useEffect, Suspense, use } from 'react'
@@ -34,11 +34,11 @@ interface ProxyProps {
 }
 
 export default function ProxyPage({ params }: ProxyProps) {
-  // 1. Unwrap params imediatamente usando o hook 'use' (Padrão Next.js 16)
+  // 1. Unwrap params (Next.js 16 Pattern)
   const resolvedParams = use(params)
   const lang = resolvedParams.lang as SupportedLocale
 
-  // 2. Validação imediata de localidade para evitar execução de hooks desnecessários
+  // 2. Validação de segurança de rota
   if (!i18n.locales.includes(lang as any)) {
     return notFound()
   }
@@ -54,24 +54,25 @@ export default function ProxyPage({ params }: ProxyProps) {
         const data = await getGitHubProjects(lang)
         if (data) setAllProjects(data)
       } catch (error) {
-        console.error("Erro ao carregar projetos via Proxy:", error)
+        console.error("Erro crítico ao carregar projetos:", error)
       }
     }
     
     loadData()
   }, [lang])
 
-  // 3. Prevenção de Hydration Mismatch (Crucial para o Termux/Vercel)
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-[#020617]" aria-hidden="true" />
-    )
-  }
-
+  // Carregamento do dicionário sincronizado com a lang validada
   const dict = getDictionarySync(lang)
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
 
-  // Lógica de Projetos
+  // 3. Prevenção de Hydration Mismatch com Mock Visual
+  if (!mounted) {
+    return (
+      <div className="min-h-screen w-full bg-white dark:bg-[#020617]" />
+    )
+  }
+
+  // Lógica de Filtro de Projetos (Garante alinhamento com Featured Section)
   const featuredIds = featuredConfig.map(f => f.id)
   const featuredProjects = allProjects.filter(p => featuredIds.includes(p.name))
   const remainingProjects = allProjects.filter(p => !featuredIds.includes(p.name))
@@ -83,21 +84,25 @@ export default function ProxyPage({ params }: ProxyProps) {
         
         <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
           
+          {/* HERO: Sem padding lateral para impacto visual total */}
           <section id="hero" className="scroll-mt-0">
             <HeroSection lang={lang} dict={dict} />
           </section>
           
-          <section id="about" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 sm:px-10 lg:px-12 py-16 md:py-24">
+          {/* ABOUT: Max-width controlado para leitura confortável em 2026 */}
+          <section id="about" className="mx-auto w-full max-w-7xl scroll-mt-24 px-4 sm:px-10 lg:px-12 py-16 md:py-24">
             <AboutSection lang={lang} dict={dict} />
           </section>
 
+          {/* EXPERIENCE: Contraste suave para separar seções */}
           <section id="experience" className="scroll-mt-24 bg-slate-50/50 py-20 dark:bg-slate-900/10">
-            <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-12">
+            <div className="mx-auto w-full max-w-7xl px-4 sm:px-10 lg:px-12">
               <ExperienceSection lang={lang} dict={dict} />
             </div>
           </section>
 
-          <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
+          {/* PROJECTS: Grid adaptativo */}
+          <section id="projects" className="mx-auto w-full max-w-7xl scroll-mt-24 px-4 py-20 sm:px-10 lg:px-12">
             <div className="space-y-24">
               <Suspense fallback={<div className="h-96 w-full animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800/50" />}>
                 <FeaturedProjectsSection 
@@ -113,13 +118,15 @@ export default function ProxyPage({ params }: ProxyProps) {
             </div>
           </section>
 
-          <section id="articles" className="mx-auto w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
-            <div className="rounded-[3rem] bg-slate-50/40 p-1 dark:bg-slate-900/20">
+          {/* ARTICLES: Destaque visual com bordas arredondadas (estilo mobile-first) */}
+          <section id="articles" className="mx-auto w-full max-w-7xl scroll-mt-24 px-4 py-20 sm:px-10 lg:px-12">
+            <div className="rounded-[2.5rem] md:rounded-[3rem] bg-slate-50/40 p-1 dark:bg-slate-900/20">
               <FeaturedArticleSection lang={lang} dict={dict} />
             </div>
           </section>
 
-          <section id="contact" className="mx-auto mb-20 w-full max-w-7xl scroll-mt-24 px-6 py-20 sm:px-10 lg:px-12">
+          {/* CONTACT: Encerramento estratégico */}
+          <section id="contact" className="mx-auto mb-20 w-full max-w-7xl scroll-mt-24 px-4 py-20 sm:px-10 lg:px-12">
             <ContactSection lang={lang} dict={dict} />
           </section>
 
