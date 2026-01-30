@@ -1,49 +1,59 @@
 /**
- * HOME PAGE - REVISÃO FINAL SÊNIOR
+ * HOME PAGE - ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * - Responsividade: Herdada via PageWrapper e Proxy.
- * - I18n: Suporte total a PT, EN, ES via dicionários JSON.
- * - SEO: Metadados dinâmicos baseados no idioma da URL.
+ * - Responsividade: Garantida via PageContent (Proxy) e Layout.
+ * - I18n: Suporte total a PT, EN, ES integrado aos dicionários.
+ * - SEO: Meta-tags dinâmicas para autoridade em Engenharia de Dados.
  */
 
 import { Metadata } from 'next'
-import { getDictionarySync } from '@/dictionaries'
+import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
 import { i18n, type Locale } from '@/i18n-config'
-import PageContent from '@/proxy' // Este é o componente que contém a lógica que revisamos
+import PageContent from '@/proxy'
 
 interface PageProps {
   params: Promise<{ lang: string }>
 }
 
 /**
- * SEO Dinâmico: Alinha as meta tags com o seu dicionário seo.json
+ * SEO Dinâmico: Gera metadados otimizados para cada idioma
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { lang } = await params
-  const dict = getDictionarySync(lang as any)
+  const resolvedParams = await params
+  const lang = resolvedParams.lang as SupportedLocale
+  
+  // Obtém o dicionário de forma síncrona para o servidor
+  const dict = getDictionarySync(lang)
 
   return {
-    title: dict.seo.siteName,
+    title: dict.seo.siteName || dict.hero.role,
     description: dict.seo.description,
     keywords: dict.seo.keywords,
     alternates: {
+      canonical: `/${lang}`,
       languages: {
-        'pt-BR': '/pt',
-        'en-US': '/en',
-        'es-ES': '/es',
+        'pt': '/pt',
+        'en': '/en',
+        'es': '/es',
       },
     },
     openGraph: {
       title: dict.seo.siteName,
       description: dict.seo.description,
-      type: 'website',
+      url: `https://sergiosantos.com/${lang}`, // Substitua pelo seu domínio real
+      siteName: 'Sérgio Santos Portfolio',
       locale: lang,
+      type: 'website',
+    },
+    robots: {
+      index: true,
+      follow: true,
     }
   }
 }
 
 /**
- * Gera os caminhos estáticos para performance na Vercel
+ * Geração Estática (SSG): Garante performance máxima na Vercel
  */
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({
@@ -52,14 +62,20 @@ export async function generateStaticParams() {
 }
 
 export default async function HomePage({ params }: PageProps) {
-  // Simplesmente validamos o idioma e passamos para o PageContent (Proxy)
-  // O PageContent cuidará da hidratação, tema escuro e busca no GitHub.
-  const { lang } = await params
-  
-  // Fallback de segurança para o idioma
+  const resolvedParams = await params
+  const { lang } = resolvedParams
+
+  // Validação rigorosa do idioma para evitar 404s ou erros de hidratação
   const currentLang = i18n.locales.includes(lang as Locale) 
     ? (lang as Locale) 
     : i18n.defaultLocale
 
-  return <PageContent params={{ lang: currentLang }} />
+  return (
+    <main className="min-h-screen">
+      {/* O PageContent atua como um Proxy para componentes Client-side,
+          mantendo o page.tsx limpo para processamento no servidor (SSR).
+      */}
+      <PageContent params={{ lang: currentLang }} />
+    </main>
+  )
 }
