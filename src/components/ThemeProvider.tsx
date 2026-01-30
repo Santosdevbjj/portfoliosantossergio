@@ -3,9 +3,9 @@
 /**
  * THEME PROVIDER: Governança de Interface (Dark/Light Mode)
  * -----------------------------------------------------------------------------
- * - Engine: Baseado em 'next-themes' para manipulação de classes CSS.
- * - Performance: Otimizado para evitar FOUC (Flash of Unstyled Content).
- * - Acessibilidade: Sincroniza com as preferências do Sistema Operacional.
+ * Revisão Sênior:
+ * 1. Adicionado suppressHydrationWarning para evitar erros de servidor/cliente.
+ * 2. Garantia de que o conteúdo não cause "layout shift" durante o carregamento.
  */
 
 import * as React from 'react'
@@ -20,29 +20,30 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   const [mounted, setMounted] = React.useState(false)
 
-  /**
-   * Safe Mounting Pattern
-   * Essencial para evitar erros de hidratação (Hydration Mismatch) 
-   * entre o servidor (que não conhece o tema) e o cliente.
-   */
+  // O useEffect garante que o código só rode no navegador
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Durante o SSR, renderizamos um fragmento transparente para manter a árvore DOM íntegra
-  if (!mounted) {
-    return <>{children}</>
-  }
-
+  /**
+   * Padrão Sênior: No Next.js 16, se retornarmos apenas os children antes de montar,
+   * o HTML final pode divergir do inicial. 
+   * Usamos um wrapper simples ou apenas o Provider com a lógica de montagem.
+   */
   return (
     <NextThemesProvider
       attribute="class"
       defaultTheme="system"
       enableSystem
-      disableTransitionOnChange // Melhora a performance ao trocar de tema
+      disableTransitionOnChange
       {...props}
     >
-      {children}
+      <div 
+        style={{ visibility: mounted ? 'visible' : 'hidden' }} 
+        suppressHydrationWarning
+      >
+        {children}
+      </div>
     </NextThemesProvider>
   )
 }
