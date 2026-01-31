@@ -1,17 +1,17 @@
 'use client'
 
 /**
- * LANGUAGE SWITCHER — SÉRGIO SANTOS (REVISÃO 2026)
+ * LANGUAGE SWITCHER — SÉRGIO SANTOS (REVISÃO FINAL 2026)
  * -----------------------------------------------------------------------------
- * - Responsividade: Design compacto para Header/Navbar.
- * - Multilingue: Suporte a PT, EN, ES com preservação de rota e âncoras.
- * - Performance: Utiliza Suspense para evitar bloqueio de renderização no Next.js 16.
+ * ✔ Responsivo (Navbar / Mobile / Desktop)
+ * ✔ Multilíngue (PT / EN / ES)
+ * ✔ Preserva rota, query params e âncoras
+ * ✔ Alinhado ao dicionário e App Router
  */
 
 import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import type { Route } from 'next'
 
 import { i18n, type Locale, localeMetadata } from '@/i18n-config'
 import { LOCALE_COOKIE, LOCALE_COOKIE_OPTIONS } from '@/lib/locale-cookie'
@@ -32,56 +32,74 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
 
   if (!mounted) {
     return (
-      <div className="h-8 w-32 bg-slate-200/10 dark:bg-slate-800/10 animate-pulse rounded-lg" />
+      <div className="h-8 w-28 rounded-lg bg-slate-200/10 dark:bg-slate-800/10 animate-pulse" />
     )
   }
 
   /**
-   * Grava a preferência do usuário no Cookie para que o Middleware 
-   * redirecione corretamente em visitas futuras.
+   * Persiste a preferência de idioma para o middleware
    */
-  function writeLocaleCookie(locale: string) {
+  function writeLocaleCookie(locale: SupportedLocale) {
     if (typeof document === 'undefined') return
-    document.cookie = `${LOCALE_COOKIE}=${locale}; path=${LOCALE_COOKIE_OPTIONS.path}; max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}`
-  }
 
-  const labels = {
-    pt: 'Mudar idioma',
-    en: 'Change language',
-    es: 'Cambiar idioma'
-  }[currentLang] || 'Change language'
+    document.cookie =
+      `${LOCALE_COOKIE}=${locale}; ` +
+      `path=${LOCALE_COOKIE_OPTIONS.path}; ` +
+      `max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; ` +
+      `SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}` +
+      `${location.protocol === 'https:' ? '; Secure' : ''}`
+  }
 
   const availableLocales = Array.from(i18n.locales) as Locale[]
 
   return (
-    <nav aria-label={labels} className="inline-flex items-center gap-1 p-1 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md rounded-lg border border-slate-200/50 dark:border-slate-800/50 shadow-sm">
+    <nav
+      aria-label="Language selector"
+      className="
+        inline-flex items-center gap-1 p-1
+        rounded-lg border border-slate-200/50 dark:border-slate-800/50
+        bg-white/40 dark:bg-slate-900/40 backdrop-blur-md
+        shadow-sm
+      "
+    >
       {availableLocales.map((locale) => {
         const isActive = currentLang === locale
         const meta = localeMetadata[locale]
 
-        // Lógica de Reconstrução da Rota (Preserva sub-páginas e IDs)
-        const segments = pathname?.split('/') || []
+        /**
+         * Reconstrói a rota preservando:
+         * - idioma
+         * - subpáginas
+         * - âncoras
+         * - query params
+         */
+        const segments = pathname?.split('/') ?? []
+
         if (segments[1] && availableLocales.includes(segments[1] as Locale)) {
           segments[1] = locale
         } else {
-          // Caso a rota não comece com o locale (fallback)
           segments.splice(1, 0, locale)
         }
-        
+
         const queryString = searchParams?.toString()
-        const finalPath = `${segments.join('/') || '/'}${queryString ? `?${queryString}` : ''}`
+        const finalPath =
+          `${segments.join('/') || '/'}` +
+          `${queryString ? `?${queryString}` : ''}`
 
         return (
           <Link
             key={locale}
-            href={finalPath as Route}
+            href={finalPath}
             hrefLang={locale}
             onClick={() => writeLocaleCookie(locale)}
             className={`
-              relative px-2.5 py-1 text-[9px] font-black uppercase tracking-tighter rounded-md transition-all
-              ${isActive 
-                ? 'text-white bg-blue-600 shadow-md' 
-                : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white/50 dark:hover:bg-slate-800/50'
+              relative px-2.5 py-1 rounded-md
+              text-[9px] font-black uppercase tracking-tighter
+              transition-all duration-200
+              ${
+                isActive
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white/50 dark:hover:bg-slate-800/50'
               }
             `}
           >
@@ -95,7 +113,11 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
 
 export function LanguageSwitcher({ currentLang }: LanguageSwitcherProps) {
   return (
-    <Suspense fallback={<div className="h-8 w-32 bg-slate-200/10 rounded-lg animate-pulse" />}>
+    <Suspense
+      fallback={
+        <div className="h-8 w-28 rounded-lg bg-slate-200/10 dark:bg-slate-800/10 animate-pulse" />
+      }
+    >
       <LanguageSwitcherContent currentLang={currentLang} />
     </Suspense>
   )
