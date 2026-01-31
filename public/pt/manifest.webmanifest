@@ -1,17 +1,22 @@
 {
-  "id": "/pt/",
+  "id": "/",
   "name": "Sérgio Santos | Especialista em Dados e Sistemas",
   "short_name": "SergioData",
-  "description": "Portfólio profissional de Sérgio Santos — Especialista em Dados, Engenharia de Sistemas e IA Generativa.",
+  "description": "Portfólio profissional de Sérgio Santos — Especialista em Dados, Engenharia de Sistemas e Inteligência Artificial.",
   "lang": "pt-BR",
   "dir": "ltr",
 
-  "start_url": "/pt/",
+  "start_url": "/pt/?source=pwa",
   "scope": "/pt/",
 
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
-  "orientation": "any",
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "window-controls-overlay"
+  ],
+
+  "orientation": "natural",
 
   "background_color": "#020617",
   "theme_color": "#020617",
@@ -75,7 +80,7 @@
       "name": "Projetos em Destaque",
       "short_name": "Projetos",
       "description": "Explorar o portfólio de projetos técnicos",
-      "url": "/pt#projects",
+      "url": "/pt/#projects",
       "icons": [
         {
           "src": "/icons/icon-192.png",
@@ -87,8 +92,8 @@
     {
       "name": "Artigos Técnicos",
       "short_name": "Artigos",
-      "description": "Aceder a publicações e insights sobre dados",
-      "url": "/pt#articles",
+      "description": "Aceder a publicações e insights sobre dados e tecnologia",
+      "url": "/pt/#articles",
       "icons": [
         {
           "src": "/icons/icon-192.png",
