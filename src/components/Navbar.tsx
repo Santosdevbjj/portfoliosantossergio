@@ -1,15 +1,5 @@
 'use client'
 
-/**
- * NAVBAR COMPONENT — SÉRGIO SANTOS (FINAL 2026 — AUDITADO)
- * -----------------------------------------------------------------------------
- * ✔ Responsivo (Desktop / Tablet / Mobile)
- * ✔ Multilíngue (PT / EN / ES)
- * ✔ Acessível (ARIA + Keyboard + Screen Readers)
- * ✔ Integrado ao Dictionary tipado
- * ✔ Alinhado ao useScrollSpy (null-safe)
- */
-
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Menu, X, Globe } from 'lucide-react'
@@ -38,20 +28,15 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
   useEffect(() => {
     setMounted(true)
-
     const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
-
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Bloqueia scroll do body quando menu mobile está aberto
   useEffect(() => {
     if (!mounted) return
     document.body.style.overflow = isOpen ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
-    }
+    return () => { document.body.style.overflow = '' }
   }, [isOpen, mounted])
 
   if (!mounted) return null
@@ -73,11 +58,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
-        {/* LOGO */}
-        <Link
-          href={`/${lang}`}
-          className="group outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded"
-        >
+        <Link href={`/${lang}`} className="group outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded">
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
             SÉRGIO<span className="text-blue-600">SANTOS</span>
           </span>
@@ -91,21 +72,17 @@ export function Navbar({ lang, dict }: NavbarProps) {
                 key={link.id}
                 href={link.href}
                 aria-current={activeSection === link.id ? 'page' : undefined}
-                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded ${
-                  activeSection === link.id
-                    ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600'
+                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${
+                  activeSection === link.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-blue-600'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
           </div>
-
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
-
           <div className="flex items-center gap-4">
-            <LanguageSwitcher currentLang={lang} onChange={() => setIsOpen(false)} />
+            <LanguageSwitcher currentLang={lang} />
             <ThemeToggle />
           </div>
         </div>
@@ -115,10 +92,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
           <ThemeToggle />
           <button
             onClick={() => setIsOpen(prev => !prev)}
-            aria-expanded={isOpen}
-            aria-controls="mobile-menu"
-            aria-label={isOpen ? common.closeMenu : common.openMenu}
-            className="p-2 text-slate-900 dark:text-white active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-600 rounded"
+            className="p-2 text-slate-900 dark:text-white"
           >
             {isOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -127,9 +101,8 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
       {/* MOBILE MENU */}
       <div
-        id="mobile-menu"
         className={`lg:hidden absolute top-full left-0 w-full overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ${
-          isOpen ? 'max-h-[90vh] opacity-100 shadow-2xl' : 'max-h-0 opacity-0'
+          isOpen ? 'max-h-[90vh] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
         <div className="flex flex-col gap-6 p-8">
@@ -137,24 +110,17 @@ export function Navbar({ lang, dict }: NavbarProps) {
             <Link
               key={link.id}
               href={link.href}
-              aria-current={activeSection === link.id ? 'page' : undefined}
               onClick={() => setIsOpen(false)}
-              className={`text-2xl font-black tracking-tighter focus-visible:ring-2 focus-visible:ring-blue-600 rounded ${
-                activeSection === link.id
-                  ? 'text-blue-600'
-                  : 'text-slate-900 dark:text-white'
+              className={`text-2xl font-black tracking-tighter ${
+                activeSection === link.id ? 'text-blue-600' : 'text-slate-900 dark:text-white'
               }`}
             >
               {link.label}
             </Link>
           ))}
-
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
-            <p className="mb-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-              <Globe size={14} className="text-blue-600" />
-              {common.navigation}
-            </p>
-            <LanguageSwitcher currentLang={lang} onChange={() => setIsOpen(false)} />
+             {/* Note: O menu mobile fecha ao trocar de página via Link, então o onChange aqui é redundante */}
+            <LanguageSwitcher currentLang={lang} />
           </div>
         </div>
       </div>
