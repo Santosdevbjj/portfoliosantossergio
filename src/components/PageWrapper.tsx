@@ -3,10 +3,10 @@
 /**
  * PAGE WRAPPER: Orquestrador de Experiência e Layout Root
  * -----------------------------------------------------------------------------
- * - Função: Provê o contexto de ScrollSpy e estrutura semântica base.
- * - Resiliência: Safe Mounting para evitar Hydration Mismatch no Next.js 16.
- * - I18n: Configura o atributo 'lang' dinâmico para SEO e Acessibilidade.
- * - Estética: Background dinâmico com grid adaptativo (Light/Dark).
+ * - Provê contexto de ScrollSpy
+ * - Garante hidratação segura no Next.js 16
+ * - Define idioma dinâmico para SEO e Acessibilidade
+ * - Controla layout, background e experiência visual global
  */
 
 import {
@@ -14,6 +14,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  type ReactNode,
 } from 'react'
 
 import { useScrollSpy } from '@/hooks/useScrollSpy'
@@ -24,19 +25,17 @@ import type { SupportedLocale } from '@/dictionaries'
 /* -------------------------------------------------------------------------- */
 
 interface PageWrapperProps {
-  readonly children: React.ReactNode
+  readonly children: ReactNode
   readonly lang: SupportedLocale
-  readonly sectionIds?: string[]
+  readonly sectionIds?: readonly string[]
 }
 
 /* -------------------------------------------------------------------------- */
 /* CONTEXT                                                                    */
 /* -------------------------------------------------------------------------- */
 
-/**
- * ScrollSpyContext: Exportado para que Navbar e Sidebar saibam a seção ativa.
- */
 export const ScrollSpyContext = createContext<string | null>(null)
+ScrollSpyContext.displayName = 'ScrollSpyContext'
 
 /* -------------------------------------------------------------------------- */
 /* COMPONENT                                                                  */
@@ -48,35 +47,34 @@ export function PageWrapper({
   sectionIds = [],
 }: PageWrapperProps) {
   const [mounted, setMounted] = useState(false)
-  
-  // Hook customizado para monitorar a posição do scroll
+
+  // Hook de ScrollSpy (offset otimizado para headers fixos)
   const activeSectionFromHook = useScrollSpy(sectionIds, 150)
 
-  // Garante que o componente só execute lógica de cliente após o mount inicial
   useEffect(() => {
     setMounted(true)
   }, [])
 
   /**
-   * MEMOIZAÇÃO DA SEÇÃO ATIVA:
-   * Resolve a discrepância de tipos entre o hook e o context de forma segura.
+   * Resolve estado final da seção ativa
+   * Evita inconsistências durante hidratação
    */
-  const activeSection = useMemo<string | null>(
-    () => {
-      if (!mounted) return null
-      return (activeSectionFromHook as string | undefined) || null
-    },
-    [mounted, activeSectionFromHook]
-  )
+  const activeSection = useMemo<string | null>(() => {
+    if (!mounted) return null
+    return activeSectionFromHook ?? null
+  }, [mounted, activeSectionFromHook])
 
   /**
-   * GESTÃO DE HIDRATAÇÃO:
-   * Se ainda não montou, retornamos um esqueleto estrutural neutro para evitar 
-   * a exceção de cliente (Hydration Mismatch).
+   * Skeleton estrutural neutro
+   * Evita hydration mismatch no App Router
    */
   if (!mounted) {
     return (
-      <div className="bg-white dark:bg-[#020617] min-h-screen w-full" />
+      <div
+        className="min-h-screen w-full bg-white dark:bg-[#020617]"
+        aria-busy="true"
+        suppressHydrationWarning
+      />
     )
   }
 
@@ -84,41 +82,66 @@ export function PageWrapper({
     <ScrollSpyContext.Provider value={activeSection}>
       <div
         lang={lang}
-        className="relative min-h-[100dvh] flex flex-col bg-white dark:bg-[#020617] transition-colors duration-500 overflow-x-hidden"
+        suppressHydrationWarning
+        className="
+          relative
+          min-h-[100dvh]
+          flex
+          flex-col
+          bg-white
+          dark:bg-[#020617]
+          transition-colors
+          duration-500
+          overflow-x-hidden
+        "
       >
-        {/* ELEMENTOS DE BACKGROUND (Fixos e Decorativos) */}
+        {/* BACKGROUND DECORATIVO GLOBAL */}
         <div
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
         >
-          {/* Glow Superior Centralizado - Gradiente de Marca */}
+          {/* Glow superior */}
           <div
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1400px] h-[400px] md:h-[800px] opacity-40 dark:opacity-20 transition-opacity duration-1000"
+            className="
+              absolute
+              top-0
+              left-1/2
+              -translate-x-1/2
+              w-full
+              max-w-[1400px]
+              h-[400px]
+              md:h-[800px]
+              opacity-40
+              dark:opacity-20
+              transition-opacity
+              duration-1000
+            "
             style={{
-              background: 'radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.2), transparent 70%)',
+              background:
+                'radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.2), transparent 70%)',
             }}
           />
-          
-          {/* Grid de Pontos (Pattern de Engenharia/Dados) */}
-          <div 
-            className="absolute inset-0 opacity-[0.12] dark:opacity-[0.05]" 
-            style={{ 
-              backgroundImage: 'radial-gradient(#94a3b8 0.5px, transparent 0.5px)', 
-              backgroundSize: '32px 32px' 
+
+          {/* Grid de engenharia/dados */}
+          <div
+            className="absolute inset-0 opacity-[0.12] dark:opacity-[0.05]"
+            style={{
+              backgroundImage:
+                'radial-gradient(#94a3b8 0.5px, transparent 0.5px)',
+              backgroundSize: '32px 32px',
             }}
           />
         </div>
 
-        {/* CONTEÚDO PRINCIPAL (MAIN) */}
+        {/* CONTEÚDO PRINCIPAL */}
         <main
-          role="main"
           id="main-content"
+          role="main"
           className="
             flex-grow
             pt-20
             md:pt-28
             lg:pt-32
-            px-0
             motion-safe:animate-in
             motion-safe:fade-in
             motion-safe:slide-in-from-bottom-2
