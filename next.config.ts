@@ -1,9 +1,9 @@
 import type { NextConfig } from 'next';
 
 /**
- * NEXT.JS CONFIGURATION
- * Target: Next.js 16.1.5 + Node 24.x + Vercel + App Router (src/)
- * Status: Production-safe / Termux-safe / CSP-hardened
+ * NEXT.JS CONFIGURATION — SÉRGIO SANTOS (REVISÃO 2026)
+ * Target: Next.js 16.1.5 + Node 24.x + Vercel
+ * Status: CSP-hardened / Alinhado com as novas APIs do v16
  */
 
 const nextConfig: NextConfig = {
@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
   /* -------------------------------------------------------------------------- */
   reactStrictMode: true,
   poweredByHeader: false,
+  
+  // CORREÇÃO DO ALERTA: typedRoutes agora fica na raiz, fora de experimental
+  typedRoutes: true,
 
   typescript: {
     ignoreBuildErrors: false,
@@ -35,8 +38,6 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     minimumCacheTTL: 86400,
-
-    // Segurança: evita uso do servidor como proxy de imagens gigantes
     remotePatterns: [
       {
         protocol: 'https',
@@ -62,15 +63,9 @@ const nextConfig: NextConfig = {
   },
 
   /* -------------------------------------------------------------------------- */
-  /* EXPERIMENTAL (Next.js 16 COMPATÍVEL)                                       */
+  /* EXPERIMENTAL                                                               */
   /* -------------------------------------------------------------------------- */
   experimental: {
-    // typedRoutes ainda é experimental no 16.x
-    typedRoutes: true,
-
-    // Evita engine Rust que quebra no Termux
-    typedEnv: false,
-
     // Tree-shaking agressivo e seguro
     optimizePackageImports: [
       'lucide-react',
@@ -79,10 +74,11 @@ const nextConfig: NextConfig = {
       'tailwind-merge',
       'next-themes',
     ],
+    // Removido o objeto experimental.typedRoutes daqui para sanar o Warning
   },
 
   /* -------------------------------------------------------------------------- */
-  /* SECURITY HEADERS                                                           */
+  /* SECURITY HEADERS (CSP Hardened)                                            */
   /* -------------------------------------------------------------------------- */
   async headers() {
     return [
@@ -105,7 +101,7 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self';",
               "img-src 'self' data: https: blob:;",
-              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com;",
+              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com https://www.googletagmanager.com;",
               "style-src 'self' 'unsafe-inline';",
               "font-src 'self' data: https:;",
               `connect-src 'self' https: ${
