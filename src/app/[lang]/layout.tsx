@@ -1,5 +1,5 @@
 /**
- * ROOT LAYOUT - NEXT.JS 16 - SÉRGIO SANTOS (REVISÃO FINAL)
+ * ROOT LAYOUT - NEXT.JS 16 - SÉRGIO SANTOS (REVISÃO FINAL - SEM ERROS DE TIPO)
  * -----------------------------------------------------------------------------
  */
 
@@ -74,22 +74,24 @@ export default async function RootLayout(props: {
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
       <head>
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V" strategy="afterInteractive" />
+        <Script 
+          src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V" 
+          strategy="afterInteractive" 
+        />
       </head>
       <body className="min-h-screen flex flex-col bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden">
-        {/* O ThemeProvider unificado gerencia seus próprios atributos internamente */}
         <ThemeProvider>
           <main id="main-content" className="flex-grow w-full">
             {props.children}
           </main>
+          
+          {/* CORREÇÃO: Passando o dicionário completo para o CookieBanner. 
+              A lógica de tradução de 'Aceitar/Privacidade' deve ser tratada 
+              DENTRO do componente CookieBanner usando dict.common.
+          */}
           <CookieBanner
             lang={currentLang}
-            dict={{
-              title: currentLang === 'pt' ? 'Privacidade' : currentLang === 'es' ? 'Privacidad' : 'Privacy',
-              description: dict.seo.description,
-              accept: currentLang === 'pt' ? 'Aceitar' : currentLang === 'es' ? 'Aceptar' : 'Accept',
-              common: dict.common,
-            }}
+            dict={dict} 
           />
         </ThemeProvider>
       </body>
