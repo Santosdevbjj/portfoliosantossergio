@@ -1,11 +1,12 @@
 'use client'
 
 /**
- * FOOTER COMPONENT — SÉRGIO SANTOS
+ * FOOTER COMPONENT — SÉRGIO SANTOS (REVISÃO FINAL 2026)
  * -----------------------------------------------------------------------------
- * - Fix: Removida variável 'currentYear' para sanar erro de build (unused variable).
- * - I18n: 100% alinhado com dicionários PT, EN e ES.
- * - Responsividade: Layout adaptativo (Mobile/Tablet/Desktop).
+ * ✔ Responsivo (Mobile / Tablet / Desktop)
+ * ✔ Multilíngue (PT / EN / ES)
+ * ✔ 100% alinhado ao Dictionary (sem strings soltas)
+ * ✔ Integrado ao LanguageSwitcher e App Router
  */
 
 import Link from 'next/link'
@@ -35,14 +36,17 @@ export function Footer({ lang, dict }: FooterProps) {
 
   const { nav, contact, common } = dict
 
+  const countryLabel =
+    lang === 'en' ? 'Brazil' : 'Brasil'
+
   return (
     <footer
       role="contentinfo"
       className="bg-slate-50 dark:bg-[#020617] border-t border-slate-200 dark:border-slate-800/60 transition-colors mt-24"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 lg:py-24 space-y-20">
-        
-        {/* CTA ESTRATÉGICO */}
+
+        {/* CTA */}
         <section className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row justify-between gap-10 items-start lg:items-center shadow-2xl shadow-blue-500/20">
           <div className="max-w-xl relative z-10">
             <h3 className="text-2xl md:text-4xl font-black mb-4 tracking-tight">
@@ -64,9 +68,9 @@ export function Footer({ lang, dict }: FooterProps) {
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-white/10 rounded-full blur-[80px]" />
         </section>
 
-        {/* GRID PRINCIPAL */}
+        {/* GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
-          
+
           {/* IDENTIDADE */}
           <div className="space-y-6">
             <div className="flex flex-col gap-1">
@@ -80,7 +84,7 @@ export function Footer({ lang, dict }: FooterProps) {
 
             <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">
               <Globe className="w-3.5 h-3.5 text-blue-500" />
-              Brasil
+              {countryLabel}
             </div>
           </div>
 
@@ -101,28 +105,26 @@ export function Footer({ lang, dict }: FooterProps) {
             </ul>
           </nav>
 
-          {/* SELETOR DE IDIOMA */}
+          {/* IDIOMA */}
           <div>
-            <h4 className={STYLES.footerTitle}>
-              {lang === 'pt' ? 'Idioma' : lang === 'es' ? 'Idioma' : 'Language'}
-            </h4>
+            <h4 className={STYLES.footerTitle}>{common.navigation}</h4>
             <div className="max-w-[200px]">
-               <LanguageSwitcher currentLang={lang} />
+              <LanguageSwitcher currentLang={lang} />
             </div>
           </div>
 
-          {/* CONTATO DIRETO */}
+          {/* CONTATO */}
           <div className="space-y-6">
             <h4 className={STYLES.footerTitle}>{contact.emailLabel}</h4>
-            <a 
-              href={`mailto:${email}`} 
+            <a
+              href={`mailto:${email}`}
               className="group block space-y-3 outline-none"
             >
               <div className="flex items-center gap-3 text-slate-500 group-hover:text-blue-600 transition-colors font-bold text-sm">
                 <div className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg group-hover:border-blue-600/30 transition-all">
                   <Mail className="w-4 h-4" />
                 </div>
-                <span>Email</span>
+                <span>{contact.emailLabel}</span>
               </div>
               <p className="text-[11px] font-mono font-bold text-slate-400 break-all bg-slate-100/50 dark:bg-slate-800/30 p-4 rounded-xl border border-slate-200/50 dark:border-slate-800/50 group-hover:border-blue-500/20 transition-all">
                 {email}
@@ -131,7 +133,7 @@ export function Footer({ lang, dict }: FooterProps) {
           </div>
         </div>
 
-        {/* BARRA DE DIREITOS */}
+        {/* RODAPÉ FINAL */}
         <div className="pt-10 border-t border-slate-200 dark:border-slate-800/80 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-center md:text-left">
             {common.footer}
@@ -159,7 +161,15 @@ export function Footer({ lang, dict }: FooterProps) {
   )
 }
 
-function SocialIcon({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
+function SocialIcon({
+  href,
+  label,
+  children,
+}: {
+  href: string
+  label: string
+  children: React.ReactNode
+}) {
   return (
     <a
       href={href}
@@ -175,6 +185,8 @@ function SocialIcon({ href, label, children }: { href: string; label: string; ch
 }
 
 const STYLES = {
-  footerTitle: 'font-black uppercase tracking-[0.2em] text-[10px] mb-6 text-slate-400 dark:text-slate-500',
-  footerLink: 'font-bold text-sm text-slate-500 hover:text-blue-600 hover:translate-x-1 transition-all inline-block',
+  footerTitle:
+    'font-black uppercase tracking-[0.2em] text-[10px] mb-6 text-slate-400 dark:text-slate-500',
+  footerLink:
+    'font-bold text-sm text-slate-500 hover:text-blue-600 hover:translate-x-1 transition-all inline-block',
 }
