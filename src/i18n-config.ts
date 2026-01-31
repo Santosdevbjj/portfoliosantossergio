@@ -1,8 +1,12 @@
 /**
- * I18N CONFIG — ESTRUTURA SÉRGIO SANTOS
+ * I18N CONFIG — FONTE ÚNICA DE VERDADE
  * -----------------------------------------------------------------------------
- * Fonte única de verdade para internacionalização (Locales, Metadata e Loader).
- * Alinhado com Next.js 16, App Router e dicionários PT, EN e ES.
+ * Centraliza:
+ * - Locales
+ * - Metadata internacional (SEO, hreflang, manifest)
+ * - Loader tipado de dicionários
+ *
+ * Compatível com Next.js 16 (App Router)
  */
 
 import type { Dictionary } from '@/types/dictionary';
@@ -15,65 +19,76 @@ export const i18n = {
 export type Locale = (typeof i18n.locales)[number];
 
 /**
- * Metadados dos Locales
- * Utilizados para LanguageSwitcher, SEO (hreflang) e acessibilidade.
+ * Metadata por idioma
+ * Usado por:
+ * - metadata.ts
+ * - manifest.ts
+ * - LanguageSwitcher
+ * - hreflang
  */
 export const localeMetadata: Record<
   Locale,
   {
     name: string;
+    label: string;
     region: string;
     flag: string;
-    label: string;
     hrefLang: string;
+    description: string;
   }
 > = {
   pt: {
     name: 'Português',
+    label: 'PT',
     region: 'pt-BR',
     flag: '🇧🇷',
-    label: 'PT',
     hrefLang: 'pt-BR',
+    description:
+      'Engenharia de Dados, Ciência de Dados, Inteligência Artificial e Sistemas de Missão Crítica.',
   },
   en: {
     name: 'English',
+    label: 'EN',
     region: 'en-US',
     flag: '🇺🇸',
-    label: 'EN',
     hrefLang: 'en-US',
+    description:
+      'Data Engineering, Data Science, Artificial Intelligence, and Mission-Critical Systems.',
   },
   es: {
     name: 'Español',
+    label: 'ES',
     region: 'es-ES',
     flag: '🇪🇸',
-    label: 'ES',
     hrefLang: 'es-ES',
+    description:
+      'Ingeniería de Datos, Ciencia de Datos, Inteligencia Artificial y Sistemas de Misión Crítica.',
   },
 };
 
 /**
- * Locale padrão para SEO internacional (hreflang="x-default")
- * Recomendado pelo Google para sites multilíngues.
+ * Locale padrão para SEO internacional
+ * hreflang="x-default"
  */
 export const DEFAULT_HREFLANG = 'x-default';
 
 /**
- * Carregamento Dinâmico de Dicionários (Server-Side)
- * Tipado e seguro — fallback automático para PT.
+ * Loader dinâmico de dicionários (Server Components)
+ * Fallback seguro para PT
  */
 export async function getDictionary(locale: Locale): Promise<Dictionary> {
-  const dictionaries: Record<Locale, () => Promise<Dictionary>> = {
+  const loaders: Record<Locale, () => Promise<Dictionary>> = {
     pt: () => import('./dictionaries/pt.json').then((m) => m.default),
     en: () => import('./dictionaries/en.json').then((m) => m.default),
     es: () => import('./dictionaries/es.json').then((m) => m.default),
   };
 
-  const loader = dictionaries[locale] ?? dictionaries[i18n.defaultLocale];
+  const loader = loaders[locale] ?? loaders[i18n.defaultLocale];
   return loader();
 }
 
 /**
- * Helper para validação segura de locale (URL, params, middleware)
+ * Validação segura de locale (URL, params, middleware)
  */
 export function isSupportedLocale(locale: string): locale is Locale {
   return i18n.locales.includes(locale as Locale);
