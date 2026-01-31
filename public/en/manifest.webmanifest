@@ -1,17 +1,22 @@
 {
-  "id": "/en/",
+  "id": "/",
   "name": "Sérgio Santos | Data & Systems Specialist",
   "short_name": "SergioData",
-  "description": "Professional portfolio of Sérgio Santos — Specialist in Data Engineering, Systems Architecture, and Generative AI solutions.",
+  "description": "Professional portfolio of Sérgio Santos — Specialist in Data Engineering, Systems Architecture, and Generative Artificial Intelligence.",
   "lang": "en-US",
   "dir": "ltr",
 
-  "start_url": "/en/",
+  "start_url": "/en/?source=pwa",
   "scope": "/en/",
 
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
-  "orientation": "any",
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "window-controls-overlay"
+  ],
+
+  "orientation": "natural",
 
   "background_color": "#020617",
   "theme_color": "#020617",
@@ -74,8 +79,8 @@
     {
       "name": "Featured Projects",
       "short_name": "Projects",
-      "description": "View technical case studies and software projects",
-      "url": "/en#projects",
+      "description": "Explore technical case studies and software projects",
+      "url": "/en/#projects",
       "icons": [
         {
           "src": "/icons/icon-192.png",
@@ -87,8 +92,8 @@
     {
       "name": "Technical Articles",
       "short_name": "Articles",
-      "description": "Read insights on data engineering and AI",
-      "url": "/en#articles",
+      "description": "Read insights and publications on data engineering and artificial intelligence",
+      "url": "/en/#articles",
       "icons": [
         {
           "src": "/icons/icon-192.png",
