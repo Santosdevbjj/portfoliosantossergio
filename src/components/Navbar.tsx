@@ -1,45 +1,60 @@
-'use client';
+'use client'
 
 /**
- * NAVBAR COMPONENT — SÉRGIO SANTOS (REVISÃO FINAL 2026)
+ * NAVBAR COMPONENT — SÉRGIO SANTOS (FINAL 2026 — AUDITADO)
  * -----------------------------------------------------------------------------
- * ✔ Responsivo (Desktop / Mobile)
+ * ✔ Responsivo (Desktop / Tablet / Mobile)
  * ✔ Multilíngue (PT / EN / ES)
- * ✔ Compatível com App Router + Vercel
- * ✔ Alinhado 100% ao Dictionary
+ * ✔ Acessível (ARIA + Keyboard + Screen Readers)
+ * ✔ Integrado ao Dictionary tipado
+ * ✔ Alinhado ao useScrollSpy (null-safe)
  */
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Menu, X, Globe } from 'lucide-react';
-import type { Locale } from '@/i18n-config';
-import type { Dictionary } from '@/types/dictionary';
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { Menu, X, Globe } from 'lucide-react'
 
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { useScrollSpy } from '@/hooks/useScrollSpy';
+import type { Locale } from '@/i18n-config'
+import type { Dictionary } from '@/types/dictionary'
+
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { useScrollSpy } from '@/hooks/useScrollSpy'
 
 interface NavbarProps {
-  readonly lang: Locale;
-  readonly dict: Dictionary;
+  readonly lang: Locale
+  readonly dict: Dictionary
 }
 
 export function Navbar({ lang, dict }: NavbarProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const { nav, common } = dict
 
-  const { nav, common } = dict;
+  const [isOpen, setIsOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  const sectionIds = ['about', 'experience', 'projects', 'articles', 'contact'];
-  const activeSection = useScrollSpy(sectionIds, 100);
+  const sectionIds = ['about', 'experience', 'projects', 'articles', 'contact'] as const
+  const activeSection = useScrollSpy(sectionIds, 100)
 
   useEffect(() => {
-    setMounted(true);
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    setMounted(true)
+
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Bloqueia scroll do body quando menu mobile está aberto
+  useEffect(() => {
+    if (!mounted) return
+    document.body.style.overflow = isOpen ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen, mounted])
+
+  if (!mounted) return null
 
   const navLinks = [
     { id: 'about', href: `/${lang}#about`, label: nav.about },
@@ -47,22 +62,23 @@ export function Navbar({ lang, dict }: NavbarProps) {
     { id: 'projects', href: `/${lang}#projects`, label: nav.projects },
     { id: 'articles', href: `/${lang}#articles`, label: nav.articles },
     { id: 'contact', href: `/${lang}#contact`, label: nav.contact },
-  ];
-
-  if (!mounted) return null;
+  ] as const
 
   return (
     <nav
-      className={`fixed top-0 w-full z-[100] transition-all duration-500 ${
+      className={`fixed top-0 z-[100] w-full transition-all duration-500 ${
         scrolled
           ? 'bg-white/95 dark:bg-[#020617]/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 py-3 shadow-lg'
           : 'bg-transparent py-6'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 flex justify-between items-center">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
         {/* LOGO */}
-        <Link href={`/${lang}`} className="group outline-none">
-          <span className="font-black text-xl md:text-2xl tracking-tighter text-slate-900 dark:text-white uppercase">
+        <Link
+          href={`/${lang}`}
+          className="group outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded"
+        >
+          <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
             SÉRGIO<span className="text-blue-600">SANTOS</span>
           </span>
         </Link>
@@ -74,10 +90,11 @@ export function Navbar({ lang, dict }: NavbarProps) {
               <Link
                 key={link.id}
                 href={link.href}
-                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors hover:text-blue-600 ${
+                aria-current={activeSection === link.id ? 'page' : undefined}
+                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded ${
                   activeSection === link.id
                     ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-slate-500 dark:text-slate-400'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-blue-600'
                 }`}
               >
                 {link.label}
@@ -97,11 +114,11 @@ export function Navbar({ lang, dict }: NavbarProps) {
         <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle />
           <button
-            className="p-2 text-slate-900 dark:text-white active:scale-90"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => setIsOpen(prev => !prev)}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
             aria-label={isOpen ? common.closeMenu : common.openMenu}
+            className="p-2 text-slate-900 dark:text-white active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-600 rounded"
           >
             {isOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -111,17 +128,18 @@ export function Navbar({ lang, dict }: NavbarProps) {
       {/* MOBILE MENU */}
       <div
         id="mobile-menu"
-        className={`lg:hidden absolute top-full left-0 w-full bg-white dark:bg-[#020617] border-b border-slate-200 dark:border-slate-800 transition-all duration-300 overflow-hidden ${
+        className={`lg:hidden absolute top-full left-0 w-full overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ${
           isOpen ? 'max-h-[90vh] opacity-100 shadow-2xl' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="p-8 flex flex-col gap-6">
+        <div className="flex flex-col gap-6 p-8">
           {navLinks.map(link => (
             <Link
               key={link.id}
               href={link.href}
+              aria-current={activeSection === link.id ? 'page' : undefined}
               onClick={() => setIsOpen(false)}
-              className={`text-2xl font-black tracking-tighter ${
+              className={`text-2xl font-black tracking-tighter focus-visible:ring-2 focus-visible:ring-blue-600 rounded ${
                 activeSection === link.id
                   ? 'text-blue-600'
                   : 'text-slate-900 dark:text-white'
@@ -132,7 +150,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
           ))}
 
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-4 flex items-center gap-2">
+            <p className="mb-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
               <Globe size={14} className="text-blue-600" />
               {common.navigation}
             </p>
@@ -141,5 +159,5 @@ export function Navbar({ lang, dict }: NavbarProps) {
         </div>
       </div>
     </nav>
-  );
+  )
 }
