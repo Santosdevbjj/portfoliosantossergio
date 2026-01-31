@@ -1,14 +1,5 @@
 'use client'
 
-/**
- * THEME SYSTEM UNIFIED — SÉRGIO SANTOS (2026)
- * -----------------------------------------------------------------------------
- * - Responsivo: Área de toque acessível + Safe Areas
- * - Multilíngue: PT / EN / ES via pathname
- * - Acessível: ARIA + prefers-color-scheme
- * - Framework: Next.js 16 + React 19
- */
-
 import {
   createContext,
   useContext,
@@ -20,10 +11,10 @@ import {
 } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useTheme as useNextTheme } from 'next-themes'
+import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from 'next-themes'
 
 /* -------------------------------------------------------------------------- */
-/* 1. TYPES & CONTEXT                                                          */
+/* 1. TYPES & CONTEXT                                                         */
 /* -------------------------------------------------------------------------- */
 
 export type ThemeType = 'light' | 'dark' | 'system'
@@ -38,34 +29,46 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 /* -------------------------------------------------------------------------- */
-/* 2. THEME PROVIDER                                                           */
+/* 2. THEME PROVIDER (CORRIGIDO PARA REACT 19 / NEXT 16)                      */
 /* -------------------------------------------------------------------------- */
 
-export function ThemeProvider({
-  children,
-}: {
-  readonly children: ReactNode
-}) {
-  const { theme, setTheme, resolvedTheme } = useNextTheme()
+export function ThemeProvider({ children }: { readonly children: ReactNode }) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  // Envolvemos o seu Contexto dentro do Provider do next-themes para garantir 
+  // que o 'class="dark"' seja aplicado corretamente ao <html>
+  return (
+    <NextThemesProvider 
+      attribute="class" 
+      defaultTheme="system" 
+      enableSystem
+      disableTransitionOnChange
+    >
+      <ThemeContentProvider mounted={mounted}>
+        {children}
+      </ThemeContentProvider>
+    </NextThemesProvider>
+  )
+}
+
+// Componente auxiliar para acessar o useNextTheme com segurança
+function ThemeContentProvider({ children, mounted }: { children: ReactNode, mounted: boolean }) {
+  const { theme, setTheme, resolvedTheme } = useNextTheme()
+
   const toggleTheme = useCallback(() => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
   }, [resolvedTheme, setTheme])
 
-  const value = useMemo<ThemeContextValue>(
-    () => ({
-      theme: (theme as ThemeType) ?? 'system',
-      isDark: resolvedTheme === 'dark',
-      mounted,
-      toggleTheme,
-    }),
-    [theme, resolvedTheme, mounted, toggleTheme]
-  )
+  const value = useMemo<ThemeContextValue>(() => ({
+    theme: (theme as ThemeType) ?? 'system',
+    isDark: resolvedTheme === 'dark',
+    mounted,
+    toggleTheme,
+  }), [theme, resolvedTheme, mounted, toggleTheme])
 
   return (
     <ThemeContext.Provider value={value}>
@@ -75,77 +78,33 @@ export function ThemeProvider({
 }
 
 /* -------------------------------------------------------------------------- */
-/* 3. CUSTOM HOOK                                                              */
+/* 3. CUSTOM HOOK & UI (TEMA/BOTÃO)                                           */
 /* -------------------------------------------------------------------------- */
 
-export function useTheme(): ThemeContextValue {
+export function useTheme() {
   const context = useContext(ThemeContext)
-  const nextTheme = useNextTheme()
-
-  if (!context) {
-    return {
-      theme: (nextTheme.theme as ThemeType) ?? 'system',
-      isDark: nextTheme.resolvedTheme === 'dark',
-      mounted: true,
-      toggleTheme: () =>
-        nextTheme.setTheme(
-          nextTheme.resolvedTheme === 'dark' ? 'light' : 'dark'
-        ),
-    }
-  }
-
+  if (!context) throw new Error("useTheme must be used within ThemeProvider")
   return context
 }
-
-/* -------------------------------------------------------------------------- */
-/* 4. THEME TOGGLE COMPONENT (UI)                                              */
-/* -------------------------------------------------------------------------- */
-
-type Lang = 'pt' | 'en' | 'es'
 
 export function ThemeToggle() {
   const pathname = usePathname()
   const { toggleTheme, isDark, mounted } = useTheme()
 
-  /* --- Detecção de idioma robusta --- */
-  const lang = useMemo<Lang>(() => {
-    if (!pathname) return 'pt'
-    const segment = pathname.split('/')[1]?.toLowerCase()
-    return segment === 'en' || segment === 'es' ? segment : 'pt'
+  const lang = useMemo(() => {
+    const segment = pathname?.split('/')[1]?.toLowerCase()
+    return (segment === 'en' || segment === 'es') ? segment : 'pt'
   }, [pathname])
 
-  const labels: Record<Lang, { dark: string; light: string }> = {
-    pt: {
-      dark: 'Ativar modo escuro',
-      light: 'Ativar modo claro',
-    },
-    en: {
-      dark: 'Enable dark mode',
-      light: 'Enable light mode',
-    },
-    es: {
-      dark: 'Activar modo oscuro',
-      light: 'Activar modo claro',
-    },
+  const labels = {
+    pt: { dark: 'Ativar modo escuro', light: 'Ativar modo claro' },
+    en: { dark: 'Enable dark mode', light: 'Enable light mode' },
+    es: { dark: 'Activar modo oscuro', light: 'Activar modo claro' },
   }
 
-  /* --- Skeleton durante hidratação --- */
-  if (!mounted) {
-    return (
-      <div
-        className="
-          min-w-[44px] min-h-[44px]
-          rounded-xl
-          bg-slate-200/60 dark:bg-slate-800/60
-          border border-slate-200 dark:border-slate-800
-          animate-pulse
-        "
-        aria-hidden="true"
-      />
-    )
-  }
+  if (!mounted) return <div className="w-11 h-11 rounded-xl bg-slate-200/60 dark:bg-slate-800/60 animate-pulse" />
 
-  const t = labels[lang]
+  const t = labels[lang as keyof typeof labels]
   const currentLabel = isDark ? t.light : t.dark
 
   return (
@@ -153,54 +112,11 @@ export function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       aria-label={currentLabel}
-      aria-pressed={isDark}
-      title={currentLabel}
-      className="
-        relative
-        min-w-[44px] min-h-[44px]
-        p-2.5
-        rounded-xl
-        bg-white/80 dark:bg-slate-900/80
-        border border-slate-200 dark:border-slate-800/60
-        shadow-sm backdrop-blur-md
-        text-slate-600 dark:text-slate-400
-        hover:text-blue-600 dark:hover:text-amber-400
-        hover:border-blue-500/30 dark:hover:border-amber-500/30
-        transition-all duration-300
-        group active:scale-95
-        focus:outline-none
-        focus-visible:ring-2 focus-visible:ring-blue-500
-        focus-visible:ring-offset-2
-        focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900
-        supports-[padding:env(safe-area-inset-top)]:p-[calc(0.625rem+env(safe-area-inset-top))]
-      "
+      className="relative w-11 h-11 p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800/60 shadow-sm backdrop-blur-md text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-amber-400 transition-all active:scale-95"
     >
       <div className="relative w-5 h-5 flex items-center justify-center overflow-hidden">
-        {/* Sol — aparece quando Dark */}
-        <Sun
-          size={20}
-          className={`
-            absolute transition-all duration-500
-            ${
-              isDark
-                ? 'translate-y-0 opacity-100 rotate-0'
-                : 'translate-y-8 opacity-0 rotate-45'
-            }
-          `}
-        />
-
-        {/* Lua — aparece quando Light */}
-        <Moon
-          size={20}
-          className={`
-            absolute transition-all duration-500
-            ${
-              !isDark
-                ? 'translate-y-0 opacity-100 rotate-0'
-                : '-translate-y-8 opacity-0 -rotate-45'
-            }
-          `}
-        />
+        <Sun size={20} className={`absolute transition-all duration-500 ${isDark ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`} />
+        <Moon size={20} className={`absolute transition-all duration-500 ${!isDark ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'}`} />
       </div>
     </button>
   )
