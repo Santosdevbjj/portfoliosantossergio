@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * LANGUAGE SWITCHER — SÉRGIO SANTOS (CORRIGIDO PARA BUILD)
+ * LANGUAGE SWITCHER — SÉRGIO SANTOS (REVISÃO FINAL SEM UNUSED IMPORTS)
  * -----------------------------------------------------------------------------
  */
 
-import { useState, useEffect, Suspense, useMemo } from 'react'
+import { useState, useEffect, Suspense } from 'react' // Removido useMemo daqui
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 
@@ -53,10 +53,8 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
         const isActive = currentLang === locale
         const meta = localeMetadata[locale]
 
-        // Lógica de reconstrução de rota blindada
         const segments = pathname ? pathname.split('/') : []
         
-        // Se o segundo segmento for um idioma conhecido, substitui. Se não, insere.
         if (segments[1] && availableLocales.includes(segments[1] as Locale)) {
           segments[1] = locale
         } else {
@@ -64,14 +62,12 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
         }
 
         const queryString = searchParams?.toString()
-        // Garantimos que finalPath comece com / e tratamos como string pura para o Link
         const path = segments.join('/') || '/'
         const finalPath = queryString ? `${path}?${queryString}` : path
 
         return (
           <Link
             key={locale}
-            // O segredo está em garantir que o href nunca seja undefined
             href={finalPath as any} 
             hrefLang={locale}
             onClick={() => writeLocaleCookie(locale)}
