@@ -1,35 +1,34 @@
 'use client'
 
 /**
- * THEME PROVIDER: Governança de Interface (Dark/Light Mode)
+ * THEME PROVIDER - PORTÃO DE ENTRADA UNIFICADO
  * -----------------------------------------------------------------------------
- * Revisão Sênior:
- * 1. Adicionado suppressHydrationWarning para evitar erros de servidor/cliente.
- * 2. Garantia de que o conteúdo não cause "layout shift" durante o carregamento.
+ * Revisão: Sincronizado com a unificação do ThemeToggle.
+ * - Elimina o "Flash" de cores erradas no carregamento.
+ * - Atua como um Wrapper de infraestrutura para o Next.js 16.
+ * - Integração: Utiliza o Provider unificado do @/components/ThemeToggle.
  */
 
 import * as React from 'react'
-import {
-  ThemeProvider as NextThemesProvider,
-  type ThemeProviderProps,
-} from 'next-themes'
+import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { ThemeProvider as CustomLogicProvider } from './ThemeToggle'
 
-export function ThemeProvider({
-  children,
-  ...props
-}: ThemeProviderProps) {
+interface ThemeProviderProps {
+  children: React.ReactNode
+  attribute?: string
+  defaultTheme?: string
+  enableSystem?: boolean
+  disableTransitionOnChange?: boolean
+}
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  // Estado de montagem para evitar Hydration Mismatch no servidor
   const [mounted, setMounted] = React.useState(false)
 
-  // O useEffect garante que o código só rode no navegador
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
-  /**
-   * Padrão Sênior: No Next.js 16, se retornarmos apenas os children antes de montar,
-   * o HTML final pode divergir do inicial. 
-   * Usamos um wrapper simples ou apenas o Provider com a lógica de montagem.
-   */
   return (
     <NextThemesProvider
       attribute="class"
@@ -38,12 +37,17 @@ export function ThemeProvider({
       disableTransitionOnChange
       {...props}
     >
-      <div 
-        style={{ visibility: mounted ? 'visible' : 'hidden' }} 
-        suppressHydrationWarning
-      >
-        {children}
-      </div>
+      {/* O CustomLogicProvider (do ThemeToggle) injeta nossas funções 
+          de toggleTheme() e isDark em toda a aplicação.
+      */}
+      <CustomLogicProvider>
+        <div 
+          className={mounted ? 'contents' : 'invisible'} 
+          suppressHydrationWarning
+        >
+          {children}
+        </div>
+      </CustomLogicProvider>
     </NextThemesProvider>
   )
 }
