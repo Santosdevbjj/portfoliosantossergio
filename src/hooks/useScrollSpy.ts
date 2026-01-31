@@ -3,38 +3,53 @@
 /**
  * HOOK: useScrollSpy
  * -----------------------------------------------------------------------------
- * Monitora a rolagem da página e identifica qual seção está visível.
- * - Performance: Usa IntersectionObserver em vez de eventos de scroll pesados.
- * - Resiliência: Blindado contra SSR (Server Side Rendering).
- * - Mobile: Ajuste de rootMargin para melhor detecção em telas pequenas.
+ * Detecta qual seção está ativa no viewport usando IntersectionObserver.
+ *
+ * ✔ Performance: Sem listeners de scroll
+ * ✔ Responsivo: Funciona em mobile, tablet e desktop
+ * ✔ SSR-safe: Não executa no servidor
+ * ✔ Acessível: Compatível com prefers-reduced-motion
+ * ✔ Determinístico: Resolve conflitos quando múltiplas seções estão visíveis
  */
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-export function useScrollSpy(sectionIds: string[], offset: number = 100) {
-  const [activeId, setActiveId] = useState<string>('')
-  const observer = useRef<IntersectionObserver | null>(null)
+export function useScrollSpy(
+  sectionIds: readonly string[],
+  offset: number = 100
+): string | null {
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
-    // Proteção contra execução no servidor
     if (typeof window === 'undefined') return
+    if (!sectionIds.length) return
 
-    // Limpa observer anterior se existir
-    if (observer.current) observer.current.disconnect()
+    // Limpa observer anterior
+    observerRef.current?.disconnect()
 
-    /**
-     * Configuração do Observer:
-     * rootMargin: Ajusta a "janela" de detecção. 
-     * O valor -25% no topo e -40% no fundo garante que a seção mude 
-     * quando ela estiver realmente no centro da visão do usuário.
-     */
-    observer.current = new IntersectionObserver(
+    const visibleSections = new Map<string, number>()
+
+    observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const id = entry.target.id
+          if (!id) return
+
           if (entry.isIntersecting) {
-            setActiveId(entry.target.id)
+            visibleSections.set(id, entry.boundingClientRect.top)
+          } else {
+            visibleSections.delete(id)
           }
         })
+
+        if (visibleSections.size > 0) {
+          // Seleciona a seção mais próxima do topo da viewport
+          const closestSection = [...visibleSections.entries()]
+            .sort((a, b) => a[1] - b[1])[0][0]
+
+          setActiveId(closestSection)
+        }
       },
       {
         rootMargin: `-${offset}px 0px -40% 0px`,
@@ -42,21 +57,21 @@ export function useScrollSpy(sectionIds: string[], offset: number = 100) {
       }
     )
 
-    // Conecta o observer a cada seção
     sectionIds.forEach((id) => {
       const element = document.getElementById(id)
-      if (element && observer.current) {
-        observer.current.observe(element)
-      }
+      if (element) observerRef.current?.observe(element)
     })
 
     return () => {
-      if (observer.current) observer.current.disconnect()
+      observerRef.current?.disconnect()
+      visibleSections.clear()
     }
   }, [sectionIds, offset])
 
   return activeId
 }
 
-// Exportação adicional para compatibilidade com nomes legados no projeto
+/**
+ * Alias legado mantido por compatibilidade
+ */
 export const useScrollSpyObserver = useScrollSpy
