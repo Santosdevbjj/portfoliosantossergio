@@ -29,13 +29,10 @@ export function generateBreadcrumbs(
   segments.forEach((segment) => {
     currentPath += `/${segment}`;
 
-    // Tipamos as chaves para o TS parar de reclamar
-    const navKey = segment as keyof typeof dict.nav;
-    const pagesKey = segment as keyof NonNullable<typeof dict.seo.pages>;
-
+    // Tentamos buscar no nav, depois no seo.pages, e por fim usamos o próprio nome do segmento
     const label =
-      dict.nav?.[navKey] ||
-      (dict.seo.pages as any)?.[segment]?.title || // Fallback usando any para o index signature
+      (dict.nav as any)[segment] ||
+      (dict.seo.pages as any)?.[segment]?.title ||
       segment.charAt(0).toUpperCase() + segment.slice(1);
 
     breadcrumbs.push({
