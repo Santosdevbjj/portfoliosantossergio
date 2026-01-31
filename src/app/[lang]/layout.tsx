@@ -46,12 +46,12 @@ export const viewport: Viewport = {
 
 // SEO Metadata
 export async function generateMetadata(
-  props: { params: Promise<{ lang: string }> }
+  { params }: { params: { lang: string } }
 ): Promise<Metadata> {
-  const { lang } = await props.params
-
   const currentLang = (
-    i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale
+    i18n.locales.includes(params.lang as Locale)
+      ? params.lang
+      : i18n.defaultLocale
   ) as SupportedLocale
 
   const dict = getDictionarySync(currentLang)
@@ -59,6 +59,13 @@ export async function generateMetadata(
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
     'https://portfoliosantossergio.vercel.app'
+
+  const ogLocale =
+    currentLang === 'pt'
+      ? 'pt_BR'
+      : currentLang === 'es'
+      ? 'es_ES'
+      : 'en_US'
 
   return {
     metadataBase: new URL(siteUrl),
@@ -76,7 +83,10 @@ export async function generateMetadata(
     },
 
     alternates: {
-      canonical: `${siteUrl}/${currentLang}`,
+      canonical:
+        currentLang === i18n.defaultLocale
+          ? siteUrl
+          : `${siteUrl}/${currentLang}`,
       languages: {
         'pt-BR': `${siteUrl}/pt`,
         'en-US': `${siteUrl}/en`,
@@ -90,7 +100,7 @@ export async function generateMetadata(
       description: dict.seo.description,
       url: `${siteUrl}/${currentLang}`,
       siteName: dict.seo.siteName,
-      locale: currentLang,
+      locale: ogLocale,
       type: 'website',
       images: [
         {
@@ -101,6 +111,13 @@ export async function generateMetadata(
       ],
     },
 
+    twitter: {
+      card: 'summary_large_image',
+      title: dict.seo.siteName,
+      description: dict.seo.description,
+      images: ['/og-image.png'],
+    },
+
     robots: {
       index: true,
       follow: true,
@@ -109,14 +126,17 @@ export async function generateMetadata(
 }
 
 // Root Layout
-export default async function RootLayout(props: {
+export default function RootLayout({
+  children,
+  params,
+}: {
   children: React.ReactNode
-  params: Promise<{ lang: string }>
+  params: { lang: string }
 }) {
-  const { lang } = await props.params
-
   const currentLang = (
-    i18n.locales.includes(lang as Locale) ? lang : i18n.defaultLocale
+    i18n.locales.includes(params.lang as Locale)
+      ? params.lang
+      : i18n.defaultLocale
   ) as SupportedLocale
 
   const dict = getDictionarySync(currentLang)
@@ -154,26 +174,23 @@ export default async function RootLayout(props: {
           disableTransitionOnChange
         >
           <main id="main-content" className="flex-grow w-full">
-            {props.children}
+            {children}
           </main>
 
-          {/* Cookie Banner alinhado ao Dictionary */}
           <CookieBanner
             lang={currentLang}
             dict={{
-              title:
-                currentLang === 'pt'
-                  ? 'Privacidade'
-                  : currentLang === 'es'
-                  ? 'Privacidad'
-                  : 'Privacy',
+              title: currentLang === 'pt'
+                ? 'Privacidade'
+                : currentLang === 'es'
+                ? 'Privacidad'
+                : 'Privacy',
               description: dict.seo.description,
-              accept:
-                currentLang === 'pt'
-                  ? 'Aceitar'
-                  : currentLang === 'es'
-                  ? 'Aceptar'
-                  : 'Accept',
+              accept: currentLang === 'pt'
+                ? 'Aceitar'
+                : currentLang === 'es'
+                ? 'Aceptar'
+                : 'Accept',
               common: dict.common,
             }}
           />
