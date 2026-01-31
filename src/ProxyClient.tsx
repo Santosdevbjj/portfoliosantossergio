@@ -19,6 +19,53 @@ import { getGitHubProjects } from '@/lib/github'
 import type { Project } from '@/domain/projects'
 import { featuredConfig } from '@/components/featured/projects.data'
 
+
+
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { i18n } from './i18n-config'
+
+export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+
+  // 1. EXCEÇÃO CRÍTICA: Não redirecionar arquivos estáticos ou de sistema
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.includes('.') || // Pega favicon.ico, sitemap.xml, etc.
+    pathname === '/robots.txt'
+  ) {
+    return NextResponse.next()
+  }
+
+  // 2. Verificar se o idioma já está presente na URL
+  const pathnameIsMissingLocale = i18n.locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  )
+
+  // 3. Redirecionar se não houver idioma (ex: "/" -> "/pt")
+  if (pathnameIsMissingLocale) {
+    const locale = i18n.defaultLocale
+    return NextResponse.redirect(
+      new URL(
+        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
+        request.url
+      )
+    )
+  }
+}
+
+export const config = {
+  // O Matcher deve ser robusto para ignorar o que não é página
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|sw.js|.*\\..*).*)',
+  ],
+}
+
+
+
+
+
 interface ProxyProps {
   lang: SupportedLocale
 }
