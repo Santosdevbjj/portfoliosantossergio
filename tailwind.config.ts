@@ -6,8 +6,7 @@ const config: Config = {
   /* CORE CONFIG                                                            */
   /* ---------------------------------------------------------------------- */
   darkMode: 'class',
-  
-  // Caminhos otimizados para o motor de scan do Next.js 16 / Turbopack
+
   content: [
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
@@ -15,32 +14,43 @@ const config: Config = {
     './src/styles/**/*.css',
   ],
 
+  safelist: [
+    'dark',
+    'light',
+    'lang-pt',
+    'lang-en',
+    'lang-es',
+  ],
+
   theme: {
     container: {
       center: true,
       padding: {
-        DEFAULT: '1.5rem',
-        sm: '2rem',
-        lg: '4rem',
+        DEFAULT: '1rem',
+        sm: '1.5rem',
+        lg: '2rem',
+        xl: '3rem',
       },
     },
 
     extend: {
       /* ------------------------------ Breakpoints ----------------------- */
       screens: {
-        'xs': '375px',
-        '2xl': '1440px', 
+        xs: '375px',
+        '2xl': '1440px',
       },
 
       /* ------------------------------ Colors ---------------------------- */
       colors: {
-        // Cores Semânticas (Necessárias para Shadcn/UI e Reset Global)
         border: 'rgb(var(--border) / <alpha-value>)',
         input: 'rgb(var(--input) / <alpha-value>)',
-        ring: 'rgb(var(--ring) / <alpha-value>)',
+
+        /* FIX: variável ring agora coerente com globals.css */
+        ring: 'rgb(var(--brand-500) / <alpha-value>)',
+
         background: 'rgb(var(--background) / <alpha-value>)',
         foreground: 'rgb(var(--foreground) / <alpha-value>)',
-        
+
         brand: {
           50: 'rgb(var(--brand-50) / <alpha-value>)',
           100: 'rgb(var(--brand-100) / <alpha-value>)',
@@ -54,8 +64,9 @@ const config: Config = {
           900: 'rgb(var(--brand-900) / <alpha-value>)',
           DEFAULT: 'rgb(var(--brand-500) / <alpha-value>)',
         },
+
         slate: {
-          950: '#020617', // OLED Dark Mode Pure
+          950: '#020617',
         },
       },
 
@@ -67,7 +78,11 @@ const config: Config = {
           '-apple-system',
           'sans-serif',
         ],
-        heading: ['var(--font-montserrat)', 'sans-serif'],
+        heading: [
+          'var(--font-montserrat)',
+          'system-ui',
+          'sans-serif',
+        ],
       },
 
       /* ------------------------------ Animations ------------------------ */
@@ -75,8 +90,8 @@ const config: Config = {
         'fade-in': 'fadeIn 0.5s ease-out forwards',
         'fade-in-up': 'fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'shimmer': 'shimmer 2s linear infinite',
-        'float': 'float 4s ease-in-out infinite',
+        shimmer: 'shimmer 2s linear infinite',
+        float: 'float 4s ease-in-out infinite',
       },
 
       keyframes: {
@@ -85,8 +100,14 @@ const config: Config = {
           '100%': { opacity: '1' },
         },
         fadeInUp: {
-          '0%': { opacity: '0', transform: 'translateY(12px) scale(0.98)' },
-          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(12px) scale(0.98)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0) scale(1)',
+          },
         },
         shimmer: {
           '0%': { transform: 'translateX(-100%)' },
@@ -102,7 +123,6 @@ const config: Config = {
       boxShadow: {
         premium: '0 20px 50px -12px rgba(0, 0, 0, 0.08)',
         'premium-dark': '0 20px 50px -12px rgba(0, 0, 0, 0.4)',
-        // Glow sincronizado com o sistema RGB raw
         glow: '0 0 20px rgb(var(--brand-500) / 0.3)',
       },
     },
@@ -113,7 +133,6 @@ const config: Config = {
   /* ---------------------------------------------------------------------- */
   plugins: [
     typography,
-    // Garanta que 'npm install tailwindcss-animate' foi executado
     require('tailwindcss-animate'),
   ],
 }
