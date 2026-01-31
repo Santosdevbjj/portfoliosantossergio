@@ -1,17 +1,5 @@
 'use client'
 
-/**
- * HOOK: useScrollSpy
- * -----------------------------------------------------------------------------
- * Detecta qual seção está ativa no viewport usando IntersectionObserver.
- *
- * ✔ Performance: Sem listeners de scroll
- * ✔ Responsivo: Funciona em mobile, tablet e desktop
- * ✔ SSR-safe: Não executa no servidor
- * ✔ Acessível: Compatível com prefers-reduced-motion
- * ✔ Determinístico: Resolve conflitos quando múltiplas seções estão visíveis
- */
-
 import { useEffect, useRef, useState } from 'react'
 
 export function useScrollSpy(
@@ -25,7 +13,6 @@ export function useScrollSpy(
     if (typeof window === 'undefined') return
     if (!sectionIds.length) return
 
-    // Limpa observer anterior
     observerRef.current?.disconnect()
 
     const visibleSections = new Map<string, number>()
@@ -44,11 +31,17 @@ export function useScrollSpy(
         })
 
         if (visibleSections.size > 0) {
-          // Seleciona a seção mais próxima do topo da viewport
-          const closestSection = [...visibleSections.entries()]
-            .sort((a, b) => a[1] - b[1])[0][0]
-
-          setActiveId(closestSection)
+          // Convertemos para array e ordenamos pela distância do topo
+          const sorted = Array.from(visibleSections.entries()).sort(
+            (a, b) => a[1] - b[1]
+          )
+          
+          // Pegamos o ID da primeira seção (a mais próxima do topo) de forma segura
+          const closestSection = sorted[0]?.[0]
+          
+          if (closestSection) {
+            setActiveId(closestSection)
+          }
         }
       },
       {
@@ -71,7 +64,4 @@ export function useScrollSpy(
   return activeId
 }
 
-/**
- * Alias legado mantido por compatibilidade
- */
 export const useScrollSpyObserver = useScrollSpy
