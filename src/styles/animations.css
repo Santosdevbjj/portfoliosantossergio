@@ -3,19 +3,34 @@
 /**
  * SISTEMA DE ANIMAÇÕES — 2026 Ready
  * -----------------------------------------------------------------------------
- * - Performance: Camadas compostas (Composite Layers) para 120Hz/144Hz.
- * - Hardware: Força aceleração via translateZ(0).
- * - UX: Movimento orgânico via easing de quarta ordem.
+ * - Performance: Apenas propriedades compostas (opacity / transform).
+ * - GPU: Aceleração forçada quando necessário.
+ * - UX: Responsivo, acessível e culturalmente neutro (i18n-ready).
  */
 
 /* ------------------------------------------ */
-/* 🔑 Keyframes (Otimizados para GPU) */
+/* 🌐 Variáveis Responsivas */
 /* ------------------------------------------ */
+
+:root {
+  --motion-offset-sm: 8px;
+  --motion-offset-md: 12px;
+  --motion-offset-lg: 16px;
+}
+
+/* ------------------------------------------ */
+/* 🔑 Keyframes (GPU Safe) */
+/* ------------------------------------------ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(var(--motion-offset-md)) scale(0.98);
   }
   100% {
     opacity: 1;
@@ -33,11 +48,6 @@
   50% { transform: translateY(-8px); }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
 /* ------------------------------------------ */
 /* ⚡ Utilities */
 /* ------------------------------------------ */
@@ -47,18 +57,34 @@
 }
 
 .animate-fade-in-up {
-  /* Força criação de nova camada apenas durante a execução */
   animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
 .animate-float {
   animation: float 4s ease-in-out infinite;
-  transform: translateZ(0); /* Hardware acceleration */
+  transform: translateZ(0);
 }
 
 /* ------------------------------------------ */
-/* 🦴 Skeleton Shimmer (Ultra-Smooth) */
+/* 📱 Ajustes Responsivos de Movimento */
+/* ------------------------------------------ */
+
+@media (max-width: 640px) {
+  :root {
+    --motion-offset-md: var(--motion-offset-sm);
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --motion-offset-md: var(--motion-offset-lg);
+  }
+}
+
+/* ------------------------------------------ */
+/* 🦴 Skeleton Shimmer */
 /* ------------------------------------------ */
 
 .skeleton-shimmer {
@@ -74,21 +100,18 @@
 .skeleton-shimmer::after {
   content: "";
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   background: linear-gradient(
     90deg,
     transparent 0%,
     rgba(255, 255, 255, 0.06) 50%,
     transparent 100%
   );
-  animation: shimmer 1.8s infinite linear;
+  animation: shimmer 1.8s linear infinite;
 }
 
 /* ------------------------------------------ */
-/* 🧊 Staggered Load (Automated) */
+/* 🧊 Staggered Load */
 /* ------------------------------------------ */
 
 .stagger-load > * {
@@ -96,7 +119,7 @@
   animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-/* Delays incrementais para percepção de fluidez */
+/* Delays incrementais */
 .stagger-load > *:nth-child(1) { animation-delay: 100ms; }
 .stagger-load > *:nth-child(2) { animation-delay: 160ms; }
 .stagger-load > *:nth-child(3) { animation-delay: 220ms; }
@@ -104,13 +127,34 @@
 .stagger-load > *:nth-child(5) { animation-delay: 340ms; }
 .stagger-load > *:nth-child(6) { animation-delay: 400ms; }
 
+/* Fallback para listas longas */
+.stagger-load > *:nth-child(n+7) {
+  animation-delay: 460ms;
+}
+
+/* ------------------------------------------ */
+/* 🌍 i18n — Ajustes Culturais Opcionais */
+/* ------------------------------------------ */
+
+/* Exemplo: reduzir movimento em contextos específicos */
+.lang-es .animate-float {
+  animation-duration: 5s;
+}
+
+.lang-en .animate-float {
+  animation-duration: 4s;
+}
+
+.lang-pt .animate-float {
+  animation-duration: 4.5s;
+}
+
 /* ------------------------------------------ */
 /* ♿ Reduced Motion — Respeito Total */
 /* ------------------------------------------ */
 
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
-    animation-delay: 0s !important;
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0s !important;
@@ -119,9 +163,10 @@
 
   .stagger-load > *,
   .animate-fade-in-up,
-  .animate-float {
+  .animate-float,
+  .skeleton-shimmer::after {
     opacity: 1 !important;
     transform: none !important;
-    transition: none !important;
+    animation: none !important;
   }
 }
