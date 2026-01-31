@@ -11,7 +11,7 @@ import { Inter, Montserrat } from 'next/font/google'
 import Script from 'next/script'
 import '../globals.css'
 
-import { ThemeProvider } from '@/components/ThemeProvider'
+import { ThemeProvider } from '@/components/ThemeToggle'
 import { CookieBanner } from '@/components/CookieBanner'
 import { i18n, type Locale } from '@/i18n-config'
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
