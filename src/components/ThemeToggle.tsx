@@ -1,30 +1,100 @@
 'use client'
 
 /**
- * THEME TOGGLE — SÉRGIO SANTOS
+ * THEME SYSTEM UNIFIED — SÉRGIO SANTOS (2026)
  * -----------------------------------------------------------------------------
- * - Responsividade: Adaptativo com feedback tátil (active:scale-95).
- * - Multilingue: Labels em PT, EN, ES baseados na rota atual.
- * - Build Fix: Removida variável 'theme' não utilizada para sanar erro de compilação.
+ * Unifica: Contexto, Hook Customizado e Componente UI.
+ * - Responsividade: Feedback tátil (active:scale-95) e suporte a Safe Areas.
+ * - Multilingue: Detecção automática via Pathname (PT, EN, ES).
+ * - Framework: Otimizado para Next.js 16 e React 19.
  */
 
-import { useState, useEffect, useMemo } from 'react'
+import { 
+  createContext, 
+  useContext, 
+  useEffect, 
+  useState, 
+  useMemo, 
+  useCallback, 
+  type ReactNode 
+} from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useTheme } from 'next-themes'
+import { useTheme as useNextTheme } from 'next-themes'
 
-export function ThemeToggle() {
-  const pathname = usePathname()
-  // Removido 'theme' para evitar erro "declared but never read" no Vercel
-  const { setTheme, resolvedTheme } = useTheme()
+/* -------------------------------------------------------------------------- */
+/* 1. TYPES & CONTEXT                                                         */
+/* -------------------------------------------------------------------------- */
+
+export type ThemeType = 'light' | 'dark' | 'system'
+
+interface ThemeContextValue {
+  theme: ThemeType
+  isDark: boolean
+  mounted: boolean
+  toggleTheme: () => void
+}
+
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
+
+/* -------------------------------------------------------------------------- */
+/* 2. THEME PROVIDER (Orquestrador)                                          */
+/* -------------------------------------------------------------------------- */
+
+export function ThemeProvider({ children }: { readonly children: ReactNode }) {
+  const { theme, setTheme, resolvedTheme } = useNextTheme()
   const [mounted, setMounted] = useState(false)
 
-  // Garante sincronia após montagem no cliente
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  /* ------------------------------ i18n Logic ------------------------------ */
+  const toggleTheme = useCallback(() => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+  }, [resolvedTheme, setTheme])
+
+  const value = useMemo(() => ({
+    theme: (theme as ThemeType) || 'system',
+    isDark: resolvedTheme === 'dark',
+    mounted,
+    toggleTheme,
+  }), [theme, resolvedTheme, mounted, toggleTheme])
+
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* 3. CUSTOM HOOK (Abstração)                                                 */
+/* -------------------------------------------------------------------------- */
+
+export function useTheme() {
+  const context = useContext(ThemeContext)
+  // Fallback para caso o dev esqueça o Provider
+  if (!context) {
+    const { theme, setTheme, resolvedTheme } = useNextTheme()
+    return {
+      theme: (theme as ThemeType) || 'system',
+      isDark: resolvedTheme === 'dark',
+      mounted: true,
+      toggleTheme: () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+    }
+  }
+  return context
+}
+
+/* -------------------------------------------------------------------------- */
+/* 4. THEME TOGGLE COMPONENT (UI)                                            */
+/* -------------------------------------------------------------------------- */
+
+export function ThemeToggle() {
+  const pathname = usePathname()
+  const { toggleTheme, isDark, mounted } = useTheme()
+
+  /* --- Lógica de Tradução Interna --- */
   const lang = useMemo(() => {
     if (!pathname) return 'pt'
     const segment = pathname.split('/')[1]
@@ -37,7 +107,7 @@ export function ThemeToggle() {
     es: { dark: 'Activar modo oscuro', light: 'Activar modo claro' },
   }
 
-  /* --------------------------- Skeleton State ----------------------------- */
+  /* --- Skeleton durante a Hidratação --- */
   if (!mounted) {
     return (
       <div 
@@ -47,14 +117,13 @@ export function ThemeToggle() {
     )
   }
 
-  const isDark = resolvedTheme === 'dark'
   const t = labels[lang]
   const currentLabel = isDark ? t.light : t.dark
 
   return (
     <button
       type="button"
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      onClick={toggleTheme}
       aria-label={currentLabel}
       aria-pressed={isDark}
       title={currentLabel}
@@ -72,7 +141,7 @@ export function ThemeToggle() {
       "
     >
       <div className="relative w-5 h-5 flex items-center justify-center overflow-hidden">
-        {/* Ícone de Sol: Visível no Dark Mode para mudar para Light */}
+        {/* Ícone de Sol: Aparece quando está Dark */}
         <Sun
           size={20}
           className={`
@@ -83,7 +152,7 @@ export function ThemeToggle() {
           `}
         />
         
-        {/* Ícone de Lua: Visível no Light Mode para mudar para Dark */}
+        {/* Ícone de Lua: Aparece quando está Light */}
         <Moon
           size={20}
           className={`
@@ -94,9 +163,6 @@ export function ThemeToggle() {
           `}
         />
       </div>
-
-      {/* Overlay decorativo discreto */}
-      <span className="absolute inset-0 rounded-xl border border-blue-500/0 group-hover:border-blue-500/10 dark:group-hover:border-amber-500/10 transition-colors pointer-events-none" />
     </button>
   )
 }
