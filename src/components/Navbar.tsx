@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Menu, X, Globe } from 'lucide-react'
+import { Menu, X } from 'lucide-react' // Removido o Globe daqui
 
 import type { Locale } from '@/i18n-config'
 import type { Dictionary } from '@/types/dictionary'
@@ -102,7 +102,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
       {/* MOBILE MENU */}
       <div
         className={`lg:hidden absolute top-full left-0 w-full overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ${
-          isOpen ? 'max-h-[90vh] opacity-100' : 'max-h-0 opacity-0'
+          isOpen ? 'max-h-[90vh] opacity-100 shadow-2xl' : 'max-h-0 opacity-0'
         }`}
       >
         <div className="flex flex-col gap-6 p-8">
@@ -119,7 +119,9 @@ export function Navbar({ lang, dict }: NavbarProps) {
             </Link>
           ))}
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
-             {/* Note: O menu mobile fecha ao trocar de página via Link, então o onChange aqui é redundante */}
+             <p className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+              {common.navigation}
+            </p>
             <LanguageSwitcher currentLang={lang} />
           </div>
         </div>
