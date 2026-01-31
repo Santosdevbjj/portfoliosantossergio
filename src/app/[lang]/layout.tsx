@@ -1,9 +1,7 @@
 /**
- * ROOT LAYOUT - NEXT.JS 16 - SÉRGIO SANTOS ESTRATÉGICO
+ * ROOT LAYOUT - NEXT.JS 16 - SÉRGIO SANTOS ESTRATÉGICO (CORRIGIDO)
  * -----------------------------------------------------------------------------
- * - Responsividade: Mobile-first, sem overflow lateral.
- * - Multilíngue: PT, EN, ES com SEO dinâmico.
- * - SEO Técnico: Google Search Console, OpenGraph, Canonical absoluto.
+ * Ajuste: params agora é uma Promise (Requisito obrigatório do Next.js 16)
  */
 
 import type { Metadata, Viewport } from 'next'
@@ -44,13 +42,15 @@ export const viewport: Viewport = {
   ],
 }
 
-// SEO Metadata
+// SEO Metadata - Corrigido para Promise
 export async function generateMetadata(
-  { params }: { params: { lang: string } }
+  props: { params: Promise<{ lang: string }> } // params é Promise no v16
 ): Promise<Metadata> {
+  const { lang } = await props.params // Aguarda a resolução
+  
   const currentLang = (
-    i18n.locales.includes(params.lang as Locale)
-      ? params.lang
+    i18n.locales.includes(lang as Locale)
+      ? lang
       : i18n.defaultLocale
   ) as SupportedLocale
 
@@ -61,27 +61,19 @@ export async function generateMetadata(
     'https://portfoliosantossergio.vercel.app'
 
   const ogLocale =
-    currentLang === 'pt'
-      ? 'pt_BR'
-      : currentLang === 'es'
-      ? 'es_ES'
-      : 'en_US'
+    currentLang === 'pt' ? 'pt_BR' : currentLang === 'es' ? 'es_ES' : 'en_US'
 
   return {
     metadataBase: new URL(siteUrl),
-
     title: {
       default: dict.seo.siteName,
       template: `%s | ${dict.seo.siteName}`,
     },
-
     description: dict.seo.description,
     keywords: dict.seo.keywords,
-
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
-
     alternates: {
       canonical:
         currentLang === i18n.defaultLocale
@@ -94,7 +86,6 @@ export async function generateMetadata(
         'x-default': `${siteUrl}/pt`,
       },
     },
-
     openGraph: {
       title: dict.seo.siteName,
       description: dict.seo.description,
@@ -102,22 +93,14 @@ export async function generateMetadata(
       siteName: dict.seo.siteName,
       locale: ogLocale,
       type: 'website',
-      images: [
-        {
-          url: '/og-image.png',
-          width: 1200,
-          height: 630,
-        },
-      ],
+      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
     },
-
     twitter: {
       card: 'summary_large_image',
       title: dict.seo.siteName,
       description: dict.seo.description,
       images: ['/og-image.png'],
     },
-
     robots: {
       index: true,
       follow: true,
@@ -125,17 +108,16 @@ export async function generateMetadata(
   }
 }
 
-// Root Layout
-export default function RootLayout({
-  children,
-  params,
-}: {
+// Root Layout - Corrigido para Async e Promise
+export default async function RootLayout(props: {
   children: React.ReactNode
-  params: { lang: string }
+  params: Promise<{ lang: string }> // params é Promise no v16
 }) {
+  const { lang } = await props.params // Aguarda a resolução antes de usar
+
   const currentLang = (
-    i18n.locales.includes(params.lang as Locale)
-      ? params.lang
+    i18n.locales.includes(lang as Locale)
+      ? lang
       : i18n.defaultLocale
   ) as SupportedLocale
 
@@ -149,7 +131,6 @@ export default function RootLayout({
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
       <head>
-        {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
           strategy="afterInteractive"
@@ -174,7 +155,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <main id="main-content" className="flex-grow w-full">
-            {children}
+            {props.children}
           </main>
 
           <CookieBanner
