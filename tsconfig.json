@@ -1,14 +1,10 @@
 {
   "compilerOptions": {
-    /* ---------------------------------------------------------------------- */
-    /* CORE TARGET & RUNTIME (Node.js 24 + 2026 Standards)                    */
-    /* ---------------------------------------------------------------------- */
+    /* CORE TARGET & RUNTIME (Node.js 24 + 2026 Standards) */
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
 
-    /* ---------------------------------------------------------------------- */
-    /* STRICTNESS (Rigor de Missão Crítica)                                   */
-    /* ---------------------------------------------------------------------- */
+    /* STRICTNESS (Rigor de Missão Crítica) */
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true,
@@ -17,51 +13,37 @@
     "noUnusedLocals": true,
     "noUnusedParameters": false,
 
-    /* ---------------------------------------------------------------------- */
-    /* EMIT & MODULE RESOLUTION (Next.js 16 + Motion 12 Compat)               */
-    /* ---------------------------------------------------------------------- */
+    /* EMIT & MODULE RESOLUTION */
     "noEmit": true,
     "module": "ESNext",
-    "moduleResolution": "Bundler", // Essencial para reconhecer subcaminhos como 'motion/react'
-    "moduleDetection": "force",    // Garante que todo arquivo seja tratado como módulo
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
     "isolatedModules": true,
     "jsx": "react-jsx",
 
-    /* ---------------------------------------------------------------------- */
-    /* INTEROP & MODERN JS                                                    */
-    /* ---------------------------------------------------------------------- */
+    /* INTEROP & MODERN JS */
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "skipLibCheck": true,          // Vital para ignorar inconsistências de tipos em pacotes externos
+    "skipLibCheck": true,
 
-    /* ---------------------------------------------------------------------- */
-    /* PROJECT STRUCTURE                                                      */
-    /* ---------------------------------------------------------------------- */
+    /* PROJECT STRUCTURE */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
 
-    /* ---------------------------------------------------------------------- */
-    /* PERFORMANCE & CACHE (Ajustado para Termux)                             */
-    /* ---------------------------------------------------------------------- */
+    /* PERFORMANCE & CACHE */
     "incremental": true,
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo",
 
-    /* ---------------------------------------------------------------------- */
-    /* NEXT.JS PLUGIN                                                         */
-    /* ---------------------------------------------------------------------- */
+    /* NEXT.JS PLUGIN */
     "plugins": [
       {
         "name": "next"
       }
     ]
   },
-
- "paths": {
-      "@/*": ["./src/*"]
-    },
   
   "include": [
     "next-env.d.ts",
