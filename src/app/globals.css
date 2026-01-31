@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 /* -------------------------------------------------------------------------- */
-/* DESIGN TOKENS (RGB Raw Format for Tailwind Opacity Support)               */
+/* DESIGN TOKENS (RGB Raw Format for Tailwind Opacity Support)                 */
 /* -------------------------------------------------------------------------- */
 @layer base {
   :root {
@@ -21,19 +21,17 @@
     --brand-800: 7 75 133;
     --brand-900: 12 63 109;
 
-    /* Semantic Colors (Raw RGB) */
+    /* Semantic Colors */
     --background: 248 250 252;
     --foreground: 15 23 42;
     --card: 255 255 255;
-    
-    /* FIX: Mapeando explicitamente para evitar erro de 'border-border' no build */
-    --border: 226 232 240; 
+
+    --border: 226 232 240;
     --input: 226 232 240;
-    
+
     --muted: 100 116 139;
     --accent: 59 130 246;
 
-    /* Interactive */
     --selection-bg: 14 140 233;
     --scroll-thumb: 203 213 225;
   }
@@ -42,11 +40,10 @@
     --background: 2 6 23;
     --foreground: 241 245 249;
     --card: 15 23 42;
-    
-    /* FIX: Variáveis Dark para bordas */
+
     --border: 30 41 59;
     --input: 30 41 59;
-    
+
     --muted: 148 163 184;
     --accent: 96 165 250;
 
@@ -57,10 +54,7 @@
   /* -------------------------------------------------------------------------- */
   /* GLOBAL RESET & BEHAVIOR                                                    */
   /* -------------------------------------------------------------------------- */
-  
-  /* Aqui estava o erro: O Tailwind precisa que 'border' esteja definido 
-     no tailwind.config.ts apontando para var(--border).
-  */
+
   * {
     @apply border-border;
   }
@@ -70,6 +64,11 @@
     overflow-x: hidden;
     background-color: rgb(var(--background));
     -webkit-tap-highlight-color: transparent;
+
+    /* Multilanguage Typography Handling */
+    hyphens: auto;
+    line-break: auto;
+    word-break: normal;
   }
 
   body {
@@ -79,24 +78,24 @@
     color: rgb(var(--foreground));
     background-color: rgb(var(--background));
 
-    /* Typography Hardening */
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     font-optical-sizing: auto;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    /* Safe Area for Modern Devices */
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) 
-             env(safe-area-inset-bottom) env(safe-area-inset-left);
+    padding: env(safe-area-inset-top)
+             env(safe-area-inset-right)
+             env(safe-area-inset-bottom)
+             env(safe-area-inset-left);
 
     transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Performance: Content Visibility para seções fora da dobra */
+  /* Performance Optimization */
   section {
     content-visibility: auto;
-    contain-intrinsic-size: 1px 500px;
+    contain-intrinsic-size: 1px 600px;
   }
 
   ::selection {
@@ -112,7 +111,7 @@
     @apply outline-none ring-2 ring-brand-500 ring-offset-4 ring-offset-background;
   }
 
-  /* Custom Scrollbar */
+  /* Custom Scrollbar (Desktop Only) */
   @media (min-width: 1024px) {
     ::-webkit-scrollbar {
       width: 10px;
@@ -132,7 +131,7 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* ABSTRACTIONS                                                               */
+/* COMPONENT ABSTRACTIONS                                                     */
 /* -------------------------------------------------------------------------- */
 @layer components {
   .main-container {
@@ -160,12 +159,13 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* UTILITIES & ACCESSIBILITY                                                 */
+/* UTILITIES & ACCESSIBILITY                                                  */
 /* -------------------------------------------------------------------------- */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+
   .text-pretty {
     text-wrap: pretty;
   }
@@ -180,9 +180,10 @@
   }
 }
 
-/* Suporte para Alto Contraste (Acessibilidade 2026) */
+/* High Contrast Support (WCAG 2.2 / 2026) */
 @media (forced-colors: active) {
-  .glass-effect, .project-card {
+  .glass-effect,
+  .project-card {
     border: 2px solid ButtonText;
   }
 }
