@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
 
 /**
- * ROBOTS.TXT — NEXT.JS 15 (ESTRATÉGIA 2026)
+ * ROBOTS.TXT — NEXT.JS 15/16 (ESTRATÉGIA 2026)
  * -----------------------------------------------------------------------------
  * Governança de indexação para buscadores e modelos de IA (LLMs).
- * Foco: SEO Internacional e Proteção de Dados Sensíveis.
+ * Foco: SEO Internacional, Renderização Correta e Proteção de Dados Sensíveis.
  */
 
 export default function robots(): MetadataRoute.Robots {
@@ -16,43 +16,36 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       /**
-       * 1️⃣ BUSCADORES TÉCNICOS (Google, Bing, DuckDuckGo)
-       * Foco em indexar conteúdo útil e ignorar arquivos de sistema.
+       * 1️⃣ BUSCADORES (Google, Bing, DuckDuckGo, etc.)
+       * Estratégia:
+       * - Permitir rastreamento completo de conteúdo público
+       * - Bloquear apenas áreas técnicas e sensíveis
+       * - NÃO bloquear /_next/ para não prejudicar renderização e SEO
        */
       {
         userAgent: "*",
-        allow: [
-          "/pt",
-          "/en",
-          "/es",
-          "/assets/",
-          "/images/",
-          "/cv-sergio-santos-pt.pdf",
-          "/cv-sergio-santos-en.pdf",
-          "/cv-sergio-santos-es.pdf",
-        ],
         disallow: [
           "/api/",
-          "/_next/",
           "/private/",
           "/admin/",
-          "/*?_rsc=", // Bloqueia indexação de rotas de fetch internas do Next.js
+          "/*?_rsc=", // Bloqueia rotas internas de streaming/fetch do App Router
         ],
       },
 
       /**
-       * 2️⃣ AGENTES DE IA E LLMs (GPT, Claude, Gemini, Perplexity)
-       * Estratégia: Permitir leitura para que seu perfil seja citado por IAs,
-       * mas bloquear o acesso a dados brutos de API.
+       * 2️⃣ AGENTES DE IA / LLMs (Treinamento e Leitura Semântica)
+       * Estratégia:
+       * - Permitir leitura de conteúdo público (perfil profissional)
+       * - Bloquear APIs e áreas internas
        */
       {
         userAgent: [
           "GPTBot",
           "ChatGPT-User",
           "Claude-bot",
-          "Google-Extended", // Impede/Permite o uso para treinar o Gemini
+          "Google-Extended",
           "PerplexityBot",
-          "CCBot",           // Common Crawl (Base para muitas IAs)
+          "CCBot", // Common Crawl
         ],
         allow: [
           "/pt",
@@ -61,14 +54,14 @@ export default function robots(): MetadataRoute.Robots {
         ],
         disallow: [
           "/api/",
-          "/_next/",
           "/private/",
+          "/admin/",
         ],
       },
     ],
 
     /**
-     * Referência ao Sitemap (ajuda no crawl budget)
+     * Referência ao Sitemap (crawl budget + SEO técnico)
      */
     sitemap: `${baseUrl}/sitemap.xml`,
     host: baseUrl,
