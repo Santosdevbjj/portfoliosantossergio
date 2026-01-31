@@ -1,9 +1,9 @@
 /**
  * HOME PAGE — ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * Framework: Next.js 16.1.5
+ * Framework: Next.js 16
  * I18n: PT / EN / ES (SSG)
- * SEO: Metadata + OG dinâmico
+ * SEO: Metadata + OpenGraph dinâmico
  * Responsividade: Viewport API (padrão moderno)
  */
 
@@ -19,7 +19,7 @@ interface PageProps {
 }
 
 /* -------------------------------------------------------------------------- */
-/* VIEWPORT — RESPONSIVIDADE TOTAL                                             */
+/* VIEWPORT — RESPONSIVIDADE GLOBAL                                            */
 /* -------------------------------------------------------------------------- */
 export const viewport: Viewport = {
   width: 'device-width',
@@ -33,7 +33,7 @@ export const viewport: Viewport = {
 }
 
 /* -------------------------------------------------------------------------- */
-/* SEO & OPEN GRAPH DINÂMICO                                                   */
+/* SEO & OPEN GRAPH — HOME PAGE                                                */
 /* -------------------------------------------------------------------------- */
 export async function generateMetadata(
   { params }: PageProps
@@ -44,7 +44,16 @@ export async function generateMetadata(
       : i18n.defaultLocale
 
   const dict = getDictionarySync(currentLang)
-  const siteUrl = 'https://portfoliosantossergio.vercel.app'
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    'https://portfoliosantossergio.vercel.app'
+
+  const pageTitle =
+    dict.seo.pages?.home?.title ?? dict.seo.siteName
+
+  const pageDescription =
+    dict.seo.pages?.home?.description ?? dict.seo.description
 
   const ogImageUrl =
     `${siteUrl}/api/post-og` +
@@ -52,29 +61,36 @@ export async function generateMetadata(
     `&description=${encodeURIComponent(dict.hero.headline)}` +
     `&author=Sérgio Santos`
 
+  const ogLocaleMap: Record<SupportedLocale, string> = {
+    pt: 'pt_BR',
+    en: 'en_US',
+    es: 'es_ES',
+  }
+
   return {
     title: {
-      default: dict.seo.siteName,
+      default: pageTitle,
       template: `%s | ${dict.seo.siteName}`,
     },
-    description: dict.seo.description,
+    description: pageDescription,
     keywords: dict.seo.keywords,
 
     alternates: {
       canonical: `${siteUrl}/${currentLang}`,
       languages: {
-        pt: '/pt',
-        en: '/en',
-        es: '/es',
+        'pt-BR': `${siteUrl}/pt`,
+        'en-US': `${siteUrl}/en`,
+        'es-ES': `${siteUrl}/es`,
+        'x-default': `${siteUrl}/pt`,
       },
     },
 
     openGraph: {
-      title: dict.seo.siteName,
-      description: dict.seo.description,
+      title: pageTitle,
+      description: pageDescription,
       url: `${siteUrl}/${currentLang}`,
       siteName: dict.seo.siteName,
-      locale: currentLang,
+      locale: ogLocaleMap[currentLang],
       type: 'website',
       images: [
         {
@@ -101,7 +117,7 @@ export async function generateMetadata(
 }
 
 /* -------------------------------------------------------------------------- */
-/* STATIC GENERATION — ROTAS DE IDIOMA                                          */
+/* STATIC GENERATION — ROTAS DE IDIOMA                                         */
 /* -------------------------------------------------------------------------- */
 export async function generateStaticParams() {
   return i18n.locales.map((lang) => ({ lang }))
