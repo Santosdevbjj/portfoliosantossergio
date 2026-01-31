@@ -1,27 +1,38 @@
 import type { MetadataRoute } from 'next'
-import { localeMetadata, type Locale } from '@/i18n-config'
+import { i18n, type Locale } from '@/i18n-config'
+import { getDictionary } from '@/i18n-config'
 
-const SITE_NAME = 'Sérgio Santos'
+const SITE_URL = 'https://portfoliosantossergio.vercel.app'
 const SHORT_NAME = 'SergioData'
 
-export default function manifest(
+export default async function manifest(
   { params }: { params: { lang: Locale } }
-): MetadataRoute.Manifest {
-  const meta = localeMetadata[params.lang] ?? localeMetadata.pt
+): Promise<MetadataRoute.Manifest> {
+  const lang: Locale = i18n.locales.includes(params.lang)
+    ? params.lang
+    : i18n.defaultLocale
+
+  const dict = await getDictionary(lang)
+
+  const ogImageMap: Record<Locale, string> = {
+    pt: '/og-image-pt.png',
+    en: '/og-image-en.png',
+    es: '/og-image-es.png',
+  }
 
   return {
-    id: `/${params.lang}/`,
-    lang: meta.hrefLang,
+    id: `${SITE_URL}/${lang}/`,
+    lang,
 
-    name: `${SITE_NAME} | ${meta.name}`,
+    name: dict.seo.siteName,
     short_name: SHORT_NAME,
-    description: meta.description,
+    description: dict.seo.description,
 
-    start_url: `/${params.lang}/?source=pwa`,
-    scope: `/${params.lang}/`,
+    start_url: `/${lang}/?source=pwa`,
+    scope: `/${lang}/`,
 
     display: 'standalone',
-    orientation: 'portrait',
+    orientation: 'any',
     background_color: '#020617',
     theme_color: '#020617',
 
@@ -54,6 +65,15 @@ export default function manifest(
         sizes: '180x180',
         type: 'image/png',
         purpose: 'any',
+      },
+    ],
+
+    screenshots: [
+      {
+        src: ogImageMap[lang],
+        sizes: '1200x630',
+        type: 'image/png',
+        label: dict.seo.siteName,
       },
     ],
   }
