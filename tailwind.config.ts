@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss'
 import typography from '@tailwindcss/typography'
+import animate from 'tailwindcss-animate'
 
 const config: Config = {
   /* ---------------------------------------------------------------------- */
@@ -8,18 +9,20 @@ const config: Config = {
   darkMode: 'class',
 
   content: [
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/hooks/**/*.{js,ts,jsx,tsx}',
+    './src/lib/**/*.{js,ts,jsx,tsx}',
+    './src/utils/**/*.{js,ts,jsx,tsx}',
     './src/styles/**/*.css',
   ],
 
   safelist: [
     'dark',
     'light',
-    'lang-pt',
-    'lang-en',
-    'lang-es',
+    {
+      pattern: /^lang-/,
+    },
   ],
 
   theme: {
@@ -44,8 +47,6 @@ const config: Config = {
       colors: {
         border: 'rgb(var(--border) / <alpha-value>)',
         input: 'rgb(var(--input) / <alpha-value>)',
-
-        /* FIX: variável ring agora coerente com globals.css */
         ring: 'rgb(var(--brand-500) / <alpha-value>)',
 
         background: 'rgb(var(--background) / <alpha-value>)',
@@ -133,7 +134,7 @@ const config: Config = {
   /* ---------------------------------------------------------------------- */
   plugins: [
     typography,
-    require('tailwindcss-animate'),
+    animate,
   ],
 }
 
