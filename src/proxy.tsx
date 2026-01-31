@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense, useMemo } from 'react'
 import { notFound } from 'next/navigation'
 
-// ... seus imports de componentes permanecem iguais ...
 import { AboutSection } from '@/components/AboutSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ExperienceSection } from '@/components/ExperienceSection'
@@ -16,7 +15,6 @@ import { ProjectSection } from '@/components/ProjectSection'
 import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection'
 
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
-import { i18n } from '@/i18n-config'
 import { getGitHubProjects } from '@/lib/github'
 import type { Project } from '@/domain/projects'
 import { featuredConfig } from '@/components/featured/projects.data'
@@ -26,7 +24,7 @@ interface ProxyProps {
 }
 
 export default function ProxyPage({ lang }: ProxyProps) {
-  // 1. Validação imediata (evita renderizar lixo)
+  // 1. Validação manual para garantir segurança de rota
   if (!['pt', 'en', 'es'].includes(lang)) {
     notFound()
   }
@@ -34,7 +32,7 @@ export default function ProxyPage({ lang }: ProxyProps) {
   const [mounted, setMounted] = useState(false)
   const [allProjects, setAllProjects] = useState<Project[]>([])
 
-  // 2. Memorizar o dicionário para evitar re-calculos e erros de referência
+  // 2. Memorizar o dicionário para estabilidade
   const dict = useMemo(() => getDictionarySync(lang), [lang])
 
   useEffect(() => {
@@ -50,11 +48,9 @@ export default function ProxyPage({ lang }: ProxyProps) {
     loadData()
   }, [lang])
 
-  // 3. IDs de seção alinhados com o dicionário.nav
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
 
-  // 4. Se não estiver montado, retorna um layout vazio mas com a mesma estrutura de cores
-  // Isso evita o "flash" de branco e o erro de hidratação (500)
+  // 3. Evita erro de hidratação e Internal Server Error (500)
   if (!mounted) {
     return <div className="min-h-screen w-full bg-white dark:bg-[#020617]" />
   }
