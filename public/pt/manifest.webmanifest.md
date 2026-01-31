@@ -1,6 +1,6 @@
 {
   "id": "/",
-  "name": "Sérgio Santos | Especialista em Dados e Sistemas",
+  "name": "Sérgio Santos | Especialista em Dados e Sistemas", 
   "short_name": "SergioData",
   "description": "Portfólio profissional de Sérgio Santos — Especialista em Dados, Engenharia de Sistemas e Inteligência Artificial.",
   "lang": "pt-BR",
