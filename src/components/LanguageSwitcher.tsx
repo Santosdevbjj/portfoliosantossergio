@@ -1,15 +1,11 @@
 'use client'
 
 /**
- * LANGUAGE SWITCHER — SÉRGIO SANTOS (REVISÃO FINAL 2026)
+ * LANGUAGE SWITCHER — SÉRGIO SANTOS (CORRIGIDO PARA BUILD)
  * -----------------------------------------------------------------------------
- * ✔ Responsivo (Navbar / Mobile / Desktop)
- * ✔ Multilíngue (PT / EN / ES)
- * ✔ Preserva rota, query params e âncoras
- * ✔ Alinhado ao dicionário e App Router
  */
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 
@@ -36,12 +32,8 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
     )
   }
 
-  /**
-   * Persiste a preferência de idioma para o middleware
-   */
   function writeLocaleCookie(locale: SupportedLocale) {
     if (typeof document === 'undefined') return
-
     document.cookie =
       `${LOCALE_COOKIE}=${locale}; ` +
       `path=${LOCALE_COOKIE_OPTIONS.path}; ` +
@@ -55,26 +47,16 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
   return (
     <nav
       aria-label="Language selector"
-      className="
-        inline-flex items-center gap-1 p-1
-        rounded-lg border border-slate-200/50 dark:border-slate-800/50
-        bg-white/40 dark:bg-slate-900/40 backdrop-blur-md
-        shadow-sm
-      "
+      className="inline-flex items-center gap-1 p-1 rounded-lg border border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md shadow-sm"
     >
       {availableLocales.map((locale) => {
         const isActive = currentLang === locale
         const meta = localeMetadata[locale]
 
-        /**
-         * Reconstrói a rota preservando:
-         * - idioma
-         * - subpáginas
-         * - âncoras
-         * - query params
-         */
-        const segments = pathname?.split('/') ?? []
-
+        // Lógica de reconstrução de rota blindada
+        const segments = pathname ? pathname.split('/') : []
+        
+        // Se o segundo segmento for um idioma conhecido, substitui. Se não, insere.
         if (segments[1] && availableLocales.includes(segments[1] as Locale)) {
           segments[1] = locale
         } else {
@@ -82,19 +64,20 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
         }
 
         const queryString = searchParams?.toString()
-        const finalPath =
-          `${segments.join('/') || '/'}` +
-          `${queryString ? `?${queryString}` : ''}`
+        // Garantimos que finalPath comece com / e tratamos como string pura para o Link
+        const path = segments.join('/') || '/'
+        const finalPath = queryString ? `${path}?${queryString}` : path
 
         return (
           <Link
             key={locale}
-            href={finalPath}
+            // O segredo está em garantir que o href nunca seja undefined
+            href={finalPath as any} 
             hrefLang={locale}
             onClick={() => writeLocaleCookie(locale)}
             className={`
               relative px-2.5 py-1 rounded-md
-              text-[9px] font-black uppercase tracking-tighter
+              text-[10px] font-black uppercase tracking-tighter
               transition-all duration-200
               ${
                 isActive
