@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, Suspense, useMemo } from 'react'
 import { notFound } from 'next/navigation'
 
+// ... seus imports de componentes permanecem iguais ...
 import { AboutSection } from '@/components/AboutSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ExperienceSection } from '@/components/ExperienceSection'
@@ -25,17 +26,19 @@ interface ProxyProps {
 }
 
 export default function ProxyPage({ lang }: ProxyProps) {
-  // Segurança de rota
-  if (!i18n.locales.includes(lang)) {
+  // 1. Validação imediata (evita renderizar lixo)
+  if (!['pt', 'en', 'es'].includes(lang)) {
     notFound()
   }
 
   const [mounted, setMounted] = useState(false)
   const [allProjects, setAllProjects] = useState<Project[]>([])
 
+  // 2. Memorizar o dicionário para evitar re-calculos e erros de referência
+  const dict = useMemo(() => getDictionarySync(lang), [lang])
+
   useEffect(() => {
     setMounted(true)
-
     async function loadData() {
       try {
         const data = await getGitHubProjects(lang)
@@ -44,13 +47,14 @@ export default function ProxyPage({ lang }: ProxyProps) {
         console.error('Erro ao carregar projetos:', error)
       }
     }
-
     loadData()
   }, [lang])
 
-  const dict = getDictionarySync(lang)
+  // 3. IDs de seção alinhados com o dicionário.nav
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
 
+  // 4. Se não estiver montado, retorna um layout vazio mas com a mesma estrutura de cores
+  // Isso evita o "flash" de branco e o erro de hidratação (500)
   if (!mounted) {
     return <div className="min-h-screen w-full bg-white dark:bg-[#020617]" />
   }
@@ -64,7 +68,6 @@ export default function ProxyPage({ lang }: ProxyProps) {
       <Navbar lang={lang} dict={dict} />
 
       <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
-
         <section id="hero">
           <HeroSection lang={lang} dict={dict} />
         </section>
@@ -96,7 +99,6 @@ export default function ProxyPage({ lang }: ProxyProps) {
         <section id="contact" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <ContactSection lang={lang} dict={dict} />
         </section>
-
       </main>
 
       <Footer lang={lang} dict={dict} />
