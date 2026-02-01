@@ -24,13 +24,14 @@ import { NavSection } from '@/domain/navigation'
 
 /**
  * Representa a seção atualmente visível no viewport.
- * 'null' indica que o usuário está no topo (Hero) ou fora das seções principais.
+ * `null` indica que o usuário está no topo (Hero)
+ * ou fora das seções principais.
  */
 export type ActiveSection = NavSection | null
 
 export interface ScrollSpyContextValue {
   activeSection: ActiveSection
-  setActiveSection: (section: NavSection) => void
+  setActiveSection: (section: ActiveSection) => void
   resetActiveSection: () => void
 }
 
@@ -52,19 +53,26 @@ interface ScrollSpyProviderProps {
 
 /**
  * Provedor de estado global para o rastreamento de scroll.
- * Envolva o layout principal ou a PageWrapper com este componente.
+ * Deve envolver o layout principal ou PageWrapper.
  */
 export function ScrollSpyProvider({
   children,
-}: ScrollSpyProviderProps) {
-  const [activeSection, setActiveSectionState] = useState<ActiveSection>(null)
+}: ScrollSpyProviderProps): JSX.Element {
+  const [activeSection, setActiveSectionState] =
+    useState<ActiveSection>(null)
 
   /**
-   * Define a seção ativa com proteção de referência (useCallback).
+   * Define a seção ativa.
+   * Evita re-renderizações quando a seção não muda.
    */
-  const setActiveSection = useCallback((section: NavSection) => {
-    setActiveSectionState((prev) => (prev === section ? prev : section))
-  }, [])
+  const setActiveSection = useCallback(
+    (section: ActiveSection) => {
+      setActiveSectionState((prev) =>
+        prev === section ? prev : section,
+      )
+    },
+    [],
+  )
 
   /**
    * Reseta o estado para o valor inicial.
@@ -74,8 +82,8 @@ export function ScrollSpyProvider({
   }, [])
 
   /**
-   * Valor do contexto memorizado para evitar re-renderizações desnecessárias
-   * em componentes que apenas consomem o estado.
+   * Valor do contexto memorizado para evitar re-renderizações
+   * desnecessárias em consumidores do contexto.
    */
   const value = useMemo<ScrollSpyContextValue>(
     () => ({
@@ -98,8 +106,8 @@ export function ScrollSpyProvider({
 /* -------------------------------------------------------------------------- */
 
 /**
- * Hook: useScrollSpyContext
- * Recomendado para uso interno em hooks de observação para evitar colisão de nomes.
+ * Hook interno para acesso seguro ao ScrollSpyContext.
+ * Lança erro caso seja utilizado fora do Provider.
  */
 export function useScrollSpyContext(): ScrollSpyContextValue {
   const context = useContext(ScrollSpyContext)
@@ -114,7 +122,7 @@ export function useScrollSpyContext(): ScrollSpyContextValue {
 }
 
 /**
- * Hook: useScrollSpy (Alias principal)
- * Mantido para compatibilidade com componentes de UI (Navbar, etc).
+ * Hook público (alias).
+ * Mantido para consumo em componentes de UI (Navbar, Sidebar, etc).
  */
 export const useScrollSpy = useScrollSpyContext
