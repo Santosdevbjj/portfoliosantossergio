@@ -3,9 +3,9 @@
 /**
  * HERO SECTION: Impacto Inicial e Proposta de Valor Sérgio Santos
  * -----------------------------------------------------------------------------
- * - UI: Tipografia de alta escala e grid dinâmico.
- * - I18n: Totalmente integrado aos dicionários de idiomas (PT, EN, ES).
- * - Responsividade: Fluid typography com limites seguros para mobile.
+ * - UI: Tipografia de alta escala com Engine Oxide (Tailwind v4).
+ * - I18n: Sincronizado com common.role e dicionários regionais.
+ * - UX: Sistema de CTAs adaptativos para Mobile/Desktop.
  */
 
 import { ArrowRight, Database, ShieldCheck, FileText, BarChart3, Sparkles } from 'lucide-react';
@@ -18,7 +18,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ dict, lang }: HeroSectionProps) {
-  const { hero, contact, projects } = dict;
+  const { hero, contact, projects, common } = dict;
   
   // Caminho dinâmico para o currículo conforme o idioma selecionado
   const cvPath = `/cv-sergio-santos-${lang}.pdf`;
@@ -48,10 +48,10 @@ export function HeroSection({ dict, lang }: HeroSectionProps) {
             </span>
           </div>
 
-          {/* H1: Nome com escala fluida para garantir responsividade */}
+          {/* H1: Nome com escala fluida e proteção contra overflow */}
           <h1 
             id="hero-title" 
-            className="mb-8 text-[15vw] font-black leading-[0.85] tracking-tighter text-slate-900 dark:text-white sm:text-7xl md:text-8xl lg:text-[9rem] xl:text-[10rem]"
+            className="mb-8 text-[clamp(3.5rem,15vw,10rem)] font-black leading-[0.85] tracking-tighter text-slate-900 dark:text-white"
           >
             Sérgio <br className="hidden sm:block" />
             <span className="text-blue-600 inline-block">Santos</span>
@@ -62,9 +62,9 @@ export function HeroSection({ dict, lang }: HeroSectionProps) {
             {hero.title} <span className="text-blue-600">{hero.subtitle}</span>
           </h2>
 
-          {/* PARÁGRAFO: Headline de Autoridade */}
-          <p className="mb-4 max-w-2xl text-lg font-bold text-slate-700 dark:text-slate-300 md:text-xl">
-             {hero.role}
+          {/* PARÁGRAFO: Headline de Autoridade (Sincronizado com common.role) */}
+          <p className="mb-4 max-w-2xl text-lg font-bold text-blue-700 dark:text-blue-400 md:text-xl">
+             {common.role}
           </p>
           <p className="mb-12 max-w-2xl text-lg font-medium text-slate-600 dark:text-slate-400 md:text-xl leading-relaxed">
             {hero.headline}
@@ -74,7 +74,7 @@ export function HeroSection({ dict, lang }: HeroSectionProps) {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <a 
               href="#projects" 
-              className="group flex min-w-[200px] items-center justify-center gap-3 rounded-2xl bg-blue-600 px-8 py-5 text-lg font-black text-white transition-all hover:bg-blue-700 shadow-xl shadow-blue-500/20 active:scale-95"
+              className="group flex min-w-[220px] items-center justify-center gap-3 rounded-2xl bg-blue-600 px-8 py-5 text-lg font-black text-white transition-all hover:bg-blue-700 hover:scale-[1.02] shadow-xl shadow-blue-500/20 active:scale-95"
             >
               {hero.ctaPrimary}
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-2" />
@@ -84,24 +84,24 @@ export function HeroSection({ dict, lang }: HeroSectionProps) {
               href={cvPath} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="flex min-w-[200px] items-center justify-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-8 py-5 text-lg font-bold text-slate-900 dark:bg-slate-900 dark:text-white dark:border-slate-800 transition-all hover:border-blue-600/50 hover:shadow-lg active:scale-95"
+              className="group flex min-w-[220px] items-center justify-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-8 py-5 text-lg font-bold text-slate-900 dark:bg-slate-900 dark:text-white dark:border-slate-800 transition-all hover:border-blue-600/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 active:scale-95"
             >
-              <FileText className="h-5 w-5 text-blue-600" />
+              <FileText className="h-5 w-5 text-blue-600 transition-transform group-hover:scale-110" />
               {contact.cvLabel}
             </a>
           </div>
 
-          {/* STACK TECNOLÓGICA (Sincronizada com dicionário) */}
+          {/* STACK TECNOLÓGICA (Sincronizada com dicionário e categorias) */}
           <div className="mt-20 flex flex-wrap gap-x-12 gap-y-6 border-t border-slate-200/60 pt-12 dark:border-slate-800/60">
-            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors">
               <Database className="h-4 w-4 text-blue-600" />
               {projects.categories.cloud}
             </div>
-            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors">
               <BarChart3 className="h-4 w-4 text-blue-600" />
               {projects.categories.dataScience}
             </div>
-            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors">
               <ShieldCheck className="h-4 w-4 text-blue-600" />
               {projects.categories.security}
             </div>
