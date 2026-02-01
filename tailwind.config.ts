@@ -2,21 +2,23 @@ import type { Config } from 'tailwindcss'
 import typography from '@tailwindcss/typography'
 import animate from 'tailwindcss-animate'
 
+/**
+ * TAILWIND CONFIGURATION — SÉRGIO SANTOS (BASELINE 2026)
+ * Foco: Performance responsiva e Design de Missão Crítica.
+ */
 const config: Config = {
-  /* ---------------------------------------------------------------------- */
-  /* CORE CONFIG                                                            */
-  /* ---------------------------------------------------------------------- */
+  // Ativa o modo escuro via classe (essencial para o ThemeToggle.tsx)
   darkMode: 'class',
 
   content: [
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/hooks/**/*.{js,ts,jsx,tsx}',
-    './src/lib/**/*.{js,ts,jsx,tsx}',
-    './src/utils/**/*.{js,ts,jsx,tsx}',
-    './src/styles/**/*.css',
+    // Otimizado para buscar apenas onde classes Tailwind são realmente usadas
+    './src/proxy.tsx',
+    './src/ProxyClient.tsx',
   ],
 
+  // Mantém classes dinâmicas seguras no bundle
   safelist: [
     'dark',
     'light',
@@ -37,18 +39,17 @@ const config: Config = {
     },
 
     extend: {
-      /* ------------------------------ Breakpoints ----------------------- */
+      /* --- Breakpoints Customizados --- */
       screens: {
         xs: '375px',
         '2xl': '1440px',
       },
 
-      /* ------------------------------ Colors ---------------------------- */
+      /* --- Sistema de Cores (Baseado em Variáveis CSS do globals.css) --- */
       colors: {
         border: 'rgb(var(--border) / <alpha-value>)',
         input: 'rgb(var(--input) / <alpha-value>)',
         ring: 'rgb(var(--brand-500) / <alpha-value>)',
-
         background: 'rgb(var(--background) / <alpha-value>)',
         foreground: 'rgb(var(--foreground) / <alpha-value>)',
 
@@ -71,7 +72,7 @@ const config: Config = {
         },
       },
 
-      /* ------------------------------ Typography ------------------------ */
+      /* --- Tipografia de Alta Autoridade --- */
       fontFamily: {
         sans: [
           'var(--font-inter)',
@@ -86,7 +87,7 @@ const config: Config = {
         ],
       },
 
-      /* ------------------------------ Animations ------------------------ */
+      /* --- Animações Fluídas (Rigor Visual 2026) --- */
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',
         'fade-in-up': 'fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards',
@@ -120,7 +121,6 @@ const config: Config = {
         },
       },
 
-      /* ------------------------------ Effects --------------------------- */
       boxShadow: {
         premium: '0 20px 50px -12px rgba(0, 0, 0, 0.08)',
         'premium-dark': '0 20px 50px -12px rgba(0, 0, 0, 0.4)',
@@ -129,9 +129,7 @@ const config: Config = {
     },
   },
 
-  /* ---------------------------------------------------------------------- */
-  /* PLUGINS                                                                */
-  /* ---------------------------------------------------------------------- */
+  /* --- Plugins (Alinhados com o package.json atualizado) --- */
   plugins: [
     typography,
     animate,
