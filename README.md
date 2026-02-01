@@ -58,6 +58,8 @@ Seguindo um framework estruturado de engenharia:
 Um projeto técnico só tem valor se comunica resultados. Este portfólio entrega:
  * Comunicação Assertiva: Explica não apenas "o que foi feito", mas "por que foi feito" e "qual o impacto".
  * Confiabilidade: Demonstra atualização constante com patches de segurança e tecnologias de ponta.
+
+   
  * Visão Estratégica: Transforma o código em uma narrativa de resolução de problemas.
 
 **8. Como Executar o Projeto**
