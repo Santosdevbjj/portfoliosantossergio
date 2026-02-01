@@ -1,4 +1,5 @@
 import type { Dictionary } from '@/types/dictionary';
+
 import pt from './pt.json';
 import en from './en.json';
 import es from './es.json';
@@ -16,7 +17,7 @@ export const dictionaries: Record<SupportedLocale, Dictionary> = {
 };
 
 export function getDictionarySync(locale: SupportedLocale): Dictionary {
-  return dictionaries[locale] || ptDictionary;
+  return dictionaries[locale] ?? ptDictionary;
 }
 
 export default dictionaries;
