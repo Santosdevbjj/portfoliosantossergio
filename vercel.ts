@@ -2,8 +2,10 @@
 import { type VercelConfig } from '@vercel/config/v1';
 
 /**
- * VERCEL CONFIGURATION — FIX: MISSING SIZES & TYPES
+ * VERCEL CONFIGURATION — RIGOR BANCÁRIO & SEGURANÇA
  * -----------------------------------------------------------------------------
+ * Revisão: Removido 'image/avif' para compatibilidade de tipos.
+ * Revisão: Mantido headers de segurança estritos para ambiente de missão crítica.
  */
 
 const config: VercelConfig = {
@@ -12,12 +14,13 @@ const config: VercelConfig = {
   trailingSlash: false,
 
   /**
-   * Configuração de Imagens (CORREÇÃO DO ERRO)
-   * Adicionada a propriedade 'sizes' obrigatória conforme o schema da Vercel.
+   * Configuração de Otimização de Imagens
+   * Corrigido para evitar erro de atribuição de tipo no build.
    */
   images: {
     sizes: [640, 750, 828, 1080, 1200, 1920, 2048],
-    formats: ['image/avif', 'image/webp'],
+    // Removido avif para resolver o Type error: '"image/avif"' is not assignable to type '"image/png"'
+    formats: ['image/webp'], 
     minimumCacheTTL: 60,
     remotePatterns: [
       { protocol: 'https', hostname: '**.githubusercontent.com' },
@@ -25,6 +28,9 @@ const config: VercelConfig = {
     ]
   },
 
+  /**
+   * Headers de Segurança (Compliance Bradesco/ISO 27001)
+   */
   headers: [
     {
       source: '/(.*)',
@@ -40,6 +46,9 @@ const config: VercelConfig = {
     }
   ],
 
+  /**
+   * Redirect Root: Garante que o tráfego caia sempre no idioma padrão (PT)
+   */
   redirects: [
     {
       source: '/',
