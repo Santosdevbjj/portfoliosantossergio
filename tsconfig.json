@@ -1,43 +1,47 @@
 {
   "compilerOptions": {
-    /* CORE TARGET & RUNTIME (Node.js 24 + 2026 Standards) */
-    "target": "ESNext",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-
-    /* STRICTNESS (Rigor de Missão Crítica) */
+    /* NATIVE RUNTIME & TARGET (Baseline Jan/2026) */
+    "target": "ES2024", 
+    "lib": ["DOM", "DOM.Iterable", "ES2024", "ESNext"],
+    
+    /* TSGO ENGINE OPTIMIZATION (Project Corsa) */
+    "verbatimModuleSyntax": true,   // Essencial para o compilador em Go: separa tipos de runtime com custo zero
+    "isolatedModules": true,         // Garante que cada arquivo seja tratável de forma independente e paralela
+    "moduleDetection": "force",      // Força o escopo de módulo em todos os arquivos para evitar colisões no Global Cache
+    
+    /* RIGOR DE MISSÃO CRÍTICA (Prevenção de Erro 500) */
     "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true, // Evita undefined em dicionários de tradução (Vital para o seu i18n)
+    "exactOptionalPropertyTypes": true, // Impede a atribuição de 'undefined' a propriedades opcionais
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
-
-    /* EMIT & MODULE RESOLUTION */
-    "noEmit": true,
+    
+    /* NEXT.JS 16 & REACT 19 ARCHITECTURE */
     "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "moduleDetection": "force",
-    "isolatedModules": true,
+    "moduleResolution": "Bundler",   // Otimizado para o Turbopack nativo
     "jsx": "react-jsx",
-
-    /* INTEROP & MODERN JS */
+    "noEmit": true,                  // Delegamos a geração de código para o Turbopack/tsgo
+    
+    /* INTEROP & SECURITY */
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true,            // Aumenta a velocidade focando apenas no seu código-fonte
+    "forceConsistentCasingInFileNames": true,
 
-    /* PROJECT STRUCTURE */
+    /* INFRASTRUCTURE PATHS */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
 
-    /* PERFORMANCE & CACHE */
+    /* NATIVE BUILD CACHE */
     "incremental": true,
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo",
 
-    /* NEXT.JS PLUGIN */
+    /* PLUGINS */
     "plugins": [
       {
         "name": "next"
@@ -49,7 +53,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "vercel.ts" // Incluído para validar sua configuração programática
   ],
 
   "exclude": ["node_modules"]
