@@ -1,22 +1,15 @@
 import type { NextConfig } from "next";
 
+/** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
-  /* Configurações padrão do Next.js 16 */
   reactStrictMode: true,
 
-  // No Next.js 16, o Turbo é configurado fora do 'experimental' 
-  // ou habilitado via CLI. Para regras de loader (como SVG):
-  turbo: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
-  },
+  /* Removida a chave 'turbo' manual para evitar erro de tipagem no build.
+     O Next.js 16 já utiliza o motor Oxide/Turbo por padrão 
+     quando detectado no ambiente Vercel.
+  */
 
   experimental: {
-    // Removido o 'turbo' daqui de dentro
     optimizePackageImports: [
       "lucide-react",
       "framer-motion",
@@ -25,14 +18,19 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Configuração de imagens deve estar aqui também para o build local
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
-      { protocol: 'https', hostname: '**.githubusercontent.com' },
-      { protocol: 'https', hostname: '**.medium.com' }
-    ]
-  }
+      {
+        protocol: 'https',
+        hostname: '**.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.medium.com',
+      }
+    ],
+  },
 };
 
 export default nextConfig;
