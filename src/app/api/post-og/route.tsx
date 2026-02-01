@@ -20,9 +20,16 @@ const sanitizeNumber = (value: string, fallback: number) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }
 
+const formatDateSafe = () => {
+  const d = new Date()
+  return `${String(d.getDate()).padStart(2, '0')}/${String(
+    d.getMonth() + 1
+  ).padStart(2, '0')}/${d.getFullYear()}`
+}
+
 // Handler ----------------------------------------------------
 
-export async function GET(request: Request): Promise<ImageResponse> {
+export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
 
@@ -44,7 +51,7 @@ export async function GET(request: Request): Promise<ImageResponse> {
 
     const createdAt =
       sanitizeText(searchParams.get('created-at') ?? '', 20) ||
-      new Date().toLocaleDateString('pt-BR')
+      formatDateSafe()
 
     const readingTime = sanitizeNumber(
       searchParams.get('reading-time') ?? '',
@@ -170,6 +177,9 @@ export async function GET(request: Request): Promise<ImageResponse> {
     )
   } catch (error) {
     console.error('Falha ao gerar imagem OG:', error)
-    return new ImageResponse(<div />, { width: 1200, height: 630 })
+
+    return new Response('Erro ao gerar Open Graph image', {
+      status: 500,
+    })
   }
 }
