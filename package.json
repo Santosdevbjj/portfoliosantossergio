@@ -1,16 +1,16 @@
 {
   "name": "portfolio-sergio-santos",
-  "version": "13.0.2",
+  "version": "13.0.1",
   "private": true,
   "engines": {
-    "node": ">=20.11.0 <25"
+    "node": "24.x"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsgo --project ." 
   },
   "dependencies": {
     "next": "16.1.6",
@@ -23,7 +23,8 @@
     "class-variance-authority": "0.7.1"
   },
   "devDependencies": {
-    "typescript": "^6.0.0",
+    "@typescript/native-preview": "7.0.0-alpha.5",
+    "typescript": "6.0.0",
     "@types/node": "25.1.0",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
