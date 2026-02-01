@@ -6,12 +6,18 @@ export interface BreadcrumbItem {
   item: string;
 }
 
+/**
+ * Gera breadcrumbs semânticos e SEO-friendly
+ * Compatível com JSON-LD (Schema.org)
+ */
 export function generateBreadcrumbs(
   pathname: string,
   locale: SupportedLocale,
   dict: Dictionary,
   baseUrl: string
 ): BreadcrumbItem[] {
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+
   const segments = pathname
     .split('/')
     .filter(Boolean)
@@ -20,20 +26,23 @@ export function generateBreadcrumbs(
   const breadcrumbs: BreadcrumbItem[] = [
     {
       name: dict.seo.siteName,
-      item: `${baseUrl}/${locale}`,
+      item: `${normalizedBaseUrl}/${locale}`,
     },
   ];
 
-  let currentPath = `${baseUrl}/${locale}`;
+  let currentPath = `${normalizedBaseUrl}/${locale}`;
 
-  segments.forEach((segment) => {
+  segments.forEach((rawSegment) => {
+    const segment = decodeURIComponent(rawSegment);
     currentPath += `/${segment}`;
 
-    // Tentamos buscar no nav, depois no seo.pages, e por fim usamos o próprio nome do segmento
     const label =
-      (dict.nav as any)[segment] ||
-      (dict.seo.pages as any)?.[segment]?.title ||
-      segment.charAt(0).toUpperCase() + segment.slice(1);
+      (dict.nav as Record<string, string>)?.[segment] ||
+      (dict.seo.pages as Record<string, { title?: string }>)?.[segment]
+        ?.title ||
+      segment
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase());
 
     breadcrumbs.push({
       name: label,
