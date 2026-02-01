@@ -2,25 +2,18 @@
   "semi": true,
   "singleQuote": true,
   "jsxSingleQuote": false,
-
   "trailingComma": "all",
   "printWidth": 100,
   "tabWidth": 2,
   "useTabs": false,
-
   "bracketSpacing": true,
   "bracketSameLine": false,
-
   "arrowParens": "always",
   "endOfLine": "lf",
-
   "embeddedLanguageFormatting": "auto",
   "proseWrap": "preserve",
-  "htmlWhitespaceSensitivity": "ignore",
-
+  "htmlWhitespaceSensitivity": "css",
   "plugins": ["prettier-plugin-tailwindcss"],
-
-  "tailwindConfig": "./tailwind.config.ts",
-  "tailwindAttributes": ["className", "class"],
-  "tailwindFunctions": ["clsx", "twMerge", "twJoin", "cn"]
+  "tailwindAttributes": ["className", "class", "tw"],
+  "tailwindFunctions": ["clsx", "twMerge", "twJoin", "cn", "cva"]
 }
