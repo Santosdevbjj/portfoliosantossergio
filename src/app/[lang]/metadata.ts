@@ -1,30 +1,51 @@
-import type { Metadata } from 'next'
-import { i18n, localeMetadata, type Locale } from '@/i18n-config'
-import { getDictionary } from '@/i18n-config'
+// src/app/[lang]/metadata.ts
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-const SITE_URL = 'https://portfoliosantossergio.vercel.app'
+import {
+  getDictionarySync,
+  type SupportedLocale,
+} from '@/dictionaries';
 
-export async function generateMetadata(
-  { params }: { params: { lang: Locale } }
-): Promise<Metadata> {
-  const lang: Locale = i18n.locales.includes(params.lang)
+const SITE_URL = 'https://portfoliosantossergio.vercel.app';
+
+interface MetadataProps {
+  params: {
+    lang: SupportedLocale;
+  };
+}
+
+export function generateMetadata(
+  { params }: MetadataProps
+): Metadata {
+  const supportedLocales: SupportedLocale[] = ['pt', 'en', 'es'];
+  const lang = supportedLocales.includes(params.lang)
     ? params.lang
-    : i18n.defaultLocale
+    : null;
 
-  const dict = await getDictionary(lang)
-  const meta = localeMetadata[lang]
-
-  const ogImageMap: Record<Locale, string> = {
-    pt: `${SITE_URL}/og-image-pt.png`,
-    en: `${SITE_URL}/og-image-en.png`,
-    es: `${SITE_URL}/og-image-es.png`,
+  if (!lang) {
+    notFound();
   }
 
+  const dict = getDictionarySync(lang);
+
   const pageTitle =
-    dict.seo.pages?.home?.title ?? dict.seo.siteName
+    dict.seo.pages?.home?.title ?? dict.seo.siteName;
 
   const pageDescription =
-    dict.seo.pages?.home?.description ?? dict.seo.description
+    dict.seo.pages?.home?.description ?? dict.seo.description;
+
+  const ogImageMap: Record<SupportedLocale, string> = {
+    pt: '/og-image-pt.png',
+    en: '/og-image-en.png',
+    es: '/og-image-es.png',
+  };
+
+  const ogLocaleMap: Record<SupportedLocale, string> = {
+    pt: 'pt_BR',
+    en: 'en_US',
+    es: 'es_ES',
+  };
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -38,21 +59,21 @@ export async function generateMetadata(
     keywords: dict.seo.keywords,
 
     alternates: {
-      canonical: `${SITE_URL}/${lang}`,
+      canonical: `/${lang}`,
       languages: {
-        pt: `${SITE_URL}/pt`,
-        en: `${SITE_URL}/en`,
-        es: `${SITE_URL}/es`,
+        pt: '/pt',
+        en: '/en',
+        es: '/es',
       },
     },
 
     openGraph: {
       type: 'website',
-      locale: meta.hrefLang,
+      locale: ogLocaleMap[lang],
       url: `${SITE_URL}/${lang}`,
+      siteName: dict.seo.site.siteName,
       title: pageTitle,
       description: pageDescription,
-      siteName: dict.seo.siteName,
       images: [
         {
           url: ogImageMap[lang],
@@ -71,14 +92,25 @@ export async function generateMetadata(
     },
 
     icons: {
-      icon: '/icons/icon-192.png',
-      shortcut: '/icons/icon-192.png',
-      apple: '/icons/icon-192.png',
+      icon: '/icons/favicon.ico',
+      shortcut: '/icons/favicon.ico',
+      apple: '/icons/apple-touch-icon.png',
     },
 
     themeColor: [
       { media: '(prefers-color-scheme: dark)', color: '#020617' },
       { media: '(prefers-color-scheme: light)', color: '#ffffff' },
     ],
-  }
+
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+  };
 }
