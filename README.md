@@ -68,6 +68,8 @@ Um projeto técnico só tem valor se comunica resultados. Este portfólio entreg
 
 **9. Próximos Passos**
  * [ ] Dashboard integrado para métricas de performance de modelos de ML.
+
+       
  * [ ] Seção de artigos técnicos sobre Engenharia de Dados em sistemas críticos.
  * [ ] Implementação de testes E2E para garantir integridade contínua.
 • Ferramentas são meios; a resolução de problemas e a entrega de valor são os fins.
