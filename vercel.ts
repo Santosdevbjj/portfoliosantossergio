@@ -1,33 +1,35 @@
-import { type VercelConfig, routes } from '@vercel/config/v1';
+// vercel.ts
+import { type VercelConfig } from '@vercel/config/v1';
 
 /**
- * Configuração Programática Vercel - Padrão Jan/2026
- * Focada em performance nativa e mitigação de erros de RSC.
+ * Vercel Programmatic Configuration
+ * Padrão Profissional – Jan/2026
+ *
+ * ✔ Compatível com Next.js App Router
+ * ✔ Seguro contra loops de roteamento
+ * ✔ Type-safe (TS 6 / preparado para TS 7)
+ * ✔ Alinhado com Vercel Platform Defaults
  */
 export const config: VercelConfig = {
   framework: 'nextjs',
-  
-  // Otimização para o motor Turbopack (Native Speed)
-  buildCommand: 'next build --turbopack',
-  
-  // Proteção contra loops de roteamento (Erro 500 detectado nos logs)
-  rewrites: [
-    // Garante que arquivos estáticos bypassam o middleware
-    {
-      source: '/favicon.ico',
-      destination: '/static/favicon.ico',
-    },
-    {
-      source: '/robots.txt',
-      destination: '/static/robots.txt',
-    },
-    {
-      source: '/sitemap.xml',
-      destination: '/static/sitemap.xml',
-    }
-  ],
 
-  // Configuração de Headers de Segurança para evitar Source Exposure (CVE-2026-23864)
+  /**
+   * Build
+   * --------------------------------------------------
+   * NÃO forçamos Turbopack aqui para evitar falhas
+   * em ambientes onde o beta ainda não é estável.
+   *
+   * Use Turbopack localmente:
+   *   next dev --turbo
+   */
+  buildCommand: 'next build',
+
+  /**
+   * Headers de Segurança Globais
+   * --------------------------------------------------
+   * Protege contra sniffing, clickjacking
+   * e exposição indevida de conteúdo.
+   */
   headers: [
     {
       source: '/(.*)',
@@ -39,7 +41,11 @@ export const config: VercelConfig = {
         {
           key: 'X-Frame-Options',
           value: 'DENY',
-        }
+        },
+        {
+          key: 'Referrer-Policy',
+          value: 'strict-origin-when-cross-origin',
+        },
       ],
     },
   ],
