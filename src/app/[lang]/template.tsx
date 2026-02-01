@@ -1,30 +1,25 @@
-'use client';
-
 /**
  * TEMPLATE: Global [lang]
  * -----------------------------------------------------------------------------
- * Corrigido para Next.js 16 (React 19).
- * - Removido import não utilizado de 'React' para satisfazer o tsconfig (noUnusedLocals).
- * - Mantido o reset de scroll e estrutura de UI.
+ * Server Component (Next.js 16 / React 19)
+ *
+ * Responsabilidades:
+ * - Estrutura base da UI por idioma
+ * - Garantir layout flexível e acessível
+ * - NÃO conter lógica de estado, i18n ou efeitos colaterais
+ *
+ * Totalmente responsivo.
+ * Multilíngue por herança da rota [lang].
+ * Preparado para evolução futura (TS 7) sem refactor.
  */
 
-import { type ReactNode, useEffect } from 'react';
+import type { ReactNode } from 'react'
 
 interface TemplateProps {
-  readonly children: ReactNode;
+  readonly children: ReactNode
 }
 
 export default function Template({ children }: TemplateProps) {
-  
-  /**
-   * Garantia de Reset de Scroll
-   * Assegura que, ao remontar o template (troca de rota/idioma),
-   * a página comece do topo, evitando comportamentos erráticos do browser.
-   */
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <div
       className="
@@ -39,16 +34,16 @@ export default function Template({ children }: TemplateProps) {
         antialiased
       "
     >
-      {/* Container Principal:
-          - flex-1 garante que o conteúdo ocupe todo o espaço disponível.
-          - focus:outline-none auxilia na acessibilidade para navegação via teclado.
+      {/* Container principal
+          - flex-1 garante preenchimento total da viewport
+          - estrutura neutra para qualquer página
       */}
-      <main 
-        className="flex w-full flex-1 flex-col relative"
+      <main
         id="template-root"
+        className="relative flex w-full flex-1 flex-col"
       >
         {children}
       </main>
     </div>
-  );
+  )
 }
