@@ -6,7 +6,7 @@ import { Menu, X } from 'lucide-react'
 
 import type { Locale } from '@/i18n-config'
 import type { Dictionary } from '@/types/dictionary'
-import type { NavSection } from '@/domain/navigation'
+import { NavSection, getSectionId } from '@/domain/navigation'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -18,7 +18,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ lang, dict }: NavbarProps) {
-  const { nav, common } = dict
+  const { nav, common, seo } = dict
   const { activeSection } = useScrollSpy()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -27,41 +27,42 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
   useEffect(() => {
     setMounted(true)
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
-
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Lock scroll quando menu mobile está aberto
   useEffect(() => {
     if (!mounted) return
-
     document.body.style.overflow = isOpen ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
-    }
+    return () => { document.body.style.overflow = '' }
   }, [isOpen, mounted])
 
-  // Fecha menu ao trocar idioma (UX)
+  // Fecha menu ao trocar idioma ou rota
   useEffect(() => {
     setIsOpen(false)
   }, [lang])
 
   if (!mounted) return null
 
+  /**
+   * NAV LINKS - Sincronizados com Domain/Navigation.ts
+   * Aqui usamos getSectionId(NavSection.VALUE) para garantir que o href
+   * bata exatamente com o ID que está nas seções da Home.
+   */
   const navLinks: ReadonlyArray<{
     id: NavSection
     href: string
     label: string
   }> = [
-    { id: 'about', href: `/${lang}#about`, label: nav.about },
-    { id: 'experience', href: `/${lang}#experience`, label: nav.experience },
-    { id: 'projects', href: `/${lang}#projects`, label: nav.projects },
-    { id: 'articles', href: `/${lang}#articles`, label: nav.articles },
-    { id: 'contact', href: `/${lang}#contact`, label: nav.contact },
+    { id: NavSection.ABOUT, href: `/${lang}#${getSectionId(NavSection.ABOUT)}`, label: nav.about },
+    { id: NavSection.EXPERIENCE, href: `/${lang}#${getSectionId(NavSection.EXPERIENCE)}`, label: nav.experience },
+    { id: NavSection.PROJECTS, href: `/${lang}#${getSectionId(NavSection.PROJECTS)}`, label: nav.projects },
+    { id: NavSection.ARTICLES, href: `/${lang}#${getSectionId(NavSection.ARTICLES)}`, label: nav.articles },
+    { id: NavSection.CONTACT, href: `/${lang}#${getSectionId(NavSection.CONTACT)}`, label: nav.contact },
   ]
 
   return (
@@ -78,7 +79,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
         {/* LOGO */}
         <Link
           href={`/${lang}`}
-          aria-label={dict.seo.siteName}
+          aria-label={seo.siteName}
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
@@ -121,11 +122,9 @@ export function Navbar({ lang, dict }: NavbarProps) {
         <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle />
           <button
-            aria-label={
-              isOpen ? common.closeMenu : common.openMenu
-            }
+            aria-label={isOpen ? common.closeMenu : common.openMenu}
             onClick={() => setIsOpen(prev => !prev)}
-            className="p-2 text-slate-900 dark:text-white"
+            className="p-2 text-slate-900 dark:text-white transition-transform active:scale-90"
           >
             {isOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -134,10 +133,8 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
       {/* MOBILE MENU */}
       <div
-        className={`lg:hidden absolute top-full left-0 w-full overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ${
-          isOpen
-            ? 'max-h-[90vh] opacity-100 shadow-2xl'
-            : 'max-h-0 opacity-0'
+        className={`lg:hidden absolute top-full left-0 w-full overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ease-in-out ${
+          isOpen ? 'max-h-[90vh] opacity-100 shadow-2xl' : 'max-h-0 opacity-0'
         }`}
       >
         <div className="flex flex-col gap-6 p-8">
@@ -149,10 +146,8 @@ export function Navbar({ lang, dict }: NavbarProps) {
                 key={link.id}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className={`text-2xl font-black tracking-tighter ${
-                  isActive
-                    ? 'text-blue-600'
-                    : 'text-slate-900 dark:text-white'
+                className={`text-2xl font-black tracking-tighter transition-colors ${
+                  isActive ? 'text-blue-600' : 'text-slate-900 dark:text-white hover:text-blue-600'
                 }`}
               >
                 {link.label}
