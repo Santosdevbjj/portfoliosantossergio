@@ -2,51 +2,75 @@
 import { type VercelConfig } from '@vercel/config/v1';
 
 /**
- * Vercel Programmatic Configuration
- * Padrão Profissional – Jan/2026
- *
- * ✔ Compatível com Next.js App Router
- * ✔ Seguro contra loops de roteamento
- * ✔ Type-safe (TS 6 / preparado para TS 7)
- * ✔ Alinhado com Vercel Platform Defaults
+ * VERCEL PROGRAMMATIC CONFIGURATION — REVISÃO FEVEREIRO 2026
+ * -----------------------------------------------------------------------------
+ * ✔ Suporte total a Next.js 16 e i18n dinâmico.
+ * ✔ Segurança Bancária (HSTS + Security Headers).
+ * ✔ Gestão de Cache para Ativos de Dados.
  */
-export const config: VercelConfig = {
+
+const config: VercelConfig = {
   framework: 'nextjs',
+  cleanUrls: true,
+  trailingSlash: false,
 
   /**
-   * Build
+   * Headers de Segurança e Performance
    * --------------------------------------------------
-   * NÃO forçamos Turbopack aqui para evitar falhas
-   * em ambientes onde o beta ainda não é estável.
-   *
-   * Use Turbopack localmente:
-   *   next dev --turbo
-   */
-  buildCommand: 'next build',
-
-  /**
-   * Headers de Segurança Globais
-   * --------------------------------------------------
-   * Protege contra sniffing, clickjacking
-   * e exposição indevida de conteúdo.
    */
   headers: [
     {
       source: '/(.*)',
       headers: [
-        {
-          key: 'X-Content-Type-Options',
-          value: 'nosniff',
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'X-Frame-Options', value: 'DENY' },
+        { key: 'X-XSS-Protection', value: '1; mode=block' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { 
+          key: 'Strict-Transport-Security', 
+          value: 'max-age=31536000; includeSubDomains; preload' 
         },
         {
-          key: 'X-Frame-Options',
-          value: 'DENY',
-        },
-        {
-          key: 'Referrer-Policy',
-          value: 'strict-origin-when-cross-origin',
-        },
+          key: 'Permissions-Policy',
+          value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+        }
       ],
     },
+    {
+      source: '/fonts/(.*)',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable'
+        }
+      ]
+    }
   ],
+
+  /**
+   * Redirecionamentos Estratégicos (i18n)
+   * --------------------------------------------------
+   * Garante que a entrada no domínio raiz leve ao idioma padrão.
+   */
+  redirects: [
+    {
+      source: '/',
+      destination: '/pt',
+      permanent: false
+    }
+  ],
+
+  /**
+   * Otimização de Imagens Oxide v4
+   * --------------------------------------------------
+   */
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      { protocol: 'https', hostname: '**.githubusercontent.com' },
+      { protocol: 'https', hostname: '**.medium.com' }
+    ]
+  }
 };
+
+export default config;
