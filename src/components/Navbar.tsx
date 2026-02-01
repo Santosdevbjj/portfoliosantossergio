@@ -19,7 +19,6 @@ interface NavbarProps {
 
 export function Navbar({ lang, dict }: NavbarProps) {
   const { nav, common } = dict
-
   const { activeSection } = useScrollSpy()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -46,6 +45,11 @@ export function Navbar({ lang, dict }: NavbarProps) {
     }
   }, [isOpen, mounted])
 
+  // Fecha menu ao trocar idioma (UX)
+  useEffect(() => {
+    setIsOpen(false)
+  }, [lang])
+
   if (!mounted) return null
 
   const navLinks: ReadonlyArray<{
@@ -62,6 +66,8 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
   return (
     <nav
+      role="navigation"
+      aria-label={common.navigation}
       className={`fixed top-0 z-[100] w-full transition-all duration-500 ${
         scrolled
           ? 'bg-white/95 dark:bg-[#020617]/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 py-3 shadow-lg'
@@ -72,7 +78,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
         {/* LOGO */}
         <Link
           href={`/${lang}`}
-          aria-label="Homepage"
+          aria-label={dict.seo.siteName}
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
@@ -115,7 +121,9 @@ export function Navbar({ lang, dict }: NavbarProps) {
         <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle />
           <button
-            aria-label="Toggle navigation menu"
+            aria-label={
+              isOpen ? common.closeMenu : common.openMenu
+            }
             onClick={() => setIsOpen(prev => !prev)}
             className="p-2 text-slate-900 dark:text-white"
           >
