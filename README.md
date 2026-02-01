@@ -26,6 +26,8 @@ Para garantir a integridade e a experiência do usuário, adotei as seguintes pr
  * Acessibilidade: Conformidade com normas WCAG e SEO internacional para indexação global.
    
  * Eficiência de Dados: Uso de ISR (Incremental Static Regeneration) para atualizar projetos sem sobrecarregar APIs externas.
+
+   
 4. Decisões Técnicas e Stack
 A arquitetura foi escolhida para refletir o que há de mais moderno e escalável no mercado corporativo:
 
