@@ -73,7 +73,6 @@ export interface Dictionary {
       analysis: string;
       dev: string;
       security: string;
-      // Mantendo chaves legadas para compatibilidade
       data: string;
       backend: string;
       frontend: string;
