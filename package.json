@@ -3,7 +3,7 @@
   "version": "13.0.1",
   "private": true,
   "author": "Sérgio Santos",
-  "description": "Portfólio de Engenharia de Dados - Tailwind v4 Oxide Engine",
+  "description": "Portfólio de Engenharia de Dados - Tailwind v4 & Lucide 0.563",
   "engines": {
     "node": "24.x"
   },
@@ -19,7 +19,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "framer-motion": "12.29.2",
-    "lucide-react": "0.474.0",
+    "lucide-react": "0.563.0",
     "clsx": "2.1.1",
     "tailwind-merge": "2.6.0",
     "class-variance-authority": "0.7.1",
