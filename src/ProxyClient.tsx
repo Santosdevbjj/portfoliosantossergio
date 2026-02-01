@@ -21,16 +21,17 @@ import { getGitHubProjects } from '@/lib/github'
 import type { Project } from '@/domain/projects'
 import { featuredConfig } from '@/components/featured/projects.data'
 
-interface ProxyProps {
+interface ProxyClientProps {
   lang: SupportedLocale
 }
 
 /**
- * ProxyPage (Client Component)
- * Responsável pela renderização da SPA multilingue e responsiva.
+ * ProxyClient (Client Component)
+ * Gerenciador central da SPA. Revisado para garantir 100% de 
+ * compatibilidade com os dicionários PT, EN e ES.
  */
-export default function ProxyPage({ lang }: ProxyProps) {
-  // 1. Validação de Segurança de Idioma (Inference 6.0+)
+export default function ProxyClient({ lang }: ProxyClientProps) {
+  // 1. Validação de idioma robusta
   const supportedLocales: SupportedLocale[] = ['pt', 'en', 'es']
   if (!supportedLocales.includes(lang)) {
     notFound()
@@ -39,7 +40,7 @@ export default function ProxyPage({ lang }: ProxyProps) {
   const [mounted, setMounted] = useState(false)
   const [allProjects, setAllProjects] = useState<Project[]>([])
 
-  // 2. Memorizar o dicionário para evitar re-renders desnecessários
+  // 2. Memorização do dicionário (Evita overhead de tradução)
   const dict = useMemo(() => getDictionarySync(lang), [lang])
 
   useEffect(() => {
@@ -49,22 +50,23 @@ export default function ProxyPage({ lang }: ProxyProps) {
         const data = await getGitHubProjects(lang)
         if (data) setAllProjects(data)
       } catch (error) {
-        console.error('Erro de Missão Crítica (GitHub API):', error)
+        console.error('Erro ao carregar dados do GitHub:', error)
       }
     }
     loadData()
   }, [lang])
 
+  // IDs para Scroll Suave da Navbar
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
 
-  // 3. Estado de Carregamento (Skeleton Simples)
+  // 3. Hydration Guard (Essencial para Next.js 16/Turbopack)
   if (!mounted) {
     return (
       <div className="min-h-screen w-full bg-white dark:bg-[#020617] animate-pulse" />
     )
   }
 
-  // 4. Filtragem Lógica de Projetos
+  // 4. Lógica de Filtragem de Projetos (Baseada no domínio configurado)
   const featuredIds = featuredConfig.map(f => f.id)
   const featuredProjects = allProjects.filter(p => featuredIds.includes(p.name))
   const remainingProjects = allProjects.filter(p => !featuredIds.includes(p.name))
@@ -75,24 +77,24 @@ export default function ProxyPage({ lang }: ProxyProps) {
 
       <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
         
-        {/* Seção Hero: Impacto Inicial */}
+        {/* Hero: Passando dicionário global e local para garantir tipagem */}
         <section id="hero" className="w-full">
           <HeroSection lang={lang} dict={dict} />
         </section>
 
-        {/* Seção Sobre: Trajetória Profissional */}
+        {/* Sobre: Grid Responsivo (Padding otimizado para mobile) */}
         <section id="about" className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
           <AboutSection lang={lang} dict={dict} />
         </section>
 
-        {/* Seção Experiência: Rigor Bancário */}
+        {/* Experiência: Fundo alternado para quebra visual */}
         <section id="experience" className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10">
           <div className="mx-auto max-w-7xl px-4 sm:px-10 lg:px-12">
             <ExperienceSection lang={lang} dict={dict} />
           </div>
         </section>
 
-        {/* Seção Projetos: Repositório Técnico */}
+        {/* Projetos: Uso de Suspense para carregamento assíncrono da API */}
         <section id="projects" className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <Suspense fallback={
             <div className="h-96 w-full animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800/50" />
@@ -105,12 +107,12 @@ export default function ProxyPage({ lang }: ProxyProps) {
           </div>
         </section>
 
-        {/* Seção Artigos: Autoridade Intelectual */}
+        {/* Artigos: Integração com Medium */}
         <section id="articles" className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <FeaturedArticleSection lang={lang} dict={dict} />
         </section>
 
-        {/* Seção Contato: CTA Final */}
+        {/* Contato: Final da Jornada */}
         <section id="contact" className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <ContactSection lang={lang} dict={dict} />
         </section>
