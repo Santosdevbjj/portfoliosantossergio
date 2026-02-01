@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+
 import { generateBreadcrumbs } from '@/lib/seo/breadcrumbs';
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
 
@@ -10,41 +11,76 @@ interface BreadcrumbsJsonLdProps {
   baseUrl: string;
 }
 
-export function BreadcrumbsJsonLd({ lang, baseUrl }: BreadcrumbsJsonLdProps) {
+export function BreadcrumbsJsonLd({
+  lang,
+  baseUrl,
+}: BreadcrumbsJsonLdProps) {
   const pathname = usePathname();
-  const dict = getDictionarySync(lang);
 
-  useEffect(() => {
-    if (!pathname) return;
+  /**
+   * Normaliza a baseUrl para evitar "//" ou inconsistências
+   */
+  const normalizedBaseUrl = useMemo(
+    () => baseUrl.replace(/\/+$/, ''),
+    [baseUrl]
+  );
 
-    const breadcrumbs = generateBreadcrumbs(
+  /**
+   * Dicionário sincronizado com o idioma atual
+   * (não deve ser dependência direta do useEffect)
+   */
+  const dict = useMemo(
+    () => getDictionarySync(lang),
+    [lang]
+  );
+
+  /**
+   * Geração determinística dos breadcrumbs
+   */
+  const breadcrumbs = useMemo(() => {
+    if (!pathname) return [];
+
+    return generateBreadcrumbs(
       pathname,
       lang,
       dict,
-      baseUrl
+      normalizedBaseUrl
     );
+  }, [pathname, lang, dict, normalizedBaseUrl]);
 
-    const jsonLd = {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: breadcrumbs.map((crumb, index) => ({
-        '@type': 'ListItem',
-        position: index + 1,
-        name: crumb.name,
-        item: crumb.item,
-      })),
-    };
+  useEffect(() => {
+    if (!breadcrumbs.length) return;
 
-    const scriptId = 'breadcrumbs-jsonld';
-    const existing = document.getElementById(scriptId);
-    if (existing) existing.remove();
+    try {
+      const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbs.map((crumb, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: crumb.name,
+          item: crumb.item,
+        })),
+      };
 
-    const script = document.createElement('script');
-    script.id = scriptId;
-    script.type = 'application/ld+json';
-    script.textContent = JSON.stringify(jsonLd);
-    document.head.appendChild(script);
-  }, [pathname, lang, dict, baseUrl]);
+      const scriptId = 'breadcrumbs-jsonld';
+      const existingScript = document.getElementById(scriptId);
+      if (existingScript) {
+        existingScript.remove();
+      }
+
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.type = 'application/ld+json';
+      script.textContent = JSON.stringify(jsonLd);
+
+      document.head.appendChild(script);
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[BreadcrumbsJsonLd]', error);
+      }
+    }
+  }, [breadcrumbs]);
 
   return null;
 }
