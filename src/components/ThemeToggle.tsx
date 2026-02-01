@@ -29,7 +29,7 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 /* -------------------------------------------------------------------------- */
-/* 2. THEME PROVIDER (CORRIGIDO PARA REACT 19 / NEXT 16)                      */
+/* 2. THEME PROVIDER (OPTIMIZED FOR NEXT 16 / REACT 19)                       */
 /* -------------------------------------------------------------------------- */
 
 export function ThemeProvider({ children }: { readonly children: ReactNode }) {
@@ -39,8 +39,6 @@ export function ThemeProvider({ children }: { readonly children: ReactNode }) {
     setMounted(true)
   }, [])
 
-  // Envolvemos o seu Contexto dentro do Provider do next-themes para garantir 
-  // que o 'class="dark"' seja aplicado corretamente ao <html>
   return (
     <NextThemesProvider 
       attribute="class" 
@@ -55,7 +53,6 @@ export function ThemeProvider({ children }: { readonly children: ReactNode }) {
   )
 }
 
-// Componente auxiliar para acessar o useNextTheme com segurança
 function ThemeContentProvider({ children, mounted }: { children: ReactNode, mounted: boolean }) {
   const { theme, setTheme, resolvedTheme } = useNextTheme()
 
@@ -78,7 +75,7 @@ function ThemeContentProvider({ children, mounted }: { children: ReactNode, moun
 }
 
 /* -------------------------------------------------------------------------- */
-/* 3. CUSTOM HOOK & UI (TEMA/BOTÃO)                                           */
+/* 3. CUSTOM HOOK & UI                                                        */
 /* -------------------------------------------------------------------------- */
 
 export function useTheme() {
@@ -91,33 +88,64 @@ export function ThemeToggle() {
   const pathname = usePathname()
   const { toggleTheme, isDark, mounted } = useTheme()
 
-  const lang = useMemo(() => {
-    const segment = pathname?.split('/')[1]?.toLowerCase()
-    return (segment === 'en' || segment === 'es') ? segment : 'pt'
-  }, [pathname])
-
+  // i18n Strategy - Simplificada para 2026
   const labels = {
     pt: { dark: 'Ativar modo escuro', light: 'Ativar modo claro' },
     en: { dark: 'Enable dark mode', light: 'Enable light mode' },
     es: { dark: 'Activar modo oscuro', light: 'Activar modo claro' },
   }
 
-  if (!mounted) return <div className="w-11 h-11 rounded-xl bg-slate-200/60 dark:bg-slate-800/60 animate-pulse" />
-
-  const t = labels[lang as keyof typeof labels]
+  const lang = (pathname?.split('/')[1]?.toLowerCase() as keyof typeof labels) || 'pt'
+  const t = labels[lang] || labels.pt
   const currentLabel = isDark ? t.light : t.dark
+
+  // Estado de Skeleton durante Hydration
+  if (!mounted) {
+    return (
+      <div className="w-11 h-11 rounded-xl bg-slate-200/50 dark:bg-slate-800/50 animate-pulse border border-transparent" />
+    )
+  }
 
   return (
     <button
       type="button"
       onClick={toggleTheme}
       aria-label={currentLabel}
-      className="relative w-11 h-11 p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800/60 shadow-sm backdrop-blur-md text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-amber-400 transition-all active:scale-95"
+      title={currentLabel}
+      className={`
+        group relative w-11 h-11 flex items-center justify-center rounded-xl 
+        bg-white/80 dark:bg-slate-900/80 
+        border border-slate-200 dark:border-slate-800/60 
+        shadow-sm backdrop-blur-md
+        hover:border-blue-500/50 dark:hover:border-amber-500/50
+        transition-all duration-300 active:scale-90
+      `}
     >
-      <div className="relative w-5 h-5 flex items-center justify-center overflow-hidden">
-        <Sun size={20} className={`absolute transition-all duration-500 ${isDark ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`} />
-        <Moon size={20} className={`absolute transition-all duration-500 ${!isDark ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'}`} />
+      <div className="relative w-5 h-5 overflow-hidden">
+        {/* Ícone Sol: Aparece no escuro para mudar para o claro */}
+        <Sun 
+          size={20} 
+          aria-hidden={!isDark}
+          className={`
+            absolute inset-0 transform transition-all duration-500 ease-spring
+            text-amber-500
+            ${isDark ? 'translate-y-0 opacity-100 rotate-0' : 'translate-y-8 opacity-0 -rotate-90'}
+          `} 
+        />
+        {/* Ícone Lua: Aparece no claro para mudar para o escuro */}
+        <Moon 
+          size={20} 
+          aria-hidden={isDark}
+          className={`
+            absolute inset-0 transform transition-all duration-500 ease-spring
+            text-slate-600 dark:text-slate-400
+            ${!isDark ? 'translate-y-0 opacity-100 rotate-0' : '-translate-y-8 opacity-0 rotate-90'}
+          `} 
+        />
       </div>
+      
+      {/* Efeito de brilho sutil no hover (Tailwind v4 ring) */}
+      <span className="absolute inset-0 rounded-xl ring-0 ring-blue-500/20 group-hover:ring-4 transition-all duration-300" />
     </button>
   )
 }
