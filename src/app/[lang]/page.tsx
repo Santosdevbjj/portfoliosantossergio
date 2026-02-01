@@ -1,21 +1,20 @@
 /**
  * HOME PAGE — ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * Framework: Next.js 16
+ * Framework: Next.js 16 (Turbopack)
  * I18n: PT / EN / ES (SSG)
- * SEO: Metadata + OpenGraph dinâmico
- * Responsividade: Viewport API (padrão moderno)
+ * SEO: Metadata Dinâmico + OpenGraph
  */
 
 import type { Metadata, Viewport } from 'next'
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
 import { i18n } from '@/i18n-config'
-import ProxyPage from '@/proxy'
+import ProxyPage from '@/ProxyClient' // Verifique se o import aponta para o ProxyClient revisado
 
 interface PageProps {
-  params: {
+  params: Promise<{
     lang: SupportedLocale
-  }
+  }>
 }
 
 /* -------------------------------------------------------------------------- */
@@ -33,14 +32,15 @@ export const viewport: Viewport = {
 }
 
 /* -------------------------------------------------------------------------- */
-/* SEO & OPEN GRAPH — HOME PAGE                                                */
+/* SEO & OPEN GRAPH — CONFIGURAÇÃO DINÂMICA                                    */
 /* -------------------------------------------------------------------------- */
 export async function generateMetadata(
   { params }: PageProps
 ): Promise<Metadata> {
+  const resolvedParams = await params
   const currentLang: SupportedLocale =
-    i18n.locales.includes(params.lang)
-      ? params.lang
+    i18n.locales.includes(resolvedParams.lang)
+      ? resolvedParams.lang
       : i18n.defaultLocale
 
   const dict = getDictionarySync(currentLang)
@@ -55,6 +55,7 @@ export async function generateMetadata(
   const pageDescription =
     dict.seo.pages?.home?.description ?? dict.seo.description
 
+  // URL para geração dinâmica de imagem de compartilhamento (OG)
   const ogImageUrl =
     `${siteUrl}/api/post-og` +
     `?title=${encodeURIComponent(`${dict.hero.title} ${dict.hero.subtitle}`)}` +
@@ -101,39 +102,31 @@ export async function generateMetadata(
         },
       ],
     },
-
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
   }
 }
 
 /* -------------------------------------------------------------------------- */
-/* STATIC GENERATION — ROTAS DE IDIOMA                                         */
+/* STATIC GENERATION — PRÉ-RENDERIZAÇÃO                                        */
 /* -------------------------------------------------------------------------- */
 export async function generateStaticParams() {
   return i18n.locales.map((lang) => ({ lang }))
 }
 
 /* -------------------------------------------------------------------------- */
-/* PAGE — SERVER COMPONENT                                                     */
+/* PAGE COMPONENT — PONTO DE ENTRADA                                           */
 /* -------------------------------------------------------------------------- */
-export default function HomePage({ params }: PageProps) {
+export default async function HomePage({ params }: PageProps) {
+  const resolvedParams = await params
   const currentLang: SupportedLocale =
-    i18n.locales.includes(params.lang)
-      ? params.lang
+    i18n.locales.includes(resolvedParams.lang)
+      ? resolvedParams.lang
       : i18n.defaultLocale
 
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617]">
+      {/* Passamos o lang resolvido para o ProxyClient. 
+          O ProxyClient cuidará da renderização das seções (About, Projects, etc).
+      */}
       <ProxyPage lang={currentLang} />
     </main>
   )
