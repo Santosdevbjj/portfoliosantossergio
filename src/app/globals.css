@@ -64,6 +64,10 @@
     overflow-x: hidden;
     background-color: rgb(var(--background));
     -webkit-tap-highlight-color: transparent;
+    
+    /* Font Smoothing para 2026 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 
     /* Multilanguage Typography Handling */
     hyphens: auto;
@@ -78,11 +82,9 @@
     color: rgb(var(--foreground));
     background-color: rgb(var(--background));
 
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
     font-optical-sizing: auto;
     text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 
     padding: env(safe-area-inset-top)
              env(safe-area-inset-right)
@@ -92,26 +94,27 @@
     transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Performance Optimization */
+  /* Performance Optimization - CSS Containment */
   section {
     content-visibility: auto;
-    contain-intrinsic-size: 1px 600px;
+    contain-intrinsic-size: auto 600px;
   }
 
   ::selection {
-    background-color: rgb(var(--selection-bg) / 0.2);
-    color: rgb(var(--brand-700));
+    background-color: rgb(var(--selection-bg) / 0.3);
+    color: rgb(var(--foreground));
   }
 
   .dark ::selection {
-    color: rgb(var(--brand-200));
+    background-color: rgb(var(--selection-bg) / 0.4);
+    color: #ffffff;
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-brand-500 ring-offset-4 ring-offset-background;
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-background;
   }
 
-  /* Custom Scrollbar (Desktop Only) */
+  /* Custom Scrollbar */
   @media (min-width: 1024px) {
     ::-webkit-scrollbar {
       width: 10px;
@@ -140,8 +143,8 @@
 
   .glass-effect {
     @apply backdrop-blur-xl shadow-lg transition-all duration-300;
-    background-color: rgb(var(--card) / 0.8);
-    border: 1px solid rgb(var(--border) / 0.8);
+    background-color: rgb(var(--card) / 0.75);
+    border: 1px solid rgb(var(--border) / 0.5);
   }
 
   .project-card {
@@ -153,7 +156,7 @@
   @media (hover: hover) {
     .project-card:hover {
       @apply -translate-y-2 shadow-2xl;
-      border-color: rgb(var(--brand-500) / 0.5);
+      border-color: rgb(var(--brand-500) / 0.4);
     }
   }
 }
@@ -180,7 +183,7 @@
   }
 }
 
-/* High Contrast Support (WCAG 2.2 / 2026) */
+/* High Contrast Support (WCAG 2.2) */
 @media (forced-colors: active) {
   .glass-effect,
   .project-card {
