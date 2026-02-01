@@ -1,36 +1,33 @@
-'use client';
-
 /**
  * LOADING: Skeleton Screen
  * -----------------------------------------------------------------------------
  * Renderizado instantaneamente via React Suspense (Streaming).
- * Alinhado ao sistema oficial de i18n (Dictionary).
- * Compatível com Next.js 16 / React 19.
- * Preparado para evolução futura (TS 7) sem refactor.
+ * Totalmente responsivo.
+ * Multilíngue (pt / en / es).
+ * Alinhado 100% ao Dictionary.
+ * Server-safe (App Router best practice).
  */
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import type { SupportedLocale } from '@/dictionaries'
+import { getDictionarySync } from '@/dictionaries'
 
-import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
+interface LoadingProps {
+  params: {
+    lang: SupportedLocale
+  }
+}
 
-export default function Loading() {
-  const params = useParams();
-  const [label, setLabel] = useState<string>('Carregando...');
+export default function Loading({ params }: LoadingProps) {
+  const locale: SupportedLocale = params?.lang ?? 'pt'
+  const dictionary = getDictionarySync(locale)
 
-  useEffect(() => {
-    const locale = (params?.lang as SupportedLocale) || 'pt';
-    const dictionary = getDictionarySync(locale);
-
-    setLabel(
-      dictionary.common.loading ??
-        (locale === 'en'
-          ? 'Loading content...'
-          : locale === 'es'
-          ? 'Cargando contenido...'
-          : 'Carregando conteúdo...')
-    );
-  }, [params?.lang]);
+  const label =
+    dictionary.common.loading ??
+    (locale === 'en'
+      ? 'Loading content...'
+      : locale === 'es'
+      ? 'Cargando contenido...'
+      : 'Carregando conteúdo...')
 
   return (
     <div
@@ -104,5 +101,5 @@ export default function Loading() {
         </section>
       </div>
     </div>
-  );
+  )
 }
