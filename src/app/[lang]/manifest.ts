@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { i18n, type Locale } from '@/i18n-config'
-import { getDictionary } from '@/i18n-config'
+import { i18n, type Locale, getDictionary } from '@/i18n-config'
 
 const SITE_URL = 'https://portfoliosantossergio.vercel.app'
 
@@ -20,7 +19,7 @@ export default async function manifest(
   }
 
   return {
-    id: `${SITE_URL}/${lang}/`,
+    id: SITE_URL,
     lang,
     dir: 'ltr',
 
@@ -54,7 +53,7 @@ export default async function manifest(
         src: '/icons/icon.png',
         sizes: '512x512',
         type: 'image/png',
-        purpose: 'any maskable',
+        purpose: 'maskable',
       },
       {
         src: '/icons/apple-icon.png',
