@@ -1,34 +1,35 @@
 {
   "compilerOptions": {
-    /* NATIVE RUNTIME & TARGET (Baseline Jan/2026) */
-    "target": "ES2024", 
-    "lib": ["DOM", "DOM.Iterable", "ES2024", "ESNext"],
+    /* NATIVE RUNTIME & TARGET (Baseline Feb/2026) */
+    "target": "ESNext", 
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     
     /* TSGO ENGINE OPTIMIZATION (Project Corsa) */
-    "verbatimModuleSyntax": true,   // Essencial para o compilador em Go: separa tipos de runtime com custo zero
-    "isolatedModules": true,         // Garante que cada arquivo seja tratável de forma independente e paralela
-    "moduleDetection": "force",      // Força o escopo de módulo em todos os arquivos para evitar colisões no Global Cache
+    "verbatimModuleSyntax": true,   // Separação rigorosa de tipos para build ultra-rápido
+    "isolatedModules": true,         
+    "moduleDetection": "force",      
     
-    /* RIGOR DE MISSÃO CRÍTICA (Prevenção de Erro 500) */
+    /* RIGOR DE MISSÃO CRÍTICA (Zero Runtime Errors) */
     "strict": true,
-    "noUncheckedIndexedAccess": true, // Evita undefined em dicionários de tradução (Vital para o seu i18n)
-    "exactOptionalPropertyTypes": true, // Impede a atribuição de 'undefined' a propriedades opcionais
+    "noUncheckedIndexedAccess": true, // Vital para segurança de dados no seu i18n
+    "exactOptionalPropertyTypes": true, 
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": false,
+    "noUnusedParameters": false,     // Mantemos false para facilitar o desenvolvimento de interfaces
     
     /* NEXT.JS 16 & REACT 19 ARCHITECTURE */
     "module": "ESNext",
-    "moduleResolution": "Bundler",   // Otimizado para o Turbopack nativo
+    "moduleResolution": "Bundler",   
     "jsx": "react-jsx",
-    "noEmit": true,                  // Delegamos a geração de código para o Turbopack/tsgo
+    "noEmit": true,                  
+    "allowImportingTsExtensions": true, // Necessário para alguns padrões de 2026
     
     /* INTEROP & SECURITY */
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "skipLibCheck": true,            // Aumenta a velocidade focando apenas no seu código-fonte
+    "skipLibCheck": true,            
     "forceConsistentCasingInFileNames": true,
 
     /* INFRASTRUCTURE PATHS */
@@ -54,8 +55,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "vercel.ts" // Incluído para validar sua configuração programática
+    "src/types/**/*.d.ts" // Garante que seus tipos customizados de ícones e CSS sejam lidos
   ],
 
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".next", "out"]
 }
