@@ -1,62 +1,84 @@
 /**
  * DATA LAYER — Featured Projects Configuration
  * -----------------------------------------------------------------------------
- * Este arquivo define quais repositórios do GitHub serão destacados no Bento Grid.
- * * FOCO:
- * - Mantém a lógica de exibir apenas 3 projetos de elite.
- * - Alinhado com o dicionário: As chaves de tradução são resolvidas no componente.
- * - Sem erros de build: Removidos imports não utilizados.
+ * Fonte única de verdade dos projetos em destaque.
+ *
+ * PRINCÍPIOS:
+ * - Apenas 3 projetos (curadoria estratégica)
+ * - Ordem explícita (define hierarquia visual e narrativa)
+ * - Agnóstico de UI, i18n e ScrollSpy
+ * - IDs DEVEM corresponder exatamente aos nomes dos repositórios no GitHub
  */
 
 export type ProjectSize = 'lg' | 'md'
 
 export interface ProjectEnrichment {
-  /** * ID: Deve ser exatamente o nome do repositório no GitHub 
-   * Ex: 'analise-riscos'
+  /**
+   * ID do repositório no GitHub
+   * ⚠️ Deve ser EXATAMENTE igual ao nome do repo
    */
-  readonly id: string 
+  readonly id: string
+
+  /**
+   * Tamanho visual no Featured Grid
+   * - lg → destaque principal
+   * - md → destaque secundário
+   */
   readonly size: ProjectSize
+
+  /**
+   * Indica se o projeto é destacado
+   * Mantido por extensibilidade futura (ex: filtros, animações, SEO)
+   */
   readonly featured: boolean
-  
-  /** * SEO & UX: Indica se o projeto deve ter uma página de detalhes expandida
-   * ou se apenas o card com link para o GitHub é suficiente.
+
+  /**
+   * Indica se existe (ou existirá) uma página interna de detalhes
+   * false → apenas link externo (GitHub)
    */
   readonly hasExtendedDetails: boolean
 }
 
 /**
- * CONFIGURAÇÃO DOS TOP 3 PROJETOS
+ * CONFIGURAÇÃO DOS 3 PROJETOS EM DESTAQUE
  * -----------------------------------------------------------------------------
- * Seleção estratégica para o Bento Grid:
- * 1. Ocupa 2 colunas (lg) - O projeto de maior impacto.
- * 2. Ocupa 1 coluna (md)  - Segundo projeto.
- * 3. Ocupa 1 coluna (md)  - Terceiro projeto.
+ * ORDEM = ORDEM DE EXIBIÇÃO + IMPORTÂNCIA SEMÂNTICA
+ *
+ * 1️⃣ Projeto principal (impacto máximo)
+ * 2️⃣ Projeto secundário
+ * 3️⃣ Projeto secundário
  */
-export const featuredConfig: ProjectEnrichment[] = [
+export const featuredConfig: readonly ProjectEnrichment[] = [
   {
-    id: 'portfoliosantossergio', // Nome exato do repositório principal
+    id: 'analiseRiscosAtrasoObras',
     size: 'lg',
     featured: true,
-    hasExtendedDetails: true
-  },
-  {
-    id: 'genAIpipeETLPython', 
-    size: 'md',
-    featured: true,
-    hasExtendedDetails: false
+    hasExtendedDetails: true,
   },
   {
     id: 'analiseDadosNaPratica',
     size: 'md',
     featured: true,
-    hasExtendedDetails: false
-  }
-]
+    hasExtendedDetails: false,
+  },
+  {
+    id: 'genAIpipeETLPython',
+    size: 'md',
+    featured: true,
+    hasExtendedDetails: false,
+  },
+] as const
 
 /**
- * HELPER: getProjectConfig
- * Filtra e retorna a configuração visual para um repositório específico.
+ * HELPER — getProjectConfig
+ * -----------------------------------------------------------------------------
+ * Retorna a configuração visual de um repositório específico.
+ * Utilizado pelo FeaturedGrid / ProjectCard.
  */
-export const getProjectConfig = (repoName: string): ProjectEnrichment | undefined => {
-  return featuredConfig.find(config => config.id === repoName)
+export function getProjectConfig(
+  repoName: string,
+): ProjectEnrichment | undefined {
+  return featuredConfig.find(
+    config => config.id === repoName,
+  )
 }
