@@ -1,7 +1,7 @@
 /**
  * HOME PAGE — ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * Framework: Next.js 16 (Turbopack)
+ * Framework: Next.js 16 (App Router / Turbopack)
  * I18n: PT / EN / ES (SSG)
  * SEO: Metadata Dinâmico + OpenGraph
  */
@@ -9,12 +9,12 @@
 import type { Metadata, Viewport } from 'next'
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
 import { i18n } from '@/i18n-config'
-import ProxyPage from '@/ProxyClient' // Verifique se o import aponta para o ProxyClient revisado
+import ProxyPage from '@/ProxyClient'
 
 interface PageProps {
-  params: Promise<{
+  params: {
     lang: SupportedLocale
-  }>
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -35,12 +35,11 @@ export const viewport: Viewport = {
 /* SEO & OPEN GRAPH — CONFIGURAÇÃO DINÂMICA                                    */
 /* -------------------------------------------------------------------------- */
 export async function generateMetadata(
-  { params }: PageProps
+  { params }: PageProps,
 ): Promise<Metadata> {
-  const resolvedParams = await params
   const currentLang: SupportedLocale =
-    i18n.locales.includes(resolvedParams.lang)
-      ? resolvedParams.lang
+    i18n.locales.includes(params.lang)
+      ? params.lang
       : i18n.defaultLocale
 
   const dict = getDictionarySync(currentLang)
@@ -55,10 +54,15 @@ export async function generateMetadata(
   const pageDescription =
     dict.seo.pages?.home?.description ?? dict.seo.description
 
-  // URL para geração dinâmica de imagem de compartilhamento (OG)
+  /**
+   * Open Graph dinâmico (API /api/post-og)
+   * Ideal para homepage e compartilhamento social
+   */
   const ogImageUrl =
     `${siteUrl}/api/post-og` +
-    `?title=${encodeURIComponent(`${dict.hero.title} ${dict.hero.subtitle}`)}` +
+    `?title=${encodeURIComponent(
+      `${dict.hero.title} ${dict.hero.subtitle}`,
+    )}` +
     `&description=${encodeURIComponent(dict.hero.headline)}` +
     `&author=Sérgio Santos`
 
@@ -108,24 +112,26 @@ export async function generateMetadata(
 /* -------------------------------------------------------------------------- */
 /* STATIC GENERATION — PRÉ-RENDERIZAÇÃO                                        */
 /* -------------------------------------------------------------------------- */
-export async function generateStaticParams() {
+export function generateStaticParams() {
   return i18n.locales.map((lang) => ({ lang }))
 }
 
 /* -------------------------------------------------------------------------- */
 /* PAGE COMPONENT — PONTO DE ENTRADA                                           */
 /* -------------------------------------------------------------------------- */
-export default async function HomePage({ params }: PageProps) {
-  const resolvedParams = await params
+export default function HomePage({ params }: PageProps) {
   const currentLang: SupportedLocale =
-    i18n.locales.includes(resolvedParams.lang)
-      ? resolvedParams.lang
+    i18n.locales.includes(params.lang)
+      ? params.lang
       : i18n.defaultLocale
 
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617]">
-      {/* Passamos o lang resolvido para o ProxyClient. 
-          O ProxyClient cuidará da renderização das seções (About, Projects, etc).
+      {/* 
+        ProxyPage é responsável por:
+        - Renderizar Hero, About, Projects, Articles, Contact
+        - Consumir dicionário no Client
+        - Sincronizar ScrollSpy
       */}
       <ProxyPage lang={currentLang} />
     </main>
