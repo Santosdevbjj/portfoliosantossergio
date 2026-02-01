@@ -1,9 +1,9 @@
-// eslint.config.mjs
 import { FlatCompat } from '@eslint/eslintrc';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
+import { fixupConfigRules } from '@eslint/compat';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,13 +13,13 @@ const compat = new FlatCompat({
 });
 
 /**
- * ESLint v9 Flat Config - Janeiro 2026
- * Next.js 16 (App Router) + React 19
+ * ESLint v9/v10 Flat Config — Baseline Fevereiro 2026
+ * Otimizado para Next.js 16, React 19 e TypeScript 5.7+
  */
 export default [
   /**
-   * 0️⃣ Arquivos ignorados
-   * Reduzido para focar na segurança: agora validamos layouts e erros.
+   * 1️⃣ Global Ignores
+   * No ESLint v9+, um objeto contendo apenas 'ignores' age como um .eslintignore global.
    */
   {
     ignores: [
@@ -29,11 +29,12 @@ export default [
       'build/**',
       'public/**',
       '**/*.d.ts',
+      'eslint.config.mjs',
     ],
   },
 
   /**
-   * 1️⃣ Ambiente e Parser
+   * 2️⃣ Ambiente e Parser
    */
   {
     languageOptions: {
@@ -47,56 +48,61 @@ export default [
   },
 
   /**
-   * 2️⃣ Next.js & TypeScript
-   * Usando FlatCompat para garantir que o plugin do Next.js 16
-   * carregue corretamente no ESLint v9.
+   * 3️⃣ Next.js & React 19 Compatibility
+   * Usamos o fixupConfigRules para "sanitizar" as regras do Next.js para o modo Flat Config.
    */
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  ...fixupConfigRules(compat.extends('next/core-web-vitals', 'next/typescript')),
 
   /**
-   * 3️⃣ Regras de Blindagem do Projeto
+   * 4️⃣ Regras de Engenharia de Dados e UI
    */
   {
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
-      /* ---------------- Next.js 16 ---------------- */
-      // Obriga o uso do componente Image para Web Vitals
-      '@next/next/no-img-element': 'error', 
+      /* --- Next.js & Performance --- */
+      '@next/next/no-img-element': 'error', // Foco em Web Vitals (LCP)
       
-      /* ---------------- React 19 ---------------- */
+      /* --- React 19 (Compiler-Ready) --- */
       'react/react-in-jsx-scope': 'off',
       'react/no-unescaped-entities': 'off',
       'react/prop-types': 'off',
+      'react/display-name': 'off',
 
-      /* ---------------- TypeScript Rigoroso ---------------- */
-      // Garante que não esqueçamos de tratar as Promises do Next 16
-      '@typescript-eslint/no-floating-promises': 'error',
+      /* --- TypeScript & Async (Next 16) --- */
+      // O Next 16 usa muitas Promises em Layouts e Metadata
+      '@typescript-eslint/no-floating-promises': 'warn',
       
       '@typescript-eslint/consistent-type-imports': [
         'warn',
-        { prefer: 'type-imports' },
+        { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
 
       '@typescript-eslint/no-unused-vars': [
         'warn',
-        { argsIgnorePattern: '^_' },
+        { 
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true 
+        },
       ],
 
-      // Flexibilidade necessária para Data Specialist (tratamento de APIs dinâmicas)
+      // Flexibilidade para manipulação de payloads de dados complexos
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-deprecated': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-deprecated': 'warn',
 
-      /* ---------------- Qualidade & Segurança ---------------- */
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      /* --- Qualidade de Código & Clean Code --- */
+      'no-console': ['warn', { allow: ['warn', 'error', 'debug'] }],
       'prefer-const': 'error',
       'no-var': 'error',
+      'eqeqeq': ['error', 'always', { null: 'ignore' }],
     },
   },
 
   /**
-   * 4️⃣ Prettier (Sempre por último)
+   * 5️⃣ Prettier (Finalizador)
    */
   prettier,
 ];
