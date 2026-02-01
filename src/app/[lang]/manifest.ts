@@ -19,7 +19,7 @@ export default async function manifest(
   }
 
   return {
-    id: SITE_URL,
+    id: `${SITE_URL}/${lang}`,
     lang,
     dir: 'ltr',
 
@@ -28,7 +28,7 @@ export default async function manifest(
 
     description: dict.seo.description,
 
-    start_url: `/${lang}/?source=pwa`,
+    start_url: `/${lang}/`,
     scope: `/${lang}/`,
 
     display: 'standalone',
@@ -48,6 +48,12 @@ export default async function manifest(
         src: '/icons/favicon.ico',
         sizes: 'any',
         type: 'image/x-icon',
+      },
+      {
+        src: '/icons/icon.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
       },
       {
         src: '/icons/icon.png',
