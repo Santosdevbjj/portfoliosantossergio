@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense, useMemo } from 'react'
 import { notFound } from 'next/navigation'
 
+// Componentes de UI
 import { AboutSection } from '@/components/AboutSection'
 import { ContactSection } from '@/components/ContactSection'
 import { ExperienceSection } from '@/components/ExperienceSection'
@@ -14,72 +15,31 @@ import { PageWrapper } from '@/components/PageWrapper'
 import { ProjectSection } from '@/components/ProjectSection'
 import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection'
 
+// Infraestrutura e Tipos
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
 import { getGitHubProjects } from '@/lib/github'
 import type { Project } from '@/domain/projects'
 import { featuredConfig } from '@/components/featured/projects.data'
 
-
-
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { i18n } from './i18n-config'
-
-export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
-
-  // 1. EXCEÇÃO CRÍTICA: Não redirecionar arquivos estáticos ou de sistema
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.includes('.') || // Pega favicon.ico, sitemap.xml, etc.
-    pathname === '/robots.txt'
-  ) {
-    return NextResponse.next()
-  }
-
-  // 2. Verificar se o idioma já está presente na URL
-  const pathnameIsMissingLocale = i18n.locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
-  )
-
-  // 3. Redirecionar se não houver idioma (ex: "/" -> "/pt")
-  if (pathnameIsMissingLocale) {
-    const locale = i18n.defaultLocale
-    return NextResponse.redirect(
-      new URL(
-        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
-        request.url
-      )
-    )
-  }
-}
-
-export const config = {
-  // O Matcher deve ser robusto para ignorar o que não é página
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|sw.js|.*\\..*).*)',
-  ],
-}
-
-
-
-
-
 interface ProxyProps {
   lang: SupportedLocale
 }
 
+/**
+ * ProxyPage (Client Component)
+ * Responsável pela renderização da SPA multilingue e responsiva.
+ */
 export default function ProxyPage({ lang }: ProxyProps) {
-  // 1. Validação manual para garantir segurança de rota
-  if (!['pt', 'en', 'es'].includes(lang)) {
+  // 1. Validação de Segurança de Idioma (Inference 6.0+)
+  const supportedLocales: SupportedLocale[] = ['pt', 'en', 'es']
+  if (!supportedLocales.includes(lang)) {
     notFound()
   }
 
   const [mounted, setMounted] = useState(false)
   const [allProjects, setAllProjects] = useState<Project[]>([])
 
-  // 2. Memorizar o dicionário para estabilidade
+  // 2. Memorizar o dicionário para evitar re-renders desnecessários
   const dict = useMemo(() => getDictionarySync(lang), [lang])
 
   useEffect(() => {
@@ -89,7 +49,7 @@ export default function ProxyPage({ lang }: ProxyProps) {
         const data = await getGitHubProjects(lang)
         if (data) setAllProjects(data)
       } catch (error) {
-        console.error('Erro ao carregar projetos:', error)
+        console.error('Erro de Missão Crítica (GitHub API):', error)
       }
     }
     loadData()
@@ -97,11 +57,14 @@ export default function ProxyPage({ lang }: ProxyProps) {
 
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact']
 
-  // 3. Evita erro de hidratação e Internal Server Error (500)
+  // 3. Estado de Carregamento (Skeleton Simples)
   if (!mounted) {
-    return <div className="min-h-screen w-full bg-white dark:bg-[#020617]" />
+    return (
+      <div className="min-h-screen w-full bg-white dark:bg-[#020617] animate-pulse" />
+    )
   }
 
+  // 4. Filtragem Lógica de Projetos
   const featuredIds = featuredConfig.map(f => f.id)
   const featuredProjects = allProjects.filter(p => featuredIds.includes(p.name))
   const remainingProjects = allProjects.filter(p => !featuredIds.includes(p.name))
@@ -111,22 +74,29 @@ export default function ProxyPage({ lang }: ProxyProps) {
       <Navbar lang={lang} dict={dict} />
 
       <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
-        <section id="hero">
+        
+        {/* Seção Hero: Impacto Inicial */}
+        <section id="hero" className="w-full">
           <HeroSection lang={lang} dict={dict} />
         </section>
 
-        <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
+        {/* Seção Sobre: Trajetória Profissional */}
+        <section id="about" className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
           <AboutSection lang={lang} dict={dict} />
         </section>
 
-        <section id="experience" className="bg-slate-50/50 py-20 dark:bg-slate-900/10">
+        {/* Seção Experiência: Rigor Bancário */}
+        <section id="experience" className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10">
           <div className="mx-auto max-w-7xl px-4 sm:px-10 lg:px-12">
             <ExperienceSection lang={lang} dict={dict} />
           </div>
         </section>
 
-        <section id="projects" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
-          <Suspense fallback={<div className="h-96 animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800/50" />}>
+        {/* Seção Projetos: Repositório Técnico */}
+        <section id="projects" className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
+          <Suspense fallback={
+            <div className="h-96 w-full animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-800/50" />
+          }>
             <FeaturedProjectsSection lang={lang} dict={dict} projects={featuredProjects} />
           </Suspense>
 
@@ -135,13 +105,16 @@ export default function ProxyPage({ lang }: ProxyProps) {
           </div>
         </section>
 
-        <section id="articles" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
+        {/* Seção Artigos: Autoridade Intelectual */}
+        <section id="articles" className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <FeaturedArticleSection lang={lang} dict={dict} />
         </section>
 
-        <section id="contact" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
+        {/* Seção Contato: CTA Final */}
+        <section id="contact" className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <ContactSection lang={lang} dict={dict} />
         </section>
+
       </main>
 
       <Footer lang={lang} dict={dict} />
