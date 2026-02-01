@@ -1,28 +1,29 @@
 import type { NextConfig } from 'next';
 
 /**
- * NEXT.JS CONFIGURATION — SÉRGIO SANTOS (REVISÃO 2026)
- * Target: Next.js 16.1.5 + Node 24.x + Vercel
- * Status: CSP-hardened / Alinhado com as novas APIs do v16
+ * NEXT.JS CONFIGURATION — SÉRGIO SANTOS (REVISÃO CRÍTICA 2026.1)
+ * Stack: Next.js 16.1.6 + Node 24.x + Turbopack + Vercel
+ * Foco: Performance de Missão Crítica e Segurança Hardened
  */
 
 const nextConfig: NextConfig = {
   /* -------------------------------------------------------------------------- */
-  /* CORE                                                                       */
+  /* CORE SETTINGS                                                              */
   /* -------------------------------------------------------------------------- */
   reactStrictMode: true,
   poweredByHeader: false,
   
-  // CORREÇÃO DO ALERTA: typedRoutes agora fica na raiz, fora de experimental
+  // Typed Routes nativo na raiz para TypeScript 6/7
   typedRoutes: true,
 
   typescript: {
+    // Mantemos false para garantir a integridade dos dados antes do deploy
     ignoreBuildErrors: false,
     tsconfigPath: 'tsconfig.json',
   },
 
   /* -------------------------------------------------------------------------- */
-  /* COMPILER                                                                   */
+  /* COMPILER & PERFORMANCE (Turbopack 2026)                                    */
   /* -------------------------------------------------------------------------- */
   compiler: {
     removeConsole:
@@ -31,54 +32,48 @@ const nextConfig: NextConfig = {
         : false,
   },
 
+  // Otimização para o motor nativo Turbopack
+  turbo: {
+    rules: {
+      // Regras personalizadas para loaders de assets se necessário
+    },
+  },
+
   /* -------------------------------------------------------------------------- */
-  /* IMAGES                                                                     */
+  /* IMAGES (Otimização para Provedores de Dados)                               */
   /* -------------------------------------------------------------------------- */
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     minimumCacheTTL: 86400,
+    dangerouslyAllowSVG: true, // Necessário para alguns badges do GitHub
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "script-src 'none'; frame-src 'none'; sandbox;",
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'avatars.githubusercontent.com',
-        pathname: '/u/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'raw.githubusercontent.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'media.licdn.com',
-        pathname: '/dms/image/**',
-      },
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
+      { protocol: 'https', hostname: 'raw.githubusercontent.com' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'media.licdn.com' },
     ],
   },
 
   /* -------------------------------------------------------------------------- */
-  /* EXPERIMENTAL                                                               */
+  /* EXPERIMENTAL FEATURES                                                      */
   /* -------------------------------------------------------------------------- */
   experimental: {
-    // Tree-shaking agressivo e seguro
+    // Previne carregamento de código desnecessário no bundle final
     optimizePackageImports: [
       'lucide-react',
-      'motion',
+      'framer-motion',
       'clsx',
       'tailwind-merge',
-      'next-themes',
     ],
-    // Removido o objeto experimental.typedRoutes daqui para sanar o Warning
+    // Garante que o Node 24 gerencie bem o middleware de proxy
+    nodeJsMiddleware: true,
   },
 
   /* -------------------------------------------------------------------------- */
-  /* SECURITY HEADERS (CSP Hardened)                                            */
+  /* SECURITY HEADERS (CSP Hardened v2)                                         */
   /* -------------------------------------------------------------------------- */
   async headers() {
     return [
@@ -87,6 +82,7 @@ const nextConfig: NextConfig = {
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           {
             key: 'Strict-Transport-Security',
@@ -94,19 +90,20 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
+            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
           },
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self';",
               "img-src 'self' data: https: blob:;",
-              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com https://www.googletagmanager.com;",
+              // Adicionada permissão para scripts de análise da Vercel
+              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com;",
               "style-src 'self' 'unsafe-inline';",
               "font-src 'self' data: https:;",
-              `connect-src 'self' https: ${
-                process.env.NODE_ENV === 'development' ? 'ws: wss:' : ''
-              };`,
+              // Connect-src expandido para APIs de dados e WebSocket de desenvolvimento
+              "connect-src 'self' https://api.github.com https://*.vercel-storage.com" + 
+              (process.env.NODE_ENV === 'development' ? ' ws: wss:;' : ';'),
               "frame-ancestors 'none';",
               "object-src 'none';",
               "base-uri 'self';",
