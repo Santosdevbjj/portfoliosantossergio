@@ -1,11 +1,11 @@
 /* src/styles/animations.css */
 
 /**
- * SISTEMA DE ANIMAÇÕES — 2026 Ready
+ * SISTEMA DE ANIMAÇÕES — 2026 Baseline
  * -----------------------------------------------------------------------------
- * - Performance: Apenas propriedades compostas (opacity / transform).
- * - GPU: Aceleração forçada quando necessário.
- * - UX: Responsivo, acessível e culturalmente neutro (i18n-ready).
+ * - Performance: Foco em propriedades não-layout (transform/opacity).
+ * - Render: Camadas compostas para evitar re-paints.
+ * - UX: Suavidade baseada em curvas de Bézier industriais.
  */
 
 /* ------------------------------------------ */
@@ -19,7 +19,7 @@
 }
 
 /* ------------------------------------------ */
-/* 🔑 Keyframes (GPU Safe) */
+/* 🔑 Keyframes (GPU Optimized) */
 /* ------------------------------------------ */
 
 @keyframes fadeIn {
@@ -44,31 +44,82 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%, 100% { transform: translateY(0) translateZ(0); }
+  50% { transform: translateY(-8px) translateZ(0); }
 }
 
 /* ------------------------------------------ */
-/* ⚡ Utilities */
+/* 🧊 Staggered Load (Lógica de Container) */
 /* ------------------------------------------ */
 
-.animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  backface-visibility: hidden;
+.stagger-load > * {
+  opacity: 0;
   will-change: transform, opacity;
+  /* Utiliza a curva padrão do sistema para consistência */
+  animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-  transform: translateZ(0);
+/* Delays incrementais calculados para fluidez visual */
+.stagger-load > *:nth-child(1) { animation-delay: 100ms; }
+.stagger-load > *:nth-child(2) { animation-delay: 180ms; }
+.stagger-load > *:nth-child(3) { animation-delay: 260ms; }
+.stagger-load > *:nth-child(4) { animation-delay: 340ms; }
+.stagger-load > *:nth-child(5) { animation-delay: 420ms; }
+.stagger-load > *:nth-child(6) { animation-delay: 500ms; }
+
+/* Fallback para coleções densas de dados */
+.stagger-load > *:nth-child(n+7) {
+  animation-delay: 580ms;
 }
 
 /* ------------------------------------------ */
-/* 📱 Ajustes Responsivos de Movimento */
+/* 🦴 Skeleton Shimmer (UX de Carregamento) */
+/* ------------------------------------------ */
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: inherit;
+}
+
+.dark .skeleton-shimmer {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s linear infinite;
+}
+
+.dark .skeleton-shimmer::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+}
+
+/* ------------------------------------------ */
+/* 🌍 i18n — Sensibilidade de Movimento */
+/* ------------------------------------------ */
+
+/* Ajustes finos de timing baseados na percepção de leitura */
+.lang-es .stagger-load > * { animation-duration: 0.8s; }
+.lang-en .stagger-load > * { animation-duration: 0.7s; }
+.lang-pt .stagger-load > * { animation-duration: 0.75s; }
+
+/* ------------------------------------------ */
+/* 📱 Media Queries (Performance & Acessibilidade) */
 /* ------------------------------------------ */
 
 @media (max-width: 640px) {
@@ -83,87 +134,16 @@
   }
 }
 
-/* ------------------------------------------ */
-/* 🦴 Skeleton Shimmer */
-/* ------------------------------------------ */
-
-.skeleton-shimmer {
-  position: relative;
-  overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.dark .skeleton-shimmer {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.skeleton-shimmer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.06) 50%,
-    transparent 100%
-  );
-  animation: shimmer 1.8s linear infinite;
-}
-
-/* ------------------------------------------ */
-/* 🧊 Staggered Load */
-/* ------------------------------------------ */
-
-.stagger-load > * {
-  opacity: 0;
-  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-/* Delays incrementais */
-.stagger-load > *:nth-child(1) { animation-delay: 100ms; }
-.stagger-load > *:nth-child(2) { animation-delay: 160ms; }
-.stagger-load > *:nth-child(3) { animation-delay: 220ms; }
-.stagger-load > *:nth-child(4) { animation-delay: 280ms; }
-.stagger-load > *:nth-child(5) { animation-delay: 340ms; }
-.stagger-load > *:nth-child(6) { animation-delay: 400ms; }
-
-/* Fallback para listas longas */
-.stagger-load > *:nth-child(n+7) {
-  animation-delay: 460ms;
-}
-
-/* ------------------------------------------ */
-/* 🌍 i18n — Ajustes Culturais Opcionais */
-/* ------------------------------------------ */
-
-/* Exemplo: reduzir movimento em contextos específicos */
-.lang-es .animate-float {
-  animation-duration: 5s;
-}
-
-.lang-en .animate-float {
-  animation-duration: 4s;
-}
-
-.lang-pt .animate-float {
-  animation-duration: 4.5s;
-}
-
-/* ------------------------------------------ */
-/* ♿ Reduced Motion — Respeito Total */
-/* ------------------------------------------ */
-
+/* Respeito às configurações do sistema do usuário (Acessibilidade WCAG) */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
-    animation-duration: 1ms !important;
+    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0s !important;
+    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
 
   .stagger-load > *,
-  .animate-fade-in-up,
-  .animate-float,
   .skeleton-shimmer::after {
     opacity: 1 !important;
     transform: none !important;
