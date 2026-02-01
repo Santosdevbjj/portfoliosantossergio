@@ -3,7 +3,6 @@ import { i18n, type Locale } from '@/i18n-config'
 import { getDictionary } from '@/i18n-config'
 
 const SITE_URL = 'https://portfoliosantossergio.vercel.app'
-const SHORT_NAME = 'SergioData'
 
 export default async function manifest(
   { params }: { params: { lang: Locale } }
@@ -23,16 +22,17 @@ export default async function manifest(
   return {
     id: `${SITE_URL}/${lang}/`,
     lang,
+    dir: 'ltr',
 
     name: dict.seo.siteName,
-    short_name: SHORT_NAME,
+    short_name: dict.seo.siteName.split(' | ')[0],
+
     description: dict.seo.description,
 
     start_url: `/${lang}/?source=pwa`,
     scope: `/${lang}/`,
 
     display: 'standalone',
-    orientation: 'any',
     background_color: '#020617',
     theme_color: '#020617',
 
@@ -40,8 +40,8 @@ export default async function manifest(
       'technology',
       'education',
       'portfolio',
-      'data-science',
-      'software'
+      'software',
+      'productivity',
     ],
 
     icons: [
@@ -54,6 +54,7 @@ export default async function manifest(
         src: '/icons/icon.png',
         sizes: '512x512',
         type: 'image/png',
+        purpose: 'any maskable',
       },
       {
         src: '/icons/apple-icon.png',
@@ -64,7 +65,6 @@ export default async function manifest(
         src: '/icons/apple-touch-icon.png',
         sizes: '180x180',
         type: 'image/png',
-        purpose: 'any',
       },
     ],
 
@@ -73,6 +73,7 @@ export default async function manifest(
         src: ogImageMap[lang],
         sizes: '1200x630',
         type: 'image/png',
+        form_factor: 'wide',
         label: dict.seo.siteName,
       },
     ],
