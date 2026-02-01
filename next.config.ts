@@ -1,14 +1,15 @@
 import type { NextConfig } from "next";
 
-/** @type {import('next').NextConfig} */
+/**
+ * NEXT.JS 16 CONFIGURATION — SÉRGIO SANTOS PORTFOLIO
+ * -----------------------------------------------------------------------------
+ * Revisão: Padronização de formatos de imagem para evitar erros de compilação.
+ * Revisão: Otimização de pacotes para performance máxima no Turbopack.
+ */
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
-  /* Removida a chave 'turbo' manual para evitar erro de tipagem no build.
-     O Next.js 16 já utiliza o motor Oxide/Turbo por padrão 
-     quando detectado no ambiente Vercel.
-  */
-
+  // Otimização de pacotes para carregamento rápido (Crucial para mobile)
   experimental: {
     optimizePackageImports: [
       "lucide-react",
@@ -19,7 +20,11 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    formats: ['image/avif', 'image/webp'],
+    /**
+     * Removido 'image/avif' para manter sincronia com vercel.ts e evitar
+     * conflito de tipos que travou o build anterior.
+     */
+    formats: ['image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -30,6 +35,11 @@ const nextConfig: NextConfig = {
         hostname: '**.medium.com',
       }
     ],
+  },
+
+  // Garante que o build ignore erros de linting para focar apenas em erros reais de código
+  typescript: {
+    ignoreBuildErrors: false, 
   },
 };
 
