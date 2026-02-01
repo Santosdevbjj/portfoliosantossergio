@@ -24,8 +24,8 @@
     "tailwind-merge": "2.6.0",
     "class-variance-authority": "0.7.1"
   },
-  "devDependencies": {
-    "typescript": "^6.0.0",
+    "devDependencies": {
+    "typescript": "^5.7.0 || ^6.0.0",
     "@vercel/config": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
