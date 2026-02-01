@@ -1,22 +1,24 @@
 import type { NextConfig } from 'next';
 
 /**
- * NEXT.JS CONFIGURATION — SÉRGIO SANTOS (VERSÃO ESTÁVEL 2026)
- * Ajustada para compatibilidade WASM (Termux) e Vercel
+ * NEXT.JS CONFIGURATION — SÉRGIO SANTOS (BASELINE 2026)
+ * Otimizado para Tailwind v4 Oxide, Turbopack e Segurança P3.
  */
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   
-  // Typed Routes nativo
+  // Typed Routes para garantir que links internos nunca quebrem
   typedRoutes: true,
 
   typescript: {
+    // Mantemos como false para garantir qualidade total no build da Vercel
     ignoreBuildErrors: false,
   },
 
   compiler: {
+    // Limpeza de logs em produção, preservando erros críticos
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
 
@@ -32,13 +34,22 @@ const nextConfig: NextConfig = {
   },
 
   experimental: {
+    // Crucial para a performance da Lucide-React 0.563.0 e Framer Motion
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
       'clsx',
       'tailwind-merge',
     ],
-    // Removido nodeJsMiddleware (não suportado em WASM)
+    // Habilita o suporte nativo para o motor Oxide do Tailwind v4
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
 
   async headers() {
@@ -53,7 +64,8 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self';",
-              "img-src 'self' data: https: blob:;",
+              // Atualizado para permitir imagens dos hosts do remotePatterns
+              "img-src 'self' data: https://avatars.githubusercontent.com https://images.unsplash.com https://media.licdn.com blob:;",
               "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://va.vercel-scripts.com;",
               "style-src 'self' 'unsafe-inline';",
               "font-src 'self' data: https:;",
