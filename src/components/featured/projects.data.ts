@@ -1,43 +1,26 @@
 import type { SupportedLocale } from '@/dictionaries'
+import type { ProjectCategory } from '@/types/project'
 
-/**
- * Modelo de projeto SEO-first
- * Estável para Next 17 / TS 7
- */
 export interface FeaturedProject {
-  /** ID semântico e estável (âncora, scroll, SEO) */
+  /** ID semântico (SEO, âncora, scroll) */
   id: string
 
-  /** Nome público do projeto */
+  /** Nome público */
   name: string
 
-  /** Descrição por idioma */
+  /** Descrição multilíngue */
   description: Record<SupportedLocale, string>
 
-  /** URL do repositório */
+  /** Repositório */
   repoUrl: string
 
-  /** Categorias semânticas (alinhadas ao dicionário) */
-  categories: Array<
-    | 'dataScience'
-    | 'analysis'
-    | 'data'
-    | 'dev'
-    | 'backend'
-    | 'cloud'
-    | 'devops'
-  >
+  /** Categorias SEMÂNTICAS alinhadas ao dicionário */
+  categories: readonly ProjectCategory[]
 
-  /** Prioridade editorial / SEO */
+  /** Ordem editorial / SEO */
   priority: number
 }
 
-/**
- * PROJETOS EM DESTAQUE (CURADORIA MANUAL)
- * Ordem = prioridade editorial + SEO
- *
- * ⚠️ IDs são SEMÂNTICOS (kebab-case) — não são nomes de repositório
- */
 export const featuredProjects = [
   {
     id: 'analise-riscos-atraso-obras',
@@ -47,24 +30,26 @@ export const featuredProjects = [
     priority: 1,
     categories: ['dataScience', 'analysis', 'data'],
     description: {
-      pt: 'Projeto de ciência de dados para análise preditiva de riscos de atraso em obras, combinando dados históricos, clima e fornecedores.',
-      en: 'Data science project focused on predictive risk analysis for construction delays using historical, weather and supplier data.',
-      es: 'Proyecto de ciencia de datos para el análisis predictivo de riesgos de retraso en obras usando datos históricos, clima y proveedores.',
+      pt: 'Projeto de ciência de dados para análise preditiva de riscos de atraso em obras.',
+      en: 'Data science project focused on predictive risk analysis for construction delays.',
+      es: 'Proyecto de ciencia de datos para el análisis predictivo de riesgos de retraso en obras.',
     },
   },
+
   {
     id: 'analise-dados-na-pratica',
     name: 'Análise de Dados na Prática',
     repoUrl:
       'https://github.com/Santosdevbjj/analiseDadosNaPratica',
     priority: 2,
-    categories: ['dataScience', 'analysis', 'dev'],
+    categories: ['dataScience', 'analysis', 'graphs'],
     description: {
-      pt: 'Coleção prática de estudos de análise de dados aplicada a problemas reais, com foco em clareza, métricas e storytelling.',
-      en: 'Practical collection of data analysis studies applied to real-world problems, focusing on clarity, metrics and storytelling.',
-      es: 'Colección práctica de estudios de análisis de datos aplicados a problemas reales, con enfoque en claridad, métricas y storytelling.',
+      pt: 'Projeto prático focado em análise exploratória de dados, visualizações e insights.',
+      en: 'Hands-on project focused on exploratory data analysis, visualizations and insights.',
+      es: 'Proyecto práctico centrado en análisis exploratorio de datos, visualizaciones e insights.',
     },
   },
+
   {
     id: 'genai-pipeline-etl-python',
     name: 'GenAI Pipeline ETL em Python',
@@ -73,9 +58,9 @@ export const featuredProjects = [
     priority: 3,
     categories: ['dataScience', 'backend', 'cloud', 'devops'],
     description: {
-      pt: 'Pipeline ETL moderno em Python com integração de IA generativa, automação e boas práticas de engenharia de dados.',
-      en: 'Modern Python ETL pipeline with generative AI integration, automation and data engineering best practices.',
-      es: 'Pipeline ETL moderno en Python con integración de IA generativa, automatización y buenas prácticas de ingeniería de datos.',
+      pt: 'Pipeline ETL moderno em Python com integração de IA generativa.',
+      en: 'Modern Python ETL pipeline with generative AI integration.',
+      es: 'Pipeline ETL moderno en Python con integración de IA generativa.',
     },
   },
 ] as const satisfies readonly FeaturedProject[]
