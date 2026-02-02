@@ -13,7 +13,27 @@
   "embeddedLanguageFormatting": "auto",
   "proseWrap": "preserve",
   "htmlWhitespaceSensitivity": "css",
+
   "plugins": ["prettier-plugin-tailwindcss"],
+
   "tailwindAttributes": ["className", "class", "tw"],
-  "tailwindFunctions": ["clsx", "twMerge", "twJoin", "cn", "cva"]
+  "tailwindFunctions": ["clsx", "twMerge", "twJoin", "cn", "cva"],
+
+  "overrides": [
+    {
+      "files": [
+        "**/app/api/**/route.tsx",
+        "**/app/api/**/route.ts",
+        "**/*og*/**/*.tsx",
+        "**/*og*/**/*.ts"
+      ],
+      "options": {
+        "printWidth": 1000,
+        "jsxBracketSameLine": true,
+        "bracketSameLine": true,
+        "htmlWhitespaceSensitivity": "ignore",
+        "embeddedLanguageFormatting": "off"
+      }
+    }
+  ]
 }
