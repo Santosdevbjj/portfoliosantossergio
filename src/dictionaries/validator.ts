@@ -1,5 +1,7 @@
 import type { Dictionary } from '@/types/dictionary'
-import { dictionaries, SupportedLocale } from './index'
+import type { SupportedLocale } from './index'
+
+import { dictionaries } from './index'
 
 /**
  * Resultado da validação
