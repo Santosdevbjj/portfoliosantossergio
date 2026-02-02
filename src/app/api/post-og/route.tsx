@@ -1,8 +1,12 @@
 import { ImageResponse } from 'next/og'
 
-export const runtime = 'edge'
+/**
+ * API ROUTE: OPEN GRAPH GENERATOR (POST-OG)
+ * -----------------------------------------------------------------------------
+ * Hardened for Next.js 16 + Satori Engine Rigidity
+ */
 
-// Helpers ----------------------------------------------------
+export const runtime = 'edge'
 
 const sanitizeText = (value: string, maxLength = 120) =>
   value.replace(/\s+/g, ' ').trim().slice(0, maxLength)
@@ -18,8 +22,6 @@ const formatDateSafe = () => {
     d.getMonth() + 1
   ).padStart(2, '0')}/${d.getFullYear()}`
 }
-
-// Handler ----------------------------------------------------
 
 export async function GET(request: Request) {
   try {
@@ -54,9 +56,9 @@ export async function GET(request: Request) {
       (
         <div
           style={{
-            display: 'flex',
             width: '100%',
             height: '100%',
+            display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
             backgroundColor: '#020617',
@@ -74,6 +76,7 @@ export async function GET(request: Request) {
                 'linear-gradient(to bottom, rgba(2,6,23,0) 0%, rgba(2,6,23,0.92) 70%)',
             }}
           >
+            {/* Reading Time Badge */}
             <div
               style={{
                 display: 'flex',
@@ -81,30 +84,33 @@ export async function GET(request: Request) {
                 color: '#fff',
                 fontSize: 14,
                 fontWeight: 700,
-                letterSpacing: '0.08em',
                 padding: '6px 14px',
                 borderRadius: 8,
                 marginBottom: 24,
-                alignSelf: 'flex-start',
+                width: 'auto',
               }}
             >
-              <span>{readingTime} MIN DE LEITURA</span>
+              <span style={{ display: 'flex' }}>
+                {readingTime} MIN DE LEITURA
+              </span>
             </div>
 
+            {/* Title */}
             <div
               style={{
                 display: 'flex',
                 fontSize: 54,
-                fontWeight: 900,
+                fontWeight: 800,
                 color: '#fff',
                 lineHeight: 1.1,
                 maxWidth: 900,
                 marginBottom: 20,
               }}
             >
-              <span>{title}</span>
+              {title}
             </div>
 
+            {/* Description */}
             <div
               style={{
                 display: 'flex',
@@ -114,9 +120,10 @@ export async function GET(request: Request) {
                 marginBottom: 40,
               }}
             >
-              <span>{description}</span>
+              {description}
             </div>
 
+            {/* Footer Container */}
             <div
               style={{
                 display: 'flex',
@@ -124,35 +131,47 @@ export async function GET(request: Request) {
                 alignItems: 'center',
                 borderTop: '1px solid rgba(255,69,0,0.3)',
                 paddingTop: 25,
+                width: '100%',
               }}
             >
+              {/* Author Box */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  fontSize: 20,
-                  color: '#fff',
-                  fontWeight: 600,
                 }}
               >
                 <div
                   style={{
-                    display: 'flex',
                     width: 48,
                     height: 48,
                     borderRadius: 12,
                     backgroundColor: '#ff4500',
+                    display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: 22,
                     marginRight: 16,
+                    color: '#fff',
                   }}
                 >
-                  <span>{author.charAt(0).toUpperCase()}</span>
+                  <span style={{ display: 'flex' }}>
+                    {author.charAt(0).toUpperCase()}
+                  </span>
                 </div>
-                <span>{author}</span>
+                <div
+                  style={{
+                    display: 'flex',
+                    fontSize: 20,
+                    color: '#fff',
+                    fontWeight: 600,
+                  }}
+                >
+                  {author}
+                </div>
               </div>
 
+              {/* Date Box */}
               <div
                 style={{
                   display: 'flex',
@@ -160,7 +179,7 @@ export async function GET(request: Request) {
                   color: '#64748b',
                 }}
               >
-                <span>{createdAt}</span>
+                {createdAt}
               </div>
             </div>
           </div>
@@ -169,13 +188,10 @@ export async function GET(request: Request) {
       {
         width: 1200,
         height: 630,
-        headers: {
-          'Cache-Control': 'public, immutable, max-age=31536000',
-        },
       }
     )
   } catch (error) {
-    console.error('Falha ao gerar imagem OG:', error)
-    return new Response('Erro ao gerar Open Graph image', { status: 500 })
+    console.error('OG Generation Error:', error)
+    return new Response('Internal Server Error', { status: 500 })
   }
 }
