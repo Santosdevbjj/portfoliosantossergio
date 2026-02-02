@@ -71,6 +71,12 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
 
   const featuredIds = featuredConfig.map(f => f.id);
 
+  const featuredIds: readonly FeaturedProjectId[] = [
+  'analise-riscos-atraso-obras',
+  'analise-dados-na-pratica',
+  'genai-pipeline-etl-python',
+] 
+  
   const featured = allProjects.filter(p =>
     featuredIds.includes(p.name),
   );
