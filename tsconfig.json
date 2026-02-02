@@ -1,29 +1,28 @@
 {
   "compilerOptions": {
     /* NATIVE RUNTIME & TARGET (Baseline Feb/2026) */
-    "target": "ESNext", 
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "target": "ES2022", 
+    "lib": ["dom", "dom.iterable", "esnext"],
     
-    /* TSGO ENGINE OPTIMIZATION (Project Corsa) */
-    "verbatimModuleSyntax": true,   // Separação rigorosa de tipos para build ultra-rápido
+    /* TSGO ENGINE OPTIMIZATION (Next.js 16 Turbopack) */
+    "verbatimModuleSyntax": true,   
     "isolatedModules": true,         
     "moduleDetection": "force",      
     
     /* RIGOR DE MISSÃO CRÍTICA (Zero Runtime Errors) */
     "strict": true,
-    "noUncheckedIndexedAccess": true, // Vital para segurança de dados no seu i18n
+    "noUncheckedIndexedAccess": true, 
     "exactOptionalPropertyTypes": true, 
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": false,     // Mantemos false para facilitar o desenvolvimento de interfaces
+    "noUnusedParameters": false,     
     
     /* NEXT.JS 16 & REACT 19 ARCHITECTURE */
     "module": "ESNext",
     "moduleResolution": "Bundler",   
-    "jsx": "react-jsx",
+    "jsx": "preserve",               /* Alterado para 'preserve' para compatibilidade total com Turbopack */
     "noEmit": true,                  
-    "allowImportingTsExtensions": true, // Necessário para alguns padrões de 2026
     
     /* INTEROP & SECURITY */
     "esModuleInterop": true,
@@ -55,8 +54,13 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/types/**/*.d.ts" // Garante que seus tipos customizados de ícones e CSS sejam lidos
+    "src/types/**/*.d.ts"
   ],
 
-  "exclude": ["node_modules", ".next", "out"]
+  "exclude": [
+    "node_modules", 
+    ".next", 
+    "out",
+    "build" /* Adicionado para evitar conflitos de cache local */
+  ]
 }
