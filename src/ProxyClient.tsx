@@ -19,10 +19,24 @@ import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsS
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
 import { getGitHubProjects } from '@/lib/github';
 import type { Project } from '@/domain/projects';
-import { featuredProjects as featuredConfig } from '@/components/featured/projects.data';
+import {
+  featuredProjects as featuredConfig,
+  type FeaturedProjectId,
+} from '@/components/featured/projects.data';
 
 interface ProxyClientProps {
   readonly lang: SupportedLocale;
+}
+
+/**
+ * Type guard semântico:
+ * garante que um id genérico pertence ao conjunto editorial FeaturedProjectId
+ */
+function isFeaturedProjectId(
+  id: string,
+  featuredIds: readonly FeaturedProjectId[],
+): id is FeaturedProjectId {
+  return featuredIds.includes(id as FeaturedProjectId);
 }
 
 export default function ProxyClient({ lang }: ProxyClientProps) {
@@ -67,15 +81,17 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
     'contact',
   ] as const;
 
-  /** IDs editoriais derivados da fonte única (SEO-first) */
-  const featuredIds = featuredConfig.map(f => f.id);
+  /** Fonte única da verdade editorial (SEO-first) */
+  const featuredIds = featuredConfig.map(
+    f => f.id,
+  ) as readonly FeaturedProjectId[];
 
   const featured = allProjects.filter(project =>
-    featuredIds.includes(project.id),
+    isFeaturedProjectId(project.id, featuredIds),
   );
 
   const remaining = allProjects.filter(
-    project => !featuredIds.includes(project.id),
+    project => !isFeaturedProjectId(project.id, featuredIds),
   );
 
   return (
