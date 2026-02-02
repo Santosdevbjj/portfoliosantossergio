@@ -1,10 +1,14 @@
-// src/middleware.ts
+// src/proxy.tsx
 import { NextRequest, NextResponse } from 'next/server';
 
 const SUPPORTED_LOCALES = ['pt', 'en', 'es'] as const;
 type Locale = (typeof SUPPORTED_LOCALES)[number];
 
-export function middleware(request: NextRequest) {
+/**
+ * Proxy (substitui o antigo middleware no Next 16+)
+ * Executa em todas as requisições
+ */
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   /**
@@ -47,7 +51,8 @@ export function middleware(request: NextRequest) {
 }
 
 /**
- * Matcher explícito (evita edge cases)
+ * Matcher explícito
+ * Evita execução desnecessária em assets internos
  */
 export const config = {
   matcher: ['/((?!_next/static|_next/image).*)'],
