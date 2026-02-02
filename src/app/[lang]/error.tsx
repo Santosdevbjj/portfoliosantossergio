@@ -49,16 +49,24 @@ export default function Error({ error, reset }: ErrorProps) {
   const t = content[lang]
 
   /**
-   * 🔍 LOG FORENSE COMPLETO
-   * Tudo o que o Next permite expor neste nível
+   * 🔥 DIAGNÓSTICO FORENSE — RUNTIME ERROR
+   * Este log é intencionalmente verboso para rastrear falhas reais
+   * em produção (Vercel Runtime Logs).
    */
   useEffect(() => {
-    console.group('[NEXT ERROR BOUNDARY]')
+    console.group('🔥 RUNTIME ERROR CAPTURED')
     console.error('Message:', error.message)
-    console.error('Digest:', error.digest ?? 'N/A')
     console.error('Stack:', error.stack ?? 'N/A')
+    console.error('Digest:', error.digest ?? 'N/A')
+    console.error(
+      'Path:',
+      typeof window !== 'undefined' ? window.location.pathname : 'SSR'
+    )
+    console.error(
+      'URL:',
+      typeof window !== 'undefined' ? window.location.href : 'SSR'
+    )
     console.error('Runtime:', process.env.NEXT_RUNTIME ?? 'unknown')
-    console.error('URL:', typeof window !== 'undefined' ? window.location.href : 'SSR')
     console.error('Timestamp:', new Date().toISOString())
     console.groupEnd()
   }, [error])
@@ -70,6 +78,7 @@ export default function Error({ error, reset }: ErrorProps) {
       className="min-h-[100dvh] w-full flex items-center justify-center p-6 bg-slate-50 dark:bg-[#020617]"
     >
       <section className="max-w-md w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-red-900/20 p-8 rounded-[2rem] shadow-2xl text-center space-y-8">
+        {/* Status Técnico */}
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-full">
           <ShieldAlert size={12} className="text-red-600 dark:text-red-500" />
           <span className="text-[10px] font-black text-red-600 dark:text-red-500 uppercase tracking-widest">
@@ -77,17 +86,22 @@ export default function Error({ error, reset }: ErrorProps) {
           </span>
         </div>
 
+        {/* Ícone */}
         <div className="mx-auto w-20 h-20 flex items-center justify-center">
           <AlertCircle size={64} className="text-red-500" strokeWidth={1.5} />
         </div>
 
+        {/* Texto */}
         <div className="space-y-3">
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white">{t.title}</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">
+            {t.title}
+          </h1>
           <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
             {t.desc}
           </p>
         </div>
 
+        {/* Ações */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
             onClick={reset}
@@ -106,6 +120,7 @@ export default function Error({ error, reset }: ErrorProps) {
           </Link>
         </div>
 
+        {/* Trace ID */}
         {error.digest && (
           <code className="block pt-4 text-[10px] text-slate-400 font-mono break-all">
             TRACE_ID: {error.digest}
