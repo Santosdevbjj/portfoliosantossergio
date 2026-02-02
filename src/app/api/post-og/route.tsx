@@ -54,9 +54,9 @@ export async function GET(request: Request) {
       (
         <div
           style={{
+            display: 'flex',
             width: '100%',
             height: '100%',
-            display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
             backgroundColor: '#020617',
@@ -65,7 +65,6 @@ export async function GET(request: Request) {
             backgroundSize: '50px 50px',
           }}
         >
-          {/* CONTENT WRAPPER */}
           <div
             style={{
               display: 'flex',
@@ -75,7 +74,6 @@ export async function GET(request: Request) {
                 'linear-gradient(to bottom, rgba(2,6,23,0) 0%, rgba(2,6,23,0.92) 70%)',
             }}
           >
-            {/* Reading Time Badge */}
             <div
               style={{
                 display: 'flex',
@@ -90,10 +88,9 @@ export async function GET(request: Request) {
                 alignSelf: 'flex-start',
               }}
             >
-              {readingTime} MIN DE LEITURA
+              <span>{readingTime} MIN DE LEITURA</span>
             </div>
 
-            {/* Title */}
             <div
               style={{
                 display: 'flex',
@@ -105,10 +102,9 @@ export async function GET(request: Request) {
                 marginBottom: 20,
               }}
             >
-              {title}
+              <span>{title}</span>
             </div>
 
-            {/* Description */}
             <div
               style={{
                 display: 'flex',
@@ -118,10 +114,9 @@ export async function GET(request: Request) {
                 marginBottom: 40,
               }}
             >
-              {description}
+              <span>{description}</span>
             </div>
 
-            {/* Footer */}
             <div
               style={{
                 display: 'flex',
@@ -131,7 +126,6 @@ export async function GET(request: Request) {
                 paddingTop: 25,
               }}
             >
-              {/* Author */}
               <div
                 style={{
                   display: 'flex',
@@ -154,12 +148,11 @@ export async function GET(request: Request) {
                     marginRight: 16,
                   }}
                 >
-                  {author.charAt(0).toUpperCase()}
+                  <span>{author.charAt(0).toUpperCase()}</span>
                 </div>
-                {author}
+                <span>{author}</span>
               </div>
 
-              {/* Date */}
               <div
                 style={{
                   display: 'flex',
@@ -167,7 +160,7 @@ export async function GET(request: Request) {
                   color: '#64748b',
                 }}
               >
-                {createdAt}
+                <span>{createdAt}</span>
               </div>
             </div>
           </div>
