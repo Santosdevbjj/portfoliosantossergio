@@ -3,7 +3,7 @@ import { ImageResponse } from 'next/og'
 /**
  * API ROUTE: OPEN GRAPH GENERATOR (POST-OG)
  * -----------------------------------------------------------------------------
- * Hardened for Next.js 16 + Satori Engine Rigidity
+ * Hardened for Next.js 16 + Satori Engine (Zero Layout Error Policy)
  */
 
 export const runtime = 'edge'
@@ -62,8 +62,7 @@ export async function GET(request: Request) {
             flexDirection: 'column',
             justifyContent: 'flex-end',
             backgroundColor: '#020617',
-            backgroundImage:
-              'radial-gradient(circle at 25px 25px, #1e293b 2%, transparent 0%)',
+            backgroundImage: 'radial-gradient(circle at 25px 25px, #1e293b 2%, transparent 0%)',
             backgroundSize: '50px 50px',
           }}
         >
@@ -72,11 +71,10 @@ export async function GET(request: Request) {
               display: 'flex',
               flexDirection: 'column',
               padding: '40px 60px',
-              backgroundImage:
-                'linear-gradient(to bottom, rgba(2,6,23,0) 0%, rgba(2,6,23,0.92) 70%)',
+              backgroundImage: 'linear-gradient(to bottom, #020617 0%, rgba(2,6,23,0.95) 100%)',
             }}
           >
-            {/* Reading Time Badge */}
+            {/* Badge - CORRIGIDO: Texto interpolado em template literal para ser 1 único nó */}
             <div
               style={{
                 display: 'flex',
@@ -90,9 +88,9 @@ export async function GET(request: Request) {
                 width: 'auto',
               }}
             >
-              <span style={{ display: 'flex' }}>
-                {readingTime} MIN DE LEITURA
-              </span>
+              <div style={{ display: 'flex' }}>
+                {`${readingTime} MIN DE LEITURA`}
+              </div>
             </div>
 
             {/* Title */}
@@ -103,8 +101,8 @@ export async function GET(request: Request) {
                 fontWeight: 800,
                 color: '#fff',
                 lineHeight: 1.1,
-                maxWidth: 900,
                 marginBottom: 20,
+                width: '100%',
               }}
             >
               {title}
@@ -116,32 +114,25 @@ export async function GET(request: Request) {
                 display: 'flex',
                 fontSize: 22,
                 color: '#94a3b8',
-                maxWidth: 800,
                 marginBottom: 40,
+                width: '100%',
               }}
             >
               {description}
             </div>
 
-            {/* Footer Container */}
+            {/* Footer */}
             <div
               style={{
                 display: 'flex',
+                width: '100%',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 borderTop: '1px solid rgba(255,69,0,0.3)',
                 paddingTop: 25,
-                width: '100%',
               }}
             >
-              {/* Author Box - CORRIGIDO: Adicionado display flex explícito aqui */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexDirection: 'row'
-                }}
-              >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div
                   style={{
                     width: 48,
@@ -156,9 +147,9 @@ export async function GET(request: Request) {
                     color: '#fff',
                   }}
                 >
-                  <span style={{ display: 'flex' }}>
+                  <div style={{ display: 'flex' }}>
                     {author.charAt(0).toUpperCase()}
-                  </span>
+                  </div>
                 </div>
                 <div
                   style={{
@@ -172,7 +163,6 @@ export async function GET(request: Request) {
                 </div>
               </div>
 
-              {/* Date Box */}
               <div
                 style={{
                   display: 'flex',
@@ -192,7 +182,7 @@ export async function GET(request: Request) {
       }
     )
   } catch (error) {
-    console.error('OG Generation Error:', error)
-    return new Response('Internal Server Error', { status: 500 })
+    console.error('Critical OG Error:', error)
+    return new Response('Error rendering image', { status: 500 })
   }
 }
