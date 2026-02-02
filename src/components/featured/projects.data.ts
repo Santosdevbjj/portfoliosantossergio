@@ -63,4 +63,6 @@ export const featuredProjects = [
       es: 'Pipeline ETL moderno en Python con integración de IA generativa.',
     },
   },
-] as const satisfies readonly FeaturedProject[]
+] as const satisfies readonly FeaturedProject[] 
+export type FeaturedProjectId =
+  (typeof featuredProjects)[number]['id'] 
