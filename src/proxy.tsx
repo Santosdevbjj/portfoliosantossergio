@@ -1,4 +1,4 @@
-// src/proxy.tsx — Estável para Next.js 16+ e futuro TS 7
+// src/proxy.tsx
 import { notFound } from 'next/navigation';
 import ProxyClient from './ProxyClient';
 import type { SupportedLocale } from '@/dictionaries';
@@ -12,11 +12,7 @@ interface ProxyPageProps {
 export default function ProxyPage({ params }: ProxyPageProps) {
   const supported: readonly SupportedLocale[] = ['pt', 'en', 'es'];
 
-  const lang = params?.lang;
-
-  if (!lang) {
-    return <ProxyClient lang="pt" />;
-  }
+  const lang = params?.lang ?? 'pt';
 
   if (!supported.includes(lang)) {
     notFound();
