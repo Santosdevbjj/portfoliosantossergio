@@ -14,7 +14,11 @@ export function FeaturedProjectsSection({
   lang,
   dict,
 }: FeaturedProjectsSectionProps) {
-  const projects = featuredProjects
+  /**
+   * ⚠️ featuredProjects é readonly (SEO-first, editorial)
+   * Criamos uma cópia mutável antes de ordenar
+   */
+  const projects = [...featuredProjects]
     .sort((a, b) => a.priority - b.priority)
     .slice(0, 3)
 
