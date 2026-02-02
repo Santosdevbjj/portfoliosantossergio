@@ -4,8 +4,8 @@
  * FEATURED PROJECTS SECTION
  * -----------------------------------------------------------------------------
  * - Orquestrador de Projetos em Destaque
+ * - Curadoria editorial (apenas 3 projetos estratégicos)
  * - Totalmente integrado com i18n, SEO e ScrollSpy
- * - Exibe apenas 3 projetos para SEO e autoridade semântica
  */
 
 import FeaturedGrid from './FeaturedGrid'
@@ -25,12 +25,13 @@ export function FeaturedProjectsSection({
   dict,
 }: FeaturedProjectsSectionProps) {
   /**
-   * Limitamos os projetos para SEO (autoridade > volume)
+   * Curadoria fixa: apenas 3 projetos
+   * (autoridade semântica > volume)
    */
-  const featuredForSeo = projects.slice(0, 3)
+  const featuredProjects = projects.slice(0, 3)
 
   /**
-   * SEO internacionalizado (JSON-LD)
+   * SEO estruturado (JSON-LD)
    */
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -40,27 +41,37 @@ export function FeaturedProjectsSection({
       dict.seo.pages?.projects?.description ??
       dict.seo.description,
     inLanguage: lang,
-    itemListElement: featuredForSeo.map((project, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'SoftwareApplication',
-        name: project.name,
-        description: project.description,
-        applicationCategory: 'DataScienceApplication',
-        operatingSystem: 'Web/Cloud',
-        url: `/${lang}/projects#${project.slug ?? project.name}`,
-        author: {
-          '@type': 'Person',
-          name: 'Sérgio Santos',
+    itemListElement: featuredProjects.map(
+      (project, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'SoftwareApplication',
+          name: project.name,
+          description: project.description,
+          applicationCategory: 'DataScienceApplication',
+          operatingSystem: 'Web/Cloud',
+          /**
+           * Âncora baseada no nome do projeto
+           * (slug derivado, não pertencente ao domínio)
+           */
+          url: `/${lang}/projects#${project.name}`,
+          author: {
+            '@type': 'Person',
+            name: 'Sérgio Santos',
+          },
         },
-      },
-    })),
+      }),
+    ),
   }
 
   return (
     <section
-      id="featured-projects"
+      /**
+       * ID CANÔNICO DA SEÇÃO
+       * -> deve ser o MESMO usado no menu e no ScrollSpy
+       */
+      id="projects"
       className="
         relative
         overflow-hidden
@@ -73,9 +84,9 @@ export function FeaturedProjectsSection({
         sm:py-32
       "
     >
-      {/* Anchor invisível para ScrollSpy (corrige offset visual no menu) */}
+      {/* Âncora invisível para ScrollSpy (offset visual do menu fixo) */}
       <span
-        id="featured-projects-anchor"
+        id="projects"
         className="absolute top-0 block h-px w-px"
         aria-hidden="true"
       />
@@ -107,9 +118,9 @@ export function FeaturedProjectsSection({
           </p>
         </div>
 
-        {/* Grid de Projetos */}
+        {/* Grid de Projetos em Destaque */}
         <FeaturedGrid
-          projects={projects}
+          projects={featuredProjects}
           lang={lang}
           dict={dict}
         />
