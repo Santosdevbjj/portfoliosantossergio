@@ -28,10 +28,6 @@ interface ProxyClientProps {
   readonly lang: SupportedLocale;
 }
 
-/**
- * Type guard semântico:
- * garante que um id genérico pertence ao conjunto editorial FeaturedProjectId
- */
 function isFeaturedProjectId(
   id: string,
   featuredIds: readonly FeaturedProjectId[],
@@ -81,14 +77,9 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
     'contact',
   ] as const;
 
-  /** Fonte única da verdade editorial (SEO-first) */
   const featuredIds = featuredConfig.map(
     f => f.id,
   ) as readonly FeaturedProjectId[];
-
-  const featured = allProjects.filter(project =>
-    isFeaturedProjectId(project.id, featuredIds),
-  );
 
   const remaining = allProjects.filter(
     project => !isFeaturedProjectId(project.id, featuredIds),
@@ -103,52 +94,29 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
           <HeroSection lang={lang} dict={dict} />
         </section>
 
-        <section
-          id="about"
-          className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12"
-        >
+        <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
           <AboutSection lang={lang} dict={dict} />
         </section>
 
-        <section
-          id="experience"
-          className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10"
-        >
+        <section id="experience" className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10">
           <div className="mx-auto max-w-7xl px-4 sm:px-10 lg:px-12">
             <ExperienceSection lang={lang} dict={dict} />
           </div>
         </section>
 
-        <section
-          id="projects"
-          className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12"
-        >
-          <FeaturedProjectsSection
-            lang={lang}
-            dict={dict}
-            projects={featured}
-          />
+        <section id="projects" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
+          <FeaturedProjectsSection lang={lang} dict={dict} />
 
           <div className="mt-12 border-t pt-12 dark:border-slate-800">
-            <ProjectSection
-              projects={remaining}
-              lang={lang}
-              dict={dict}
-            />
+            <ProjectSection projects={remaining} lang={lang} dict={dict} />
           </div>
         </section>
 
-        <section
-          id="articles"
-          className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12"
-        >
+        <section id="articles" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <FeaturedArticleSection lang={lang} dict={dict} />
         </section>
 
-        <section
-          id="contact"
-          className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12"
-        >
+        <section id="contact" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <ContactSection lang={lang} dict={dict} />
         </section>
       </main>
