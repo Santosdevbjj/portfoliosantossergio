@@ -1,14 +1,14 @@
 'use client'
 
 import ProjectCard from './ProjectCard'
-import type { Project } from '@/domain/projects'
+import type { FeaturedProject } from './projects.data'
 import type { SupportedLocale } from '@/dictionaries'
 import type { Dictionary } from '@/types/dictionary'
 
 interface FeaturedGridProps {
-  projects: Project[]
-  lang: SupportedLocale
-  dict: Dictionary
+  readonly projects: readonly FeaturedProject[]
+  readonly lang: SupportedLocale
+  readonly dict: Dictionary
 }
 
 export default function FeaturedGrid({
@@ -31,7 +31,7 @@ export default function FeaturedGrid({
     >
       {projects.map((project, index) => (
         <ProjectCard
-          key={project.name}
+          key={project.id}
           project={project}
           lang={lang}
           dict={dict}
