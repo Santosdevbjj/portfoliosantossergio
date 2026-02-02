@@ -1,22 +1,11 @@
 import { ImageResponse } from 'next/og'
 
-/**
- * API ROUTE: OPEN GRAPH GENERATOR (POST-OG)
- * -----------------------------------------------------------------------------
- * Runtime: Edge
- * Criticidade: Alta (SEO / Social Preview)
- * Status: Hardened & Production-Ready
- */
-
 export const runtime = 'edge'
 
 // Helpers ----------------------------------------------------
 
 const sanitizeText = (value: string, maxLength = 120) =>
-  value
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, maxLength)
+  value.replace(/\s+/g, ' ').trim().slice(0, maxLength)
 
 const sanitizeNumber = (value: string, fallback: number) => {
   const parsed = Number(value)
@@ -76,8 +65,11 @@ export async function GET(request: Request) {
             backgroundSize: '50px 50px',
           }}
         >
+          {/* CONTENT WRAPPER */}
           <div
             style={{
+              display: 'flex',
+              flexDirection: 'column',
               padding: '40px 60px',
               backgroundImage:
                 'linear-gradient(to bottom, rgba(2,6,23,0) 0%, rgba(2,6,23,0.92) 70%)',
@@ -86,6 +78,7 @@ export async function GET(request: Request) {
             {/* Reading Time Badge */}
             <div
               style={{
+                display: 'flex',
                 backgroundColor: '#ff4500',
                 color: '#fff',
                 fontSize: 14,
@@ -94,7 +87,7 @@ export async function GET(request: Request) {
                 padding: '6px 14px',
                 borderRadius: 8,
                 marginBottom: 24,
-                display: 'flex', // ✅ Satori-safe
+                alignSelf: 'flex-start',
               }}
             >
               {readingTime} MIN DE LEITURA
@@ -103,6 +96,7 @@ export async function GET(request: Request) {
             {/* Title */}
             <div
               style={{
+                display: 'flex',
                 fontSize: 54,
                 fontWeight: 900,
                 color: '#fff',
@@ -117,6 +111,7 @@ export async function GET(request: Request) {
             {/* Description */}
             <div
               style={{
+                display: 'flex',
                 fontSize: 22,
                 color: '#94a3b8',
                 maxWidth: 800,
@@ -136,6 +131,7 @@ export async function GET(request: Request) {
                 paddingTop: 25,
               }}
             >
+              {/* Author */}
               <div
                 style={{
                   display: 'flex',
@@ -147,11 +143,11 @@ export async function GET(request: Request) {
               >
                 <div
                   style={{
+                    display: 'flex',
                     width: 48,
                     height: 48,
                     borderRadius: 12,
                     backgroundColor: '#ff4500',
-                    display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: 22,
@@ -163,7 +159,14 @@ export async function GET(request: Request) {
                 {author}
               </div>
 
-              <div style={{ fontSize: 18, color: '#64748b' }}>
+              {/* Date */}
+              <div
+                style={{
+                  display: 'flex',
+                  fontSize: 18,
+                  color: '#64748b',
+                }}
+              >
                 {createdAt}
               </div>
             </div>
@@ -180,9 +183,6 @@ export async function GET(request: Request) {
     )
   } catch (error) {
     console.error('Falha ao gerar imagem OG:', error)
-
-    return new Response('Erro ao gerar Open Graph image', {
-      status: 500,
-    })
+    return new Response('Erro ao gerar Open Graph image', { status: 500 })
   }
 }
