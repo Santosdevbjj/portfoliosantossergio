@@ -2,7 +2,7 @@ import type { SupportedLocale } from '@/dictionaries'
 import type { ProjectCategory } from '@/types/project'
 
 export interface FeaturedProject {
-  /** ID semântico (SEO, âncora, scroll) */
+  /** ID semântico (SEO, âncora, filtro, tipagem) */
   id: string
 
   /** Nome público */
@@ -11,13 +11,13 @@ export interface FeaturedProject {
   /** Descrição multilíngue */
   description: Record<SupportedLocale, string>
 
-  /** Repositório */
+  /** Repositório GitHub */
   repoUrl: string
 
-  /** Categorias SEMÂNTICAS alinhadas ao dicionário */
+  /** Categorias semânticas alinhadas ao dicionário */
   categories: readonly ProjectCategory[]
 
-  /** Ordem editorial / SEO */
+  /** Prioridade editorial / SEO */
   priority: number
 }
 
@@ -35,7 +35,6 @@ export const featuredProjects = [
       es: 'Proyecto de ciencia de datos para el análisis predictivo de riesgos de retraso en obras.',
     },
   },
-
   {
     id: 'analise-dados-na-pratica',
     name: 'Análise de Dados na Prática',
@@ -49,7 +48,6 @@ export const featuredProjects = [
       es: 'Proyecto práctico centrado en análisis exploratorio de datos, visualizaciones e insights.',
     },
   },
-
   {
     id: 'genai-pipeline-etl-python',
     name: 'GenAI Pipeline ETL em Python',
@@ -63,6 +61,8 @@ export const featuredProjects = [
       es: 'Pipeline ETL moderno en Python con integración de IA generativa.',
     },
   },
-] as const satisfies readonly FeaturedProject[] 
+] as const satisfies readonly FeaturedProject[]
+
+/** Tipo inferido automaticamente a partir dos dados */
 export type FeaturedProjectId =
-  (typeof featuredProjects)[number]['id'] 
+  (typeof featuredProjects)[number]['id']
