@@ -19,20 +19,10 @@ import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsS
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
 import { getGitHubProjects } from '@/lib/github';
 import type { Project } from '@/domain/projects';
-import {
-  featuredProjects as featuredConfig,
-  type FeaturedProjectId,
-} from '@/components/featured/projects.data';
+import { featuredProjects } from '@/components/featured/projects.data';
 
 interface ProxyClientProps {
   readonly lang: SupportedLocale;
-}
-
-function isFeaturedProjectId(
-  id: string,
-  featuredIds: readonly FeaturedProjectId[],
-): id is FeaturedProjectId {
-  return featuredIds.includes(id as FeaturedProjectId);
 }
 
 export default function ProxyClient({ lang }: ProxyClientProps) {
@@ -77,12 +67,14 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
     'contact',
   ] as const;
 
-  const featuredIds = featuredConfig.map(
-    f => f.id,
-  ) as readonly FeaturedProjectId[];
+  /**
+   * Remove os projetos em destaque da lista geral
+   * Usamos repoUrl como chave canônica (mais segura)
+   */
+  const featuredRepoUrls = featuredProjects.map(p => p.repoUrl);
 
-  const remaining = allProjects.filter(
-    project => !isFeaturedProjectId(project.id, featuredIds),
+  const remainingProjects = allProjects.filter(
+    project => !featuredRepoUrls.includes(project.repoUrl),
   );
 
   return (
@@ -94,29 +86,50 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
           <HeroSection lang={lang} dict={dict} />
         </section>
 
-        <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
+        <section
+          id="about"
+          className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12"
+        >
           <AboutSection lang={lang} dict={dict} />
         </section>
 
-        <section id="experience" className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10">
+        <section
+          id="experience"
+          className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10"
+        >
           <div className="mx-auto max-w-7xl px-4 sm:px-10 lg:px-12">
             <ExperienceSection lang={lang} dict={dict} />
           </div>
         </section>
 
-        <section id="projects" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
+        <section
+          id="projects"
+          className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12"
+        >
+          {/* Projetos editoriais / SEO */}
           <FeaturedProjectsSection lang={lang} dict={dict} />
 
+          {/* Demais projetos */}
           <div className="mt-12 border-t pt-12 dark:border-slate-800">
-            <ProjectSection projects={remaining} lang={lang} dict={dict} />
+            <ProjectSection
+              projects={remainingProjects}
+              lang={lang}
+              dict={dict}
+            />
           </div>
         </section>
 
-        <section id="articles" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
+        <section
+          id="articles"
+          className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12"
+        >
           <FeaturedArticleSection lang={lang} dict={dict} />
         </section>
 
-        <section id="contact" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
+        <section
+          id="contact"
+          className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12"
+        >
           <ContactSection lang={lang} dict={dict} />
         </section>
       </main>
