@@ -134,11 +134,12 @@ export async function GET(request: Request) {
                 width: '100%',
               }}
             >
-              {/* Author Box */}
+              {/* Author Box - CORRIGIDO: Adicionado display flex explícito aqui */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
+                  flexDirection: 'row'
                 }}
               >
                 <div
