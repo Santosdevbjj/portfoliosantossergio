@@ -19,7 +19,6 @@ import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsS
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
 import { getGitHubProjects } from '@/lib/github';
 import type { Project } from '@/domain/projects';
-import { featuredProjects } from '@/components/featured/projects.data';
 
 interface ProxyClientProps {
   readonly lang: SupportedLocale;
@@ -33,7 +32,7 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
   }
 
   const [mounted, setMounted] = useState(false);
-  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
   const dict = useMemo(() => getDictionarySync(lang), [lang]);
 
@@ -43,7 +42,9 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
     async function loadData() {
       try {
         const data = await getGitHubProjects(lang);
-        if (data) setAllProjects(data);
+        if (Array.isArray(data)) {
+          setProjects(data);
+        }
       } catch (error) {
         console.error('Erro ao carregar projetos:', error);
       }
@@ -66,16 +67,6 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
     'articles',
     'contact',
   ] as const;
-
-  /**
-   * Remove os projetos em destaque da lista geral
-   * Usamos repoUrl como chave canônica (mais segura)
-   */
-  const featuredRepoUrls = featuredProjects.map(p => p.repoUrl);
-
-  const remainingProjects = allProjects.filter(
-    project => !featuredRepoUrls.includes(project.repoUrl),
-  );
 
   return (
     <PageWrapper lang={lang} sectionIds={sectionIds}>
@@ -106,13 +97,13 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
           id="projects"
           className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12"
         >
-          {/* Projetos editoriais / SEO */}
+          {/* Projetos curados (editorial / SEO) */}
           <FeaturedProjectsSection lang={lang} dict={dict} />
 
-          {/* Demais projetos */}
+          {/* Projetos dinâmicos (GitHub) */}
           <div className="mt-12 border-t pt-12 dark:border-slate-800">
             <ProjectSection
-              projects={remainingProjects}
+              projects={projects}
               lang={lang}
               dict={dict}
             />
