@@ -1,84 +1,79 @@
+import type { SupportedLocale } from '@/dictionaries'
+
 /**
- * DATA LAYER — Featured Projects Configuration
- * -----------------------------------------------------------------------------
- * Fonte única de verdade dos projetos em destaque.
- *
- * PRINCÍPIOS:
- * - Apenas 3 projetos (curadoria estratégica)
- * - Ordem explícita (define hierarquia visual e narrativa)
- * - Agnóstico de UI, i18n e ScrollSpy
- * - IDs DEVEM corresponder exatamente aos nomes dos repositórios no GitHub
+ * Modelo de projeto SEO-first
+ * Estável para Next 17 / TS 7
  */
+export interface FeaturedProject {
+  /** ID semântico e estável (âncora, scroll, SEO) */
+  id: string
 
-export type ProjectSize = 'lg' | 'md'
+  /** Nome público do projeto */
+  name: string
 
-export interface ProjectEnrichment {
-  /**
-   * ID do repositório no GitHub
-   * ⚠️ Deve ser EXATAMENTE igual ao nome do repo
-   */
-  readonly id: string
+  /** Descrição por idioma */
+  description: Record<SupportedLocale, string>
 
-  /**
-   * Tamanho visual no Featured Grid
-   * - lg → destaque principal
-   * - md → destaque secundário
-   */
-  readonly size: ProjectSize
+  /** URL do repositório */
+  repoUrl: string
 
-  /**
-   * Indica se o projeto é destacado
-   * Mantido por extensibilidade futura (ex: filtros, animações, SEO)
-   */
-  readonly featured: boolean
+  /** Categorias semânticas (alinhadas ao dicionário) */
+  categories: Array<
+    | 'dataScience'
+    | 'analysis'
+    | 'data'
+    | 'dev'
+    | 'backend'
+    | 'cloud'
+    | 'devops'
+  >
 
-  /**
-   * Indica se existe (ou existirá) uma página interna de detalhes
-   * false → apenas link externo (GitHub)
-   */
-  readonly hasExtendedDetails: boolean
+  /** Prioridade editorial / SEO */
+  priority: number
 }
 
 /**
- * CONFIGURAÇÃO DOS 3 PROJETOS EM DESTAQUE
- * -----------------------------------------------------------------------------
- * ORDEM = ORDEM DE EXIBIÇÃO + IMPORTÂNCIA SEMÂNTICA
- *
- * 1️⃣ Projeto principal (impacto máximo)
- * 2️⃣ Projeto secundário
- * 3️⃣ Projeto secundário
+ * PROJETOS EM DESTAQUE (CURADORIA MANUAL)
+ * Ordem = prioridade editorial + SEO
  */
-export const featuredConfig: readonly ProjectEnrichment[] = [
+export const featuredProjects: readonly FeaturedProject[] = [
   {
-    id: 'analiseRiscosAtrasoObras',
-    size: 'lg',
-    featured: true,
-    hasExtendedDetails: true,
+    id: 'analise-riscos-atraso-obras',
+    name: 'Análise de Riscos de Atraso em Obras',
+    repoUrl:
+      'https://github.com/Santosdevbjj/analiseRiscosAtrasoObras',
+    priority: 1,
+    categories: ['dataScience', 'analysis', 'data'],
+    description: {
+      pt: 'Projeto de ciência de dados para análise preditiva de riscos de atraso em obras, combinando dados históricos, clima e fornecedores.',
+      en: 'Data science project focused on predictive risk analysis for construction delays using historical, weather and supplier data.',
+      es: 'Proyecto de ciencia de datos para el análisis predictivo de riesgos de retraso en obras usando datos históricos, clima y proveedores.',
+    },
   },
   {
-    id: 'analiseDadosNaPratica',
-    size: 'md',
-    featured: true,
-    hasExtendedDetails: false,
+    id: 'analise-dados-na-pratica',
+    name: 'Análise de Dados na Prática',
+    repoUrl:
+      'https://github.com/Santosdevbjj/analiseDadosNaPratica',
+    priority: 2,
+    categories: ['dataScience', 'analysis', 'dev'],
+    description: {
+      pt: 'Coleção prática de estudos de análise de dados aplicada a problemas reais, com foco em clareza, métricas e storytelling.',
+      en: 'Practical collection of data analysis studies applied to real-world problems, focusing on clarity, metrics and storytelling.',
+      es: 'Colección práctica de estudios de análisis de datos aplicados a problemas reales, con enfoque en claridad, métricas y storytelling.',
+    },
   },
   {
-    id: 'genAIpipeETLPython',
-    size: 'md',
-    featured: true,
-    hasExtendedDetails: false,
+    id: 'genai-pipeline-etl-python',
+    name: 'GenAI Pipeline ETL em Python',
+    repoUrl:
+      'https://github.com/Santosdevbjj/genAIpipeETLPython',
+    priority: 3,
+    categories: ['dataScience', 'backend', 'cloud', 'devops'],
+    description: {
+      pt: 'Pipeline ETL moderno em Python com integração de IA generativa, automação e boas práticas de engenharia de dados.',
+      en: 'Modern Python ETL pipeline with generative AI integration, automation and data engineering best practices.',
+      es: 'Pipeline ETL moderno en Python con integración de IA generativa, automatización y buenas prácticas de ingeniería de datos.',
+    },
   },
 ] as const
-
-/**
- * HELPER — getProjectConfig
- * -----------------------------------------------------------------------------
- * Retorna a configuração visual de um repositório específico.
- * Utilizado pelo FeaturedGrid / ProjectCard.
- */
-export function getProjectConfig(
-  repoName: string,
-): ProjectEnrichment | undefined {
-  return featuredConfig.find(
-    config => config.id === repoName,
-  )
-}
