@@ -21,7 +21,7 @@
     /* NEXT.JS 16 & REACT 19 ARCHITECTURE */
     "module": "ESNext",
     "moduleResolution": "Bundler",   
-    "jsx": "preserve",               /* Alterado para 'preserve' para compatibilidade total com Turbopack */
+    "jsx": "preserve",               
     "noEmit": true,                  
     
     /* INTEROP & SECURITY */
@@ -53,7 +53,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
+    ".next/types/**/*.ts",      /* Tipos de Produção */
+    ".next/dev/types/**/*.ts",  /* ADICIONADO: Tipos de Desenvolvimento (Sugestão do Next.js) */
     "src/types/**/*.d.ts"
   ],
 
@@ -61,6 +62,6 @@
     "node_modules", 
     ".next", 
     "out",
-    "build" /* Adicionado para evitar conflitos de cache local */
+    "build"
   ]
 }
