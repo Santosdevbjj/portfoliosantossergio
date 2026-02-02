@@ -1,7 +1,11 @@
 'use client'
 
 import FeaturedGrid from './FeaturedGrid'
-import { featuredProjects } from './projects.data'
+import {
+  featuredProjects,
+  type FeaturedProject,
+} from './projects.data'
+
 import type { SupportedLocale } from '@/dictionaries'
 import type { Dictionary } from '@/types/dictionary'
 
@@ -15,10 +19,10 @@ export function FeaturedProjectsSection({
   dict,
 }: FeaturedProjectsSectionProps) {
   /**
-   * ⚠️ featuredProjects é readonly (SEO-first, editorial)
-   * Criamos uma cópia mutável antes de ordenar
+   * featuredProjects é EDITORIAL, IMUTÁVEL e SEO-first
+   * Criamos uma cópia apenas para ordenação visual
    */
-  const projects = [...featuredProjects]
+  const projects: FeaturedProject[] = [...featuredProjects]
     .sort((a, b) => a.priority - b.priority)
     .slice(0, 3)
 
@@ -63,14 +67,14 @@ export function FeaturedProjectsSection({
         sm:py-32
       "
     >
-      {/* ScrollSpy anchor */}
+      {/* Âncora para scroll/SEO */}
       <span
         id="featured-projects-anchor"
         className="absolute top-0 block h-px w-px"
         aria-hidden
       />
 
-      {/* SEO */}
+      {/* SEO Rich Snippets */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -94,6 +98,7 @@ export function FeaturedProjectsSection({
           </p>
         </div>
 
+        {/* ⚠️ FeaturedGrid DEVE aceitar FeaturedProject[] */}
         <FeaturedGrid
           projects={projects}
           lang={lang}
