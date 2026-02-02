@@ -21,7 +21,7 @@
     /* NEXT.JS 16 & REACT 19 ARCHITECTURE */
     "module": "ESNext",
     "moduleResolution": "Bundler",   
-    "jsx": "preserve",               
+    "jsx": "react-jsx",              /* AJUSTADO: Requisito obrigatório do Next.js 16 */
     "noEmit": true,                  
     
     /* INTEROP & SECURITY */
@@ -53,8 +53,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",      /* Tipos de Produção */
-    ".next/dev/types/**/*.ts",  /* ADICIONADO: Tipos de Desenvolvimento (Sugestão do Next.js) */
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
     "src/types/**/*.d.ts"
   ],
 
