@@ -15,8 +15,6 @@ import { PageWrapper } from '@/components/PageWrapper';
 import { ProjectSection } from '@/components/ProjectSection';
 import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection';
 
-import type { FeaturedProjectId } from '@/components/featured/projects.data'
-
 // Infra
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
 import { getGitHubProjects } from '@/lib/github';
@@ -69,20 +67,15 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
     'contact',
   ] as const;
 
+  /** IDs editoriais derivados da fonte única (SEO-first) */
   const featuredIds = featuredConfig.map(f => f.id);
 
-  const featuredIds: readonly FeaturedProjectId[] = [
-  'analise-riscos-atraso-obras',
-  'analise-dados-na-pratica',
-  'genai-pipeline-etl-python',
-] 
-  
-  const featured = allProjects.filter(p =>
-    featuredIds.includes(p.name),
+  const featured = allProjects.filter(project =>
+    featuredIds.includes(project.id),
   );
 
   const remaining = allProjects.filter(
-    p => !featuredIds.includes(p.name),
+    project => !featuredIds.includes(project.id),
   );
 
   return (
