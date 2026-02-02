@@ -15,6 +15,8 @@ import { PageWrapper } from '@/components/PageWrapper';
 import { ProjectSection } from '@/components/ProjectSection';
 import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection';
 
+import type { FeaturedProjectId } from '@/components/featured/projects.data'
+
 // Infra
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
 import { getGitHubProjects } from '@/lib/github';
