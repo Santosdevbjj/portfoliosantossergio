@@ -35,8 +35,10 @@ export interface FeaturedProject {
 /**
  * PROJETOS EM DESTAQUE (CURADORIA MANUAL)
  * Ordem = prioridade editorial + SEO
+ *
+ * ⚠️ IDs são SEMÂNTICOS (kebab-case) — não são nomes de repositório
  */
-export const featuredProjects: readonly FeaturedProject[] = [
+export const featuredProjects = [
   {
     id: 'analise-riscos-atraso-obras',
     name: 'Análise de Riscos de Atraso em Obras',
@@ -76,4 +78,4 @@ export const featuredProjects: readonly FeaturedProject[] = [
       es: 'Pipeline ETL moderno en Python con integración de IA generativa, automatización y buenas prácticas de ingeniería de datos.',
     },
   },
-] as const
+] as const satisfies readonly FeaturedProject[]
