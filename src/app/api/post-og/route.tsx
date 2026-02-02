@@ -3,12 +3,12 @@ import { ImageResponse } from 'next/og'
 /**
  * API ROUTE: OPEN GRAPH GENERATOR (POST-OG)
  * -----------------------------------------------------------------------------
- * Runtime: Edge
+ * Runtime: Edge (Obrigatório para performance e estabilidade na Vercel)
  * Criticidade: Alta (SEO / Social Preview)
  * Status: Hardened & Production-Ready
  */
 
-// export const runtime = 'edge'
+export const runtime = 'edge'
 
 // Helpers ----------------------------------------------------
 
@@ -75,23 +75,25 @@ export async function GET(request: Request) {
         >
           <div
             style={{
+              display: 'flex',
+              flexDirection: 'column',
               padding: '40px 60px',
               backgroundImage:
                 'linear-gradient(to bottom, rgba(2,6,23,0) 0%, rgba(2,6,23,0.92) 70%)',
             }}
           >
-            {/* Reading Time Badge */}
+            {/* Reading Time Badge - CORRIGIDO: display flex em vez de inline-flex */}
             <div
               style={{
+                display: 'flex',
                 backgroundColor: '#ff4500',
                 color: '#fff',
                 fontSize: 14,
                 fontWeight: 700,
-                letterSpacing: '0.08em',
                 padding: '6px 14px',
                 borderRadius: 8,
                 marginBottom: 24,
-                display: 'inline-flex',
+                width: 'auto',
               }}
             >
               {readingTime} MIN DE LEITURA
@@ -100,8 +102,9 @@ export async function GET(request: Request) {
             {/* Title */}
             <div
               style={{
+                display: 'flex',
                 fontSize: 54,
-                fontWeight: 900,
+                fontWeight: 700,
                 color: '#fff',
                 lineHeight: 1.1,
                 maxWidth: 900,
@@ -114,6 +117,7 @@ export async function GET(request: Request) {
             {/* Description */}
             <div
               style={{
+                display: 'flex',
                 fontSize: 22,
                 color: '#94a3b8',
                 maxWidth: 800,
@@ -160,7 +164,7 @@ export async function GET(request: Request) {
                 {author}
               </div>
 
-              <div style={{ fontSize: 18, color: '#64748b' }}>
+              <div style={{ display: 'flex', fontSize: 18, color: '#64748b' }}>
                 {createdAt}
               </div>
             </div>
