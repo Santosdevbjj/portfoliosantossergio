@@ -8,7 +8,7 @@ import { ImageResponse } from 'next/og'
  * Status: Hardened & Production-Ready
  */
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
 // Helpers ----------------------------------------------------
 
