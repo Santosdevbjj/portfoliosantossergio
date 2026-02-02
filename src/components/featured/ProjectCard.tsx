@@ -1,14 +1,14 @@
 'use client'
 
-import type { Project } from '@/domain/projects'
+import type { FeaturedProject } from './projects.data'
 import type { SupportedLocale } from '@/dictionaries'
 import type { Dictionary } from '@/types/dictionary'
 
 interface ProjectCardProps {
-  project: Project
-  lang: SupportedLocale
-  dict: Dictionary
-  featured?: boolean
+  readonly project: FeaturedProject
+  readonly lang: SupportedLocale
+  readonly dict: Dictionary
+  readonly featured?: boolean
 }
 
 export default function ProjectCard({
@@ -17,13 +17,13 @@ export default function ProjectCard({
   dict,
   featured = false,
 }: ProjectCardProps) {
-  const projectUrl = `/${lang}/projects#${project.name}`
+  const projectUrl = `/${lang}/projects#${project.id}`
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: project.name,
-    description: project.description,
+    description: project.description[lang],
     applicationCategory: 'DataScienceApplication',
     operatingSystem: 'Web/Cloud',
     url: projectUrl,
@@ -35,7 +35,7 @@ export default function ProjectCard({
 
   return (
     <article
-      id={project.name}
+      id={project.id}
       className={`
         relative
         rounded-2xl
@@ -48,7 +48,11 @@ export default function ProjectCard({
         hover:shadow-md
         dark:border-slate-800
         dark:bg-slate-900
-        ${featured ? 'lg:col-span-2 lg:row-span-2' : ''}
+        ${
+          featured
+            ? 'lg:col-span-2 lg:row-span-2'
+            : ''
+        }
       `}
     >
       {/* SEO individual por projeto */}
@@ -64,12 +68,12 @@ export default function ProjectCard({
       </h3>
 
       <p className="mb-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-        {project.description}
+        {project.description[lang]}
       </p>
 
       <div className="flex items-center gap-4">
         <a
-          href={project.html_url}
+          href={project.repoUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm font-semibold text-blue-600 hover:underline"
