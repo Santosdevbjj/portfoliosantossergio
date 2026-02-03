@@ -56,8 +56,7 @@ export function ProjectsGrid({
               {project.categories.map(category => (
                 <ProjectCategoryBadge
                   key={category}
-                  category={category}
-                  dict={dict}
+                  label={dict.projects.categories[category]}
                 />
               ))}
             </div>
