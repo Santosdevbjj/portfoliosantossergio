@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "locale": "pt-BR",
+    "direction": "ltr",
+    "lastUpdated": "2026-02-03T19:40:00Z",
+    "author": "Sérgio Santos",
+    "source": "manual"
+  },
+  "common": {
+    "navigation": "Navegação",
+    "role": "Especialista em Sistemas Críticos & Dados",
+    "footer": {
+      "copyright": "© 2026 Sérgio Santos.",
+      "rights": "Todos os direitos reservados."
+    },
+    "builtWith": "Desenvolvido com Next.js 16 & TypeScript",
+    "loading": "Carregando...",
+    "error": "Algo deu errado. Tente novamente.",
+    "socialLinks": "Abrir perfil de {platform} em nova aba",
+    "languageSwitcher": "Alterar idioma para {lang}",
+    "errorBoundary": {
+      "title": "Ops! Ocorreu um erro inesperado.",
+      "description": "Se o problema persistir, entre em contato.",
+      "actions": {
+        "retry": "Tentar novamente",
+        "home": "Voltar ao início"
+      }
+    },
+    "notFound": {
+      "title": "Página não encontrada",
+      "description": "O link que você acessou pode estar quebrado ou não existir.",
+      "button": "Voltar para o Início"
+    },
+    "externalLinks": {
+      "linkedin": {
+        "url": "https://www.linkedin.com/in/santossergioluiz",
+        "label": "LinkedIn"
+      },
+      "github": {
+        "url": "https://github.com/seu-usuario",
+        "label": "GitHub"
+      },
+      "medium": {
+        "url": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
+        "label": "Medium"
+      },
+      "email": {
+        "address": "santossergiorealbjj@outlook.com",
+        "mailto": "mailto:santossergiorealbjj@outlook.com",
+        "label": "Email"
+      }
+    },
+    "menu": {
+      "open": "Abrir menu",
+      "close": "Fechar menu",
+      "aria": {
+        "open": "Abrir menu de navegação",
+        "close": "Fechar menu de navegação"
+      }
+    }
+  },
+  "intl": {
+    "locale": "pt-BR",
+    "fallbackLocale": "pt",
+    "currency": "BRL",
+    "timezone": "America/Sao_Paulo",
+    "unitDisplay": "short",
+    "numberFormat": "pt-BR"
+  },
+  "states": {
+    "loading": "Carregando...",
+    "empty": "Nenhum dado disponível.",
+    "error": "Não foi possível carregar as informações.",
+    "emptyProjects": {
+      "title": "Nenhum projeto disponível",
+      "description": "Novos projetos serão adicionados em breve.",
+      "cta": "Voltar ao início"
+    },
+    "emptyExperience": "Nenhuma experiência cadastrada.",
+    "errorArticles": "Não foi possível carregar os artigos."
+  }
+}
