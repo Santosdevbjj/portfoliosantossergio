@@ -1,52 +1,65 @@
 // src/proxy.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server'
 
-const SUPPORTED_LOCALES = ["pt", "en", "es"] as const;
-type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+/**
+ * Locales suportados
+ */
+const SUPPORTED_LOCALES = ['pt', 'en', 'es'] as const
+type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+/**
+ * Proxy global (substitui o antigo middleware no Next.js 16)
+ * Executado em TODA requisição antes do App Router
+ */
+export default function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
 
   /**
-   * Ignorar rotas internas, assets, erros e arquivos
+   * Ignorar:
+   * - Assets internos do Next
+   * - APIs
+   * - Arquivos estáticos
    */
   if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api") ||
-    pathname.startsWith("/_error") ||
-    pathname.startsWith("/_not-found") ||
-    pathname.startsWith("/_global-error") ||
-    pathname === "/favicon.ico" ||
-    pathname.includes(".")
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname === '/favicon.ico' ||
+    pathname.includes('.')
   ) {
-    return NextResponse.next();
+    return NextResponse.next()
   }
 
   /**
-   * Raiz → locale padrão
+   * Raiz do site → locale padrão
    */
-  if (pathname === "/") {
-    const url = request.nextUrl.clone();
-    url.pathname = "/pt";
-    return NextResponse.redirect(url);
+  if (pathname === '/') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/pt'
+    return NextResponse.redirect(url)
   }
 
   /**
-   * Extrai locale com segurança
+   * Extrai o primeiro segmento da URL
    */
-  const firstSegment = pathname.split("/")[1];
+  const firstSegment = pathname.split('/')[1]
 
+  /**
+   * Se não tiver locale válido, prefixa com /pt
+   */
   if (!SUPPORTED_LOCALES.includes(firstSegment as SupportedLocale)) {
-    const url = request.nextUrl.clone();
-    url.pathname = `/pt${pathname}`;
-    return NextResponse.redirect(url);
+    const url = request.nextUrl.clone()
+    url.pathname = `/pt${pathname}`
+    return NextResponse.redirect(url)
   }
 
-  return NextResponse.next();
+  return NextResponse.next()
 }
 
+/**
+ * Matcher oficial
+ */
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
-};
+}
