@@ -1,54 +1,59 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+// src/proxy.tsx
+import { NextRequest, NextResponse } from 'next/server';
 
-const SUPPORTED_LOCALES = ['pt', 'en', 'es'] as const
-const DEFAULT_LOCALE = 'pt'
+const SUPPORTED_LOCALES = ['pt', 'en', 'es'] as const;
+type Locale = (typeof SUPPORTED_LOCALES)[number];
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+/**
+ * Proxy (substitui o antigo middleware no Next 16+)
+ * Executa em todas as requisições
+ */
+export default function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
   /**
-   * 🚫 IGNORAR COMPLETAMENTE ARQUIVOS ESTÁTICOS E ROTAS INTERNAS
+   * Ignorar arquivos estáticos e rotas internas
    */
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
-    pathname.startsWith('/robots.txt') ||
-    pathname.startsWith('/sitemap.xml') ||
-    pathname.endsWith('.ico') ||
-    pathname.endsWith('.png') ||
-    pathname.endsWith('.jpg') ||
-    pathname.endsWith('.jpeg') ||
-    pathname.endsWith('.svg') ||
-    pathname.endsWith('.webp')
+    pathname.startsWith('/favicon') ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml'
   ) {
-    return NextResponse.next()
+    return NextResponse.next();
   }
 
   /**
-   * 🌍 DETECTAR LOCALE
+   * Raiz → redireciona para /pt
    */
-  const segments = pathname.split('/')
-  const locale = segments[1]
-
-  if (SUPPORTED_LOCALES.includes(locale as any)) {
-    return NextResponse.next()
+  if (pathname === '/') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/pt';
+    return NextResponse.redirect(url);
   }
 
   /**
-   * 🔁 REDIRECT SE NÃO HOUVER LOCALE
+   * Verifica se a primeira parte da URL é um locale válido
    */
-  const url = request.nextUrl.clone()
-  url.pathname = `/${DEFAULT_LOCALE}${pathname === '/' ? '' : pathname}`
+  const maybeLocale = pathname.split('/')[1] as Locale | undefined;
 
-  return NextResponse.redirect(url)
+  if (!SUPPORTED_LOCALES.includes(maybeLocale as Locale)) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/pt${pathname}`;
+    return NextResponse.redirect(url);
+  }
+
+  /**
+   * Tudo OK → segue o fluxo
+   */
+  return NextResponse.next();
 }
 
 /**
- * 🎯 MATCHER RESTRITIVO (CRÍTICO)
+ * Matcher explícito
+ * Evita execução desnecessária em assets internos
  */
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:png|jpg|jpeg|svg|webp)).*)',
-  ],
-}
+  matcher: ['/((?!_next/static|_next/image).*)'],
+};
