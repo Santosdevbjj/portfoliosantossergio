@@ -6,10 +6,13 @@
  * ✔️ Responsividade: Mobile-first com viewport segura
  */
 
-import type { Metadata, Viewport } from 'next'
+/** import type { Metadata, Viewport } from 'next'
 import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
 import { i18n } from '@/i18n-config'
-import ProxyPage from '@/ProxyClient'
+import ProxyPage from '@/ProxyClient' 
+
+*/
+
 
 // Definição de Props para Next.js 16
 interface PageProps {
