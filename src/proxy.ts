@@ -4,22 +4,21 @@ import { NextRequest, NextResponse } from 'next/server'
 const SUPPORTED_LOCALES = ['pt', 'en', 'es'] as const
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
 
-/**
- * Proxy global (Next 16+)
- * Executa antes de TODAS as rotas
- */
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   /**
-   * 1️⃣ Ignorar API, assets e rotas internas
+   * 1️⃣ IGNORAR TUDO QUE NÃO É HTML DE PÁGINA
+   * (isso é o ponto que estava quebrando tudo)
    */
   if (
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
+    pathname.startsWith('/_vercel') ||
+    pathname.endsWith('.json') ||
+    pathname.match(/\.(ico|png|jpg|jpeg|svg|webp|css|js|map|woff2?)$/) ||
     pathname === '/robots.txt' ||
-    pathname === '/sitemap.xml' ||
-    /\.(ico|png|jpg|jpeg|svg|webp)$/.test(pathname)
+    pathname === '/sitemap.xml'
   ) {
     return NextResponse.next()
   }
@@ -34,34 +33,25 @@ export default function proxy(request: NextRequest) {
   }
 
   /**
-   * 3️⃣ Extrai possível locale da URL
+   * 3️⃣ Locale válido?
    */
-  const segment = pathname.split('/')[1]
+  const firstSegment = pathname.split('/')[1]
 
-  /**
-   * 4️⃣ Validação segura do locale
-   */
-  const isSupportedLocale = SUPPORTED_LOCALES.includes(
-    segment as SupportedLocale,
-  )
-
-  if (!isSupportedLocale) {
+  if (!SUPPORTED_LOCALES.includes(firstSegment as SupportedLocale)) {
     const url = request.nextUrl.clone()
     url.pathname = `/pt${pathname}`
     return NextResponse.redirect(url)
   }
 
   /**
-   * 5️⃣ Tudo OK → segue fluxo normal
+   * 4️⃣ OK
    */
   return NextResponse.next()
 }
 
-/**
- * Matcher explícito (performance)
- */
 export const config = {
   matcher: [
+    // ⚠️ IMPORTANTE: só páginas
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }
