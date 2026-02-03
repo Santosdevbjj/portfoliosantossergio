@@ -1,15 +1,8 @@
-import type { Dictionary } from '@/types/dictionary'
-import type { ProjectCategory } from '@/types/project'
-
 interface Props {
-  category: ProjectCategory
-  dict: Dictionary
+  label: string
 }
 
-export function ProjectCategoryBadge({
-  category,
-  dict,
-}: Props) {
+export function ProjectCategoryBadge({ label }: Props) {
   return (
     <span
       className="
@@ -19,7 +12,7 @@ export function ProjectCategoryBadge({
         dark:bg-blue-900/30 dark:text-blue-300
       "
     >
-      {dict.projects.categories[category]}
+      {label}
     </span>
   )
 }
