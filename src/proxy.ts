@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 const SUPPORTED_LOCALES = ['pt', 'en', 'es'] as const
-type Locale = (typeof SUPPORTED_LOCALES)[number]
 
 /**
  * Proxy global (Next 16+)
