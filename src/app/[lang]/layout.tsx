@@ -3,8 +3,9 @@
  * -----------------------------------------------------------------------------
  * ✔ Responsivo (Mobile / Desktop)
  * ✔ Multilingue (PT / EN / ES)
- * ✔ SEO Global centralizado
- * ✔ Fonts otimizadas
+ * ✔ SEO Global centralizado e seguro
+ * ✔ Alinhado ao sistema de dicionários tipado
+ * ✔ Blindado contra falhas de runtime / middleware
  */
 
 import type { Metadata, Viewport } from 'next'
@@ -15,10 +16,13 @@ import '../globals.css'
 import { ThemeProvider } from '@/components/ThemeToggle'
 import { CookieBanner } from '@/components/CookieBanner'
 import { i18n } from '@/i18n-config'
-import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
+import {
+  getDictionarySync,
+  type SupportedLocale,
+} from '@/dictionaries'
 
 /* -------------------------------------------------------------------------- */
-/* FONTS                                                                       */
+/* FONTS                                                                      */
 /* -------------------------------------------------------------------------- */
 const inter = Inter({
   subsets: ['latin'],
@@ -35,7 +39,7 @@ const montserrat = Montserrat({
 })
 
 /* -------------------------------------------------------------------------- */
-/* VIEWPORT                                                                    */
+/* VIEWPORT                                                                   */
 /* -------------------------------------------------------------------------- */
 export const viewport: Viewport = {
   width: 'device-width',
@@ -48,19 +52,18 @@ export const viewport: Viewport = {
 }
 
 /* -------------------------------------------------------------------------- */
-/* SEO GLOBAL                                                                  */
+/* SEO GLOBAL                                                                 */
 /* -------------------------------------------------------------------------- */
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { lang: SupportedLocale }
-}): Metadata {
-  const currentLang: SupportedLocale =
-    i18n.locales.includes(params.lang)
-      ? params.lang
-      : i18n.defaultLocale
+  params?: { lang?: string }
+}): Promise<Metadata> {
+  const lang = i18n.locales.includes(params?.lang as SupportedLocale)
+    ? (params?.lang as SupportedLocale)
+    : i18n.defaultLocale
 
-  const dict = getDictionarySync(currentLang)
+  const dict = getDictionarySync(lang)
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
@@ -72,6 +75,11 @@ export function generateMetadata({
     es: 'es_ES',
   }
 
+  const localizedUrl =
+    lang === i18n.defaultLocale
+      ? siteUrl
+      : `${siteUrl}/${lang}`
+
   return {
     metadataBase: new URL(siteUrl),
     title: {
@@ -82,14 +90,15 @@ export function generateMetadata({
     keywords: dict.seo.keywords,
     authors: [{ name: 'Sérgio Santos' }],
     creator: 'Sérgio Santos',
+    robots: {
+      index: true,
+      follow: true,
+    },
     verification: {
       google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
     alternates: {
-      canonical:
-        currentLang === i18n.defaultLocale
-          ? siteUrl
-          : `${siteUrl}/${currentLang}`,
+      canonical: localizedUrl,
       languages: {
         'pt-BR': `${siteUrl}/pt`,
         'en-US': `${siteUrl}/en`,
@@ -98,35 +107,39 @@ export function generateMetadata({
     },
     openGraph: {
       type: 'website',
-      locale: ogLocaleMap[currentLang],
-      url: siteUrl,
+      locale: ogLocaleMap[lang],
+      url: localizedUrl,
       title: dict.seo.siteName,
       description: dict.seo.description,
       siteName: dict.seo.siteName,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: dict.seo.siteName,
+      description: dict.seo.description,
     },
   }
 }
 
 /* -------------------------------------------------------------------------- */
-/* ROOT LAYOUT                                                                */
+/* ROOT LAYOUT                                                               */
 /* -------------------------------------------------------------------------- */
 export default function RootLayout({
   children,
   params,
 }: {
   children: React.ReactNode
-  params: { lang: SupportedLocale }
+  params?: { lang?: string }
 }) {
-  const currentLang: SupportedLocale =
-    i18n.locales.includes(params.lang)
-      ? params.lang
-      : i18n.defaultLocale
+  const lang = i18n.locales.includes(params?.lang as SupportedLocale)
+    ? (params?.lang as SupportedLocale)
+    : i18n.defaultLocale
 
-  const dict = getDictionarySync(currentLang)
+  const dict = getDictionarySync(lang)
 
   return (
     <html
-      lang={currentLang}
+      lang={lang}
       suppressHydrationWarning
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
@@ -163,7 +176,7 @@ export default function RootLayout({
             {children}
           </main>
 
-          <CookieBanner lang={currentLang} dict={dict} />
+          <CookieBanner lang={lang} dict={dict} />
         </ThemeProvider>
       </body>
     </html>
