@@ -18,13 +18,9 @@ interface ErrorProps {
   readonly reset: () => void
 }
 
-export default function Error({
-  error,
-  reset,
-}: ErrorProps) {
+export default function Error({ error, reset }: ErrorProps) {
   /**
-   * ⚠️ NUNCA use router hooks aqui
-   * Error Boundaries precisam ser isolados
+   * ⚠️ Error Boundaries NÃO podem usar router hooks
    */
   const lang: SupportedLocale = useMemo(() => {
     if (typeof window === 'undefined') {
@@ -41,11 +37,14 @@ export default function Error({
   const dict = getDictionarySync(lang)
 
   /**
-   * 🔥 LOG FORENSE — PRODUÇÃO / EDGE / NODE
-   * Visível nos Runtime Logs da Vercel
+   * 🔥 LOG COMPLETO — Browser + Vercel Runtime
    */
   useEffect(() => {
     console.group('🔥 APPLICATION RUNTIME ERROR')
+
+    // 👉 Log cru (como você pediu)
+    console.error(error)
+
     console.error('Message:', error.message)
     console.error('Stack:', error.stack ?? 'N/A')
     console.error('Digest:', error.digest ?? 'N/A')
@@ -66,6 +65,7 @@ export default function Error({
       process.env.NEXT_RUNTIME ?? 'unknown',
     )
     console.error('Timestamp:', new Date().toISOString())
+
     console.groupEnd()
   }, [error])
 
@@ -76,8 +76,8 @@ export default function Error({
       aria-describedby="error-description"
       className="min-h-[100dvh] w-full flex items-center justify-center p-6 bg-slate-50 dark:bg-[#020617]"
     >
-      <section className="max-w-md w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-red-900/20 p-8 rounded-[2rem] shadow-2xl text-center space-y-8">
-        {/* Status técnico */}
+      <section className="w-full max-w-md bg-white dark:bg-slate-950 border border-slate-200 dark:border-red-900/20 p-8 rounded-[2rem] shadow-2xl text-center space-y-8">
+        {/* Status */}
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-full">
           <ShieldAlert
             size={12}
@@ -102,19 +102,14 @@ export default function Error({
         {/* Texto */}
         <div className="space-y-3">
           <h1 className="text-2xl font-black text-slate-900 dark:text-white">
-            {dict.common.error ?? 'Unexpected error'}
+            {dict.common.error}
           </h1>
 
           <p
             id="error-description"
             className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed"
           >
-            {lang === 'pt' &&
-              'Ocorreu uma falha inesperada durante a execução. Tente novamente.'}
-            {lang === 'en' &&
-              'An unexpected error occurred during execution. Please try again.'}
-            {lang === 'es' &&
-              'Ocurrió un error inesperado durante la ejecución. Inténtalo de nuevo.'}
+            {dict.common.error}
           </p>
         </div>
 
@@ -145,7 +140,7 @@ export default function Error({
           </Link>
         </div>
 
-        {/* Trace ID */}
+        {/* Trace */}
         {error.digest && (
           <code className="block pt-4 text-[10px] text-slate-400 font-mono break-all">
             TRACE_ID: {error.digest}
