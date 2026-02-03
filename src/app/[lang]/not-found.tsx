@@ -4,9 +4,10 @@
  * NOT FOUND (404)
  * -----------------------------------------------------------------------------
  * Página de rota inexistente.
- * - Não depende de router hooks
- * - Compatível com Edge / Node / Streaming
- * - Alinhada ao contrato atual de dicionários
+ * - Totalmente responsiva
+ * - Multilingue (pt / en / es)
+ * - Alinhada ao contrato oficial de dicionários
+ * - Build-safe (TypeScript estrito)
  */
 
 import { Search, ArrowLeft, Home, Terminal } from 'lucide-react'
@@ -20,7 +21,7 @@ import { i18n } from '@/i18n-config'
 export default function NotFound() {
   /**
    * Detecção segura de idioma via URL
-   * (sem usar hooks do router)
+   * (sem hooks do router)
    */
   const lang: SupportedLocale = useMemo(() => {
     if (typeof window === 'undefined') {
@@ -36,6 +37,10 @@ export default function NotFound() {
 
   const dict = getDictionarySync(lang)
 
+  /**
+   * Mensagens específicas do 404
+   * Complementam o dicionário global
+   */
   const messages = {
     pt: {
       title: '404 — Rota Não Encontrada',
@@ -71,7 +76,7 @@ export default function NotFound() {
       aria-live="assertive"
       className="relative min-h-[100dvh] flex items-center justify-center px-6 bg-slate-50 dark:bg-[#020617] overflow-hidden transition-colors duration-500"
     >
-      {/* Grid tecnológico de fundo */}
+      {/* Grid de fundo */}
       <div
         aria-hidden
         className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06] pointer-events-none"
@@ -82,34 +87,23 @@ export default function NotFound() {
         }}
       />
 
-      {/* Glow atmosférico */}
+      {/* Glow */}
       <div
         aria-hidden
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-blue-500/10 dark:bg-blue-600/5 rounded-full blur-[100px]"
       />
 
-      <section className="relative z-10 max-w-xl w-full text-center animate-in fade-in zoom-in duration-700">
+      <section className="relative z-10 max-w-xl w-full text-center">
         {/* Ícone */}
-        <div
-          aria-hidden
-          className="relative inline-flex p-8 mb-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] text-blue-600 dark:text-blue-400 shadow-2xl group"
-        >
-          <Search
-            size={54}
-            strokeWidth={1.2}
-            className="relative z-10 transition-transform duration-500 group-hover:rotate-12"
-          />
-
-          <div className="absolute inset-0 overflow-hidden rounded-[2.5rem]">
-            <div className="absolute top-0 w-full h-[2px] bg-blue-500/50 animate-[scan_3s_linear_infinite]" />
-          </div>
+        <div className="inline-flex p-8 mb-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] text-blue-600 dark:text-blue-400 shadow-2xl">
+          <Search size={54} strokeWidth={1.2} />
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 dark:text-white mb-6 leading-tight">
+        <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 dark:text-white mb-6">
           {t.title}
         </h1>
 
-        <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 mb-12 leading-relaxed font-medium">
+        <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 mb-12">
           {t.description}
         </p>
 
@@ -118,18 +112,15 @@ export default function NotFound() {
           <button
             type="button"
             onClick={() => window.history.back()}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all group"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
           >
-            <ArrowLeft
-              size={20}
-              className="transition-transform group-hover:-translate-x-2"
-            />
+            <ArrowLeft size={20} />
             {t.back}
           </button>
 
           <Link
             href={`/${lang}`}
-            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all shadow-xl shadow-blue-500/30 active:scale-95 text-lg"
+            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-500/30"
           >
             <Home size={22} />
             {t.home}
@@ -138,10 +129,10 @@ export default function NotFound() {
 
         {/* Rodapé técnico */}
         <div className="mt-16 pt-8 border-t border-slate-200/50 dark:border-slate-800/50">
-          <div className="inline-flex items-center gap-3 px-4 py-2 bg-slate-100 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-3 px-4 py-2 bg-slate-100 dark:bg-slate-900/60 rounded-xl border">
             <Terminal size={14} className="text-blue-500" />
-            <code className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-              STATUS: 404_NOT_FOUND | {t.stack}
+            <code className="text-[10px] font-mono uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              404 | {dict.common.error} | {t.stack}
             </code>
           </div>
         </div>
