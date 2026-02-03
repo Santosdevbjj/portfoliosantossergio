@@ -1,11 +1,10 @@
 /**
  * ROOT LAYOUT — NEXT.JS 16 — SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * ✔ Responsivo (Mobile / Desktop)
- * ✔ Multilingue (PT / EN / ES)
- * ✔ SEO Global centralizado e seguro
- * ✔ Alinhado ao sistema de dicionários tipado
- * ✔ Blindado contra falhas de runtime / middleware
+ * ✔️ Fix: Params transformados em Promise (Next.js 16 Compliance)
+ * ✔️ Fix: Acesso aos dicionários corrigido para dict.seo.siteName
+ * ✔️ Responsivo (Mobile / Desktop)
+ * ✔️ Multilingue (PT / EN / ES)
  */
 
 import type { Metadata, Viewport } from 'next'
@@ -54,13 +53,18 @@ export const viewport: Viewport = {
 /* -------------------------------------------------------------------------- */
 /* SEO GLOBAL                                                                 */
 /* -------------------------------------------------------------------------- */
+type Props = {
+  params: Promise<{ lang: string }>
+}
+
 export async function generateMetadata({
   params,
-}: {
-  params?: { lang?: string }
-}): Promise<Metadata> {
-  const lang = i18n.locales.includes(params?.lang as SupportedLocale)
-    ? (params?.lang as SupportedLocale)
+}: Props): Promise<Metadata> {
+  // No Next.js 16, devemos aguardar o params
+  const { lang: rawLang } = await params
+  
+  const lang = i18n.locales.includes(rawLang as SupportedLocale)
+    ? (rawLang as SupportedLocale)
     : i18n.defaultLocale
 
   const dict = getDictionarySync(lang)
@@ -80,6 +84,7 @@ export async function generateMetadata({
       ? siteUrl
       : `${siteUrl}/${lang}`
 
+  // Nota: Acesso ajustado para dict.seo.siteName conforme o seu JSON
   return {
     metadataBase: new URL(siteUrl),
     title: {
@@ -112,11 +117,20 @@ export async function generateMetadata({
       title: dict.seo.siteName,
       description: dict.seo.description,
       siteName: dict.seo.siteName,
+      images: [
+        {
+          url: `/og-image-${lang}.png`,
+          width: 1200,
+          height: 630,
+          alt: dict.seo.siteName,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: dict.seo.siteName,
       description: dict.seo.description,
+      images: [`/og-image-${lang}.png`],
     },
   }
 }
@@ -124,15 +138,16 @@ export async function generateMetadata({
 /* -------------------------------------------------------------------------- */
 /* ROOT LAYOUT                                                               */
 /* -------------------------------------------------------------------------- */
-export default function RootLayout({
-  children,
-  params,
-}: {
+export default async function RootLayout(props: {
   children: React.ReactNode
-  params?: { lang?: string }
+  params: Promise<{ lang: string }>
 }) {
-  const lang = i18n.locales.includes(params?.lang as SupportedLocale)
-    ? (params?.lang as SupportedLocale)
+  // Unwrapping params no Next.js 16
+  const { lang: rawLang } = await props.params
+  const { children } = props
+
+  const lang = i18n.locales.includes(rawLang as SupportedLocale)
+    ? (rawLang as SupportedLocale)
     : i18n.defaultLocale
 
   const dict = getDictionarySync(lang)
@@ -144,7 +159,6 @@ export default function RootLayout({
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
       <head>
-        {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
           strategy="afterInteractive"
@@ -161,12 +175,12 @@ export default function RootLayout({
 
       <body className="min-h-screen flex flex-col bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden font-inter">
         <ThemeProvider>
-          {/* Acessibilidade */}
+          {/* Skip Link para Acessibilidade */}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-blue-600 focus:text-white"
           >
-            Skip to content
+            {lang === 'pt' ? 'Pular para o conteúdo' : lang === 'es' ? 'Saltar al contenido' : 'Skip to content'}
           </a>
 
           <main
