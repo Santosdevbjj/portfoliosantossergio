@@ -19,7 +19,7 @@ export default function proxy(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname === '/robots.txt' ||
     pathname === '/sitemap.xml' ||
-    pathname.match(/\.(ico|png|jpg|jpeg|svg|webp)$/)
+    /\.(ico|png|jpg|jpeg|svg|webp)$/.test(pathname)
   ) {
     return NextResponse.next()
   }
@@ -36,16 +36,23 @@ export default function proxy(request: NextRequest) {
   /**
    * 3️⃣ Extrai possível locale da URL
    */
-  const firstSegment = pathname.split('/')[1] as SupportedLocale | undefined
+  const segment = pathname.split('/')[1]
 
-  if (!SUPPORTED_LOCALES.includes(firstSegment)) {
+  /**
+   * 4️⃣ Validação segura do locale
+   */
+  const isSupportedLocale = SUPPORTED_LOCALES.includes(
+    segment as SupportedLocale,
+  )
+
+  if (!isSupportedLocale) {
     const url = request.nextUrl.clone()
     url.pathname = `/pt${pathname}`
     return NextResponse.redirect(url)
   }
 
   /**
-   * 4️⃣ Tudo OK → segue fluxo normal
+   * 5️⃣ Tudo OK → segue fluxo normal
    */
   return NextResponse.next()
 }
