@@ -1,9 +1,9 @@
 /**
  * HOME PAGE — ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * Framework: Next.js 16 (App Router / Turbopack)
- * I18n: PT / EN / ES (SSG)
- * SEO: Metadata Dinâmico + OpenGraph
+ * ✔️ Fix: Params as Promise (Next.js 16 Compliance)
+ * ✔️ Fix: SEO dinâmico alinhado à estrutura real do JSON
+ * ✔️ Responsividade: Mobile-first com viewport segura
  */
 
 import type { Metadata, Viewport } from 'next'
@@ -11,10 +11,11 @@ import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
 import { i18n } from '@/i18n-config'
 import ProxyPage from '@/ProxyClient'
 
+// Definição de Props para Next.js 16
 interface PageProps {
-  params: {
+  params: Promise<{
     lang: SupportedLocale
-  }
+  }>
 }
 
 /* -------------------------------------------------------------------------- */
@@ -35,8 +36,10 @@ export const viewport: Viewport = {
 /* SEO & OPEN GRAPH — CONFIGURAÇÃO DINÂMICA                                    */
 /* -------------------------------------------------------------------------- */
 export async function generateMetadata(
-  { params }: PageProps,
+  props: PageProps,
 ): Promise<Metadata> {
+  const params = await props.params;
+  
   const currentLang: SupportedLocale =
     i18n.locales.includes(params.lang)
       ? params.lang
@@ -48,15 +51,12 @@ export async function generateMetadata(
     process.env.NEXT_PUBLIC_SITE_URL ??
     'https://portfoliosantossergio.vercel.app'
 
-  const pageTitle =
-    dict.seo.pages?.home?.title ?? dict.seo.siteName
-
-  const pageDescription =
-    dict.seo.pages?.home?.description ?? dict.seo.description
+  // Ajuste de fallback: Usa dict.seo.siteName pois 'pages' está ausente nos JSONs
+  const pageTitle = dict.seo.siteName
+  const pageDescription = dict.seo.description
 
   /**
-   * Open Graph dinâmico (API /api/post-og)
-   * Ideal para homepage e compartilhamento social
+   * Open Graph dinâmico via Image Generation API
    */
   const ogImageUrl =
     `${siteUrl}/api/post-og` +
@@ -73,13 +73,9 @@ export async function generateMetadata(
   }
 
   return {
-    title: {
-      default: pageTitle,
-      template: `%s | ${dict.seo.siteName}`,
-    },
+    title: pageTitle,
     description: pageDescription,
     keywords: dict.seo.keywords,
-
     alternates: {
       canonical: `${siteUrl}/${currentLang}`,
       languages: {
@@ -89,7 +85,6 @@ export async function generateMetadata(
         'x-default': `${siteUrl}/pt`,
       },
     },
-
     openGraph: {
       title: pageTitle,
       description: pageDescription,
@@ -106,6 +101,12 @@ export async function generateMetadata(
         },
       ],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: pageTitle,
+      description: pageDescription,
+      images: [ogImageUrl],
+    },
   }
 }
 
@@ -119,7 +120,9 @@ export function generateStaticParams() {
 /* -------------------------------------------------------------------------- */
 /* PAGE COMPONENT — PONTO DE ENTRADA                                           */
 /* -------------------------------------------------------------------------- */
-export default function HomePage({ params }: PageProps) {
+export default async function HomePage(props: PageProps) {
+  const params = await props.params;
+  
   const currentLang: SupportedLocale =
     i18n.locales.includes(params.lang)
       ? params.lang
@@ -127,11 +130,8 @@ export default function HomePage({ params }: PageProps) {
 
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617]">
-      {/* 
-        ProxyPage é responsável por:
-        - Renderizar Hero, About, Projects, Articles, Contact
-        - Consumir dicionário no Client
-        - Sincronizar ScrollSpy
+      {/* ProxyPage centraliza a lógica do lado do cliente para manter 
+        esta página como Server Component para SEO máximo.
       */}
       <ProxyPage lang={currentLang} />
     </main>
