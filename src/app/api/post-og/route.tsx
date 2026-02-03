@@ -1,47 +1,63 @@
 import { ImageResponse } from 'next/og'
+import type { NextRequest } from 'next/server'
 
 export const runtime = 'edge'
 
 // -------------------- Helpers --------------------
 
-const sanitizeText = (v: string, max = 120) =>
-  v.replace(/\s+/g, ' ').trim().slice(0, max)
+const sanitizeText = (value: string, max = 120) =>
+  value.replace(/\s+/g, ' ').trim().slice(0, max)
 
-const sanitizeNum = (v: string, fallback: number) => {
-  const p = Number(v)
-  return Number.isFinite(p) && p > 0 ? p : fallback
+const sanitizePositiveInt = (value: string | null, fallback: number) => {
+  const n = Number(value)
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback
 }
 
 const formatDateSafe = () => {
   const d = new Date()
-  return `${String(d.getDate()).padStart(2, '0')}/${String(
-    d.getMonth() + 1,
-  ).padStart(2, '0')}/${d.getFullYear()}`
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const year = d.getUTCFullYear()
+  return `${day}/${month}/${year}`
 }
 
 // -------------------- Handler --------------------
 
-export async function GET(request: Request) {
+export function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
 
-    const title = sanitizeText(searchParams.get('title') ?? 'Sérgio Santos', 90)
-    const desc = sanitizeText(
+    const title = sanitizeText(
+      searchParams.get('title') ?? 'Sérgio Santos',
+      90,
+    )
+
+    const description = sanitizeText(
       searchParams.get('description') ?? 'Data Specialist',
       160,
     )
-    const author = sanitizeText(searchParams.get('author') ?? 'Sérgio Santos', 40)
+
+    const author = sanitizeText(
+      searchParams.get('author') ?? 'Sérgio Santos',
+      40,
+    )
+
     const date =
-      sanitizeText(searchParams.get('created-at') ?? '', 20) || formatDateSafe()
-    const time = sanitizeNum(searchParams.get('reading-time') ?? '', 5)
+      sanitizeText(searchParams.get('created-at') ?? '', 20) ||
+      formatDateSafe()
+
+    const readingTime = sanitizePositiveInt(
+      searchParams.get('reading-time'),
+      5,
+    )
 
     return new ImageResponse(
       (
         <div
           style={{
-            display: 'flex',
-            height: '100%',
             width: '100%',
+            height: '100%',
+            display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-end',
             backgroundColor: '#020617',
@@ -57,87 +73,84 @@ export async function GET(request: Request) {
               width: '100%',
               padding: 60,
               background:
-                'linear-gradient(to top, #020617 0%, rgba(2,6,23,0.85) 100%)',
+                'linear-gradient(to top, #020617 0%, rgba(2,6,23,0.88) 100%)',
             }}
           >
-            {/* Reading time */}
+            {/* Reading Time */}
             <div
               style={{
                 display: 'flex',
+                alignSelf: 'flex-start',
                 backgroundColor: '#ff4500',
                 padding: '8px 16px',
                 borderRadius: 8,
-                marginBottom: 30,
-                alignSelf: 'flex-start',
+                marginBottom: 28,
               }}
             >
               <span
                 style={{
-                  display: 'flex',
                   color: '#ffffff',
                   fontSize: 16,
                   fontWeight: 700,
+                  letterSpacing: 0.5,
                 }}
               >
-                {time} MIN DE LEITURA
+                {readingTime} MIN DE LEITURA
               </span>
             </div>
 
             {/* Title */}
             <div
               style={{
-                display: 'flex',
                 fontSize: 64,
                 fontWeight: 900,
                 color: '#ffffff',
                 lineHeight: 1.1,
-                marginBottom: 20,
+                marginBottom: 22,
+                maxWidth: 1000,
               }}
             >
-              <span>{title}</span>
+              {title}
             </div>
 
             {/* Description */}
             <div
               style={{
-                display: 'flex',
                 fontSize: 26,
                 color: '#94a3b8',
                 lineHeight: 1.4,
-                marginBottom: 40,
+                marginBottom: 42,
                 maxWidth: 900,
               }}
             >
-              <span>{desc}</span>
+              {description}
             </div>
 
             {/* Footer */}
             <div
               style={{
                 display: 'flex',
-                width: '100%',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                borderTop: '1px solid rgba(255,69,0,0.3)',
-                paddingTop: 30,
+                borderTop: '1px solid rgba(255,69,0,0.35)',
+                paddingTop: 28,
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div
                   style={{
-                    display: 'flex',
                     width: 50,
                     height: 50,
                     backgroundColor: '#ff4500',
                     borderRadius: 12,
+                    display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginRight: 15,
+                    marginRight: 14,
                   }}
                 >
                   <span
                     style={{
-                      display: 'flex',
                       color: '#ffffff',
                       fontSize: 24,
                       fontWeight: 700,
@@ -149,7 +162,6 @@ export async function GET(request: Request) {
 
                 <span
                   style={{
-                    display: 'flex',
                     color: '#ffffff',
                     fontSize: 22,
                     fontWeight: 600,
@@ -161,7 +173,6 @@ export async function GET(request: Request) {
 
               <span
                 style={{
-                  display: 'flex',
                   color: '#64748b',
                   fontSize: 20,
                 }}
@@ -180,8 +191,9 @@ export async function GET(request: Request) {
         },
       },
     )
-  } catch (error) {
-    console.error('[OG IMAGE ERROR]', error)
-    return new Response('Failed to generate OG image', { status: 500 })
+  } catch {
+    return new Response('Failed to generate OG image', {
+      status: 500,
+    })
   }
 }
