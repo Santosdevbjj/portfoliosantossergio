@@ -1,62 +1,67 @@
-'use client';
+'use client'
 
-import { useEffect, useMemo, useState } from 'react';
-import { notFound } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react'
+import { notFound } from 'next/navigation'
 
 // UI
-import { AboutSection } from '@/components/AboutSection';
-import { ContactSection } from '@/components/ContactSection';
-import { ExperienceSection } from '@/components/ExperienceSection';
-import { FeaturedArticleSection } from '@/components/FeaturedArticleSection';
-import { Footer } from '@/components/Footer';
-import { HeroSection } from '@/components/HeroSection';
-import { Navbar } from '@/components/Navbar';
-import { PageWrapper } from '@/components/PageWrapper';
-import { ProjectSection } from '@/components/ProjectSection';
-import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection';
+import { AboutSection } from '@/components/AboutSection'
+import { ContactSection } from '@/components/ContactSection'
+import { ExperienceSection } from '@/components/ExperienceSection'
+import { FeaturedArticleSection } from '@/components/FeaturedArticleSection'
+import { Footer } from '@/components/Footer'
+import { HeroSection } from '@/components/HeroSection'
+import { Navbar } from '@/components/Navbar'
+import { PageWrapper } from '@/components/PageWrapper'
+import { ProjectSection } from '@/components/ProjectSection'
+import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection'
 
 // Infra
-import { getDictionarySync, type SupportedLocale } from '@/dictionaries';
-import { getGitHubProjects } from '@/lib/github';
-import type { Project } from '@/domain/projects';
+import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
+import { getGitHubProjects } from '@/lib/github'
+import type { Project } from '@/domain/projects'
 
 interface ProxyClientProps {
-  readonly lang: SupportedLocale;
+  readonly lang: SupportedLocale
 }
 
 export default function ProxyClient({ lang }: ProxyClientProps) {
-  const supportedLocales: readonly SupportedLocale[] = ['pt', 'en', 'es'];
+  /**
+   * 🔐 Segurança: locale inválido → 404
+   */
+  const dict = useMemo(() => getDictionarySync(lang), [lang])
 
-  if (!supportedLocales.includes(lang)) {
-    notFound();
+  if (!dict) {
+    notFound()
   }
 
-  const [mounted, setMounted] = useState(false);
-  const [projects, setProjects] = useState<Project[]>([]);
-
-  const dict = useMemo(() => getDictionarySync(lang), [lang]);
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setMounted(true);
-
     async function loadData() {
       try {
-        const data = await getGitHubProjects(lang);
+        const data = await getGitHubProjects(lang)
         if (Array.isArray(data)) {
-          setProjects(data);
+          setProjects(data)
         }
       } catch (error) {
-        console.error('Erro ao carregar projetos:', error);
+        console.error('[PROJECTS]', error)
+      } finally {
+        setLoading(false)
       }
     }
 
-    loadData();
-  }, [lang]);
+    loadData()
+  }, [lang])
 
-  if (!mounted) {
+  if (loading) {
     return (
-      <div className="min-h-screen w-full animate-pulse bg-white dark:bg-[#020617]" />
-    );
+      <div className="min-h-screen w-full flex items-center justify-center bg-white dark:bg-[#020617]">
+        <span className="text-sm text-slate-500">
+          {dict.common.loading ?? 'Loading...'}
+        </span>
+      </div>
+    )
   }
 
   const sectionIds = [
@@ -66,7 +71,7 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
     'projects',
     'articles',
     'contact',
-  ] as const;
+  ] as const
 
   return (
     <PageWrapper lang={lang} sectionIds={sectionIds}>
@@ -77,10 +82,7 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
           <HeroSection lang={lang} dict={dict} />
         </section>
 
-        <section
-          id="about"
-          className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12"
-        >
+        <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
           <AboutSection lang={lang} dict={dict} />
         </section>
 
@@ -93,39 +95,24 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
           </div>
         </section>
 
-        <section
-          id="projects"
-          className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12"
-        >
-          {/* Projetos curados (editorial / SEO) */}
+        <section id="projects" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <FeaturedProjectsSection lang={lang} dict={dict} />
 
-          {/* Projetos dinâmicos (GitHub) */}
           <div className="mt-12 border-t pt-12 dark:border-slate-800">
-            <ProjectSection
-              projects={projects}
-              lang={lang}
-              dict={dict}
-            />
+            <ProjectSection projects={projects} lang={lang} dict={dict} />
           </div>
         </section>
 
-        <section
-          id="articles"
-          className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12"
-        >
+        <section id="articles" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <FeaturedArticleSection lang={lang} dict={dict} />
         </section>
 
-        <section
-          id="contact"
-          className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12"
-        >
+        <section id="contact" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
           <ContactSection lang={lang} dict={dict} />
         </section>
       </main>
 
       <Footer lang={lang} dict={dict} />
     </PageWrapper>
-  );
+  )
 }
