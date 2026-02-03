@@ -1,5 +1,3 @@
-'use client'
-
 import FeaturedGrid from './FeaturedGrid'
 import {
   featuredProjects,
@@ -40,7 +38,7 @@ export function FeaturedProjectsSection({
       item: {
         '@type': 'SoftwareApplication',
         name: project.name,
-        description: project.description[lang],
+        description: project.description?.[lang] ?? '',
         applicationCategory: 'DataScienceApplication',
         operatingSystem: 'Web/Cloud',
         url: `/${lang}/projects#${project.id}`,
@@ -71,7 +69,7 @@ export function FeaturedProjectsSection({
       <span
         id="featured-projects-anchor"
         className="absolute top-0 block h-px w-px"
-        aria-hidden
+        aria-hidden="true"
       />
 
       {/* SEO Rich Snippets */}
@@ -98,7 +96,6 @@ export function FeaturedProjectsSection({
           </p>
         </div>
 
-        {/* ⚠️ FeaturedGrid DEVE aceitar FeaturedProject[] */}
         <FeaturedGrid
           projects={projects}
           lang={lang}
