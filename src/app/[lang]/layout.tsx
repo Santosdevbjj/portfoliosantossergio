@@ -7,7 +7,7 @@
  * ✔️ Multilingue (PT / EN / ES)
  */
 
-import type { Metadata, Viewport } from 'next'
+/** import type { Metadata, Viewport } from 'next'
 import { Inter, Montserrat } from 'next/font/google'
 import Script from 'next/script'
 import '../globals.css'
@@ -19,6 +19,8 @@ import {
   getDictionarySync,
   type SupportedLocale,
 } from '@/dictionaries'
+
+*/
 
 /* -------------------------------------------------------------------------- */
 /* FONTS                                                                      */
