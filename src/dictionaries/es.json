@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "locale": "es-ES",
+    "direction": "ltr",
+    "lastUpdated": "2026-02-03T19:45:00Z",
+    "author": "Sérgio Santos",
+    "source": "manual"
+  },
+  "common": {
+    "navigation": "Navegación",
+    "role": "Especialista en Sistemas Críticos y Datos",
+    "footer": {
+      "copyright": "© 2026 Sérgio Santos.",
+      "rights": "Todos los derechos reservados."
+    },
+    "builtWith": "Desarrollado con Next.js 16 y TypeScript",
+    "loading": "Cargando...",
+    "error": "Algo salió mal. Inténtalo de nuevo.",
+    "socialLinks": "Abrir perfil de {platform} en una nueva pestaña",
+    "languageSwitcher": "Cambiar idioma a {lang}",
+    "errorBoundary": {
+      "title": "¡Ups! Ocurrió un error inesperado.",
+      "description": "Si el problema persiste, póngase en contacto con soporte.",
+      "actions": {
+        "retry": "Reintentar",
+        "home": "Volver al inicio"
+      }
+    },
+    "notFound": {
+      "title": "Página no encontrada",
+      "description": "El enlace que accedió puede estar roto o ya no existir.",
+      "button": "Volver al inicio"
+    },
+    "externalLinks": {
+      "linkedin": {
+        "url": "https://www.linkedin.com/in/santossergioluiz",
+        "label": "LinkedIn"
+      },
+      "github": {
+        "url": "https://github.com/seu-usuario",
+        "label": "GitHub"
+      },
+      "medium": {
+        "url": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
+        "label": "Medium"
+      },
+      "email": {
+        "address": "santossergiorealbjj@outlook.com",
+        "mailto": "mailto:santossergiorealbjj@outlook.com",
+        "label": "Email"
+      }
+    },
+    "menu": {
+      "open": "Abrir menú",
+      "close": "Cerrar menú",
+      "aria": {
+        "open": "Abrir menú de navegación",
+        "close": "Cerrar menú de navegación"
+      }
+    }
+  },
+  "intl": {
+    "locale": "es-ES",
+    "fallbackLocale": "es",
+    "currency": "EUR",
+    "timezone": "Europe/Madrid",
+    "unitDisplay": "short",
+    "numberFormat": "es-ES"
+  },
+  "states": {
+    "loading": "Cargando...",
+    "empty": "No hay datos disponibles.",
+    "error": "No se pudieron cargar los datos.",
+    "emptyProjects": {
+      "title": "No hay proyectos disponibles",
+      "description": "Nuevos proyectos se añadirán pronto.",
+      "cta": "Volver al inicio"
+    },
+    "emptyExperience": "No hay experiencia registrada.",
+    "errorArticles": "No se pudieron cargar los artículos."
+  }
+}
