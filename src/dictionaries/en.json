@@ -3,54 +3,67 @@
     "version": "1.0.0",
     "locale": "en-US",
     "direction": "ltr",
-    "lastUpdated": "2026-02-03T19:40:00Z",
+    "lastUpdated": "2026-02-03T19:10:00Z",
     "author": "Sérgio Santos",
-    "source": "manual"
+    "source": "manual",
+
+    "contentVersion": "2026.02.03",
+    "contentHash": "i18n-enus-2026-02-03",
+    "sourceType": "curated-manual"
   },
+
   "common": {
     "navigation": "Navigation",
     "role": "Mission-Critical Systems & Data Specialist",
-    "footer": {
-      "copyright": "© 2026 Sérgio Santos.",
-      "rights": "All rights reserved."
-    },
+    "footer": "© 2026 Sérgio Santos. All rights reserved.",
+    "rights": "All rights reserved",
     "builtWith": "Built with Next.js 16 & TypeScript",
     "loading": "Loading...",
     "error": "Something went wrong. Please try again.",
     "socialLinks": "Open {platform} profile in a new tab",
     "languageSwitcher": "Switch language to {lang}",
+
     "errorBoundary": {
       "title": "Oops! An unexpected error occurred.",
       "description": "If the problem persists, please contact support.",
       "actions": {
-        "retry": "Retry",
+        "retry": "Try again",
         "home": "Back to Home"
       }
     },
+
     "notFound": {
       "title": "Page not found",
       "description": "The link you accessed may be broken or no longer exists.",
       "button": "Back to Home"
     },
+
     "externalLinks": {
+      "linkedin": "https://www.linkedin.com/in/santossergioluiz",
+      "github": "https://github.com/seu-usuario",
+      "medium": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
+      "email": "santossergiorealbjj@outlook.com"
+    },
+
+    "externalLinksNormalized": {
       "linkedin": {
         "url": "https://www.linkedin.com/in/santossergioluiz",
-        "label": "LinkedIn"
+        "platform": "LinkedIn"
       },
       "github": {
-        "url": "https://github.com/Santosdevbjj",
-        "label": "GitHub"
+        "url": "https://github.com/seu-usuario",
+        "platform": "GitHub"
       },
       "medium": {
         "url": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
-        "label": "Medium"
+        "platform": "Medium"
       },
       "email": {
-        "address": "santossergiorealbjj@outlook.com",
-        "mailto": "mailto:santossergiorealbjj@outlook.com",
-        "label": "Email"
+        "url": "mailto:santossergiorealbjj@outlook.com",
+        "platform": "Email"
       }
     },
+
     "menu": {
       "open": "Open menu",
       "close": "Close menu",
@@ -60,71 +73,89 @@
       }
     }
   },
-  "about": {
-    "title": "Professional Background",
-    "description": "Strong background in mission-critical banking systems and modern data projects.",
-    "differentialTitle": "Strategic Advantage",
-    "differentialContent": "Experience in regulated environments combined with modern technologies.",
-    "highlights": [
-      "Critical systems",
-      "Process automation",
-      "Strategic data engineering"
-    ],
-    "stats": {
-      "experience": "20+ years",
-      "availability": "99.5%",
-      "automation": "{hours}/year"
-    }
-  },
-  "projects": {
-    "title": "Projects",
-    "featured": {
-      "label": "Featured",
-      "description": "Project selected as main"
-    },
-    "actions": {
-      "viewProject": "View project",
-      "viewAll": "View all",
-      "openRepository": "Open repository"
-    },
-    "firstLabel": "Main",
-    "categories": {
-      "dataScience": "Data Science",
-      "cloud": "Cloud",
-      "graphs": "Graphs",
-      "analysis": "Analytics",
-      "dev": "Development",
-      "security": "Security",
-      "data": "Data",
-      "backend": "Back-end",
-      "frontend": "Front-end",
-      "devops": "DevOps",
-      "others": "Others"
-    },
-    "count": {
-      "zero": "No projects",
-      "one": "{count} project",
-      "other": "{count} projects"
-    }
-  },
+
   "intl": {
     "locale": "en-US",
     "fallbackLocale": "en",
     "currency": "USD",
     "timezone": "America/New_York",
     "unitDisplay": "short",
-    "numberFormat": "en-US"
+    "numberFormat": "en-US",
+
+    "contract": {
+      "requiredFields": ["locale", "currency", "numberFormat", "timezone"],
+      "formattingResponsibility": "presentation-layer"
+    }
   },
+
   "states": {
     "loading": "Loading...",
     "empty": "No data available.",
     "error": "Unable to load information.",
+
     "emptyProjects": {
       "title": "No projects available",
       "description": "New projects will be added soon.",
       "cta": "Back to Home"
     },
+
     "emptyExperience": "No experience listed.",
-    "errorArticles": "Failed to load articles."
+    "errorArticles": "Unable to load articles."
+  },
+
+  "labels": {
+    "home": "Home",
+    "back": "Back",
+    "retry": "Try again",
+    "close": "Close",
+    "open": "Open"
+  },
+
+  "pluralization": {
+    "projects": {
+      "legacy": {
+        "zero": "No projects",
+        "one": "{count} project",
+        "other": "{count} projects"
+      },
+      "icu": "{count, plural, =0 {No projects} one {{count} project} other {{count} projects}}"
+    }
+  },
+
+  "seo": {
+    "projects": {
+      "title": "Data Engineering and Mission-Critical Systems Projects",
+      "description": "Real-world projects involving data, cloud, security, automation, and mission-critical systems."
+    },
+    "articles": {
+      "title": "Technical Articles and Professional Content",
+      "description": "Articles about technology, data, cloud, and software architecture."
+    }
+  },
+
+  "categoriesExtended": {
+    "dataScience": {
+      "label": "Data Science",
+      "seo": "Data Science and Analytics projects",
+      "order": 1
+    },
+    "cloud": {
+      "label": "Cloud",
+      "seo": "Cloud computing projects",
+      "order": 2
+    },
+    "graphs": {
+      "label": "Graphs",
+      "seo": "Graph visualization and analysis",
+      "order": 3
+    }
+  },
+
+  "metrics": {
+    "availability": "99.5%",
+    "availabilityNormalized": {
+      "value": 99.5,
+      "unit": "%"
+    }
   }
 }
