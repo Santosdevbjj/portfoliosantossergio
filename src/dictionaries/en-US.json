@@ -10,7 +10,19 @@
     "contentVersion": "2026.02.03",
     "contentHash": "i18n-enus-2026-02-03",
     "sourceType": "curated-manual"
-  },
+  }, 
+
+
+"cookie": {
+  "title": "Cookie Settings",
+  "description": "We use cookies to improve your experience and analyze site traffic.",
+  "necessary": "Necessary",
+  "alwaysActive": "Always Active",
+  "analytics": "Analytics",
+  "acceptAll": "Accept All",
+  "savePreferences": "Save Preferences"
+}
+  
 
   "common": {
     "navigation": "Navigation",
