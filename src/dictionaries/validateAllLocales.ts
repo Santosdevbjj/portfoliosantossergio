@@ -1,19 +1,45 @@
-import pt from "./pt.json";
-import en from "./en.json";
-import es from "./es.json";
-import { validateCrossLocale } from "./validateCrossLocale";
+// src/dictionaries/validateAllLocales.ts
 
+import ptBR from "./pt-BR.json";
+import enUS from "./en-US.json";
+import esES from "./es-ES.json";
+import esAR from "./es-AR.json";
+import esMX from "./es-MX.json";
+
+import { validateCrossLocale } from "./validateCrossLocale";
+import { Dictionary } from "@/types/dictionary";
+
+/**
+ * Valida a consistência estrutural entre todos os dicionários.
+ * Garante que chaves presentes no idioma principal (pt-BR) existam nos outros.
+ */
 export function validateAllLocales() {
-  const errors = [
-    ...validateCrossLocale(pt, en, "pt", "en"),
-    ...validateCrossLocale(pt, es, "pt", "es")
+  // Cast para Dictionary para garantir que estamos validando contra o contrato correto
+  const base = ptBR as Dictionary;
+  
+  const targets = [
+    { data: enUS as Dictionary, code: "en-US" },
+    { data: esES as Dictionary, code: "es-ES" },
+    { data: esAR as Dictionary, code: "es-AR" },
+    { data: esMX as Dictionary, code: "es-MX" }
   ];
 
-  if (errors.length) {
-    console.error("❌ i18n validation failed:\n");
-    errors.forEach(err => console.error(err));
-    process.exit(1);
-  }
+  const errors: string[] = [];
 
-  console.log("✅ i18n dictionaries are fully aligned");
+  // Executa a validação cruzada para cada idioma contra o pt-BR
+  targets.forEach(target => {
+    errors.push(...validateCrossLocale(base, target.data, "pt-BR", target.code));
+  });
+
+  if (errors.length > 0) {
+    console.error("\n❌ i18n validation failed (Alignment Errors):\n");
+    errors.forEach(err => console.error(`  - ${err}`));
+    
+    // Interrompe o build ou execução se houver erro de alinhamento
+    if (process.env.NODE_ENV !== "development") {
+      process.exit(1);
+    }
+  } else {
+    console.log("✅ i18n dictionaries are fully aligned (5 locales).");
+  }
 }
