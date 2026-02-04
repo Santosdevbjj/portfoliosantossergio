@@ -12,6 +12,17 @@
     "sourceType": "curated-manual"
   },
 
+"cookie": {
+  "title": "Configurações de Cookies",
+  "description": "Utilizamos cookies para melhorar sua experiência e analisar o tráfego do site.",
+  "necessary": "Necessários",
+  "alwaysActive": "Sempre Ativo",
+  "analytics": "Analíticos",
+  "acceptAll": "Aceitar Todos",
+  "savePreferences": "Salvar Preferências"
+},
+
+  
   "common": {
     "navigation": "Navegação",
     "role": "Especialista em Sistemas Críticos & Dados",
