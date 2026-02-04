@@ -20,6 +20,36 @@ import {
 } from '@/dictionaries'
 
 
+import { getServerDictionary } from "@/lib/getServerDictionary";
+import type { Locale } from "@/types/dictionary";
+
+// No Next.js 15/16, params deve ser tratado como Promise
+export default async function LangLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ lang: Locale }>;
+}) {
+  // Aguarda a resolução dos parâmetros da URL
+  const { lang } = await params;
+  
+  // Obtém o dicionário baseado no idioma resolvido
+  const dict = getServerDictionary(lang);
+
+  return (
+    <html lang={lang} dir={dict.meta.direction || "ltr"}>
+      <body className="antialiased">
+        {/* Exemplo de uso: <Navbar dict={dict.common} /> */}
+        {children}
+        {/* Exemplo de uso: <Footer dict={dict.common} /> */}
+      </body>
+    </html>
+  );
+}
+
+
+
 
 /* -------------------------------------------------------------------------- */
 /* FONTS                                                                      */
