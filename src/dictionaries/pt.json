@@ -38,7 +38,7 @@
         "label": "LinkedIn"
       },
       "github": {
-        "url": "https://github.com/seu-usuario",
+        "url": "https://github.com/Santosdevbjj",
         "label": "GitHub"
       },
       "medium": {
@@ -58,6 +58,53 @@
         "open": "Abrir menu de navegação",
         "close": "Fechar menu de navegação"
       }
+    }
+  },
+  "about": {
+    "title": "Trajetória Profissional",
+    "description": "Atuação sólida em sistemas bancários críticos e projetos modernos de dados.",
+    "differentialTitle": "Diferencial Estratégico",
+    "differentialContent": "Experiência em ambientes regulados aliada a tecnologias modernas.",
+    "highlights": [
+      "Sistemas críticos",
+      "Automação de processos",
+      "Engenharia de dados estratégica"
+    ],
+    "stats": {
+      "experience": "20+ anos",
+      "availability": "99,5%",
+      "automation": "{hours}/ano"
+    }
+  },
+  "projects": {
+    "title": "Projetos",
+    "featured": {
+      "label": "Destaque",
+      "description": "Projeto selecionado como principal"
+    },
+    "actions": {
+      "viewProject": "Ver projeto",
+      "viewAll": "Ver todos",
+      "openRepository": "Abrir repositório"
+    },
+    "firstLabel": "Principal",
+    "categories": {
+      "dataScience": "Ciência de Dados",
+      "cloud": "Cloud",
+      "graphs": "Grafos",
+      "analysis": "Análise",
+      "dev": "Desenvolvimento",
+      "security": "Segurança",
+      "data": "Dados",
+      "backend": "Back-end",
+      "frontend": "Front-end",
+      "devops": "DevOps",
+      "others": "Outros"
+    },
+    "count": {
+      "zero": "Nenhum projeto",
+      "one": "{count} projeto",
+      "other": "{count} projetos"
     }
   },
   "intl": {
