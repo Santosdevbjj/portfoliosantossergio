@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "locale": "es-ES",
     "direction": "ltr",
-    "lastUpdated": "2026-02-03T19:45:00Z",
+    "lastUpdated": "2026-02-03T19:40:00Z",
     "author": "Sérgio Santos",
     "source": "manual"
   },
@@ -21,7 +21,7 @@
     "languageSwitcher": "Cambiar idioma a {lang}",
     "errorBoundary": {
       "title": "¡Ups! Ocurrió un error inesperado.",
-      "description": "Si el problema persiste, póngase en contacto con soporte.",
+      "description": "Si el problema persiste, póngase en contacto.",
       "actions": {
         "retry": "Reintentar",
         "home": "Volver al inicio"
@@ -29,7 +29,7 @@
     },
     "notFound": {
       "title": "Página no encontrada",
-      "description": "El enlace que accedió puede estar roto o ya no existir.",
+      "description": "El enlace que accedió puede estar roto o no existir.",
       "button": "Volver al inicio"
     },
     "externalLinks": {
@@ -38,7 +38,7 @@
         "label": "LinkedIn"
       },
       "github": {
-        "url": "https://github.com/seu-usuario",
+        "url": "https://github.com/Santosdevbjj",
         "label": "GitHub"
       },
       "medium": {
@@ -58,6 +58,53 @@
         "open": "Abrir menú de navegación",
         "close": "Cerrar menú de navegación"
       }
+    }
+  },
+  "about": {
+    "title": "Trayectoria Profesional",
+    "description": "Experiencia sólida en sistemas bancarios críticos y proyectos modernos de datos.",
+    "differentialTitle": "Ventaja Estratégica",
+    "differentialContent": "Experiencia en entornos regulados junto con tecnologías modernas.",
+    "highlights": [
+      "Sistemas críticos",
+      "Automatización de procesos",
+      "Ingeniería de datos estratégica"
+    ],
+    "stats": {
+      "experience": "20+ años",
+      "availability": "99,5%",
+      "automation": "{hours}/año"
+    }
+  },
+  "projects": {
+    "title": "Proyectos",
+    "featured": {
+      "label": "Destacado",
+      "description": "Proyecto seleccionado como principal"
+    },
+    "actions": {
+      "viewProject": "Ver proyecto",
+      "viewAll": "Ver todos",
+      "openRepository": "Abrir repositorio"
+    },
+    "firstLabel": "Principal",
+    "categories": {
+      "dataScience": "Ciencia de Datos",
+      "cloud": "Nube",
+      "graphs": "Grafos",
+      "analysis": "Análisis",
+      "dev": "Desarrollo",
+      "security": "Seguridad",
+      "data": "Datos",
+      "backend": "Back-end",
+      "frontend": "Front-end",
+      "devops": "DevOps",
+      "others": "Otros"
+    },
+    "count": {
+      "zero": "Ningún proyecto",
+      "one": "{count} proyecto",
+      "other": "{count} proyectos"
     }
   },
   "intl": {
