@@ -1,5 +1,7 @@
 // src/types/project.ts
 
+import { Locale } from "./dictionary";
+
 export type ProjectLocaleContent = {
   title: string;
   description: string;
@@ -26,16 +28,24 @@ export interface Project {
   order: number;
   status: "active" | "archived" | "draft";
 
+  /**
+   * Conteúdo localizado do projeto.
+   * Mapeado dinamicamente usando o tipo Locale global.
+   * 'pt-BR' é obrigatório como fallback principal.
+   */
   content: {
     "pt-BR": ProjectLocaleContent;
-    "en-US"?: ProjectLocaleContent;
-    "es-ES"?: ProjectLocaleContent;
+  } & {
+    [K in Extract<Locale, "en-US" | "es-ES" | "es-AR" | "es-MX">]?: ProjectLocaleContent;
   };
 
+  /**
+   * SEO localizado do projeto.
+   */
   seo: {
     "pt-BR": ProjectSEO;
-    "en-US"?: ProjectSEO;
-    "es-ES"?: ProjectSEO;
+  } & {
+    [K in Extract<Locale, "en-US" | "es-ES" | "es-AR" | "es-MX">]?: ProjectSEO;
   };
 
   stack: string[];
