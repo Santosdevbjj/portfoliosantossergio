@@ -1,13 +1,18 @@
-import pt from "./pt.json";
-import en from "./en.json";
-import es from "./es.json";
-import esAR from "./es-AR.json";
+// src/dictionaries/fallback.ts
+
+import ptBR from "./pt-BR.json";
+import enUS from "./en-US.json";
+import esES from "./es-ES.json";
+import esAR from "./es-AR.json"; 
 import esMX from "./es-MX.json";
 
+import type { Dictionary, Locale } from "@/types/dictionary";
+
+// Usando o tipo Locale para garantir que as chaves principais estejam corretas
 const DICTIONARIES: Record<string, any> = {
-  "pt-BR": pt,
-  "en-US": en,
-  "es-ES": es,
+  "pt-BR": ptBR,
+  "en-US": enUS,
+  "es-ES": esES,
   "es-AR": esAR,
   "es-MX": esMX
 };
@@ -20,14 +25,15 @@ const FALLBACK_CHAIN: Record<string, string[]> = {
   "pt-BR": ["pt-BR"]
 };
 
-export function getDictionary(locale: string) {
+export function getDictionary(locale: string): Dictionary {
   const chain = FALLBACK_CHAIN[locale] || ["pt-BR"];
 
   for (const lang of chain) {
     if (DICTIONARIES[lang]) {
-      return DICTIONARIES[lang];
+      return DICTIONARIES[lang] as Dictionary;
     }
   }
 
-  return pt;
+  // Fallback definitivo caso nada na corrente seja encontrado
+  return ptBR as Dictionary;
 }
