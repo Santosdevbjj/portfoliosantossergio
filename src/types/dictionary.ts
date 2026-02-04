@@ -40,6 +40,28 @@ export interface Dictionary {
     }
   }
 
+  about?: {
+    title: string
+    description: string
+    differentialTitle: string
+    differentialContent: string
+    highlights: string[]
+    stats: {
+      experience: string
+      availability: string
+      automation: string
+    }
+  }
+
+  projects?: {
+    title: string
+    featured?: { label: string; description?: string }
+    actions?: { viewProject: string; viewAll: string; openRepository: string }
+    firstLabel?: string
+    categories: Record<string, string>
+    count?: { zero?: string; one: string; other: string }
+  }
+
   states?: {
     loading?: string
     empty?: string
