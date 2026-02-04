@@ -7,34 +7,40 @@ export function validateDictionary(
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
-  if (!dictionary.meta) {
+  // 1. Validação da Seção Meta
+  if (!dictionary?.meta) {
     errors.push("Missing meta section");
-  }
-
-  if (!dictionary.meta.locale) {
+  } else if (!dictionary.meta.locale) {
     errors.push("Missing meta.locale");
   }
 
-  if (!dictionary.common) {
+  // 2. Validação da Seção Common e ErrorBoundary
+  // Adicionado Optional Chaining (?.) para evitar crash se 'common' ou 'errorBoundary' estiverem ausentes
+  if (!dictionary?.common) {
     errors.push("Missing common section");
+  } else if (!dictionary.common.errorBoundary?.actions?.retry) {
+    errors.push("Missing common.errorBoundary.actions.retry");
   }
 
-  if (!dictionary.common.errorBoundary?.actions?.retry) {
-    errors.push("Missing errorBoundary retry action");
-  }
-
-  if (!dictionary.intl) {
+  // 3. Validação da Seção Intl
+  if (!dictionary?.intl) {
     errors.push("Missing intl section");
   }
 
-  if (!dictionary.states?.emptyProjects?.title) {
-    errors.push("Missing emptyProjects.title");
+  // 4. Validação da Seção States (Crucial para a renderização de listas)
+  if (!dictionary?.states?.emptyProjects?.title) {
+    errors.push("Missing states.emptyProjects.title");
   }
 
-  if (dictionary.metrics?.availabilityNormalized) {
+  // 5. Validação de Métricas (Lógica de Negócio)
+  // Verifica se o objeto existe antes de validar os tipos internos
+  if (dictionary?.metrics?.availabilityNormalized) {
     const { value, unit } = dictionary.metrics.availabilityNormalized;
-    if (typeof value !== "number" || unit !== "%") {
-      errors.push("Invalid availabilityNormalized format");
+    if (typeof value !== "number") {
+      errors.push("metrics.availabilityNormalized.value must be a number");
+    }
+    if (unit !== "%") {
+      errors.push("metrics.availabilityNormalized.unit must be '%'");
     }
   }
 
