@@ -13,6 +13,43 @@ import ProxyPage from '@/ProxyClient'
 
 
 
+import { getServerDictionary } from "@/lib/getServerDictionary";
+import type { Locale } from "@/types/dictionary";
+
+interface PageProps {
+  params: Promise<{
+    lang: Locale;
+  }>;
+}
+
+export default async function Page({ params }: PageProps) {
+  // 1. Resolvemos a Promise de params
+  const { lang } = await params;
+
+  // 2. Buscamos o dicionário (getServerDictionary é síncrono, mas roda no servidor)
+  const dict = getServerDictionary(lang);
+
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <header className="mb-12">
+        <h1 className="text-4xl font-bold tracking-tight">
+          {dict.seo.projects.title}
+        </h1>
+        <p className="mt-4 text-lg text-muted-foreground">
+          {dict.seo.projects.description}
+        </p>
+      </header>
+      
+      {/* Exemplo de uso de estados do dicionário */}
+      <section>
+        {/* Se não houvesse projetos, você usaria: dict.states.emptyProjects.title */}
+      </section>
+    </main>
+  );
+}
+
+
+
 
 // Definição de Props para Next.js 16
 interface PageProps {
