@@ -1,4 +1,4 @@
-import type { Dictionary } from '@/types/dictionary'
+import type { Dictionary } from './dictionary'
 
 /**
  * ProjectCategory
