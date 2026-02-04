@@ -1,11 +1,11 @@
 /**
  * ROOT LAYOUT — NEXT.JS 16 — SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * ✔️ Fix: Params transformados em Promise (Next.js 16 Compliance)
- * ✔️ Fix: Acesso aos dicionários corrigido para dict.seo.siteName
- * ✔️ Responsivo (Mobile / Desktop)
- * ✔️ Multilingue (PT / EN / ES)
+ * ✔️ TOTALMENTE ALINHADO: src/types/dictionary.ts
+ * ✔️ VERIFICAÇÃO PRESERVADA: Google Search Console
+ * ✔️ SEM DUPLICATAS: Versão limpa e otimizada
  */
+
 import type { Metadata, Viewport } from 'next'
 import { Inter, Montserrat } from 'next/font/google'
 import Script from 'next/script'
@@ -13,64 +13,23 @@ import '../globals.css'
 
 import { ThemeProvider } from '@/components/ThemeToggle'
 import { CookieBanner } from '@/components/CookieBanner'
-import { i18n } from '@/i18n-config'
-import {
-  getDictionarySync,
-  type SupportedLocale,
-} from '@/dictionaries'
+import { getServerDictionary } from "@/lib/getServerDictionary"
+import type { Locale } from "@/types/dictionary"
 
-
-import { getServerDictionary } from "@/lib/getServerDictionary";
-import type { Locale } from "@/types/dictionary";
-
-// No Next.js 15/16, params deve ser tratado como Promise
-export default async function LangLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
-}) {
-  // Aguarda a resolução dos parâmetros da URL
-  const { lang } = await params;
-  
-  // Obtém o dicionário baseado no idioma resolvido
-  const dict = getServerDictionary(lang);
-
-  return (
-    <html lang={lang} dir={dict.meta.direction || "ltr"}>
-      <body className="antialiased">
-        {/* Exemplo de uso: <Navbar dict={dict.common} /> */}
-        {children}
-        {/* Exemplo de uso: <Footer dict={dict.common} /> */}
-      </body>
-    </html>
-  );
-}
-
-
-
-
-/* -------------------------------------------------------------------------- */
-/* FONTS                                                                      */
-/* -------------------------------------------------------------------------- */
+/* --- FONTS --- */
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
-  preload: true,
 })
 
 const montserrat = Montserrat({
   subsets: ['latin'],
   variable: '--font-montserrat',
   display: 'swap',
-  preload: true,
 })
 
-/* -------------------------------------------------------------------------- */
-/* VIEWPORT                                                                   */
-/* -------------------------------------------------------------------------- */
+/* --- VIEWPORT --- */
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -81,115 +40,67 @@ export const viewport: Viewport = {
   ],
 }
 
-/* -------------------------------------------------------------------------- */
-/* SEO GLOBAL                                                                 */
-/* -------------------------------------------------------------------------- */
+/* --- SEO & METADATA --- */
 type Props = {
   params: Promise<{ lang: string }>
 }
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
-  // No Next.js 16, devemos aguardar o params
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang: rawLang } = await params
+  const lang = rawLang as Locale
+  const dict = getServerDictionary(lang)
   
-  const lang = i18n.locales.includes(rawLang as SupportedLocale)
-    ? (rawLang as SupportedLocale)
-    : i18n.defaultLocale
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app'
 
-  const dict = getDictionarySync(lang)
-
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    'https://portfoliosantossergio.vercel.app'
-
-  const ogLocaleMap: Record<SupportedLocale, string> = {
-    pt: 'pt_BR',
-    en: 'en_US',
-    es: 'es_ES',
-  }
-
-  const localizedUrl =
-    lang === i18n.defaultLocale
-      ? siteUrl
-      : `${siteUrl}/${lang}`
-
-  // Nota: Acesso ajustado para dict.seo.siteName conforme o seu JSON
   return {
     metadataBase: new URL(siteUrl),
-    title: {
-      default: dict.seo.siteName,
-      template: `%s | ${dict.seo.siteName}`,
-    },
-    description: dict.seo.description,
-    keywords: dict.seo.keywords,
-    authors: [{ name: 'Sérgio Santos' }],
-    creator: 'Sérgio Santos',
-    robots: {
-      index: true,
-      follow: true,
-    },
     verification: {
-      google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
+      google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0', // PRESERVADO
     },
+    title: {
+      default: `Sérgio Santos | ${dict.common.role}`,
+      template: `%s | Sérgio Santos`,
+    },
+    description: dict.common.role,
     alternates: {
-      canonical: localizedUrl,
+      canonical: `${siteUrl}/${lang}`,
       languages: {
-        'pt-BR': `${siteUrl}/pt`,
-        'en-US': `${siteUrl}/en`,
-        'es-ES': `${siteUrl}/es`,
+        'pt-BR': `${siteUrl}/pt-BR`,
+        'en-US': `${siteUrl}/en-US`,
+        'es-ES': `${siteUrl}/es-ES`,
+        'es-AR': `${siteUrl}/es-AR`,
+        'es-MX': `${siteUrl}/es-MX`,
       },
     },
     openGraph: {
       type: 'website',
-      locale: ogLocaleMap[lang],
-      url: localizedUrl,
-      title: dict.seo.siteName,
-      description: dict.seo.description,
-      siteName: dict.seo.siteName,
-      images: [
-        {
-          url: `/og-image-${lang}.png`,
-          width: 1200,
-          height: 630,
-          alt: dict.seo.siteName,
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: dict.seo.siteName,
-      description: dict.seo.description,
-      images: [`/og-image-${lang}.png`],
+      url: `${siteUrl}/${lang}`,
+      title: "Sérgio Santos",
+      description: dict.common.role,
+      siteName: "Sérgio Santos",
+      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
     },
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* ROOT LAYOUT                                                               */
-/* -------------------------------------------------------------------------- */
+/* --- ROOT LAYOUT --- */
 export default async function RootLayout(props: {
   children: React.ReactNode
   params: Promise<{ lang: string }>
 }) {
-  // Unwrapping params no Next.js 16
   const { lang: rawLang } = await props.params
-  const { children } = props
-
-  const lang = i18n.locales.includes(rawLang as SupportedLocale)
-    ? (rawLang as SupportedLocale)
-    : i18n.defaultLocale
-
-  const dict = getDictionarySync(lang)
+  const lang = rawLang as Locale
+  const dict = getServerDictionary(lang)
 
   return (
     <html
       lang={lang}
+      dir={dict.meta.direction} // "ltr" vindo do seu JSON
       suppressHydrationWarning
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
       <head>
+        {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
           strategy="afterInteractive"
@@ -204,21 +115,18 @@ export default async function RootLayout(props: {
         </Script>
       </head>
 
-      <body className="min-h-screen flex flex-col bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden font-inter">
+      <body className="min-h-screen flex flex-col bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased font-inter">
         <ThemeProvider>
-          {/* Skip Link para Acessibilidade */}
+          {/* Acessibilidade - Skip Link usando seu dicionário */}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-blue-600 focus:text-white"
           >
-            {lang === 'pt' ? 'Pular para o conteúdo' : lang === 'es' ? 'Saltar al contenido' : 'Skip to content'}
+            {dict.common.menu.aria.open}
           </a>
 
-          <main
-            id="main-content"
-            className="flex-grow w-full relative"
-          >
-            {children}
+          <main id="main-content" className="flex-grow">
+            {props.children}
           </main>
 
           <CookieBanner lang={lang} dict={dict} />
