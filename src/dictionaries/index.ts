@@ -1,4 +1,4 @@
-import type { Dictionary } from './dictionary'
+import type { Dictionary } from '../types/dictionary'
 
 import pt from './pt.json'
 import en from './en.json'
