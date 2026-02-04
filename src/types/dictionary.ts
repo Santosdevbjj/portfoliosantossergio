@@ -133,7 +133,18 @@ export interface MetricsDictionary {
     value: number;
     unit: string;
   };
+} 
+
+export interface CookieDictionary {
+  title: string;
+  description: string;
+  necessary: string;
+  alwaysActive: string;
+  analytics: string;
+  acceptAll: string;
+  savePreferences: string;
 }
+
 
 /**
  * Estrutura principal do Dicionário.
@@ -144,6 +155,7 @@ export interface Dictionary {
   common: CommonDictionary;
   intl: IntlDictionary;
   states: StateDictionary;
+  cookie: CookieDictionary; // Adicione esta linha
   labels?: LabelsDictionary;
   pluralization?: PluralizationDictionary;
   seo?: SeoDictionary;
