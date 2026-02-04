@@ -1,6 +1,10 @@
 // src/types/dictionary.ts
 
-export type Locale = "pt-BR" | "en-US" | "es-ES";
+/**
+ * Tipos de idiomas suportados pela aplicação.
+ * Adicionado: es-AR e es-MX para suporte regional completo.
+ */
+export type Locale = "pt-BR" | "en-US" | "es-ES" | "es-AR" | "es-MX";
 
 export interface DictionaryMeta {
   version: string;
@@ -131,6 +135,10 @@ export interface MetricsDictionary {
   };
 }
 
+/**
+ * Estrutura principal do Dicionário.
+ * Representa a forma exata dos arquivos .json na pasta dictionaries.
+ */
 export interface Dictionary {
   meta: DictionaryMeta;
   common: CommonDictionary;
