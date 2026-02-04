@@ -1,4 +1,4 @@
-import type { Dictionary } from './dictionary'
+import type { Dictionary } from '../types/dictionary'
 import type { SupportedLocale } from './index'
 import { dictionaries } from './index'
 
@@ -12,7 +12,7 @@ interface ValidationResult {
 /**
  * Arrays que não podem estar vazios
  */
-const REQUIRED_NON_EMPTY_ARRAYS = ['about.highlights', 'experience.items']
+const REQUIRED_NON_EMPTY_ARRAYS = ['about.highlights']
 
 function extractKeys(obj: Record<string, any>, prefix = ''): string[] {
   return Object.entries(obj).flatMap(([key, value]) => {
