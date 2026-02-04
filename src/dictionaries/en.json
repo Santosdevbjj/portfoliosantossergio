@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "locale": "en-US",
     "direction": "ltr",
-    "lastUpdated": "2026-02-03T19:45:00Z",
+    "lastUpdated": "2026-02-03T19:40:00Z",
     "author": "Sérgio Santos",
     "source": "manual"
   },
@@ -38,7 +38,7 @@
         "label": "LinkedIn"
       },
       "github": {
-        "url": "https://github.com/seu-usuario",
+        "url": "https://github.com/Santosdevbjj",
         "label": "GitHub"
       },
       "medium": {
@@ -58,6 +58,53 @@
         "open": "Open navigation menu",
         "close": "Close navigation menu"
       }
+    }
+  },
+  "about": {
+    "title": "Professional Background",
+    "description": "Strong background in mission-critical banking systems and modern data projects.",
+    "differentialTitle": "Strategic Advantage",
+    "differentialContent": "Experience in regulated environments combined with modern technologies.",
+    "highlights": [
+      "Critical systems",
+      "Process automation",
+      "Strategic data engineering"
+    ],
+    "stats": {
+      "experience": "20+ years",
+      "availability": "99.5%",
+      "automation": "{hours}/year"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "featured": {
+      "label": "Featured",
+      "description": "Project selected as main"
+    },
+    "actions": {
+      "viewProject": "View project",
+      "viewAll": "View all",
+      "openRepository": "Open repository"
+    },
+    "firstLabel": "Main",
+    "categories": {
+      "dataScience": "Data Science",
+      "cloud": "Cloud",
+      "graphs": "Graphs",
+      "analysis": "Analytics",
+      "dev": "Development",
+      "security": "Security",
+      "data": "Data",
+      "backend": "Back-end",
+      "frontend": "Front-end",
+      "devops": "DevOps",
+      "others": "Others"
+    },
+    "count": {
+      "zero": "No projects",
+      "one": "{count} project",
+      "other": "{count} projects"
     }
   },
   "intl": {
