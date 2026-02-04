@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "locale": "es-AR",
+    "direction": "ltr",
+    "lastUpdated": "2026-02-03T19:10:00Z",
+    "author": "Sérgio Santos",
+    "source": "manual",
+
+    "contentVersion": "2026.02.03",
+    "contentHash": "i18n-esar-2026-02-03",
+    "sourceType": "curated-manual"
+  },
+
+  "common": {
+    "navigation": "Navegación",
+    "role": "Especialista en Sistemas Críticos y Datos",
+    "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
+    "rights": "Todos los derechos reservados",
+    "builtWith": "Desarrollado con Next.js 16 y TypeScript",
+    "loading": "Cargando...",
+    "error": "Algo salió mal. Inténtalo nuevamente.",
+    "socialLinks": "Abrir perfil de {platform} en una nueva pestaña",
+    "languageSwitcher": "Cambiar idioma a {lang}",
+
+    "errorBoundary": {
+      "title": "¡Ups! Ocurrió un error inesperado.",
+      "description": "Si el problema persiste, póngase en contacto.",
+      "actions": {
+        "retry": "Intentar nuevamente",
+        "home": "Volver al inicio"
+      }
+    },
+
+    "notFound": {
+      "title": "Página no encontrada",
+      "description": "El enlace al que accediste puede estar roto o no existir.",
+      "button": "Volver al inicio"
+    },
+
+    "externalLinks": {
+      "linkedin": "https://www.linkedin.com/in/santossergioluiz",
+      "github": "https://github.com/seu-usuario",
+      "medium": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
+      "email": "santossergiorealbjj@outlook.com"
+    },
+
+    "externalLinksNormalized": {
+      "linkedin": {
+        "url": "https://www.linkedin.com/in/santossergioluiz",
+        "platform": "LinkedIn"
+      },
+      "github": {
+        "url": "https://github.com/seu-usuario",
+        "platform": "GitHub"
+      },
+      "medium": {
+        "url": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e",
+        "platform": "Medium"
+      },
+      "email": {
+        "url": "mailto:santossergiorealbjj@outlook.com",
+        "platform": "Email"
+      }
+    },
+
+    "menu": {
+      "open": "Abrir menú",
+      "close": "Cerrar menú",
+      "aria": {
+        "open": "Abrir menú de navegación",
+        "close": "Cerrar menú de navegación"
+      }
+    }
+  },
+
+  "intl": {
+    "locale": "es-AR",
+    "fallbackLocale": "es",
+    "currency": "ARS",
+    "timezone": "America/Argentina/Buenos_Aires",
+    "unitDisplay": "short",
+    "numberFormat": "es-AR",
+
+    "contract": {
+      "requiredFields": ["locale", "currency", "numberFormat", "timezone"],
+      "formattingResponsibility": "presentation-layer"
+    }
+  },
+
+  "states": {
+    "loading": "Cargando...",
+    "empty": "No hay datos disponibles.",
+    "error": "No fue posible cargar la información.",
+
+    "emptyProjects": {
+      "title": "No hay proyectos disponibles",
+      "description": "Se agregarán nuevos proyectos próximamente.",
+      "cta": "Volver al inicio"
+    },
+
+    "emptyExperience": "No hay experiencias registradas.",
+    "errorArticles": "No fue posible cargar los artículos."
+  },
+
+  "labels": {
+    "home": "Inicio",
+    "back": "Volver",
+    "retry": "Intentar nuevamente",
+    "close": "Cerrar",
+    "open": "Abrir"
+  },
+
+  "pluralization": {
+    "projects": {
+      "legacy": {
+        "zero": "Ningún proyecto",
+        "one": "{count} proyecto",
+        "other": "{count} proyectos"
+      },
+      "icu": "{count, plural, =0 {Ningún proyecto} one {{count} proyecto} other {{count} proyectos}}"
+    }
+  },
+
+  "seo": {
+    "projects": {
+      "title": "Proyectos de Ingeniería de Datos y Sistemas Críticos",
+      "description": "Proyectos reales que involucran datos, cloud, seguridad, automatización y sistemas críticos."
+    },
+    "articles": {
+      "title": "Artículos Técnicos y Contenido Profesional",
+      "description": "Artículos sobre tecnología, datos, cloud y arquitectura de software."
+    }
+  },
+
+  "categoriesExtended": {
+    "dataScience": {
+      "label": "Data Science",
+      "seo": "Proyectos de Data Science y Analytics",
+      "order": 1
+    },
+    "cloud": {
+      "label": "Cloud",
+      "seo": "Proyectos de computación en la nube",
+      "order": 2
+    },
+    "graphs": {
+      "label": "Graphs",
+      "seo": "Visualización y análisis de grafos",
+      "order": 3
+    }
+  },
+
+  "metrics": {
+    "availability": "99,5%",
+    "availabilityNormalized": {
+      "value": 99.5,
+      "unit": "%"
+    }
+  }
+}
