@@ -1,35 +1,31 @@
-import type { Dictionary } from '../types/dictionary'
+// src/dictionaries/index.ts
 
-import pt from './pt.json'
-import en from './en.json'
-import es from './es.json'
+import type { Dictionary, Locale } from "@/types/dictionary";
+import { validateDictionary } from "./validator";
 
-import { validateDictionaries } from './validator'
+import ptBR from "./pt-BR.json";
+import enUS from "./en-US.json";
+import esES from "./es-ES.json";
 
-export const ptDictionary = pt as const satisfies Dictionary
-export const enDictionary = en as const satisfies Dictionary
-export const esDictionary = es as const satisfies Dictionary
+const dictionaries: Record<Locale, Dictionary> = {
+  "pt-BR": ptBR as Dictionary,
+  "en-US": enUS as Dictionary,
+  "es-ES": esES as Dictionary,
+};
 
-export type SupportedLocale = 'pt' | 'en' | 'es'
+export function getDictionary(locale: Locale): Dictionary {
+  const dictionary = dictionaries[locale] ?? dictionaries["pt-BR"];
 
-export const dictionaries: Record<SupportedLocale, Dictionary> = {
-  pt: ptDictionary,
-  en: enDictionary,
-  es: esDictionary,
+  const { valid, errors } = validateDictionary(dictionary);
+
+  if (!valid) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error(
+        `[i18n] Invalid dictionary for locale ${locale}`,
+        errors
+      );
+    }
+  }
+
+  return dictionary;
 }
-
-/**
- * Validação automática em DEV/TEST
- */
-if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-  validateDictionaries()
-}
-
-/**
- * Loader síncrono com fallback seguro
- */
-export function getDictionarySync(locale: SupportedLocale): Dictionary {
-  return dictionaries[locale] ?? ptDictionary
-}
-
-export default dictionaries
