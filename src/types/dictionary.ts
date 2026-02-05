@@ -44,6 +44,24 @@ export interface ExperienceDictionary {
   items: ExperienceItem[];
 }
 
+export interface HeroDictionary {
+  greeting: string;
+  title: string;
+  subtitle: string;
+  headline: string;
+  ctaPrimary: string;
+}
+
+export interface ProjectCategories {
+  cloud: string;
+  dataScience: string;
+  security: string;
+}
+
+export interface ProjectsSectionDictionary {
+  categories: ProjectCategories;
+}
+
 
 export interface DictionaryMeta {
   version: string;
@@ -198,6 +216,8 @@ export interface Dictionary {
   about: AboutDictionary;
   contact: ContactDictionary;
   experience: ExperienceDictionary; 
+  hero: HeroDictionary;        
+  projects: ProjectsSectionDictionary; 
   labels?: LabelsDictionary;
   pluralization?: PluralizationDictionary;
   seo?: SeoDictionary;
