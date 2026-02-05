@@ -20,7 +20,17 @@ export interface AboutDictionary {
     availabilityLabel: string;
     automation: string;
   };
+} 
+
+export interface ContactDictionary {
+  title: string;
+  subtitle: string;
+  cta: string;
+  emailLabel: string;
+  cvLabel: string;
+  linkedinLabel: string;
 }
+
 
 
 export interface DictionaryMeta {
@@ -173,7 +183,8 @@ export interface Dictionary {
   intl: IntlDictionary;
   states: StateDictionary;
   cookie: CookieDictionary; 
-  about: AboutDictionary; 
+  about: AboutDictionary;
+  contact: ContactDictionary;
   labels?: LabelsDictionary;
   pluralization?: PluralizationDictionary;
   seo?: SeoDictionary;
