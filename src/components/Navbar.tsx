@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 
-import type { Locale } from '@/i18n-config'
+import type { Locale } from '@/types/dictionary'
 import type { Dictionary } from '@/types/dictionary'
 import { NavSection, getSectionId } from '@/domain/navigation'
 
@@ -18,7 +18,13 @@ interface NavbarProps {
 }
 
 export function Navbar({ lang, dict }: NavbarProps) {
-  const { nav, common, seo } = dict
+  // Ajuste na desestruturação para alinhar com a hierarquia do JSON
+  const { common, seo } = dict
+  // As labels de navegação (about, experience, etc) não estavam no 'nav' do JSON enviado, 
+  // mas presumo que existam ou devam vir de 'labels' ou similar. 
+  // Se 'nav' não existir no Dictionary, usamos fallback para evitar erro.
+  const nav = (dict as any).nav || {} 
+  
   const { activeSection } = useScrollSpy()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -41,28 +47,23 @@ export function Navbar({ lang, dict }: NavbarProps) {
     return () => { document.body.style.overflow = '' }
   }, [isOpen, mounted])
 
-  // Fecha menu ao trocar idioma ou rota
+  // Fecha menu ao trocar idioma
   useEffect(() => {
     setIsOpen(false)
   }, [lang])
 
   if (!mounted) return null
 
-  /**
-   * NAV LINKS - Sincronizados com Domain/Navigation.ts
-   * Aqui usamos getSectionId(NavSection.VALUE) para garantir que o href
-   * bata exatamente com o ID que está nas seções da Home.
-   */
   const navLinks: ReadonlyArray<{
     id: NavSection
     href: string
     label: string
   }> = [
-    { id: NavSection.ABOUT, href: `/${lang}#${getSectionId(NavSection.ABOUT)}`, label: nav.about },
-    { id: NavSection.EXPERIENCE, href: `/${lang}#${getSectionId(NavSection.EXPERIENCE)}`, label: nav.experience },
-    { id: NavSection.PROJECTS, href: `/${lang}#${getSectionId(NavSection.PROJECTS)}`, label: nav.projects },
-    { id: NavSection.ARTICLES, href: `/${lang}#${getSectionId(NavSection.ARTICLES)}`, label: nav.articles },
-    { id: NavSection.CONTACT, href: `/${lang}#${getSectionId(NavSection.CONTACT)}`, label: nav.contact },
+    { id: NavSection.ABOUT, href: `/${lang}#${getSectionId(NavSection.ABOUT)}`, label: nav.about || 'About' },
+    { id: NavSection.EXPERIENCE, href: `/${lang}#${getSectionId(NavSection.EXPERIENCE)}`, label: nav.experience || 'Experience' },
+    { id: NavSection.PROJECTS, href: `/${lang}#${getSectionId(NavSection.PROJECTS)}`, label: nav.projects || 'Projects' },
+    { id: NavSection.ARTICLES, href: `/${lang}#${getSectionId(NavSection.ARTICLES)}`, label: nav.articles || 'Articles' },
+    { id: NavSection.CONTACT, href: `/${lang}#${getSectionId(NavSection.CONTACT)}`, label: nav.contact || 'Contact' },
   ]
 
   return (
@@ -79,7 +80,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
         {/* LOGO */}
         <Link
           href={`/${lang}`}
-          aria-label={seo.siteName}
+          aria-label={seo?.siteName || 'Home'}
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
@@ -122,7 +123,8 @@ export function Navbar({ lang, dict }: NavbarProps) {
         <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle />
           <button
-            aria-label={isOpen ? common.closeMenu : common.openMenu}
+            // CORREÇÃO: Acesso ao dicionário conforme estrutura JSON (common.menu.aria)
+            aria-label={isOpen ? common.menu.aria.close : common.menu.aria.open}
             onClick={() => setIsOpen(prev => !prev)}
             className="p-2 text-slate-900 dark:text-white transition-transform active:scale-90"
           >
@@ -133,8 +135,8 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
       {/* MOBILE MENU */}
       <div
-        className={`lg:hidden absolute top-full left-0 w-full overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ease-in-out ${
-          isOpen ? 'max-h-[90vh] opacity-100 shadow-2xl' : 'max-h-0 opacity-0'
+        className={`lg:hidden absolute top-full left-0 w-full overflow-y-auto border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ease-in-out ${
+          isOpen ? 'max-h-screen opacity-100 shadow-2xl' : 'max-h-0 opacity-0'
         }`}
       >
         <div className="flex flex-col gap-6 p-8">
