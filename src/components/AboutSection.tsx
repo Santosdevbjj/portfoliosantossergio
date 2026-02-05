@@ -4,15 +4,15 @@
  * ABOUT SECTION — SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
  * - 100% Responsivo (Mobile-First)
- * - Totalmente Multilingue (Integração Direta com JSON)
+ * - Totalmente Multilingue (Integração Direta com Dicionários)
  * - SEO Otimizado com JSON-LD (Schema.org)
- * - Compatível com Next.js 16 (React 19)
+ * - Compatível com Next.js 15/16 (React 19)
  */
 
 import Image from 'next/image';
 import Script from 'next/script';
 import { CheckCircle2 } from 'lucide-react';
-import type { Locale } from '@/i18n-config';
+import type { Locale } from '@/types/dictionary';
 import type { Dictionary } from '@/types/dictionary';
 
 interface AboutSectionProps {
@@ -21,8 +21,10 @@ interface AboutSectionProps {
 }
 
 export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
-  const { about } = dict;
+  // Nota: Certifique-se de que a chave 'about' exista no seu Dictionary type e JSONs
+  const { about, common } = dict;
 
+  // Schema.org para melhor SEO técnico
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
@@ -30,14 +32,16 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
     mainEntity: {
       '@type': 'Person',
       name: 'Sérgio Santos',
-      jobTitle: dict.hero.role,
-      description: about.description,
+      jobTitle: common.role,
+      description: about?.description,
       sameAs: [
         'https://www.linkedin.com/in/santossergioluiz',
         'https://github.com/Santosdevbjj'
       ],
     },
   };
+
+  if (!about) return null; // Prevenção contra dicionário incompleto
 
   return (
     <section
@@ -54,7 +58,7 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
           
-          {/* COLUNA 1: CONTEÚDO TEXTUAL (Ordem 2 no mobile para a imagem vir primeiro) */}
+          {/* COLUNA 1: CONTEÚDO TEXTUAL (Abaixo da imagem no mobile) */}
           <div className="space-y-12 order-2 lg:order-1">
             <header className="space-y-6">
               <div className="flex items-center gap-2">
@@ -94,7 +98,7 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
             </div>
           </div>
 
-          {/* COLUNA 2: IMAGEM E STATS (Ordem 1 no mobile) */}
+          {/* COLUNA 2: IMAGEM E STATS (Topo no mobile) */}
           <div className="relative order-1 lg:order-2 lg:sticky lg:top-32">
             <div className="relative aspect-[4/5] rounded-[2.5rem] md:rounded-[4rem] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800">
               <Image
@@ -105,34 +109,33 @@ export const AboutSection = ({ dict, lang }: AboutSectionProps) => {
                 sizes="(max-width: 768px) 100vw, 45vw"
                 className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
               />
-              {/* Overlay sutil para garantir leitura dos stats brancos */}
+              
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
 
-              {/* STATS OVERLAY — Conectado 100% ao Dicionário */}
+              {/* STATS OVERLAY — 100% Data-Driven */}
               <div className="absolute bottom-4 left-4 right-4 md:bottom-8 md:left-8 md:right-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-[2rem] p-6 shadow-2xl">
-                <div className="grid grid-cols-3 gap-2">
+                <div className="flex justify-around items-center gap-2">
                    <div className="text-center">
                       <span className="block text-xl md:text-2xl font-black text-blue-600 leading-none">
-                        {about.stats.experience.split(' ')[0]}
+                        {about.stats.experienceValue}
                       </span>
                       <span className="text-[7px] md:text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block mt-1">
-                        {lang === 'pt' ? 'Experiência' : lang === 'en' ? 'Experience' : 'Experiencia'}
+                        {about.stats.experienceLabel}
                       </span>
                    </div>
                    
-                   <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 mx-auto self-center" />
+                   <div className="w-px h-8 bg-slate-200 dark:bg-slate-700" />
                    
                    <div className="text-center">
                       <span className="block text-xl md:text-2xl font-black text-blue-600 leading-none">
-                        {about.stats.availability.split(' ')[0]}
+                        {about.stats.availabilityValue}
                       </span>
                       <span className="text-[7px] md:text-[9px] uppercase font-bold text-slate-500 dark:text-slate-400 block mt-1">
-                        Uptime
+                        {about.stats.availabilityLabel}
                       </span>
                    </div>
                 </div>
                 
-                {/* Rodapé do card de Stats */}
                 <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
                    <p className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] text-blue-600">
                      {about.stats.automation}
