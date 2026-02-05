@@ -36,6 +36,18 @@
   "emailLabel": "Copy Email",
   "cvLabel": "View CV",
   "linkedinLabel": "LinkedIn"
+} 
+
+  "experience": {
+  "title": "Professional Experience",
+  "items": [
+    {
+      "company": "Independent Consultant",
+      "period": "2023 — Present",
+      "role": "Critical Systems Specialist",
+      "description": "Architecture and maintenance of data pipelines and resilient infrastructure."
+    }
+  ]
 }
 
   
