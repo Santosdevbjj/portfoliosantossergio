@@ -34,7 +34,23 @@
   "emailLabel": "Copiar Email",
   "cvLabel": "Ver CV",
   "linkedinLabel": "LinkedIn"
+} 
+
+
+"experience": {
+  "title": "Experiência Profissional",
+  "items": [
+    {
+      "company": "Sua Empresa",
+      "period": "2023 — Atual",
+      "role": "Especialista em Sistemas Críticos",
+      "description": "Arquitetura e manutenção de pipelines de dados e infraestrutura resiliente."
+    }
+  ]
 }
+
+
+  
 
 
 "cookie": {
