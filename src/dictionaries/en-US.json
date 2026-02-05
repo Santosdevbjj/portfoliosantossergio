@@ -67,7 +67,34 @@
   }
 }
 
-  
+
+"articles": {
+  "title": "Technical Articles",
+  "mediumProfile": "View Medium profile",
+  "readMore": "Read full article",
+  "publishedAt": "Published on",
+  "bestOfMonth": "Highlight of the Month",
+  "awardWinner": "Award-Winning Article",
+  "items": [
+    {
+      "title": "The Data Era in Critical Systems",
+      "description": "How data governance transforms legacy systems into strategic assets.",
+      "date": "2025",
+      "category": "Data Strategy",
+      "isAward": true,
+      "link": "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77"
+    },
+    {
+      "title": "Databricks & Governance",
+      "description": "Security and compliance in modern data pipelines using Azure.",
+      "date": "2025",
+      "category": "Data Engineering",
+      "isAward": false,
+      "link": "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77"
+    }
+  ]
+}
+
 
 "cookie": {
   "title": "Cookie Settings",
