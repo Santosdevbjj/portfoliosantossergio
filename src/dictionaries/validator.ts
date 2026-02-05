@@ -36,7 +36,43 @@ if (!dictionary?.experience) {
 if (!dictionary?.projects?.categories) {
   errors.push("Missing projects.categories section");
 } 
+
   
+// Validação da Seção de Artigos (Articles)
+if (!dictionary?.articles) {
+  errors.push("Missing articles section");
+} else {
+  const { articles } = dictionary;
+  
+  // Validação de labels obrigatórias da seção
+  if (!articles.title) errors.push("Missing articles.title");
+  if (!articles.mediumProfile) errors.push("Missing articles.mediumProfile");
+  if (!articles.readMore) errors.push("Missing articles.readMore");
+  if (!articles.publishedAt) errors.push("Missing articles.publishedAt");
+  if (!articles.awardWinner) errors.push("Missing articles.awardWinner");
+
+  // Validação dos itens (Array de Artigos)
+  if (!Array.isArray(articles.items)) {
+    errors.push("articles.items must be an array");
+  } else if (articles.items.length === 0) {
+    errors.push("articles.items should not be empty for a complete showcase");
+  } else {
+    articles.items.forEach((article, index) => {
+      if (!article.title) errors.push(`Missing articles.items[${index}].title`);
+      if (!article.description) errors.push(`Missing articles.items[${index}].description`);
+      if (!article.date) errors.push(`Missing articles.items[${index}].date`);
+      if (!article.category) errors.push(`Missing articles.items[${index}].category`);
+      if (!article.link) errors.push(`Missing articles.items[${index}].link`);
+      
+      // Validação de tipo para o booleano de premiação
+      if (typeof article.isAward !== 'boolean') {
+        errors.push(`articles.items[${index}].isAward must be a boolean`);
+      }
+    });
+  }
+}
+
+
 
   // 1. Validação da Seção Meta
   if (!dictionary?.meta) {
