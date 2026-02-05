@@ -17,6 +17,9 @@ import {
   type ReactNode,
 } from 'react'
 
+
+// src/contexts/ScrollSpyContext.tsx
+
 import { useScrollSpy } from '@/hooks/useScrollSpy'
 import type { SupportedLocale } from '@/dictionaries'
 
