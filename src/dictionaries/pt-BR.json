@@ -25,6 +25,15 @@
     "availabilityLabel": "Uptime",
     "automation": "Sistemas 100% Automatizados"
   }
+} 
+
+  "contact": {
+  "title": "Título aqui",
+  "subtitle": "Subtítulo aqui",
+  "cta": "Enviar Email",
+  "emailLabel": "Copiar Email",
+  "cvLabel": "Ver CV",
+  "linkedinLabel": "LinkedIn"
 }
 
 
