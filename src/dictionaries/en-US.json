@@ -50,6 +50,23 @@
   ]
 }
 
+{
+  "hero": {
+    "greeting": "Available for Critical Projects",
+    "title": "Architecting the Future of",
+    "subtitle": "Data and Resilience",
+    "headline": "Specialist in transforming complex infrastructures into high-availability systems and scalable data pipelines.",
+    "ctaPrimary": "View Projects"
+  },
+  "projects": {
+    "categories": {
+      "cloud": "Cloud & Infrastructure",
+      "dataScience": "Data Science",
+      "security": "Security"
+    }
+  }
+}
+
   
 
 "cookie": {
