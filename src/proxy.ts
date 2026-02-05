@@ -1,24 +1,23 @@
 // src/proxy.ts
 import { NextRequest, NextResponse } from 'next/server'
+import { Locale } from '@/types/dictionary'
 
 /**
- * Locales suportados
+ * Locales suportados extraídos diretamente do seu contrato de tipos.
+ * Nota: Como o tipo Locale é uma união de strings, definimos a lista aqui 
+ * para validação em runtime.
  */
-const SUPPORTED_LOCALES = ['pt', 'en', 'es'] as const
-type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
+const SUPPORTED_LOCALES: Locale[] = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"]
 
 /**
- * Proxy global (substitui o antigo middleware no Next.js 16)
- * Executado em TODA requisição antes do App Router
+ * Proxy global (Next.js 16)
+ * Gerencia o roteamento de internacionalização antes do App Router
  */
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   /**
-   * Ignorar:
-   * - Assets internos do Next
-   * - APIs
-   * - Arquivos estáticos
+   * 1. Ignorar arquivos estáticos, APIs e assets internos
    */
   if (
     pathname.startsWith('/_next') ||
@@ -30,25 +29,28 @@ export default function proxy(request: NextRequest) {
   }
 
   /**
-   * Raiz do site → locale padrão
+   * 2. Raiz do site (/) → Redireciona para o locale padrão (pt-BR)
    */
   if (pathname === '/') {
     const url = request.nextUrl.clone()
-    url.pathname = '/pt'
+    url.pathname = '/pt-BR'
     return NextResponse.redirect(url)
   }
 
   /**
-   * Extrai o primeiro segmento da URL
+   * 3. Extração e Validação do Locale
+   * O split('/') em "/pt-BR/contato" resulta em ["", "pt-BR", "contato"]
    */
-  const firstSegment = pathname.split('/')[1]
+  const segments = pathname.split('/')
+  const firstSegment = segments[1] as Locale
 
   /**
-   * Se não tiver locale válido, prefixa com /pt
+   * 4. Se o primeiro segmento não for um dos 5 locales suportados,
+   * prefixa a URL com /pt-BR
    */
-  if (!SUPPORTED_LOCALES.includes(firstSegment as SupportedLocale)) {
+  if (!SUPPORTED_LOCALES.includes(firstSegment)) {
     const url = request.nextUrl.clone()
-    url.pathname = `/pt${pathname}`
+    url.pathname = `/pt-BR${pathname}`
     return NextResponse.redirect(url)
   }
 
@@ -56,10 +58,11 @@ export default function proxy(request: NextRequest) {
 }
 
 /**
- * Matcher oficial
+ * Matcher para otimização de performance
  */
 export const config = {
   matcher: [
+    // Pula caminhos internos e arquivos estáticos
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }
