@@ -63,6 +63,27 @@ export interface ProjectsSectionDictionary {
 }
 
 
+export interface ArticleItem {
+  title: string;
+  description: string;
+  date: string;
+  category: string;
+  isAward: boolean;
+  link: string;
+}
+
+export interface ArticlesSectionDictionary {
+  title: string;
+  mediumProfile: string;
+  readMore: string;
+  publishedAt: string;
+  bestOfMonth: string;
+  awardWinner: string;
+  items: ArticleItem[];
+}
+
+
+
 export interface DictionaryMeta {
   version: string;
   locale: Locale;
@@ -216,7 +237,8 @@ export interface Dictionary {
   about: AboutDictionary;
   contact: ContactDictionary;
   experience: ExperienceDictionary; 
-  hero: HeroDictionary;        
+  hero: HeroDictionary; 
+  articles: ArticlesSectionDictionary;
   projects: ProjectsSectionDictionary; 
   labels?: LabelsDictionary;
   pluralization?: PluralizationDictionary;
