@@ -3,7 +3,7 @@
 /**
  * PAGE WRAPPER: Orquestrador de Experiência e Layout Root
  * -----------------------------------------------------------------------------
- * - Provê contexto de ScrollSpy
+ * - Provê contexto de ScrollSpyContext
  * - Garante hidratação segura no Next.js 16
  * - Define idioma dinâmico para SEO e Acessibilidade
  * - Controla layout, background e experiência visual global
