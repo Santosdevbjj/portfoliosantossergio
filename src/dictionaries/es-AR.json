@@ -35,6 +35,18 @@
   "emailLabel": "Copiar correo electrónico",
   "cvLabel": "Ver CV",
   "linkedinLabel": "LinkedIn"
+} 
+  
+"experience": {
+  "title": "Experiencia Profesional",
+  "items": [
+    {
+      "company": " Consultor Autónomo",
+      "period": "Actual",
+      "role": "Especialista en Sistemas Críticos",
+      "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructura resiliente."
+    }
+  ]
 }
   
 
