@@ -6,6 +6,23 @@
  */
 export type Locale = "pt-BR" | "en-US" | "es-ES" | "es-AR" | "es-MX";
 
+
+export interface AboutDictionary {
+  title: string;
+  differentialTitle: string;
+  description: string;
+  differentialContent: string;
+  highlights: string[];
+  stats: {
+    experienceValue: string;
+    experienceLabel: string;
+    availabilityValue: string;
+    availabilityLabel: string;
+    automation: string;
+  };
+}
+
+
 export interface DictionaryMeta {
   version: string;
   locale: Locale;
@@ -155,7 +172,8 @@ export interface Dictionary {
   common: CommonDictionary;
   intl: IntlDictionary;
   states: StateDictionary;
-  cookie: CookieDictionary; // Adicione esta linha
+  cookie: CookieDictionary; 
+  about: AboutDictionary; 
   labels?: LabelsDictionary;
   pluralization?: PluralizationDictionary;
   seo?: SeoDictionary;
