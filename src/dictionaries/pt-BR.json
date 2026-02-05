@@ -12,6 +12,22 @@
     "sourceType": "curated-manual"
   },
 
+  "about": {
+  "title": "Sobre Mim",
+  "differentialTitle": "Engenharia de Dados com Foco em Missão Crítica",
+  "description": "Especialista em arquitetura de dados e sistemas de alta disponibilidade.",
+  "differentialContent": "Foco em automação inteligente e resiliência de sistemas.",
+  "highlights": ["10+ anos em TI", "Especialista Cloud", "DevOps Core"],
+  "stats": {
+    "experienceValue": "+10",
+    "experienceLabel": "Anos",
+    "availabilityValue": "99.9%",
+    "availabilityLabel": "Uptime",
+    "automation": "Sistemas 100% Automatizados"
+  }
+}
+
+
 "cookie": {
   "title": "Configurações de Cookies",
   "description": "Utilizamos cookies para melhorar sua experiência e analisar o tráfego do site.",
