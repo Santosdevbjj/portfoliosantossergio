@@ -47,8 +47,25 @@
       "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructura resiliente."
     }
   ]
-}
+} 
+
   
+  {
+  "hero": {
+    "greeting": "Disponible para Proyectos Críticos",
+    "title": "Arquitectando el Futuro de",
+    "subtitle": "Datos y Resiliencia",
+    "headline": "Especialista en transformar infraestructuras complejas en sistemas de alta disponibilidad y pipelines de datos escalables.",
+    "ctaPrimary": "Ver Proyectos"
+  },
+  "projects": {
+    "categories": {
+      "cloud": "Nube e Infraestructura",
+      "dataScience": "Ciencia de Datos",
+      "security": "Seguridad"
+    }
+  }
+}
 
 
 "cookie": {
