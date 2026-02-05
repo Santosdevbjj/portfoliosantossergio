@@ -18,9 +18,9 @@ import {
 } from 'react'
 
 
-// src/contexts/ScrollSpyContext.tsx
 
-import { useScrollSpy } from '@/hooks/useScrollSpy'
+
+import { ScrollSpyContext } from '@/contexts/ScrollSpyContext'
 import type { SupportedLocale } from '@/dictionaries'
 
 /* -------------------------------------------------------------------------- */
@@ -51,8 +51,8 @@ export function PageWrapper({
 }: PageWrapperProps) {
   const [mounted, setMounted] = useState(false)
 
-  // Hook de ScrollSpy (offset otimizado para headers fixos)
-  const activeSectionFromHook = useScrollSpy(sectionIds, 150)
+  //  de ScrollSpy (offset otimizado para headers fixos)
+  const activeSectionFromHook = ScrollSpyContext(sectionIds, 150)
 
   useEffect(() => {
     setMounted(true)
