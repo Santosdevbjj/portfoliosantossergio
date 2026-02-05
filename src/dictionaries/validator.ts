@@ -7,6 +7,10 @@ export function validateDictionary(
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
+  if (!dictionary?.contact?.cta) {
+  errors.push("Missing contact.cta");
+} 
+
   // 1. Validação da Seção Meta
   if (!dictionary?.meta) {
     errors.push("Missing meta section");
