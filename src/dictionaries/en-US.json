@@ -26,9 +26,21 @@
     "availabilityLabel": "Uptime",
     "automation": "100% Automated Systems"
   }
+} 
+
+
+"contact": {
+  "title": "Title here",
+  "subtitle": "Subtitle here",
+  "cta": "Send Email",
+  "emailLabel": "Copy Email",
+  "cvLabel": "View CV",
+  "linkedinLabel": "LinkedIn"
 }
 
-"cookie": {
+  
+
+"cookie"e: {
   "title": "Cookie Settings",
   "description": "We use cookies to improve your experience and analyze site traffic.",
   "necessary": "Necessary",
