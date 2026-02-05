@@ -29,8 +29,20 @@ export interface ContactDictionary {
   emailLabel: string;
   cvLabel: string;
   linkedinLabel: string;
+} 
+
+
+export interface ExperienceItem {
+  company: string;
+  period: string;
+  role: string;
+  description: string;
 }
 
+export interface ExperienceDictionary {
+  title: string;
+  items: ExperienceItem[];
+}
 
 
 export interface DictionaryMeta {
@@ -185,6 +197,7 @@ export interface Dictionary {
   cookie: CookieDictionary; 
   about: AboutDictionary;
   contact: ContactDictionary;
+  experience: ExperienceDictionary; 
   labels?: LabelsDictionary;
   pluralization?: PluralizationDictionary;
   seo?: SeoDictionary;
