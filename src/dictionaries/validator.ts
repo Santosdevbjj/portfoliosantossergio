@@ -11,6 +11,22 @@ export function validateDictionary(
   errors.push("Missing contact.cta");
 } 
 
+// Validação da Seção Experience
+if (!dictionary?.experience) {
+  errors.push("Missing experience section");
+} else {
+  if (!dictionary.experience.title) errors.push("Missing experience.title");
+  if (!Array.isArray(dictionary.experience.items) || dictionary.experience.items.length === 0) {
+    errors.push("experience.items must be a non-empty array");
+  } else {
+    dictionary.experience.items.forEach((item, index) => {
+      if (!item.company) errors.push(`Missing experience.items[${index}].company`);
+      if (!item.role) errors.push(`Missing experience.items[${index}].role`);
+    });
+  }
+}
+  
+
   // 1. Validação da Seção Meta
   if (!dictionary?.meta) {
     errors.push("Missing meta section");
