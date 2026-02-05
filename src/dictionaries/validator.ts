@@ -24,7 +24,18 @@ if (!dictionary?.experience) {
       if (!item.role) errors.push(`Missing experience.items[${index}].role`);
     });
   }
+} 
+
+  if (!dictionary?.hero) {
+  errors.push("Missing hero section");
+} else {
+  if (!dictionary.hero.title) errors.push("Missing hero.title");
+  if (!dictionary.hero.ctaPrimary) errors.push("Missing hero.ctaPrimary");
 }
+
+if (!dictionary?.projects?.categories) {
+  errors.push("Missing projects.categories section");
+} 
   
 
   // 1. Validação da Seção Meta
