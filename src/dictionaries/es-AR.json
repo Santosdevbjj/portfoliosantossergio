@@ -65,7 +65,37 @@
     }
   }
 }
-  
+
+
+"articles": {
+  "title": "Artículos Técnicos",
+  "mediumProfile": "Ver perfil en Medium",
+  "readMore": "Leer artículo completo",
+  "publishedAt": "Publicado en",
+  "bestOfMonth": "Destacado del Mes",
+  "awardWinner": "Artículo Premiado",
+  "items": [
+    {
+      "title": "La Era de los Datos en Sistemas Críticos",
+      "description": "Cómo la gobernanza de datos transforma sistemas heredados en activos estratégicos.",
+      "date": "2025",
+      "category": "Data Strategy",
+      "isAward": true,
+      "link": "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-en-semanas-5474e7dddfad"
+    },
+    {
+      "title": "Databricks & Gobernanza",
+      "description": "Seguridad y cumplimiento en pipelines de datos modernos utilizando Azure.",
+      "date": "2025",
+      "category": "Data Engineering",
+      "isAward": false,
+      "link": "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-en-semanas-5474e7dddfad"
+    }
+  ]
+}
+
+
+
 
  "cookie": {
   "title": "Configuración de Cookies",
