@@ -12,6 +12,21 @@
     "sourceType": "curated-manual"
   }, 
 
+  
+"about": {
+  "title": "About Me",
+  "differentialTitle": "Data Engineering with a Mission-Critical Focus",
+  "description": "Specialist in data architecture and high-availability systems.",
+  "differentialContent": "Focused on intelligent automation and system resilience.",
+  "highlights": ["10+ years in IT", "Cloud Specialist", "DevOps Core"],
+  "stats": {
+    "experienceValue": "+10",
+    "experienceLabel": "Years",
+    "availabilityValue": "99.9%",
+    "availabilityLabel": "Uptime",
+    "automation": "100% Automated Systems"
+  }
+}
 
 "cookie": {
   "title": "Cookie Settings",
