@@ -6,7 +6,7 @@
  * - UI: Cards de alto impacto e Banner de KPIs.
  * - I18n: Totalmente alinhado com dict.about.highlights e dict.about.stats.
  * - Responsividade: Grid adaptativo para mobile, tablet e desktop.
- * - Fix: Removido import redundante de React para conformidade com Next.js moderno.
+ * - Correção: Mapeamento de chaves do dicionário (experienceValue, Label, etc).
  */
 
 import {
@@ -24,12 +24,12 @@ interface CareerHighlightsProps {
 }
 
 export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
-  // Fallbacks de segurança para evitar erros de renderização
+  // Fallbacks de segurança baseados na estrutura real do Dictionary
   const highlights = dict?.about?.highlights ?? [];
-  const stats = dict?.about?.stats ?? { experience: '', availability: '', automation: '' };
+  const stats = dict?.about?.stats;
   const differentialTitle = dict?.about?.differentialTitle ?? '';
 
-  // Ícones representativos para os 3 destaques
+  // Ícones representativos para os destaques
   const highlightIcons = [
     <Activity key="icon-1" className="w-6 h-6" />,
     <Zap key="icon-2" className="w-6 h-6" />,
@@ -118,9 +118,20 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
           <div aria-hidden="true" className="hidden lg:block h-16 w-px bg-white/20" />
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 w-full lg:w-auto">
-            <StatItem label={stats.experience} />
-            <StatItem label={stats.availability} isBorder />
-            <StatItem label={stats.automation} isBorder />
+            <StatItem 
+              value={stats.experienceValue} 
+              label={stats.experienceLabel} 
+            />
+            <StatItem 
+              value={stats.availabilityValue} 
+              label={stats.availabilityLabel} 
+              isBorder 
+            />
+            {/* Para automação, o JSON usa uma string única, tratamos separadamente */}
+            <StatItem 
+              fullText={stats.automation} 
+              isBorder 
+            />
           </div>
         </div>
       </div>
@@ -128,20 +139,33 @@ export const CareerHighlights = ({ dict }: CareerHighlightsProps) => {
   );
 };
 
-function StatItem({ label, isBorder }: { label: string; isBorder?: boolean }) {
-  if (!label) return null;
+interface StatItemProps {
+  value?: string;
+  label?: string;
+  fullText?: string;
+  isBorder?: boolean;
+}
 
-  const tokens = label.trim().split(/\s+/);
-  const value = tokens[0];
-  const description = tokens.slice(1).join(' ');
+function StatItem({ value, label, fullText, isBorder }: StatItemProps) {
+  // Se for passado fullText (como o caso de automation no seu JSON), fazemos o split
+  let displayValue = value;
+  let displayLabel = label;
+
+  if (fullText) {
+    const tokens = fullText.trim().split(/\s+/);
+    displayValue = tokens[0];
+    displayLabel = tokens.slice(1).join(' ');
+  }
+
+  if (!displayValue) return null;
 
   return (
     <div className={`text-center ${isBorder ? 'sm:border-l border-white/10 sm:pl-8' : ''}`}>
       <span className="block text-4xl md:text-5xl font-black tracking-tighter tabular-nums mb-1">
-        {value}
+        {displayValue}
       </span>
       <span className="block text-blue-100 text-[10px] font-black uppercase tracking-[0.2em] opacity-90 max-w-[120px] mx-auto leading-relaxed">
-        {description}
+        {displayLabel}
       </span>
     </div>
   );
