@@ -3,25 +3,28 @@
 /**
  * FEATURED ARTICLE: Card de Autoridade Técnica
  * -----------------------------------------------------------------------------
- * - I18n: Totalmente integrado com SupportedLocale (PT, EN, ES).
- * - UI: Design de alta fidelidade com efeitos de glassmorphism e shimmer.
- * - Fix: Ajuste na lógica de exibição de conteúdo para evitar repetição da bio.
+ * - I18n: Totalmente alinhado com o dicionário e suporte a 5 locales.
+ * - Fix: Agora consome o primeiro item de 'articles.items' para evitar hardcoding.
+ * - UI: Ajustes de responsividade e animações otimizadas.
  */
 
 import { useEffect, useRef } from 'react';
 import { ExternalLink, BookOpen, Award } from 'lucide-react';
 import Script from 'next/script';
-import type { SupportedLocale } from '@/dictionaries';
+import type { Locale } from '@/types/dictionary';
 import type { Dictionary } from '@/types/dictionary';
 
 interface FeaturedArticleProps {
   readonly dict: Dictionary;
-  readonly lang: SupportedLocale;
+  readonly lang: Locale;
 }
 
 export const FeaturedArticle = ({ dict, lang }: FeaturedArticleProps) => {
   const ref = useRef<HTMLElement | null>(null);
   const { articles } = dict;
+  
+  // Seleciona o primeiro artigo do dicionário como "Destaque"
+  const featuredArticle = articles.items[0];
 
   useEffect(() => {
     const currentRef = ref.current;
@@ -31,7 +34,7 @@ export const FeaturedArticle = ({ dict, lang }: FeaturedArticleProps) => {
       (entries) => {
         const [entry] = entries;
         if (entry?.isIntersecting) {
-          // Hook para futuras animações de entrada
+          currentRef.classList.add('opacity-100', 'translate-y-0');
         }
       },
       { rootMargin: '-10% 0px -10% 0px', threshold: 0.1 }
@@ -41,29 +44,24 @@ export const FeaturedArticle = ({ dict, lang }: FeaturedArticleProps) => {
     return () => observer.disconnect();
   }, []);
 
-  const activeLink = "https://medium.com/@santossergioluiz";
-
-  // Helper para descrição do artigo baseada no idioma
-  const getArticleExcerpt = () => {
-    const excerpts = {
-      pt: "Explorando a interseção entre governança de dados e sistemas de alta disponibilidade.",
-      en: "Exploring the intersection between data governance and high-availability systems.",
-      es: "Explorando la intersección entre el gobierno de datos y los sistemas de alta disponibilidad."
-    };
-    return excerpts[lang];
-  };
-
+  // Dados para o SEO Schema baseados no dicionário real
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: articles.title,
-    description: getArticleExcerpt(),
+    headline: featuredArticle?.title || articles.title,
+    description: featuredArticle?.description,
     inLanguage: lang,
     author: {
       '@type': 'Person',
+      name: dict.meta.author
+    },
+    publisher: {
+      '@type': 'Organization',
       name: 'Sérgio Santos'
     }
   };
+
+  if (!featuredArticle) return null;
 
   return (
     <>
@@ -75,7 +73,7 @@ export const FeaturedArticle = ({ dict, lang }: FeaturedArticleProps) => {
 
       <article
         ref={ref}
-        className="group relative flex flex-col h-full bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-[2.5rem] md:rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 p-6 sm:p-10 md:p-14 overflow-hidden transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_40px_80px_-15px_rgba(37,99,235,0.15)]"
+        className="group relative flex flex-col h-full bg-white dark:bg-slate-900/40 backdrop-blur-md rounded-[2.5rem] md:rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 p-5 sm:p-10 md:p-14 overflow-hidden transition-all duration-700 hover:-translate-y-3 hover:shadow-[0_40px_80px_-15px_rgba(37,99,235,0.15)] opacity-0 translate-y-8"
       >
         {/* Efeito de Brilho no Hover */}
         <div 
@@ -98,17 +96,17 @@ export const FeaturedArticle = ({ dict, lang }: FeaturedArticleProps) => {
 
         <div className="flex-grow z-10">
           <h3 className="mb-6 font-black tracking-tighter leading-[1.1] text-slate-900 dark:text-white transition-colors duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 text-[clamp(1.5rem,5vw,2.75rem)] break-words hyphens-auto">
-            {articles.title}
+            {featuredArticle.title}
           </h3>
 
           <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed font-medium italic opacity-90 border-l-4 border-slate-100 dark:border-slate-800 pl-5 md:pl-6 group-hover:border-blue-500/30 transition-colors">
-            “{getArticleExcerpt()}”
+            “{featuredArticle.description}”
           </p>
         </div>
 
         <footer className="mt-10 md:mt-12 z-10">
           <a
-            href={activeLink}
+            href={featuredArticle.link}
             target="_blank"
             rel="noopener noreferrer"
             className="group/btn relative flex items-center justify-center gap-4 w-full py-5 md:py-6 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 text-white rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-[0.2em] transition-all shadow-xl active:scale-[0.97] overflow-hidden"
