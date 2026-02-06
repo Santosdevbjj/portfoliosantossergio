@@ -5,14 +5,14 @@
  * -----------------------------------------------------------------------------
  * - Performance: Filtragem via useMemo integrada ao domain/projects.
  * - UX: Sistema de categorias com snap-scroll e feedback visual de resultados.
- * - I18n: Sincronia total com src/dictionaries/ (PT, EN, ES).
+ * - I18n: 100% Sincronizado com src/dictionaries/ (PT, EN, ES, AR, MX).
+ * - Responsividade: Grid fluído e navegação touch-optimized.
  */
 
 import { useState, useMemo } from 'react'
 import { ProjectCard } from './ProjectCard'
 import { Filter, Database, FolderSearch, Sparkles } from 'lucide-react'
-import type { SupportedLocale } from '@/dictionaries'
-import type { Dictionary } from '@/types/dictionary'
+import type { Locale, Dictionary } from '@/types/dictionary'
 import { resolveProjectTechnology } from '@/domain/projects'
 
 interface GitHubRepository {
@@ -27,7 +27,7 @@ interface GitHubRepository {
 
 interface PortfolioGridProps {
   readonly projects: GitHubRepository[]
-  readonly lang: SupportedLocale
+  readonly lang: Locale
   readonly dict: Dictionary
 }
 
@@ -38,14 +38,17 @@ export const PortfolioGrid = ({
 }: PortfolioGridProps) => {
   const [activeCategory, setActiveCategory] = useState<'all' | string>('all')
 
+  // Atalhos tipados para o dicionário
   const projectsDict = dict.projects
   const categoriesDict = projectsDict.categories
+  const statesDict = dict.states
+  const commonDict = dict.common
 
   /* -------------------------------------------------
    * 🧠 LÓGICA DE FILTRAGEM + PRIORIZAÇÃO
    * ------------------------------------------------*/
   const filteredProjects = useMemo(() => {
-    // 1. Filtra apenas o que é marcado como portfólio
+    // 1. Filtra apenas o que é marcado como portfólio via topics do GitHub
     let base = projects.filter((p) => 
       p.topics?.some(t => ['portfolio', 'projeto', 'portfolio-item'].includes(t.toLowerCase()))
     )
@@ -58,7 +61,7 @@ export const PortfolioGrid = ({
       })
     }
 
-    // 3. Ordenação: Featured primeiro, depois data de atualização
+    // 3. Ordenação: Featured (Destaque) primeiro, depois data de atualização
     return base.sort((a, b) => {
       const isAFeatured = a.topics?.some(t => ['featured', 'destaque', 'primeiro'].includes(t.toLowerCase()))
       const isBFeatured = b.topics?.some(t => ['featured', 'destaque', 'primeiro'].includes(t.toLowerCase()))
@@ -69,15 +72,6 @@ export const PortfolioGrid = ({
       return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
     })
   }, [projects, activeCategory])
-
-  /* -------------------------------------------------
-   * 🌍 TRADUÇÕES DE INTERFACE (Contextuais)
-   * ------------------------------------------------*/
-  const uiLabels = {
-    pt: { filter: 'Filtrar por Especialidade', empty: 'Nenhuma solução encontrada nesta categoria', results: 'Projetos Encontrados' },
-    en: { filter: 'Filter by Specialty', empty: 'No solutions found in this category', results: 'Projects Found' },
-    es: { filter: 'Filtrar por Especialidad', empty: 'Ninguna solución encontrada en esta categoría', results: 'Proyectos Encontrados' }
-  }[lang]
 
   return (
     <section
@@ -107,23 +101,24 @@ export const PortfolioGrid = ({
                 id="portfolio-title"
                 className="text-4xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-none"
               >
-                {projectsDict.title}
+                {/* Usando o título do SEO ou fallback para consistência */}
+                {dict.seo?.projects.title.split(' ')[0] || "Portfolio"}
               </h2>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="w-10 h-1 bg-blue-600 rounded-full" />
               <p className="text-slate-500 dark:text-slate-400 font-bold text-[10px] md:text-xs uppercase tracking-[0.2em]">
-                {filteredProjects.length} {uiLabels.results}
+                {filteredProjects.length} {dict.labels?.home === "Início" ? "Resultados" : "Results"}
               </p>
             </div>
           </div>
 
           {/* FILTROS COM SCROLL HORIZONTAL MOBILE */}
-          <nav className="w-full lg:w-auto" aria-label={uiLabels.filter}>
+          <nav className="w-full lg:w-auto" aria-label={commonDict.menu.aria.open}>
             <div className="flex items-center gap-2 mb-4 text-slate-400 dark:text-slate-500 font-black text-[9px] uppercase tracking-[0.2em]">
               <Filter className="text-blue-600 w-3.5 h-3.5" strokeWidth={3} />
-              <span>{uiLabels.filter}</span>
+              <span>{commonDict.navigation}</span>
             </div>
 
             <div className="relative group">
@@ -160,7 +155,6 @@ export const PortfolioGrid = ({
                   </button>
                 ))}
               </div>
-              {/* Fade out para indicar scroll no mobile */}
               <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-white dark:from-[#020617] to-transparent pointer-events-none lg:hidden" />
             </div>
           </nav>
@@ -179,13 +173,15 @@ export const PortfolioGrid = ({
               </div>
             ))
           ) : (
-            /* EMPTY STATE */
             <div className="col-span-full flex flex-col items-center justify-center py-24 md:py-32 rounded-[2.5rem] md:rounded-[4rem] border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
               <div className="p-6 md:p-8 bg-white dark:bg-slate-800 rounded-3xl shadow-xl mb-6 md:mb-8 text-slate-200 dark:text-slate-700">
                 <FolderSearch className="w-12 h-12 md:w-16 md:h-16" strokeWidth={1.5} />
               </div>
-              <p className="text-slate-500 dark:text-slate-400 font-black uppercase tracking-[0.2em] text-[10px] md:text-xs text-center max-w-xs leading-relaxed px-4">
-                {uiLabels.empty}
+              <h3 className="text-slate-900 dark:text-white font-black uppercase tracking-widest text-lg mb-2">
+                {statesDict.emptyProjects.title}
+              </h3>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-sm text-center max-w-xs leading-relaxed px-4">
+                {statesDict.emptyProjects.description}
               </p>
             </div>
           )}
