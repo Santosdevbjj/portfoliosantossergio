@@ -1,107 +1,92 @@
 // src/app/[lang]/metadata.ts
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-
-import {
-  getDictionarySync,
-  type SupportedLocale,
-} from '@/dictionaries';
+import { getDictionary } from '@/dictionaries';
+import { Locale } from '@/types/dictionary';
 
 const SITE_URL = 'https://portfoliosantossergio.vercel.app';
 
 interface MetadataProps {
   params: {
-    lang: SupportedLocale;
+    lang: Locale;
   };
 }
 
-export function generateMetadata(
-  { params }: MetadataProps
-): Metadata {
-  const supportedLocales: SupportedLocale[] = ['pt', 'en', 'es'];
-  const lang = supportedLocales.includes(params.lang)
-    ? params.lang
-    : null;
-
-  if (!lang) {
+export function generateMetadata({ params }: MetadataProps): Metadata {
+  // Lista de locales baseada no seu src/types/dictionary.ts
+  const supportedLocales: Locale[] = ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'];
+  
+  if (!supportedLocales.includes(params.lang)) {
     notFound();
   }
 
-  const dict = getDictionarySync(lang);
+  const dict = getDictionary(params.lang);
 
-  const pageTitle =
-    dict.seo.pages?.home?.title ?? dict.seo.siteName;
+  const pageTitle = dict.seo.pages?.home?.title ?? dict.seo.siteName;
+  const pageDescription = dict.seo.pages?.home?.description ?? dict.seo.description;
 
-  const pageDescription =
-    dict.seo.pages?.home?.description ?? dict.seo.description;
-
-  const ogImageMap: Record<SupportedLocale, string> = {
-    pt: '/og-image-pt.png',
-    en: '/og-image-en.png',
-    es: '/og-image-es.png',
+  // Mapeamento de imagens OG (ajustado para os Locales reais)
+  const ogImageMap: Record<Locale, string> = {
+    'pt-BR': '/og-image-pt.png',
+    'en-US': '/og-image-en.png',
+    'es-ES': '/og-image-es.png',
+    'es-AR': '/og-image-es.png', // Reaproveita a imagem base em espanhol
+    'es-MX': '/og-image-es.png',
   };
 
-  const ogLocaleMap: Record<SupportedLocale, string> = {
-    pt: 'pt_BR',
-    en: 'en_US',
-    es: 'es_ES',
+  const ogLocaleMap: Record<Locale, string> = {
+    'pt-BR': 'pt_BR',
+    'en-US': 'en_US',
+    'es-ES': 'es_ES',
+    'es-AR': 'es_AR',
+    'es-MX': 'es_MX',
   };
 
   return {
     metadataBase: new URL(SITE_URL),
-
     title: {
       default: pageTitle,
       template: `%s | ${dict.seo.siteName}`,
     },
-
     description: pageDescription,
     keywords: dict.seo.keywords,
-
     alternates: {
-      canonical: `/${lang}`,
+      canonical: `/${params.lang}`,
       languages: {
-        pt: '/pt',
-        en: '/en',
-        es: '/es',
+        'pt-BR': '/pt-BR',
+        'en-US': '/en-US',
+        'es-ES': '/es-ES',
+        'es-AR': '/es-AR',
+        'es-MX': '/es-MX',
       },
     },
-
     openGraph: {
       type: 'website',
-      locale: ogLocaleMap[lang],
-      url: `${SITE_URL}/${lang}`,
-      siteName: dict.seo.site.siteName,
+      locale: ogLocaleMap[params.lang],
+      url: `${SITE_URL}/${params.lang}`,
+      siteName: dict.seo.siteName, // Corrigido de .site.siteName para .siteName
       title: pageTitle,
       description: pageDescription,
       images: [
         {
-          url: ogImageMap[lang],
+          url: ogImageMap[params.lang],
           width: 1200,
           height: 630,
           alt: pageTitle,
         },
       ],
     },
-
     twitter: {
       card: 'summary_large_image',
       title: pageTitle,
       description: pageDescription,
-      images: [ogImageMap[lang]],
+      images: [ogImageMap[params.lang]],
     },
-
     icons: {
       icon: '/icons/favicon.ico',
       shortcut: '/icons/favicon.ico',
       apple: '/icons/apple-touch-icon.png',
     },
-
-    themeColor: [
-      { media: '(prefers-color-scheme: dark)', color: '#020617' },
-      { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    ],
-
     robots: {
       index: true,
       follow: true,
