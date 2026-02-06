@@ -95,7 +95,8 @@
   ]
 }
 
-"projects": {
+"projects": { 
+  "title": "Proyectos y Soluciones",
   "featuredLabel": "Destacado Técnico",
   "firstLabel": "Desafío y Arquitectura",
   "impactLabel": "Impacto y Resultado",
