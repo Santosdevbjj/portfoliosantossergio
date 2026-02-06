@@ -234,7 +234,25 @@ export interface CookieDictionary {
   analytics: string;
   acceptAll: string;
   savePreferences: string;
+} 
+
+
+export interface SeoPage {
+  title: string;
+  description: string;
 }
+
+export interface SeoDictionary {
+  siteName: string;
+  description: string;
+  keywords: string[]; // Adicionado
+  pages: {           // Adicionado
+    home: SeoPage;
+    projects: SeoPage;
+    articles: SeoPage;
+  };
+}
+
 
 
 /**
@@ -253,6 +271,7 @@ export interface Dictionary {
   hero: HeroDictionary; 
   articles: ArticlesSectionDictionary;
   projects: ProjectsSectionDictionary; 
+  seo: SeoDictionary;
   labels?: LabelsDictionary;
   pluralization?: PluralizationDictionary;
   seo?: SeoDictionary;
