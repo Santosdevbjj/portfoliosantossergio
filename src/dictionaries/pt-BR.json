@@ -94,6 +94,18 @@
 }
 
 
+"projects": {
+  "featuredLabel": "Destaque Técnico",
+  "firstLabel": "Desafio e Arquitetura",
+  "impactLabel": "Impacto e Resultado",
+  "viewProject": "Repositório GitHub",
+  "viewDemo": "Visualizar Demo",
+  "categories": {
+    "cloud": "Cloud & Infra",
+    "dataScience": "Data Science",
+    "security": "Segurança"
+  }
+}
 
 
 
