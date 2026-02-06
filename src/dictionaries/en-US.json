@@ -95,7 +95,8 @@
   ]
 }
 
-"projects": {
+"projects": { 
+  "title": "Projects & Solutions",
   "featuredLabel": "Technical Highlight",
   "firstLabel": "Challenge and Architecture",
   "impactLabel": "Impact and Outcome",
