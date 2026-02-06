@@ -100,6 +100,7 @@
   "impactLabel": "Impacto e Resultado",
   "viewProject": "Repositório GitHub",
   "viewDemo": "Visualizar Demo",
+  "viewAll": "Ver Todos",
   "categories": {
     "cloud": "Cloud & Infra",
     "dataScience": "Data Science",
