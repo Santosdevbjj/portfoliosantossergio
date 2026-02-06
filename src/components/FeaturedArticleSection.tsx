@@ -12,20 +12,20 @@ import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Script from 'next/script'
 import { Trophy, ArrowUpRight, Calendar } from 'lucide-react'
-import type { SupportedLocale } from '@/dictionaries'
-import type { Dictionary } from '@/types/dictionary'
+import type { Locale, Dictionary } from '@/types/dictionary'
 
 interface FeaturedArticleSectionProps {
-  readonly lang: SupportedLocale
+  readonly lang: Locale
   readonly dict: Dictionary
 }
 
 export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionProps) => {
   const sectionRef = useRef<HTMLElement | null>(null)
-  const { articles } = dict
-
-  // Link centralizado para o Medium
-  const mediumLink = "https://medium.com/@santossergioluiz"
+  const { articles, common } = dict
+  
+  // Pegamos o primeiro item (destaque) do dicionário para garantir consistência total
+  const featuredArticle = articles.items[0]
+  const mediumLink = common.externalLinks.medium
 
   useEffect(() => {
     const currentRef = sectionRef.current
@@ -49,22 +49,15 @@ export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionPro
     return () => observer.disconnect()
   }, [])
 
-  // Descrições traduzidas dinamicamente para o destaque
-  const featuredDescription = {
-    pt: "Análise profunda sobre a convergência entre sistemas legados e governança de dados moderna.",
-    en: "In-depth analysis of the convergence between legacy systems and modern data governance.",
-    es: "Análisis profundo sobre la convergencia entre sistemas heredados y gobernanza de datos moderna."
-  }
-
   const schemaPerson = {
     '@context': 'https://schema.org',
     '@type': 'Person',
     '@id': 'https://sergiosantos.dev/#sergio-santos',
     name: 'Sérgio Santos',
-    jobTitle: 'Senior Data Specialist',
+    jobTitle: common.role,
     sameAs: [
-      'https://www.linkedin.com/in/santossergioluiz',
-      'https://github.com/Santosdevbjj'
+      common.externalLinks.linkedin,
+      common.externalLinks.github
     ]
   }
 
@@ -103,16 +96,16 @@ export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionPro
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             
             {/* CONTAINER DA IMAGEM */}
-            <div className="relative overflow-hidden rounded-[2rem] shadow-xl aspect-[4/3] md:aspect-video lg:aspect-square">
+            <div className="relative overflow-hidden rounded-[2rem] shadow-xl aspect-[4/3] md:aspect-video lg:aspect-square bg-slate-200 dark:bg-slate-800">
               <Image
                 src="/images/trofeu-35-edicao.png"
-                alt={articles.awardWinner}
+                alt={featuredArticle.title}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
 
             {/* CONTEÚDO TEXTUAL */}
@@ -120,24 +113,26 @@ export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionPro
               <div className="flex flex-wrap items-center gap-3 text-blue-600 dark:text-blue-400 font-black text-[10px] md:text-xs uppercase tracking-widest mb-6">
                 <div className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 rounded-full">
                   <Calendar className="w-3.5 h-3.5" />
-                  <span>{articles.publishedAt} 2024</span>
+                  <span>{articles.publishedAt} {featuredArticle.date}</span>
                 </div>
-                <span className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-3 py-1.5 rounded-full">
-                  {articles.bestOfMonth}
-                </span>
+                {featuredArticle.isAward && (
+                  <span className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-3 py-1.5 rounded-full">
+                    {articles.bestOfMonth}
+                  </span>
+                )}
               </div>
 
               <h3 className="text-2xl md:text-5xl font-black mb-6 leading-[1.15] text-slate-900 dark:text-white tracking-tight">
-                {articles.awardWinner}
+                {featuredArticle.title}
               </h3>
 
               <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 mb-8 md:mb-10 leading-relaxed font-medium">
-                {featuredDescription[lang]}
+                {featuredArticle.description}
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <a
-                  href={mediumLink}
+                  href={featuredArticle.link}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 md:py-5 rounded-2xl font-black inline-flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-blue-500/20 group/btn"
