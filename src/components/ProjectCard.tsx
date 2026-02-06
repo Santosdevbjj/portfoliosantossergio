@@ -3,9 +3,9 @@
 /**
  * PROJECT CARD: A unidade fundamental do Portfólio.
  * -----------------------------------------------------------------------------
- * - UI: Design baseado em cartões de alta densidade, totalmente responsivo.
- * - DX: Integrado com resolveProjectFlags e resolveProjectTechnology.
- * - Alinhamento: Sincronizado com src/dictionaries/ e src/domain/projects.ts
+ * - UI: Totalmente responsivo, suporte a Bento Grid e Dark Mode.
+ * - i18n: Multilíngue (PT, EN, ES-ES, ES-AR, ES-MX) via dict prop.
+ * - Logic: Parsing de descrição por Pipes (|) e resolução de tags GitHub.
  */
 
 import {
@@ -17,7 +17,7 @@ import {
   Lightbulb,
   TrendingUp,
 } from 'lucide-react'
-import type { SupportedLocale } from '@/dictionaries'
+import type { Locale } from '@/types/dictionary'
 import type { Dictionary } from '@/types/dictionary'
 import { resolveProjectFlags, resolveProjectTechnology } from '@/domain/projects'
 
@@ -32,11 +32,12 @@ interface GitHubProject {
 
 interface ProjectCardProps {
   readonly project: GitHubProject
-  readonly lang: SupportedLocale
+  readonly lang: Locale
   readonly dict: Dictionary
 }
 
 export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
+  // Extração segura das labels do dicionário alinhado
   const { projects: labels } = dict
   
   // Resolve flags e tecnologia usando a lógica de domínio centralizada
@@ -49,16 +50,8 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
   const displayTopics = topics.filter(t => !ADMIN_TOPICS.has(t.toLowerCase()))
 
   /* -------------------------------------------------
-   * 🌍 TRADUÇÃO DE SEÇÕES (Case Study)
-   * ------------------------------------------------*/
-  const sectionLabels = {
-    pt: { problem: 'Desafio', solution: 'Solução', impact: 'Impacto' },
-    en: { problem: 'Challenge', solution: 'Solution', impact: 'Impact' },
-    es: { problem: 'Desafío', solution: 'Solución', impact: 'Impacto' },
-  }[lang]
-
-  /* -------------------------------------------------
    * 🧠 PARSING DE CONTEÚDO (Pipe-separated description)
+   * O Problema | A Solução | O Impacto
    * ------------------------------------------------*/
   const descParts = project.description?.split('|').map(p => p.trim()) ?? []
   const problemText = descParts[0] || project.description || ''
@@ -79,13 +72,13 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
         p-6 md:p-8 rounded-[2rem] border transition-all duration-500
         ${
           isFirst
-            ? 'border-blue-500/30 bg-white dark:bg-slate-900 shadow-xl shadow-blue-500/5 ring-1 ring-blue-500/10'
+            ? 'border-blue-500/30 bg-white dark:bg-slate-900 shadow-xl shadow-blue-500/5 ring-1 ring-blue-500/10 md:col-span-2 lg:col-span-2'
             : 'border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950/40 shadow-sm hover:border-blue-500/20'
         }
         hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/10
       `}
     >
-      {/* BADGE DE STATUS (Destaque ou Principal) */}
+      {/* BADGE DE STATUS (Destaque ou Principal) - Traduzido via Dict */}
       {(isFirst || isFeatured) && (
         <div className="absolute -top-3 right-6 z-10">
           <span className="flex items-center gap-1.5 bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg shadow-blue-500/20">
@@ -111,7 +104,7 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="p-2.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all"
-            title={labels.repoLink}
+            aria-label={labels.viewProject}
           >
             <Github size={20} />
           </a>
@@ -121,7 +114,7 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="p-2.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all"
-              title={labels.viewProject}
+              aria-label={labels.viewDemo}
             >
               <ExternalLink size={20} />
             </a>
@@ -136,9 +129,10 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
         </h3>
 
         <div className="space-y-4">
+          {/* Seção Problema - Usando FirstLabel como título de seção se for o principal */}
           <CaseSection 
             icon={<Target size={14} />} 
-            label={sectionLabels.problem} 
+            label={labels.firstLabel} 
             text={problemText} 
             color="amber" 
           />
@@ -146,7 +140,7 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
           {solutionText && (
             <CaseSection 
               icon={<Lightbulb size={14} />} 
-              label={sectionLabels.solution} 
+              label={dict.projects.featuredLabel} 
               text={solutionText} 
               color="blue" 
             />
@@ -160,7 +154,7 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
                 </div>
                 <div>
                   <span className="block text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500">
-                    {sectionLabels.impact}
+                    {labels.impactLabel}
                   </span>
                   <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase leading-tight italic mt-0.5">
                     {impactText}
@@ -174,12 +168,12 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
 
       {/* FOOTER: TECH BADGES */}
       <footer className="mt-8 pt-5 border-t border-slate-100 dark:border-slate-800/40 flex flex-wrap gap-2">
-        {/* Badge da Categoria Principal (Dicionário) */}
+        {/* Badge da Categoria Principal vinda do Dicionário (i18n total) */}
         <span className="px-2.5 py-1 text-[9px] font-black uppercase tracking-widest bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg border border-blue-100 dark:border-blue-800/30">
-          {dict.projects.categories[labelKey as keyof typeof dict.projects.categories] || labelKey}
+          {labels.categories[labelKey as keyof typeof labels.categories] || labelKey}
         </span>
 
-        {/* Demais tecnologias do GitHub */}
+        {/* Demais tecnologias do GitHub mapeadas dinamicamente */}
         {displayTopics.slice(0, 3).map(topic => (
           <span
             key={topic}
@@ -193,9 +187,6 @@ export function ProjectCard({ project, dict, lang }: ProjectCardProps) {
   )
 }
 
-/**
- * Sub-componente para seções do card (Desafio/Solução)
- */
 function CaseSection({ 
   icon, 
   label, 
