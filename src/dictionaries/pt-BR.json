@@ -233,20 +233,6 @@
   },
 
 
-
- // "seo": {
-   // "projects": {
-   //  "title": "Projetos de Engenharia de Dados e Sistemas Críticos",
-    //  "description": "Projetos reais envolvendo dados, cloud, segurança, automação e sistemas críticos."
-  //  },
-  //  "articles": {
-    //  "title": "Artigos Técnicos e Conteúdo Profissional",
-  //  "description": "Artigos sobre tecnologia, dados, cloud e arquitetura de software."
-  // }
- // },
-  
-
-
 "seo": {
   "siteName": "Sérgio Santos | Portfolio",
   "description": "Engenheiro de Dados & Sistemas Críticos",
