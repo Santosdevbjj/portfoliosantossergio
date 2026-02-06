@@ -68,6 +68,7 @@ export interface ProjectsSectionDictionary {
   impactLabel: string;   // Label do card de impacto
   viewProject: string;   // Texto do botão GitHub
   viewDemo: string;      // Texto do botão Demo
+  viewAll: string; // <-- Adicione esta linha
   categories: ProjectCategories;
 }
 
