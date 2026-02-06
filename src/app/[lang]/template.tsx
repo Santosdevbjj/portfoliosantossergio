@@ -10,7 +10,6 @@
  *
  * Totalmente responsivo.
  * Multilíngue por herança da rota [lang].
- * Preparado para evolução futura (TS 7) sem refactor.
  */
 
 import type { ReactNode } from 'react'
@@ -34,13 +33,14 @@ export default function Template({ children }: TemplateProps) {
         antialiased
       "
     >
-      {/* Container principal
-          - flex-1 garante preenchimento total da viewport
-          - estrutura neutra para qualquer página
+      {/* Container principal:
+          - flex-1: garante que o conteúdo ocupe o espaço restante (empurrando footer se houver)
+          - focus-visible: melhora acessibilidade para navegação via teclado
       */}
       <main
         id="template-root"
-        className="relative flex w-full flex-1 flex-col"
+        className="relative flex w-full flex-1 flex-col focus-visible:outline-none"
+        tabIndex={-1}
       >
         {children}
       </main>
