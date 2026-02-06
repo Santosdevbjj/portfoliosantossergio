@@ -58,9 +58,20 @@ export interface ProjectCategories {
   security: string;
 }
 
+// export interface ProjectsSectionDictionary {
+//  categories: ProjectCategories;
+// } 
+
 export interface ProjectsSectionDictionary {
+  featuredLabel: string; // Título do badge (Destaque)
+  firstLabel: string;    // Subtítulo da descrição
+  impactLabel: string;   // Label do card de impacto
+  viewProject: string;   // Texto do botão GitHub
+  viewDemo: string;      // Texto do botão Demo
   categories: ProjectCategories;
 }
+
+
 
 
 export interface ArticleItem {
