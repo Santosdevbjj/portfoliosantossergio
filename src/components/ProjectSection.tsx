@@ -1,20 +1,10 @@
 'use client'
 
-/**
- * PROJECT SECTION: Orquestrador de Portfólio
- * -----------------------------------------------------------------------------
- * - Responsividade: Grid adaptativo, containers com limite de largura e scroll touch.
- * - I18n: Consumo via dicionários (PT, EN, ES-ES, ES-AR, ES-MX).
- * - Alinhamento: Sincronizado com Dictionary Interface e JSONs.
- */
-
 import { useMemo, useState } from 'react'
 import { Database, Filter, FolderSearch } from 'lucide-react'
-
 import { ProjectCard } from '@/components/ProjectCard'
-import type { Locale } from '@/types/dictionary' // Usando o tipo correto do seu arquivo de tipos
-import type { Dictionary } from '@/types/dictionary'
-import type { Project } from '@/types/project' // Importando do local correto
+import type { Locale, Dictionary } from '@/types/dictionary'
+import type { Project } from '@/types/project'
 
 interface ProjectSectionProps {
   readonly projects: Project[]
@@ -32,31 +22,20 @@ export function ProjectSection({
   const projectDict = dict.projects
   const statesDict = dict.states
 
-  /**
-   * LABELS EXTRAÍDAS DIRETAMENTE DO DICIONÁRIO
-   * Substituindo strings fixas pelas chaves existentes nos seus JSONs
-   */
   const uiLabels = {
-    all: projectDict.viewAll, // Usando a chave viewAll que você adicionou no tipo
-    filter: dict.common.menu.aria.open.split(' ')[0], // Helper simples ou idealmente adicionar "filter" ao common
+    all: projectDict.viewAll || "All",
+    filter: dict.common.menu.open,
     results: projectDict.featuredLabel, 
     empty: statesDict.emptyProjects.description
   }
 
-  /**
-   * ENGINE DE FILTRAGEM + RANKING
-   * Ajustado para a estrutura do seu Project Type
-   */
   const filteredProjects = useMemo(() => {
-    // 1. Filtra projetos ativos (conforme seu status no type)
     let base = projects.filter((p) => p.status === 'active')
 
-    // 2. Aplica filtro de categoria (baseado no project.category)
     if (activeCategory !== 'all') {
       base = base.filter((p) => p.category === activeCategory)
     }
 
-    // 3. Ordenação: Featured (Destaque) > Order (Definido no JSON) > ID
     return [...base].sort((a, b) => {
       if (a.featured !== b.featured) return a.featured ? -1 : 1
       return a.order - b.order
@@ -78,8 +57,8 @@ export function ProjectSection({
                 <Database className="w-6 h-6 md:w-8 md:h-8" aria-hidden="true" />
               </div>
               <h2 id="projects-title" className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
-                {/* Usamos o título do SEO ou Common se o projects.title não existir no seu JSON atual */}
-                {dict.seo?.projects?.title || "Portfolio"}
+                {/* Correção do Título: Prioriza Dictionary Project Title */}
+                {projectDict.title || dict.seo?.projects?.title || "Portfolio"}
               </h2>
             </div>
 
@@ -108,14 +87,13 @@ export function ProjectSection({
                   key={key} 
                   active={activeCategory === key} 
                   onClick={() => setActiveCategory(key)} 
-                  label={label as string} 
+                  label={label} 
                 />
               ))}
             </div>
           </nav>
         </header>
 
-        {/* GRID RESPONSIVO: 1 coluna mobile, 2 tablet, 3 desktop */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 min-h-[300px]">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project, index) => (
