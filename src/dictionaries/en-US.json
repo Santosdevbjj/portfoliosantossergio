@@ -231,16 +231,31 @@
     }
   },
 
+
+
   "seo": {
+  "siteName": "Sérgio Santos | Portfolio",
+  "description": "Data Engineer & Critical Systems",
+  "keywords": ["data engineering", "high availability", "distributed systems", "next.js"],
+  "pages": {
+    "home": {
+      "title": "Data Architecture and Resilience",
+      "description": "Specialist in transforming complex infrastructures into high-availability systems."
+    },
     "projects": {
-      "title": "Data Engineering and Mission-Critical Systems Projects",
-      "description": "Real-world projects involving data, cloud, security, automation, and mission-critical systems."
+      "title": "Engineering Projects",
+      "description": "Portfolio of cloud solutions and data pipelines."
     },
     "articles": {
-      "title": "Technical Articles and Professional Content",
-      "description": "Articles about technology, data, cloud, and software architecture."
+      "title": "Technical Articles",
+      "description": "Specialized content on technology and architecture."
     }
-  },
+  }
+}
+
+
+
+
 
   "categoriesExtended": {
     "dataScience": {
