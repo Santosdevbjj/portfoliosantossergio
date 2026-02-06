@@ -62,7 +62,8 @@ export interface ProjectCategories {
 //  categories: ProjectCategories;
 // } 
 
-export interface ProjectsSectionDictionary {
+export interface ProjectsSectionDictionary { 
+  title: string;
   featuredLabel: string; // Título do badge (Destaque)
   firstLabel: string;    // Subtítulo da descrição
   impactLabel: string;   // Label do card de impacto
@@ -117,7 +118,7 @@ export interface ErrorBoundaryDictionary {
   };
 }
 
-export interface NotFoundDictionary {
+export interface No;tFoundDictionary {
   title: string;
   description: string;
   button: string;
