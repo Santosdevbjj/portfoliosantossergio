@@ -8,9 +8,33 @@ export function validateDictionary(
   const errors: string[] = [];
 
   if (!dictionary?.contact?.cta) {
-  errors.push("Missing contact.cta");
+  errors.push("Missing contact.cta")
+  validateSeo(dictionary.seo, errors)
 } 
 
+
+function validateSeo(seo: any, errors: string[]) {
+  if (!seo) {
+    errors.push("Missing seo section");
+    return;
+  }
+  if (!seo.siteName) errors.push("Missing seo.siteName");
+  if (!Array.isArray(seo.keywords)) errors.push("seo.keywords must be an array");
+  
+  const requiredPages = ['home', 'projects', 'articles'];
+  requiredPages.forEach(page => {
+    if (!seo.pages?.[page]?.title) errors.push(`Missing seo.pages.${page}.title`);
+    if (!seo.pages?.[page]?.description) errors.push(`Missing seo.pages.${page}.description`);
+  });
+}
+
+// Chame validateSeo(dictionary.seo, errors) dentro da função principal validateDictionary
+
+
+
+
+
+  
 // Validação da Seção Experience
 if (!dictionary?.experience) {
   errors.push("Missing experience section");
