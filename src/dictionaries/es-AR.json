@@ -231,16 +231,30 @@
     }
   },
 
-  "seo": {
+
+"seo": {
+  "siteName": "Sérgio Santos | Portfolio",
+  "description": "Ingeniero de Datos y Sistemas Críticos",
+  "keywords": ["data engineering", "high availability", "distributed systems", "next.js"],
+  "pages": {
+    "home": {
+      "title": "Arquitectura de Datos y Resiliencia",
+      "description": "Especialista en transformar infraestructuras complejas en sistemas de alta disponibilidad."
+    },
     "projects": {
-      "title": "Proyectos de Ingeniería de Datos y Sistemas Críticos",
-      "description": "Proyectos reales que involucran datos, cloud, seguridad, automatización y sistemas críticos."
+      "title": "Proyectos de Ingeniería",
+      "description": "Portafolio de soluciones en cloud y pipelines de datos."
     },
     "articles": {
-      "title": "Artículos Técnicos y Contenido Profesional",
-      "description": "Artículos sobre tecnología, datos, cloud y arquitectura de software."
+      "title": "Artículos Técnicos",
+      "description": "Contenido especializado sobre tecnología y arquitectura."
     }
-  },
+  }
+}
+  
+
+
+
 
   "categoriesExtended": {
     "dataScience": {
