@@ -2,32 +2,25 @@
  * LOADING: Skeleton Screen
  * -----------------------------------------------------------------------------
  * Renderizado instantaneamente via React Suspense (Streaming).
- * Totalmente responsivo.
- * Multilíngue (pt / en / es).
- * Alinhado 100% ao Dictionary.
- * Server-safe (App Router best practice).
+ * Totalmente responsivo e alinhado aos dicionários pt-BR, en-US, es-ES, es-AR, es-MX.
  */
 
-import type { SupportedLocale } from '@/dictionaries'
-import { getDictionarySync } from '@/dictionaries'
+import { getDictionary } from '@/dictionaries'
+import type { Locale } from '@/types/dictionary'
 
 interface LoadingProps {
   params: {
-    lang: SupportedLocale
+    lang: Locale
   }
 }
 
 export default function Loading({ params }: LoadingProps) {
-  const locale: SupportedLocale = params?.lang ?? 'pt'
-  const dictionary = getDictionarySync(locale)
+  // Garante o fallback para pt-BR caso o params falhe
+  const locale: Locale = params?.lang ?? 'pt-BR'
+  const dictionary = getDictionary(locale)
 
-  const label =
-    dictionary.common.loading ??
-    (locale === 'en'
-      ? 'Loading content...'
-      : locale === 'es'
-      ? 'Cargando contenido...'
-      : 'Carregando conteúdo...')
+  // Utiliza a chave 'common.loading' que validamos nos arquivos JSON
+  const label = dictionary.common.loading || "Carregando..."
 
   return (
     <div
@@ -36,7 +29,7 @@ export default function Loading({ params }: LoadingProps) {
       aria-live="polite"
       aria-busy="true"
     >
-      {/* Texto acessível para leitores de tela */}
+      {/* Texto acessível para leitores de tela - SEO & Acessibilidade */}
       <span className="sr-only">{label}</span>
 
       {/* 🦴 Skeleton Navbar */}
@@ -46,20 +39,24 @@ export default function Loading({ params }: LoadingProps) {
       />
 
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 pt-16 pb-20">
-        {/* 🦴 Skeleton Hero */}
+        {/* 🦴 Skeleton Hero Section */}
         <section className="space-y-8 mb-24" aria-hidden="true">
-          <div className="h-6 w-40 bg-blue-600/10 dark:bg-blue-600/20 rounded-full animate-pulse border border-blue-600/20" />
+          {/* Badge Skeleton */}
+          <div className="h-6 w-48 bg-blue-600/10 dark:bg-blue-600/20 rounded-full animate-pulse border border-blue-600/20" />
 
+          {/* Title Skeletons */}
           <div className="space-y-4">
             <div className="h-12 md:h-16 w-full max-w-3xl bg-slate-200 dark:bg-slate-800/80 rounded-3xl animate-pulse" />
             <div className="h-12 md:h-16 w-2/3 max-w-xl bg-slate-200 dark:bg-slate-800/80 rounded-3xl animate-pulse" />
           </div>
 
+          {/* Subtitle Skeletons */}
           <div className="space-y-3">
             <div className="h-5 w-full max-w-lg bg-slate-200/60 dark:bg-slate-800/40 rounded-xl animate-pulse" />
             <div className="h-5 w-3/4 max-w-sm bg-slate-200/60 dark:bg-slate-800/40 rounded-xl animate-pulse" />
           </div>
 
+          {/* Button Skeletons */}
           <div className="flex gap-4 pt-4">
             <div className="h-12 w-40 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />
             <div className="h-12 w-12 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />
@@ -76,21 +73,26 @@ export default function Loading({ params }: LoadingProps) {
               key={i}
               className="relative overflow-hidden min-h-[420px] bg-white dark:bg-slate-900/40 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800/60 p-8 flex flex-col justify-end"
             >
-              <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 dark:via-slate-800/20 to-transparent" />
+              {/* Shimmer Effect */}
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 dark:via-slate-800/10 to-transparent" />
 
               <div className="space-y-6 relative z-10">
+                {/* Category Badges */}
                 <div className="flex gap-2">
                   <div className="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-lg animate-pulse" />
                   <div className="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-lg animate-pulse" />
                 </div>
 
+                {/* Project Title */}
                 <div className="h-7 w-full bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse" />
 
+                {/* Project Description */}
                 <div className="space-y-3">
                   <div className="h-4 w-full bg-slate-200/50 dark:bg-slate-800/50 rounded-md animate-pulse" />
                   <div className="h-4 w-5/6 bg-slate-200/50 dark:bg-slate-800/50 rounded-md animate-pulse" />
                 </div>
 
+                {/* Card Footer */}
                 <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800">
                   <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg animate-pulse" />
                   <div className="h-8 w-8 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
