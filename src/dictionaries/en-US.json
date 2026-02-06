@@ -95,6 +95,18 @@
   ]
 }
 
+"projects": {
+  "featuredLabel": "Technical Highlight",
+  "firstLabel": "Challenge and Architecture",
+  "impactLabel": "Impact and Outcome",
+  "viewProject": "GitHub Repository",
+  "viewDemo": "View Demo",
+  "categories": {
+    "cloud": "Cloud & Infra",
+    "dataScience": "Data Science",
+    "security": "Security"
+  }
+} 
 
 "cookie": {
   "title": "Cookie Settings",
