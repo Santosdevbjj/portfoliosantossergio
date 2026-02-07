@@ -6,8 +6,8 @@ export interface BreadcrumbItem {
 }
 
 /**
- * Gera breadcrumbs semânticos e SEO-friendly
- * Corrigido para alinhar com a estrutura do dicionário fornecida
+ * Gera breadcrumbs semânticos e SEO-friendly.
+ * Alinhado com a estrutura multi-regional (pt-BR, en-US, es-ES, es-AR, es-MX).
  */
 export function generateBreadcrumbs(
   pathname: string,
@@ -17,15 +17,16 @@ export function generateBreadcrumbs(
 ): BreadcrumbItem[] {
   const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
   
-  // Remove o locale do início do path para processar os segmentos
+  // Remove o locale da URL para processar os segmentos de página
   const segments = pathname
     .split('/')
     .filter(Boolean)
     .filter((seg) => seg !== locale);
 
+  // O "Home" agora usa breadcrumb_root conforme seu labels.json
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      name: dict.labels?.home || 'Home',
+      name: dict.labels?.breadcrumb_root || dict.labels?.home || 'Home',
       item: `${normalizedBaseUrl}/${locale}`,
     },
   ];
@@ -36,10 +37,12 @@ export function generateBreadcrumbs(
     const decodedSegment = decodeURIComponent(segment);
     currentPath += `/${segment}`;
 
-    // Tenta buscar o nome traduzido na seção seo.pages do dicionário
-    // Se não encontrar, tenta labels, se não, formata o slug
+    // Lógica de busca de Label:
+    // 1. Procura na seção SEO do dicionário (ex: seo.pages.projects.title)
+    // 2. Procura em labels genéricos
+    // 3. Fallback: Formata o slug (ex: "meus-projetos" -> "Meus Projetos")
     const label = 
-      dict.seo.pages?.[decodedSegment as keyof typeof dict.seo.pages]?.title ||
+      dict.seo?.pages?.[decodedSegment as keyof typeof dict.seo.pages]?.title ||
       (dict.labels as any)?.[decodedSegment] ||
       decodedSegment
         .replace(/-/g, ' ')
