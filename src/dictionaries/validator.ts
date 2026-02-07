@@ -6,10 +6,11 @@ export function validateDictionary(
   dictionary: Dictionary
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
+  validateSeo(dictionary.seo, errors)
 
   if (!dictionary?.contact?.cta) {
   errors.push("Missing contact.cta")
-  validateSeo(dictionary.seo, errors)
+  
 } 
 
 
