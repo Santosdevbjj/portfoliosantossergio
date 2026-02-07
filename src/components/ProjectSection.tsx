@@ -105,7 +105,7 @@ export function ProjectSection({
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <ProjectCard
-                  project={project as any} // Cast temporário até atualizar o ProjectCard
+                  project={project} // Cast temporário até atualizar o ProjectCard
                   lang={lang}
                   dict={dict}
                 />
