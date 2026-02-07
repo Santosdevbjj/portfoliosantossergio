@@ -1,8 +1,10 @@
+// src/proxy.ts
+
 import { NextRequest, NextResponse } from 'next/server'
 import { Locale } from '@/types/dictionary'
 
 /**
- * Locales suportados alinhados com src/types/dictionary.ts
+ * Locales suportados alinhados com a aplicação.
  */
 const SUPPORTED_LOCALES: Locale[] = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"]
 const DEFAULT_LOCALE: Locale = "pt-BR"
@@ -10,36 +12,41 @@ const DEFAULT_LOCALE: Locale = "pt-BR"
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // 1. Proteção de arquivos internos e estáticos
+  // 1. Ignorar arquivos estáticos, assets e API
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
+    pathname.startsWith('/static') ||
     pathname === '/favicon.ico' ||
+    pathname === '/robots.txt' ||
     pathname.includes('.')
   ) {
     return NextResponse.next()
   }
 
-  // 2. Verifica se a URL já começa com um locale válido
-  const pathnameIsMissingLocale = SUPPORTED_LOCALES.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  // 2. Verificar se o locale já está presente na URL
+  const pathnameHasLocale = SUPPORTED_LOCALES.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   )
 
-  // 3. Redireciona se o locale estiver faltando
-  if (pathnameIsMissingLocale) {
-    // Se for a raiz "/", vai para /pt-BR
-    // Se for "/contato", vai para /pt-BR/contato
-    return NextResponse.redirect(
-      new URL(`/${DEFAULT_LOCALE}${pathname.startsWith('/') ? '' : '/'}${pathname}`, request.url)
-    )
-  }
+  if (pathnameHasLocale) return NextResponse.next()
 
-  return NextResponse.next()
+  // 3. Caso não tenha locale, redirecionar para o padrão (pt-BR)
+  // Ex: /projetos -> /pt-BR/projetos
+  const redirectUrl = new URL(
+    `/${DEFAULT_LOCALE}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
+    request.url
+  )
+
+  return NextResponse.redirect(redirectUrl)
 }
 
+/**
+ * Matcher para garantir que o middleware rode em todas as rotas relevantes.
+ */
 export const config = {
   matcher: [
-    // Pula caminhos internos e arquivos estáticos
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    // Roda em tudo, exceto caminhos internos do Next.js e arquivos com extensão (png, jpg, etc)
+    '/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js).*)',
   ],
 }
