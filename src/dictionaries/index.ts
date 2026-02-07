@@ -21,22 +21,22 @@ export function getDictionary(locale: Locale): Dictionary {
   // 1. Tentativa de busca direta (ex: es-AR)
   let dictionary = dictionaries[locale];
 
-  // 2. Lógica de Fallback Regional para a família "es"
+  // 2. Lógica de Fallback Regional para a família "es" (Espanhol)
+  // Se pedir um dialeto que não temos (ex: es-CL), entrega o es-ES
   if (!dictionary && locale.startsWith("es")) {
-    // Se pedir "es" ou "es-CL", tenta entregar o es-ES como base da família
     dictionary = dictionaries["es-ES"];
   }
 
-  // 3. Fallback Global (Padrão do sistema)
+  // 3. Fallback Global (Padrão do sistema se tudo falhar)
   if (!dictionary) {
     dictionary = dictionaries["pt-BR"];
   }
 
-  // Validação em tempo de desenvolvimento
+  // Validação em tempo de desenvolvimento para evitar campos vazios na UI
   const { valid, errors } = validateDictionary(dictionary);
 
   if (!valid && process.env.NODE_ENV !== "production") {
-    console.error(`[i18n] Invalid dictionary for locale ${locale}`, errors);
+    console.error(`[i18n] Invalid dictionary for locale: ${locale}`, errors);
   }
 
   return dictionary;
