@@ -15,20 +15,21 @@ import { PageWrapper } from '@/components/PageWrapper'
 import { ProjectSection } from '@/components/ProjectSection'
 import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection'
 
-// Infra
-import { getDictionarySync, type SupportedLocale } from '@/dictionaries'
+// Infra - Ajustado para usar getDictionary (nome correto no seu index.ts)
+import { getDictionary } from '@/dictionaries'
 import { getGitHubProjects } from '@/lib/github'
+import type { Locale, Dictionary } from '@/types/dictionary'
 import type { Project } from '@/domain/projects'
 
 interface ProxyClientProps {
-  readonly lang: SupportedLocale
+  readonly lang: Locale
 }
 
 export default function ProxyClient({ lang }: ProxyClientProps) {
-  // 1. Carregamento seguro do dicionário
+  // 1. Carregamento do dicionário alinhado com o src/dictionaries/index.ts
   const dict = useMemo(() => {
     try {
-      return getDictionarySync(lang)
+      return getDictionary(lang)
     } catch (e) {
       console.error("Erro crítico ao carregar dicionário:", e)
       return null
@@ -54,14 +55,15 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
     loadData()
   }, [lang])
 
+  // Se o dicionário falhar completamente após os fallbacks
   if (!dict) return notFound()
 
-  // Estado de carregamento (O que a Vercel gera no build estático)
+  // Estado de carregamento com fallback de texto do dicionário
   if (loading) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-white dark:bg-[#020617]">
-        <div className="animate-pulse text-sm text-slate-500">
-          {dict.common?.loading || 'Carregando...'}
+        <div className="animate-pulse text-sm font-medium text-slate-500">
+          {dict.common?.loading || 'Loading...'}
         </div>
       </div>
     )
@@ -69,32 +71,26 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
 
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact'] as const
 
-  // 2. Renderização Defensiva
-  // Se qualquer seção falhar, o erro será capturado e logado no console do seu navegador
   try {
     return (
       <PageWrapper lang={lang} sectionIds={sectionIds}>
         <Navbar lang={lang} dict={dict} />
 
         <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
-          {/* Seção Hero */}
           <section id="hero">
             <HeroSection lang={lang} dict={dict} />
           </section>
 
-          {/* Seção Sobre */}
           <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
             <AboutSection lang={lang} dict={dict} />
           </section>
 
-          {/* Seção Experiência */}
           <section id="experience" className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10">
             <div className="mx-auto max-w-7xl px-4 sm:px-10 lg:px-12">
               <ExperienceSection lang={lang} dict={dict} />
             </div>
           </section>
 
-          {/* Seção Projetos */}
           <section id="projects" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
             <FeaturedProjectsSection lang={lang} dict={dict} />
             <div className="mt-12 border-t pt-12 dark:border-slate-800">
@@ -102,12 +98,10 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
             </div>
           </section>
 
-          {/* Seção Artigos */}
           <section id="articles" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
             <FeaturedArticleSection lang={lang} dict={dict} />
           </section>
 
-          {/* Seção Contato */}
           <section id="contact" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
             <ContactSection lang={lang} dict={dict} />
           </section>
@@ -117,11 +111,13 @@ export default function ProxyClient({ lang }: ProxyClientProps) {
       </PageWrapper>
     )
   } catch (error) {
-    console.error("ERRO DE RENDERIZAÇÃO DETECTADO:", error)
+    console.error("ERRO DE RENDERIZAÇÃO:", error)
     return (
-      <div className="p-20 text-center">
-        <h1 className="text-red-500 font-bold">Erro na Interface. Verifique o Console (F12).</h1>
-        <p className="text-sm text-slate-500 mt-2">{String(error)}</p>
+      <div className="flex min-h-screen items-center justify-center p-6 text-center">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-8">
+          <h1 className="text-xl font-bold text-red-600">{dict.common?.error || 'Error'}</h1>
+          <p className="mt-2 text-sm text-red-500">{String(error)}</p>
+        </div>
       </div>
     )
   }
