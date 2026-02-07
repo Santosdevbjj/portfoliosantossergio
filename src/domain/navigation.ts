@@ -1,3 +1,5 @@
+// src/domain/navigation.ts
+
 export enum NavSection {
   ABOUT = 'about',
   EXPERIENCE = 'experience',
@@ -14,6 +16,10 @@ export const NAV_SECTIONS: readonly NavSection[] = [
   NavSection.CONTACT,
 ] as const;
 
+/**
+ * Mapeia a seção para o ID da âncora no HTML.
+ * Útil para scroll suave e SEO.
+ */
 export const NAV_HASH_MAP: Readonly<Record<NavSection, `#${string}`>> = {
   [NavSection.ABOUT]: '#sobre',
   [NavSection.EXPERIENCE]: '#trajetoria',
