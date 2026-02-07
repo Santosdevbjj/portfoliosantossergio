@@ -1,0 +1,42 @@
+{
+  "pt-BR": {
+    "home": "Início",
+    "back": "Voltar",
+    "retry": "Tentar novamente",
+    "close": "Fechar",
+    "open": "Abrir",
+    "breadcrumb_root": "Início"
+  },
+  "en-US": {
+    "home": "Home",
+    "back": "Back",
+    "retry": "Try again",
+    "close": "Close",
+    "open": "Open",
+    "breadcrumb_root": "Home"
+  },
+  "es-ES": {
+    "home": "Inicio",
+    "back": "Volver",
+    "retry": "Intentar de nuevo",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "breadcrumb_root": "Inicio"
+  },
+  "es-AR": {
+    "home": "Inicio",
+    "back": "Volver",
+    "retry": "Intentar nuevamente",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "breadcrumb_root": "Inicio"
+  },
+  "es-MX": {
+    "home": "Inicio",
+    "back": "Volver",
+    "retry": "Intentar de nuevo",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "breadcrumb_root": "Inicio"
+  }
+}
