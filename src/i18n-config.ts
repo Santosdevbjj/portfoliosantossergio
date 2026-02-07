@@ -7,16 +7,16 @@
 import type { Locale } from '@/types/dictionary';
 
 export const i18n = {
-  defaultLocale: 'pt-BR',
-  // Lista exaustiva baseada nos seus arquivos JSON e no tipo Locale
-  locales: ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'],
+  defaultLocale: 'pt-BR' as const,
+  /**
+   * Lista exaustiva baseada nos arquivos JSON e no tipo Locale.
+   * Manter em sincronia com src/types/dictionary.ts
+   */
+  locales: ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'] as const,
 } as const;
 
-// Removemos a função getDictionary daqui para evitar duplicidade, 
-// pois você já a possui em src/dictionaries/index.ts e src/lib/getServerDictionary.ts
-
 /**
- * Metadata por idioma para SEO e UI
+ * Metadata por idioma para SEO e UI (Language Switcher)
  */
 export const localeMetadata: Record<
   Locale,
@@ -67,7 +67,7 @@ export const localeMetadata: Record<
     region: 'es-MX',
     flag: '🇲🇽',
     hrefLang: 'es-MX',
-    description: 'Ingeniería de Datos, Ciencia de Dados, IA y Sistemas de Misión Crítica.',
+    description: 'Ingeniería de Datos, Ciencia de Datos, IA y Sistemas de Misión Crítica.',
   },
 };
 
@@ -75,7 +75,8 @@ export const DEFAULT_HREFLANG = 'x-default';
 
 /**
  * Validação segura de locale
+ * Verifica se uma string de rota é um locale suportado pela aplicação.
  */
 export function isSupportedLocale(locale: string): locale is Locale {
-  return (i18n.locales as readonly string[]).includes(locale);
+  return (i18n.locales as readonly string[]).includes(locale as Locale);
 }
