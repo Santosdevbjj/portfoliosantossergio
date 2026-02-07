@@ -30,23 +30,18 @@ export interface Project {
 
   /**
    * Conteúdo localizado do projeto.
-   * Mapeado dinamicamente usando o tipo Locale global.
-   * 'pt-BR' é obrigatório como fallback principal.
+   * 'pt-BR' é obrigatório, os demais são opcionais.
    */
   content: {
     "pt-BR": ProjectLocaleContent;
-  } & {
-    [K in Extract<Locale, "en-US" | "es-ES" | "es-AR" | "es-MX">]?: ProjectLocaleContent;
-  };
+  } & Partial<Record<Exclude<Locale, "pt-BR">, ProjectLocaleContent>>;
 
   /**
    * SEO localizado do projeto.
    */
   seo: {
     "pt-BR": ProjectSEO;
-  } & {
-    [K in Extract<Locale, "en-US" | "es-ES" | "es-AR" | "es-MX">]?: ProjectSEO;
-  };
+  } & Partial<Record<Exclude<Locale, "pt-BR">, ProjectSEO>>;
 
   stack: string[];
   links?: ProjectLinks;
