@@ -11,18 +11,18 @@
     "sourceType": "curated-manual"
   },
   "hero": {
-    "greeting": "Available for Critical Projects",
+    "greeting": "Available for Mission-Critical Projects",
     "title": "Data Science Analyst",
-    "subtitle": "Data and Resilience",
+    "subtitle": "Data & Resilience",
     "headline": "Specialist in transforming complex infrastructures into high-availability systems and scalable data pipelines.",
     "ctaPrimary": "View Projects"
   },
   "about": {
     "title": "About Me",
-    "differentialTitle": "Data Engineering with Mission-Critical Focus",
-    "description": "Data Science Analyst with a solid background in critical banking systems, focusing on transforming data into decisions and operational efficiency.",
-    "differentialContent": "I worked for over 15 years at Bradesco Bank. Currently, I focus on Data Science and AI, applying the rigor of critical systems to predictive models.",
-    "highlights": ["15+ years in Banking", "Cloud Specialist", "Data Science & AI"],
+    "differentialTitle": "Data Engineering with a Mission-Critical Focus",
+    "description": "Data Science Analyst with a solid background in critical banking systems, focusing on transforming data into decisions, cost reduction, and operational efficiency.",
+    "differentialContent": "I served for over 15 years at Banco Bradesco in regulated mission-critical environments. Currently, I focus my work on Data Science and AI, applying the rigor of critical systems to the creation of predictive models.",
+    "highlights": ["15+ Years in Banking", "Cloud Specialist", "Data Science & AI"],
     "stats": {
       "experienceValue": "+15",
       "experienceLabel": "Years",
@@ -33,7 +33,7 @@
   },
   "contact": {
     "title": "Let's Talk?",
-    "subtitle": "Looking for opportunities in governance and modernization projects.",
+    "subtitle": "Seeking opportunities in governance and modernization projects.",
     "cta": "Send Email",
     "emailLabel": "Copy Email",
     "cvLabel": "View CV",
@@ -43,10 +43,10 @@
     "title": "Professional Experience",
     "items": [
       {
-        "company": "Independent Consultant",
+        "company": "Freelance Consultant / Transition",
         "period": "2008 - Present",
         "role": "Critical Systems Specialist",
-        "description": "Architecture and maintenance of resilient data pipelines and infrastructure. Focus on Data Science."
+        "description": "Architecture and maintenance of resilient data pipelines and infrastructure. Focus on Data Science and intelligent automation."
       }
     ]
   },
@@ -56,24 +56,24 @@
     "readMore": "Read full article",
     "publishedAt": "Published on",
     "bestOfMonth": "Highlight of the Month",
-    "awardWinner": "Award Winner",
+    "awardWinner": "Award-Winning Article",
     "items": [
       {
-        "title": "The Data Era in Critical Systems",
+        "title": "The Era of Data in Critical Systems",
         "description": "How data governance transforms legacy systems into strategic assets.",
         "date": "2025",
         "category": "Data Strategy",
         "isAward": true,
-        "link": "https://medium.com/@sergiosantosluiz"
+        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
       }
     ]
   },
   "projects": {
-    "title": "Projects & Solutions",
+    "title": "Projects and Solutions",
     "featuredLabel": "Technical Highlight",
     "firstLabel": "Challenge & Architecture",
-    "impactLabel": "Impact & Result",
-    "viewProject": "GitHub Repo",
+    "impactLabel": "Impact & Results",
+    "viewProject": "GitHub Repository",
     "viewDemo": "View Demo",
     "viewAll": "View All",
     "categories": {
@@ -83,7 +83,7 @@
       "analysis": "Power BI & Analysis",
       "excel": "Excel",
       "database": "Database",
-      "dev": "Development",
+      "dev": "Development (Python/C#/Java)",
       "security": "Security"
     }
   },
@@ -98,14 +98,14 @@
     "socialLinks": "Open {platform} profile",
     "languageSwitcher": "Change language",
     "errorBoundary": {
-      "title": "Oops! Error.",
-      "description": "Contact support if it persists.",
-      "actions": { "retry": "Retry", "home": "Home" }
+      "title": "Oops! Unexpected error.",
+      "description": "Please contact me if the problem persists.",
+      "actions": { "retry": "Try again", "home": "Home" }
     },
     "notFound": {
-      "title": "Page Not Found",
-      "description": "Link might be broken.",
-      "button": "Back"
+      "title": "Page not found",
+      "description": "The link may be broken.",
+      "button": "Go Back"
     },
     "externalLinks": {
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
@@ -126,18 +126,18 @@
   "states": {
     "loading": "Loading...",
     "empty": "No data.",
-    "error": "Loading error.",
-    "emptyProjects": { "title": "No projects", "description": "Coming soon.", "cta": "Back" },
-    "emptyExperience": "No records.",
-    "errorArticles": "Articles error."
+    "error": "Error loading.",
+    "emptyProjects": { "title": "No projects", "description": "Coming soon.", "cta": "Go Back" },
+    "emptyExperience": "No records found.",
+    "errorArticles": "Error loading articles."
   },
   "cookie": {
     "title": "Cookies",
     "description": "We improve your experience.",
     "necessary": "Necessary",
-    "alwaysActive": "Active",
+    "alwaysActive": "Always Active",
     "analytics": "Analytics",
-    "acceptAll": "Accept",
+    "acceptAll": "Accept All",
     "savePreferences": "Save"
   },
   "seo": {
@@ -145,7 +145,7 @@
     "description": "Data Science & Critical Systems",
     "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
     "pages": {
-      "home": { "title": "Home", "description": "Sérgio Santos Portfolio" },
+      "home": { "title": "Home", "description": "Portfolio of Sérgio Santos" },
       "projects": { "title": "Projects", "description": "Data solutions" },
       "articles": { "title": "Articles", "description": "Technical content" }
     }
