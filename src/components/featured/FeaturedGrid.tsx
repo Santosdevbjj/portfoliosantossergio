@@ -11,31 +11,18 @@ interface FeaturedGridProps {
   readonly dict: Dictionary
 }
 
-export default function FeaturedGrid({
-  projects,
-  lang,
-  dict,
-}: FeaturedGridProps) {
+export default function FeaturedGrid({ projects, lang, dict }: FeaturedGridProps) {
   if (!projects.length) return null
 
   return (
-    <div
-      className="
-        grid
-        grid-cols-1
-        gap-6
-        sm:grid-cols-2
-        lg:grid-cols-3
-        lg:auto-rows-[1fr]
-      "
-    >
+    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:auto-rows-fr">
       {projects.map((project, index) => (
         <ProjectCard
           key={project.id}
           project={project}
           lang={lang}
           dict={dict}
-          featured={index === 0}
+          featured={index === 0} // O primeiro projeto (prioridade 1) ganha destaque
         />
       ))}
     </div>
