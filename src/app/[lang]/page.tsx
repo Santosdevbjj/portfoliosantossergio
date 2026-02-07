@@ -3,13 +3,14 @@
  * -----------------------------------------------------------------------------
  * ✔️ SSG: generateStaticParams para pt-BR, en-US, es-ES, es-AR, es-MX
  * ✔️ Next.js 16 Ready: params tratado como Promise
- * ✔️ Responsividade: Mobile-first com Tailwind CSS
+ * ✔️ Data Fetching: Integração com GitHub Service + Cache
  * ✔️ Multilíngue: Alinhado com a estrutura de dicionários e fallbacks
  */
 
 import type { Metadata, Viewport } from 'next';
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import type { Locale } from "@/types/dictionary";
+import { getGitHubProjects } from "@/services/githubService";
 import ProxyPage from '@/ProxyClient'; 
 
 // Interface para as propriedades da página conforme Next.js 15/16
@@ -22,10 +23,6 @@ interface PageProps {
 /* -------------------------------------------------------------------------- */
 /* STATIC GENERATION — PRÉ-RENDERIZAÇÃO                                        */
 /* -------------------------------------------------------------------------- */
-/**
- * Garante que todas as rotas de idioma sejam geradas no momento do build.
- * Isso torna o carregamento instantâneo.
- */
 export async function generateStaticParams() {
   return [
     { lang: 'pt-BR' },
@@ -59,9 +56,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app';
 
-  // Fallback seguro usando a estrutura SEO do seu dicionário
-  const pageTitle = dict.seo?.projects?.title || "Sérgio Santos | Portfolio";
-  const pageDescription = dict.seo?.projects?.description || dict.common.role;
+  const pageTitle = dict.seo?.pages?.projects?.title || "Sérgio Santos | Portfolio";
+  const pageDescription = dict.seo?.pages?.projects?.description || dict.common.role;
 
   return {
     title: pageTitle,
@@ -82,7 +78,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: pageDescription,
       url: `${siteUrl}/${lang}`,
       siteName: "Sérgio Santos Portfolio",
-      locale: lang.replace('-', '_'), // Converte pt-BR para pt_BR
+      locale: lang.replace('-', '_'),
       type: 'website',
     },
   };
@@ -92,52 +88,66 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 /* PAGE COMPONENT — PONTO DE ENTRADA                                           */
 /* -------------------------------------------------------------------------- */
 export default async function HomePage({ params }: PageProps) {
-  // Resolve os parâmetros e carrega o dicionário no servidor
+  // 1. Resolve os parâmetros da URL
   const { lang } = await params;
-  const dict = getServerDictionary(lang);
+
+  // 2. Dispara as buscas em paralelo para máxima performance
+  const dictPromise = getServerDictionary(lang);
+  const projectsPromise = getGitHubProjects();
+
+  // 3. Aguarda ambos os resultados
+  const [dict, projects] = await Promise.all([dictPromise, projectsPromise]);
 
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100">
       
-      {/* CONTAINER RESPONSIVO:
-          - px-4: Padding lateral em mobile
-          - md:px-8: Padding em tablets
-          - lg:px-16: Padding em desktops
-          - max-w-7xl: Limita a largura em telas ultra-wide
-      */}
       <div className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-20 max-w-7xl">
         
         {/* HEADER DA PÁGINA */}
         <header className="mb-16 space-y-4 text-center md:text-left">
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-            {dict.seo?.projects?.title}
+             {/* Título vindo do dicionário mapeado */}
+            {dict.projects.title}
           </h1>
           <p className="max-w-2xl text-lg md:text-xl text-slate-600 dark:text-slate-400">
-            {dict.seo?.projects?.description}
+            {dict.seo?.pages?.projects?.description}
           </p>
         </header>
 
-        {/* COMPONENTE CLIENTE (ProxyPage) 
-            Centraliza interações do lado do cliente (filtros, animações) 
-            enquanto o SEO permanece robusto no servidor.
+        {/* SEÇÃO PRINCIPAL DE PROJETOS 
+            Enviamos os dados do GitHub (projects) e o Dicionário para o ProxyPage.
+            Isso permite que o ProxyPage gerencie filtros/animações instantaneamente.
         */}
         <section className="w-full">
-          <ProxyPage lang={lang} />
+          {projects.length > 0 ? (
+            <ProxyPage 
+              lang={lang} 
+              initialProjects={projects} 
+              dictionary={dict} 
+            />
+          ) : (
+            /* ESTADO VAZIO: Consistência com o Dicionário JSON */
+            <div className="text-center py-20 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
+              <h2 className="text-2xl font-semibold text-slate-400">
+                {dict.states.emptyProjects.title}
+              </h2>
+              <p className="text-slate-500 mt-2">
+                {dict.states.emptyProjects.description}
+              </p>
+            </div>
+          )}
         </section>
 
-        {/* FALLBACK EM CASO DE LISTA VAZIA (Exemplo de consistência com o dicionário) */}
-        {/* Aqui você integraria sua lista de projetos. Caso vazio: */}
-        {/* <div className="text-center py-20">
-              <h2 className="text-2xl font-semibold">{dict.states.emptyProjects.title}</h2>
-              <p>{dict.states.emptyProjects.description}</p>
-            </div> 
-        */}
       </div>
       
-      {/* RODAPÉ SIMPLES PARA EXEMPLO */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 py-8 text-center text-sm text-slate-500">
-        <p>{dict.common.footer}</p>
-        <p className="mt-2">{dict.common.builtWith}</p>
+      {/* RODAPÉ ESTRUTURADO */}
+      <footer className="mt-auto border-t border-slate-200 dark:border-slate-800 py-12 bg-slate-50 dark:bg-slate-900/50">
+        <div className="container mx-auto px-4 text-center text-sm text-slate-500">
+          <p>{dict.common.footer}</p>
+          <div className="mt-4 flex justify-center gap-4 text-xs font-medium uppercase tracking-widest">
+             <span>{dict.common.builtWith}</span>
+          </div>
+        </div>
       </footer>
     </main>
   );
