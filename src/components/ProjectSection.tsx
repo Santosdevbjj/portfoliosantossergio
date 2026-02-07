@@ -4,10 +4,10 @@ import { useMemo, useState } from 'react'
 import { Database, Filter, FolderSearch } from 'lucide-react'
 import { ProjectCard } from '@/components/ProjectCard'
 import type { Locale, Dictionary } from '@/types/dictionary'
-import type { Project } from '@/types/project'
+import type { ProjectDomain } from '@/domain/projects'
 
 interface ProjectSectionProps {
-  readonly projects: Project[]
+  readonly projects: ProjectDomain[]
   readonly lang: Locale
   readonly dict: Dictionary
 }
@@ -24,59 +24,61 @@ export function ProjectSection({
 
   const uiLabels = {
     all: projectDict.viewAll || "All",
-    filter: dict.common.menu.open,
+    filter: dict.common.navigation,
     results: projectDict.featuredLabel, 
     empty: statesDict.emptyProjects.description
   }
 
   const filteredProjects = useMemo(() => {
-    let base = projects.filter((p) => p.status === 'active')
+    // Filtramos pela categoria baseada na labelKey mapeada no domínio
+    let base = [...projects]
 
     if (activeCategory !== 'all') {
-      base = base.filter((p) => p.category === activeCategory)
+      base = base.filter((p) => p.technology.labelKey === activeCategory)
     }
 
-    return [...base].sort((a, b) => {
-      if (a.featured !== b.featured) return a.featured ? -1 : 1
-      return a.order - b.order
+    // Ordenação: Projetos "isFirst" e "isFeatured" primeiro
+    return base.sort((a, b) => {
+      if (a.isFirst !== b.isFirst) return a.isFirst ? -1 : 1
+      if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1
+      return 0
     })
   }, [projects, activeCategory])
 
   return (
     <section
-      id="projects"
+      id="projects-list"
       aria-labelledby="projects-title"
-      className="py-16 md:py-24 lg:py-40 bg-white dark:bg-[#020617] transition-colors duration-500"
+      className="py-16 bg-white dark:bg-[#020617] transition-colors duration-500"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-16 md:mb-20">
+        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-16">
           <div className="flex-1">
-            <div className="flex items-center gap-4 mb-4 md:mb-6">
-              <div className="p-3 rounded-xl md:p-3.5 md:rounded-2xl bg-blue-600 text-white shadow-xl shadow-blue-500/20">
-                <Database className="w-6 h-6 md:w-8 md:h-8" aria-hidden="true" />
+            <div className="flex items-center gap-4 mb-4">
+              <div className="p-3 rounded-xl bg-blue-600 text-white shadow-xl shadow-blue-500/20">
+                <Database className="w-6 h-6" aria-hidden="true" />
               </div>
-              <h2 id="projects-title" className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
-                {/* Correção do Título: Prioriza Dictionary Project Title */}
-                {projectDict.title || dict.seo?.projects?.title || "Portfolio"}
+              <h2 id="projects-title" className="text-4xl md:text-5xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
+                {projectDict.title}
               </h2>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="w-10 h-1 bg-blue-600 rounded-full" />
-              <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
-                {filteredProjects.length} {dict.pluralization?.projects?.legacy?.other?.replace('{count} ', '') || 'Items'}
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+                {filteredProjects.length} Items
               </p>
             </div>
           </div>
 
           <nav aria-label="Project filters" className="w-full lg:w-auto">
-            <div className="flex items-center gap-2 mb-4 text-[9px] md:text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">
+            <div className="flex items-center gap-2 mb-4 text-[9px] font-black uppercase tracking-[0.25em] text-slate-400">
               <Filter className="w-3.5 h-3.5 text-blue-600" aria-hidden="true" />
-              {dict.common.navigation}
+              {uiLabels.filter}
             </div>
 
-            <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-4 snap-x touch-pan-x">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-4 snap-x">
               <FilterButton 
                 active={activeCategory === 'all'} 
                 onClick={() => setActiveCategory('all')} 
@@ -87,7 +89,7 @@ export function ProjectSection({
                   key={key} 
                   active={activeCategory === key} 
                   onClick={() => setActiveCategory(key)} 
-                  label={label} 
+                  label={label as string} 
                 />
               ))}
             </div>
@@ -103,7 +105,7 @@ export function ProjectSection({
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <ProjectCard
-                  project={project}
+                  project={project as any} // Cast temporário até atualizar o ProjectCard
                   lang={lang}
                   dict={dict}
                 />
@@ -125,7 +127,7 @@ function FilterButton({ active, label, onClick }: { active: boolean; label: stri
   return (
     <button
       onClick={onClick}
-      className={`min-h-[44px] md:min-h-[48px] px-6 md:px-8 py-2.5 md:py-3.5 rounded-xl md:rounded-2xl border-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap active:scale-95 snap-start ${
+      className={`px-6 py-2.5 rounded-xl border-2 text-[9px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap snap-start ${
         active 
           ? 'bg-slate-900 border-slate-900 dark:bg-blue-600 dark:border-blue-600 text-white shadow-lg' 
           : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-blue-500/40'
@@ -138,12 +140,12 @@ function FilterButton({ active, label, onClick }: { active: boolean; label: stri
 
 function EmptyState({ title, message }: { title: string, message: string }) {
   return (
-    <div className="col-span-full flex flex-col items-center justify-center py-20 md:py-32 rounded-[2rem] md:rounded-[4rem] border-4 border-dashed border-slate-100 dark:border-slate-900/50 bg-slate-50/30 dark:bg-slate-900/10">
-      <div className="p-6 md:p-8 bg-white dark:bg-slate-900 rounded-2xl md:rounded-3xl shadow-xl mb-6 md:mb-8">
-        <FolderSearch className="w-12 h-12 md:w-20 md:h-20 text-slate-200 dark:text-slate-800" aria-hidden="true" />
+    <div className="col-span-full flex flex-col items-center justify-center py-20 rounded-[2rem] border-4 border-dashed border-slate-100 dark:border-slate-900/50 bg-slate-50/30 dark:bg-slate-900/10">
+      <div className="p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-xl mb-6">
+        <FolderSearch className="w-12 h-12 text-slate-200 dark:text-slate-800" aria-hidden="true" />
       </div>
       <h3 className="text-slate-900 dark:text-white font-bold mb-2">{title}</h3>
-      <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500 text-center max-w-sm leading-relaxed px-6">
+      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 text-center max-w-sm px-6">
         {message}
       </p>
     </div>
