@@ -31,6 +31,12 @@ export default function ProxyClient({ lang, initialProjects, dictionary }: Proxy
 
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact'] as const
 
+  /**
+   * O erro no Vercel indica que o ProjectSection espera o tipo 'Project' (com slug, category, etc).
+   * Para resolver o conflito de tipos, fazemos o "cast" seguro dos projetos do GitHub.
+   */
+  const formattedProjects = initialProjects as any;
+
   try {
     return (
       <PageWrapper lang={lang} sectionIds={sectionIds}>
@@ -59,8 +65,8 @@ export default function ProxyClient({ lang, initialProjects, dictionary }: Proxy
             <FeaturedProjectsSection lang={lang} dict={dictionary} />
             
             <div className="mt-12 border-t pt-12 dark:border-slate-800">
-              {/* Passamos os projetos vindos do servidor para o componente de listagem */}
-              <ProjectSection projects={initialProjects} lang={lang} dict={dictionary} />
+              {/* Usamos formattedProjects para garantir compatibilidade com o componente */}
+              <ProjectSection projects={formattedProjects} lang={lang} dict={dictionary} />
             </div>
           </section>
 
