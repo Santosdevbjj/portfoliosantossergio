@@ -1,3 +1,5 @@
+// src/domain/career.ts
+
 export enum CareerRole {
   DATA_SPECIALIST = 'data_specialist',
   SYSTEMS_EXPERT = 'systems_expert',
@@ -10,5 +12,6 @@ export interface CareerExperience {
   role: string;
   period: string;
   description: string;
-  achievements: string[];
-}
+  // Achievements podem vir de uma lista complementar ou metadados
+  achievements?: string[]; 
+} 
