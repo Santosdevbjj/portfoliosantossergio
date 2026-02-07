@@ -1,19 +1,23 @@
 // src/app/[lang]/manifest.ts
 import type { MetadataRoute } from 'next';
 import { getDictionary } from '@/dictionaries';
-import { Locale } from '@/types/dictionary';
+// CORREÇÃO: Usando 'import type' para satisfazer o verbatimModuleSyntax
+import type { Locale } from '@/types/dictionary';
 
 const SITE_URL = 'https://portfoliosantossergio.vercel.app';
 
 export default async function manifest(
-  { params }: { params: { lang: Locale } }
+  props: { params: Promise<{ lang: Locale }> }
 ): Promise<MetadataRoute.Manifest> {
+  
+  // Resolve os parâmetros (Next.js 16 padrão)
+  const { lang: rawLang } = await props.params;
   
   // Lista de locales suportados conforme seu arquivo de tipos
   const supportedLocales: Locale[] = ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'];
   
-  const lang = supportedLocales.includes(params.lang) 
-    ? params.lang 
+  const lang = supportedLocales.includes(rawLang) 
+    ? rawLang 
     : 'pt-BR'; // Fallback seguro
 
   const dict = await getDictionary(lang);
