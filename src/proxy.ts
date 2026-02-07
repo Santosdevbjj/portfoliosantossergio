@@ -12,13 +12,14 @@ const DEFAULT_LOCALE: Locale = "pt-BR"
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // 1. Ignorar arquivos estáticos, assets e API
+  // 1. Ignorar arquivos estáticos, assets, API e arquivos de sistema
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
     pathname.startsWith('/static') ||
     pathname === '/favicon.ico' ||
     pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
     pathname.includes('.')
   ) {
     return NextResponse.next()
@@ -32,9 +33,11 @@ export default function proxy(request: NextRequest) {
   if (pathnameHasLocale) return NextResponse.next()
 
   // 3. Caso não tenha locale, redirecionar para o padrão (pt-BR)
-  // Ex: /projetos -> /pt-BR/projetos
+  // Normaliza o pathname para evitar barras duplas
+  const cleanPathname = pathname.startsWith('/') ? pathname : `/${pathname}`
+  
   const redirectUrl = new URL(
-    `/${DEFAULT_LOCALE}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
+    `/${DEFAULT_LOCALE}${cleanPathname}`,
     request.url
   )
 
@@ -42,11 +45,10 @@ export default function proxy(request: NextRequest) {
 }
 
 /**
- * Matcher para garantir que o middleware rode em todas as rotas relevantes.
+ * Matcher configurado para cobrir todas as rotas exceto arquivos internos e estáticos
  */
 export const config = {
   matcher: [
-    // Roda em tudo, exceto caminhos internos do Next.js e arquivos com extensão (png, jpg, etc)
-    '/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js).*)',
+    '/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js|robots.txt).*)',
   ],
 }
