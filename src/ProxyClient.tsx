@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import React from 'react'
 import { notFound } from 'next/navigation'
 
 // UI Components
@@ -15,108 +15,79 @@ import { PageWrapper } from '@/components/PageWrapper'
 import { ProjectSection } from '@/components/ProjectSection'
 import { FeaturedProjectsSection } from '@/components/featured/FeaturedProjectsSection'
 
-// Infra - Ajustado para usar getDictionary (nome correto no seu index.ts)
-import { getDictionary } from '@/dictionaries'
-import { getGitHubProjects } from '@/lib/github'
+// Types
 import type { Locale, Dictionary } from '@/types/dictionary'
-import type { Project } from '@/domain/projects'
+import type { ProjectDomain } from '@/domain/projects'
 
 interface ProxyClientProps {
   readonly lang: Locale
+  readonly initialProjects: ProjectDomain[]
+  readonly dictionary: Dictionary
 }
 
-export default function ProxyClient({ lang }: ProxyClientProps) {
-  // 1. Carregamento do dicionário alinhado com o src/dictionaries/index.ts
-  const dict = useMemo(() => {
-    try {
-      return getDictionary(lang)
-    } catch (e) {
-      console.error("Erro crítico ao carregar dicionário:", e)
-      return null
-    }
-  }, [lang])
-
-  const [projects, setProjects] = useState<Project[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const data = await getGitHubProjects(lang)
-        if (Array.isArray(data)) {
-          setProjects(data)
-        }
-      } catch (error) {
-        console.error('[GITHUB_ERROR]', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadData()
-  }, [lang])
-
-  // Se o dicionário falhar completamente após os fallbacks
-  if (!dict) return notFound()
-
-  // Estado de carregamento com fallback de texto do dicionário
-  if (loading) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-white dark:bg-[#020617]">
-        <div className="animate-pulse text-sm font-medium text-slate-500">
-          {dict.common?.loading || 'Loading...'}
-        </div>
-      </div>
-    )
-  }
+export default function ProxyClient({ lang, initialProjects, dictionary }: ProxyClientProps) {
+  
+  // Se o dicionário não for fornecido por algum erro no servidor
+  if (!dictionary) return notFound()
 
   const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact'] as const
 
   try {
     return (
       <PageWrapper lang={lang} sectionIds={sectionIds}>
-        <Navbar lang={lang} dict={dict} />
+        <Navbar lang={lang} dict={dictionary} />
 
         <main className="relative flex w-full flex-col overflow-x-hidden bg-white dark:bg-[#020617] antialiased">
+          {/* Seção Hero */}
           <section id="hero">
-            <HeroSection lang={lang} dict={dict} />
+            <HeroSection lang={lang} dict={dictionary} />
           </section>
 
+          {/* Seção Sobre */}
           <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
-            <AboutSection lang={lang} dict={dict} />
+            <AboutSection lang={lang} dict={dictionary} />
           </section>
 
+          {/* Seção Experiência */}
           <section id="experience" className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10">
             <div className="mx-auto max-w-7xl px-4 sm:px-10 lg:px-12">
-              <ExperienceSection lang={lang} dict={dict} />
+              <ExperienceSection lang={lang} dict={dictionary} />
             </div>
           </section>
 
+          {/* Seção Projetos (Híbrida: Featured + List) */}
           <section id="projects" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
-            <FeaturedProjectsSection lang={lang} dict={dict} />
+            <FeaturedProjectsSection lang={lang} dict={dictionary} />
+            
             <div className="mt-12 border-t pt-12 dark:border-slate-800">
-              <ProjectSection projects={projects} lang={lang} dict={dict} />
+              {/* Passamos os projetos vindos do servidor para o componente de listagem */}
+              <ProjectSection projects={initialProjects} lang={lang} dict={dictionary} />
             </div>
           </section>
 
+          {/* Seção Artigos */}
           <section id="articles" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
-            <FeaturedArticleSection lang={lang} dict={dict} />
+            <FeaturedArticleSection lang={lang} dict={dictionary} />
           </section>
 
+          {/* Seção Contato */}
           <section id="contact" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
-            <ContactSection lang={lang} dict={dict} />
+            <ContactSection lang={lang} dict={dictionary} />
           </section>
         </main>
 
-        <Footer lang={lang} dict={dict} />
+        <Footer lang={lang} dict={dictionary} />
       </PageWrapper>
     )
   } catch (error) {
-    console.error("ERRO DE RENDERIZAÇÃO:", error)
+    console.error("[ProxyClient] Rendering Error:", error)
     return (
       <div className="flex min-h-screen items-center justify-center p-6 text-center">
         <div className="rounded-lg border border-red-200 bg-red-50 p-8">
-          <h1 className="text-xl font-bold text-red-600">{dict.common?.error || 'Error'}</h1>
-          <p className="mt-2 text-sm text-red-500">{String(error)}</p>
+          <h1 className="text-xl font-bold text-red-600">
+            {dictionary.common?.error || 'Render Error'}
+          </h1>
+          <p className="mt-2 text-sm text-red-500">Please try refreshing the page.</p>
         </div>
       </div>
     )
