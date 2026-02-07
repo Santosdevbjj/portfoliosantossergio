@@ -16,41 +16,34 @@ import { i18n } from '@/i18n-config'
 interface ErrorProps {
   readonly error: Error & { digest?: string }
   readonly reset: () => void
+  readonly params: { lang: Locale } // Next.js injeta params em error.tsx
 }
 
-export default function Error({ error, reset }: ErrorProps) {
+export default function Error({ error, reset, params }: ErrorProps) {
   /**
-   * Identifica o idioma atual de forma segura para Client Components
-   * Alinhado com os tipos de Locale definidos em src/types/dictionary.ts
+   * Identifica o idioma atual. 
+   * Priorizamos o params.lang injetado pelo Next.js para maior consistência com a rota.
    */
-  const lang: Locale = useMemo(() => {
-    if (typeof window === 'undefined') {
-      return i18n.defaultLocale as Locale
-    }
-
-    const segment = window.location.pathname.split('/')[1] as Locale
-    
-    // Lista de locales suportados conforme seu arquivo de tipos
+  const currentLang: Locale = useMemo(() => {
     const supportedLocales: Locale[] = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"]
-
-    return supportedLocales.includes(segment)
-      ? segment
+    return supportedLocales.includes(params?.lang) 
+      ? params.lang 
       : (i18n.defaultLocale as Locale)
-  }, [])
+  }, [params?.lang])
 
-  // Obtém o dicionário traduzido (Lógica centralizada com Fallback)
-  const dict = getDictionary(lang)
+  // Obtém o dicionário traduzido
+  const dict = getDictionary(currentLang)
 
   /**
-   * Log de Erro para Monitoramento (Browser + Runtime)
+   * Log de Erro para Monitoramento
    */
   useEffect(() => {
-    console.group('🔥 APPLICATION RUNTIME ERROR')
-    console.error('Message:', error.message)
-    console.error('Digest:', error.digest ?? 'N/A')
-    console.error('Path:', typeof window !== 'undefined' ? window.location.pathname : 'SSR')
-    console.error('Timestamp:', new Date().toISOString())
-    console.groupEnd()
+    // Evita log excessivo em desenvolvimento, mas mantém o rastro técnico
+    console.error('🔥 [Application Error]:', {
+      message: error.message,
+      digest: error.digest,
+      timestamp: new Date().toISOString(),
+    })
   }, [error])
 
   return (
@@ -94,19 +87,19 @@ export default function Error({ error, reset }: ErrorProps) {
           </p>
         </div>
 
-        {/* Ações Responsivas */}
+        {/* Ações Responsivas (Stack no mobile, Row no desktop) */}
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <button
-            onClick={reset}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onClick={() => reset()}
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95"
           >
             <RotateCcw size={18} />
             {dict.common.errorBoundary.actions.retry}
           </button>
 
           <Link
-            href={`/${lang}`}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition"
+            href={`/${currentLang}`}
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition active:scale-95"
           >
             <Home size={18} />
             {dict.common.errorBoundary.actions.home}
