@@ -11,74 +11,37 @@ interface ProjectCardProps {
   readonly featured?: boolean
 }
 
-export default function ProjectCard({
-  project,
-  lang,
-  dict,
-  featured = false,
-}: ProjectCardProps) {
+export default function ProjectCard({ project, lang, dict, featured = false }: ProjectCardProps) {
   const projectUrl = `/${lang}/projects#${project.id}`
-
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: project.name,
-    description: project.description[lang],
-    applicationCategory: 'DataScienceApplication',
-    operatingSystem: 'Web/Cloud',
-    url: projectUrl,
-    author: {
-      '@type': 'Person',
-      name: 'Sérgio Santos',
-    },
-  }
 
   return (
     <article
       id={project.id}
       className={`
-        relative
-        rounded-2xl
-        border
-        border-slate-200
-        bg-white
-        p-6
-        shadow-sm
-        transition
-        hover:shadow-md
-        dark:border-slate-800
-        dark:bg-slate-900
-        ${
-          featured
-            ? 'lg:col-span-2 lg:row-span-2'
-            : ''
-        }
+        relative flex flex-col justify-between rounded-2xl border border-slate-200 
+        bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg
+        dark:border-slate-800 dark:bg-slate-900
+        ${featured ? 'lg:col-span-2 lg:row-span-2' : 'col-span-1'}
       `}
     >
-      {/* SEO individual por projeto */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd),
-        }}
-      />
+      <div>
+        <h3 className={`${featured ? 'text-3xl' : 'text-xl'} mb-4 font-bold text-slate-900 dark:text-white`}>
+          {project.name}
+        </h3>
+        <p className="mb-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+          {project.description[lang]}
+        </p>
+      </div>
 
-      <h3 className="mb-3 text-xl font-bold text-slate-900 dark:text-white">
-        {project.name}
-      </h3>
-
-      <p className="mb-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-        {project.description[lang]}
-      </p>
-
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 mt-auto">
         <a
           href={project.repoUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-semibold text-blue-600 hover:underline"
+          className="inline-flex items-center text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400"
         >
-          {dict.projects.repoLink}
+          {dict.projects.viewProject} 
+          <span className="ml-2">→</span>
         </a>
       </div>
     </article>
