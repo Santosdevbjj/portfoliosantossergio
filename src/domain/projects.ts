@@ -48,13 +48,15 @@ export const resolveProjectTechnology = (topics: readonly string[]) => {
   const techId = PROJECT_TECHNOLOGY_ORDER.find((tech) => topics.includes(tech));
   
   // Mapping direcionado para as chaves do seu JSON de tradução
+  // ... dentro de resolveProjectTechnology ...
+
   const mapping: Record<ProjectTechnology, string> = {
     [ProjectTechnology.DATA_SCIENCE]: 'dataScience',
     [ProjectTechnology.AZURE_DATABRICKS]: 'cloud',
     [ProjectTechnology.NEO4J]: 'graphs',
     [ProjectTechnology.POWER_BI]: 'analysis',
-    [ProjectTechnology.EXCEL]: 'analysis',
-    [ProjectTechnology.DATABASE]: 'analysis',
+    [ProjectTechnology.EXCEL]: 'excel',
+    [ProjectTechnology.DATABASE]: 'database',
     [ProjectTechnology.PYTHON]: 'dev',
     [ProjectTechnology.DOTNET]: 'dev',
     [ProjectTechnology.JAVA]: 'dev',
@@ -66,6 +68,7 @@ export const resolveProjectTechnology = (topics: readonly string[]) => {
     [ProjectTechnology.HTML]: 'dev',
     [ProjectTechnology.NODE_REACT]: 'dev',
   };
+
 
   const selectedTechId = techId || ProjectTechnology.DATA_SCIENCE;
   return { id: selectedTechId, labelKey: mapping[selectedTechId] };
