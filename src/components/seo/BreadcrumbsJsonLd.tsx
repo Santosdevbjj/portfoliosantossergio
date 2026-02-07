@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { generateBreadcrumbs } from '@/lib/seo/breadcrumbs';
-import { getDictionary } from '@/dictionaries'; // Usando a função exportada correta
+import { getDictionary } from '@/dictionaries';
 import type { Locale } from '@/types/dictionary';
 
 interface BreadcrumbsJsonLdProps {
@@ -11,6 +11,10 @@ interface BreadcrumbsJsonLdProps {
   baseUrl: string;
 }
 
+/**
+ * Injeta Schema.org JSON-LD para Breadcrumbs.
+ * Crucial para que o Google exiba a estrutura de pastas nos resultados de busca.
+ */
 export function BreadcrumbsJsonLd({
   lang,
   baseUrl,
@@ -22,7 +26,7 @@ export function BreadcrumbsJsonLd({
     [baseUrl]
   );
 
-  // Obtém o dicionário de forma segura
+  // Obtém o dicionário (já validado pelo getDictionary)
   const dict = useMemo(() => getDictionary(lang), [lang]);
 
   const breadcrumbs = useMemo(() => {
@@ -33,7 +37,7 @@ export function BreadcrumbsJsonLd({
   useEffect(() => {
     if (!breadcrumbs.length) return;
 
-    const scriptId = 'breadcrumbs-jsonld';
+    const scriptId = `breadcrumbs-jsonld-${lang}`;
     
     try {
       const jsonLd = {
@@ -47,15 +51,17 @@ export function BreadcrumbsJsonLd({
         })),
       };
 
-      // Limpeza eficiente
-      const existingScript = document.getElementById(scriptId);
-      if (existingScript) existingScript.remove();
-
-      const script = document.createElement('script');
-      script.id = scriptId;
-      script.type = 'application/ld+json';
+      // Gerenciamento do Script no DOM
+      let script = document.getElementById(scriptId) as HTMLScriptElement;
+      
+      if (!script) {
+        script = document.createElement('script');
+        script.id = scriptId;
+        script.type = 'application/ld+json';
+        document.head.appendChild(script);
+      }
+      
       script.textContent = JSON.stringify(jsonLd);
-      document.head.appendChild(script);
 
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
@@ -63,12 +69,11 @@ export function BreadcrumbsJsonLd({
       }
     }
 
-    // Cleanup ao desmontar o componente
     return () => {
-      const script = document.getElementById(scriptId);
-      if (script) script.remove();
+      const existingScript = document.getElementById(scriptId);
+      if (existingScript) existingScript.remove();
     };
-  }, [breadcrumbs]);
+  }, [breadcrumbs, lang]);
 
   return null;
 }
