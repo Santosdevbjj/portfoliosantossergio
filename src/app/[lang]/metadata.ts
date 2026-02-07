@@ -2,35 +2,40 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getDictionary } from '@/dictionaries';
-import { Locale } from '@/types/dictionary';
+// CORREÇÃO: Adicionado 'type' para conformidade com verbatimModuleSyntax
+import type { Locale } from '@/types/dictionary';
 
 const SITE_URL = 'https://portfoliosantossergio.vercel.app';
 
 interface MetadataProps {
-  params: {
+  params: Promise<{
     lang: Locale;
-  };
+  }>;
 }
 
-export function generateMetadata({ params }: MetadataProps): Metadata {
+export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
+  // Resolvemos a Promise dos parâmetros para o Next.js 16
+  const resolvedParams = await params;
+  const lang = resolvedParams.lang;
+
   // Lista de locales baseada no seu src/types/dictionary.ts
   const supportedLocales: Locale[] = ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'];
   
-  if (!supportedLocales.includes(params.lang)) {
+  if (!supportedLocales.includes(lang)) {
     notFound();
   }
 
-  const dict = getDictionary(params.lang);
+  const dict = getDictionary(lang);
 
   const pageTitle = dict.seo.pages?.home?.title ?? dict.seo.siteName;
   const pageDescription = dict.seo.pages?.home?.description ?? dict.seo.description;
 
-  // Mapeamento de imagens OG (ajustado para os Locales reais)
+  // Mapeamento de imagens OG
   const ogImageMap: Record<Locale, string> = {
     'pt-BR': '/og-image-pt.png',
     'en-US': '/og-image-en.png',
     'es-ES': '/og-image-es.png',
-    'es-AR': '/og-image-es.png', // Reaproveita a imagem base em espanhol
+    'es-AR': '/og-image-es.png',
     'es-MX': '/og-image-es.png',
   };
 
@@ -51,7 +56,7 @@ export function generateMetadata({ params }: MetadataProps): Metadata {
     description: pageDescription,
     keywords: dict.seo.keywords,
     alternates: {
-      canonical: `/${params.lang}`,
+      canonical: `/${lang}`,
       languages: {
         'pt-BR': '/pt-BR',
         'en-US': '/en-US',
@@ -62,14 +67,14 @@ export function generateMetadata({ params }: MetadataProps): Metadata {
     },
     openGraph: {
       type: 'website',
-      locale: ogLocaleMap[params.lang],
-      url: `${SITE_URL}/${params.lang}`,
-      siteName: dict.seo.siteName, // Corrigido de .site.siteName para .siteName
+      locale: ogLocaleMap[lang],
+      url: `${SITE_URL}/${lang}`,
+      siteName: dict.seo.siteName,
       title: pageTitle,
       description: pageDescription,
       images: [
         {
-          url: ogImageMap[params.lang],
+          url: ogImageMap[lang],
           width: 1200,
           height: 630,
           alt: pageTitle,
@@ -80,7 +85,7 @@ export function generateMetadata({ params }: MetadataProps): Metadata {
       card: 'summary_large_image',
       title: pageTitle,
       description: pageDescription,
-      images: [ogImageMap[params.lang]],
+      images: [ogImageMap[lang]],
     },
     icons: {
       icon: '/icons/favicon.ico',
