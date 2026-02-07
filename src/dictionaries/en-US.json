@@ -6,280 +6,152 @@
     "lastUpdated": "2026-02-03T19:10:00Z",
     "author": "Sérgio Santos",
     "source": "manual",
-
     "contentVersion": "2026.02.03",
     "contentHash": "i18n-enus-2026-02-03",
     "sourceType": "curated-manual"
-  }, 
-
-  
-"about": {
-  "title": "About Me",
-  "differentialTitle": "Data Engineering with a Mission-Critical Focus",
-  "description": "Specialist in data architecture and high-availability systems.",
-  "differentialContent": "Focused on intelligent automation and system resilience.",
-  "highlights": ["10+ years in IT", "Cloud Specialist", "DevOps Core"],
-  "stats": {
-    "experienceValue": "+10",
-    "experienceLabel": "Years",
-    "availabilityValue": "99.9%",
-    "availabilityLabel": "Uptime",
-    "automation": "100% Automated Systems"
-  }
-} 
-
-
-"contact": {
-  "title": "Title here",
-  "subtitle": "Subtitle here",
-  "cta": "Send Email",
-  "emailLabel": "Copy Email",
-  "cvLabel": "View CV",
-  "linkedinLabel": "LinkedIn"
-} 
-
-  "experience": {
-  "title": "Professional Experience",
-  "items": [
-    {
-      "company": "Independent Consultant",
-      "period": "Present",
-      "role": "Critical Systems Specialist",
-      "description": "Architecture and maintenance of data pipelines and resilient infrastructure."
-    }
-  ]
-}
-
-{
+  },
   "hero": {
     "greeting": "Available for Critical Projects",
-    "title": "Architecting the Future of",
+    "title": "Data Science Analyst",
     "subtitle": "Data and Resilience",
     "headline": "Specialist in transforming complex infrastructures into high-availability systems and scalable data pipelines.",
     "ctaPrimary": "View Projects"
   },
+  "about": {
+    "title": "About Me",
+    "differentialTitle": "Data Engineering with Mission-Critical Focus",
+    "description": "Data Science Analyst with a solid background in critical banking systems, focusing on transforming data into decisions and operational efficiency.",
+    "differentialContent": "I worked for over 15 years at Bradesco Bank. Currently, I focus on Data Science and AI, applying the rigor of critical systems to predictive models.",
+    "highlights": ["15+ years in Banking", "Cloud Specialist", "Data Science & AI"],
+    "stats": {
+      "experienceValue": "+15",
+      "experienceLabel": "Years",
+      "availabilityValue": "99.9%",
+      "availabilityLabel": "Uptime",
+      "automation": "100% Automated Systems"
+    }
+  },
+  "contact": {
+    "title": "Let's Talk?",
+    "subtitle": "Looking for opportunities in governance and modernization projects.",
+    "cta": "Send Email",
+    "emailLabel": "Copy Email",
+    "cvLabel": "View CV",
+    "linkedinLabel": "LinkedIn"
+  },
+  "experience": {
+    "title": "Professional Experience",
+    "items": [
+      {
+        "company": "Independent Consultant",
+        "period": "2008 - Present",
+        "role": "Critical Systems Specialist",
+        "description": "Architecture and maintenance of resilient data pipelines and infrastructure. Focus on Data Science."
+      }
+    ]
+  },
+  "articles": {
+    "title": "Technical Articles",
+    "mediumProfile": "View Medium Profile",
+    "readMore": "Read full article",
+    "publishedAt": "Published on",
+    "bestOfMonth": "Highlight of the Month",
+    "awardWinner": "Award Winner",
+    "items": [
+      {
+        "title": "The Data Era in Critical Systems",
+        "description": "How data governance transforms legacy systems into strategic assets.",
+        "date": "2025",
+        "category": "Data Strategy",
+        "isAward": true,
+        "link": "https://medium.com/@sergiosantosluiz"
+      }
+    ]
+  },
   "projects": {
+    "title": "Projects & Solutions",
+    "featuredLabel": "Technical Highlight",
+    "firstLabel": "Challenge & Architecture",
+    "impactLabel": "Impact & Result",
+    "viewProject": "GitHub Repo",
+    "viewDemo": "View Demo",
+    "viewAll": "View All",
     "categories": {
-      "cloud": "Cloud & Infrastructure",
       "dataScience": "Data Science",
+      "cloud": "Azure Databricks",
+      "graphs": "Neo4J",
+      "analysis": "Power BI & Analysis",
+      "excel": "Excel",
+      "database": "Database",
+      "dev": "Development",
       "security": "Security"
     }
-  }
-}
-
-
-"articles": {
-  "title": "Technical Articles",
-  "mediumProfile": "View Medium profile",
-  "readMore": "Read full article",
-  "publishedAt": "Published on",
-  "bestOfMonth": "Highlight of the Month",
-  "awardWinner": "Award-Winning Article",
-  "items": [
-    {
-      "title": "The Data Era in Critical Systems",
-      "description": "How data governance transforms legacy systems into strategic assets.",
-      "date": "2025",
-      "category": "Data Strategy",
-      "isAward": true,
-      "link": "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77"
-    },
-    {
-      "title": "Databricks & Governance",
-      "description": "Security and compliance in modern data pipelines using Azure.",
-      "date": "2025",
-      "category": "Data Engineering",
-      "isAward": false,
-      "link": "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77"
-    }
-  ]
-}
-
-"projects": { 
-  "title": "Projects & Solutions",
-  "featuredLabel": "Technical Highlight",
-  "firstLabel": "Challenge and Architecture",
-  "impactLabel": "Impact and Outcome",
-  "viewProject": "GitHub Repository",
-  "viewDemo": "View Demo",
-  "viewAll": "View All",
-  "categories": {
-    "cloud": "Cloud & Infra",
-    "dataScience": "Data Science",
-    "security": "Security"
-  }
-} 
-
-"cookie": {
-  "title": "Cookie Settings",
-  "description": "We use cookies to improve your experience and analyze site traffic.",
-  "necessary": "Necessary",
-  "alwaysActive": "Always Active",
-  "analytics": "Analytics",
-  "acceptAll": "Accept All",
-  "savePreferences": "Save Preferences"
-}
-  
-
+  },
   "common": {
     "navigation": "Navigation",
-    "role": "Mission-Critical Systems & Data Specialist",
+    "role": "Data Science Analyst | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. All rights reserved.",
     "rights": "All rights reserved",
     "builtWith": "Built with Next.js 16 & TypeScript",
     "loading": "Loading...",
-    "error": "Something went wrong. Please try again.",
-    "socialLinks": "Open {platform} profile in a new tab",
-    "languageSwitcher": "Switch language to {lang}",
-
+    "error": "Something went wrong.",
+    "socialLinks": "Open {platform} profile",
+    "languageSwitcher": "Change language",
     "errorBoundary": {
-      "title": "Oops! An unexpected error occurred.",
-      "description": "If the problem persists, please contact support.",
-      "actions": {
-        "retry": "Try again",
-        "home": "Back to Home"
-      }
+      "title": "Oops! Error.",
+      "description": "Contact support if it persists.",
+      "actions": { "retry": "Retry", "home": "Home" }
     },
-
     "notFound": {
-      "title": "Page not found",
-      "description": "The link you accessed may be broken or no longer exists.",
-      "button": "Back to Home"
+      "title": "Page Not Found",
+      "description": "Link might be broken.",
+      "button": "Back"
     },
-
     "externalLinks": {
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
-      "medium": "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
+      "medium": "https://medium.com/@sergiosantosluiz",
       "email": "santossergiorealbjj@outlook.com"
     },
-
-    "externalLinksNormalized": {
-      "linkedin": {
-        "url": "https://www.linkedin.com/in/santossergioluiz",
-        "platform": "LinkedIn"
-      },
-      "github": {
-        "url": "https://github.com/Santosdevbjj",
-        "platform": "GitHub"
-      },
-      "medium": {
-        "url": "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77",
-        "platform": "Medium"
-      },
-      "email": {
-        "url": "mailto:santossergiorealbjj@outlook.com",
-        "platform": "Email"
-      }
-    },
-
-    "menu": {
-      "open": "Open menu",
-      "close": "Close menu",
-      "aria": {
-        "open": "Open navigation menu",
-        "close": "Close navigation menu"
-      }
-    }
+    "menu": { "open": "Open", "close": "Close", "aria": { "open": "Open menu", "close": "Close menu" } }
   },
-
   "intl": {
     "locale": "en-US",
     "fallbackLocale": "en",
     "currency": "USD",
     "timezone": "America/New_York",
     "unitDisplay": "short",
-    "numberFormat": "en-US",
-
-    "contract": {
-      "requiredFields": ["locale", "currency", "numberFormat", "timezone"],
-      "formattingResponsibility": "presentation-layer"
-    }
+    "numberFormat": "en-US"
   },
-
   "states": {
     "loading": "Loading...",
-    "empty": "No data available.",
-    "error": "Unable to load information.",
-
-    "emptyProjects": {
-      "title": "No projects available",
-      "description": "New projects will be added soon.",
-      "cta": "Back to Home"
-    },
-
-    "emptyExperience": "No experience listed.",
-    "errorArticles": "Unable to load articles."
+    "empty": "No data.",
+    "error": "Loading error.",
+    "emptyProjects": { "title": "No projects", "description": "Coming soon.", "cta": "Back" },
+    "emptyExperience": "No records.",
+    "errorArticles": "Articles error."
   },
-
-  "labels": {
-    "home": "Home",
-    "back": "Back",
-    "retry": "Try again",
-    "close": "Close",
-    "open": "Open"
+  "cookie": {
+    "title": "Cookies",
+    "description": "We improve your experience.",
+    "necessary": "Necessary",
+    "alwaysActive": "Active",
+    "analytics": "Analytics",
+    "acceptAll": "Accept",
+    "savePreferences": "Save"
   },
-
-  "pluralization": {
-    "projects": {
-      "legacy": {
-        "zero": "No projects",
-        "one": "{count} project",
-        "other": "{count} projects"
-      },
-      "icu": "{count, plural, =0 {No projects} one {{count} project} other {{count} projects}}"
-    }
-  },
-
-
-
   "seo": {
-  "siteName": "Sérgio Santos | Portfolio",
-  "description": "Data Engineer & Critical Systems",
-  "keywords": ["data engineering", "high availability", "distributed systems", "next.js"],
-  "pages": {
-    "home": {
-      "title": "Data Architecture and Resilience",
-      "description": "Specialist in transforming complex infrastructures into high-availability systems."
-    },
-    "projects": {
-      "title": "Engineering Projects",
-      "description": "Portfolio of cloud solutions and data pipelines."
-    },
-    "articles": {
-      "title": "Technical Articles",
-      "description": "Specialized content on technology and architecture."
-    }
-  }
-}
-
-
-
-
-
-  "categoriesExtended": {
-    "dataScience": {
-      "label": "Data Science",
-      "seo": "Data Science and Analytics projects",
-      "order": 1
-    },
-    "cloud": {
-      "label": "Cloud",
-      "seo": "Cloud computing projects",
-      "order": 2
-    },
-    "graphs": {
-      "label": "Graphs",
-      "seo": "Graph visualization and analysis",
-      "order": 3
+    "siteName": "Sérgio Santos | Portfolio",
+    "description": "Data Science & Critical Systems",
+    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "pages": {
+      "home": { "title": "Home", "description": "Sérgio Santos Portfolio" },
+      "projects": { "title": "Projects", "description": "Data solutions" },
+      "articles": { "title": "Articles", "description": "Technical content" }
     }
   },
-
   "metrics": {
     "availability": "99.5%",
-    "availabilityNormalized": {
-      "value": 99.5,
-      "unit": "%"
-    }
+    "availabilityNormalized": { "value": 99.5, "unit": "%" }
   }
 }
