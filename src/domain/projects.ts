@@ -1,3 +1,5 @@
+// src/domain/projects.ts
+
 export enum ProjectCoreTag {
   PORTFOLIO = 'portfolio',
   FEATURED = 'featured',
@@ -19,6 +21,7 @@ export enum ProjectTechnology {
   ARTIFICIAL_INTELLIGENCE = 'artificial-intelligence',
   AWS = 'aws',
   CYBERSECURITY = 'cybersecurity',
+  SECURITY = 'security',
   PROGRAMMING_LOGIC = 'programming-logic',
   HTML = 'html',
   NODE_REACT = 'node-react',
@@ -26,7 +29,7 @@ export enum ProjectTechnology {
 
 export const PROJECT_TECHNOLOGY_ORDER: readonly ProjectTechnology[] = Object.values(ProjectTechnology);
 
-export interface Project {
+export interface ProjectDomain {
   readonly id: string;
   readonly name: string;
   readonly description: string;
@@ -35,21 +38,23 @@ export interface Project {
   readonly topics: readonly string[];
   readonly technology: {
     id: ProjectTechnology;
-    labelKey: string; // Deve bater com as chaves em dictionary.projects.categories
+    labelKey: string; // DEVE bater com projects.categories no JSON
   };
   readonly isPortfolio: boolean;
   readonly isFeatured: boolean;
   readonly isFirst: boolean;
 }
 
+/**
+ * Resolve a tecnologia principal baseada nas tags do GitHub (topics).
+ * O labelKey retornado é usado para buscar a tradução correta.
+ */
 export const resolveProjectTechnology = (topics: readonly string[]) => {
-  if (!topics || topics.length === 0) return { id: ProjectTechnology.DATA_SCIENCE, labelKey: 'dataScience' };
-
-  const techId = PROJECT_TECHNOLOGY_ORDER.find((tech) => topics.includes(tech));
+  const normalizedTopics = topics.map(t => t.toLowerCase());
   
-  // Mapping direcionado para as chaves do seu JSON de tradução
-  // ... dentro de resolveProjectTechnology ...
+  const techId = PROJECT_TECHNOLOGY_ORDER.find((tech) => normalizedTopics.includes(tech));
 
+  // Mapeamento rigoroso para as chaves em dictionary.projects.categories
   const mapping: Record<ProjectTechnology, string> = {
     [ProjectTechnology.DATA_SCIENCE]: 'dataScience',
     [ProjectTechnology.AZURE_DATABRICKS]: 'cloud',
@@ -64,18 +69,25 @@ export const resolveProjectTechnology = (topics: readonly string[]) => {
     [ProjectTechnology.ARTIFICIAL_INTELLIGENCE]: 'dataScience',
     [ProjectTechnology.AWS]: 'cloud',
     [ProjectTechnology.CYBERSECURITY]: 'security',
+    [ProjectTechnology.SECURITY]: 'security',
     [ProjectTechnology.PROGRAMMING_LOGIC]: 'dev',
     [ProjectTechnology.HTML]: 'dev',
     [ProjectTechnology.NODE_REACT]: 'dev',
   };
 
-
   const selectedTechId = techId || ProjectTechnology.DATA_SCIENCE;
-  return { id: selectedTechId, labelKey: mapping[selectedTechId] };
+  
+  return { 
+    id: selectedTechId, 
+    labelKey: mapping[selectedTechId] || 'dataScience' 
+  };
 };
 
-export const resolveProjectFlags = (topics: readonly string[]) => ({
-  isPortfolio: topics.includes(ProjectCoreTag.PORTFOLIO),
-  isFeatured: topics.includes(ProjectCoreTag.FEATURED) || topics.includes(ProjectCoreTag.DESTAQUE),
-  isFirst: topics.includes(ProjectCoreTag.PRIMEIRO),
-});
+export const resolveProjectFlags = (topics: readonly string[]) => {
+  const normalized = topics.map(t => t.toLowerCase());
+  return {
+    isPortfolio: normalized.includes(ProjectCoreTag.PORTFOLIO),
+    isFeatured: normalized.includes(ProjectCoreTag.FEATURED) || normalized.includes(ProjectCoreTag.DESTAQUE),
+    isFirst: normalized.includes(ProjectCoreTag.PRIMEIRO),
+  };
+};
