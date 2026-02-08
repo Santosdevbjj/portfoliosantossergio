@@ -1,6 +1,6 @@
 /**
  * HOME PAGE — ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS (v16.2.0)
- * Revisado para total compatibilidade com ProjectDomain e I18n
+ * Revisado para total compatibilidade com ProjectDomain, I18n e Next.js 16
  */
 
 import type { Metadata, Viewport } from 'next';
@@ -52,8 +52,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const dict = await getDictionary(lang);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app';
   
-  const pageTitle = `${dict.seo.pages.home.title} | ${dict.meta.author}`;
-  const pageDescription = dict.seo.pages.home.description;
+  // CORREÇÃO: Acesso seguro às chaves de SEO para evitar erro de build
+  const homeSeo = dict.seo.pages?.home;
+  const pageTitle = `${homeSeo?.title ?? 'Portfolio'} | ${dict.meta.author}`;
+  const pageDescription = homeSeo?.description ?? dict.seo.description;
 
   return {
     title: pageTitle,
@@ -122,7 +124,7 @@ export default async function HomePage({ params }: PageProps) {
                         <div className="flex justify-between items-start mb-4">
                           <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
                             {/* Tradução dinâmica da categoria vinda do Mapper */}
-                            {dictionary.projects.categories[project.technology.labelKey as keyof typeof dictionary.projects.categories]}
+                            {dictionary.projects.categories[project.technology.labelKey as keyof typeof dictionary.projects.categories] || project.technology.id}
                           </span>
                           {project.isFeatured && (
                             <span className="px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
