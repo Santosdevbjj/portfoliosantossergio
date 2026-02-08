@@ -3,11 +3,10 @@
 /**
  * CONTACT SECTION: Conversão e Redes Sociais
  * -----------------------------------------------------------------------------
- * Melhorias implementadas:
- * - Acessibilidade: Uso de aria-labels traduzidos via dicionário common.
- * - Robustez: Fallback dinâmico para etiquetas de cópia.
- * - UX: Feedback visual aprimorado e suporte a UTM dinâmico.
- * - I18n: Totalmente integrado aos 5 locales suportados.
+ * Ajustes realizados:
+ * - Sincronização rigorosa com as chaves do dicionário (contact e common).
+ * - Suporte nativo aos 5 locales definidos no tipo Locale.
+ * - Refinamento de acessibilidade e segurança nos links.
  */
 
 import { useState, useCallback, useMemo } from 'react';
@@ -24,15 +23,16 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
   
-  // Destruturação segura do dicionário
-  const { contact, common } = dict;
+  // Destruturação segura do dicionário para evitar erros de undefined
+  const contact = dict?.contact;
+  const common = dict?.common;
 
-  // Dados de contato centralizados vindos do dicionário global
-  const email = common.externalLinks.email;
-  const linkedinUrl = common.externalLinks.linkedin;
-  const githubUrl = common.externalLinks.github;
+  // Dados de contato centralizados vindos do common.externalLinks
+  const email = common?.externalLinks?.email ?? '';
+  const linkedinUrl = common?.externalLinks?.linkedin ?? '#';
+  const githubUrl = common?.externalLinks?.github ?? '#';
   
-  // UTM tracking para identificar a origem do contato
+  // UTM tracking para identificar a origem do contato via URL
   const origin = searchParams.get('utm_source') ?? 'portfolio_direct';
 
   const copyToClipboard = useCallback(() => {
@@ -46,7 +46,7 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
 
   /**
    * Gerenciador de etiquetas para o estado "Copiado".
-   * Mapeia automaticamente com base no Locale do sistema.
+   * Mapeia automaticamente com base nos 5 Locales suportados.
    */
   const copiedLabel = useMemo(() => {
     const labels: Record<Locale, string> = {
@@ -68,7 +68,7 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative group bg-blue-600 dark:bg-blue-700 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 lg:p-20 shadow-2xl border border-white/10 overflow-hidden">
           
-          {/* BACKGROUND DECORATION */}
+          {/* BACKGROUND DECORATION - Elementos visuais abstratos */}
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 md:w-96 md:h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl pointer-events-none" />
 
@@ -104,6 +104,7 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
                       ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300' 
                       : 'bg-blue-800/30 border-white/20 text-white hover:bg-blue-800/50'
                   }`}
+                  aria-label={contact?.emailLabel}
                 >
                   {copied ? (
                     <Check className="w-5 h-5 animate-in zoom-in duration-300" />
@@ -126,13 +127,13 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
               </div>
             </div>
 
-            {/* SOCIAL NETWORKS - Links Dinâmicos */}
+            {/* SOCIAL NETWORKS - Links Dinâmicos e Acessíveis */}
             <div className="flex flex-row lg:flex-col gap-4">
               <a 
                 href={linkedinUrl} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                aria-label={common.socialLinks.replace('{platform}', 'LinkedIn')}
+                aria-label={contact?.linkedinLabel || "LinkedIn"}
                 className="p-5 md:p-6 bg-white text-blue-600 rounded-2xl md:rounded-3xl hover:-translate-y-2 transition-all shadow-xl focus:ring-4 focus:ring-white/20 outline-none"
               >
                 <Linkedin className="w-8 h-8 md:w-10 md:h-10" />
@@ -141,7 +142,7 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
                 href={githubUrl} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                aria-label={common.socialLinks.replace('{platform}', 'GitHub')}
+                aria-label={common?.socialLinks?.replace('{platform}', 'GitHub') || "GitHub"}
                 className="p-5 md:p-6 bg-slate-900 text-white rounded-2xl md:rounded-3xl hover:-translate-y-2 transition-all shadow-xl focus:ring-4 focus:ring-slate-900/20 outline-none"
               >
                 <Github className="w-8 h-8 md:w-10 md:h-10" />
@@ -150,10 +151,10 @@ export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
           </div>
         </div>
 
-        {/* SECTION FOOTER */}
+        {/* SECTION FOOTER - Copyright Dinâmico */}
         <footer className="mt-16 text-center">
           <p className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 px-4">
-            {common.footer}
+            {common?.footer}
           </p>
         </footer>
       </div>
