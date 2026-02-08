@@ -7,8 +7,10 @@ import { getDictionary } from "@/dictionaries";
 import type { Locale } from "@/types/dictionary";
 import { getGitHubProjects } from "@/services/githubService";
 import ProxyPage from "@/components/ProxyPage";
-import Hero from "@/components/sections/Hero";
-import About from "@/components/sections/About";
+
+// Importações corrigidas conforme os arquivos existentes informados
+import HeroSection from "@/components/HeroSection";
+import AboutSection from "@/components/AboutSection";
 
 interface PageProps {
   params: Promise<{
@@ -83,7 +85,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function HomePage({ params }: PageProps) {
   const { lang } = await params;
 
-  // Buscamos os projetos aqui para passar para a listagem
+  // Busca de dados no servidor
   const projects = await getGitHubProjects();
 
   return (
@@ -91,9 +93,10 @@ export default async function HomePage({ params }: PageProps) {
       {(dictionary) => (
         <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 transition-colors duration-300">
           
-          <Hero content={dictionary.hero} common={dictionary.common} />
+          {/* Seções principais usando os componentes informados */}
+          <HeroSection content={dictionary.hero} common={dictionary.common} />
 
-          <About 
+          <AboutSection 
             content={dictionary.about} 
             metrics={dictionary.metrics} 
           />
@@ -108,7 +111,14 @@ export default async function HomePage({ params }: PageProps) {
             <section className="w-full">
               {projects && projects.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                   {/* Mapeamento de projetos aqui */}
+                   {projects.map((project) => (
+                     <div key={project.id} className="p-6 border rounded-xl border-slate-200 dark:border-slate-800">
+                        <h3 className="text-xl font-bold">{project.content[lang]?.title || project.content["pt-BR"].title}</h3>
+                        <p className="text-sm mt-2 text-slate-600 dark:text-slate-400">
+                          {project.content[lang]?.description || project.content["pt-BR"].description}
+                        </p>
+                     </div>
+                   ))}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem] bg-slate-50/50 dark:bg-slate-900/20">
