@@ -1,54 +1,40 @@
 // src/proxy.ts
-
 import { NextRequest, NextResponse } from 'next/server'
 import { Locale } from '@/types/dictionary'
 
-/**
- * Locales suportados alinhados com a aplicação.
- */
 const SUPPORTED_LOCALES: Locale[] = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"]
 const DEFAULT_LOCALE: Locale = "pt-BR"
 
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // 1. Ignorar arquivos estáticos, assets, API e arquivos de sistema
+  // 1. Ignorar arquivos internos e estáticos
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
-    pathname.startsWith('/static') ||
-    pathname === '/favicon.ico' ||
-    pathname === '/robots.txt' ||
-    pathname === '/sitemap.xml' ||
-    pathname.includes('.')
+    pathname.includes('.') ||
+    pathname === '/favicon.ico'
   ) {
     return NextResponse.next()
   }
 
-  // 2. Verificar se o locale já está presente na URL
+  // 2. Verificar se o locale já está presente
   const pathnameHasLocale = SUPPORTED_LOCALES.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   )
 
   if (pathnameHasLocale) return NextResponse.next()
 
-  // 3. Caso não tenha locale, redirecionar para o padrão (pt-BR)
-  // Normaliza o pathname para evitar barras duplas
-  const cleanPathname = pathname.startsWith('/') ? pathname : `/${pathname}`
+  // 3. Redirecionar apenas se não houver locale
+  const url = request.nextUrl.clone()
+  url.pathname = `/${DEFAULT_LOCALE}${pathname.startsWith('/') ? '' : '/'}${pathname}`
   
-  const redirectUrl = new URL(
-    `/${DEFAULT_LOCALE}${cleanPathname}`,
-    request.url
-  )
-
-  return NextResponse.redirect(redirectUrl)
+  return NextResponse.redirect(url)
 }
 
-/**
- * Matcher configurado para cobrir todas as rotas exceto arquivos internos e estáticos
- */
 export const config = {
   matcher: [
+    // Pula todos os caminhos internos (_next) e estáticos (assets, favicon, etc)
     '/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js|robots.txt).*)',
   ],
 }
