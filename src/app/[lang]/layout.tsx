@@ -48,20 +48,20 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang: rawLang } = await params
   const lang = rawLang as Locale
-  const dict = getServerDictionary(lang)
+  const dict = await getServerDictionary(lang); // ADICIONADO AWAIT
   
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app'
 
   return {
     metadataBase: new URL(siteUrl),
     verification: {
-      google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0', // PRESERVADO
+      google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
     },
     title: {
       default: `Sérgio Santos | ${dict.common.role}`,
       template: `%s | Sérgio Santos`,
     },
-    description: dict.common.role,
+    description: dict.seo.description, // Melhor usar a descrição do SEO
     alternates: {
       canonical: `${siteUrl}/${lang}`,
       languages: {
@@ -77,7 +77,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `${siteUrl}/${lang}`,
       title: "Sérgio Santos",
       description: dict.common.role,
-      siteName: "Sérgio Santos",
+      siteName: dict.seo.siteName,
       images: [{ url: '/og-image.png', width: 1200, height: 630 }],
     },
   }
@@ -90,17 +90,16 @@ export default async function RootLayout(props: {
 }) {
   const { lang: rawLang } = await props.params
   const lang = rawLang as Locale
-  const dict = getServerDictionary(lang)
+  const dict = await getServerDictionary(lang); // ADICIONADO AWAIT
 
   return (
     <html
       lang={lang}
-      dir={dict.meta.direction} // "ltr" vindo do seu JSON
+      dir={dict.meta.direction}
       suppressHydrationWarning
       className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
     >
       <head>
-        {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
           strategy="afterInteractive"
@@ -117,7 +116,7 @@ export default async function RootLayout(props: {
 
       <body className="min-h-screen flex flex-col bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased font-inter">
         <ThemeProvider>
-          {/* Acessibilidade - Skip Link usando seu dicionário */}
+          {/* Skip Link para Acessibilidade */}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-blue-600 focus:text-white"
