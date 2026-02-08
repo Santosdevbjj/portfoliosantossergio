@@ -9,18 +9,21 @@ import { getDictionary } from '@/dictionaries'
 import type { Locale } from '@/types/dictionary'
 
 interface LoadingProps {
-  params: {
+  params: Promise<{
     lang: Locale
-  }
+  }> | { lang: Locale } 
 }
 
-export default function Loading({ params }: LoadingProps) {
-  // Garante o fallback para pt-BR caso o params falhe
-  const locale: Locale = params?.lang ?? 'pt-BR'
-  const dictionary = getDictionary(locale)
+export default async function Loading({ params }: LoadingProps) {
+  // Em Next.js 15/16, params pode ser uma Promise. Aguardamos a resolução.
+  const resolvedParams = await params;
+  const locale: Locale = resolvedParams?.lang ?? 'pt-BR';
+  
+  // CORREÇÃO: getDictionary é async, precisa de await
+  const dictionary = await getDictionary(locale);
 
-  // Utiliza a chave 'common.loading' que validamos nos arquivos JSON
-  const label = dictionary.common.loading || "Carregando..."
+  // Utiliza a chave 'common.loading' vinda do JSON correspondente
+  const label = dictionary.common?.loading || "Carregando...";
 
   return (
     <div
