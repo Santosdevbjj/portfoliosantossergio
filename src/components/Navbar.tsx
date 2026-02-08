@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 
-import type { Locale } from '@/types/dictionary'
-import type { Dictionary } from '@/types/dictionary'
+import type { Locale, Dictionary } from '@/types/dictionary'
 import { NavSection, getSectionId } from '@/domain/navigation'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
@@ -18,13 +17,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ lang, dict }: NavbarProps) {
-  // Ajuste na desestruturação para alinhar com a hierarquia do JSON
-  const { common, seo } = dict
-  // As labels de navegação (about, experience, etc) não estavam no 'nav' do JSON enviado, 
-  // mas presumo que existam ou devam vir de 'labels' ou similar. 
-  // Se 'nav' não existir no Dictionary, usamos fallback para evitar erro.
-  const nav = (dict as any).nav || {} 
-  
+  const { common, seo, about, experience, projects, articles, contact } = dict
   const { activeSection } = useScrollSpy()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -54,16 +47,17 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
   if (!mounted) return null
 
+  // Mapeamento das labels conforme a estrutura real dos seus JSONs
   const navLinks: ReadonlyArray<{
     id: NavSection
     href: string
     label: string
   }> = [
-    { id: NavSection.ABOUT, href: `/${lang}#${getSectionId(NavSection.ABOUT)}`, label: nav.about || 'About' },
-    { id: NavSection.EXPERIENCE, href: `/${lang}#${getSectionId(NavSection.EXPERIENCE)}`, label: nav.experience || 'Experience' },
-    { id: NavSection.PROJECTS, href: `/${lang}#${getSectionId(NavSection.PROJECTS)}`, label: nav.projects || 'Projects' },
-    { id: NavSection.ARTICLES, href: `/${lang}#${getSectionId(NavSection.ARTICLES)}`, label: nav.articles || 'Articles' },
-    { id: NavSection.CONTACT, href: `/${lang}#${getSectionId(NavSection.CONTACT)}`, label: nav.contact || 'Contact' },
+    { id: NavSection.ABOUT, href: `/${lang}#${getSectionId(NavSection.ABOUT)}`, label: about.title },
+    { id: NavSection.EXPERIENCE, href: `/${lang}#${getSectionId(NavSection.EXPERIENCE)}`, label: experience.title },
+    { id: NavSection.PROJECTS, href: `/${lang}#${getSectionId(NavSection.PROJECTS)}`, label: projects.title },
+    { id: NavSection.ARTICLES, href: `/${lang}#${getSectionId(NavSection.ARTICLES)}`, label: articles.title },
+    { id: NavSection.CONTACT, href: `/${lang}#${getSectionId(NavSection.CONTACT)}`, label: contact.title },
   ]
 
   return (
@@ -80,7 +74,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
         {/* LOGO */}
         <Link
           href={`/${lang}`}
-          aria-label={seo?.siteName || 'Home'}
+          aria-label={seo.siteName}
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
@@ -123,7 +117,6 @@ export function Navbar({ lang, dict }: NavbarProps) {
         <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle />
           <button
-            // CORREÇÃO: Acesso ao dicionário conforme estrutura JSON (common.menu.aria)
             aria-label={isOpen ? common.menu.aria.close : common.menu.aria.open}
             onClick={() => setIsOpen(prev => !prev)}
             className="p-2 text-slate-900 dark:text-white transition-transform active:scale-90"
@@ -159,7 +152,7 @@ export function Navbar({ lang, dict }: NavbarProps) {
 
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
             <p className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-              {common.navigation}
+              {common.languageSwitcher}
             </p>
             <LanguageSwitcher currentLang={lang} />
           </div>
