@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    /* NATIVE RUNTIME & TARGET (Baseline Feb/2026) */
-    "target": "ES2022", 
+    /* NATIVE RUNTIME & TARGET (Updated to ESNext para TS 5.9) */
+    "target": "ESNext", 
     "lib": ["dom", "dom.iterable", "esnext"],
     
-    /* TSGO ENGINE OPTIMIZATION (Next.js 16 Turbopack) */
+    /* TSGO ENGINE OPTIMIZATION (Project Corsa Ready) */
     "verbatimModuleSyntax": true,   
     "isolatedModules": true,         
     "moduleDetection": "force",      
@@ -16,12 +16,14 @@
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": false,     
-    
+    "noUnusedParameters": false,
+    /* NOVIDADE TS 5.9: Evita efeitos colaterais em imports de tipos */
+    "noUncheckedSideEffectImports": true, 
+
     /* NEXT.JS 16 & REACT 19 ARCHITECTURE */
     "module": "ESNext",
     "moduleResolution": "Bundler",   
-    "jsx": "react-jsx",              /* AJUSTADO: Requisito obrigatório do Next.js 16 */
+    "jsx": "react-jsx",
     "noEmit": true,                  
     
     /* INTEROP & SECURITY */
@@ -37,9 +39,12 @@
       "@/*": ["./src/*"]
     },
 
-    /* NATIVE BUILD CACHE */
+    /* NATIVE BUILD CACHE & OUTPUT (Alinhado com tsc --init 5.9) */
     "incremental": true,
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
 
     /* PLUGINS */
     "plugins": [
@@ -54,7 +59,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
     "src/types/**/*.d.ts"
   ],
 
