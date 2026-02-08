@@ -1,17 +1,5 @@
 /* src/styles/animations.css */
 
-/**
- * SISTEMA DE ANIMAÇÕES — 2026 Baseline (Tailwind v4 Optimized)
- * -----------------------------------------------------------------------------
- * - Performance: Camadas compostas com isolamento de GPU (z-index: 0).
- * - Estabilidade: Interpolação de cores em espaço OKLAB para gradientes.
- * - Build: Compatível com Lightning CSS (Engine Oxide).
- */
-
-/* ------------------------------------------ */
-/* 🔑 Keyframes (GPU & Sub-pixel Rendering) */
-/* ------------------------------------------ */
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -33,59 +21,39 @@
   100% { transform: translateX(100%); }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0) translateZ(0); }
-  50% { transform: translateY(-8px) translateZ(0); }
-}
-
-/* ------------------------------------------ */
-/* 🧊 Staggered Load (Entrada Gradual) */
-/* ------------------------------------------ */
-
-/* Em 2026, usamos isolamento de camada para evitar que a animação 
-   force o repainting do layout inteiro.
-*/
+/* Sistema de Stagger (Entrada Gradual) */
 .stagger-load {
   isolation: isolate;
 }
 
 .stagger-load > * {
   opacity: 0;
-  /* Ativa aceleração apenas durante a animação para poupar bateria/RAM */
   backface-visibility: hidden;
+  will-change: transform, opacity;
   animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-/* Delays incrementais (Matriz de Tempo) */
+/* Delays incrementais */
 .stagger-load > *:nth-child(1) { animation-delay: 0.1s; }
 .stagger-load > *:nth-child(2) { animation-delay: 0.18s; }
 .stagger-load > *:nth-child(3) { animation-delay: 0.26s; }
 .stagger-load > *:nth-child(4) { animation-delay: 0.34s; }
 .stagger-load > *:nth-child(5) { animation-delay: 0.42s; }
-.stagger-load > *:nth-child(6) { animation-delay: 0.5s; }
+.stagger-load > *:nth-child(n+6) { animation-delay: 0.5s; }
 
-/* Fallback para listas extensas */
-.stagger-load > *:nth-child(n+7) {
-  animation-delay: 0.58s;
-}
-
-/* ------------------------------------------ */
-/* 🦴 Skeleton Shimmer (OKLCH Optimized) */
-/* ------------------------------------------ */
-
+/* Skeleton Shimmer */
 .skeleton-shimmer {
   position: relative;
   overflow: hidden;
   background-color: color-mix(in oklab, currentColor 5%, transparent);
   border-radius: inherit;
-  transform: translateZ(0); /* Força camada na GPU */
+  transform: translateZ(0); 
 }
 
 .skeleton-shimmer::after {
   content: "";
   position: absolute;
   inset: 0;
-  /* Interpolação em OKLCH para evitar o "cinza morto" no meio do gradiente */
   background: linear-gradient(
     90deg,
     transparent 0%,
@@ -95,32 +63,17 @@
   animation: shimmer 2s linear infinite;
 }
 
-/* ------------------------------------------ */
-/* 🌍 i18n — Percepção Cognitiva */
-/* ------------------------------------------ */
-
-/* Ajustes de cadência baseados na densidade textual */
-[lang="es"] .stagger-load > * { animation-duration: 0.8s; }
-[lang="en"] .stagger-load > * { animation-duration: 0.7s; }
+/* Ajustes i18n de Percepção Cognitiva */
+[lang="es"] .stagger-load > * { animation-duration: 0.85s; }
+[lang="en"] .stagger-load > * { animation-duration: 0.65s; }
 [lang="pt"] .stagger-load > * { animation-duration: 0.75s; }
 
-/* ------------------------------------------ */
-/* ♿ Reduced Motion & Acessibilidade */
-/* ------------------------------------------ */
-
+/* Acessibilidade: Movimento Reduzido */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .stagger-load > *,
-  .skeleton-shimmer::after {
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
-    will-change: auto !important;
   }
 }
