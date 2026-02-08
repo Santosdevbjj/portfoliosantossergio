@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import {
   RotateCcw,
@@ -10,20 +10,19 @@ import {
 } from 'lucide-react'
 
 import { getDictionary } from '@/dictionaries'
-import type { Locale } from '@/types/dictionary'
+import type { Dictionary, Locale } from '@/types/dictionary'
 import { i18n } from '@/i18n-config'
 
 interface ErrorProps {
   readonly error: Error & { digest?: string }
   readonly reset: () => void
-  readonly params: { lang: Locale } // Next.js injeta params em error.tsx
+  readonly params: { lang: Locale }
 }
 
 export default function Error({ error, reset, params }: ErrorProps) {
-  /**
-   * Identifica o idioma atual. 
-   * Priorizamos o params.lang injetado pelo Next.js para maior consistência com a rota.
-   */
+  const [dict, setDict] = useState<Dictionary | null>(null)
+
+  // Memoiza o idioma para evitar re-cálculos
   const currentLang: Locale = useMemo(() => {
     const supportedLocales: Locale[] = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"]
     return supportedLocales.includes(params?.lang) 
@@ -31,20 +30,29 @@ export default function Error({ error, reset, params }: ErrorProps) {
       : (i18n.defaultLocale as Locale)
   }, [params?.lang])
 
-  // Obtém o dicionário traduzido
-  const dict = getDictionary(currentLang)
-
   /**
-   * Log de Erro para Monitoramento
+   * Carrega o dicionário e faz o log do erro
    */
   useEffect(() => {
-    // Evita log excessivo em desenvolvimento, mas mantém o rastro técnico
+    // Carregamento assíncrono do dicionário (Resolve o erro do Vercel)
+    getDictionary(currentLang).then(setDict)
+
+    // Log técnico para monitoramento
     console.error('🔥 [Application Error]:', {
       message: error.message,
       digest: error.digest,
       timestamp: new Date().toISOString(),
     })
-  }, [error])
+  }, [error, currentLang])
+
+  // Estado de carregamento simples enquanto o dicionário não chega
+  if (!dict) {
+    return (
+      <div className="min-h-[100dvh] w-full flex items-center justify-center bg-slate-50 dark:bg-[#020617]">
+        <div className="animate-pulse text-slate-400 font-mono">Loading error context...</div>
+      </div>
+    )
+  }
 
   return (
     <div
