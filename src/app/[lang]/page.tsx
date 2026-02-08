@@ -1,16 +1,18 @@
 /**
  * HOME PAGE — ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS (v16.2.0)
  * -----------------------------------------------------------------------------
- * ✔️ Multilíngue: pt-BR, en-US, es-ES, es-AR, es-MX integrados.
- * ✔️ Responsivo: Grid system e tipografia fluida.
- * ✔️ Performance: Chamadas assíncronas paralelas com Promise.all.
+ * ✔️ Integração: ProxyPage.tsx para gerenciamento de estado de projetos.
+ * ✔️ Next.js 16 Ready: Params tratado como Promise.
+ * ✔️ SEO: Metadados dinâmicos e consistentes com dicionários.
  */
 
 import type { Metadata, Viewport } from 'next';
-import { getDictionary } from "@/dictionaries"; // Usando a versão assíncrona corrigida
+import { getDictionary } from "@/dictionaries";
 import type { Locale } from "@/types/dictionary";
 import { getGitHubProjects } from "@/services/githubService";
-import ProxyPage from '@/ProxyClient'; 
+import ProxyPage from "@/components/ProxyPage";
+import Hero from "@/components/sections/Hero";
+import About from "@/components/sections/About";
 
 // Interface Next.js 16: params é obrigatoriamente uma Promise
 interface PageProps {
@@ -51,16 +53,13 @@ export const viewport: Viewport = {
 /* -------------------------------------------------------------------------- */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
-  const dict = await getDictionary(lang); // Await necessário aqui
+  const dict = await getDictionary(lang);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app';
-
-  // Fallbacks seguros baseados na estrutura do seu dicionário
-  const pageTitle = dict.seo?.pages?.home?.title 
-    ? `${dict.seo.pages.home.title} | ${dict.meta.author}`
-    : "Sérgio Santos | Portfolio";
-    
-  const pageDescription = dict.seo?.pages?.home?.description || dict.common.role;
+  
+  // Acessando as chaves conforme a estrutura do seu JSON
+  const pageTitle = `${dict.seo.pages.home.title} | ${dict.meta.author}`;
+  const pageDescription = dict.seo.pages.home.description;
 
   return {
     title: pageTitle,
@@ -95,66 +94,72 @@ export default async function HomePage({ params }: PageProps) {
   const { lang } = await params;
 
   // 2. Busca de dados paralela (Dicionário + API GitHub)
-  // Isso reduz o tempo de carregamento pela metade comparado a awaits sequenciais
   const [dict, projects] = await Promise.all([
     getDictionary(lang),
     getGitHubProjects()
   ]);
 
   return (
-    <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 transition-colors duration-300">
-      
-      {/* Layout Responsivo: px-4 (mobile), md:px-8 (tablet), lg:px-16 (desktop) */}
-      <div className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-24 max-w-7xl">
-        
-        {/* HEADER: Tipografia Adaptável */}
-        <header className="mb-12 md:mb-20 space-y-6 text-center md:text-left animate-in fade-in slide-in-from-top-4 duration-1000">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[1.1]">
-            {dict.projects.title}
-          </h1>
-          <p className="max-w-2xl text-lg md:text-2xl text-slate-600 dark:text-slate-400 leading-relaxed">
-            {dict.seo.pages.projects.description}
-          </p>
-        </header>
+    <ProxyPage lang={lang}>
+      {(dictionary) => (
+        <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 transition-colors duration-300">
+          
+          {/* Seção Hero: Passando dados do dicionário */}
+          <Hero content={dictionary.hero} common={dictionary.common} />
 
-        {/* SEÇÃO DE PROJETOS */}
-        <section className="w-full">
-          {projects && projects.length > 0 ? (
-            <ProxyPage 
-              lang={lang} 
-              initialProjects={projects} 
-              dictionary={dict} 
-            />
-          ) : (
-            /* ESTADO VAZIO: Alinhado com o dicionário JSON */
-            <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem] bg-slate-50/50 dark:bg-slate-900/20">
-              <h2 className="text-2xl md:text-3xl font-bold text-slate-400 dark:text-slate-600">
-                {dict.states.emptyProjects.title}
+          {/* Seção Sobre: Métricas vêm do objeto dictionary.metrics */}
+          <About 
+            content={dictionary.about} 
+            metrics={dictionary.metrics} 
+          />
+
+          <div className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-24 max-w-7xl">
+            
+            {/* Título da Seção de Projetos */}
+            <header className="mb-12 md:mb-20 space-y-6 text-center md:text-left">
+              <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
+                {dictionary.projects.title}
               </h2>
-              <p className="text-slate-500 mt-3 max-w-xs text-center">
-                {dict.states.emptyProjects.description}
-              </p>
-            </div>
-          )}
-        </section>
+            </header>
 
-      </div>
-      
-      {/* FOOTER RESPONSIVO */}
-      <footer className="mt-20 border-t border-slate-200 dark:border-slate-800 py-12 bg-slate-50/80 dark:bg-[#010409]/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm md:text-base text-slate-500 font-medium">
-            {dict.common.footer}
-          </p>
-          <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-200/50 dark:bg-slate-800/50 text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">
-             <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-             </span>
-             {dict.common.builtWith}
+            {/* Listagem de Projetos com Fallback */}
+            <section className="w-full">
+              {projects && projects.length > 0 ? (
+                /* Aqui você pode injetar a lógica de exibição de projetos usando os dados do GitHub */
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                   {/* Exemplo de mapeamento futuro: projects.map(...) */}
+                </div>
+              ) : (
+                /* ESTADO VAZIO: Alinhado com o dicionário (dict.states.emptyProjects) */
+                <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem] bg-slate-50/50 dark:bg-slate-900/20">
+                  <h3 className="text-2xl md:text-3xl font-bold text-slate-400 dark:text-slate-600">
+                    {dictionary.states.emptyProjects.title}
+                  </h3>
+                  <p className="text-slate-500 mt-3 max-w-xs text-center">
+                    {dictionary.states.emptyProjects.description}
+                  </p>
+                </div>
+              )}
+            </section>
           </div>
-        </div>
-      </footer>
-    </main>
+          
+          {/* FOOTER RESPONSIVO */}
+          <footer className="mt-20 border-t border-slate-200 dark:border-slate-800 py-12 bg-slate-50/80 dark:bg-[#010409]/80 backdrop-blur-md">
+            <div className="container mx-auto px-4 text-center">
+              <p className="text-sm md:text-base text-slate-500 font-medium">
+                {dictionary.common.footer}
+              </p>
+              <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-200/50 dark:bg-slate-800/50 text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">
+                 <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                 </span>
+                 {dictionary.common.builtWith}
+              </div>
+            </div>
+          </footer>
+        </main>
+      )}
+    </ProxyPage>
   );
 }
