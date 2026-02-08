@@ -2,7 +2,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getDictionary } from '@/dictionaries';
-// CORREÇÃO: Adicionado 'type' para conformidade com verbatimModuleSyntax
 import type { Locale } from '@/types/dictionary';
 
 const SITE_URL = 'https://portfoliosantossergio.vercel.app';
@@ -14,23 +13,24 @@ interface MetadataProps {
 }
 
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
-  // Resolvemos a Promise dos parâmetros para o Next.js 16
+  // 1. Resolvemos a Promise dos parâmetros (Obrigatório no Next.js 15/16)
   const resolvedParams = await params;
   const lang = resolvedParams.lang;
 
-  // Lista de locales baseada no seu src/types/dictionary.ts
+  // 2. Lista de locales suportados
   const supportedLocales: Locale[] = ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'];
   
   if (!supportedLocales.includes(lang)) {
     notFound();
   }
 
-  const dict = getDictionary(lang);
+  // 3. CORREÇÃO: Adicionado 'await' para carregar o dicionário corretamente
+  const dict = await getDictionary(lang);
 
   const pageTitle = dict.seo.pages?.home?.title ?? dict.seo.siteName;
   const pageDescription = dict.seo.pages?.home?.description ?? dict.seo.description;
 
-  // Mapeamento de imagens OG
+  // Mapeamento de imagens OG (Consistente com seus arquivos públicos)
   const ogImageMap: Record<Locale, string> = {
     'pt-BR': '/og-image-pt.png',
     'en-US': '/og-image-en.png',
@@ -39,6 +39,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     'es-MX': '/og-image-es.png',
   };
 
+  // Mapeamento de locale para meta tags (padrão ISO: ll_CC)
   const ogLocaleMap: Record<Locale, string> = {
     'pt-BR': 'pt_BR',
     'en-US': 'en_US',
@@ -56,7 +57,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     description: pageDescription,
     keywords: dict.seo.keywords,
     alternates: {
-      canonical: `/${lang}`,
+      canonical: `${SITE_URL}/${lang}`,
       languages: {
         'pt-BR': '/pt-BR',
         'en-US': '/en-US',
@@ -88,9 +89,13 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       images: [ogImageMap[lang]],
     },
     icons: {
-      icon: '/icons/favicon.ico',
-      shortcut: '/icons/favicon.ico',
-      apple: '/icons/apple-touch-icon.png',
+      icon: [
+        { url: '/icons/favicon.ico' },
+        { url: '/icons/icon.png', type: 'image/png' },
+      ],
+      apple: [
+        { url: '/icons/apple-touch-icon.png' },
+      ],
     },
     robots: {
       index: true,
