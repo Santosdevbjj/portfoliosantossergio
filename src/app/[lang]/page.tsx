@@ -1,5 +1,6 @@
 /**
  * HOME PAGE — ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS (v16.2.0)
+ * Revisado para total compatibilidade com ProjectDomain e I18n
  */
 
 import type { Metadata, Viewport } from 'next';
@@ -8,7 +9,7 @@ import type { Locale } from "@/types/dictionary";
 import { getGitHubProjects } from "@/services/githubService";
 import ProxyPage from "@/components/ProxyPage";
 
-// Importações corrigidas conforme os arquivos existentes informados
+// Componentes de Seção
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 
@@ -85,7 +86,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function HomePage({ params }: PageProps) {
   const { lang } = await params;
 
-  // Busca de dados no servidor
+  // Busca de dados no servidor (Já filtrados e mapeados pelo githubService)
   const projects = await getGitHubProjects();
 
   return (
@@ -93,15 +94,17 @@ export default async function HomePage({ params }: PageProps) {
       {(dictionary) => (
         <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 transition-colors duration-300">
           
-          {/* Seções principais usando os componentes informados */}
+          {/* Hero Section */}
           <HeroSection content={dictionary.hero} common={dictionary.common} />
 
+          {/* About Section com métricas integradas */}
           <AboutSection 
             content={dictionary.about} 
             metrics={dictionary.metrics} 
           />
 
-          <div className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-24 max-w-7xl">
+          {/* Projects Section */}
+          <div id="projects" className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-24 max-w-7xl">
             <header className="mb-12 md:mb-20 space-y-6 text-center md:text-left">
               <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
                 {dictionary.projects.title}
@@ -112,15 +115,45 @@ export default async function HomePage({ params }: PageProps) {
               {projects && projects.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                    {projects.map((project) => (
-                     <div key={project.id} className="p-6 border rounded-xl border-slate-200 dark:border-slate-800">
-                        <h3 className="text-xl font-bold">{project.content[lang]?.title || project.content["pt-BR"].title}</h3>
-                        <p className="text-sm mt-2 text-slate-600 dark:text-slate-400">
-                          {project.content[lang]?.description || project.content["pt-BR"].description}
+                     <div 
+                        key={project.id} 
+                        className="group p-6 border rounded-xl border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-all duration-300 bg-slate-50/30 dark:bg-slate-900/10"
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
+                            {/* Tradução dinâmica da categoria vinda do Mapper */}
+                            {dictionary.projects.categories[project.technology.labelKey as keyof typeof dictionary.projects.categories]}
+                          </span>
+                          {project.isFeatured && (
+                            <span className="px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
+                              {dictionary.projects.featuredLabel}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <h3 className="text-xl font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {project.name}
+                        </h3>
+                        
+                        <p className="text-sm mt-3 text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">
+                          {project.description}
                         </p>
+
+                        <div className="mt-6 flex items-center gap-4">
+                          <a 
+                            href={project.htmlUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-xs font-bold underline underline-offset-4 hover:text-blue-500"
+                          >
+                            {dictionary.projects.viewProject}
+                          </a>
+                        </div>
                      </div>
                    ))}
                 </div>
               ) : (
+                /* Empty State */
                 <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem] bg-slate-50/50 dark:bg-slate-900/20">
                   <h3 className="text-2xl md:text-3xl font-bold text-slate-400 dark:text-slate-600">
                     {dictionary.states.emptyProjects.title}
@@ -133,6 +166,7 @@ export default async function HomePage({ params }: PageProps) {
             </section>
           </div>
           
+          {/* Footer */}
           <footer className="mt-20 border-t border-slate-200 dark:border-slate-800 py-12 bg-slate-50/80 dark:bg-[#010409]/80 backdrop-blur-md">
             <div className="container mx-auto px-4 text-center">
               <p className="text-sm md:text-base text-slate-500 font-medium">
