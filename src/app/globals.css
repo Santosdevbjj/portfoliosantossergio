@@ -20,7 +20,7 @@
 
   /* --- Efeitos de Elevação v4 --- */
   --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 20px oklch(0.62 0.17 256.4 / 0.3);
+  --shadow-glow: 0 0 20px color-mix(in oklch, oklch(0.62 0.17 256.4), transparent 70%);
 
   /* --- Mapeamento de Variáveis de Sistema --- */
   --color-background: var(--background);
@@ -31,7 +31,6 @@
 
 @layer base {
   :root {
-    /* Light Mode Tokens */
     --background: oklch(0.98 0.01 256.4);
     --foreground: oklch(0.15 0.02 256.4);
     --card: oklch(1 0 0);
@@ -39,7 +38,6 @@
   }
 
   .dark {
-    /* Dark Mode Tokens (OLED Optimized) */
     --background: oklch(0.12 0.02 256.4);
     --foreground: oklch(0.95 0.01 256.4);
     --card: oklch(0.18 0.02 256.4);
@@ -47,23 +45,21 @@
   }
 
   *, ::after, ::before {
-    /* Na v4, usamos a variável mapeada no theme */
     border-color: var(--color-border);
   }
 
   html {
     @apply scroll-smooth overflow-x-hidden antialiased;
     background-color: var(--color-background);
-    /* Melhora a renderização de fontes em telas 4K/8K */
     text-rendering: optimizeLegibility;
+    /* Previne saltos de layout na barra de rolagem */
+    scrollbar-gutter: stable;
   }
 
   body {
     @apply min-h-screen flex flex-col transition-colors duration-500;
     color: var(--color-foreground);
     background-color: var(--color-background);
-    
-    /* Suporte a áreas seguras (iPhones/Dobráveis) */
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 }
@@ -75,12 +71,12 @@
 
   .glass-effect {
     @apply backdrop-blur-xl shadow-premium transition-all duration-300;
-    /* color-mix é o padrão nativo da v4 para opacidade */
     background-color: color-mix(in oklab, var(--color-card) 75%, transparent);
     border: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
   }
 
   .project-card {
-    @apply relative overflow-hidden rounded-[2rem] border border-border bg-card transition-all duration-500;
+    /* Corrigido: usando variável semântica para manter consistência dark/light */
+    @apply relative overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-card)] transition-all duration-500;
   }
 }
