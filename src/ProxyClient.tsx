@@ -2,13 +2,13 @@
 
 import { notFound } from 'next/navigation'
 
-// UI Components
-import { AboutSection } from '@/components/AboutSection'
+// UI Components - Note a remoção das chaves em componentes que usam 'export default'
+import AboutSection from '@/components/AboutSection' 
 import { ContactSection } from '@/components/ContactSection'
 import { ExperienceSection } from '@/components/ExperienceSection'
 import { FeaturedArticleSection } from '@/components/FeaturedArticleSection'
 import { Footer } from '@/components/Footer'
-import { HeroSection } from '@/components/HeroSection'
+import HeroSection from '@/components/HeroSection' // Removido chaves
 import { Navbar } from '@/components/Navbar'
 import { PageWrapper } from '@/components/PageWrapper'
 import { ProjectSection } from '@/components/ProjectSection'
@@ -26,10 +26,10 @@ interface ProxyClientProps {
 
 export default function ProxyClient({ lang, initialProjects, dictionary }: ProxyClientProps) {
   
-  // Se o dicionário não for fornecido por algum erro no servidor
   if (!dictionary) return notFound()
 
-  const sectionIds = ['hero', 'about', 'experience', 'projects', 'articles', 'contact'] as const
+  // IDs alinhados com o NAV_HASH_MAP em src/domain/navigation.ts
+  const sectionIds = ['hero', 'sobre', 'trajetoria', 'projetos', 'artigos', 'contato'] as const
 
   try {
     return (
@@ -42,24 +42,23 @@ export default function ProxyClient({ lang, initialProjects, dictionary }: Proxy
             <HeroSection lang={lang} dict={dictionary} />
           </section>
 
-          {/* Seção Sobre */}
-          <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
+          {/* Seção Sobre - ID alterado para 'sobre' conforme navigation.ts */}
+          <section id="sobre" className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
             <AboutSection lang={lang} dict={dictionary} />
           </section>
 
-          {/* Seção Experiência */}
-          <section id="experience" className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10">
+          {/* Seção Experiência - ID alterado para 'trajetoria' */}
+          <section id="trajetoria" className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10">
             <div className="mx-auto max-w-7xl px-4 sm:px-10 lg:px-12">
               <ExperienceSection lang={lang} dict={dictionary} />
             </div>
           </section>
 
-          {/* Seção Projetos */}
-          <section id="projects" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
+          {/* Seção Projetos - ID alterado para 'projetos' */}
+          <section id="projetos" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
             <FeaturedProjectsSection lang={lang} dict={dictionary} />
             
             <div className="mt-12 border-t pt-12 dark:border-slate-800">
-              {/* Agora passamos initialProjects sem necessidade de cast 'any' */}
               <ProjectSection 
                 projects={initialProjects} 
                 lang={lang} 
@@ -68,13 +67,13 @@ export default function ProxyClient({ lang, initialProjects, dictionary }: Proxy
             </div>
           </section>
 
-          {/* Seção Artigos */}
-          <section id="articles" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
+          {/* Seção Artigos - ID alterado para 'artigos' */}
+          <section id="artigos" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
             <FeaturedArticleSection lang={lang} dict={dictionary} />
           </section>
 
-          {/* Seção Contato */}
-          <section id="contact" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
+          {/* Seção Contato - ID alterado para 'contato' */}
+          <section id="contato" className="mx-auto max-w-7xl px-4 py-20 sm:px-10 lg:px-12">
             <ContactSection lang={lang} dict={dictionary} />
           </section>
         </main>
