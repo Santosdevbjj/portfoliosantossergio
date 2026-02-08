@@ -1,8 +1,10 @@
+// src/types/dictionary.ts
+
 export type Locale = "pt-BR" | "en-US" | "es-ES" | "es-AR" | "es-MX";
 
 export interface DictionaryMeta {
   version: string;
-  locale: Locale; // Uso do type restrito
+  locale: Locale;
   direction: "ltr" | "rtl";
   lastUpdated: string;
   author: string;
@@ -170,7 +172,9 @@ export interface Dictionary {
     siteName: string;
     description: string;
     keywords: string[];
-    pages: Record<string, { title: string; description: string }>;
+    pages: {
+      [key: string]: { title: string; description: string };
+    };
   };
   metrics: {
     availability: string;
