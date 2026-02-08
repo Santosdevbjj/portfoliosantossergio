@@ -1,13 +1,8 @@
-// src/types/dictionary.ts
-
-/**
- * Tipos de idiomas suportados pela aplicação.
- */
 export type Locale = "pt-BR" | "en-US" | "es-ES" | "es-AR" | "es-MX";
 
 export interface DictionaryMeta {
   version: string;
-  locale: Locale;
+  locale: Locale; // Uso do type restrito
   direction: "ltr" | "rtl";
   lastUpdated: string;
   author: string;
@@ -102,28 +97,6 @@ export interface ProjectsSectionDictionary {
   categories: ProjectCategories;
 }
 
-export interface ErrorBoundaryDictionary {
-  title: string;
-  description: string;
-  actions: {
-    retry: string;
-    home: string;
-  };
-}
-
-export interface NotFoundDictionary {
-  title: string;
-  description: string;
-  button: string;
-}
-
-export interface ExternalLinks {
-  linkedin: string;
-  github: string;
-  medium: string;
-  email: string;
-}
-
 export interface CommonDictionary {
   navigation: string;
   role: string;
@@ -134,78 +107,38 @@ export interface CommonDictionary {
   error: string;
   socialLinks: string;
   languageSwitcher: string;
-  errorBoundary: ErrorBoundaryDictionary;
-  notFound: NotFoundDictionary;
-  externalLinks: ExternalLinks;
+  errorBoundary: {
+    title: string;
+    description: string;
+    actions: { retry: string; home: string };
+  };
+  notFound: {
+    title: string;
+    description: string;
+    button: string;
+  };
+  externalLinks: {
+    linkedin: string;
+    github: string;
+    medium: string;
+    email: string;
+  };
   menu: {
     open: string;
     close: string;
-    aria: {
-      open: string;
-      close: string;
-    };
+    aria: { open: string; close: string };
   };
-}
-
-export interface IntlDictionary {
-  locale: string;
-  fallbackLocale: string;
-  currency: string;
-  timezone: string;
-  unitDisplay: string;
-  numberFormat: string;
 }
 
 export interface StateDictionary {
   loading: string;
   empty: string;
   error: string;
-  emptyProjects: {
-    title: string;
-    description: string;
-    cta: string;
-  };
+  emptyProjects: { title: string; description: string; cta: string };
   emptyExperience: string;
   errorArticles: string;
 }
 
-export interface CookieDictionary {
-  title: string;
-  description: string;
-  necessary: string;
-  alwaysActive: string;
-  analytics: string;
-  acceptAll: string;
-  savePreferences: string;
-}
-
-export interface SeoPage {
-  title: string;
-  description: string;
-}
-
-export interface SeoDictionary {
-  siteName: string;
-  description: string;
-  keywords: string[];
-  pages: {
-    home: SeoPage;
-    projects: SeoPage;
-    articles: SeoPage;
-  };
-}
-
-export interface MetricsDictionary {
-  availability: string;
-  availabilityNormalized?: {
-    value: number;
-    unit: string;
-  };
-}
-
-/**
- * Estrutura principal do Dicionário.
- */
 export interface Dictionary {
   meta: DictionaryMeta;
   hero: HeroDictionary;
@@ -215,9 +148,32 @@ export interface Dictionary {
   articles: ArticlesSectionDictionary;
   projects: ProjectsSectionDictionary;
   common: CommonDictionary;
-  intl: IntlDictionary;
+  intl: {
+    locale: string;
+    fallbackLocale: string;
+    currency: string;
+    timezone: string;
+    unitDisplay: string;
+    numberFormat: string;
+  };
   states: StateDictionary;
-  cookie: CookieDictionary;
-  seo: SeoDictionary;
-  metrics?: MetricsDictionary;
+  cookie: {
+    title: string;
+    description: string;
+    necessary: string;
+    alwaysActive: string;
+    analytics: string;
+    acceptAll: string;
+    savePreferences: string;
+  };
+  seo: {
+    siteName: string;
+    description: string;
+    keywords: string[];
+    pages: Record<string, { title: string; description: string }>;
+  };
+  metrics: {
+    availability: string;
+    availabilityNormalized: { value: number; unit: string };
+  };
 }
