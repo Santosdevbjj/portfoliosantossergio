@@ -1,43 +1,21 @@
-// src/dictionaries/index.ts
-
 import type { Dictionary, Locale } from "@/types/dictionary";
-import { validateDictionary } from "./validator";
 
-import ptBR from "./pt-BR.json";
-import enUS from "./en-US.json";
-import esES from "./es-ES.json";
-import esAR from "./es-AR.json";
-import esMX from "./es-MX.json";
-
-const dictionaries: Record<Locale, Dictionary> = {
-  "pt-BR": ptBR as Dictionary,
-  "en-US": enUS as Dictionary,
-  "es-ES": esES as Dictionary,
-  "es-AR": esAR as Dictionary,
-  "es-MX": esMX as Dictionary,
+// Mapeamento de carregamento dinâmico (Code Splitting)
+const dictionaries = {
+  "pt-BR": () => import("./pt-BR.json").then((module) => module.default),
+  "en-US": () => import("./en-US.json").then((module) => module.default),
+  "es-ES": () => import("./es-ES.json").then((module) => module.default),
+  "es-AR": () => import("./es-AR.json").then((module) => module.default),
+  "es-MX": () => import("./es-MX.json").then((module) => module.default),
 };
 
-export function getDictionary(locale: Locale): Dictionary {
-  // 1. Tentativa de busca direta (ex: es-AR)
-  let dictionary = dictionaries[locale];
+export const getDictionary = async (locale: Locale): Promise<Dictionary> => {
+  // 1. Tenta carregar o locale solicitado
+  // 2. Se falhar e for espanhol, tenta es-ES
+  // 3. Fallback final para pt-BR
+  
+  const loader = dictionaries[locale] 
+    ?? (locale.startsWith("es") ? dictionaries["es-ES"] : dictionaries["pt-BR"]);
 
-  // 2. Lógica de Fallback Regional para a família "es" (Espanhol)
-  // Se pedir um dialeto que não temos (ex: es-CL), entrega o es-ES
-  if (!dictionary && locale.startsWith("es")) {
-    dictionary = dictionaries["es-ES"];
-  }
-
-  // 3. Fallback Global (Padrão do sistema se tudo falhar)
-  if (!dictionary) {
-    dictionary = dictionaries["pt-BR"];
-  }
-
-  // Validação em tempo de desenvolvimento para evitar campos vazios na UI
-  const { valid, errors } = validateDictionary(dictionary);
-
-  if (!valid && process.env.NODE_ENV !== "production") {
-    console.error(`[i18n] Invalid dictionary for locale: ${locale}`, errors);
-  }
-
-  return dictionary;
-}
+  return (await loader()) as Dictionary;
+};
