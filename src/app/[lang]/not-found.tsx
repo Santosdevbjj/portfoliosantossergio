@@ -19,6 +19,7 @@ import type { Locale, Dictionary } from '@/types/dictionary'
 
 export default function NotFound() {
   const params = useParams()
+  // Garante que lang seja um dos tipos válidos ou fallback para pt-BR
   const lang = (params?.lang as Locale) || 'pt-BR'
   
   const [dict, setDict] = useState<Dictionary | null>(null)
@@ -29,11 +30,15 @@ export default function NotFound() {
     setDict(d)
   }, [lang])
 
-  // Shimmer/Loading state simples enquanto o dicionário é montado no client
-  if (!dict) return <div className="min-h-screen bg-slate-50 dark:bg-[#020617]" />
+  // Shimmer/Loading state enquanto o dicionário é montado no client
+  // Isso evita que o código abaixo tente acessar propriedades de 'null'
+  if (!dict) {
+    return <div className="min-h-screen bg-slate-50 dark:bg-[#020617]" />
+  }
 
-  // Mapeamento direto do JSON
-  const { notFound: t, role } = dict.common
+  // Mapeamento seguro do JSON
+  const t = dict.common.notFound
+  const role = dict.common.role || "Analista de Dados" // Fallback caso role falhe
 
   return (
     <div
@@ -79,7 +84,6 @@ export default function NotFound() {
             className="group w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
           >
             <ArrowLeft size={20} className="transition-transform group-hover:-translate-x-1" />
-            {/* Usando o fallback para o termo genérico de "Voltar" do navegador */}
             {lang.startsWith('en') ? 'Go Back' : lang.startsWith('es') ? 'Volver' : 'Voltar'}
           </button>
 
@@ -97,7 +101,7 @@ export default function NotFound() {
           <div className="inline-flex items-center gap-3 px-4 py-2 bg-slate-100 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800">
             <Terminal size={14} className="text-blue-500" />
             <code className="text-[10px] font-mono uppercase tracking-widest text-slate-500 dark:text-slate-400">
-              404 | NOT_FOUND | {role.split('|')[0].trim()}
+              404 | NOT_FOUND | {role.split('|')[0]?.trim() || 'ADMIN'}
             </code>
           </div>
         </div>
