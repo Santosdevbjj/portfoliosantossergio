@@ -9,7 +9,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Montserrat } from 'next/font/google'
 import Script from 'next/script'
-import '../globals.css'
+import '@/app/globals.css'
 
 import { ThemeProvider } from '@/components/ThemeToggle'
 import { CookieBanner } from '@/components/CookieBanner'
