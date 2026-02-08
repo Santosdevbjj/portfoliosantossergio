@@ -4,8 +4,8 @@
  * FOOTER COMPONENT — SÉRGIO SANTOS (REVISÃO FINAL 2026)
  * -----------------------------------------------------------------------------
  * ✔ 100% Responsivo: Mobile-first com Tailwind.
- * ✔ Multilíngue: Suporte a pt-BR, en-US e família ES (ES, AR, MX).
- * ✔ Consistência: Alinhado estritamente aos arquivos JSON fornecidos.
+ * ✔ Multilíngue: Suporte total a pt-BR, en-US e família ES (ES, AR, MX).
+ * ✔ Consistência: Caminhos de chaves JSON corrigidos e integração com domínio.
  */
 
 import Link from 'next/link'
@@ -19,9 +19,9 @@ import {
   ArrowRight,
 } from 'lucide-react'
 
-import type { Locale } from '@/types/dictionary'
-import type { Dictionary } from '@/types/dictionary'
+import type { Locale, Dictionary } from '@/types/dictionary'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { NAV_SECTIONS, getNavHash } from '@/domain/navigation'
 
 interface FooterProps {
   readonly lang: Locale
@@ -29,15 +29,14 @@ interface FooterProps {
 }
 
 export function Footer({ lang, dict }: FooterProps) {
-  // Extração segura baseada nos seus arquivos JSON reais
-  const { common, labels } = dict
+  // Extração segura baseada na estrutura real dos seus JSONs
+  const { common, seo, articles } = dict
   
-  // Fallback para e-mail e links sociais vindo do dicionário
   const email = common.externalLinks.email
   const linkedinUrl = common.externalLinks.linkedin
   const githubUrl = common.externalLinks.github
 
-  // Lógica para rótulo de país (Brasil vs Brazil)
+  // Lógica para rótulo de país baseada no locale
   const countryLabel = lang === 'en-US' ? 'Brazil' : 'Brasil'
 
   return (
@@ -47,14 +46,14 @@ export function Footer({ lang, dict }: FooterProps) {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 lg:py-24 space-y-20">
 
-        {/* CTA - Adaptado para usar chaves existentes no JSON (Seo/Labels) */}
+        {/* CTA - Usando SEO Pages para consistência */}
         <section className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row justify-between gap-10 items-start lg:items-center shadow-2xl shadow-blue-500/20">
           <div className="max-w-xl relative z-10">
             <h3 className="text-2xl md:text-4xl font-black mb-4 tracking-tight">
-              {dict.seo?.articles.title}
+              {seo.pages.articles.title}
             </h3>
             <p className="text-blue-50/90 leading-relaxed font-medium text-sm md:text-base">
-              {dict.seo?.articles.description}
+              {seo.pages.articles.description}
             </p>
           </div>
 
@@ -62,7 +61,7 @@ export function Footer({ lang, dict }: FooterProps) {
             href={`mailto:${email}`}
             className="group relative z-10 inline-flex items-center gap-3 bg-white text-blue-700 px-8 py-4 rounded-2xl font-black uppercase tracking-wider text-xs hover:bg-blue-50 transition-all shadow-xl active:scale-95"
           >
-            {labels?.open || 'Contact'}
+            {dict.contact.cta}
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </a>
 
@@ -89,25 +88,27 @@ export function Footer({ lang, dict }: FooterProps) {
             </div>
           </div>
 
-          {/* NAVEGAÇÃO */}
+          {/* NAVEGAÇÃO DINÂMICA (alinhada com domain/navigation.ts) */}
           <nav aria-label={common.navigation}>
             <h4 className={STYLES.footerTitle}>{common.navigation}</h4>
             <ul className="space-y-3">
-               {/* Nota: Como 'nav' não existe no JSON como objeto de links, 
-                  estou usando as chaves de labels ou common.menu como exemplo.
-                  Ajuste conforme sua necessidade de links internos.
-               */}
-              <li>
-                <Link href={`/${lang}`} className={STYLES.footerLink}>
-                  {labels?.home}
-                </Link>
-              </li>
+              {NAV_SECTIONS.map((section) => (
+                <li key={section}>
+                  <Link 
+                    href={`/${lang}${getNavHash(section)}`} 
+                    className={STYLES.footerLink}
+                  >
+                    {/* Tradução dinâmica baseada na seção */}
+                    {dict.seo.pages[section]?.title || section}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 
           {/* IDIOMA */}
           <div>
-            <h4 className={STYLES.footerTitle}>{common.languageSwitcher.split('{')[0]}</h4>
+            <h4 className={STYLES.footerTitle}>{common.languageSwitcher}</h4>
             <div className="max-w-[200px]">
               <LanguageSwitcher currentLang={lang} />
             </div>
@@ -124,7 +125,7 @@ export function Footer({ lang, dict }: FooterProps) {
                 <div className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg group-hover:border-blue-600/30 transition-all">
                   <Mail className="w-4 h-4" />
                 </div>
-                <span>{common.externalLinksNormalized?.email.platform || 'Email'}</span>
+                <span>{dict.contact.emailLabel}</span>
               </div>
               <p className="text-[11px] font-mono font-bold text-slate-400 break-all bg-slate-100/50 dark:bg-slate-800/30 p-4 rounded-xl border border-slate-200/50 dark:border-slate-800/50 group-hover:border-blue-500/20 transition-all">
                 {email}
