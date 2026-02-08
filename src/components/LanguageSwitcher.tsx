@@ -3,15 +3,25 @@
 /**
  * LANGUAGE SWITCHER — SÉRGIO SANTOS (REVISÃO FINAL DE CONSISTÊNCIA)
  * -----------------------------------------------------------------------------
- * Alinhado com: es-AR, es-MX, es-ES, pt-BR e en-US.
+ * Alinhado com as variantes: pt-BR, en-US, es-ES, es-AR, es-MX.
+ * Versão: 2026.02.08
  */
 
 import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 
-import { i18n, type Locale, localeMetadata } from '@/i18n-config'
+import { i18n, type Locale } from '@/i18n-config'
 import { LOCALE_COOKIE, LOCALE_COOKIE_OPTIONS } from '@/lib/locale-cookie'
+
+// Labels simplificados para o seletor (UI)
+const languageLabels: Record<Locale, string> = {
+  'pt-BR': 'PT',
+  'en-US': 'EN',
+  'es-ES': 'ES',
+  'es-AR': 'AR',
+  'es-MX': 'MX',
+}
 
 interface LanguageSwitcherProps {
   readonly currentLang: Locale
@@ -26,15 +36,15 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
     setMounted(true)
   }, [])
 
-  // Skeleton loading para evitar Hydration Mismatch
+  // Skeleton Loading Responsivo
   if (!mounted) {
     return (
-      <div className="h-9 w-48 rounded-lg bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
+      <div className="h-9 w-40 sm:w-48 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
     )
   }
 
   /**
-   * Atualiza o cookie de preferência do usuário para futuras visitas (Middleware)
+   * Atualiza o cookie de preferência do usuário (Middleware-friendly)
    */
   function writeLocaleCookie(locale: Locale) {
     if (typeof document === 'undefined') return
@@ -50,16 +60,13 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
 
   return (
     <nav
-      aria-label="Language selector"
-      className="inline-flex items-center gap-1.5 p-1 rounded-xl border border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md shadow-sm"
+      aria-label="Select Language"
+      className="inline-flex items-center gap-1 p-1 rounded-xl border border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md shadow-sm"
     >
       {availableLocales.map((locale) => {
         const isActive = currentLang === locale
         
-        // Fallback de segurança para o Label (busca no i18n-config)
-        const meta = localeMetadata[locale] || { label: locale.toUpperCase() }
-
-        // Lógica de URL robusta: limpa segmentos vazios e substitui o idioma
+        // Lógica de URL: substitui o locale atual na rota
         const segments = pathname ? pathname.split('/').filter(Boolean) : []
         
         if (segments.length > 0 && availableLocales.includes(segments[0] as Locale)) {
@@ -70,26 +77,27 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
 
         const path = `/${segments.join('/')}`
         const queryString = searchParams?.toString()
-        const finalPath = queryString ? `${path}?${queryString}` : path
+        const href = queryString ? `${path}?${queryString}` : path
 
         return (
           <Link
             key={locale}
-            href={finalPath as any} 
+            href={href} 
             hrefLang={locale}
             onClick={() => writeLocaleCookie(locale)}
             className={`
-              relative px-2 py-1.5 rounded-lg
-              text-[10px] font-bold uppercase tracking-tight
+              relative px-2.5 py-1.5 rounded-lg
+              text-[10px] font-bold uppercase tracking-tighter
               transition-all duration-300 ease-out
+              sm:tracking-tight
               ${
                 isActive
-                  ? 'bg-blue-600 text-white shadow-lg scale-105 z-10'
+                  ? 'bg-blue-600 text-white shadow-md scale-105 z-10'
                   : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white/60 dark:hover:bg-slate-800/60'
               }
             `}
           >
-            {meta.label}
+            {languageLabels[locale] || locale.split('-')[0]}
           </Link>
         )
       })}
@@ -101,7 +109,7 @@ export function LanguageSwitcher({ currentLang }: LanguageSwitcherProps) {
   return (
     <Suspense
       fallback={
-        <div className="h-9 w-48 rounded-lg bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
+        <div className="h-9 w-40 sm:w-48 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
       }
     >
       <LanguageSwitcherContent currentLang={currentLang} />
