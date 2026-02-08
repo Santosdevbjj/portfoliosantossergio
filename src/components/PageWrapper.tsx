@@ -11,12 +11,11 @@
 
 import {
   useEffect,
-  useMemo,
   useState,
   type ReactNode,
 } from 'react'
 
-// Importamos o Provider e o Hook, não o objeto do contexto diretamente para evitar conflitos
+// Importamos o Provider e o Hook
 import { ScrollSpyProvider, useScrollSpy } from '@/contexts/ScrollSpyContext'
 import type { Locale } from '@/types/dictionary'
 
@@ -31,11 +30,12 @@ interface PageWrapperProps {
 }
 
 /* -------------------------------------------------------------------------- */
-/* INNER COMPONENT (Para consumir o context internamente se necessário)       */
+/* INNER COMPONENT                                                            */
 /* -------------------------------------------------------------------------- */
 
 function PageLayoutContent({ children, lang }: { children: ReactNode, lang: Locale }) {
   const [mounted, setMounted] = useState(false)
+  // useScrollSpy pode ser usado aqui para lógica global baseada na seção ativa
   const { activeSection } = useScrollSpy()
 
   useEffect(() => {
@@ -43,13 +43,14 @@ function PageLayoutContent({ children, lang }: { children: ReactNode, lang: Loca
   }, [])
 
   /**
-   * Skeleton estrutural neutro para evitar hydration mismatch
+   * Skeleton estrutural neutro para evitar hydration mismatch.
+   * Mantém a cor de fundo idêntica para uma transição suave.
    */
   if (!mounted) {
     return (
       <div
         className="min-h-screen w-full bg-white dark:bg-[#020617]"
-        aria-busy="true"
+        aria-hidden="true"
       />
     )
   }
@@ -72,9 +73,9 @@ function PageLayoutContent({ children, lang }: { children: ReactNode, lang: Loca
       {/* BACKGROUND DECORATIVO GLOBAL */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+        className="pointer-events-none fixed inset-0 -z-0 overflow-hidden"
       >
-        {/* Glow superior dinâmico */}
+        {/* Glow superior dinâmico - Opacidade ajustada para não ofuscar o texto */}
         <div
           className="
             absolute
@@ -85,20 +86,21 @@ function PageLayoutContent({ children, lang }: { children: ReactNode, lang: Loca
             max-w-[1400px]
             h-[400px]
             md:h-[800px]
-            opacity-40
+            opacity-30
             dark:opacity-20
             transition-opacity
             duration-1000
+            blur-[100px]
           "
           style={{
             background:
-              'radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.2), transparent 70%)',
+              'radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.25), transparent 70%)',
           }}
         />
 
-        {/* Grid de engenharia/dados */}
+        {/* Grid de engenharia/dados - Sutil e elegante */}
         <div
-          className="absolute inset-0 opacity-[0.12] dark:opacity-[0.05]"
+          className="absolute inset-0 opacity-[0.08] dark:opacity-[0.04]"
           style={{
             backgroundImage:
               'radial-gradient(#94a3b8 0.5px, transparent 0.5px)',
@@ -112,6 +114,8 @@ function PageLayoutContent({ children, lang }: { children: ReactNode, lang: Loca
         id="main-content"
         role="main"
         className="
+          relative
+          z-10
           flex-grow
           pt-20
           md:pt-28
