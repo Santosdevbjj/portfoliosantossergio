@@ -1,5 +1,5 @@
 /**
- * HOME PAGE — ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS (v16.2.0-canary)
+ * HOME PAGE — ESTRUTURA ESTRATÉGICA SÉRGIO SANTOS (v16.2.0)
  * -----------------------------------------------------------------------------
  * ✔️ Multilíngue: pt-BR, en-US, es-ES, es-AR, es-MX integrados.
  * ✔️ Responsivo: Grid system e tipografia fluida.
