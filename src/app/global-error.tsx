@@ -1,93 +1,22 @@
-'use client'
+// src/app/global-error.tsx
+'use client';
 
-import { useEffect, useMemo } from 'react'
-import Link from 'next/link'
-import { AlertTriangle, RotateCcw, Home, ShieldAlert } from 'lucide-react'
-import { getDictionary } from '@/dictionaries'
-import type { Locale } from '@/types/dictionary'
-
-interface GlobalErrorProps {
-  readonly error: Error & { digest?: string }
-  readonly reset: () => void
-}
+import { ErrorDisplay } from '@/components/error-display';
 
 export default function GlobalError({
   error,
   reset,
-}: GlobalErrorProps) {
-  
-  const lang: Locale = useMemo(() => {
-    if (typeof window === 'undefined') return 'pt-BR'
-    const segment = window.location.pathname.split('/')[1]
-    const supportedLocales: Locale[] = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"]
-    return supportedLocales.includes(segment as Locale) ? (segment as Locale) : 'pt-BR'
-  }, [])
-
-  const dict = getDictionary(lang)
-  // Ajuste aqui: Pegando as traduções corretas do objeto common
-  const t = dict.common.errorBoundary
-  const commonDict = dict.common 
-
-  useEffect(() => {
-    console.error('🔥 CRITICAL_GLOBAL_ERROR:', {
-      message: error.message,
-      digest: error.digest,
-      timestamp: new Date().toISOString(),
-    })
-  }, [error])
-
+}: {
+  error: Error & { digest?: string; errorId?: string; action?: string };
+  reset: () => void;
+}) {
   return (
-    <html lang={lang}>
-      <body className="min-h-[100dvh] bg-slate-50 dark:bg-[#020617] flex items-center justify-center p-4">
-        <main role="alert" className="w-full max-w-lg bg-white dark:bg-slate-950 border border-red-200 dark:border-red-900/30 rounded-[2rem] p-6 sm:p-8 shadow-2xl text-center space-y-6">
-          
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-full">
-            <ShieldAlert size={12} className="text-red-600 dark:text-red-500" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-red-600 dark:text-red-500">
-              {commonDict.error} 
-            </span>
-          </div>
-
-          <div className="mx-auto w-16 h-16 flex items-center justify-center">
-            <AlertTriangle size={56} className="text-red-500" />
-          </div>
-
-          <div className="space-y-3">
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-              {t.title}
-            </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              {t.description}
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              onClick={() => reset()}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all active:scale-95"
-            >
-              <RotateCcw size={18} />
-              {t.actions.retry}
-            </button>
-
-            <Link
-              href={`/${lang}`}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 transition-all"
-            >
-              <Home size={18} />
-              {t.actions.home}
-            </Link>
-          </div>
-
-          {error.digest && (
-            <div className="pt-4">
-              <code className="inline-block px-2 py-1 bg-slate-100 dark:bg-slate-900 rounded text-[9px] text-slate-500 font-mono">
-                ID: {error.digest}
-              </code>
-            </div>
-          )}
+    <html>
+      <body>
+        <main className="flex h-screen w-screen items-center justify-center">
+          <ErrorDisplay error={error} reset={reset} />
         </main>
       </body>
     </html>
-  )
+  );
 }
