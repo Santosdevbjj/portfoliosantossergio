@@ -1,0 +1,14 @@
+{
+  "InternalServerError": {
+    "message": "Um erro interno não esperado aconteceu.",
+    "action": "Informe ao suporte o ID: {id}"
+  },
+  "NotFoundError": {
+    "message": "Não foi possível encontrar este recurso.",
+    "action": "Verifique o caminho e tente novamente."
+  },
+  "ValidationError": {
+    "message": "Dados inválidos.",
+    "action": "Ajuste os campos destacados."
+  }
+}
