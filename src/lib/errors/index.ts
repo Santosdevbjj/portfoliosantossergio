@@ -2,10 +2,11 @@
 import crypto from "crypto";
 
 /**
- * Contrato base de construção de erros
+ * Contrato base de construção de erros alinhado com ErrorDictionary
  */
 export interface BaseErrorParams {
   name: string;
+  title?: string; // Adicionado para consistência com o dicionário
   message: string;
   action?: string;
   statusCode?: number;
@@ -21,6 +22,7 @@ export interface BaseErrorParams {
 }
 
 export class BaseError extends Error {
+  public readonly title?: string;
   public readonly statusCode: number;
   public readonly errorId: string;
   public readonly requestId?: string;
@@ -35,6 +37,7 @@ export class BaseError extends Error {
     super(params.message);
 
     this.name = params.name;
+    this.title = params.title;
     this.statusCode = params.statusCode ?? 500;
     this.errorId = params.errorId ?? crypto.randomUUID();
     this.requestId = params.requestId;
@@ -45,6 +48,7 @@ export class BaseError extends Error {
     this.type = params.type;
     this.databaseErrorCode = params.databaseErrorCode;
 
+    // TypeScript 6.0+ captura de stack trace otimizada
     if (params.stack) {
       this.stack = params.stack;
     }
@@ -57,22 +61,17 @@ export class BaseError extends Error {
 
 /* =======================
    Erros específicos
+   Nota: As mensagens default aqui servem apenas como "fallback"
+   técnico caso o dicionário i18n falhe.
 ======================= */
 
 export class InternalServerError extends BaseError {
   constructor(params: Partial<BaseErrorParams> = {}) {
     super({
+      ...params,
       name: "InternalServerError",
-      message: params.message ?? "Um erro interno não esperado aconteceu.",
-      action:
-        params.action ??
-        "Informe ao suporte o valor encontrado no campo 'error_id'.",
-      statusCode: params.statusCode ?? 500,
-      requestId: params.requestId,
-      errorId: params.errorId,
-      stack: params.stack,
-      errorLocationCode: params.errorLocationCode,
-      cause: params.cause,
+      message: params.message ?? "Internal Server Error",
+      statusCode: 500,
     });
   }
 }
@@ -80,19 +79,10 @@ export class InternalServerError extends BaseError {
 export class NotFoundError extends BaseError {
   constructor(params: Partial<BaseErrorParams> = {}) {
     super({
+      ...params,
       name: "NotFoundError",
-      message:
-        params.message ??
-        "Não foi possível encontrar este recurso no sistema.",
-      action:
-        params.action ??
-        "Verifique se o caminho (PATH) está correto.",
+      message: params.message ?? "Resource Not Found",
       statusCode: 404,
-      requestId: params.requestId,
-      errorId: params.errorId,
-      stack: params.stack,
-      errorLocationCode: params.errorLocationCode,
-      key: params.key,
     });
   }
 }
@@ -100,17 +90,10 @@ export class NotFoundError extends BaseError {
 export class ValidationError extends BaseError {
   constructor(params: Partial<BaseErrorParams> = {}) {
     super({
+      ...params,
       name: "ValidationError",
-      message: params.message ?? "Um erro de validação ocorreu.",
-      action:
-        params.action ??
-        "Ajuste os dados enviados e tente novamente.",
-      statusCode: params.statusCode ?? 400,
-      stack: params.stack,
-      context: params.context,
-      errorLocationCode: params.errorLocationCode,
-      key: params.key,
-      type: params.type,
+      message: params.message ?? "Validation Failed",
+      statusCode: 400,
     });
   }
 }
@@ -118,15 +101,10 @@ export class ValidationError extends BaseError {
 export class UnauthorizedError extends BaseError {
   constructor(params: Partial<BaseErrorParams> = {}) {
     super({
+      ...params,
       name: "UnauthorizedError",
-      message: params.message ?? "Usuário não autenticado.",
-      action:
-        params.action ??
-        "Verifique se você está autenticado com uma sessão ativa.",
+      message: params.message ?? "Unauthorized",
       statusCode: 401,
-      requestId: params.requestId,
-      stack: params.stack,
-      errorLocationCode: params.errorLocationCode,
     });
   }
 }
@@ -134,17 +112,10 @@ export class UnauthorizedError extends BaseError {
 export class ForbiddenError extends BaseError {
   constructor(params: Partial<BaseErrorParams> = {}) {
     super({
+      ...params,
       name: "ForbiddenError",
-      message:
-        params.message ??
-        "Você não possui permissão para executar esta ação.",
-      action:
-        params.action ??
-        "Verifique se você possui permissão para executar esta ação.",
+      message: params.message ?? "Forbidden",
       statusCode: 403,
-      requestId: params.requestId,
-      stack: params.stack,
-      errorLocationCode: params.errorLocationCode,
     });
   }
 }
@@ -152,17 +123,10 @@ export class ForbiddenError extends BaseError {
 export class TooManyRequestsError extends BaseError {
   constructor(params: Partial<BaseErrorParams> = {}) {
     super({
+      ...params,
       name: "TooManyRequestsError",
-      message:
-        params.message ??
-        "Você realizou muitas requisições recentemente.",
-      action:
-        params.action ??
-        "Tente novamente mais tarde ou contate o suporte.",
+      message: params.message ?? "Too Many Requests",
       statusCode: 429,
-      context: params.context,
-      stack: params.stack,
-      errorLocationCode: params.errorLocationCode,
     });
   }
 }
@@ -170,16 +134,10 @@ export class TooManyRequestsError extends BaseError {
 export class UnprocessableEntityError extends BaseError {
   constructor(params: Partial<BaseErrorParams> = {}) {
     super({
+      ...params,
       name: "UnprocessableEntityError",
-      message:
-        params.message ??
-        "Não foi possível realizar esta operação.",
-      action:
-        params.action ??
-        "Os dados enviados estão corretos, porém a operação falhou.",
+      message: params.message ?? "Unprocessable Entity",
       statusCode: 422,
-      stack: params.stack,
-      errorLocationCode: params.errorLocationCode,
     });
   }
 }
@@ -187,18 +145,10 @@ export class UnprocessableEntityError extends BaseError {
 export class MethodNotAllowedError extends BaseError {
   constructor(params: Partial<BaseErrorParams> = {}) {
     super({
+      ...params,
       name: "MethodNotAllowedError",
-      message:
-        params.message ??
-        "Método não permitido para este recurso.",
-      action:
-        params.action ??
-        "Verifique se o método HTTP utilizado é válido.",
+      message: params.message ?? "Method Not Allowed",
       statusCode: 405,
-      requestId: params.requestId,
-      errorId: params.errorId,
-      stack: params.stack,
-      errorLocationCode: params.errorLocationCode,
     });
   }
 }
