@@ -1,52 +1,52 @@
 {
   "compilerOptions": {
-    /* NATIVE RUNTIME & TARGET (Updated to ESNext para TS 5.9) */
+    /* --- BRIDGE TO TS 6.0 / TSGO ENGINE OPTIMIZATION --- */
     "target": "ESNext", 
     "lib": ["dom", "dom.iterable", "esnext"],
-    
-    /* TSGO ENGINE OPTIMIZATION (Project Corsa Ready) */
-    "verbatimModuleSyntax": true,   
+    "module": "ESNext",
+    "moduleResolution": "Bundler", // OBRIGATÓRIO para TS 6.0 (deprecia node10)
+    "verbatimModuleSyntax": true,   // Garante paridade com compiladores nativos (Go/Rust)
     "isolatedModules": true,         
-    "moduleDetection": "force",      
-    
-    /* RIGOR DE MISSÃO CRÍTICA (Zero Runtime Errors) */
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* --- RIGOR DE MISSÃO CRÍTICA (Zero Runtime Errors) --- */
     "strict": true,
     "noUncheckedIndexedAccess": true, 
     "exactOptionalPropertyTypes": true, 
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    /* NOVIDADE TS 5.9: Evita efeitos colaterais em imports de tipos */
-    "noUncheckedSideEffectImports": true, 
+    "noUnusedParameters": false, // Mantido false para flexibilidade em handlers
+    "noUncheckedSideEffectImports": true, // TS 5.9+
 
-    /* NEXT.JS 16 & REACT 19 ARCHITECTURE */
-    "module": "ESNext",
-    "moduleResolution": "Bundler",   
+    /* --- PERFORMANCE: EXPLICIT TYPES (TS 6.0 Speedup) --- */
+    /* Evita o carregamento automático de todo o @types de node_modules */
+    "types": ["node", "react", "react-dom"], 
+
+    /* --- NEXT.JS 16 & REACT 19 ARCHITECTURE --- */
     "jsx": "react-jsx",
-    "noEmit": true,                  
+    "incremental": true,
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo",
     
-    /* INTEROP & SECURITY */
+    /* --- INTEROP & SECURITY --- */
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "skipLibCheck": true,            
+    "skipLibCheck": true, // Importante para não travar em tipos de terceiros legados          
     "forceConsistentCasingInFileNames": true,
 
-    /* INFRASTRUCTURE PATHS */
-    "baseUrl": ".",
+    /* --- INFRASTRUCTURE PATHS (TS 6.0 Style) --- */
+    /* Removido baseUrl para evitar depreciação. O paths agora usa caminhos relativos ao arquivo. */
     "paths": {
       "@/*": ["./src/*"]
     },
 
-    /* NATIVE BUILD CACHE & OUTPUT (Alinhado com tsc --init 5.9) */
-    "incremental": true,
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo",
+    /* --- DEBUGGING & AUDIT --- */
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
 
-    /* PLUGINS */
     "plugins": [
       {
         "name": "next"
@@ -66,6 +66,8 @@
     "node_modules", 
     ".next", 
     "out",
-    "build"
+    "build",
+    "**/*.spec.ts", // Exclui testes do build principal para performance
+    "**/*.test.ts"
   ]
 }
