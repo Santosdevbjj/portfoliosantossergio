@@ -1,26 +1,24 @@
-"use client";
+// src/app/error.tsx
+'use client';
 
-export default function GlobalError({
+import { useEffect } from 'react';
+import { ErrorDisplay } from '@/components/error-display';
+
+export default function Error({
   error,
   reset,
 }: {
-  error: Error;
+  error: Error & { digest?: string; errorId?: string; action?: string };
   reset: () => void;
 }) {
-  return (
-    <html>
-      <body className="flex min-h-screen flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold">Algo deu errado</h1>
-        <p className="mt-4 text-gray-500">
-          {error.message}
-        </p>
-        <button
-          onClick={reset}
-          className="mt-6 rounded bg-blue-600 px-4 py-2 text-white"
-        >
-          Tentar novamente
-        </button>
-      </body>
-    </html>
-  );
+  useEffect(() => {
+    // Aqui você integraria com Sentry ou LogRocket
+    console.error("LOG_CRITICO:", {
+      message: error.message,
+      id: error.errorId,
+      stack: error.stack
+    });
+  }, [error]);
+
+  return <ErrorDisplay error={error} reset={reset} />;
 }
