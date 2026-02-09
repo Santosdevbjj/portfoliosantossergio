@@ -1,0 +1,14 @@
+{
+  "InternalServerError": {
+    "message": "An unexpected internal error occurred.",
+    "action": "Please inform support with the ID: {id}"
+  },
+  "NotFoundError": {
+    "message": "This resource could not be found.",
+    "action": "Check the path and try again."
+  },
+  "ValidationError": {
+    "message": "Invalid data.",
+    "action": "Adjust the highlighted fields."
+  }
+}
