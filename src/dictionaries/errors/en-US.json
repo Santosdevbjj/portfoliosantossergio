@@ -1,14 +1,42 @@
-{
+"errors": {
   "InternalServerError": {
-    "message": "An unexpected internal error occurred.",
-    "action": "Please inform support with the ID: {id}"
+    "title": "Internal Error",
+    "message": "An unexpected error occurred on our servers.",
+    "action": "Provide the error ID to technical support."
   },
   "NotFoundError": {
-    "message": "This resource could not be found.",
-    "action": "Check the path and try again."
+    "title": "Not Found",
+    "message": "The resource you are looking for doesn't exist.",
+    "action": "Check the URL or return to the home page."
   },
   "ValidationError": {
-    "message": "Invalid data.",
-    "action": "Adjust the highlighted fields."
+    "title": "Validation Error",
+    "message": "The provided data is invalid or incomplete.",
+    "action": "Review the highlighted fields and try again."
+  },
+  "UnauthorizedError": {
+    "title": "Unauthorized",
+    "message": "Your session has expired or you are not logged in.",
+    "action": "Please log in to access this area."
+  },
+  "ForbiddenError": {
+    "title": "Access Denied",
+    "message": "You do not have permission to perform this action.",
+    "action": "Contact the admin if you believe this is an error."
+  },
+  "TooManyRequestsError": {
+    "title": "Too Many Requests",
+    "message": "You have reached the temporary request limit.",
+    "action": "Wait a few minutes before trying again."
+  },
+  "UnprocessableEntityError": {
+    "title": "Invalid Operation",
+    "message": "Unable to process the submitted instructions.",
+    "action": "Verify the data logic and try again."
+  },
+  "MethodNotAllowedError": {
+    "title": "Method Not Allowed",
+    "message": "The HTTP method used is not supported.",
+    "action": "Use a valid method (GET, POST, etc)."
   }
 }
