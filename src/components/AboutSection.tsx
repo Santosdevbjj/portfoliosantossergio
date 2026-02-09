@@ -20,11 +20,12 @@ interface AboutSectionProps {
 }
 
 export default function AboutSection({ dict, lang }: AboutSectionProps) {
+  // Desestruturação segura para evitar erros caso o dicionário mude
   const { about, common } = dict;
   
   const sectionId = getSectionId(NavSection.ABOUT);
 
-  // Schema.org para SEO Técnico
+  // Schema.org para SEO Técnico — Melhora visibilidade em múltiplos idiomas
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
@@ -44,6 +45,7 @@ export default function AboutSection({ dict, lang }: AboutSectionProps) {
     },
   };
 
+  // Guard Clause para evitar quebra se o dicionário estiver incompleto
   if (!about) return null;
 
   return (
@@ -62,7 +64,7 @@ export default function AboutSection({ dict, lang }: AboutSectionProps) {
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
           
-          {/* COLUNA 1: IMAGEM (Ordem 1 no mobile) */}
+          {/* COLUNA 1: IMAGEM (Ordem 1 no mobile, 2 no desktop para layout moderno) */}
           <div className="relative order-1 lg:order-2 lg:sticky lg:top-32">
             <div className="relative aspect-[4/5] rounded-[2.5rem] md:rounded-[4rem] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800">
               <Image
@@ -76,7 +78,7 @@ export default function AboutSection({ dict, lang }: AboutSectionProps) {
               
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-70" />
 
-              {/* STATS OVERLAY */}
+              {/* STATS OVERLAY — Consistente com about.stats do dicionário */}
               <div className="absolute bottom-4 left-4 right-4 md:bottom-8 md:left-8 md:right-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-[2rem] p-6 shadow-2xl border border-white/20">
                 <div className="flex justify-around items-center gap-4">
                    <div className="text-center">
@@ -109,7 +111,7 @@ export default function AboutSection({ dict, lang }: AboutSectionProps) {
             </div>
           </div>
 
-          {/* COLUNA 2: TEXTO (Ordem 2 no mobile) */}
+          {/* COLUNA 2: TEXTO (Ordem 2 no mobile, 1 no desktop) */}
           <div className="space-y-12 order-2 lg:order-1">
             <header className="space-y-6">
               <div className="flex items-center gap-2">
@@ -133,6 +135,7 @@ export default function AboutSection({ dict, lang }: AboutSectionProps) {
               </div>
             </header>
 
+            {/* HIGHLIGHTS — Mapeado dinamicamente do dicionário */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
               {about.highlights.map((item, idx) => (
                 <div 
