@@ -1,14 +1,42 @@
-{
+"errors": {
   "InternalServerError": {
-    "message": "Ocurrió un error interno inesperado.",
-    "action": "Informe al soporte el ID: {id}"
+    "title": "Error Interno",
+    "message": "Ha ocurrido un error inesperado en nuestros servidores.",
+    "action": "Facilite el ID del error al soporte técnico."
   },
   "NotFoundError": {
-    "message": "No fue posible encontrar este recurso.",
-    "action": "Verifique la ruta e inténtelo nuevamente."
+    "title": "No Encontrado",
+    "message": "El recurso que busca no existe o ha sido movido.",
+    "action": "Compruebe la URL o vuelva a la página de inicio."
   },
   "ValidationError": {
-    "message": "Datos inválidos.",
-    "action": "Ajuste los campos resaltados."
+    "title": "Error de Validación",
+    "message": "Los datos enviados son inválidos o están incompletos.",
+    "action": "Revise los campos marcados e inténtelo de nuevo."
+  },
+  "UnauthorizedError": {
+    "title": "No Autenticado",
+    "message": "Su sesión ha caducado o no ha iniciado sesión.",
+    "action": "Por favor, inicie sesión para acceder a esta área."
+  },
+  "ForbiddenError": {
+    "title": "Acceso Denegado",
+    "message": "No tiene permiso para realizar esta acción.",
+    "action": "Contacte con el administrador si cree que es un error."
+  },
+  "TooManyRequestsError": {
+    "title": "Demasiadas Peticiones",
+    "message": "Ha alcanzado el límite temporal de peticiones.",
+    "action": "Espere unos minutos antes de intentarlo de nuevo."
+  },
+  "UnprocessableEntityError": {
+    "title": "Operación Inválida",
+    "message": "No se han podido procesar las instrucciones enviadas.",
+    "action": "Verifique la lógica de los datos y reintente."
+  },
+  "MethodNotAllowedError": {
+    "title": "Método No Permitido",
+    "message": "El método HTTP utilizado no está permitido.",
+    "action": "Utilice un método válido (GET, POST, etc)."
   }
 }
