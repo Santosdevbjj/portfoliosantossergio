@@ -1,5 +1,12 @@
 ## 📊 Sérgio Santos | Data Science & Critical Systems Specialist 
 
+
+
+Este projeto foi desenvolvido utilizando TypeScript 6.0 (Bridge Release), garantindo compatibilidade total com o futuro compilador nativo (Project Corsa). Foram adotadas práticas de Strict Mode padrão, remoção de Namespaces legados e configuração de módulos ESNext para garantir performance de compilação 10x superior com o novo tsgo CLI.
+
+
+
+
 **1. Problema de Negócio (Motivação)**
 
 No cenário atual de tecnologia e dados, a visibilidade de um profissional sênior não pode depender apenas de uma lista de competências. 
