@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import PageWrapper from "@/components/PageWrapper";
 import HeroSection from "@/components/HeroSection";
 import FeaturedProject from "@/components/FeaturedProject";
-import ProjectsSection from "@/components/ProjectsSection";
+import ProjectsSection from "@/components/ProjectSection";
 import FeaturedArticleSection from "@/components/FeaturedArticleSection";
 import AboutSection from "@/components/AboutSection";
 
