@@ -22,16 +22,19 @@ const dictionaries = {
 
 type SupportedLocale = keyof typeof dictionaries;
 
+type AppError = Error & {
+  digest?: string;
+  statusCode?: number;
+  action?: string;
+  errorId?: string;
+  title?: string;
+};
+
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & {
-    digest?: string;
-    errorId?: string;
-    action?: string;
-    title?: string;
-  };
+  error: AppError;
   reset: () => void;
 }) {
   const getLocale = (): SupportedLocale => {
@@ -53,17 +56,25 @@ export default function Error({
     dictionaries[locale]?.errors ??
     dictionaries['pt-BR'].errors;
 
-  const errorKey = (
-    error.name in dict ? error.name : 'InternalServerError'
-  ) as keyof ErrorDictionary;
+  const errorKey: keyof ErrorDictionary =
+    error.name in dict
+      ? (error.name as keyof ErrorDictionary)
+      : 'InternalServerError';
 
-  const translatedError = {
-    ...error,
-    title: error.title || dict[errorKey].title,
+  // 🔒 Construção segura — sem espalhar Error
+  const translatedError: AppError = {
+    name: error.name,
     message: error.message || dict[errorKey].message,
-    action: error.action || dict[errorKey].action,
-    errorId: error.errorId || error.digest,
+    stack: error.stack,
+    digest: error.digest,
+    title: error.title ?? dict[errorKey].title,
+    action: error.action ?? dict[errorKey].action,
   };
+
+  // Só adiciona se existir
+  if (error.errorId || error.digest) {
+    translatedError.errorId = error.errorId ?? error.digest;
+  }
 
   useEffect(() => {
     console.error('CriticalErrorBoundary:', {
