@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 import { ErrorDisplay } from '@/components/error-display';
-import { ErrorDictionary } from '@/types/error-dictionary';
+import type { ErrorDictionary } from '@/types/error-dictionary';
 
 // Importação dos dicionários para tradução no Client Side
 import ptBR from "@/dictionaries/errors/pt-BR.json";
