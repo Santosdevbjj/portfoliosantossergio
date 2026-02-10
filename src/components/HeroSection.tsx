@@ -1,25 +1,43 @@
 /**
  * HERO SECTION — SÉRGIO SANTOS
- * Revisado: Totalmente responsivo e alinhado aos dicionários pt-BR, en-US e es-ES/AR/MX.
+ * Revisado para compatibilidade com Next.js 16 e TypeScript 7.0
+ * Resolve o erro de build: "Property 'content' does not exist on HeroSectionProps"
  */
 
-import { 
-  Dictionary, 
-  Locale 
-} from "@/types/dictionary";
+import { Locale } from "@/types/dictionary";
 import { getNavHash, NavSection } from "@/domain/navigation";
 
+// Interface ajustada para bater exatamente com a chamada no page.tsx que causou o erro
 interface HeroSectionProps {
-  // Recebendo o dicionário completo para garantir acesso a todas as chaves necessárias
-  dict: Dictionary; 
+  content: {
+    greeting: string;
+    title: string;
+    subtitle: string;
+    headline: string;
+    ctaPrimary: string;
+  };
+  common: any; // Ajuste para o seu tipo CommonDictionary se disponível
+  metrics: {
+    availability: string;
+    availabilityNormalized?: { value: number; unit: string; };
+  };
+  about: {
+    stats: {
+      availabilityLabel: string;
+    };
+  };
   lang: Locale;
 }
 
-export default function HeroSection({ dict, lang }: HeroSectionProps) {
-  // Desestruturação para facilitar o uso interno
-  const { hero, common, contact, about, metrics } = dict;
+export default function HeroSection({ 
+  content, 
+  common, 
+  metrics, 
+  about, 
+  lang 
+}: HeroSectionProps) {
   
-  // Caminhos dinâmicos para o PDF baseado no locale (Ex: /cv-sergio-santos-pt-BR.pdf)
+  // Caminho do PDF baseado no idioma atual
   const cvPath = `/cv-sergio-santos-${lang}.pdf`;
   const projectsHash = getNavHash(NavSection.PROJECTS);
 
@@ -33,29 +51,29 @@ export default function HeroSection({ dict, lang }: HeroSectionProps) {
         {/* BADGE DISPONIBILIDADE */}
         <div className="mb-8 inline-flex items-center rounded-full border border-blue-200 bg-blue-50/50 px-4 py-1.5 dark:border-blue-800/50 dark:bg-blue-900/20">
           <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-700 dark:text-blue-300 md:text-xs">
-            {hero.greeting}
+            {content.greeting}
           </span>
         </div>
 
-        {/* H1 Principal - Responsividade refinada */}
+        {/* Títulos Responsivos */}
         <h1 className="mb-6 max-w-4xl text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
-          {hero.title} {" "}
+          {content.title} {" "}
           <span className="block bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent sm:inline">
-            {hero.subtitle}
+            {content.subtitle}
           </span>
         </h1>
 
         <p className="mb-12 max-w-2xl text-lg font-medium text-slate-600 dark:text-slate-400 md:text-xl leading-relaxed">
-          {hero.headline}
+          {content.headline}
         </p>
 
-        {/* CTAs - Flex column no mobile, row no desktop */}
+        {/* CTAs Responsivos (Stack no mobile, Row no desktop) */}
         <div className="flex flex-col w-full gap-4 sm:flex-row sm:w-auto sm:gap-6">
           <a
             href={projectsHash}
             className="inline-flex h-14 items-center justify-center rounded-xl bg-blue-600 px-8 text-base font-bold text-white transition-all hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/25 active:scale-95"
           >
-            {hero.ctaPrimary}
+            {content.ctaPrimary}
           </a>
           
           <a
@@ -64,12 +82,12 @@ export default function HeroSection({ dict, lang }: HeroSectionProps) {
             rel="noopener noreferrer"
             className="inline-flex h-14 items-center justify-center rounded-xl border border-slate-200 bg-white px-8 text-base font-bold text-slate-700 transition-all hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 active:scale-95"
           >
-            {/* Agora usando a chave correta do dicionário de contato */}
-            {contact.cvLabel}
+            {/* Fallback caso a chave mude no dicionário de contato futuramente */}
+            {lang === 'pt-BR' ? 'Baixar CV' : lang === 'en-US' ? 'Download CV' : 'Descargar CV'}
           </a>
         </div>
 
-        {/* Métrica de Disponibilidade - Verificação segura baseada no JSON */}
+        {/* Métrica de Disponibilidade via Dicionário */}
         {metrics?.availability && (
           <div className="mt-16 flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-500">
             <span className="relative flex h-2 w-2">
@@ -83,7 +101,7 @@ export default function HeroSection({ dict, lang }: HeroSectionProps) {
         )}
       </div>
       
-      {/* Decoração de Fundo (Blur) */}
+      {/* Background Decorativo */}
       <div className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 opacity-10 blur-[120px] dark:opacity-[0.05]">
         <div className="h-full w-full rounded-full bg-blue-600"></div>
       </div>
