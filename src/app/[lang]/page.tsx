@@ -1,6 +1,6 @@
 // src/app/[lang]/page.tsx
 import type { Metadata, Viewport } from "next";
-import type { Locale, Dictionary } from "@/types/dictionary";
+import type { Locale } from "@/types/dictionary";
 
 import { getDictionary } from "@/dictionaries";
 import { getGitHubProjects } from "@/services/githubService";
@@ -9,10 +9,9 @@ import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 
-interface PageProps {
-  params: Promise<{ lang: Locale }>;
-}
-
+/**
+ * Static Params — idiomas suportados
+ */
 export async function generateStaticParams() {
   return [
     { lang: "pt-BR" },
@@ -23,6 +22,9 @@ export async function generateStaticParams() {
   ];
 }
 
+/**
+ * Viewport global
+ */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -32,10 +34,15 @@ export const viewport: Viewport = {
   ],
 };
 
-export async function generateMetadata(
-  { params }: PageProps
-): Promise<Metadata> {
-  const { lang } = await params;
+/**
+ * SEO dinâmico por idioma
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: { lang: Locale };
+}): Promise<Metadata> {
+  const { lang } = params;
   const dict = await getDictionary(lang);
 
   const siteUrl =
@@ -60,81 +67,89 @@ export async function generateMetadata(
   };
 }
 
-export default async function HomePage({ params }: PageProps) {
-  const { lang } = await params;
+/**
+ * Home Page — Server Component
+ */
+export default async function HomePage({
+  params,
+}: {
+  params: { lang: Locale };
+}) {
+  const { lang } = params;
 
-  const dictionary: Dictionary = await getDictionary(lang);
   const projects = await getGitHubProjects();
 
   return (
-    <ProxyPage dictionary={dictionary}>
-      <main>
-        {/* HERO */}
-        <HeroSection dict={dictionary} lang={lang} />
+    <ProxyPage lang={lang}>
+      {(dictionary) => (
+        <main>
+          {/* HERO */}
+          <HeroSection dict={dictionary} lang={lang} />
 
-        {/* ABOUT */}
-        <AboutSection
-          content={dictionary.about}
-          metrics={dictionary.metrics}
-        />
+          {/* ABOUT */}
+          <AboutSection
+            content={dictionary.about}
+            metrics={dictionary.metrics}
+          />
 
-        {/* PROJECTS */}
-        <section
-          id="projects"
-          className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-24 max-w-7xl"
-        >
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-12">
-            {dictionary.projects.title}
-          </h2>
+          {/* PROJECTS */}
+          <section
+            id="projects"
+            className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-24 max-w-7xl"
+          >
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-12">
+              {dictionary.projects.title}
+            </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {projects.length > 0 ? (
-              projects.map((project) => (
-                <article
-                  key={project.id}
-                  className="group p-6 border rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10"
-                >
-                  <span className="text-[10px] font-bold uppercase text-blue-600">
-                    {dictionary.projects.categories[
-                      project.technology.labelKey as keyof typeof dictionary.projects.categories
-                    ] ?? project.technology.id}
-                  </span>
-
-                  <h3 className="text-xl font-bold mt-2">
-                    {project.name}
-                  </h3>
-
-                  <p className="text-sm mt-3 text-slate-600 dark:text-slate-400 line-clamp-3">
-                    {project.description}
-                  </p>
-
-                  <a
-                    href={project.htmlUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-6 text-xs font-bold underline"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {projects.length > 0 ? (
+                projects.map((project) => (
+                  <article
+                    key={project.id}
+                    className="group p-6 border rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10"
                   >
-                    {dictionary.projects.viewProject}
-                  </a>
-                </article>
-              ))
-            ) : (
-              <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-200 rounded-3xl">
-                <p className="text-slate-500">
-                  {dictionary.states.emptyProjects.description}
-                </p>
-              </div>
-            )}
-          </div>
-        </section>
+                    <span className="text-[10px] font-bold uppercase text-blue-600">
+                      {dictionary.projects.categories[
+                        project.technology.labelKey as keyof typeof dictionary.projects.categories
+                      ] ?? project.technology.id}
+                    </span>
 
-        {/* FOOTER */}
-        <footer className="border-t border-slate-200 py-12 text-center">
-          <p className="text-sm text-slate-500">
-            {dictionary.common.footer}
-          </p>
-        </footer>
-      </main>
+                    <h3 className="text-xl font-bold mt-2">
+                      {project.name}
+                    </h3>
+
+                    <p className="text-sm mt-3 text-slate-600 dark:text-slate-400 line-clamp-3">
+                      {project.description}
+                    </p>
+
+                    <a
+                      href={project.htmlUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-6 text-xs font-bold underline"
+                    >
+                      {dictionary.projects.viewProject}
+                    </a>
+                  </article>
+                ))
+              ) : (
+                <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-200 rounded-3xl">
+                  <p className="text-slate-500">
+                    {dictionary.states.emptyProjects.description}
+                  </p>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* FOOTER */}
+          <footer className="border-t border-slate-200 py-12 text-center">
+            <p className="text-sm text-slate-500">
+              {dictionary.common.footer}
+            </p>
+          </footer>
+        </main>
+      )}
     </ProxyPage>
   );
 }
