@@ -41,10 +41,10 @@ export default function Error({
   const getLocale = (): SupportedLocale => {
     if (typeof window === 'undefined') return 'pt-BR';
 
-    const browserLang = navigator.language as SupportedLocale;
-    if (browserLang in dictionaries) return browserLang;
+    const lang = navigator.language as SupportedLocale;
+    if (lang in dictionaries) return lang;
 
-    const prefix = browserLang.split('-')[0];
+    const prefix = lang.split('-')[0];
     if (prefix === 'en') return 'en-US';
     if (prefix === 'es') return 'es-ES';
 
@@ -62,24 +62,26 @@ export default function Error({
       ? (error.name as keyof ErrorDictionary)
       : 'InternalServerError';
 
+  // ✅ NÃO define campos opcionais aqui
   const translatedError: AppError = {
     name: error.name,
     message: error.message || dict[errorKey].message,
     title: dict[errorKey].title,
     action: dict[errorKey].action,
-    digest: error.digest,
-    stack: error.stack,
-    errorId: error.digest,
   };
 
+  // ✅ Só adiciona SE existir
+  if (error.digest) {
+    translatedError.errorId = error.digest;
+    translatedError.digest = error.digest;
+  }
+
+  if (error.stack) {
+    translatedError.stack = error.stack;
+  }
+
   useEffect(() => {
-    console.error('CriticalErrorBoundary', {
-      name: translatedError.name,
-      message: translatedError.message,
-      errorId: translatedError.errorId,
-      digest: translatedError.digest,
-      stack: translatedError.stack,
-    });
+    console.error('CriticalErrorBoundary', translatedError);
   }, [translatedError]);
 
   return (
