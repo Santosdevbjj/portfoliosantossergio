@@ -81,10 +81,7 @@ export default async function HomePage({ params }: PageProps) {
             lang={lang}
           />
 
-          <AboutSection 
-            content={dictionary.about} 
-            metrics={dictionary.metrics} 
-          />
+          <AboutSection lang={lang} dict={dictionary} />
 
           <div id="projects" className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-24 max-w-7xl">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-12">
@@ -101,6 +98,7 @@ export default async function HomePage({ params }: PageProps) {
                     <h3 className="text-xl font-bold mt-2">{project.name}</h3>
                     <p className="text-sm mt-3 text-slate-600 dark:text-slate-400 line-clamp-3">
                       {project.description}
+                 
                     </p>
                     <a href={project.htmlUrl} target="_blank" className="inline-block mt-6 text-xs font-bold underline">
                       {dictionary.projects.viewProject}
