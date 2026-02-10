@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { ErrorDisplay } from '@/components/error-display';
 import type { ErrorDictionary } from '@/types/error-dictionary';
 
-// Importação dos dicionários
 import ptBR from '@/dictionaries/errors/pt-BR.json';
 import enUS from '@/dictionaries/errors/en-US.json';
 import esES from '@/dictionaries/errors/es-ES.json';
@@ -22,19 +21,21 @@ const dictionaries = {
 
 type SupportedLocale = keyof typeof dictionaries;
 
-type AppError = Error & {
-  digest?: string;
-  statusCode?: number;
+type AppError = {
+  name: string;
+  message: string;
+  title?: string;
   action?: string;
   errorId?: string;
-  title?: string;
+  digest?: string;
+  stack?: string;
 };
 
 export default function Error({
   error,
   reset,
 }: {
-  error: AppError;
+  error: Error & { digest?: string };
   reset: () => void;
 }) {
   const getLocale = (): SupportedLocale => {
@@ -61,30 +62,25 @@ export default function Error({
       ? (error.name as keyof ErrorDictionary)
       : 'InternalServerError';
 
-  // 🔒 Construção segura — sem espalhar Error
   const translatedError: AppError = {
     name: error.name,
     message: error.message || dict[errorKey].message,
-    stack: error.stack,
+    title: dict[errorKey].title,
+    action: dict[errorKey].action,
     digest: error.digest,
-    title: error.title ?? dict[errorKey].title,
-    action: error.action ?? dict[errorKey].action,
+    stack: error.stack,
+    errorId: error.digest,
   };
 
-  // Só adiciona se existir
-  if (error.errorId || error.digest) {
-    translatedError.errorId = error.errorId ?? error.digest;
-  }
-
   useEffect(() => {
-    console.error('CriticalErrorBoundary:', {
-      name: error.name,
-      message: error.message,
-      id: translatedError.errorId,
-      digest: error.digest,
-      stack: error.stack,
+    console.error('CriticalErrorBoundary', {
+      name: translatedError.name,
+      message: translatedError.message,
+      errorId: translatedError.errorId,
+      digest: translatedError.digest,
+      stack: translatedError.stack,
     });
-  }, [error, translatedError.errorId]);
+  }, [translatedError]);
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-white dark:bg-slate-950">
