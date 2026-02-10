@@ -1,126 +1,68 @@
-'use client';
+// components/AboutSection.tsx
+import React from "react";
 
-import Image from 'next/image';
-import Script from 'next/script';
-import { CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
-import { NavSection, getSectionId } from '@/domain/navigation';
-
-import type { Locale, Dictionary } from '@/types/dictionary';
-
-interface AboutSectionProps {
-  lang: Locale;
-  dict: Dictionary;
+export interface AboutMetric {
+  label: string;
+  value: string;
 }
 
-export default function AboutSection({ lang, dict }: AboutSectionProps) {
-  const content = dict.about;
-  const metrics = dict.metrics;
-  const common = dict.common;
+export interface AboutContent {
+  title: string;
+  subtitle?: string;
+  description: string;
+  metrics?: AboutMetric[];
+}
 
-  if (!content) return null;
+export interface AboutSectionProps {
+  content: AboutContent;
+}
 
-  const sectionId = getSectionId(NavSection.ABOUT);
-
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: 'Sérgio Santos',
-    jobTitle: common.role,
-    description: content.description,
-    knowsAbout: content.highlights,
-    address: {
-      '@type': 'PostalAddress',
-      addressCountry: lang.split('-')[1] ?? 'BR',
-    },
-  };
+const AboutSection: React.FC<AboutSectionProps> = ({ content }) => {
+  const { title, subtitle, description, metrics } = content;
 
   return (
     <section
-      id={sectionId}
-      lang={lang}
-      className="relative py-24 lg:py-40 bg-white dark:bg-[#020617]"
+      id="about"
+      className="w-full py-16 px-4 md:px-8 lg:px-16 bg-background text-foreground"
     >
-      <Script
-        id="schema-about"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-      />
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header */}
+        <header className="space-y-2">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+            {title}
+          </h2>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {subtitle && (
+            <p className="text-lg text-muted-foreground">{subtitle}</p>
+          )}
+        </header>
 
-          {/* VISUAL */}
-          <div className="relative">
-            <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
-              <Image
-                src="/images/sergio-santos-profile.png"
-                alt={`Sérgio Santos – ${common.role}`}
-                fill
-                priority
-                className="object-cover"
-              />
+        {/* Description */}
+        <p className="text-base md:text-lg leading-relaxed max-w-3xl">
+          {description}
+        </p>
 
-              <div className="absolute bottom-6 left-6 right-6 bg-white/90 dark:bg-slate-900/90 rounded-2xl p-6">
-                <div className="grid grid-cols-2 text-center gap-4">
-                  <div>
-                    <span className="block text-3xl font-black text-blue-600">
-                      {content.stats.experienceValue}
-                    </span>
-                    <span className="text-xs font-bold">
-                      {content.stats.experienceLabel}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="block text-3xl font-black text-blue-600">
-                      {content.stats.availabilityValue}
-                    </span>
-                    <span className="text-xs font-bold">
-                      {content.stats.availabilityLabel}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex justify-center gap-2 text-xs font-bold">
-                  <Zap className="w-4 h-4 text-blue-500" />
-                  {content.stats.automation}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* TEXTO */}
-          <div className="space-y-10">
-            <header className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30">
-                <ShieldCheck className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-bold uppercase">
-                  {content.title}
+        {/* Metrics */}
+        {metrics && metrics.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pt-8">
+            {metrics.map((metric, index) => (
+              <div
+                key={index}
+                className="flex flex-col items-center justify-center rounded-xl border border-border p-4 text-center shadow-sm"
+              >
+                <span className="text-2xl font-bold text-primary">
+                  {metric.value}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {metric.label}
                 </span>
               </div>
-
-              <h2 className="text-4xl lg:text-6xl font-black">
-                {content.differentialTitle}
-              </h2>
-            </header>
-
-            <p className="text-lg">{content.description}</p>
-            <p className="opacity-80">{content.differentialContent}</p>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              {content.highlights.map((item, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-900"
-                >
-                  <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-bold">{item}</span>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
-
-        </div>
+        )}
       </div>
     </section>
   );
-}
+};
+
+export default AboutSection;
