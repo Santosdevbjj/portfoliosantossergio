@@ -9,12 +9,18 @@ import ProjectsSection from "@/components/ProjectsSection";
 import FeaturedArticleSection from "@/components/FeaturedArticleSection";
 import AboutSection from "@/components/AboutSection";
 
-import { getDictionary, i18n, type Locale } from "@/lib/i18n";
+import { getDictionary, i18n } from "@/lib/i18n";
 import {
   getPortfolioRepos,
   CATEGORIES_ORDER,
   type GitHubRepo,
 } from "@/lib/github";
+import type { Locale } from "@/types/dictionary";
+
+/**
+ * Edge Runtime — Next.js 16
+ */
+export const runtime = "edge";
 
 /**
  * ISR — revalida a cada 1 hora
@@ -22,44 +28,47 @@ import {
 export const revalidate = 3600;
 
 interface PageProps {
-  params: Promise<{ lang: Locale }>;
+  params: {
+    lang: Locale;
+  };
 }
 
 /**
- * SEO dinâmico por idioma
+ * SEO dinâmico por idioma (ALINHADO AO DICIONÁRIO)
  */
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
-  const { lang } = await params;
+export async function generateMetadata(
+  { params }: PageProps
+): Promise<Metadata> {
+  const { lang } = params;
 
   if (!i18n.locales.includes(lang)) {
     notFound();
   }
 
   const dict = await getDictionary(lang);
+  const seoHome = dict.seo.pages.home;
 
   return {
-    title: dict.seo.home.title,
-    description: dict.seo.home.description,
+    title: seoHome.title,
+    description: seoHome.description,
     openGraph: {
-      title: dict.seo.home.title,
-      description: dict.seo.home.description,
+      title: seoHome.title,
+      description: seoHome.description,
       locale: lang,
       type: "website",
+      siteName: dict.seo.siteName,
     },
   };
 }
 
 export default async function HomePage({ params }: PageProps) {
-  const { lang } = await params;
+  const { lang } = params;
 
   if (!i18n.locales.includes(lang)) {
     notFound();
   }
 
   const dict = await getDictionary(lang);
-
   const repos: GitHubRepo[] = await getPortfolioRepos();
 
   return (
@@ -68,22 +77,15 @@ export default async function HomePage({ params }: PageProps) {
       <HeroSection content={dict.hero} />
 
       {/* ABOUT */}
-      <AboutSection
-        content={{
-          title: dict.about.title,
-          subtitle: dict.about.subtitle,
-          description: dict.about.description,
-          metrics: dict.about.metrics,
-        }}
-      />
+      <AboutSection content={dict.about} />
 
       {/* FEATURED PROJECT */}
-      <FeaturedProject project={dict.featuredProject} />
+      <FeaturedProject project={dict.projects} />
 
       {/* PROJECTS */}
       <ProjectsSection
         title={dict.projects.title}
-        description={dict.projects.description}
+        description={dict.projects.featuredLabel}
         categoriesOrder={CATEGORIES_ORDER}
         repos={repos}
       />
