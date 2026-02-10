@@ -5,7 +5,7 @@ import { getGitHubProjects } from "@/services/githubService";
 import ProxyPage from "@/components/ProxyPage";
 
 
-import type { Metadata } from "next";
+
 import { notFound } from "next/navigation";
 
 import PageWrapper from "@/components/PageWrapper";
