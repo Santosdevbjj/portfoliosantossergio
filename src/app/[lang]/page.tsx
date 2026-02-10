@@ -4,8 +4,19 @@ import type { Locale, Dictionary } from "@/types/dictionary";
 import { getGitHubProjects } from "@/services/githubService";
 import ProxyPage from "@/components/ProxyPage";
 
+
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+import PageWrapper from "@/components/PageWrapper";
 import HeroSection from "@/components/HeroSection";
+import FeaturedProject from "@/components/FeaturedProject";
+import ProjectsSection from "@/components/ProjectSection";
+import FeaturedArticleSection from "@/components/FeaturedArticleSection";
 import AboutSection from "@/components/AboutSection";
+
+
+
 
 interface PageProps {
   params: Promise<{
