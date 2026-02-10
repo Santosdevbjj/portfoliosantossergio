@@ -69,6 +69,6 @@
     "build",
     "**/*.spec.ts", // Exclui testes do build principal para performance
     "**/*.test.ts",
-    '.next/dev/types/**/*.ts'
+    ".next/dev/types/**/*.ts"
   ]
 }
