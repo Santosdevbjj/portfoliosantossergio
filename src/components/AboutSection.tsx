@@ -1,28 +1,27 @@
-// components/AboutSection.tsx
+// src/components/AboutSection.tsx
 import React from "react";
-
-export interface AboutMetric {
-  label: string;
-  value: string;
-}
-
-export interface AboutContent {
-  title: string;
-  subtitle?: string;
-  description: string;
-  metrics?: AboutMetric[];
-}
+import type { Dictionary, Locale } from "@/types/dictionary";
 
 export interface AboutSectionProps {
-  content: AboutContent;
+  readonly lang: Locale;
+  readonly dict: Dictionary;
 }
 
-const AboutSection: React.FC<AboutSectionProps> = ({ content }) => {
-  const { title, subtitle, description, metrics } = content;
+const AboutSection: React.FC<AboutSectionProps> = ({ dict }) => {
+  const { about } = dict;
+
+  const {
+    title,
+    differentialTitle,
+    description,
+    differentialContent,
+    highlights,
+    stats,
+  } = about;
 
   return (
     <section
-      id="about"
+      id="sobre"
       className="w-full py-16 px-4 md:px-8 lg:px-16 bg-background text-foreground"
     >
       <div className="max-w-6xl mx-auto space-y-8">
@@ -31,33 +30,61 @@ const AboutSection: React.FC<AboutSectionProps> = ({ content }) => {
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
             {title}
           </h2>
-
-          {subtitle && (
-            <p className="text-lg text-muted-foreground">{subtitle}</p>
-          )}
+          <p className="text-lg text-muted-foreground">
+            {differentialTitle}
+          </p>
         </header>
 
         {/* Description */}
-        <p className="text-base md:text-lg leading-relaxed max-w-3xl">
-          {description}
-        </p>
+        <div className="space-y-4 max-w-3xl">
+          <p className="text-base md:text-lg leading-relaxed">
+            {description}
+          </p>
+          <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
+            {differentialContent}
+          </p>
+        </div>
 
-        {/* Metrics */}
-        {metrics && metrics.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pt-8">
-            {metrics.map((metric, index) => (
-              <div
+        {/* Highlights */}
+        {highlights?.length > 0 && (
+          <ul className="flex flex-wrap gap-3 pt-4">
+            {highlights.map((item, index) => (
+              <li
                 key={index}
-                className="flex flex-col items-center justify-center rounded-xl border border-border p-4 text-center shadow-sm"
+                className="rounded-full border border-border px-4 py-1 text-sm"
               >
-                <span className="text-2xl font-bold text-primary">
-                  {metric.value}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  {metric.label}
-                </span>
-              </div>
+                {item}
+              </li>
             ))}
+          </ul>
+        )}
+
+        {/* Stats */}
+        {stats && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pt-8">
+            <div className="flex flex-col items-center rounded-xl border p-4">
+              <span className="text-2xl font-bold text-primary">
+                {stats.experienceValue}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {stats.experienceLabel}
+              </span>
+            </div>
+
+            <div className="flex flex-col items-center rounded-xl border p-4">
+              <span className="text-2xl font-bold text-primary">
+                {stats.availabilityValue}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {stats.availabilityLabel}
+              </span>
+            </div>
+
+            <div className="flex flex-col items-center rounded-xl border p-4 col-span-2">
+              <span className="text-sm text-muted-foreground">
+                {stats.automation}
+              </span>
+            </div>
           </div>
         )}
       </div>
