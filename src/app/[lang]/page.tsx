@@ -1,155 +1,95 @@
 // src/app/[lang]/page.tsx
-import type { Metadata, Viewport } from "next";
-import type { Locale } from "@/types/dictionary";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import { getDictionary } from "@/dictionaries";
-import { getGitHubProjects } from "@/services/githubService";
-
-import ProxyPage from "@/components/ProxyPage";
+import PageWrapper from "@/components/PageWrapper";
 import HeroSection from "@/components/HeroSection";
+import FeaturedProject from "@/components/FeaturedProject";
+import ProjectsSection from "@/components/ProjectsSection";
+import FeaturedArticleSection from "@/components/FeaturedArticleSection";
 import AboutSection from "@/components/AboutSection";
 
-/**
- * Static Params — idiomas suportados
- */
-export async function generateStaticParams() {
-  return [
-    { lang: "pt-BR" },
-    { lang: "en-US" },
-    { lang: "es-ES" },
-    { lang: "es-AR" },
-    { lang: "es-MX" },
-  ];
-}
+import { getDictionary, i18n, type Locale } from "@/lib/i18n";
+import {
+  getPortfolioRepos,
+  CATEGORIES_ORDER,
+  type GitHubRepo,
+} from "@/lib/github";
 
 /**
- * Viewport global
+ * ISR — revalida a cada 1 hora
  */
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#020617" },
-  ],
-};
+export const revalidate = 3600;
+
+interface PageProps {
+  params: Promise<{ lang: Locale }>;
+}
 
 /**
  * SEO dinâmico por idioma
  */
 export async function generateMetadata({
   params,
-}: {
-  params: { lang: Locale };
-}): Promise<Metadata> {
-  const { lang } = params;
+}: PageProps): Promise<Metadata> {
+  const { lang } = await params;
+
+  if (!i18n.locales.includes(lang)) {
+    notFound();
+  }
+
   const dict = await getDictionary(lang);
 
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "https://portfoliosantossergio.vercel.app";
-
-  const homeSeo = dict.seo.pages?.home;
-
   return {
-    title: `${homeSeo?.title ?? "Portfolio"} | ${dict.meta.author}`,
-    description: homeSeo?.description ?? dict.seo.description,
-    alternates: {
-      canonical: `${siteUrl}/${lang}`,
-      languages: {
-        "pt-BR": `${siteUrl}/pt-BR`,
-        "en-US": `${siteUrl}/en-US`,
-        "es-ES": `${siteUrl}/es-ES`,
-        "es-AR": `${siteUrl}/es-AR`,
-        "es-MX": `${siteUrl}/es-MX`,
-      },
+    title: dict.seo.home.title,
+    description: dict.seo.home.description,
+    openGraph: {
+      title: dict.seo.home.title,
+      description: dict.seo.home.description,
+      locale: lang,
+      type: "website",
     },
   };
 }
 
-/**
- * Home Page — Server Component
- */
-export default async function HomePage({
-  params,
-}: {
-  params: { lang: Locale };
-}) {
-  const { lang } = params;
+export default async function HomePage({ params }: PageProps) {
+  const { lang } = await params;
 
-  const projects = await getGitHubProjects();
+  if (!i18n.locales.includes(lang)) {
+    notFound();
+  }
+
+  const dict = await getDictionary(lang);
+
+  const repos: GitHubRepo[] = await getPortfolioRepos();
 
   return (
-    <ProxyPage lang={lang}>
-      {(dictionary) => (
-        <main>
-          {/* HERO */}
-          <HeroSection dict={dictionary} lang={lang} />
+    <PageWrapper>
+      {/* HERO */}
+      <HeroSection content={dict.hero} />
 
-          {/* ABOUT */}
-          <AboutSection
-            content={dictionary.about}
-            metrics={dictionary.metrics}
-          />
+      {/* ABOUT */}
+      <AboutSection
+        content={{
+          title: dict.about.title,
+          subtitle: dict.about.subtitle,
+          description: dict.about.description,
+          metrics: dict.about.metrics,
+        }}
+      />
 
-          {/* PROJECTS */}
-          <section
-            id="projects"
-            className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-24 max-w-7xl"
-          >
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-12">
-              {dictionary.projects.title}
-            </h2>
+      {/* FEATURED PROJECT */}
+      <FeaturedProject project={dict.featuredProject} />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {projects.length > 0 ? (
-                projects.map((project) => (
-                  <article
-                    key={project.id}
-                    className="group p-6 border rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10"
-                  >
-                    <span className="text-[10px] font-bold uppercase text-blue-600">
-                      {dictionary.projects.categories[
-                        project.technology.labelKey as keyof typeof dictionary.projects.categories
-                      ] ?? project.technology.id}
-                    </span>
+      {/* PROJECTS */}
+      <ProjectsSection
+        title={dict.projects.title}
+        description={dict.projects.description}
+        categoriesOrder={CATEGORIES_ORDER}
+        repos={repos}
+      />
 
-                    <h3 className="text-xl font-bold mt-2">
-                      {project.name}
-                    </h3>
-
-                    <p className="text-sm mt-3 text-slate-600 dark:text-slate-400 line-clamp-3">
-                      {project.description}
-                    </p>
-
-                    <a
-                      href={project.htmlUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block mt-6 text-xs font-bold underline"
-                    >
-                      {dictionary.projects.viewProject}
-                    </a>
-                  </article>
-                ))
-              ) : (
-                <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-200 rounded-3xl">
-                  <p className="text-slate-500">
-                    {dictionary.states.emptyProjects.description}
-                  </p>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* FOOTER */}
-          <footer className="border-t border-slate-200 py-12 text-center">
-            <p className="text-sm text-slate-500">
-              {dictionary.common.footer}
-            </p>
-          </footer>
-        </main>
-      )}
-    </ProxyPage>
+      {/* FEATURED ARTICLE */}
+      <FeaturedArticleSection content={dict.articles} />
+    </PageWrapper>
   );
 }
