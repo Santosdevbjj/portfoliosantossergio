@@ -91,7 +91,6 @@ export async function generateMetadata(
 export default async function HomePage({ params }: PageProps) {
   const { lang } = await params;
 
-  // Validação de locale (404 real)
   if (!SUPPORTED_LOCALES.includes(lang)) {
     notFound();
   }
@@ -104,16 +103,10 @@ export default async function HomePage({ params }: PageProps) {
         <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100">
           
           {/* Hero */}
-          <HeroSection
-            content={dictionary.hero}
-            common={dictionary.common}
-            metrics={dictionary.metrics}
-            about={dictionary.about}
-            lang={lang}
-          />
+          <HeroSection dict={dictionary} lang={lang} />
 
           {/* About */}
-          <AboutSection lang={lang} dict={dictionary} />
+          <AboutSection dict={dictionary} lang={lang} />
 
           {/* Projects */}
           <section
