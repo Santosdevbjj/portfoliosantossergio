@@ -1,12 +1,5 @@
 'use client'
 
-/**
- * LANGUAGE SWITCHER — SÉRGIO SANTOS
- * -----------------------------------------------------------------------------
- * Next.js 16 | TypeScript 5.9 | i18n consistente
- * Responsivo, acessível e alinhado aos dicionários.
- */
-
 import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -15,7 +8,6 @@ import { i18n } from '@/i18n-config'
 import type { Locale } from '@/types/dictionary'
 import { LOCALE_COOKIE, LOCALE_COOKIE_OPTIONS } from '@/lib/locale-cookie'
 
-// Labels curtos para UI
 const languageLabels: Record<Locale, string> = {
   'pt-BR': 'PT',
   'en-US': 'EN',
@@ -82,16 +74,12 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
             href={href}
             hrefLang={locale}
             onClick={() => writeLocaleCookie(locale)}
-            className={`
-              px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase
-              transition-all duration-300
-              ${
+            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase
+              transition-all duration-300 ${
                 isActive
                   ? 'bg-blue-600 text-white shadow-md scale-105'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-blue-600
-                     dark:hover:text-blue-400 hover:bg-white/60 dark:hover:bg-slate-800/60'
-              }
-            `}
+                  : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white/60 dark:hover:bg-slate-800/60'
+              }`}
           >
             {languageLabels[locale]}
           </Link>
