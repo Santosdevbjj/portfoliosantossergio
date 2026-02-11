@@ -1,21 +1,6 @@
 'use client'
 
-/**
- * PAGE WRAPPER: Orquestrador de Experiência e Layout Root
- * -----------------------------------------------------------------------------
- * - Provê o estado do ScrollSpy para a aplicação
- * - Garante hidratação segura no Next.js (evita Hydration Mismatch)
- * - Define idioma dinâmico para SEO e Acessibilidade
- * - Controla layout, background e animações globais
- */
-
-import {
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react'
-
-// Provider do ScrollSpy (não consome estado aqui)
+import { useEffect, useState, type ReactNode } from 'react'
 import { ScrollSpyProvider } from '@/contexts/ScrollSpyContext'
 import type { Locale } from '@/types/dictionary'
 
@@ -23,9 +8,14 @@ import type { Locale } from '@/types/dictionary'
 /* TYPES                                                                      */
 /* -------------------------------------------------------------------------- */
 
-interface PageWrapperProps {
+export interface PageWrapperProps {
   readonly children: ReactNode
   readonly lang: Locale
+  /**
+   * IDs das seções visíveis na página.
+   * Usado por ScrollSpy, navegação e acessibilidade.
+   */
+  readonly sectionIds?: readonly string[]
 }
 
 /* -------------------------------------------------------------------------- */
@@ -45,9 +35,6 @@ function PageLayoutContent({
     setMounted(true)
   }, [])
 
-  /**
-   * Skeleton estrutural neutro para evitar hydration mismatch.
-   */
   if (!mounted) {
     return (
       <div
@@ -72,12 +59,11 @@ function PageLayoutContent({
         overflow-x-hidden
       "
     >
-      {/* BACKGROUND DECORATIVO GLOBAL */}
+      {/* BACKGROUND GLOBAL */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 -z-0 overflow-hidden"
       >
-        {/* Glow superior */}
         <div
           className="
             absolute
@@ -90,8 +76,6 @@ function PageLayoutContent({
             md:h-[800px]
             opacity-30
             dark:opacity-20
-            transition-opacity
-            duration-1000
             blur-[100px]
           "
           style={{
@@ -100,7 +84,6 @@ function PageLayoutContent({
           }}
         />
 
-        {/* Grid técnico sutil */}
         <div
           className="absolute inset-0 opacity-[0.08] dark:opacity-[0.04]"
           style={{
@@ -111,7 +94,6 @@ function PageLayoutContent({
         />
       </div>
 
-      {/* CONTEÚDO PRINCIPAL */}
       <main
         id="main-content"
         role="main"
@@ -141,9 +123,10 @@ function PageLayoutContent({
 export function PageWrapper({
   children,
   lang,
+  sectionIds,
 }: PageWrapperProps) {
   return (
-    <ScrollSpyProvider>
+    <ScrollSpyProvider sectionIds={sectionIds}>
       <PageLayoutContent lang={lang}>
         {children}
       </PageLayoutContent>
