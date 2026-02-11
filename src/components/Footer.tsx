@@ -1,13 +1,5 @@
 'use client'
 
-/**
- * FOOTER COMPONENT — SÉRGIO SANTOS (REVISÃO FINAL 2026)
- * -----------------------------------------------------------------------------
- * ✔ 100% Responsivo: Mobile-first com Tailwind.
- * ✔ Multilíngue: Suporte total a pt-BR, en-US e família ES (ES, AR, MX).
- * ✔ Consistência: Caminhos de chaves JSON corrigidos e integração com domínio.
- */
-
 import Link from 'next/link'
 import {
   Linkedin,
@@ -29,14 +21,13 @@ interface FooterProps {
 }
 
 export function Footer({ lang, dict }: FooterProps) {
-  // Extração segura baseada na estrutura real dos seus JSONs
-  const { common, seo, articles } = dict
-  
+  // ✔ Extração SOMENTE do que é realmente usado
+  const { common, seo, contact } = dict
+
   const email = common.externalLinks.email
   const linkedinUrl = common.externalLinks.linkedin
   const githubUrl = common.externalLinks.github
 
-  // Lógica para rótulo de país baseada no locale
   const countryLabel = lang === 'en-US' ? 'Brazil' : 'Brasil'
 
   return (
@@ -46,7 +37,7 @@ export function Footer({ lang, dict }: FooterProps) {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 lg:py-24 space-y-20">
 
-        {/* CTA - Usando SEO Pages para consistência */}
+        {/* CTA */}
         <section className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row justify-between gap-10 items-start lg:items-center shadow-2xl shadow-blue-500/20">
           <div className="max-w-xl relative z-10">
             <h3 className="text-2xl md:text-4xl font-black mb-4 tracking-tight">
@@ -61,7 +52,7 @@ export function Footer({ lang, dict }: FooterProps) {
             href={`mailto:${email}`}
             className="group relative z-10 inline-flex items-center gap-3 bg-white text-blue-700 px-8 py-4 rounded-2xl font-black uppercase tracking-wider text-xs hover:bg-blue-50 transition-all shadow-xl active:scale-95"
           >
-            {dict.contact.cta}
+            {contact.cta}
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </a>
 
@@ -88,18 +79,17 @@ export function Footer({ lang, dict }: FooterProps) {
             </div>
           </div>
 
-          {/* NAVEGAÇÃO DINÂMICA (alinhada com domain/navigation.ts) */}
+          {/* NAVEGAÇÃO */}
           <nav aria-label={common.navigation}>
             <h4 className={STYLES.footerTitle}>{common.navigation}</h4>
             <ul className="space-y-3">
               {NAV_SECTIONS.map((section) => (
                 <li key={section}>
-                  <Link 
-                    href={`/${lang}${getNavHash(section)}`} 
+                  <Link
+                    href={`/${lang}${getNavHash(section)}`}
                     className={STYLES.footerLink}
                   >
-                    {/* Tradução dinâmica baseada na seção */}
-                    {dict.seo.pages[section]?.title || section}
+                    {seo.pages[section]?.title ?? section}
                   </Link>
                 </li>
               ))}
@@ -117,26 +107,23 @@ export function Footer({ lang, dict }: FooterProps) {
           {/* CONTATO */}
           <div className="space-y-6">
             <h4 className={STYLES.footerTitle}>Email</h4>
-            <a
-              href={`mailto:${email}`}
-              className="group block space-y-3 outline-none"
-            >
+            <a href={`mailto:${email}`} className="group block space-y-3">
               <div className="flex items-center gap-3 text-slate-500 group-hover:text-blue-600 transition-colors font-bold text-sm">
-                <div className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg group-hover:border-blue-600/30 transition-all">
+                <div className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg">
                   <Mail className="w-4 h-4" />
                 </div>
-                <span>{dict.contact.emailLabel}</span>
+                <span>{contact.emailLabel}</span>
               </div>
-              <p className="text-[11px] font-mono font-bold text-slate-400 break-all bg-slate-100/50 dark:bg-slate-800/30 p-4 rounded-xl border border-slate-200/50 dark:border-slate-800/50 group-hover:border-blue-500/20 transition-all">
+              <p className="text-[11px] font-mono font-bold text-slate-400 break-all bg-slate-100/50 dark:bg-slate-800/30 p-4 rounded-xl border">
                 {email}
               </p>
             </a>
           </div>
         </div>
 
-        {/* RODAPÉ FINAL */}
+        {/* FOOTER FINAL */}
         <div className="pt-10 border-t border-slate-200 dark:border-slate-800/80 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-center md:text-left">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
             {common.footer}
           </div>
 
