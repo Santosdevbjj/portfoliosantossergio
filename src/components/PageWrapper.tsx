@@ -15,8 +15,8 @@ import {
   type ReactNode,
 } from 'react'
 
-// Importamos o Provider e o Hook
-import { ScrollSpyProvider, useScrollSpy } from '@/contexts/ScrollSpyContext'
+// Provider do ScrollSpy (não consome estado aqui)
+import { ScrollSpyProvider } from '@/contexts/ScrollSpyContext'
 import type { Locale } from '@/types/dictionary'
 
 /* -------------------------------------------------------------------------- */
@@ -26,17 +26,20 @@ import type { Locale } from '@/types/dictionary'
 interface PageWrapperProps {
   readonly children: ReactNode
   readonly lang: Locale
-  readonly sectionIds?: readonly string[]
 }
 
 /* -------------------------------------------------------------------------- */
 /* INNER COMPONENT                                                            */
 /* -------------------------------------------------------------------------- */
 
-function PageLayoutContent({ children, lang }: { children: ReactNode, lang: Locale }) {
+function PageLayoutContent({
+  children,
+  lang,
+}: {
+  children: ReactNode
+  lang: Locale
+}) {
   const [mounted, setMounted] = useState(false)
-  // useScrollSpy pode ser usado aqui para lógica global baseada na seção ativa
-  const { activeSection } = useScrollSpy()
 
   useEffect(() => {
     setMounted(true)
@@ -44,7 +47,6 @@ function PageLayoutContent({ children, lang }: { children: ReactNode, lang: Loca
 
   /**
    * Skeleton estrutural neutro para evitar hydration mismatch.
-   * Mantém a cor de fundo idêntica para uma transição suave.
    */
   if (!mounted) {
     return (
@@ -75,7 +77,7 @@ function PageLayoutContent({ children, lang }: { children: ReactNode, lang: Loca
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 -z-0 overflow-hidden"
       >
-        {/* Glow superior dinâmico - Opacidade ajustada para não ofuscar o texto */}
+        {/* Glow superior */}
         <div
           className="
             absolute
@@ -98,7 +100,7 @@ function PageLayoutContent({ children, lang }: { children: ReactNode, lang: Loca
           }}
         />
 
-        {/* Grid de engenharia/dados - Sutil e elegante */}
+        {/* Grid técnico sutil */}
         <div
           className="absolute inset-0 opacity-[0.08] dark:opacity-[0.04]"
           style={{
