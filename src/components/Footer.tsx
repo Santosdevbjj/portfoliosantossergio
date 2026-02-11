@@ -21,8 +21,11 @@ interface FooterProps {
 }
 
 export function Footer({ lang, dict }: FooterProps) {
-  // ✔ Extração SOMENTE do que é realmente usado
-  const { common, seo, contact } = dict
+  // ✅ Extração correta (incluindo articles)
+  const { common, seo, contact, articles } = dict
+
+  // ✅ Narrow seguro para evitar erro de possível undefined
+  const articlesSeo = seo.pages['articles']
 
   const email = common.externalLinks.email
   const linkedinUrl = common.externalLinks.linkedin
@@ -41,10 +44,11 @@ export function Footer({ lang, dict }: FooterProps) {
         <section className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row justify-between gap-10 items-start lg:items-center shadow-2xl shadow-blue-500/20">
           <div className="max-w-xl relative z-10">
             <h3 className="text-2xl md:text-4xl font-black mb-4 tracking-tight">
-              {seo.pages.articles.title}
+              {articlesSeo?.title ?? articles.title}
             </h3>
+
             <p className="text-blue-50/90 leading-relaxed font-medium text-sm md:text-base">
-              {seo.pages.articles.description}
+              {articlesSeo?.description ?? ''}
             </p>
           </div>
 
