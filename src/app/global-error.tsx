@@ -1,11 +1,9 @@
-// src/app/global-error.tsx
 'use client';
 
 import { useEffect } from 'react';
 import { ErrorDisplay } from '@/components/error-display';
 import type { ErrorDictionary } from '@/types/error-dictionary';
 
-// Importação dos dicionários (Client Side)
 import ptBR from '@/dictionaries/errors/pt-BR.json';
 import enUS from '@/dictionaries/errors/en-US.json';
 import esES from '@/dictionaries/errors/es-ES.json';
@@ -57,14 +55,23 @@ export default function GlobalError({
       ? (error.name as keyof ErrorDictionary)
       : 'InternalServerError';
 
-  const translatedError = {
-    name: error.name,
-    title: error.title ?? dict[errorKey].title,
-    message: error.message || dict[errorKey].message,
-    action: error.action ?? dict[errorKey].action,
-    errorId: error.errorId ?? error.digest,
-    stack: error.stack,
-  };
+  // 🔥 CONSTRUÇÃO SEGURA PARA exactOptionalPropertyTypes
+  const translatedError: GlobalAppError = new Error(
+    error.message || dict[errorKey].message
+  );
+
+  translatedError.name = error.name;
+  translatedError.title = error.title ?? dict[errorKey].title;
+  translatedError.action = error.action ?? dict[errorKey].action;
+
+  if (error.digest) {
+    translatedError.digest = error.digest;
+    translatedError.errorId = error.digest;
+  }
+
+  if (error.stack) {
+    translatedError.stack = error.stack;
+  }
 
   useEffect(() => {
     console.error('FATAL_GLOBAL_ERROR', {
