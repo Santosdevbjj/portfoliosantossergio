@@ -3,21 +3,22 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
 
-// IMPORTS DE TIPOS (Essencial para TS 6.0)
-import type { Locale, Dictionary } from "@/types/dictionary"
-import type { ProjectDomain } from "@/domain/projects"
+// 1. IMPORTS DE TIPOS (Obrigatório 'import type' e extensão .js no TS 6.0)
+import type { Locale, Dictionary } from "@/types/dictionary.js"
+import type { ProjectDomain } from "@/domain/projects.js"
 
-// IMPORTS DE COMPONENTES (Certifique-se que os caminhos estão corretos)
-import PageWrapper from "@/components/PageWrapper" 
-import Navbar from "@/components/Navbar"
-import HeroSection from "@/components/HeroSection"
-import AboutSection from "@/components/AboutSection"
-import ExperienceSection from "@/components/ExperienceSection"
-import FeaturedProjectsSection from "@/components/FeaturedProjectsSection"
-import ProjectSection from "@/components/ProjectSection"
-import FeaturedArticleSection from "@/components/FeaturedArticleSection"
-import ContactSection from "@/components/ContactSection"
-import Footer from "@/components/Footer"
+// 2. IMPORTS DE COMPONENTES 
+// Corrigido para Named Exports { } conforme indicado no log de erro da Vercel
+import { PageWrapper } from "@/components/PageWrapper.js" 
+import { Navbar } from "@/components/Navbar.js"
+import { HeroSection } from "@/components/HeroSection.js"
+import { AboutSection } from "@/components/AboutSection.js"
+import { ExperienceSection } from "@/components/ExperienceSection.js"
+import { FeaturedProjectsSection } from "@/components/FeaturedProjectsSection.js"
+import { ProjectSection } from "@/components/ProjectSection.js"
+import { FeaturedArticleSection } from "@/components/FeaturedArticleSection.js"
+import { ContactSection } from "@/components/ContactSection.js"
+import { Footer } from "@/components/Footer.js"
 
 interface ProxyClientProps {
   lang: Locale;
@@ -25,21 +26,15 @@ interface ProxyClientProps {
   dictionary: Dictionary;
 }
 
-/**
- * ProxyClient - Otimizado para Next.js 16 e TS 6.0
- * Gerencia a renderização das seções baseadas no dicionário e domínio.
- */
 export default function ProxyClient({ 
   lang, 
   initialProjects, 
   dictionary 
 }: ProxyClientProps): React.JSX.Element {
   
-  // Early return se o dicionário falhar no carregamento
   if (!dictionary) return notFound()
 
-  // Sincronizado com NAV_HASH_MAP em domain/navigation.ts
-  // Usamos 'as const' para garantir imutabilidade dos IDs
+  // IDs sincronizados com NAV_HASH_MAP em domain/navigation.ts
   const sectionIds = ['sobre', 'trajetoria', 'projetos', 'artigos', 'contato'] as const
 
   return (
@@ -52,7 +47,7 @@ export default function ProxyClient({
           <HeroSection lang={lang} dict={dictionary} />
         </section>
 
-        {/* Layout centralizado e responsivo via max-w-7xl */}
+        {/* Layout responsivo com containers max-w-7xl e padding lateral adaptativo */}
         <section id="sobre" className="mx-auto max-w-7xl px-4 py-16 sm:px-10 lg:px-12">
           <AboutSection lang={lang} dict={dictionary} />
         </section>
