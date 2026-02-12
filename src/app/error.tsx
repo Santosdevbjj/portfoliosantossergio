@@ -61,7 +61,6 @@ export default function Error({
     action: dict[errorKey].action,
   };
 
-  // ✅ só adiciona se existir
   if (error.digest) {
     translatedError.errorId = error.digest;
     translatedError.digest = error.digest;
@@ -77,6 +76,7 @@ export default function Error({
         error={translatedError}
         reset={reset}
         dictionary={dictionaries[locale]}
+        locale={locale} {/* ✅ ESTA ERA A PEÇA FALTANTE */}
       />
     </main>
   );
