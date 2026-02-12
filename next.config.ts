@@ -3,17 +3,19 @@ import type { NextConfig } from "next";
 /**
  * NEXT.JS 16 & NODE 24 CONFIGURATION — SÉRGIO SANTOS PORTFOLIO
  * -----------------------------------------------------------------------------
- * Fix: Removida chave 'eslint' (Depreciada no Next 16)
- * Fix: Ajustada tipagem para conformidade com TS 6.0
+ * Estabilidade: Node 24.x (LTS Ready)
+ * Compilador: Turbopack + TS 6.0 Go-Engine Compatibility
+ * Otimização: Imagens AVIF & Segurança de Headers
  */
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   
   // Habilita suporte a pacotes que exigem Node.js nativo (Node 24)
+  // Essencial para manter a performance de telemetria e análise
   serverExternalPackages: ["@microsoft/applicationinsights-web"], 
 
   experimental: {
-    // Performance: Carregamento seletivo de bibliotecas pesadas
+    // Essencial para o Next 16: Reduz o bundle enviando apenas o que é usado
     optimizePackageImports: [
       "lucide-react",
       "framer-motion",
@@ -21,11 +23,15 @@ const nextConfig: NextConfig = {
       "tailwind-merge",
       "date-fns"
     ],
-    // Segurança e Data Fetching (React 19 / Next 16)
+    // Habilita proteção contra vazamento de dados sensíveis (React 19)
     taint: true, 
   },
 
   images: {
+    /**
+     * AVIF é o padrão ouro em 2026. 
+     * O Node 24 gerencia o encoder Sharp com muito mais eficiência de memória.
+     */
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200],
     imageSizes: [16, 32, 48, 64, 96],
@@ -44,18 +50,16 @@ const nextConfig: NextConfig = {
       }
     ],
     minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true, // Útil para ícones externos de tecnologia
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
-  // Mantido para garantir integridade do código no build
+  // Rigor do TS 6.0: Garante que o build pare se houver erros de tipagem
   typescript: {
     ignoreBuildErrors: false,
   },
 
-  /**
-   * NOTA: A chave 'eslint' foi removida. 
-   * Para desativar o lint no build, use 'next build --no-lint' no package.json
-   */
-
+  // Segurança e Performance
   poweredByHeader: false, 
   compress: true,        
 };
