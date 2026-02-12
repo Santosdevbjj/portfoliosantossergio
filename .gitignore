@@ -1,17 +1,17 @@
 # =====================================================
-# DEPENDÊNCIAS — Node.js / NPM
+# DEPENDÊNCIAS — Node.js / NPM / Bun
 # =====================================================
 node_modules/
 .pnp
 .pnp.js
-# REMOVIDO: package-lock.json (Essencial para builds reprodutíveis)
-yarn.lock
-pnpm-lock.yaml
+.yarn/
+# Lockfiles são essenciais (MANTENHA package-lock.json ou pnpm-lock.yaml)
 
 # =====================================================
-# BUILD E SAÍDA — Next.js 16 + Vercel
+# BUILD E SAÍDA — Next.js 16 + Turbopack
 # =====================================================
 .next/
+# IMPORTANTE: Mantemos o cache para acelerar builds na Vercel/CI
 !.next/cache/
 .next/trace
 .next/types
@@ -19,11 +19,15 @@ out/
 build/
 dist/
 .vercel/
+
+# TypeScript 6.0 Incremental & Metadata
 *.tsbuildinfo
-# REMOVIDO: next-env.d.ts (Recomendado manter no Git para consistência de tipos)
+next-env.d.ts
+# O TS 6.0 gera definições automáticas para Server Actions e Metadata
+.next/server-reference-manifest.json
 
 # =====================================================
-# VARIÁVEIS DE AMBIENTE — SEGURANÇA CRÍTICA
+# VARIÁVEIS DE AMBIENTE — SEGURANÇA MÁXIMA
 # =====================================================
 .env
 .env.local
@@ -31,26 +35,30 @@ dist/
 .env.test.local
 .env.production.local
 .env*.local
+# Arquivos de credenciais de Cloud/Databricks
+.azure/
+.aws/
+*.pem
+*.key
+*.pub
 
 # Permitir apenas o modelo de exemplo
 !.env.example
 
 # =====================================================
-# LOGS, CACHE E PERFORMANCE
+# LOGS, CACHE E PERFORMANCE (Turborepo / Nx)
 # =====================================================
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-lerna-debug.log*
 *.log
-
 .cache/
-coverage/
-.nyc_output/
+.turbo/
 .eslintcache
 .stylelintcache
-.turbo/
+coverage/
+.nyc_output/
 
 # =====================================================
 # SISTEMA OPERACIONAL
@@ -62,59 +70,42 @@ Thumbs.db
 desktop.ini
 
 # =====================================================
-# IDEs E EDITORES (Configurações de equipe são permitidas)
+# IDEs E EDITORES
 # =====================================================
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
 !.vscode/launch.json
-
 .idea/
-*.iws
-*.iml
-*.ipr
-.history
-*.sublime-project
-*.sublime-workspace
-.project
-.settings/
 *.swp
+*.swo
 
 # =====================================================
-# CI/CD E INFRAESTRUTURA
+# CIÊNCIA DE DADOS E BACKEND (Python/SQL/Neo4J)
 # =====================================================
-.terraform/
-*.tfstate
-*.tfstate.backup
-
-# =====================================================
-# CIÊNCIA DE DADOS / BACKEND / PYTHON
-# =====================================================
-# Ignora arquivos de dados, mas permite a estrutura se necessário
+# Ignora arquivos de dados pesados e temporários
 *.csv
 *.xlsx
+*.parquet
 *.sqlite
 *.db
+*.jsonl
 
-.python-version
+# Python (Venv & Notebooks)
 .venv/
 env/
 venv/
-ENV/
 __pycache__/
+*.py[cod]
+*$py.class
 .ipynb_checkpoints/
+.python-version
 
 # =====================================================
-# ARQUIVOS TEMPORÁRIOS
+# ARQUIVOS TEMPORÁRIOS E BACKUPS
 # =====================================================
 *.tmp
 *.temp
 *.bak
 *.old
-
-# =====================================================
-# CACHE DE FERRAMENTAS MODERNAS
-# =====================================================
-node_modules/.cache/
-# Mantemos o cache do Next para builds incrementais rápidos na Vercel
-!.next/cache/
+*.patch
