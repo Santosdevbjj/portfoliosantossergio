@@ -4,15 +4,16 @@
   "private": true,
   "author": "Sérgio Santos",
   "description": "Portfólio de Engenharia de Dados - Tailwind v4 & Lucide 0.563",
+  "type": "module",
   "engines": {
-    "node": "24.x"
+    "node": ">=24.0.0"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit --incremental"
   },
   "dependencies": {
     "next": "16.1.6",
@@ -27,8 +28,7 @@
     "tailwindcss": "4.0.0"
   },
   "devDependencies": {
-    "@vercel/config": "0.0.28",
-    "typescript": "^5.9.0",
+    "typescript": "6.0.0-beta",
     "@tailwindcss/postcss": "4.0.0",
     "postcss": "8.5.1",
     "@types/node": "24.0.0",
