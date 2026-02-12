@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     /* --- MOTOR NATIVO (TS 6.0/7.0 Go-Engine Ready) --- */
-    "target": "ES2025",              // Alvo específico para 2026 (suporte a Temporal e RegExp.escape)
+    "target": "ESNext",          // Alvo específico para 2026 (suporte a Temporal e RegExp.escape)
     "lib": ["dom", "dom.iterable", "esnext", "es2025"], // Libs atualizadas para APIs de 2025/2026
     "module": "NodeNext",            // Recomendado no lugar de ESNext para melhor suporte a pacotes ESM puros
     "moduleResolution": "NodeNext",  // NodeNext é o padrão ouro no TS 6.0 para projetos Next.js 16
