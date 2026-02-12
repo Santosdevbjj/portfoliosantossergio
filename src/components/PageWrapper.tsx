@@ -8,7 +8,7 @@ import type { Locale } from '@/types/dictionary'
 /* TYPES                                                                      */
 /* -------------------------------------------------------------------------- */
 
-export interface PageWrapperProps {
+export type interface PageWrapperProps {
   readonly children: ReactNode
   readonly lang: Locale
   /**
