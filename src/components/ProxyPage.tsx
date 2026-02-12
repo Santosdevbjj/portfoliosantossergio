@@ -1,7 +1,7 @@
 // src/components/ProxyPage.tsx
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { getDictionary } from "@/dictionaries";
-import { Locale, Dictionary } from "@/types/dictionary";
+import type { Locale, Dictionary } from "@/types/dictionary";
 import { notFound } from "next/navigation";
 
 interface ProxyPageProps {
@@ -16,14 +16,17 @@ interface ProxyPageProps {
  * - carregar dicionário
  * - injetar o dicionário corretamente
  */
-export default async function ProxyPage({ lang, children }: ProxyPageProps) {
-  const supportedLocales: Locale[] = [
+export default async function ProxyPage({
+  lang,
+  children,
+}: ProxyPageProps) {
+  const supportedLocales: readonly Locale[] = [
     "pt-BR",
     "en-US",
     "es-ES",
     "es-AR",
     "es-MX",
-  ];
+  ] as const;
 
   if (!supportedLocales.includes(lang)) {
     notFound();
