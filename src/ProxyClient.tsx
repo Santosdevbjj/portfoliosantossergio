@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation'
 import type { Locale, Dictionary } from '@/types/dictionary.js'
 import type { ProjectDomain } from '@/domain/projects.js'
 
-import PageWrapper from '@/components/PageWrapper.js'
+import type { PageWrapper } from '@/components/PageWrapper.js'
 import Navbar from '@/components/Navbar.js'
 import HeroSection from '@/components/HeroSection.js'
 import AboutSection from '@/components/AboutSection.js'
