@@ -3,23 +3,22 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
-import { fixupConfigRules } from '@eslint/compat';
+import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
+  // No v10, garantir que o resolvePluginsRelativeTo esteja correto é vital
+  resolvePluginsRelativeTo: __dirname, 
 });
 
-/**
- * ESLint v9/v10 Flat Config — Baseline Fevereiro 2026
- * Otimizado para Next.js 16, React 19 e TypeScript 5.7+
- */
+/** @type {import('eslint').Linter.Config[]} */
 export default [
   /**
    * 1️⃣ Global Ignores
-   * No ESLint v9+, um objeto contendo apenas 'ignores' age como um .eslintignore global.
+   * No v10, o primeiro objeto de configuração com 'ignores' define o escopo do projeto.
    */
   {
     ignores: [
@@ -29,12 +28,12 @@ export default [
       'build/**',
       'public/**',
       '**/*.d.ts',
-      'eslint.config.mjs',
+      'eslint.config.mjs', // auto-ignore
     ],
   },
 
   /**
-   * 2️⃣ Ambiente e Parser
+   * 2️⃣ Base Configuration & Globals
    */
   {
     languageOptions: {
@@ -43,35 +42,43 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+        ...globals.es2021, // Adicionado para garantir APIs modernas de JS
+      },
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true, // Importante para o novo rastreamento de JSX do v10
+        },
       },
     },
   },
 
   /**
-   * 3️⃣ Next.js & React 19 Compatibility
-   * Usamos o fixupConfigRules para "sanitizar" as regras do Next.js para o modo Flat Config.
+   * 3️⃣ Next.js & TypeScript Compatibility
+   * Aplicamos o fixup para garantir que os plugins antigos não quebrem no core do v10.
    */
-  ...fixupConfigRules(compat.extends('next/core-web-vitals', 'next/typescript')),
+  ...fixupConfigRules(
+    compat.extends(
+      'plugin:@next/next/core-web-vitals',
+      'plugin:@typescript-eslint/recommended'
+    )
+  ),
 
   /**
-   * 4️⃣ Regras de Engenharia de Dados e UI
+   * 4️⃣ Regras Customizadas (TS e React 19)
    */
   {
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
-      /* --- Next.js & Performance --- */
-      '@next/next/no-img-element': 'error', // Foco em Web Vitals (LCP)
+      /* --- Performance & Next.js 16 --- */
+      '@next/next/no-img-element': 'error',
       
-      /* --- React 19 (Compiler-Ready) --- */
+      /* --- React 19 & JSX (v10 improvement) --- */
+      // Com o rastreamento de JSX do ESLint v10, 'no-unused-vars' 
+      // agora entende melhor componentes React sem precisar de hacks.
       'react/react-in-jsx-scope': 'off',
-      'react/no-unescaped-entities': 'off',
       'react/prop-types': 'off',
-      'react/display-name': 'off',
 
-      /* --- TypeScript & Async (Next 16) --- */
-      // O Next 16 usa muitas Promises em Layouts e Metadata
-      '@typescript-eslint/no-floating-promises': 'warn',
-      
+      /* --- TypeScript & Clean Code --- */
       '@typescript-eslint/consistent-type-imports': [
         'warn',
         { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
@@ -86,23 +93,22 @@ export default [
         },
       ],
 
-      // Flexibilidade para manipulação de payloads de dados complexos
+      // Desativando regras restritivas para facilitar manipulação de dados
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
+      
+      // Nova regra de deprecation recomendada para migrações em 2026
       '@typescript-eslint/no-deprecated': 'warn',
 
-      /* --- Qualidade de Código & Clean Code --- */
+      /* --- Qualidade de Código --- */
       'no-console': ['warn', { allow: ['warn', 'error', 'debug'] }],
       'prefer-const': 'error',
-      'no-var': 'error',
       'eqeqeq': ['error', 'always', { null: 'ignore' }],
     },
   },
 
   /**
-   * 5️⃣ Prettier (Finalizador)
+   * 5️⃣ Prettier (Sempre por último para sobrescrever conflitos)
    */
   prettier,
 ];
