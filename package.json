@@ -2,7 +2,7 @@
   "name": "portfolio-sergio-santos",
   "version": "13.0.1",
   "private": true,
-  "author": "Sérgio Santos",
+  "author": "Sérgio Santos"
   "description": "Portfólio de Engenharia de Dados - Tailwind v4.0.6 & Lucide 0.563",
   "type": "module",
   "engines": {
