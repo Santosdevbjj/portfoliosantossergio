@@ -5,12 +5,12 @@ import type { NextConfig } from "next";
  * -----------------------------------------------------------------------------
  * Node.js: 24.x (LTS)
  * TS Engine: 6.0 Ready
- * Deployment Target: Edge/Node Runtime
+ * i18n Strategy: App Router Middleware (Configuração removida para evitar erro de build)
  */
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   
-  // Suporte nativo para telemetria no Node 24
+  // Suporte nativo para telemetria no Node 24 (Otimizado para Sharp)
   serverExternalPackages: ["@microsoft/applicationinsights-web"], 
 
   experimental: {
@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
       "tailwind-merge",
       "date-fns"
     ],
-    // React 19/20 Taint API: Impede que objetos de banco de dados vazem para o cliente
+    // React 19/20 Taint API: Segurança para dados sensíveis do backend
     taint: true, 
     // Habilita o novo motor de cache estável do Next 16
     staleTimes: {
@@ -31,15 +31,12 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // Configuração de i18n para suporte nativo aos seus 5 idiomas
-  i18n: {
-    locales: ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'],
-    defaultLocale: 'pt-BR',
-    localeDetection: true,
-  },
+  /* * NOTA: O bloco 'i18n' foi removido porque o App Router lida com isso 
+   * via diretórios [lang] e Middleware. Mantê-lo aqui causaria erro de build.
+   */
 
   images: {
-    // AVIF priorizado para Node 24 (Sharp 0.35+)
+    // AVIF priorizado (Padrão ouro em 2026)
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128],
@@ -57,22 +54,22 @@ const nextConfig: NextConfig = {
         hostname: '**.medium.com',
       }
     ],
-    minimumCacheTTL: 3600, // Aumentado para 1h para melhor LCP em 2026
+    minimumCacheTTL: 3600, 
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   typescript: {
-    // TS 6.0 strict compliance
+    // Rigor do TS 6.0: Impede deploys com bugs de tipagem
     ignoreBuildErrors: false,
     tsconfigPath: './tsconfig.json'
   },
 
-  // Segurança de Headers (Padrão Séc. XXI)
+  // Segurança e Performance
   poweredByHeader: false, 
   compress: true,        
   
-  // Garante que o Turbopack entenda seus decorators se usar algum em Data Science
+  // Transpilação de lógica de negócio compartilhada
   transpilePackages: ['@santos/portfolio-logic'], 
 };
 
