@@ -32,7 +32,7 @@
   "devDependencies": {
     "typescript": "6.0.0-beta",
     "@tailwindcss/postcss": "4.0.6",
-    "postcss": "8.5.1",
+    "postcss": "8.5.6",
     "@types/node": "25.2.3",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
