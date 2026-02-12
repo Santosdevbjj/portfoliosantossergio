@@ -10,11 +10,33 @@
   "bracketSameLine": false,
   "arrowParens": "always",
   "endOfLine": "lf",
+  "singleAttributePerLine": true,
   "embeddedLanguageFormatting": "auto",
   "proseWrap": "preserve",
   "htmlWhitespaceSensitivity": "css",
 
-  "plugins": ["prettier-plugin-tailwindcss"],
+  "plugins": [
+    "prettier-plugin-tailwindcss",
+    "@trivago/prettier-plugin-sort-imports"
+  ],
+
+  "// Import Sorting Config": "Configuração para o plugin @trivago",
+  "importOrder": [
+    "^(react/(.*)$)|^(react$)",
+    "^(next/(.*)$)|^(next$)",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^@/types/(.*)$",
+    "^@/dictionaries/(.*)$",
+    "^@/domain/(.*)$",
+    "^@/services/(.*)$",
+    "^@/hooks/(.*)$",
+    "^@/components/(.*)$",
+    "^@/styles/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
 
   "tailwindAttributes": ["className", "class", "tw"],
   "tailwindFunctions": ["clsx", "twMerge", "twJoin", "cn", "cva"],
@@ -24,15 +46,22 @@
       "files": [
         "**/app/api/**/route.tsx",
         "**/app/api/**/route.ts",
-        "**/*og*/**/*.tsx",
-        "**/*og*/**/*.ts"
+        "**/app/**/og.tsx",
+        "**/app/**/og.ts"
       ],
       "options": {
-        "printWidth": 1000,
-        "jsxBracketSameLine": true,
+        "printWidth": 120,
         "bracketSameLine": true,
+        "singleAttributePerLine": false,
         "htmlWhitespaceSensitivity": "ignore",
         "embeddedLanguageFormatting": "off"
+      }
+    },
+    {
+      "files": ["*.json", "*.jsonc"],
+      "options": {
+        "parser": "json",
+        "singleQuote": false
       }
     }
   ]
