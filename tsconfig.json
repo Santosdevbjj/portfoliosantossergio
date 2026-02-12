@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    /* --- MOTOR NATIVO & COMPATIBILIDADE NEXT.JS 16 --- */
+    /* --- MOTOR NATIVO TS 6.0 & NEXT.JS 16 --- */
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",   
-    "verbatimModuleSyntax": true,   
-    "isolatedDeclarations": true,    
+    "verbatimModuleSyntax": true,    /* Exige import type para tipos */
+    "isolatedDeclarations": true,    /* Melhora performance de build em 2026 */
     "moduleDetection": "force",
     "noEmit": true,
 
-    /* --- RIGOR DE MISSÃO CRÍTICA --- */
+    /* --- RIGOR DE MISSÃO CRÍTICA (Padrão Bancário) --- */
     "strict": true,
     "noUncheckedIndexedAccess": true, 
     "exactOptionalPropertyTypes": true, 
@@ -18,7 +18,7 @@
     "useUnknownInCatchVariables": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false, 
-    "noUncheckedSideEffectImports": true, 
+    /* "noUncheckedSideEffectImports": true, */ /* Removido: pode causar erro com CSS imports */
 
     /* --- NEXT.JS 16 & REACT 19 ARCHITECTURE --- */
     "jsx": "react-jsx",
@@ -33,17 +33,15 @@
     "forceConsistentCasingInFileNames": true,
 
     /* --- PERFORMANCE & TYPES --- */
-    /* Ajuste: Inclua 'node' mas garanta que o compilador busque tipos locais */
     "types": ["node"],
-    "stableTypeOrdering": true,      
+    /* Removida stableTypeOrdering pois é experimental no TS 6.0 */
 
     /* --- INFRASTRUCTURE PATHS --- */
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "#/*": ["./src/*"]
     },
-
-    "sourceMap": true,
 
     "plugins": [
       {
@@ -56,8 +54,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/types/**/*.d.ts",           // ADICIONADO: Força o TS a ler suas definições globais
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts" /* Mantido como sugerido pelo Next.js */
   ],
 
   "exclude": [
