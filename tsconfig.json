@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    /* --- MOTOR NATIVO & COMPATIBILIDADE NEXT.JS 16 (REVISADO FEV/2026) --- */
+    /* --- MOTOR NATIVO & COMPATIBILIDADE NEXT.JS 16 --- */
     "target": "ESNext",
-    "lib": ["dom", "dom.iterable", "esnext", "es2025"],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",   
     "verbatimModuleSyntax": true,   
-    "isolatedDeclarations": true,    // MANTIDO: Essencial para compilação rápida via motor Go/Rust
+    "isolatedDeclarations": true,    
     "moduleDetection": "force",
     "noEmit": true,
 
-    /* --- RIGOR DE MISSÃO CRÍTICA (Zero Runtime Errors) --- */
+    /* --- RIGOR DE MISSÃO CRÍTICA --- */
     "strict": true,
     "noUncheckedIndexedAccess": true, 
     "exactOptionalPropertyTypes": true, 
@@ -23,19 +23,18 @@
     /* --- NEXT.JS 16 & REACT 19 ARCHITECTURE --- */
     "jsx": "react-jsx",
     "incremental": true,
-    /* Ajustado: Cache granular para evitar conflitos no build da Vercel */
     "tsBuildInfoFile": "node_modules/.cache/tsconfig.tsbuildinfo",
     
     /* --- INTEROP & SECURITY --- */
     "esModuleInterop": true,         
     "resolveJsonModule": true,
     "allowJs": true,
-    /* Ajustado: Performance no build - o Next.js 16 já valida tipos das libs no CI */
     "skipLibCheck": true,          
     "forceConsistentCasingInFileNames": true,
 
-    /* --- PERFORMANCE: EXPLICIT TYPES (REVISADO) --- */
-    "types": ["node"], // Removido 'react' e 'react-dom' pois o JSX: react-jsx já os injeta automaticamente
+    /* --- PERFORMANCE & TYPES --- */
+    /* Ajuste: Inclua 'node' mas garanta que o compilador busque tipos locais */
+    "types": ["node"],
     "stableTypeOrdering": true,      
 
     /* --- INFRASTRUCTURE PATHS --- */
@@ -44,9 +43,7 @@
       "#/*": ["./src/*"]
     },
 
-    /* --- DEBUGGING & AUDIT --- */
     "sourceMap": true,
-    /* Removido: 'declaration' e 'declarationMap' não são necessários com 'noEmit: true' em apps Next.js */
 
     "plugins": [
       {
@@ -59,8 +56,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",           
-    ".next/dev/types/**/*.ts"        
+    "src/types/**/*.d.ts",           // ADICIONADO: Força o TS a ler suas definições globais
+    ".next/types/**/*.ts"
   ],
 
   "exclude": [
