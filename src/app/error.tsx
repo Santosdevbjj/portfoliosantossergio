@@ -39,9 +39,7 @@ export default function Error({
   const getLocale = (): SupportedLocale => {
     if (typeof window === 'undefined') return 'pt-BR';
 
-    const lang = navigator.language as SupportedLocale;
-    if (lang in dictionaries) return lang;
-
+    const lang = navigator.language;
     if (lang.startsWith('en')) return 'en-US';
     if (lang.startsWith('es')) return 'es-ES';
 
@@ -61,9 +59,13 @@ export default function Error({
     message: dict[errorKey].message,
     title: dict[errorKey].title,
     action: dict[errorKey].action,
-    errorId: error.digest,
-    digest: error.digest,
   };
+
+  // ✅ só adiciona se existir
+  if (error.digest) {
+    translatedError.errorId = error.digest;
+    translatedError.digest = error.digest;
+  }
 
   useEffect(() => {
     console.error('CriticalErrorBoundary', translatedError);
