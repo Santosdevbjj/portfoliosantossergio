@@ -33,7 +33,7 @@
     "typescript": "6.0.0",
     "@tailwindcss/postcss": "4.0.6",
     "postcss": "8.5.1",
-    "@types/node": "25.2.3",
+    "@types/node": "24.0.0",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
     "eslint": "9.19.0",
