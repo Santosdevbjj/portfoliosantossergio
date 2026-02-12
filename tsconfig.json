@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    /* --- BRIDGE TO TS 6.0 / TSGO ENGINE OPTIMIZATION --- */
-    "target": "ESNext", 
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler", // OBRIGATÓRIO para TS 6.0 (deprecia node10)
-    "verbatimModuleSyntax": true,   // Garante paridade com compiladores nativos (Go/Rust)
-    "isolatedModules": true,         
+    /* --- MOTOR NATIVO (TS 6.0/7.0 Go-Engine Ready) --- */
+    "target": "ES2025",              // Alvo específico para 2026 (suporte a Temporal e RegExp.escape)
+    "lib": ["dom", "dom.iterable", "esnext", "es2025"], // Libs atualizadas para APIs de 2025/2026
+    "module": "NodeNext",            // Recomendado no lugar de ESNext para melhor suporte a pacotes ESM puros
+    "moduleResolution": "NodeNext",  // NodeNext é o padrão ouro no TS 6.0 para projetos Next.js 16
+    "verbatimModuleSyntax": true,   
+    "isolatedDeclarations": true,    // NOVO E OBRIGATÓRIO: Permite que o motor Go gere tipos em paralelo
     "moduleDetection": "force",
     "noEmit": true,
 
@@ -17,12 +17,13 @@
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": false, // Mantido false para flexibilidade em handlers
-    "noUncheckedSideEffectImports": true, // TS 5.9+
+    "noUnusedParameters": false, 
+    "noUncheckedSideEffectImports": true, 
 
     /* --- PERFORMANCE: EXPLICIT TYPES (TS 6.0 Speedup) --- */
-    /* Evita o carregamento automático de todo o @types de node_modules */
+    /* No TS 6.0, 'types' vazio [] é o novo padrão para evitar carregar o lixo do node_modules */
     "types": ["node", "react", "react-dom"], 
+    "stableTypeOrdering": true,      // NOVO: Garante que a ordem dos tipos seja determinística no motor nativo
 
     /* --- NEXT.JS 16 & REACT 19 ARCHITECTURE --- */
     "jsx": "react-jsx",
@@ -30,16 +31,16 @@
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo",
     
     /* --- INTEROP & SECURITY --- */
-    "esModuleInterop": true,
+    "esModuleInterop": true,         // Nota: TS 6.0 agora assume true por padrão, mas mantemos para clareza
     "resolveJsonModule": true,
     "allowJs": true,
-    "skipLibCheck": true, // Importante para não travar em tipos de terceiros legados          
+    "skipLibCheck": true,          
     "forceConsistentCasingInFileNames": true,
 
-    /* --- INFRASTRUCTURE PATHS (TS 6.0 Style) --- */
-    /* Removido baseUrl para evitar depreciação. O paths agora usa caminhos relativos ao arquivo. */
+    /* --- INFRASTRUCTURE PATHS (2026 Subpath Style) --- */
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "#/*": ["./src/*"]            // Adição de Subpath Imports para paridade com o package.json
     },
 
     /* --- DEBUGGING & AUDIT --- */
@@ -58,16 +59,13 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "src/types/**/*.d.ts"
+    ".next/types/**/*.ts"
   ],
 
   "exclude": [
     "node_modules", 
     ".next", 
     "out",
-    "build",
-    "**/*.spec.ts", // Exclui testes do build principal para performance
-    "**/*.test.ts"
+    "build"
   ]
 }
