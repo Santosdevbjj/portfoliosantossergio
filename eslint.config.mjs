@@ -3,22 +3,21 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
-import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
+import { fixupConfigRules } from '@eslint/compat';
+import tseslint from 'typescript-eslint'; // Importação direta recomendada no v10
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
-  // No v10, garantir que o resolvePluginsRelativeTo esteja correto é vital
-  resolvePluginsRelativeTo: __dirname, 
+  resolvePluginsRelativeTo: __dirname,
 });
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   /**
-   * 1️⃣ Global Ignores
-   * No v10, o primeiro objeto de configuração com 'ignores' define o escopo do projeto.
+   * 1️⃣ Ignorar arquivos gerados e de infraestrutura
    */
   {
     ignores: [
@@ -28,62 +27,62 @@ export default [
       'build/**',
       'public/**',
       '**/*.d.ts',
-      'eslint.config.mjs', // auto-ignore
+      'next.config.ts', // Configs de infra costumam ter regras próprias
     ],
   },
 
   /**
-   * 2️⃣ Base Configuration & Globals
+   * 2️⃣ Configuração de Parser para TS 6.0
    */
   {
+    files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
+      parser: tseslint.parser,
+      parserOptions: {
+        // Habilita o novo motor de performance do TS 6.0
+        projectService: true,
+        tsconfigRootDir: __dirname,
+        ecmaFeatures: { jsx: true },
+      },
       globals: {
         ...globals.browser,
         ...globals.node,
-        ...globals.es2021, // Adicionado para garantir APIs modernas de JS
-      },
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true, // Importante para o novo rastreamento de JSX do v10
-        },
+        ...globals.es2024, // Atualizado para 2024 (Node 24)
       },
     },
   },
 
   /**
-   * 3️⃣ Next.js & TypeScript Compatibility
-   * Aplicamos o fixup para garantir que os plugins antigos não quebrem no core do v10.
+   * 3️⃣ Compatibilidade Next.js 16 & Plugins v10
    */
   ...fixupConfigRules(
     compat.extends(
       'plugin:@next/next/core-web-vitals',
-      'plugin:@typescript-eslint/recommended'
+      'plugin:@typescript-eslint/recommended-type-checked' // Versão mais segura para Ciência de Dados
     )
   ),
 
   /**
-   * 4️⃣ Regras Customizadas (TS e React 19)
+   * 4️⃣ Regras Customizadas e Refinamento
    */
   {
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
-      /* --- Performance & Next.js 16 --- */
+      /* --- Performance & Next.js 16 (RSC) --- */
       '@next/next/no-img-element': 'error',
-      
-      /* --- React 19 & JSX (v10 improvement) --- */
-      // Com o rastreamento de JSX do ESLint v10, 'no-unused-vars' 
-      // agora entende melhor componentes React sem precisar de hacks.
-      'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off',
+      '@next/next/no-html-link-for-pages': 'error',
 
-      /* --- TypeScript & Clean Code --- */
+      /* --- TypeScript 6.0 Engine --- */
+      // Obriga o uso de 'type' no import, reduzindo o bundle final (Tree-shaking)
       '@typescript-eslint/consistent-type-imports': [
-        'warn',
+        'error',
         { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
 
+      // Regra de ouro para 2026: detectar código depreciado do ecossistema
+      '@typescript-eslint/no-deprecated': 'warn',
+
+      // Tratamento inteligente de variáveis não usadas
       '@typescript-eslint/no-unused-vars': [
         'warn',
         { 
@@ -93,22 +92,26 @@ export default [
         },
       ],
 
-      // Desativando regras restritivas para facilitar manipulação de dados
+      /* --- Flexibilidade (Ideal para manipulação de objetos dinâmicos/JSON) --- */
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
-      
-      // Nova regra de deprecation recomendada para migrações em 2026
-      '@typescript-eslint/no-deprecated': 'warn',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
 
-      /* --- Qualidade de Código --- */
-      'no-console': ['warn', { allow: ['warn', 'error', 'debug'] }],
+      /* --- React & Clean Code --- */
+      'react/react-in-jsx-scope': 'off',
+      'no-console': ['warn', { allow: ['warn', 'error', 'info', 'debug'] }],
       'prefer-const': 'error',
       'eqeqeq': ['error', 'always', { null: 'ignore' }],
+      
+      // Garante que o build falhe se houver promessas flutuantes (Importante para o Dictionary async)
+      '@typescript-eslint/no-floating-promises': 'error',
     },
   },
 
   /**
-   * 5️⃣ Prettier (Sempre por último para sobrescrever conflitos)
+   * 5️⃣ Formatação
    */
   prettier,
 ];
