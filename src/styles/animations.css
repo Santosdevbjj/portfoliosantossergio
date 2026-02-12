@@ -8,46 +8,48 @@
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    /* translate3d ativa aceleração de hardware (GPU) */
+    transform: translate3d(0, 15px, 0) scale(0.98);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
 }
 
-/* Sistema de Stagger (Entrada Gradual) */
+/* Sistema de Stagger (Entrada Gradual Otimizada) */
 .stagger-load {
-  isolation: isolate;
+  isolation: isolate; /* Cria um contexto de empilhamento independente */
 }
 
 .stagger-load > * {
   opacity: 0;
+  /* Melhora a performance em telas ProMotion/120Hz */
   backface-visibility: hidden;
   will-change: transform, opacity;
-  animation: fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Delays incrementais */
-.stagger-load > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-load > *:nth-child(2) { animation-delay: 0.18s; }
-.stagger-load > *:nth-child(3) { animation-delay: 0.26s; }
-.stagger-load > *:nth-child(4) { animation-delay: 0.34s; }
-.stagger-load > *:nth-child(5) { animation-delay: 0.42s; }
-.stagger-load > *:nth-child(n+6) { animation-delay: 0.5s; }
+/* Delays baseados na sequência de leitura */
+.stagger-load > *:nth-child(1) { animation-delay: 100ms; }
+.stagger-load > *:nth-child(2) { animation-delay: 180ms; }
+.stagger-load > *:nth-child(3) { animation-delay: 260ms; }
+.stagger-load > *:nth-child(4) { animation-delay: 340ms; }
+.stagger-load > *:nth-child(5) { animation-delay: 420ms; }
+.stagger-load > *:nth-child(n+6) { animation-delay: 500ms; }
 
-/* Skeleton Shimmer */
+/* Skeleton Shimmer de Alta Performance */
 .skeleton-shimmer {
   position: relative;
   overflow: hidden;
-  background-color: color-mix(in oklab, currentColor 5%, transparent);
+  background-color: color-mix(in oklch, currentColor 5%, transparent);
   border-radius: inherit;
-  transform: translateZ(0); 
+  transform: translateZ(0); /* Força nova camada de renderização */
 }
 
 .skeleton-shimmer::after {
@@ -57,23 +59,32 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    color-mix(in oklch, currentColor 10%, transparent) 50%,
+    color-mix(in oklch, currentColor 8%, transparent) 50%,
     transparent 100%
   );
-  animation: shimmer 2s linear infinite;
+  animation: shimmer 1.8s ease-in-out infinite;
+  will-change: transform;
 }
 
-/* Ajustes i18n de Percepção Cognitiva */
-[lang="es"] .stagger-load > * { animation-duration: 0.85s; }
-[lang="en"] .stagger-load > * { animation-duration: 0.65s; }
-[lang="pt"] .stagger-load > * { animation-duration: 0.75s; }
+/* Ajustes de Ritmo Cognitivo (Localização) 
+   Idiomas latinos (PT/ES) tendem a ter textos mais longos, 
+   uma animação levemente mais lenta melhora a legibilidade durante o scroll.
+*/
+[lang^="es"] .stagger-load > * { animation-duration: 0.9s; }
+[lang^="pt"] .stagger-load > * { animation-duration: 0.85s; }
+[lang^="en"] .stagger-load > * { animation-duration: 0.7s; }
 
-/* Acessibilidade: Movimento Reduzido */
+/* Acessibilidade: Movimento Reduzido (Rigor 2026) */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  
+  .stagger-load > * {
+    opacity: 1; /* Garante visibilidade imediata sem movimento */
+    transform: none !important;
   }
 }
