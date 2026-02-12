@@ -16,7 +16,7 @@ interface NavbarProps {
   readonly dict: Dictionary
 }
 
-export function Navbar({ lang, dict }: NavbarProps) {
+export  default function Navbar({ lang, dict }: NavbarProps) {
   const { common, seo, about, experience, projects, articles, contact } = dict
   const { activeSection } = useScrollSpy()
 
