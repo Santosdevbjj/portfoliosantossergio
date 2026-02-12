@@ -8,14 +8,14 @@ import type { ProjectDomain } from '@/domain/projects.js'
 
 import type { PageWrapper } from '@/components/PageWrapper.js'
 import type { Navbar } from '@/components/Navbar.js'
-import HeroSection from '@/components/HeroSection.js'
-import AboutSection from '@/components/AboutSection.js'
-import ExperienceSection from '@/components/ExperienceSection.js'
-import FeaturedProjectsSection from '@/components/FeaturedProjectsSection.js'
-import ProjectSection from '@/components/ProjectSection.js'
-import FeaturedArticleSection from '@/components/FeaturedArticleSection.js'
-import ContactSection from '@/components/ContactSection.js'
-import Footer from '@/components/Footer.js'
+import type { HeroSection } from '@/components/HeroSection.js'
+import type { AboutSection } from '@/components/AboutSection.js'
+import type { ExperienceSection }  from '@/components/ExperienceSection.js'
+import type { FeaturedProjectsSection } from '@/components/FeaturedProjectsSection.js'
+import type { ProjectSection }  from '@/components/ProjectSection.js'
+import type { FeaturedArticleSection }  from '@/components/FeaturedArticleSection.js'
+import type { ContactSection }  from '@/components/ContactSection.js'
+import type { Footer }  from '@/components/Footer.js'
 
 interface ProxyClientProps {
   readonly lang: Locale
