@@ -120,7 +120,7 @@ function PageLayoutContent({
 /* MAIN EXPORT                                                                */
 /* -------------------------------------------------------------------------- */
 
-export function PageWrapper({
+export default function PageWrapper({
   children,
   lang,
   sectionIds,
