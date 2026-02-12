@@ -68,12 +68,14 @@ export const PortfolioGrid = ({
                 <Database className="w-7 h-7 md:w-8 md:h-8" />
               </div>
 
+
               <h2
-                id="portfolio-title"
-                className="text-4xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-none"
+                 id="portfolio-title"
+                 className="text-4xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-none"
               >
-                {dict.seo.pages.projects.title}
-              </h2>
+              {dict.seo.pages['projects']?.title ?? dict.projects.title}
+             </h2>
+              
             </div>
 
             <div className="flex items-center gap-3">
