@@ -21,14 +21,12 @@ const dictionaries = {
 
 type SupportedLocale = keyof typeof dictionaries;
 
-type AppError = {
-  name: string;
-  message: string;
+type AppError = Error & {
+  name: keyof ErrorDictionary;
   title?: string;
   action?: string;
   errorId?: string;
   digest?: string;
-  stack?: string;
 };
 
 export default function Error({
@@ -44,41 +42,28 @@ export default function Error({
     const lang = navigator.language as SupportedLocale;
     if (lang in dictionaries) return lang;
 
-    const prefix = lang.split('-')[0];
-    if (prefix === 'en') return 'en-US';
-    if (prefix === 'es') return 'es-ES';
+    if (lang.startsWith('en')) return 'en-US';
+    if (lang.startsWith('es')) return 'es-ES';
 
     return 'pt-BR';
   };
 
   const locale = getLocale();
-
-  const dict =
-    dictionaries[locale]?.errors ??
-    dictionaries['pt-BR'].errors;
+  const dict = dictionaries[locale].errors;
 
   const errorKey: keyof ErrorDictionary =
     error.name in dict
       ? (error.name as keyof ErrorDictionary)
       : 'InternalServerError';
 
-  // ✅ NÃO define campos opcionais aqui
   const translatedError: AppError = {
-    name: error.name,
-    message: error.message || dict[errorKey].message,
+    name: errorKey,
+    message: dict[errorKey].message,
     title: dict[errorKey].title,
     action: dict[errorKey].action,
+    errorId: error.digest,
+    digest: error.digest,
   };
-
-  // ✅ Só adiciona SE existir
-  if (error.digest) {
-    translatedError.errorId = error.digest;
-    translatedError.digest = error.digest;
-  }
-
-  if (error.stack) {
-    translatedError.stack = error.stack;
-  }
 
   useEffect(() => {
     console.error('CriticalErrorBoundary', translatedError);
@@ -89,7 +74,7 @@ export default function Error({
       <ErrorDisplay
         error={translatedError}
         reset={reset}
-        locale={locale}
+        dictionary={dictionaries[locale]}
       />
     </main>
   );
