@@ -1,24 +1,26 @@
 @import "tailwindcss";
 
-/* Import das animações customizadas (A engine Oxide processa o bundling) */
+/* A engine Oxide do Tailwind v4 processa o bundling automaticamente.
+   TS 6.0 ajuda na tipagem de variáveis CSS em componentes.
+*/
 @import "../styles/animations.css";
 
 @theme {
-  /* --- Palette de Cores OKLCH (Vibrância 2026) --- */
+  /* --- Palette de Cores OKLCH (Perceptualmente Uniforme) --- */
   --color-brand-50: oklch(0.97 0.01 256.4);
   --color-brand-100: oklch(0.92 0.04 256.4);
   --color-brand-500: oklch(0.62 0.17 256.4);
   --color-brand-700: oklch(0.45 0.12 256.4);
   --color-brand-900: oklch(0.28 0.07 256.4);
 
-  /* --- Design Tokens Semânticos --- */
-  --font-sans: var(--font-inter), "system-ui", sans-serif;
-  --font-heading: var(--font-montserrat), "system-ui", sans-serif;
+  /* --- Design Tokens Semânticos com Fallbacks --- */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-montserrat), ui-serif, Georgia, serif;
   
   --breakpoint-xs: 375px;
   --breakpoint-2xl: 1440px;
 
-  /* --- Efeitos de Elevação v4 --- */
+  /* --- Efeitos de Elevação de Alta Definição --- */
   --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
   --shadow-glow: 0 0 20px color-mix(in oklch, oklch(0.62 0.17 256.4), transparent 70%);
 
@@ -35,6 +37,9 @@
     --foreground: oklch(0.15 0.02 256.4);
     --card: oklch(1 0 0);
     --border: oklch(0.92 0.01 256.4);
+    
+    /* Suporte a esquemas de cores do navegador */
+    color-scheme: light;
   }
 
   .dark {
@@ -42,25 +47,35 @@
     --foreground: oklch(0.95 0.01 256.4);
     --card: oklch(0.18 0.02 256.4);
     --border: oklch(0.25 0.02 256.4);
+    
+    color-scheme: dark;
   }
 
   *, ::after, ::before {
-    border-color: var(--color-border);
+    @apply border-[var(--color-border)];
   }
 
   html {
-    @apply scroll-smooth overflow-x-hidden antialiased;
+    @apply scroll-smooth antialiased;
     background-color: var(--color-background);
     text-rendering: optimizeLegibility;
-    /* Previne saltos de layout na barra de rolagem */
+    /* Impede o layout de "balançar" ao abrir modais */
     scrollbar-gutter: stable;
+    /* Melhora o toque em dispositivos móveis */
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    @apply min-h-screen flex flex-col transition-colors duration-500;
+    @apply min-h-screen flex flex-col transition-colors duration-500 overflow-x-hidden;
     color: var(--color-foreground);
     background-color: var(--color-background);
+    /* Tratamento para telas com entalhes/notches */
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* Foco acessível para navegação via teclado */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
   }
 }
 
@@ -71,12 +86,17 @@
 
   .glass-effect {
     @apply backdrop-blur-xl shadow-premium transition-all duration-300;
-    background-color: color-mix(in oklab, var(--color-card) 75%, transparent);
-    border: 1px solid color-mix(in oklab, var(--color-border) 50%, transparent);
+    background-color: color-mix(in oklch, var(--color-card) 75%, transparent);
+    border: 1px solid color-mix(in oklch, var(--color-border) 50%, transparent);
   }
 
   .project-card {
-    /* Corrigido: usando variável semântica para manter consistência dark/light */
     @apply relative overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-card)] transition-all duration-500;
+    /* Melhora performance de animação via GPU */
+    will-change: transform, box-shadow;
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
