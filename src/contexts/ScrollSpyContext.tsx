@@ -30,7 +30,7 @@ const ScrollSpyContext = createContext<ScrollSpyContextValue | undefined>(
 
 interface ScrollSpyProviderProps {
   readonly children: React.ReactNode
-  readonly sectionIds?: readonly string[]
+  readonly sectionIds: readonly string[] | undefined
 }
 
 export function ScrollSpyProvider({
