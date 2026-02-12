@@ -4,6 +4,12 @@ import React from 'react' // Adicionado para React.JSX.Element
 import { notFound } from 'next/navigation'
 // ... seus outros imports
 
+interface ProxyClientProps {
+  lang: Locale;
+  initialProjects: ProjectDomain[];
+  dictionary: Dictionary;
+}
+
 export default function ProxyClient({ 
   lang, 
   initialProjects, 
