@@ -8,7 +8,7 @@ interface ExperienceSectionProps {
   readonly dict: Dictionary;
 }
 
-export const ExperienceSection = ({ dict, lang }: ExperienceSectionProps) => {
+export default ExperienceSection = ({ dict, lang }: ExperienceSectionProps) => {
   // Acessa o conteúdo traduzido conforme a estrutura do dicionário
   const { experience } = dict; 
 
