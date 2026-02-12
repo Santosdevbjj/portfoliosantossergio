@@ -4,6 +4,12 @@ import { Locale } from '@/types/dictionary'
 const SUPPORTED_LOCALES: Locale[] = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"]
 const DEFAULT_LOCALE: Locale = "pt-BR"
 
+interface ProxyClientProps {
+  lang: Locale;
+  initialProjects: ProjectDomain[];
+  dictionary: Dictionary;
+}
+
 export default function proxy(request: NextRequest): NextResponse { // Adicionado tipo de retorno
   const { pathname } = request.nextUrl
 
