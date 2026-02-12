@@ -9,7 +9,7 @@ import type { ProjectDomain } from "@/domain/projects.js"
 
 // 2. IMPORTS DE COMPONENTES 
 // Corrigido para Named Exports { } conforme indicado no log de erro da Vercel
-import  PageWrapper  from "@/components/PageWrapper.tsx" 
+import  PageWrapper  from "@/components/PageWrapper.js" 
 import  Navbar  from "@/components/Navbar.js"
 import  HeroSection  from "@/components/HeroSection.js"
 import  AboutSection  from "@/components/AboutSection.js"
