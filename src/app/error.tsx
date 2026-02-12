@@ -72,11 +72,12 @@ export default function Error({
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-white dark:bg-slate-950">
+      {/* locale é exigido pelo ErrorDisplay */}
       <ErrorDisplay
         error={translatedError}
         reset={reset}
         dictionary={dictionaries[locale]}
-        locale={locale} {/* ✅ ESTA ERA A PEÇA FALTANTE */}
+        locale={locale}
       />
     </main>
   );
