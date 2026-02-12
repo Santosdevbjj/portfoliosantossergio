@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import type { ReactElement } from 'react'
+
 import { ProjectCard } from './ProjectCard'
 import { Filter, Database, FolderSearch, Sparkles } from 'lucide-react'
 
@@ -17,7 +19,7 @@ export const PortfolioGrid = ({
   projects,
   dict,
   lang,
-}: PortfolioGridProps): JSX.Element => {
+}: PortfolioGridProps): ReactElement => {
   const [activeCategory, setActiveCategory] = useState<'all' | string>('all')
 
   const projectsDict = dict.projects
@@ -83,7 +85,10 @@ export const PortfolioGrid = ({
           </div>
 
           {/* FILTROS */}
-          <nav className="w-full lg:w-auto" aria-label={commonDict.menu.aria.open}>
+          <nav
+            className="w-full lg:w-auto"
+            aria-label={commonDict.menu.aria.open}
+          >
             <div className="flex items-center gap-2 mb-4 text-slate-400 dark:text-slate-500 font-black text-[9px] uppercase tracking-[0.2em]">
               <Filter className="text-blue-600 w-3.5 h-3.5" strokeWidth={3} />
               <span>{commonDict.navigation}</span>
