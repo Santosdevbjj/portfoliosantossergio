@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "typescript": "6.0.0-beta",
-    "@tailwindcss/postcss": "4.0.6",
+    "@tailwindcss/postcss": "4.1.18",
     "postcss": "8.5.6",
     "@types/node": "25.2.3",
     "@types/react": "19.2.14",
