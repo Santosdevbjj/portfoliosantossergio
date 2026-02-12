@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
-    /* --- MOTOR NATIVO & COMPATIBILIDADE NEXT.JS 16 --- */
+    /* --- MOTOR NATIVO & COMPATIBILIDADE NEXT.JS 16 (REVISADO FEV/2026) --- */
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext", "es2025"],
-    "module": "ESNext",              // Ajustado: ESNext garante compatibilidade com o pipeline do Turbopack
-    "moduleResolution": "Bundler",   // Ajustado: Essencial para o TS encontrar 'next/navigation' em 2026
+    "module": "ESNext",
+    "moduleResolution": "Bundler",   
     "verbatimModuleSyntax": true,   
-    "isolatedDeclarations": true,    // MANTIDO: Crucial para o futuro motor nativo (Go)
+    "isolatedDeclarations": true,    // MANTIDO: Essencial para compilação rápida via motor Go/Rust
     "moduleDetection": "force",
     "noEmit": true,
 
@@ -20,21 +20,23 @@
     "noUnusedParameters": false, 
     "noUncheckedSideEffectImports": true, 
 
-    /* --- PERFORMANCE: EXPLICIT TYPES --- */
-    "types": ["node", "react", "react-dom"], 
-    "stableTypeOrdering": true,      
-
     /* --- NEXT.JS 16 & REACT 19 ARCHITECTURE --- */
     "jsx": "react-jsx",
     "incremental": true,
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo",
+    /* Ajustado: Cache granular para evitar conflitos no build da Vercel */
+    "tsBuildInfoFile": "node_modules/.cache/tsconfig.tsbuildinfo",
     
     /* --- INTEROP & SECURITY --- */
     "esModuleInterop": true,         
     "resolveJsonModule": true,
     "allowJs": true,
+    /* Ajustado: Performance no build - o Next.js 16 já valida tipos das libs no CI */
     "skipLibCheck": true,          
     "forceConsistentCasingInFileNames": true,
+
+    /* --- PERFORMANCE: EXPLICIT TYPES (REVISADO) --- */
+    "types": ["node"], // Removido 'react' e 'react-dom' pois o JSX: react-jsx já os injeta automaticamente
+    "stableTypeOrdering": true,      
 
     /* --- INFRASTRUCTURE PATHS --- */
     "paths": {
@@ -44,8 +46,7 @@
 
     /* --- DEBUGGING & AUDIT --- */
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    /* Removido: 'declaration' e 'declarationMap' não são necessários com 'noEmit: true' em apps Next.js */
 
     "plugins": [
       {
@@ -58,8 +59,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",           // O log da Vercel pediu essa atualização
-    ".next/dev/types/**/*.ts"        // Adicionado para paridade com o ambiente local
+    ".next/types/**/*.ts",           
+    ".next/dev/types/**/*.ts"        
   ],
 
   "exclude": [
