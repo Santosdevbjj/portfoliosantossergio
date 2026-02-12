@@ -8,7 +8,7 @@ interface FeaturedProjectsSectionProps {
   readonly dict: Dictionary
 }
 
-export function FeaturedProjectsSection({ lang, dict }: FeaturedProjectsSectionProps) {
+export default function FeaturedProjectsSection({ lang, dict }: FeaturedProjectsSectionProps) {
   const projects = [...featuredProjects].sort((a, b) => a.priority - b.priority).slice(0, 3)
 
   return (
