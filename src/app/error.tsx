@@ -53,23 +53,20 @@ export default function GlobalError({
     return 'pt-BR'
   }, [])
 
-  const dictionary = dictionaries[locale].errors
+  const dictionary = dictionaries[locale]
 
   const errorKey: keyof ErrorDictionary =
-    error.name in dictionary
+    error.name && error.name in dictionary.errors
       ? (error.name as keyof ErrorDictionary)
       : 'InternalServerError'
 
-  const baseError: AppError = {
+  const translatedError: AppError = {
     name: errorKey,
-    message: dictionary[errorKey].message,
-    title: dictionary[errorKey].title,
-    action: dictionary[errorKey].action,
+    message: dictionary.errors[errorKey].message,
+    title: dictionary.errors[errorKey].title,
+    action: dictionary.errors[errorKey].action,
+    ...(error.digest && { errorId: error.digest, digest: error.digest }),
   }
-
-  const translatedError: AppError = error.digest
-    ? { ...baseError, errorId: error.digest, digest: error.digest }
-    : baseError
 
   useEffect(() => {
     console.error('CriticalErrorBoundary', translatedError)
@@ -80,7 +77,7 @@ export default function GlobalError({
       <ErrorDisplay
         error={translatedError}
         reset={reset}
-        dictionary={dictionaries[locale]}
+        dictionary={dictionary}
       />
     </main>
   )
