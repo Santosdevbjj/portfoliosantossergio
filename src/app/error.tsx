@@ -61,14 +61,12 @@ export default function ErrorPage({
   }, [error])
 
   return (
-    <main className="flex min-h-screen w-full items-center justify-center bg-white p-4 dark:bg-slate-950">
-      <ErrorDisplay
-        errorKey={errorKey}
-        // ✅ CORREÇÃO DO TS: Garante que passe string ou trate o opcional
-        errorId={error.digest ?? ''} 
-        dictionary={dictionary}
-        reset={reset}
-      />
-    </main>
-  )
-}
+  <main className="flex min-h-screen w-full items-center justify-center bg-white p-4 dark:bg-slate-950">
+    <ErrorDisplay
+      errorKey={errorKey}
+      dictionary={dictionary}
+      reset={reset}
+      {...(error.digest ? { errorId: error.digest } : {})}
+    />
+  </main>
+)
