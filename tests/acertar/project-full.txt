@@ -1086,106 +1086,1656 @@ trim_trailing_whitespace = false
 
 
 
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
+===== FILE: public/cv-sergio-santos-en.pdf =====
+<conteúdo completo do arquivo
+ meu currículo em inglês 
 
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
+>
 
 
 
 
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
 
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
+===== FILE: public/cv-sergio-santos-es.pdf =====
+<conteúdo completo do arquivo
+   meu currículo vitae em espanhol 
 
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
-
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
+>
 
 
 
 
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
 
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
+===== FILE: public/cv-sergio-santos-pt.pdf =====
+<conteúdo completo do arquivo
+  meu currículo em português 
 
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
+>
 
-===== FILE: src/components/AboutSection.tsx =====
+
+
+
+
+===== FILE:  public/og-image-en.png =====
+<conteúdo completo do arquivo
+  minha ogImage em inglês 
+
+>
+
+
+
+
+
+
+===== FILE:   public/og-image-es.png =====
+<conteúdo completo do arquivo
+  minha ogImage em espanhol 
+
+>
+
+
+
+
+===== FILE: public/og-image-pt.png =====
+<conteúdo completo do arquivo
+   minha ogImage em português 
+>
+
+
+
+
+
+===== FILE: public/icons/apple-icon.png =====
 <conteúdo completo do arquivo>
 
 
 
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
 
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
+===== FILE: public/icons/apple-touch-icon.png  =====
 <conteúdo completo do arquivo>
 
 
 
-===== FILE: src/app/[lang]/page.tsx =====
+
+===== FILE: public/icons/favicon.ico   =====
 <conteúdo completo do arquivo>
+
+
+
+
+
+===== FILE: public/icons/icon.png  =====
+<conteúdo completo do arquivo>
+
+
+
+
+===== FILE: public/images/sergio-santos-profile.png  =====
+<conteúdo completo do arquivo>
+
+
+
+
+===== FILE:  public/images/trofeu-35-edicao.png    =====
+<conteúdo completo do arquivo
+   trofeu de melhor artigo da 35° competição de artigos da DIO 
+  
+"Low-Code na Saúde: Como Criar Apps Médicos em Semanas"
+
+>
+
+
+
+
+
+===== FILE:  public/images/trofeu-melhor-artigo-setembro.png  =====
+<conteúdo completo do arquivo
+  troféu de melhor artigo do mês de setembro de 2025 da DIO 
+
+
+"Low-Code na Saúde: Como Criar Apps Médicos em Semanas"
+
+>
+
+
+
+
+===== FILE: src/app/[lang]/layout.tsx  =====
+<conteúdo completo do arquivo
+// ESTOU USANDO A TAG DO GOOGLE 
+
+/**
+ * ROOT LAYOUT — NEXT.JS 16 — SÉRGIO SANTOS
+ * -----------------------------------------------------------------------------
+ * ✔️ TOTALMENTE ALINHADO: src/types/dictionary.ts e src/dictionaries/index.ts
+ * ✔️ SEO: Suporte a multilingue (PT, EN, ES) com x-default
+ * ✔️ ACESSIBILIDADE: Skip links e ARIA labels dinâmicos
+ */
+
+import type { Metadata, Viewport } from 'next'
+import { Inter, Montserrat } from 'next/font/google'
+import Script from 'next/script'
+import '../globals.css'
+
+import { ThemeProvider } from '@/components/ThemeToggle'
+import { CookieBanner } from '@/components/CookieBanner'
+import { getServerDictionary } from "@/lib/getServerDictionary"
+import type { Locale } from "@/types/dictionary"
+
+/* --- FONTS --- */
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  variable: '--font-montserrat',
+  display: 'swap',
+})
+
+/* --- VIEWPORT --- */
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#020617' },
+  ],
+}
+
+/* --- SEO & METADATA --- */
+interface LayoutProps {
+  children: React.ReactNode
+  params: Promise<{ lang: Locale }>
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: Locale }> }): Promise<Metadata> {
+  const { lang } = await params
+  const dict = await getServerDictionary(lang)
+  
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app'
+
+  return {
+    metadataBase: new URL(siteUrl),
+    verification: {
+      google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
+    },
+    title: {
+      default: `Sérgio Santos | ${dict.common.role}`,
+      template: `%s | Sérgio Santos`,
+    },
+    description: dict.seo.description,
+    alternates: {
+      canonical: `${siteUrl}/${lang}`,
+      languages: {
+        'pt-BR': `${siteUrl}/pt-BR`,
+        'en-US': `${siteUrl}/en-US`,
+        'es-ES': `${siteUrl}/es-ES`,
+        'es-AR': `${siteUrl}/es-AR`,
+        'es-MX': `${siteUrl}/es-MX`,
+        'x-default': `${siteUrl}/pt-BR`,
+      },
+    },
+    openGraph: {
+      type: 'website',
+      url: `${siteUrl}/${lang}`,
+      title: "Sérgio Santos",
+      description: dict.seo.description,
+      siteName: dict.seo.siteName,
+      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Sérgio Santos Portfolio' }],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+  }
+}
+
+/* --- ROOT LAYOUT --- */
+export default async function RootLayout({ children, params }: LayoutProps) {
+  const { lang } = await params
+  const dict = await getServerDictionary(lang)
+
+  return (
+    <html
+      lang={lang}
+      dir={dict.meta.direction}
+      suppressHydrationWarning
+      className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
+    >
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-3XF5BTP58V');
+          `}
+        </Script>
+      </head>
+
+      <body className="min-h-screen flex flex-col bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased font-inter">
+        <ThemeProvider>
+          {/* Skip Link para Acessibilidade — Texto corrigido para fluxo de navegação */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:p-4 focus:bg-blue-600 focus:text-white focus:rounded-b-lg shadow-lg"
+          >
+            {dict.common.navigation}
+          </a>
+
+          <main id="main-content" className="flex-grow">
+            {children}
+          </main>
+
+          <CookieBanner lang={lang} dict={dict} />
+        </ThemeProvider>
+      </body>
+    </html>
+  )
+}
+
+
+>
+
+
+
+===== FILE: src/app/[lang]/page.tsx  =====
+<conteúdo completo do arquivo
+
+// src/app/[lang]/page.tsx
+import type { Metadata, Viewport } from "next";
+import { notFound } from "next/navigation";
+
+import { getDictionary } from "@/dictionaries";
+import type { Locale, Dictionary } from "@/types/dictionary";
+import { getGitHubProjects } from "@/services/githubService";
+
+import ProxyPage from "@/components/ProxyPage";
+import HeroSection from "@/components/HeroSection";
+import AboutSection from "@/components/AboutSection";
+
+// ---------------------------------------------
+// Tipos
+// ---------------------------------------------
+interface PageProps {
+  params: Promise<{
+    lang: Locale;
+  }>;
+}
+
+// ---------------------------------------------
+// Constantes
+// ---------------------------------------------
+const SUPPORTED_LOCALES: readonly Locale[] = [
+  "pt-BR",
+  "en-US",
+  "es-ES",
+  "es-AR",
+  "es-MX",
+] as const;
+
+// ---------------------------------------------
+// Static Params (SSG)
+// ---------------------------------------------
+export async function generateStaticParams() {
+  return SUPPORTED_LOCALES.map((lang) => ({ lang }));
+}
+
+// ---------------------------------------------
+// Viewport
+// ---------------------------------------------
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#020617" },
+  ],
+};
+
+// ---------------------------------------------
+// Metadata (SEO)
+// ---------------------------------------------
+export async function generateMetadata(
+  { params }: PageProps
+): Promise<Metadata> {
+  const { lang } = await params;
+
+  if (!SUPPORTED_LOCALES.includes(lang)) {
+    notFound();
+  }
+
+  const dict = await getDictionary(lang);
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "https://portfoliosantossergio.vercel.app";
+
+  const homeSeo = dict.seo.pages?.home;
+  const pageTitle = `${homeSeo?.title ?? "Portfolio"} | ${dict.meta.author}`;
+
+  return {
+    title: pageTitle,
+    description: homeSeo?.description ?? dict.seo.description,
+    alternates: {
+      canonical: `${siteUrl}/${lang}`,
+      languages: {
+        "pt-BR": `${siteUrl}/pt-BR`,
+        "en-US": `${siteUrl}/en-US`,
+        "es-ES": `${siteUrl}/es-ES`,
+        "es-AR": `${siteUrl}/es-AR`,
+        "es-MX": `${siteUrl}/es-MX`,
+      },
+    },
+  };
+}
+
+// ---------------------------------------------
+// Page
+// ---------------------------------------------
+export default async function HomePage({ params }: PageProps) {
+  const { lang } = await params;
+
+  if (!SUPPORTED_LOCALES.includes(lang)) {
+    notFound();
+  }
+
+  const projects = await getGitHubProjects();
+
+  return (
+    <ProxyPage lang={lang}>
+      {(dictionary: Dictionary) => (
+        <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100">
+          
+          {/* Hero */}
+          <HeroSection dict={dictionary} lang={lang} />
+
+          {/* About */}
+          <AboutSection dict={dictionary} lang={lang} />
+
+          {/* Projects */}
+          <section
+            id="projects"
+            className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-24 max-w-7xl"
+          >
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-12">
+              {dictionary.projects.title}
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {projects.length > 0 ? (
+                projects.map((project) => (
+                  <article
+                    key={project.id}
+                    className="group p-6 border rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10"
+                  >
+                    <span className="text-[10px] font-bold uppercase text-blue-600">
+                      {dictionary.projects.categories[
+                        project.technology.labelKey as keyof typeof dictionary.projects.categories
+                      ] ?? project.technology.id}
+                    </span>
+
+                    <h3 className="text-xl font-bold mt-2">
+                      {project.name}
+                    </h3>
+
+                    <p className="text-sm mt-3 text-slate-600 dark:text-slate-400 line-clamp-3">
+                      {project.description}
+                    </p>
+
+                    <a
+                      href={project.htmlUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-6 text-xs font-bold underline"
+                    >
+                      {dictionary.projects.viewProject}
+                    </a>
+                  </article>
+                ))
+              ) : (
+                <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-200 rounded-3xl">
+                  <p className="text-slate-500">
+                    {dictionary.states.emptyProjects.description}
+                  </p>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Footer */}
+          <footer className="border-t border-slate-200 py-12 text-center">
+            <p className="text-sm text-slate-500">
+              {dictionary.common.footer}
+            </p>
+          </footer>
+        </main>
+      )}
+    </ProxyPage>
+  );
+}
+
+
+>
+
+
+
+
+
+
+===== FILE: src/app/[lang]/error.tsx  =====
+<conteúdo completo do arquivo
+
+'use client'
+
+import { useEffect, useState, useMemo } from 'react'
+import Link from 'next/link'
+import {
+  RotateCcw,
+  AlertCircle,
+  Home,
+  ShieldAlert,
+} from 'lucide-react'
+
+import { getDictionary } from '@/dictionaries'
+import type { Dictionary, Locale } from '@/types/dictionary'
+import { i18n } from '@/i18n-config'
+
+interface ErrorProps {
+  readonly error: Error & { digest?: string }
+  readonly reset: () => void
+  readonly params: { lang: Locale }
+}
+
+export default function Error({ error, reset, params }: ErrorProps) {
+  const [dict, setDict] = useState<Dictionary | null>(null)
+
+  // Memoiza o idioma para evitar re-cálculos
+  const currentLang: Locale = useMemo(() => {
+    const supportedLocales: Locale[] = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"]
+    return supportedLocales.includes(params?.lang) 
+      ? params.lang 
+      : (i18n.defaultLocale as Locale)
+  }, [params?.lang])
+
+  /**
+   * Carrega o dicionário e faz o log do erro
+   */
+  useEffect(() => {
+    // Carregamento assíncrono do dicionário (Resolve o erro do Vercel)
+    getDictionary(currentLang).then(setDict)
+
+    // Log técnico para monitoramento
+    console.error('🔥 [Application Error]:', {
+      message: error.message,
+      digest: error.digest,
+      timestamp: new Date().toISOString(),
+    })
+  }, [error, currentLang])
+
+  // Estado de carregamento simples enquanto o dicionário não chega
+  if (!dict) {
+    return (
+      <div className="min-h-[100dvh] w-full flex items-center justify-center bg-slate-50 dark:bg-[#020617]">
+        <div className="animate-pulse text-slate-400 font-mono">Loading error context...</div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      role="alert"
+      aria-live="assertive"
+      className="min-h-[100dvh] w-full flex items-center justify-center p-6 bg-slate-50 dark:bg-[#020617]"
+    >
+      <section className="w-full max-w-md bg-white dark:bg-slate-950 border border-slate-200 dark:border-red-900/20 p-8 rounded-[2rem] shadow-2xl text-center space-y-8">
+        
+        {/* Badge de Status */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-full">
+          <ShieldAlert
+            size={12}
+            className="text-red-600 dark:text-red-500"
+            aria-hidden="true"
+          />
+          <span className="text-[10px] font-black text-red-600 dark:text-red-500 uppercase tracking-widest">
+            ERROR
+          </span>
+        </div>
+
+        {/* Ícone de Alerta */}
+        <div className="mx-auto w-20 h-20 flex items-center justify-center">
+          <AlertCircle
+            size={64}
+            className="text-red-500"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
+        </div>
+
+        {/* Conteúdo Textual - Alinhado com Dictionary.common.errorBoundary */}
+        <div className="space-y-3">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">
+            {dict.common.errorBoundary.title}
+          </h1>
+
+          <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+            {dict.common.errorBoundary.description}
+          </p>
+        </div>
+
+        {/* Ações Responsivas (Stack no mobile, Row no desktop) */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <button
+            onClick={() => reset()}
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-400 active:scale-95"
+          >
+            <RotateCcw size={18} />
+            {dict.common.errorBoundary.actions.retry}
+          </button>
+
+          <Link
+            href={`/${currentLang}`}
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition active:scale-95"
+          >
+            <Home size={18} />
+            {dict.common.errorBoundary.actions.home}
+          </Link>
+        </div>
+
+        {/* ID Técnico para Suporte */}
+        {error.digest && (
+          <div className="pt-4">
+            <code className="block p-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg text-[10px] text-slate-400 font-mono break-all">
+              TRACE_ID: {error.digest}
+            </code>
+          </div>
+        )}
+      </section>
+    </div>
+  )
+}
+
+>
+
+
+
+
+===== FILE:src/app/[lang]/loading.tsx  =====
+<conteúdo completo do arquivo
+
+/**
+ * LOADING: Skeleton Screen
+ * -----------------------------------------------------------------------------
+ * Renderizado instantaneamente via React Suspense (Streaming).
+ * Totalmente responsivo e alinhado aos dicionários pt-BR, en-US, es-ES, es-AR, es-MX.
+ */
+
+import { getDictionary } from '@/dictionaries'
+import type { Locale } from '@/types/dictionary'
+
+interface LoadingProps {
+  params: Promise<{
+    lang: Locale
+  }> | { lang: Locale } 
+}
+
+export default async function Loading({ params }: LoadingProps) {
+  // Em Next.js 15/16, params pode ser uma Promise. Aguardamos a resolução.
+  const resolvedParams = await params;
+  const locale: Locale = resolvedParams?.lang ?? 'pt-BR';
+  
+  // CORREÇÃO: getDictionary é async, precisa de await
+  const dictionary = await getDictionary(locale);
+
+  // Utiliza a chave 'common.loading' vinda do JSON correspondente
+  const label = dictionary.common?.loading || "Carregando...";
+
+  return (
+    <div
+      className="min-h-screen bg-slate-50 dark:bg-[#020617] overflow-hidden"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      {/* Texto acessível para leitores de tela - SEO & Acessibilidade */}
+      <span className="sr-only">{label}</span>
+
+      {/* 🦴 Skeleton Navbar */}
+      <div
+        className="w-full h-20 border-b border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md"
+        aria-hidden="true"
+      />
+
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 pt-16 pb-20">
+        {/* 🦴 Skeleton Hero Section */}
+        <section className="space-y-8 mb-24" aria-hidden="true">
+          {/* Badge Skeleton */}
+          <div className="h-6 w-48 bg-blue-600/10 dark:bg-blue-600/20 rounded-full animate-pulse border border-blue-600/20" />
+
+          {/* Title Skeletons */}
+          <div className="space-y-4">
+            <div className="h-12 md:h-16 w-full max-w-3xl bg-slate-200 dark:bg-slate-800/80 rounded-3xl animate-pulse" />
+            <div className="h-12 md:h-16 w-2/3 max-w-xl bg-slate-200 dark:bg-slate-800/80 rounded-3xl animate-pulse" />
+          </div>
+
+          {/* Subtitle Skeletons */}
+          <div className="space-y-3">
+            <div className="h-5 w-full max-w-lg bg-slate-200/60 dark:bg-slate-800/40 rounded-xl animate-pulse" />
+            <div className="h-5 w-3/4 max-w-sm bg-slate-200/60 dark:bg-slate-800/40 rounded-xl animate-pulse" />
+          </div>
+
+          {/* Button Skeletons */}
+          <div className="flex gap-4 pt-4">
+            <div className="h-12 w-40 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />
+            <div className="h-12 w-12 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />
+          </div>
+        </section>
+
+        {/* 🦴 Skeleton Projects Grid */}
+        <section
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          aria-hidden="true"
+        >
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="relative overflow-hidden min-h-[420px] bg-white dark:bg-slate-900/40 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800/60 p-8 flex flex-col justify-end"
+            >
+              {/* Shimmer Effect */}
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 dark:via-slate-800/10 to-transparent" />
+
+              <div className="space-y-6 relative z-10">
+                {/* Category Badges */}
+                <div className="flex gap-2">
+                  <div className="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-lg animate-pulse" />
+                  <div className="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-lg animate-pulse" />
+                </div>
+
+                {/* Project Title */}
+                <div className="h-7 w-full bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse" />
+
+                {/* Project Description */}
+                <div className="space-y-3">
+                  <div className="h-4 w-full bg-slate-200/50 dark:bg-slate-800/50 rounded-md animate-pulse" />
+                  <div className="h-4 w-5/6 bg-slate-200/50 dark:bg-slate-800/50 rounded-md animate-pulse" />
+                </div>
+
+                {/* Card Footer */}
+                <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800">
+                  <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg animate-pulse" />
+                  <div className="h-8 w-8 bg-slate-200 dark:bg-slate-800 rounded-full animate-pulse" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+      </div>
+    </div>
+  )
+}
+
+
+>
+
+
+
+
+
+
+===== FILE: src/app/[lang]/not-found.tsx  =====
+<conteúdo completo do arquivo
+
+// src/app/[lang]/not-found.tsx
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { getDictionary } from '@/dictionaries'
+import type { Dictionary, Locale } from '@/types/dictionary'
+import Link from 'next/link'
+
+export default function NotFound() {
+  const params = useParams()
+  const lang = (params?.lang as Locale) || 'pt-BR'
+  const [dict, setDict] = useState<Dictionary | null>(null)
+
+  useEffect(() => {
+    // CORREÇÃO: Criamos uma função interna assíncrona para dar 'await' no dicionário
+    const loadDictionary = async () => {
+      try {
+        const data = await getDictionary(lang)
+        setDict(data)
+      } catch (error) {
+        console.error("Erro ao carregar dicionário na página 404:", error)
+      }
+    }
+
+    loadDictionary()
+  }, [lang])
+
+  // Shimmer/Loading state enquanto o dicionário é montado no client
+  if (!dict) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="animate-pulse">Carregando...</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white p-4">
+      <h1 className="text-6xl font-bold text-red-600 mb-4">404</h1>
+      <h2 className="text-2xl mb-6">{dict.common.notFound.title}</h2>
+      <p className="text-gray-400 mb-8 text-center max-w-md">
+        {dict.common.notFound.description}
+      </p>
+      <Link 
+        href={`/${lang}`}
+        className="px-6 py-3 bg-white text-black font-bold rounded-md hover:bg-gray-200 transition-colors"
+      >
+        {dict.common.notFound.button}
+      </Link>
+    </div>
+  )
+}
+
+
+>
+
+
+
+
+
+===== FILE: src/app/[lang]/manifest.ts  =====
+<conteúdo completo do arquivo
+
+// src/app/[lang]/manifest.ts
+import type { MetadataRoute } from 'next';
+import { getDictionary } from '@/dictionaries';
+// CORREÇÃO: Usando 'import type' para satisfazer o verbatimModuleSyntax
+import type { Locale } from '@/types/dictionary';
+
+const SITE_URL = 'https://portfoliosantossergio.vercel.app';
+
+export default async function manifest(
+  props: { params: Promise<{ lang: Locale }> }
+): Promise<MetadataRoute.Manifest> {
+  
+  // Resolve os parâmetros (Next.js 16 padrão)
+  const { lang: rawLang } = await props.params;
+  
+  // Lista de locales suportados conforme seu arquivo de tipos
+  const supportedLocales: Locale[] = ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'];
+  
+  const lang = supportedLocales.includes(rawLang) 
+    ? rawLang 
+    : 'pt-BR'; // Fallback seguro
+
+  const dict = await getDictionary(lang);
+
+  return {
+    id: `${SITE_URL}/${lang}`,
+    lang,
+    dir: 'ltr',
+    name: dict.seo.siteName,
+    short_name: dict.seo.siteName.split(' | ')[0],
+    description: dict.seo.description,
+    start_url: `/${lang}/`,
+    scope: `/${lang}/`,
+    display: 'standalone',
+    background_color: '#020617',
+    theme_color: '#020617',
+    categories: [
+      'technology',
+      'education',
+      'portfolio',
+      'software',
+      'productivity',
+    ],
+    icons: [
+      {
+        src: '/icons/icon.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+      {
+        src: '/icons/apple-touch-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
+    screenshots: [
+      {
+        src: `/og-image-${lang.split('-')[0]}.png`, // Pega 'pt', 'en' ou 'es'
+        sizes: '1200x630',
+        type: 'image/png',
+        form_factor: 'wide',
+        label: dict.seo.siteName,
+      },
+    ],
+  };
+}
+
+
+>
+
+
+
+
+===== FILE: src/app/[lang]/metadata.ts =====
+<conteúdo completo do arquivo
+
+// src/app/[lang]/metadata.ts
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { getDictionary } from '@/dictionaries';
+import type { Locale } from '@/types/dictionary';
+
+const SITE_URL = 'https://portfoliosantossergio.vercel.app';
+
+interface MetadataProps {
+  params: Promise<{
+    lang: Locale;
+  }>;
+}
+
+export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
+  // 1. Resolvemos a Promise dos parâmetros (Obrigatório no Next.js 15/16)
+  const resolvedParams = await params;
+  const lang = resolvedParams.lang;
+
+  // 2. Lista de locales suportados
+  const supportedLocales: Locale[] = ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'];
+  
+  if (!supportedLocales.includes(lang)) {
+    notFound();
+  }
+
+  // 3. CORREÇÃO: Adicionado 'await' para carregar o dicionário corretamente
+  const dict = await getDictionary(lang);
+
+  const pageTitle = dict.seo.pages?.home?.title ?? dict.seo.siteName;
+  const pageDescription = dict.seo.pages?.home?.description ?? dict.seo.description;
+
+  // Mapeamento de imagens OG (Consistente com seus arquivos públicos)
+  const ogImageMap: Record<Locale, string> = {
+    'pt-BR': '/og-image-pt.png',
+    'en-US': '/og-image-en.png',
+    'es-ES': '/og-image-es.png',
+    'es-AR': '/og-image-es.png',
+    'es-MX': '/og-image-es.png',
+  };
+
+  // Mapeamento de locale para meta tags (padrão ISO: ll_CC)
+  const ogLocaleMap: Record<Locale, string> = {
+    'pt-BR': 'pt_BR',
+    'en-US': 'en_US',
+    'es-ES': 'es_ES',
+    'es-AR': 'es_AR',
+    'es-MX': 'es_MX',
+  };
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: pageTitle,
+      template: `%s | ${dict.seo.siteName}`,
+    },
+    description: pageDescription,
+    keywords: dict.seo.keywords,
+    alternates: {
+      canonical: `${SITE_URL}/${lang}`,
+      languages: {
+        'pt-BR': '/pt-BR',
+        'en-US': '/en-US',
+        'es-ES': '/es-ES',
+        'es-AR': '/es-AR',
+        'es-MX': '/es-MX',
+      },
+    },
+    openGraph: {
+      type: 'website',
+      locale: ogLocaleMap[lang],
+      url: `${SITE_URL}/${lang}`,
+      siteName: dict.seo.siteName,
+      title: pageTitle,
+      description: pageDescription,
+      images: [
+        {
+          url: ogImageMap[lang],
+          width: 1200,
+          height: 630,
+          alt: pageTitle,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: pageTitle,
+      description: pageDescription,
+      images: [ogImageMap[lang]],
+    },
+    icons: {
+      icon: [
+        { url: '/icons/favicon.ico' },
+        { url: '/icons/icon.png', type: 'image/png' },
+      ],
+      apple: [
+        { url: '/icons/apple-touch-icon.png' },
+      ],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+  };
+}
+
+
+>
+
+
+
+
+
+
+
+
+===== FILE: src/app/[lang]/template.tsx =====
+<conteúdo completo do arquivo
+
+/**
+ * TEMPLATE: Global [lang]
+ * -----------------------------------------------------------------------------
+ * Server Component (Next.js 16 / React 19)
+ *
+ * Responsabilidades:
+ * - Estrutura base da UI por idioma
+ * - Garantir layout flexível e acessível
+ * - NÃO conter lógica de estado, i18n ou efeitos colaterais
+ *
+ * Totalmente responsivo.
+ * Multilíngue por herança da rota [lang].
+ */
+
+import type { ReactNode } from 'react'
+
+interface TemplateProps {
+  readonly children: ReactNode
+}
+
+export default function Template({ children }: TemplateProps) {
+  return (
+    <div
+      className="
+        relative
+        flex
+        min-h-screen
+        w-full
+        flex-col
+        overflow-x-hidden
+        bg-background
+        text-foreground
+        antialiased
+      "
+    >
+      {/* Container principal:
+          - flex-1: garante que o conteúdo ocupe o espaço restante (empurrando footer se houver)
+          - focus-visible: melhora acessibilidade para navegação via teclado
+      */}
+      <main
+        id="template-root"
+        className="relative flex w-full flex-1 flex-col focus-visible:outline-none"
+        tabIndex={-1}
+      >
+        {children}
+      </main>
+    </div>
+  )
+}
+
+
+>
+
+
+
+
+
+
+
+
+===== FILE: src/app/api/post-og/route.tsx   =====
+<conteúdo completo do arquivo
+
+import { ImageResponse } from 'next/og'
+import type { NextRequest } from 'next/server'
+
+export const runtime = 'edge'
+
+// -------------------- Helpers --------------------
+
+const sanitizeText = (value: string, max = 120) =>
+  value.replace(/\s+/g, ' ').trim().slice(0, max)
+
+const sanitizePositiveInt = (value: string | null, fallback: number) => {
+  const n = Number(value)
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback
+}
+
+const formatDateSafe = () => {
+  const d = new Date()
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const year = d.getUTCFullYear()
+  return `${day}/${month}/${year}`
+}
+
+// -------------------- Handler --------------------
+
+export function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+
+    const title = sanitizeText(
+      searchParams.get('title') ?? 'Sérgio Santos',
+      90,
+    )
+
+    const description = sanitizeText(
+      searchParams.get('description') ?? 'Data Specialist',
+      160,
+    )
+
+    const author = sanitizeText(
+      searchParams.get('author') ?? 'Sérgio Santos',
+      40,
+    )
+
+    const date =
+      sanitizeText(searchParams.get('created-at') ?? '', 20) ||
+      formatDateSafe()
+
+    const readingTime = sanitizePositiveInt(
+      searchParams.get('reading-time'),
+      5,
+    )
+
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            backgroundColor: '#020617',
+            backgroundImage:
+              'radial-gradient(circle at 25px 25px, #1e293b 2%, transparent 0%)',
+            backgroundSize: '50px 50px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              padding: 60,
+              background:
+                'linear-gradient(to top, #020617 0%, rgba(2,6,23,0.88) 100%)',
+            }}
+          >
+            {/* Reading Time */}
+            <div
+              style={{
+                display: 'flex',
+                alignSelf: 'flex-start',
+                backgroundColor: '#ff4500',
+                padding: '8px 16px',
+                borderRadius: 8,
+                marginBottom: 28,
+              }}
+            >
+              <span
+                style={{
+                  color: '#ffffff',
+                  fontSize: 16,
+                  fontWeight: 700,
+                  letterSpacing: 0.5,
+                }}
+              >
+                {readingTime} MIN DE LEITURA
+              </span>
+            </div>
+
+            {/* Title */}
+            <div
+              style={{
+                fontSize: 64,
+                fontWeight: 900,
+                color: '#ffffff',
+                lineHeight: 1.1,
+                marginBottom: 22,
+                maxWidth: 1000,
+              }}
+            >
+              {title}
+            </div>
+
+            {/* Description */}
+            <div
+              style={{
+                fontSize: 26,
+                color: '#94a3b8',
+                lineHeight: 1.4,
+                marginBottom: 42,
+                maxWidth: 900,
+              }}
+            >
+              {description}
+            </div>
+
+            {/* Footer */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderTop: '1px solid rgba(255,69,0,0.35)',
+                paddingTop: 28,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div
+                  style={{
+                    width: 50,
+                    height: 50,
+                    backgroundColor: '#ff4500',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 14,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: '#ffffff',
+                      fontSize: 24,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {author.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+
+                <span
+                  style={{
+                    color: '#ffffff',
+                    fontSize: 22,
+                    fontWeight: 600,
+                  }}
+                >
+                  {author}
+                </span>
+              </div>
+
+              <span
+                style={{
+                  color: '#64748b',
+                  fontSize: 20,
+                }}
+              >
+                {date}
+              </span>
+            </div>
+          </div>
+        </div>
+      ),
+      {
+        width: 1200,
+        height: 630,
+        headers: {
+          'Cache-Control': 'public, immutable, max-age=31536000',
+        },
+      },
+    )
+  } catch {
+    return new Response('Failed to generate OG image', {
+      status: 500,
+    })
+  }
+}
+
+
+>
+
+
+
+
+
+
+===== FILE:src/app/api/users/route.ts =====
+<conteúdo completo do arquivo
+
+import { NextRequest, NextResponse } from "next/server";
+import { NotFoundError } from "@/lib/errors";
+import { handleApiError } from "@/lib/http/handleApiError";
+
+export async function GET(req: NextRequest) {
+  try {
+    const user = null;
+
+    if (!user) {
+      throw new NotFoundError({
+        errorLocationCode: "API_USERS_GET_001",
+      });
+    }
+
+    return NextResponse.json(user);
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+>
+
+
+
+
+
+
+===== FILE: src/app/error.tsx    =====
+<conteúdo completo do arquivo
+
+    'use client';
+
+import { ErrorBoundaryView } from '@/components/error/ErrorBoundaryView';
+
+export default function ErrorPage({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  return <ErrorBoundaryView error={error} reset={reset} />;
+}
+
+>
+
+
+
+
+
+
+===== FILE:  src/app/global-error.tsx  =====
+<conteúdo completo do arquivo
+'use client';
+
+import { ErrorBoundaryView } from '@/components/error/ErrorBoundaryView';
+
+export default function GlobalError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  return (
+    <ErrorBoundaryView
+      error={error}
+      reset={reset}
+      withHtmlWrapper
+    />
+  );
+}
+  
+
+>
+
+
+
+
+===== FILE:  src/app/globals.css     =====
+<conteúdo completo do arquivo
+
+@import "tailwindcss";
+
+/* A engine Oxide do Tailwind v4 processa o bundling automaticamente.
+   TS 6.0 ajuda na tipagem de variáveis CSS em componentes.
+*/
+@import "../styles/animations.css";
+
+@theme {
+  /* --- Palette de Cores OKLCH (Perceptualmente Uniforme) --- */
+  --color-brand-50: oklch(0.97 0.01 256.4);
+  --color-brand-100: oklch(0.92 0.04 256.4);
+  --color-brand-500: oklch(0.62 0.17 256.4);
+  --color-brand-700: oklch(0.45 0.12 256.4);
+  --color-brand-900: oklch(0.28 0.07 256.4);
+
+  /* --- Design Tokens Semânticos com Fallbacks --- */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-montserrat), ui-serif, Georgia, serif;
+  
+  --breakpoint-xs: 375px;
+  --breakpoint-2xl: 1440px;
+
+  /* --- Efeitos de Elevação de Alta Definição --- */
+  --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 20px color-mix(in oklch, oklch(0.62 0.17 256.4), transparent 70%);
+
+  /* --- Mapeamento de Variáveis de Sistema --- */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+}
+
+@layer base {
+  :root {
+    --background: oklch(0.98 0.01 256.4);
+    --foreground: oklch(0.15 0.02 256.4);
+    --card: oklch(1 0 0);
+    --border: oklch(0.92 0.01 256.4);
+    
+    /* Suporte a esquemas de cores do navegador */
+    color-scheme: light;
+  }
+
+  .dark {
+    --background: oklch(0.12 0.02 256.4);
+    --foreground: oklch(0.95 0.01 256.4);
+    --card: oklch(0.18 0.02 256.4);
+    --border: oklch(0.25 0.02 256.4);
+    
+    color-scheme: dark;
+  }
+
+  *, ::after, ::before {
+    @apply border-[var(--color-border)];
+  }
+
+  html {
+    @apply scroll-smooth antialiased;
+    background-color: var(--color-background);
+    text-rendering: optimizeLegibility;
+    /* Impede o layout de "balançar" ao abrir modais */
+    scrollbar-gutter: stable;
+    /* Melhora o toque em dispositivos móveis */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply min-h-screen flex flex-col transition-colors duration-500 overflow-x-hidden;
+    color: var(--color-foreground);
+    background-color: var(--color-background);
+    /* Tratamento para telas com entalhes/notches */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* Foco acessível para navegação via teclado */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+}
+
+@layer components {
+  .main-container {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12;
+  }
+
+  .glass-effect {
+    @apply backdrop-blur-xl shadow-premium transition-all duration-300;
+    background-color: color-mix(in oklch, var(--color-card) 75%, transparent);
+    border: 1px solid color-mix(in oklch, var(--color-border) 50%, transparent);
+  }
+
+  .project-card {
+    @apply relative overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-card)] transition-all duration-500;
+    /* Melhora performance de animação via GPU */
+    will-change: transform, box-shadow;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+
+>
+
+
+
+
+
+
+
+
+
+===== FILE:  src/app/robots.ts   =====
+<conteúdo completo do arquivo
+
+import type { MetadataRoute } from 'next'
+
+/**
+ * ROBOTS.TXT — NEXT.JS 16 (ESTRATÉGIA 2026)
+ * -----------------------------------------------------------------------------
+ * ✔ SEO internacional (pt / en / es)
+ * ✔ Compatível com App Router e RSC
+ * ✔ Seguro para buscadores e LLMs
+ * ✔ Produção-ready
+ */
+
+export default function robots(): MetadataRoute.Robots {
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    'https://portfoliosantossergio.vercel.app'
+  ).replace(/\/$/, '')
+
+  return {
+    rules: [
+      /**
+       * 1️⃣ BUSCADORES GERAIS
+       * Permite indexação total do conteúdo público
+       * Bloqueia apenas áreas sensíveis
+       */
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: [
+          '/api/',
+          '/private/',
+          '/admin/',
+        ],
+      },
+
+      /**
+       * 2️⃣ AGENTES DE IA / LLMs
+       * Permite leitura semântica do conteúdo público
+       * Protege APIs e áreas internas
+       */
+      {
+        userAgent: [
+          'GPTBot',
+          'ChatGPT-User',
+          'Claude-bot',
+          'Google-Extended',
+          'PerplexityBot',
+          'CCBot', // Common Crawl
+        ],
+        allow: [
+          '/pt',
+          '/en',
+          '/es',
+        ],
+        disallow: [
+          '/api/',
+          '/private/',
+          '/admin/',
+        ],
+      },
+    ],
+
+    /**
+     * Sitemap internacional
+     */
+    sitemap: `${baseUrl}/sitemap.xml`,
+  }
+}
+
+
+>
+
+
+
+
+
+
+
+===== FILE: src/app/sitemap.ts   =====
+<conteúdo completo do arquivo
+
+import type { MetadataRoute } from 'next'
+
+/**
+ * SITEMAP DINÂMICO — NEXT.JS 16 (APP ROUTER)
+ * -----------------------------------------------------------------------------
+ * ✔ SEO internacional correto (pt / en / es)
+ * ✔ Alinhado com estrutura de navegação do dicionário
+ * ✔ Google Search Console friendly
+ * ✔ Produção-ready
+ */
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    'https://portfoliosantossergio.vercel.app'
+  ).replace(/\/$/, '')
+
+  const lastModified = new Date()
+
+  const locales = ['pt', 'en', 'es'] as const
+
+  /**
+   * Rotas principais do site
+   * Devem refletir o dicionário (nav)
+   */
+  const pages = [
+    '', // home
+    'about',
+    'experience',
+    'projects',
+    'articles',
+    'contact',
+  ]
+
+  /**
+   * 1️⃣ Páginas Internacionalizadas
+   */
+  const pageEntries: MetadataRoute.Sitemap = locales.flatMap(locale =>
+    pages.map(page => {
+      const path = page ? `/${page}` : ''
+
+      return {
+        url: `${baseUrl}/${locale}${path}`,
+        lastModified,
+        changeFrequency: 'monthly',
+        priority:
+          page === '' && locale === 'pt'
+            ? 1.0
+            : page === ''
+            ? 0.9
+            : 0.8,
+        alternates: {
+          languages: {
+            pt: `${baseUrl}/pt${path}`,
+            en: `${baseUrl}/en${path}`,
+            es: `${baseUrl}/es${path}`,
+            'x-default': `${baseUrl}/pt${path}`,
+          },
+        },
+      }
+    }),
+  )
+
+  /**
+   * 2️⃣ Entrada raiz (fallback canônico)
+   */
+  const rootEntry: MetadataRoute.Sitemap[0] = {
+    url: baseUrl,
+    lastModified,
+    changeFrequency: 'monthly',
+    priority: 1.0,
+    alternates: {
+      languages: {
+        pt: `${baseUrl}/pt`,
+        en: `${baseUrl}/en`,
+        es: `${baseUrl}/es`,
+        'x-default': `${baseUrl}/pt`,
+      },
+    },
+  }
+
+  /**
+   * 3️⃣ Documentos estratégicos (CVs por idioma)
+   * PDFs não usam priority nem changeFrequency
+   */
+  const documentEntries: MetadataRoute.Sitemap = locales.map(locale => ({
+    url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
+    lastModified,
+  }))
+
+  return [rootEntry, ...pageEntries, ...documentEntries]
+}
+
+
+
+>
+
+
+
+
+
+
+
+
+===== FILE:     =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+
 
 ===== FILE: src/app/[lang]/error.tsx =====
 <conteúdo completo do arquivo>
