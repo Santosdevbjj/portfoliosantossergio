@@ -43,8 +43,7 @@ export default function ErrorPage({
     return 'pt-BR'
   }, [])
 
-  // ✅ Cast seguro garantindo que acessamos o objeto de erros
-  const dictionary = (dictionaries[locale] as any).errors as ErrorDictionary
+  const dictionary = dictionaries[locale].errors as ErrorDictionary
 
   const errorKey = useMemo((): keyof ErrorDictionary => {
     if (error.name in dictionary) {
@@ -61,12 +60,13 @@ export default function ErrorPage({
   }, [error])
 
   return (
-  <main className="flex min-h-screen w-full items-center justify-center bg-white p-4 dark:bg-slate-950">
-    <ErrorDisplay
-      errorKey={errorKey}
-      dictionary={dictionary}
-      reset={reset}
-      {...(error.digest ? { errorId: error.digest } : {})}
-    />
-  </main>
-)
+    <main className="flex min-h-screen w-full items-center justify-center bg-white p-4 dark:bg-slate-950">
+      <ErrorDisplay
+        errorKey={errorKey}
+        dictionary={dictionary}
+        reset={reset}
+        {...(error.digest ? { errorId: error.digest } : {})}
+      />
+    </main>
+  )
+}
