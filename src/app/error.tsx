@@ -1,4 +1,3 @@
-// src/app/error.tsx
 'use client'
 
 import { useEffect, useMemo } from 'react'
@@ -11,27 +10,15 @@ import esES from '@/dictionaries/errors/es-ES.json'
 import esAR from '@/dictionaries/errors/es-AR.json'
 import esMX from '@/dictionaries/errors/es-MX.json'
 
-type ErrorDictionaryFile = {
-  errors: ErrorDictionary
-}
-
 const dictionaries = {
   'pt-BR': ptBR,
   'en-US': enUS,
   'es-ES': esES,
   'es-AR': esAR,
   'es-MX': esMX,
-} satisfies Record<string, ErrorDictionaryFile>
+} as const
 
 type SupportedLocale = keyof typeof dictionaries
-
-type AppError = Error & {
-  name: keyof ErrorDictionary
-  title?: string
-  action?: string
-  errorId?: string
-  digest?: string
-}
 
 export default function GlobalError({
   error,
@@ -41,43 +28,42 @@ export default function GlobalError({
   reset: () => void
 }) {
   const locale: SupportedLocale = useMemo(() => {
-    if (typeof window === 'undefined') return 'pt-BR'
+    if (typeof navigator === 'undefined') return 'pt-BR'
 
     const lang = navigator.language
 
-    if (lang === 'es-AR') return 'es-AR'
-    if (lang === 'es-MX') return 'es-MX'
-    if (lang.startsWith('es')) return 'es-ES'
+    if (lang in dictionaries) return lang as SupportedLocale
     if (lang.startsWith('en')) return 'en-US'
+    if (lang.startsWith('es')) return 'es-ES'
 
     return 'pt-BR'
   }, [])
 
-  const dictionary = dictionaries[locale]
+  // ✅ AQUI ESTÁ A CORREÇÃO
+  const dictionary: ErrorDictionary =
+    dictionaries[locale].errors
 
   const errorKey: keyof ErrorDictionary =
-    error.name && error.name in dictionary.errors
+    error.name in dictionary
       ? (error.name as keyof ErrorDictionary)
       : 'InternalServerError'
 
-  const translatedError: AppError = {
-    name: errorKey,
-    message: dictionary.errors[errorKey].message,
-    title: dictionary.errors[errorKey].title,
-    action: dictionary.errors[errorKey].action,
-    ...(error.digest && { errorId: error.digest, digest: error.digest }),
-  }
-
   useEffect(() => {
-    console.error('CriticalErrorBoundary', translatedError)
-  }, [translatedError])
+    console.error('GLOBAL_ERROR', {
+      name: error.name,
+      message: error.message,
+      digest: error.digest,
+      stack: error.stack,
+    })
+  }, [error])
 
   return (
-    <main className="flex min-h-screen w-full items-center justify-center bg-white dark:bg-slate-950">
+    <main className="flex min-h-screen w-full items-center justify-center bg-white p-4 dark:bg-slate-950">
       <ErrorDisplay
-        error={translatedError}
-        reset={reset}
+        errorKey={errorKey}
+        errorId={error.digest}
         dictionary={dictionary}
+        reset={reset}
       />
     </main>
   )
