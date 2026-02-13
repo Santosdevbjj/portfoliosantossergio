@@ -20,7 +20,7 @@ interface FooterProps {
   readonly dict: Dictionary
 }
 
-export function Footer({ lang, dict }: FooterProps) {
+export default function Footer({ lang, dict }: FooterProps) {
   // ✅ Extração correta (incluindo articles)
   const { common, seo, contact, articles } = dict
 
