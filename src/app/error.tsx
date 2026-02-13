@@ -68,14 +68,20 @@ export default function GlobalError({
       ? (error.name as keyof ErrorDictionary)
       : 'InternalServerError'
 
-  const translatedError: AppError = {
+  const baseError: AppError = {
     name: errorKey,
     message: dictionary[errorKey].message,
     title: dictionary[errorKey].title,
     action: dictionary[errorKey].action,
-    errorId: error.digest,
-    digest: error.digest,
   }
+
+  const translatedError: AppError = error.digest
+    ? {
+        ...baseError,
+        errorId: error.digest,
+        digest: error.digest,
+      }
+    : baseError
 
   useEffect(() => {
     console.error('CriticalErrorBoundary', translatedError)
