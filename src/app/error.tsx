@@ -20,7 +20,7 @@ const dictionaries = {
 
 type SupportedLocale = keyof typeof dictionaries
 
-export default function GlobalError({
+export default function ErrorPage({
   error,
   reset,
 }: {
@@ -28,32 +28,35 @@ export default function GlobalError({
   reset: () => void
 }) {
   const locale: SupportedLocale = useMemo(() => {
-    if (typeof navigator === 'undefined') return 'pt-BR'
+    if (typeof window === 'undefined') return 'pt-BR'
 
     const lang = navigator.language
 
     if (lang in dictionaries) return lang as SupportedLocale
     if (lang.startsWith('en')) return 'en-US'
-    if (lang.startsWith('es')) return 'es-ES'
+    if (lang.startsWith('es')) {
+      if (lang.includes('AR')) return 'es-AR'
+      if (lang.includes('MX')) return 'es-MX'
+      return 'es-ES'
+    }
 
     return 'pt-BR'
   }, [])
 
-  // ✅ AQUI ESTÁ A CORREÇÃO
-  const dictionary: ErrorDictionary =
-    dictionaries[locale].errors
+  // ✅ Cast seguro garantindo que acessamos o objeto de erros
+  const dictionary = (dictionaries[locale] as any).errors as ErrorDictionary
 
-  const errorKey: keyof ErrorDictionary =
-    error.name in dictionary
-      ? (error.name as keyof ErrorDictionary)
-      : 'InternalServerError'
+  const errorKey = useMemo((): keyof ErrorDictionary => {
+    if (error.name in dictionary) {
+      return error.name as keyof ErrorDictionary
+    }
+    return 'InternalServerError'
+  }, [error.name, dictionary])
 
   useEffect(() => {
-    console.error('GLOBAL_ERROR', {
+    console.error('APP_ERROR_BOUNDARY', {
       name: error.name,
-      message: error.message,
       digest: error.digest,
-      stack: error.stack,
     })
   }, [error])
 
@@ -61,7 +64,8 @@ export default function GlobalError({
     <main className="flex min-h-screen w-full items-center justify-center bg-white p-4 dark:bg-slate-950">
       <ErrorDisplay
         errorKey={errorKey}
-        errorId={error.digest}
+        // ✅ CORREÇÃO DO TS: Garante que passe string ou trate o opcional
+        errorId={error.digest ?? ''} 
         dictionary={dictionary}
         reset={reset}
       />
