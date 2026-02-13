@@ -1,16 +1,12 @@
 // src/components/AboutSection.tsx
-import React from "react";
-import type { Dictionary, Locale } from "@/types/dictionary";
+import type { Dictionary } from "@/types/dictionary";
 
-// 1. Definição estrita de Props para TS 6.0
+// Definição estrita de Props — TS 5.9 / Next 16
 export interface AboutSectionProps {
-  readonly lang: Locale;
   readonly dict: Dictionary;
 }
 
-// 2. Export default direto para resolver o erro de build da Vercel
 export default function AboutSection({ dict }: AboutSectionProps) {
-  // Destruturação segura do dicionário
   const { about } = dict;
   const {
     title,
@@ -24,36 +20,42 @@ export default function AboutSection({ dict }: AboutSectionProps) {
   return (
     <section
       id="sobre"
-      className="w-full py-16 px-4 md:px-8 lg:px-16 bg-background text-foreground"
+      className="w-full bg-background px-4 py-16 text-foreground md:px-8 lg:px-16"
+      aria-labelledby="about-title"
     >
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header - Responsivo: Texto menor em mobile */}
+      <div className="mx-auto max-w-6xl space-y-8">
+        {/* Header */}
         <header className="space-y-2">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
+          <h2
+            id="about-title"
+            className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl"
+          >
             {title}
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground font-medium">
+
+          <p className="text-lg font-medium text-muted-foreground md:text-xl">
             {differentialTitle}
           </p>
         </header>
 
-        {/* Description - Melhorado o line-height para legibilidade */}
-        <div className="space-y-6 max-w-4xl">
-          <p className="text-base md:text-lg leading-relaxed text-balance">
+        {/* Description */}
+        <div className="max-w-4xl space-y-6">
+          <p className="text-balance text-base leading-relaxed md:text-lg">
             {description}
           </p>
-          <p className="text-base md:text-lg leading-relaxed text-muted-foreground text-balance">
+
+          <p className="text-balance text-base leading-relaxed text-muted-foreground md:text-lg">
             {differentialContent}
           </p>
         </div>
 
-        {/* Highlights - Flex Wrap nativo para mobile */}
-        {highlights && highlights.length > 0 && (
-          <ul className="flex flex-wrap gap-2 md:gap-3 pt-4">
+        {/* Highlights */}
+        {highlights.length > 0 && (
+          <ul className="flex flex-wrap gap-2 pt-4 md:gap-3">
             {highlights.map((item, index) => (
               <li
                 key={`${item}-${index}`}
-                className="rounded-full border border-border bg-secondary/20 px-4 py-1.5 text-xs md:text-sm font-medium transition-colors hover:bg-secondary/40"
+                className="rounded-full border border-border bg-secondary/20 px-4 py-1.5 text-xs font-medium transition-colors hover:bg-secondary/40 md:text-sm"
               >
                 {item}
               </li>
@@ -61,9 +63,9 @@ export default function AboutSection({ dict }: AboutSectionProps) {
           </ul>
         )}
 
-        {/* Stats - Grid Adaptável (1 col mobile -> 2 col tablet -> 4 col desktop) */}
+        {/* Stats */}
         {stats && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 pt-8">
+          <div className="grid grid-cols-1 gap-4 pt-8 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
             <div className="flex flex-col items-center justify-center rounded-xl border border-border p-6 transition-all hover:shadow-md">
               <span className="text-3xl font-bold text-primary">
                 {stats.experienceValue}
@@ -82,7 +84,6 @@ export default function AboutSection({ dict }: AboutSectionProps) {
               </span>
             </div>
 
-            {/* O item de automação ocupa 2 colunas no desktop para equilíbrio visual */}
             <div className="flex flex-col items-center justify-center rounded-xl border border-primary/20 bg-primary/5 p-6 sm:col-span-2">
               <span className="text-center font-medium text-foreground">
                 {stats.automation}
