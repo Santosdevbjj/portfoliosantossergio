@@ -12,7 +12,7 @@ interface ProjectSectionProps {
   readonly dict: Dictionary
 }
 
-export function ProjectSection({
+export default function ProjectSection({
   projects = [],
   lang,
   dict,
