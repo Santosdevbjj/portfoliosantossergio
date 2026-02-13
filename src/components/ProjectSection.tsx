@@ -22,15 +22,17 @@ export default function ProjectSection({
   const projectDict = dict.projects
   const statesDict = dict.states
 
+  // 1. Mapeamento de labels corrigido e preciso
   const uiLabels = {
     all: projectDict.viewAll || "All",
     filter: dict.common.navigation,
-    results: projectDict.featuredLabel, 
-    empty: statesDict.emptyProjects.description
+    empty: statesDict.emptyProjects.description,
+    itemsCount: lang === 'pt-BR' 
+      ? 'Itens' 
+      : (lang.startsWith('es') ? 'Elementos' : 'Items')
   }
 
   const filteredProjects = useMemo(() => {
-    // Filtramos pela categoria baseada na labelKey mapeada no domínio
     let base = [...projects]
 
     if (activeCategory !== 'all') {
@@ -66,8 +68,9 @@ export default function ProjectSection({
 
             <div className="flex items-center gap-3">
               <div className="w-10 h-1 bg-blue-600 rounded-full" />
+              {/* 2. JSX Atualizado com a lógica de pluralização/idioma */}
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
-                {filteredProjects.length} Items
+                {filteredProjects.length} {uiLabels.itemsCount}
               </p>
             </div>
           </div>
@@ -105,7 +108,7 @@ export default function ProjectSection({
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <ProjectCard
-                  project={project} // Cast temporário até atualizar o ProjectCard
+                  project={project}
                   lang={lang}
                   dict={dict}
                 />
