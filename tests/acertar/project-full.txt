@@ -1,1 +1,1313 @@
-.
+===== FILE:    package.json =====
+<conteúdo completo do arquivo
+
+{
+  "name": "portfolio-sergio-santos",
+  "version": "13.0.1",
+  "private": true,
+  "author": "Sérgio Santos",
+  "description": "Portfólio de Engenharia de Dados - Tailwind v4.0.6 & Lucide 0.563",
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:fast": "next build --no-lint",
+    "start": "next start",
+    "lint": "eslint . --ext .ts,.tsx",
+    "type-check": "next typegen && tsc --noEmit",
+    "clean": "rm -rf .next node_modules package-lock.json && npm install"
+  },
+  "dependencies": {
+    "next": "16.1.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "framer-motion": "12.34.0",
+    "lucide-react": "0.563.0",
+    "clsx": "2.1.1",
+    "tailwind-merge": "3.4.0",
+    "class-variance-authority": "0.7.1",
+    "next-themes": "0.4.6",
+    "tailwindcss": "4.1.18"
+  },
+  "devDependencies": {
+    "typescript": "6.0.0-beta",
+    "@tailwindcss/postcss": "4.1.18",
+    "postcss": "8.5.6",
+    "@types/node": "25.2.3",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "eslint": "10.0.0",
+    "eslint-config-next": "16.1.6",
+    "sharp": "^0.34.5"
+  }
+} 
+>
+
+
+
+
+
+
+
+
+
+===== FILE:    tsconfig.json    =====
+<conteúdo completo do arquivo
+
+{
+  "compilerOptions": {
+    /* --- MOTOR NATIVO TS 6.0 & NEXT.JS 16 --- */
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",   
+    "verbatimModuleSyntax": true,    /* Exige import type para tipos */
+    "isolatedDeclarations": true,    /* Melhora performance de build em 2026 */
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* --- RIGOR DE MISSÃO CRÍTICA (Padrão Bancário) --- */
+    "strict": true,
+    "noUncheckedIndexedAccess": true, 
+    "exactOptionalPropertyTypes": true, 
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false, 
+    /* "noUncheckedSideEffectImports": true, */ /* Removido: pode causar erro com CSS imports */
+
+    /* --- NEXT.JS 16 & REACT 19 ARCHITECTURE --- */
+    "jsx": "react-jsx",
+    "incremental": true,
+    "tsBuildInfoFile": "node_modules/.cache/tsconfig.tsbuildinfo",
+    
+    /* --- INTEROP & SECURITY --- */
+    "esModuleInterop": true,         
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "skipLibCheck": true,          
+    "forceConsistentCasingInFileNames": true,
+
+    /* --- PERFORMANCE & TYPES --- */
+    "types": ["node"],
+    /* Removida stableTypeOrdering pois é experimental no TS 6.0 */
+
+    /* --- INFRASTRUCTURE PATHS --- */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "#/*": ["./src/*"]
+    },
+
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts" /* Mantido como sugerido pelo Next.js */
+  ],
+
+  "exclude": [
+    "node_modules", 
+    ".next", 
+    "out",
+    "build"
+  ]
+} 
+>
+
+
+
+
+
+===== FILE:    next.config.ts  =====
+<conteúdo completo do arquivo
+
+import type { NextConfig } from "next";
+
+/**
+ * NEXT.JS 16 & NODE 24 CONFIGURATION — SÉRGIO SANTOS PORTFOLIO
+ * -----------------------------------------------------------------------------
+ * Node.js: 24.x (LTS)
+ * TS Engine: 6.0 Ready
+ * i18n Strategy: App Router Middleware (Configuração removida para evitar erro de build)
+ */
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  
+  // Suporte nativo para telemetria no Node 24 (Otimizado para Sharp)
+  serverExternalPackages: ["@microsoft/applicationinsights-web"], 
+
+  experimental: {
+    // Next 16: Otimização agressiva de pacotes de UI
+    optimizePackageImports: [
+      "lucide-react",
+      "framer-motion",
+      "clsx",
+      "tailwind-merge",
+      "date-fns"
+    ],
+    // React 19/20 Taint API: Segurança para dados sensíveis do backend
+    taint: true, 
+    // Habilita o novo motor de cache estável do Next 16
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
+  },
+
+  /* * NOTA: O bloco 'i18n' foi removido porque o App Router lida com isso 
+   * via diretórios [lang] e Middleware. Mantê-lo aqui causaria erro de build.
+   */
+
+  images: {
+    // AVIF priorizado (Padrão ouro em 2026)
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.medium.com',
+      }
+    ],
+    minimumCacheTTL: 3600, 
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+
+  typescript: {
+    // Rigor do TS 6.0: Impede deploys com bugs de tipagem
+    ignoreBuildErrors: false,
+    tsconfigPath: './tsconfig.json'
+  },
+
+  // Segurança e Performance
+  poweredByHeader: false, 
+  compress: true,        
+  
+  // Transpilação de lógica de negócio compartilhada
+  transpilePackages: ['@santos/portfolio-logic'], 
+};
+
+export default nextConfig;
+>
+
+
+
+
+
+
+
+
+===== FILE:  eslint.config.mjs   =====
+<conteúdo completo do arquivo
+
+import { FlatCompat } from '@eslint/eslintrc';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import prettier from 'eslint-config-prettier';
+import globals from 'globals';
+import { fixupConfigRules } from '@eslint/compat';
+import tseslint from 'typescript-eslint'; // Importação direta recomendada no v10
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+  resolvePluginsRelativeTo: __dirname,
+});
+
+/** @type {import('eslint').Linter.Config[]} */
+export default [
+  /**
+   * 1️⃣ Ignorar arquivos gerados e de infraestrutura
+   */
+  {
+    ignores: [
+      '.next/**',
+      'node_modules/**',
+      'out/**',
+      'build/**',
+      'public/**',
+      '**/*.d.ts',
+      'next.config.ts', // Configs de infra costumam ter regras próprias
+    ],
+  },
+
+  /**
+   * 2️⃣ Configuração de Parser para TS 6.0
+   */
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        // Habilita o novo motor de performance do TS 6.0
+        projectService: true,
+        tsconfigRootDir: __dirname,
+        ecmaFeatures: { jsx: true },
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2024, // Atualizado para 2024 (Node 24)
+      },
+    },
+  },
+
+  /**
+   * 3️⃣ Compatibilidade Next.js 16 & Plugins v10
+   */
+  ...fixupConfigRules(
+    compat.extends(
+      'plugin:@next/next/core-web-vitals',
+      'plugin:@typescript-eslint/recommended-type-checked' // Versão mais segura para Ciência de Dados
+    )
+  ),
+
+  /**
+   * 4️⃣ Regras Customizadas e Refinamento
+   */
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    rules: {
+      /* --- Performance & Next.js 16 (RSC) --- */
+      '@next/next/no-img-element': 'error',
+      '@next/next/no-html-link-for-pages': 'error',
+
+      /* --- TypeScript 6.0 Engine --- */
+      // Obriga o uso de 'type' no import, reduzindo o bundle final (Tree-shaking)
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
+      ],
+
+      // Regra de ouro para 2026: detectar código depreciado do ecossistema
+      '@typescript-eslint/no-deprecated': 'warn',
+
+      // Tratamento inteligente de variáveis não usadas
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { 
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true 
+        },
+      ],
+
+      /* --- Flexibilidade (Ideal para manipulação de objetos dinâmicos/JSON) --- */
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+
+      /* --- React & Clean Code --- */
+      'react/react-in-jsx-scope': 'off',
+      'no-console': ['warn', { allow: ['warn', 'error', 'info', 'debug'] }],
+      'prefer-const': 'error',
+      'eqeqeq': ['error', 'always', { null: 'ignore' }],
+      
+      // Garante que o build falhe se houver promessas flutuantes (Importante para o Dictionary async)
+      '@typescript-eslint/no-floating-promises': 'error',
+    },
+  },
+
+  /**
+   * 5️⃣ Formatação
+   */
+  prettier,
+];
+
+>
+
+
+
+
+===== FILE:   vercel.ts  =====
+<conteúdo completo do arquivo
+
+// vercel.ts
+/**
+ * VERCEL CONFIGURATION
+ * -----------------------------------------------------------------------------
+ * Removida a tipagem estrita de @vercel/config/v1 que estava causando o erro
+ * "Type '"image/webp"' is not assignable to type '"image/png"'".
+ */
+
+const config = {
+  framework: 'nextjs',
+  cleanUrls: true,
+  trailingSlash: false,
+
+  images: {
+    sizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    // Removendo a tipagem estrita, o compilador aceita os formatos modernos
+    formats: ['image/webp'],
+    minimumCacheTTL: 60,
+    remotePatterns: [
+      { protocol: 'https', hostname: '**.githubusercontent.com' },
+      { protocol: 'https', hostname: '**.medium.com' }
+    ]
+  },
+
+  headers: [
+    {
+      source: '/(.*)',
+      headers: [
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'X-Frame-Options', value: 'DENY' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { 
+          key: 'Strict-Transport-Security', 
+          value: 'max-age=31536000; includeSubDomains; preload' 
+        }
+      ],
+    }
+  ],
+
+  redirects: [
+    {
+      source: '/',
+      destination: '/pt',
+      permanent: false
+    }
+  ]
+};
+
+export default config;
+
+>
+
+
+
+
+
+
+
+
+
+
+===== FILE: .prettierrc.json   =====
+<conteúdo completo do arquivo
+
+{
+  "semi": true,
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "singleAttributePerLine": true,
+  "embeddedLanguageFormatting": "auto",
+  "proseWrap": "preserve",
+  "htmlWhitespaceSensitivity": "css",
+
+  "plugins": [
+    "prettier-plugin-tailwindcss",
+    "@trivago/prettier-plugin-sort-imports"
+  ],
+
+  "// Import Sorting Config": "Configuração para o plugin @trivago",
+  "importOrder": [
+    "^(react/(.*)$)|^(react$)",
+    "^(next/(.*)$)|^(next$)",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^@/types/(.*)$",
+    "^@/dictionaries/(.*)$",
+    "^@/domain/(.*)$",
+    "^@/services/(.*)$",
+    "^@/hooks/(.*)$",
+    "^@/components/(.*)$",
+    "^@/styles/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+
+  "tailwindAttributes": ["className", "class", "tw"],
+  "tailwindFunctions": ["clsx", "twMerge", "twJoin", "cn", "cva"],
+
+  "overrides": [
+    {
+      "files": [
+        "**/app/api/**/route.tsx",
+        "**/app/api/**/route.ts",
+        "**/app/**/og.tsx",
+        "**/app/**/og.ts"
+      ],
+      "options": {
+        "printWidth": 120,
+        "bracketSameLine": true,
+        "singleAttributePerLine": false,
+        "htmlWhitespaceSensitivity": "ignore",
+        "embeddedLanguageFormatting": "off"
+      }
+    },
+    {
+      "files": ["*.json", "*.jsonc"],
+      "options": {
+        "parser": "json",
+        "singleQuote": false
+      }
+    }
+  ]
+}
+
+>
+
+
+
+
+
+
+
+
+
+
+
+===== FILE: mcp-env.js =====
+<conteúdo completo do arquivo
+
+#!/usr/bin/env node
+const { spawn } = require("child_process");
+const net = require("net");
+
+// Função para checar porta padrão ou próxima disponível
+function detectPort(host = "localhost", defaultPort = 3000) {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    server.once("error", () => resolve(defaultPort)); 
+    server.once("listening", () => {
+      server.close(() => resolve(defaultPort));
+    });
+    server.listen(defaultPort, host);
+  });
+}
+
+(async () => {
+  const host = process.env.NEXT_DEV_SERVER_HOST || "localhost";
+  const port = process.env.NEXT_DEV_SERVER_PORT || (await detectPort(host, 3000));
+
+  const env = {
+    ...process.env,
+    NEXT_DEV_SERVER_HOST: host,
+    NEXT_DEV_SERVER_PORT: port.toString(),
+    NEXT_DEV_SERVER_URL: `http://${host}:${port}`,
+    NODE_ENV: process.env.NODE_ENV || "development"
+  };
+
+  console.error(`✅ MCP Environment: ${env.NEXT_DEV_SERVER_URL}`);
+
+  // Inicia o servidor MCP real como um processo filho
+  // Isso permite que o .mcp.json chame apenas este script
+  const cmd = "npx";
+  const args = ["-y", "next-devtools-mcp@latest"];
+
+  const child = spawn(cmd, args, {
+    env,
+    stdio: "inherit", // Mantém a comunicação stdio necessária para o protocolo MCP
+    shell: true
+  });
+
+  child.on("exit", (code) => process.exit(code || 0));
+})();
+
+>
+
+
+
+
+
+
+
+
+
+===== FILE: additional-modules.d.ts =====
+<conteúdo completo do arquivo
+
+// src/types/additional-modules.d.ts
+declare module "*.css" {
+  const content: any;
+  export default content;
+}
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+===== FILE:  .npmrc =====
+<conteúdo completo do arquivo
+
+legacy-peer-deps=true
+
+>
+
+
+
+
+
+
+===== FILE:  .mcp.json =====
+<conteúdo completo do arquivo
+
+{
+  "mcpServers": {
+    "next-devtools": {
+      "description": "Next.js DevTools MCP - Auto-detecting env",
+      "command": "node",
+      "args": ["mcp-env.js"],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    "typescript-analyzer": {
+      "description": "TypeScript analysis server using MCP",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-typescript",
+        "--project",
+        "."
+      ]
+    }
+  }
+}
+>
+
+
+
+
+
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+===== FILE:   .gitignore    =====
+<conteúdo completo do arquivo
+
+# =====================================================
+# DEPENDÊNCIAS — Node.js / NPM / Bun
+# =====================================================
+node_modules/
+.pnp
+.pnp.js
+.yarn/
+# Lockfiles são essenciais (MANTENHA package-lock.json ou pnpm-lock.yaml)
+
+# =====================================================
+# BUILD E SAÍDA — Next.js 16 + Turbopack
+# =====================================================
+.next/
+# IMPORTANTE: Mantemos o cache para acelerar builds na Vercel/CI
+!.next/cache/
+.next/trace
+.next/types
+out/
+build/
+dist/
+.vercel/
+
+# TypeScript 6.0 Incremental & Metadata
+*.tsbuildinfo
+next-env.d.ts
+# O TS 6.0 gera definições automáticas para Server Actions e Metadata
+.next/server-reference-manifest.json
+
+# =====================================================
+# VARIÁVEIS DE AMBIENTE — SEGURANÇA MÁXIMA
+# =====================================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+# Arquivos de credenciais de Cloud/Databricks
+.azure/
+.aws/
+*.pem
+*.key
+*.pub
+
+# Permitir apenas o modelo de exemplo
+!.env.example
+
+# =====================================================
+# LOGS, CACHE E PERFORMANCE (Turborepo / Nx)
+# =====================================================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+.cache/
+.turbo/
+.eslintcache
+.stylelintcache
+coverage/
+.nyc_output/
+
+# =====================================================
+# SISTEMA OPERACIONAL
+# =====================================================
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+desktop.ini
+
+# =====================================================
+# IDEs E EDITORES
+# =====================================================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+.idea/
+*.swp
+*.swo
+
+# =====================================================
+# CIÊNCIA DE DADOS E BACKEND (Python/SQL/Neo4J)
+# =====================================================
+# Ignora arquivos de dados pesados e temporários
+*.csv
+*.xlsx
+*.parquet
+*.sqlite
+*.db
+*.jsonl
+
+# Python (Venv & Notebooks)
+.venv/
+env/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+.python-version
+
+# =====================================================
+# ARQUIVOS TEMPORÁRIOS E BACKUPS
+# =====================================================
+*.tmp
+*.temp
+*.bak
+*.old
+*.patch
+
+>
+
+
+
+
+
+===== FILE:   .env.example    =====
+<conteúdo completo do arquivo
+
+# ============================================================================
+# CONFIGURAÇÕES DE AMBIENTE — PORTFÓLIO SÉRGIO SANTOS
+# ============================================================================
+# 📌 Instruções:
+# 1. Copie este arquivo para: .env.local
+# 2. Preencha os valores reais
+# 3. NUNCA versionar .env.local no GitHub
+# ============================================================================
+# Projeto: Next.js 16 + App Router + Vercel + i18n (pt/en/es)
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# GITHUB — CONFIGURAÇÕES DE INTEGRAÇÃO
+# ----------------------------------------------------------------------------
+
+# Nome de usuário do GitHub
+# Usado para buscar automaticamente os repositórios públicos do portfólio
+NEXT_PUBLIC_GITHUB_USERNAME=Santosdevbjj
+
+# GitHub Personal Access Token (SERVER-SIDE ONLY)
+# ----------------------------------------------------------------------------
+# ⚠️ NÃO use o prefixo NEXT_PUBLIC
+# ⚠️ Este token NÃO deve ser exposto ao navegador
+#
+# Gere em:
+# GitHub → Settings → Developer Settings → Personal Access Tokens
+# Tipo recomendado: Fine-grained token
+# Permissões mínimas:
+# - Contents: Read-only
+#
+# Benefício:
+# - Evita rate limit (60 req/h sem token → 5.000 req/h com token)
+#
+GITHUB_ACCESS_TOKEN=seu_token_aqui
+
+# ----------------------------------------------------------------------------
+# APLICAÇÃO — CONFIGURAÇÕES GERAIS
+# ----------------------------------------------------------------------------
+
+# URL base do site
+# Usada para:
+# - OpenGraph (og:image)
+# - SEO metadata
+# - Canonical URLs
+#
+# Exemplos:
+# Local:      http://localhost:3000
+# Preview:    https://seu-projeto-git-branch.vercel.app
+# Produção:   https://portfoliosantossergio.vercel.app
+#
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# ----------------------------------------------------------------------------
+# ANALYTICS — OPCIONAL
+# ----------------------------------------------------------------------------
+
+# Google Analytics (GA4)
+# Descomente apenas se for utilizar
+# NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+
+>
+
+
+
+
+
+
+
+
+===== FILE:    .editorconfig   =====
+<conteúdo completo do arquivo
+
+# EditorConfig: Padronização Universal de Código
+# Projeto: Portfolio Sérgio Santos
+# Mantém consistência entre IDEs e previne diffs desnecessários no Git
+
+root = true
+
+# ======================================================
+# Configuração global (default)
+# ======================================================
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# ======================================================
+# Markdown e MDX (preservar espaços finais para <br>)
+# ======================================================
+[*.{md,mdx}]
+trim_trailing_whitespace = false
+indent_size = 2
+
+# ======================================================
+# Python e SQL (PEP8 e legibilidade)
+# ======================================================
+[*.{py,sql}]
+indent_style = space
+indent_size = 4
+
+# ======================================================
+# Jupyter Notebooks (JSON – não modificar trailing whitespace)
+# ======================================================
+[*.ipynb]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+# ======================================================
+# Desenvolvimento Web Moderno
+# Next.js, React, TypeScript, CSS, Tailwind, Infra YAML
+# ======================================================
+[*.{js,jsx,ts,tsx,cjs,mjs,cts,mts,css,scss,html,yml,yaml,toml}]
+indent_style = space
+indent_size = 2
+
+# ======================================================
+# Arquivos estruturados (JSON, XML, WebManifest, Configs)
+# ======================================================
+[*.{json,xml,webmanifest}]
+indent_style = space
+indent_size = 2
+
+# ======================================================
+# Variáveis de ambiente (.env)
+# ======================================================
+[*.env*]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+# ======================================================
+# Shell Scripts (sh, bash, zsh)
+# Escolha consciente: spaces + 4 para legibilidade
+# ======================================================
+[*.{sh,bash,zsh}]
+indent_style = space
+indent_size = 4
+
+[Dockerfile]
+indent_style = space
+indent_size = 4
+
+# ======================================================
+# Makefiles (exigem TAB real)
+# ======================================================
+[Makefile]
+indent_style = tab
+indent_size = 4
+
+# ======================================================
+# Dados brutos e logs (não remover whitespace)
+# ======================================================
+[*.{csv,log}]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+# ======================================================
+# Lockfiles (preservar newline final)
+# ======================================================
+[*.lock]
+trim_trailing_whitespace = false
+insert_final_newline = true
+
+# ======================================================
+# Arquivos binários e assets (não modificar)
+# ======================================================
+[*.{png,jpg,jpeg,gif,webp,svg,ico,pdf,woff,woff2}]
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+>
+
+
+
+
+
+
+===== FILE:  .vscode/extensions.json =====
+<conteúdo completo do arquivo
+
+{
+  "recommendations": [
+    // ======================================================
+    // Next.js / React / TypeScript
+    // ======================================================
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+
+    // ======================================================
+    // Tailwind CSS (DX completo)
+    // ======================================================
+    "bradlc.vscode-tailwindcss",
+
+    // ======================================================
+    // UI / UX / Acessibilidade
+    // ======================================================
+    "deque-systems.vscode-axe-linter",
+
+    // ======================================================
+    // Git / Produtividade
+    // ======================================================
+    "eamodio.gitlens",
+
+    // ======================================================
+    // Markdown / MDX / Docs
+    // ======================================================
+    "davidanson.vscode-markdownlint",
+
+    // ======================================================
+    // Infra / Config / Qualidade
+    // ======================================================
+    "editorconfig.editorconfig",
+
+    // ======================================================
+    // Ícones e Visual (opcional, mas recomendado)
+    // ======================================================
+    "pkief.material-icon-theme"
+  ],
+
+  "unwantedRecommendations": [
+    // ======================================================
+    // Evita conflitos com Prettier / ESLint
+    // ======================================================
+    "hookyqr.beautify",
+    "esbenp.prettier-vscode-eslint"
+  ]
+}
+
+>
+
+
+
+
+
+
+
+
+
+===== FILE:  .vscode/settings.json   =====
+<conteúdo completo do arquivo
+
+
+{
+  // ======================================================
+  // Formatação Geral
+  // ======================================================
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // ======================================================
+  // ESLint (Flat Config - Next.js 16)
+  // ======================================================
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.useFlatConfig": true,
+  "eslint.experimental.useFlatConfig": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  // ======================================================
+  // Prettier
+  // ======================================================
+  "prettier.requireConfig": true,
+  "prettier.useEditorConfig": true,
+
+  // ======================================================
+  // Tailwind CSS DX
+  // ======================================================
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "tailwindCSS.classAttributes": ["class", "className"],
+  "tailwindCSS.experimental.classRegex": [
+    "(clsx|cn|twMerge)\\(([^)]*)\\)"
+  ],
+
+  // ======================================================
+  // Controle por Linguagem
+  // ======================================================
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ======================================================
+  // Arquivos sensíveis (não formatar automaticamente)
+  // ======================================================
+  "[dotenv]": {
+    "editor.formatOnSave": false
+  },
+  "[csv]": {
+    "editor.formatOnSave": false
+  },
+  "[log]": {
+    "editor.formatOnSave": false
+  },
+
+  // ======================================================
+  // Integração TypeScript + Next.js
+  // ======================================================
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.format.enable": false,
+  "typescript.suggest.completeFunctionCalls": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  // ======================================================
+  // Integração React / JS
+  // ======================================================
+  "javascript.suggest.autoImports": true,
+  "typescript.suggest.autoImports": true
+}
+
+>
+
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
