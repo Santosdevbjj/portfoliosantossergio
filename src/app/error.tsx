@@ -11,10 +11,6 @@ import esES from '@/dictionaries/errors/es-ES.json'
 import esAR from '@/dictionaries/errors/es-AR.json'
 import esMX from '@/dictionaries/errors/es-MX.json'
 
-/* -------------------------------------------------------------------------- */
-/* TYPES                                                                      */
-/* -------------------------------------------------------------------------- */
-
 type ErrorDictionaryFile = {
   errors: ErrorDictionary
 }
@@ -36,10 +32,6 @@ type AppError = Error & {
   errorId?: string
   digest?: string
 }
-
-/* -------------------------------------------------------------------------- */
-/* COMPONENT                                                                  */
-/* -------------------------------------------------------------------------- */
 
 export default function GlobalError({
   error,
@@ -76,11 +68,7 @@ export default function GlobalError({
   }
 
   const translatedError: AppError = error.digest
-    ? {
-        ...baseError,
-        errorId: error.digest,
-        digest: error.digest,
-      }
+    ? { ...baseError, errorId: error.digest, digest: error.digest }
     : baseError
 
   useEffect(() => {
@@ -93,7 +81,6 @@ export default function GlobalError({
         error={translatedError}
         reset={reset}
         dictionary={dictionaries[locale]}
-        locale={locale}
       />
     </main>
   )
