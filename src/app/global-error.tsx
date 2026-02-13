@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ErrorDisplay } from '@/components/error-display';
 import type { ErrorDictionary } from '@/types/error-dictionary';
 
@@ -20,76 +20,51 @@ const dictionaries = {
 
 type SupportedLocale = keyof typeof dictionaries;
 
-type GlobalAppError = Error & {
-  digest?: string;
-  errorId?: string;
-  title?: string;
-  action?: string;
-};
-
 export default function GlobalError({
   error,
   reset,
 }: {
-  error: GlobalAppError;
+  error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const getLocale = (): SupportedLocale => {
-    if (typeof window === 'undefined') return 'pt-BR';
+  const locale: SupportedLocale = useMemo(() => {
+    if (typeof navigator === 'undefined') return 'pt-BR';
 
-    const lang = navigator.language as SupportedLocale;
-    if (lang in dictionaries) return lang;
+    const lang = navigator.language;
 
-    const prefix = lang.split('-')[0];
-    if (prefix === 'en') return 'en-US';
-    if (prefix === 'es') return 'es-ES';
+    if (lang in dictionaries) return lang as SupportedLocale;
+    if (lang.startsWith('en')) return 'en-US';
+    if (lang.startsWith('es')) return 'es-ES';
 
     return 'pt-BR';
-  };
+  }, []);
 
-  const locale = getLocale();
-  const dict = dictionaries[locale].errors;
+  const dictionary: ErrorDictionary =
+    dictionaries[locale].errors;
 
   const errorKey: keyof ErrorDictionary =
-    error.name in dict
+    error.name in dictionary
       ? (error.name as keyof ErrorDictionary)
       : 'InternalServerError';
 
-  // 🔥 CONSTRUÇÃO SEGURA PARA exactOptionalPropertyTypes
-  const translatedError: GlobalAppError = new Error(
-    error.message || dict[errorKey].message
-  );
-
-  translatedError.name = error.name;
-  translatedError.title = error.title ?? dict[errorKey].title;
-  translatedError.action = error.action ?? dict[errorKey].action;
-
-  if (error.digest) {
-    translatedError.digest = error.digest;
-    translatedError.errorId = error.digest;
-  }
-
-  if (error.stack) {
-    translatedError.stack = error.stack;
-  }
-
   useEffect(() => {
-    console.error('FATAL_GLOBAL_ERROR', {
-      digest: error.digest,
+    console.error('GLOBAL_ERROR', {
       name: error.name,
       message: error.message,
+      digest: error.digest,
       stack: error.stack,
     });
   }, [error]);
 
   return (
     <html lang={locale.split('-')[0]}>
-      <body className="m-0 p-0 antialiased">
-        <main className="flex min-h-screen w-full items-center justify-center bg-white dark:bg-slate-950 p-4">
+      <body className="antialiased">
+        <main className="flex min-h-screen w-full items-center justify-center bg-white p-4 dark:bg-slate-950">
           <ErrorDisplay
-            error={translatedError}
+            errorKey={errorKey}
+            errorId={error.digest}
+            dictionary={dictionary}
             reset={reset}
-            locale={locale}
           />
         </main>
       </body>
