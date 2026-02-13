@@ -11,7 +11,7 @@ interface FeaturedArticleSectionProps {
   readonly dict: Dictionary
 }
 
-export const FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionProps) => {
+export default FeaturedArticleSection = ({ lang, dict }: FeaturedArticleSectionProps) => {
   const sectionRef = useRef<HTMLElement | null>(null)
   const { articles, common } = dict
 
