@@ -39,8 +39,8 @@ Para garantir a integridade e a experiência do usuário, adotei as seguintes pr
 A arquitetura foi escolhida para refletir o que há de mais moderno e escalável no mercado corporativo:
 
 
- * Next.js 15.5.7 (App Router): Renderização híbrida para máxima performance.
- * TypeScript 5.7: Tipagem estrita para garantir estabilidade em sistemas de dados.
+ * Next.js 16.1.6 (App Router): Renderização híbrida para máxima performance.
+ * TypeScript 6.0 : Tipagem estrita para garantir estabilidade em sistemas de dados.
  * Tailwind CSS & Framer Motion: Interface responsiva focada em legibilidade e fluidez.
  * Node.js 24 LTS: Backend robusto utilizando a versão mais estável do ecossistema.
  * Intl (Native): Gerenciamento de idiomas sem dependências desnecessárias, priorizando a leveza do bundle.
