@@ -19,7 +19,7 @@ interface ContactSectionProps {
   readonly dict: Dictionary;
 }
 
-export const ContactSection = ({ lang, dict }: ContactSectionProps) => {
+export default ContactSection = ({ lang, dict }: ContactSectionProps) => {
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
   
