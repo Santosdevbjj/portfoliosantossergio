@@ -88,7 +88,7 @@ Um projeto técnico só tem valor se comunica resultados. Este portfólio entreg
 
 ## 🚀 Modernização & Segurança (Janeiro 2026)
 
-Este projeto foi totalmente migrado para o **Next.js 16.1.4**, operando no ambiente **Node.js 24.x (LTS)**. A atualização não visou apenas performance, mas a blindagem total contra as vulnerabilidades críticas reportadas no ecossistema React/Next.js no final de 2025.
+Este projeto foi totalmente migrado para o **Next.js 16.1.6**, operando no ambiente **Node.js 24.x (LTS)**. A atualização não visou apenas performance, mas a blindagem total contra as vulnerabilidades críticas reportadas no ecossistema React/Next.js no final de 2025.
 
 ### 🛡️ Implementações de Segurança Máxima
 - **Patch React2Shell (CVE-2025-66478):** Migração obrigatória para o motor estável do Next.js 16 para mitigar riscos de Execução Remota de Código (RCE) em Server Components.
@@ -101,9 +101,9 @@ Este projeto foi totalmente migrado para o **Next.js 16.1.4**, operando no ambie
 - **Model Context Protocol (MCP):** Integração de servidores MCP (`next-devtools-mcp` e `typescript-analyzer`) para diagnóstico assistido por IA e análise estática de tipos em tempo real durante o desenvolvimento.
 
 ### 🛠️ Stack Técnica Atualizada
-- **Core:** Next.js 16.1.4 + React 19.0.0
+- **Core:** Next.js 16.1.6 + React 19.0.0
 - **Runtime:** Node.js 24.x (Krypton LTS)
-- **Linter/Tooling:** ESLint 8.57.1 (Flat Config ready) + TypeScript 5.7.3
+- **Linter/Tooling:** ESLint 10.0.0 (Flat Config ready) + TypeScript 6.0
 - **Infras:** Vercel (Edge-ready configuration)
 
 
