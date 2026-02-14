@@ -1,6 +1,6 @@
 'use client'
 
-// import React from 'react'
+import React from 'react'
 import { notFound } from 'next/navigation'
 
 // 1. Imports de Tipos (Metadados - SEMpre com .js no final em 2026)
