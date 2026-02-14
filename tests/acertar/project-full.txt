@@ -8789,7 +8789,699 @@ export function useScrollSpy(): ScrollSpyContextValue {
 
 
 
-===== FILE:       =====
+===== FILE: src/dictionaries/index.ts     =====
+<conteúdo completo do arquivo
+
+
+// src/dictionaries/index.ts
+import type { Dictionary, Locale } from "@/types/dictionary";
+
+const dictionaries = {
+  "pt-BR": () => import("./pt-BR.json").then((m) => m.default as Dictionary),
+  "en-US": () => import("./en-US.json").then((m) => m.default as Dictionary),
+  "es-ES": () => import("./es-ES.json").then((m) => m.default as Dictionary),
+  "es-AR": () => import("./es-AR.json").then((m) => m.default as Dictionary),
+  "es-MX": () => import("./es-MX.json").then((m) => m.default as Dictionary),
+};
+
+export const getDictionary = async (locale: Locale): Promise<Dictionary> => {
+  const loadDictionary = dictionaries[locale] ?? dictionaries["pt-BR"];
+  return loadDictionary();
+};
+
+
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== FILE: src/dictionaries/validator.ts  =====
+<conteúdo completo do arquivo
+
+
+// src/dictionaries/validator.ts
+
+import { Dictionary } from "@/types/dictionary";
+
+export function validateDictionary(
+  dictionary: Dictionary
+): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  // --- Função Auxiliar: Validação de SEO ---
+  const validateSeo = (seo: any) => {
+    if (!seo) {
+      errors.push("Missing seo section");
+      return;
+    }
+    if (!seo.siteName) errors.push("Missing seo.siteName");
+    if (!Array.isArray(seo.keywords)) errors.push("seo.keywords must be an array");
+    
+    const requiredPages = ['home', 'projects', 'articles'];
+    requiredPages.forEach(page => {
+      if (!seo.pages?.[page]?.title) errors.push(`Missing seo.pages.${page}.title`);
+      if (!seo.pages?.[page]?.description) errors.push(`Missing seo.pages.${page}.description`);
+    });
+  };
+
+  // --- 1. Validação de Meta e Internacionalização ---
+  if (!dictionary?.meta?.locale) {
+    errors.push("Missing meta.locale");
+  }
+  if (!dictionary?.intl?.currency) {
+    errors.push("Missing intl section or currency");
+  }
+
+  // --- 2. Validação de SEO ---
+  validateSeo(dictionary.seo);
+
+  // --- 3. Validação da Seção Hero ---
+  if (!dictionary?.hero) {
+    errors.push("Missing hero section");
+  } else {
+    if (!dictionary.hero.title) errors.push("Missing hero.title");
+    if (!dictionary.hero.ctaPrimary) errors.push("Missing hero.ctaPrimary");
+  }
+
+  // --- 4. Validação de Experiência Profissional ---
+  if (!dictionary?.experience) {
+    errors.push("Missing experience section");
+  } else {
+    if (!dictionary.experience.title) errors.push("Missing experience.title");
+    if (!Array.isArray(dictionary.experience.items) || dictionary.experience.items.length === 0) {
+      errors.push("experience.items must be a non-empty array");
+    } else {
+      dictionary.experience.items.forEach((item, index) => {
+        if (!item.company) errors.push(`Missing experience.items[${index}].company`);
+        if (!item.role) errors.push(`Missing experience.items[${index}].role`);
+      });
+    }
+  }
+
+  // --- 5. Validação de Artigos ---
+  if (!dictionary?.articles) {
+    errors.push("Missing articles section");
+  } else {
+    const { articles } = dictionary;
+    if (!articles.title) errors.push("Missing articles.title");
+    if (!Array.isArray(articles.items)) {
+      errors.push("articles.items must be an array");
+    } else {
+      articles.items.forEach((article, index) => {
+        if (!article.title) errors.push(`Missing articles.items[${index}].title`);
+        if (!article.link) errors.push(`Missing articles.items[${index}].link`);
+        if (typeof article.isAward !== 'boolean') {
+          errors.push(`articles.items[${index}].isAward must be a boolean`);
+        }
+      });
+    }
+  }
+
+  // --- 6. Validação de Projetos e Categorias ---
+  if (!dictionary?.projects?.categories) {
+    errors.push("Missing projects.categories section");
+  }
+
+  // --- 7. Validação de Contato e Erros ---
+  if (!dictionary?.contact?.cta) errors.push("Missing contact.cta");
+  
+  if (!dictionary?.common?.errorBoundary?.actions?.retry) {
+    errors.push("Missing common.errorBoundary.actions.retry");
+  }
+
+  // --- 8. Validação de Estados de UI (Empty States) ---
+  if (!dictionary?.states?.emptyProjects?.title) {
+    errors.push("Missing states.emptyProjects.title");
+  }
+
+  // --- 9. Validação de Métricas (Normalização) ---
+  if (dictionary?.metrics?.availabilityNormalized) {
+    const { value, unit } = dictionary.metrics.availabilityNormalized;
+    if (typeof value !== "number") {
+      errors.push("metrics.availabilityNormalized.value must be a number");
+    }
+    if (unit !== "%") {
+      errors.push("metrics.availabilityNormalized.unit must be '%'");
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== FILE: src/dictionaries/fallback.ts  =====
+<conteúdo completo do arquivo
+
+// src/dictionaries/fallback.ts
+
+import ptBR from "./pt-BR.json";
+import enUS from "./en-US.json";
+import esES from "./es-ES.json";
+import esAR from "./es-AR.json"; 
+import esMX from "./es-MX.json";
+
+import type { Dictionary, Locale } from "@/types/dictionary";
+
+// Usando o tipo Locale para garantir que as chaves principais estejam corretas
+const DICTIONARIES: Record<string, any> = {
+  "pt-BR": ptBR,
+  "en-US": enUS,
+  "es-ES": esES,
+  "es-AR": esAR,
+  "es-MX": esMX
+};
+
+const FALLBACK_CHAIN: Record<string, string[]> = {
+  "es-AR": ["es-AR", "es-ES", "pt-BR"],
+  "es-MX": ["es-MX", "es-ES", "pt-BR"],
+  "es-ES": ["es-ES", "pt-BR"],
+  "en-US": ["en-US", "pt-BR"],
+  "pt-BR": ["pt-BR"]
+};
+
+export function getDictionary(locale: string): Dictionary {
+  const chain = FALLBACK_CHAIN[locale] || ["pt-BR"];
+
+  for (const lang of chain) {
+    if (DICTIONARIES[lang]) {
+      return DICTIONARIES[lang] as Dictionary;
+    }
+  }
+
+  // Fallback definitivo caso nada na corrente seja encontrado
+  return ptBR as Dictionary;
+}
+
+
+>
+
+
+
+
+
+
+
+===== FILE:  src/dictionaries/labels.json  =====
+<conteúdo completo do arquivo
+
+{
+  "pt-BR": {
+    "home": "Início",
+    "back": "Voltar",
+    "retry": "Tentar novamente",
+    "close": "Fechar",
+    "open": "Abrir",
+    "breadcrumb_root": "Início"
+  },
+  "en-US": {
+    "home": "Home",
+    "back": "Back",
+    "retry": "Try again",
+    "close": "Close",
+    "open": "Open",
+    "breadcrumb_root": "Home"
+  },
+  "es-ES": {
+    "home": "Inicio",
+    "back": "Volver",
+    "retry": "Intentar de nuevo",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "breadcrumb_root": "Inicio"
+  },
+  "es-AR": {
+    "home": "Inicio",
+    "back": "Volver",
+    "retry": "Intentar nuevamente",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "breadcrumb_root": "Inicio"
+  },
+  "es-MX": {
+    "home": "Inicio",
+    "back": "Volver",
+    "retry": "Intentar de nuevo",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "breadcrumb_root": "Inicio"
+  }
+}
+
+
+>
+
+
+
+
+
+
+
+
+
+
+===== FILE:   src/dictionaries/validateAllLocales.ts   =====
+<conteúdo completo do arquivo
+
+
+// src/dictionaries/validateAllLocales.ts
+
+import ptBR from "./pt-BR.json";
+import enUS from "./en-US.json";
+import esES from "./es-ES.json";
+import esAR from "./es-AR.json";
+import esMX from "./es-MX.json";
+
+import { validateCrossLocale } from "./validateCrossLocale";
+import { Dictionary } from "@/types/dictionary";
+
+/**
+ * Valida a consistência estrutural entre todos os dicionários.
+ * Garante que chaves presentes no idioma principal (pt-BR) existam nos outros.
+ */
+export function validateAllLocales() {
+  // Cast para Dictionary para garantir que estamos validando contra o contrato correto
+  const base = ptBR as Dictionary;
+  
+  const targets = [
+    { data: enUS as Dictionary, code: "en-US" },
+    { data: esES as Dictionary, code: "es-ES" },
+    { data: esAR as Dictionary, code: "es-AR" },
+    { data: esMX as Dictionary, code: "es-MX" }
+  ];
+
+  const errors: string[] = [];
+
+  // Executa a validação cruzada para cada idioma contra o pt-BR
+  targets.forEach(target => {
+    errors.push(...validateCrossLocale(base, target.data, "pt-BR", target.code));
+  });
+
+  if (errors.length > 0) {
+    console.error("\n❌ i18n validation failed (Alignment Errors):\n");
+    errors.forEach(err => console.error(`  - ${err}`));
+    
+    // Interrompe o build ou execução se houver erro de alinhamento
+    if (process.env.NODE_ENV !== "development") {
+      process.exit(1);
+    }
+  } else {
+    console.log("✅ i18n dictionaries are fully aligned (5 locales).");
+  }
+}
+
+
+>
+
+
+
+
+
+
+===== FILE:   src/dictionaries/validateCrossLocale.ts   =====
+<conteúdo completo do arquivo
+
+
+// src/dictionaries/validateCrossLocale.ts
+
+import { Dictionary } from "@/types/dictionary";
+
+/**
+ * Função recursiva para extrair todos os caminhos (dots) de um dicionário.
+ * Ex: "common.errorBoundary.actions.retry"
+ */
+function getAllPaths(obj: any, prefix = ""): string[] {
+  if (!obj || typeof obj !== "object") return [];
+
+  return Object.entries(obj).flatMap(([key, value]) => {
+    const path = prefix ? `${prefix}.${key}` : key;
+
+    // Continua a recursão se for um objeto, mas ignora arrays (como intl.contract.requiredFields)
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      return getAllPaths(value, path);
+    }
+
+    return [path];
+  });
+}
+
+/**
+ * Compara o dicionário base (pt-BR) com um dicionário alvo para encontrar 
+ * chaves faltantes ou chaves extras não traduzidas.
+ */
+export function validateCrossLocale(
+  base: Dictionary,
+  target: Dictionary,
+  baseName: string,
+  targetName: string
+): string[] {
+  const basePaths = new Set(getAllPaths(base));
+  const targetPaths = new Set(getAllPaths(target));
+
+  const missingInTarget = [...basePaths].filter(p => !targetPaths.has(p));
+  const extraInTarget = [...targetPaths].filter(p => !basePaths.has(p));
+
+  const errors: string[] = [];
+
+  if (missingInTarget.length > 0) {
+    errors.push(
+      `[${targetName}] Faltando chaves presentes em ${baseName}:\n    ${missingInTarget.join("\n    ")}`
+    );
+  }
+
+  if (extraInTarget.length > 0) {
+    errors.push(
+      `[${targetName}] Chaves extras que não existem em ${baseName}:\n    ${extraInTarget.join("\n    ")}`
+    );
+  }
+
+  return errors;
+}
+
+
+>
+
+
+
+
+
+
+
+===== FILE:  src/dictionaries/errors/pt-BR.json  =====
+<conteúdo completo do arquivo
+
+
+"errors": {
+  "InternalServerError": {
+    "title": "Erro Interno",
+    "message": "Um erro inesperado aconteceu em nossos servidores.",
+    "action": "Informe o ID do erro ao suporte técnico."
+  },
+  "NotFoundError": {
+    "title": "Não Encontrado",
+    "message": "O recurso que você procura não existe ou foi movido.",
+    "action": "Verifique a URL ou retorne à página inicial."
+  },
+  "ValidationError": {
+    "title": "Erro de Validação",
+    "message": "Os dados enviados são inválidos ou estão incompletos.",
+    "action": "Revise os campos destacados e tente novamente."
+  },
+  "UnauthorizedError": {
+    "title": "Não Autenticado",
+    "message": "Sua sessão expirou ou você não está logado.",
+    "action": "Por favor, faça login para acessar esta área."
+  },
+  "ForbiddenError": {
+    "title": "Acesso Negado",
+    "message": "Você não tem permissão para realizar esta ação.",
+    "action": "Contate o administrador se acreditar que isso é um erro."
+  },
+  "TooManyRequestsError": {
+    "title": "Muitas Requisições",
+    "message": "Você atingiu o limite de tentativas temporário.",
+    "action": "Aguarde alguns minutos antes de tentar novamente."
+  },
+  "UnprocessableEntityError": {
+    "title": "Operação Inválida",
+    "message": "Não foi possível processar as instruções enviadas.",
+    "action": "Verifique a lógica dos dados e tente novamente."
+  },
+  "MethodNotAllowedError": {
+    "title": "Método Não Permitido",
+    "message": "A requisição HTTP utilizada não é suportada.",
+    "action": "Utilize um método válido (GET, POST, etc)."
+  }
+}
+
+
+>
+
+
+
+
+
+
+===== FILE:  src/dictionaries/errors/es-ES.json     =====
+<conteúdo completo do arquivo
+
+"errors": {
+  "InternalServerError": {
+    "title": "Error Interno",
+    "message": "Ha ocurrido un error inesperado en nuestros servidores.",
+    "action": "Facilite el ID del error al soporte técnico."
+  },
+  "NotFoundError": {
+    "title": "No Encontrado",
+    "message": "El recurso que busca no existe o ha sido movido.",
+    "action": "Compruebe la URL o vuelva a la página de inicio."
+  },
+  "ValidationError": {
+    "title": "Error de Validación",
+    "message": "Los datos enviados son inválidos o están incompletos.",
+    "action": "Revise los campos marcados e inténtelo de nuevo."
+  },
+  "UnauthorizedError": {
+    "title": "No Autenticado",
+    "message": "Su sesión ha caducado o no ha iniciado sesión.",
+    "action": "Por favor, inicie sesión para acceder a esta área."
+  },
+  "ForbiddenError": {
+    "title": "Acceso Denegado",
+    "message": "No tiene permiso para realizar esta acción.",
+    "action": "Contacte con el administrador si cree que es un error."
+  },
+  "TooManyRequestsError": {
+    "title": "Demasiadas Peticiones",
+    "message": "Ha alcanzado el límite temporal de peticiones.",
+    "action": "Espere unos minutos antes de intentarlo de nuevo."
+  },
+  "UnprocessableEntityError": {
+    "title": "Operación Inválida",
+    "message": "No se han podido procesar las instrucciones enviadas.",
+    "action": "Verifique la lógica de los datos y reintente."
+  },
+  "MethodNotAllowedError": {
+    "title": "Método No Permitido",
+    "message": "El método HTTP utilizado no está permitido.",
+    "action": "Utilice un método válido (GET, POST, etc)."
+  }
+}
+
+
+
+>
+
+
+
+
+
+
+
+
+
+
+===== FILE: src/dictionaries/errors/en-US.json  =====
+<conteúdo completo do arquivo
+
+
+"errors": {
+  "InternalServerError": {
+    "title": "Internal Error",
+    "message": "An unexpected error occurred on our servers.",
+    "action": "Provide the error ID to technical support."
+  },
+  "NotFoundError": {
+    "title": "Not Found",
+    "message": "The resource you are looking for doesn't exist.",
+    "action": "Check the URL or return to the home page."
+  },
+  "ValidationError": {
+    "title": "Validation Error",
+    "message": "The provided data is invalid or incomplete.",
+    "action": "Review the highlighted fields and try again."
+  },
+  "UnauthorizedError": {
+    "title": "Unauthorized",
+    "message": "Your session has expired or you are not logged in.",
+    "action": "Please log in to access this area."
+  },
+  "ForbiddenError": {
+    "title": "Access Denied",
+    "message": "You do not have permission to perform this action.",
+    "action": "Contact the admin if you believe this is an error."
+  },
+  "TooManyRequestsError": {
+    "title": "Too Many Requests",
+    "message": "You have reached the temporary request limit.",
+    "action": "Wait a few minutes before trying again."
+  },
+  "UnprocessableEntityError": {
+    "title": "Invalid Operation",
+    "message": "Unable to process the submitted instructions.",
+    "action": "Verify the data logic and try again."
+  },
+  "MethodNotAllowedError": {
+    "title": "Method Not Allowed",
+    "message": "The HTTP method used is not supported.",
+    "action": "Use a valid method (GET, POST, etc)."
+  }
+}
+
+
+>
+
+
+
+
+
+
+===== FILE:   src/dictionaries/errors/es-AR.json    =====
+<conteúdo completo do arquivo
+
+
+"errors": {
+  "InternalServerError": {
+    "title": "Error Interno",
+    "message": "Hubo un error inesperado en nuestros servidores.",
+    "action": "Pasale el ID del error al soporte técnico."
+  },
+  "NotFoundError": {
+    "title": "No Encontrado",
+    "message": "El recurso que buscás no existe o fue movido.",
+    "action": "Revisá la URL o volvé a la página de inicio."
+  },
+  "ValidationError": {
+    "title": "Error de Validación",
+    "message": "Los datos enviados no son válidos o están incompletos.",
+    "action": "Revisá los campos marcados e intentá de nuevo."
+  },
+  "UnauthorizedError": {
+    "title": "No Autenticado",
+    "message": "Tu sesión expiró o no estás logueado.",
+    "action": "Por favor, iniciá sesión para entrar acá."
+  },
+  "ForbiddenError": {
+    "title": "Acceso Denegado",
+    "message": "No tenés permiso para hacer esto.",
+    "action": "Ponete en contacto con el admin si es un error."
+  },
+  "TooManyRequestsError": {
+    "title": "Muchas Peticiones",
+    "message": "Llegaste al límite temporal de peticiones.",
+    "action": "Esperá unos minutos antes de intentar otra vez."
+  },
+  "UnprocessableEntityError": {
+    "title": "Operación Inválida",
+    "message": "No pudimos procesar las instrucciones enviadas.",
+    "action": "Chequeá la lógica de los datos y reintentá."
+  },
+  "MethodNotAllowedError": {
+    "title": "Método No Permitido",
+    "message": "El método HTTP no está soportado.",
+    "action": "Usá un método válido (GET, POST, etc)."
+  }
+}
+
+
+>
+
+
+
+
+
+
+
+
+===== FILE:   src/dictionaries/errors/es-MX.json =====
+<conteúdo completo do arquivo
+
+
+"errors": {
+  "InternalServerError": {
+    "title": "Error Interno",
+    "message": "Ocurrió un error inesperado en nuestros servidores.",
+    "action": "Proporciona el ID del error al equipo de soporte."
+  },
+  "NotFoundError": {
+    "title": "No Encontrado",
+    "message": "El recurso que buscas no existe o se movió.",
+    "action": "Checa la URL o regresa al inicio."
+  },
+  "ValidationError": {
+    "title": "Error de Validación",
+    "message": "Los datos enviados son inválidos o están incompletos.",
+    "action": "Revisa los campos señalados e intenta de nuevo."
+  },
+  "UnauthorizedError": {
+    "title": "No Autenticado",
+    "message": "Tu sesión expiró o no has iniciado sesión.",
+    "action": "Por favor, inicia sesión para acceder."
+  },
+  "ForbiddenError": {
+    "title": "Acceso Denegado",
+    "message": "No tienes permiso para realizar esta acción.",
+    "action": "Contacta al administrador si crees que es un error."
+  },
+  "TooManyRequestsError": {
+    "title": "Demasiadas Peticiones",
+    "message": "Superaste el límite temporal de intentos.",
+    "action": "Espera unos minutos antes de intentar de nuevo."
+  },
+  "UnprocessableEntityError": {
+    "title": "Operación Inválida",
+    "message": "No se pudieron procesar las instrucciones.",
+    "action": "Verifica la lógica de los datos e intenta de nuevo."
+  },
+  "MethodNotAllowedError": {
+    "title": "Método No Permitido",
+    "message": "El método HTTP no está permitido aquí.",
+    "action": "Usa un método válido (GET, POST, etc)."
+  }
+}
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+===== FILE:     =====
 <conteúdo completo do arquivo>
 
 
@@ -8802,53 +9494,6 @@ export function useScrollSpy(): ScrollSpyContextValue {
 
 
 
-
-
-
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
-
-
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
-
-
-
-
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
-
-
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
 
 ===== FILE: src/app/[lang]/error.tsx =====
 <conteúdo completo do arquivo>
