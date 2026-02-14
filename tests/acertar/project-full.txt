@@ -9481,8 +9481,30 @@ export function validateCrossLocale(
 
 
 
-===== FILE:     =====
-<conteúdo completo do arquivo>
+===== FILE:   src/domain/career.ts   =====
+<conteúdo completo do arquivo
+
+
+// src/domain/career.ts
+
+export enum CareerRole {
+  DATA_SPECIALIST = 'data_specialist',
+  SYSTEMS_EXPERT = 'systems_expert',
+  STRATEGIC_LEAD = 'strategic_lead',
+}
+
+export interface CareerExperience {
+  id: string;
+  company: string;
+  role: string;
+  period: string;
+  description: string;
+  // Achievements podem vir de uma lista complementar ou metadados
+  achievements?: string[]; 
+} 
+
+
+>
 
 
 
@@ -9495,29 +9517,313 @@ export function validateCrossLocale(
 
 
 
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
+===== FILE:  src/domain/navigation.ts   =====
+<conteúdo completo do arquivo
 
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
+// src/domain/navigation.ts
 
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
+export enum NavSection {
+  ABOUT = 'about',
+  EXPERIENCE = 'experience',
+  PROJECTS = 'projects',
+  ARTICLES = 'articles',
+  CONTACT = 'contact',
+}
+
+export const NAV_SECTIONS: readonly NavSection[] = [
+  NavSection.ABOUT,
+  NavSection.EXPERIENCE,
+  NavSection.PROJECTS,
+  NavSection.ARTICLES,
+  NavSection.CONTACT,
+] as const;
+
+/**
+ * Mapeia a seção para o ID da âncora no HTML.
+ * Útil para scroll suave e SEO.
+ */
+export const NAV_HASH_MAP: Readonly<Record<NavSection, `#${string}`>> = {
+  [NavSection.ABOUT]: '#sobre',
+  [NavSection.EXPERIENCE]: '#trajetoria',
+  [NavSection.PROJECTS]: '#projetos',
+  [NavSection.ARTICLES]: '#artigos',
+  [NavSection.CONTACT]: '#contato',
+} as const;
+
+export const getNavHash = (section: NavSection): `#${string}` => NAV_HASH_MAP[section];
+export const getSectionId = (section: NavSection): string => NAV_HASH_MAP[section].replace('#', '');
+
+
+
+>
 
 
 
 
 
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
+
+
+===== FILE:   src/domain/projects.ts   =====
+<conteúdo completo do arquivo
+
+
+// src/domain/projects.ts
+
+export enum ProjectCoreTag {
+  PORTFOLIO = 'portfolio',
+  FEATURED = 'featured',
+  DESTAQUE = 'destaque',
+  PRIMEIRO = 'primeiro',
+}
+
+export enum ProjectTechnology {
+  DATA_SCIENCE = 'data-science',
+  AZURE_DATABRICKS = 'azure-databricks',
+  NEO4J = 'neo4j',
+  POWER_BI = 'power-bi',
+  EXCEL = 'excel',
+  DATABASE = 'database',
+  PYTHON = 'python',
+  DOTNET = 'dotnet',
+  JAVA = 'java',
+  MACHINE_LEARNING = 'machine-learning',
+  ARTIFICIAL_INTELLIGENCE = 'artificial-intelligence',
+  AWS = 'aws',
+  CYBERSECURITY = 'cybersecurity',
+  SECURITY = 'security',
+  PROGRAMMING_LOGIC = 'programming-logic',
+  HTML = 'html',
+  NODE_REACT = 'node-react',
+}
+
+export const PROJECT_TECHNOLOGY_ORDER: readonly ProjectTechnology[] = Object.values(ProjectTechnology);
+
+export interface ProjectDomain {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly htmlUrl: string;
+  readonly homepage?: string | null;
+  readonly topics: readonly string[];
+  readonly technology: {
+    id: ProjectTechnology;
+    labelKey: string; // DEVE bater com projects.categories no JSON
+  };
+  readonly isPortfolio: boolean;
+  readonly isFeatured: boolean;
+  readonly isFirst: boolean;
+}
+
+/**
+ * Resolve a tecnologia principal baseada nas tags do GitHub (topics).
+ * O labelKey retornado é usado para buscar a tradução correta.
+ */
+export const resolveProjectTechnology = (topics: readonly string[]) => {
+  const normalizedTopics = topics.map(t => t.toLowerCase());
+  
+  const techId = PROJECT_TECHNOLOGY_ORDER.find((tech) => normalizedTopics.includes(tech));
+
+  // Mapeamento rigoroso para as chaves em dictionary.projects.categories
+  const mapping: Record<ProjectTechnology, string> = {
+    [ProjectTechnology.DATA_SCIENCE]: 'dataScience',
+    [ProjectTechnology.AZURE_DATABRICKS]: 'cloud',
+    [ProjectTechnology.NEO4J]: 'graphs',
+    [ProjectTechnology.POWER_BI]: 'analysis',
+    [ProjectTechnology.EXCEL]: 'excel',
+    [ProjectTechnology.DATABASE]: 'database',
+    [ProjectTechnology.PYTHON]: 'dev',
+    [ProjectTechnology.DOTNET]: 'dev',
+    [ProjectTechnology.JAVA]: 'dev',
+    [ProjectTechnology.MACHINE_LEARNING]: 'dataScience',
+    [ProjectTechnology.ARTIFICIAL_INTELLIGENCE]: 'dataScience',
+    [ProjectTechnology.AWS]: 'cloud',
+    [ProjectTechnology.CYBERSECURITY]: 'security',
+    [ProjectTechnology.SECURITY]: 'security',
+    [ProjectTechnology.PROGRAMMING_LOGIC]: 'dev',
+    [ProjectTechnology.HTML]: 'dev',
+    [ProjectTechnology.NODE_REACT]: 'dev',
+  };
+
+  const selectedTechId = techId || ProjectTechnology.DATA_SCIENCE;
+  
+  return { 
+    id: selectedTechId, 
+    labelKey: mapping[selectedTechId] || 'dataScience' 
+  };
+};
+
+export const resolveProjectFlags = (topics: readonly string[]) => {
+  const normalized = topics.map(t => t.toLowerCase());
+  return {
+    isPortfolio: normalized.includes(ProjectCoreTag.PORTFOLIO),
+    isFeatured: normalized.includes(ProjectCoreTag.FEATURED) || normalized.includes(ProjectCoreTag.DESTAQUE),
+    isFirst: normalized.includes(ProjectCoreTag.PRIMEIRO),
+  };
+};
+
+
+>
 
 
 
 
 
 
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
+
+
+
+
+
+===== FILE: src/hooks/useScrollSpy.ts  =====
+<conteúdo completo do arquivo
+
+
+'use client'
+
+import { useEffect, useState } from 'react'
+
+export function useScrollSpy(sectionIds: readonly string[], offset: number = 100): string | null {
+  const [activeId, setActiveId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id)
+          }
+        })
+      },
+      { rootMargin: `-${offset}px 0px -50% 0px`, threshold: 0.1 }
+    )
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
+    })
+
+    return () => observer.disconnect()
+  }, [sectionIds, offset])
+
+  return activeId
+}
+
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+===== FILE:  src/mappers/projectMapper.ts   =====
+<conteúdo completo do arquivo
+
+
+// src/mappers/projectMapper.ts
+
+import { 
+  ProjectDomain, 
+  resolveProjectTechnology, 
+  resolveProjectFlags 
+} from "@/domain/projects";
+
+/**
+ * Interface que representa o formato bruto retornado pela API do GitHub.
+ * Baseado no esquema oficial da REST API v3.
+ */
+export interface GitHubRepoResponse {
+  id: number;
+  name: string;
+  description: string | null;
+  html_url: string;
+  homepage: string | null;
+  topics: string[];
+  created_at: string;
+  // Outros campos podem ser adicionados se necessário
+}
+
+/**
+ * Transforma um repositório bruto da API do GitHub no modelo de domínio da aplicação.
+ * * @param repo - O objeto retornado pela API do GitHub
+ * @returns ProjectDomain - O objeto formatado e pronto para ser usado na UI
+ */
+export const mapGitHubToDomain = (repo: GitHubRepoResponse): ProjectDomain => {
+  const topics = repo.topics || [];
+  
+  // Resolve a tecnologia principal e a chave de tradução baseada nos topics
+  const { id: techId, labelKey } = resolveProjectTechnology(topics);
+  
+  // Resolve flags de destaque (Portfolio, Featured, First)
+  const { isPortfolio, isFeatured, isFirst } = resolveProjectFlags(topics);
+
+  return {
+    id: String(repo.id),
+    name: repo.name,
+    description: repo.description || "",
+    htmlUrl: repo.html_url,
+    homepage: repo.homepage,
+    topics: topics,
+    technology: {
+      id: techId,
+      labelKey: labelKey, // Esta chave buscará o texto correto em dictionary.projects.categories
+    },
+    isPortfolio,
+    isFeatured,
+    isFirst,
+  };
+};
+
+/**
+ * Mapeia uma lista de repositórios do GitHub.
+ */
+export const mapGitHubListToDomain = (repos: GitHubRepoResponse[]): ProjectDomain[] => {
+  if (!Array.isArray(repos)) return [];
+  
+  return repos
+    .map(mapGitHubToDomain)
+    // Exemplo de regra de negócio: Só mostrar se for marcado como portfolio ou se tiver descrição
+    .filter(project => project.isPortfolio || project.description !== "")
+    .sort((a, b) => (a.isFirst === b.isFirst ? 0 : a.isFirst ? -1 : 1));
+};
+
+
+>
+
+
+
+
+
+
+
+
+
+===== FILE:      =====
+<conteúdo completo do arquivo
+
+
+
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ===== FILE: src/app/[lang]/global-error.tsx =====
 <conteúdo completo do arquivo>
