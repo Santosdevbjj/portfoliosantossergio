@@ -1,5 +1,5 @@
 ===== FILE:    package.json =====
-<conteúdo completo do arquivo
+<conteúdo completo do arquivo 
 
 {
   "name": "portfolio-sergio-santos",
