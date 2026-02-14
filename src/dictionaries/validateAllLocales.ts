@@ -37,7 +37,7 @@ export function validateAllLocales() {
     
     // Interrompe o build ou execução se houver erro de alinhamento
     if (process.env.NODE_ENV !== "development") {
-      process.exit(1);
+      throw new Error("i18n validation failed");
     }
   } else {
     console.log("✅ i18n dictionaries are fully aligned (5 locales).");
