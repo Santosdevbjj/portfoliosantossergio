@@ -6645,8 +6645,45 @@ export function BreadcrumbsJsonLd({
 
 
 
-===== FILE:         =====
-<conteúdo completo do arquivo>
+===== FILE:   src/proxy.ts      =====
+<conteúdo completo do arquivo
+
+import { NextRequest, NextResponse } from 'next/server'
+import { Locale } from '@/types/dictionary'
+
+const SUPPORTED_LOCALES: Locale[] = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"]
+const DEFAULT_LOCALE: Locale = "pt-BR"
+
+export default function proxy(request: NextRequest): NextResponse {
+  const { pathname } = request.nextUrl
+
+  // Proteção otimizada para Next.js 16
+  if (
+    pathname.startsWith('/_next') || 
+    pathname.startsWith('/api') ||
+    pathname.includes('.') || 
+    pathname === '/favicon.ico' ||
+    pathname.startsWith('/assets/') // Adicionado para garantir performance de imagens
+  ) {
+    return NextResponse.next()
+  }
+
+  const pathnameHasLocale = SUPPORTED_LOCALES.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  )
+
+  if (pathnameHasLocale) return NextResponse.next()
+
+  // Redirecionamento limpo
+  const url = request.nextUrl.clone()
+  url.pathname = `/${DEFAULT_LOCALE}${pathname}`
+  
+  return NextResponse.redirect(url)
+}
+
+
+
+>
 
 
 
@@ -6658,41 +6695,980 @@ export function BreadcrumbsJsonLd({
 
 
 
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
+===== FILE:    src/ProxyClient.tsx =====
+<conteúdo completo do arquivo
 
 
+'use client'
 
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
+import React from 'react'
+import { notFound } from 'next/navigation'
 
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
+// 1. Imports de Tipos (Metadados - SEMpre com .js no final em 2026)
+import type { Locale, Dictionary } from '@/types/dictionary.js'
+import type { ProjectDomain } from '@/domain/projects.js'
 
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
+// 2. Imports de Valores (Componentes - Removido o 'type' para permitir o uso no JSX)
+// Nota: Em 2026, usamos a extensão .js mesmo para arquivos .tsx no ESM nativo
+import PageWrapper from '@/components/PageWrapper.js'
+import Navbar from '@/components/Navbar.js'
+import HeroSection from '@/components/HeroSection.js'
+import AboutSection from '@/components/AboutSection.js'
+import ExperienceSection from '@/components/ExperienceSection.js'
+import FeaturedProjectsSection from '@/components/featured/FeaturedProjectsSection.js'
+import ProjectSection from '@/components/ProjectSection.js'
+import FeaturedArticleSection from '@/components/FeaturedArticleSection.js'
+import ContactSection from '@/components/ContactSection.js'
+import Footer from '@/components/Footer.js'
 
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
+interface ProxyClientProps {
+  readonly lang: Locale
+  readonly initialProjects: ProjectDomain[]
+  readonly dictionary: Dictionary
+}
+
+export default function ProxyClient({
+  lang,
+  initialProjects,
+  dictionary,
+}: ProxyClientProps): React.JSX.Element {
+  
+  // Verificação robusta do dicionário
+  if (!dictionary || !dictionary.hero) {
+    return notFound()
+  }
+
+  return (
+    <PageWrapper lang={lang} sectionIds={['sobre', 'trajetoria', 'projetos', 'artigos', 'contato']}>
+      <Navbar lang={lang} dict={dictionary} />
+
+      <main className="relative flex w-full flex-col overflow-x-hidden bg-white antialiased dark:bg-[#020617]">
+        {/* HERO - Prioridade de carregamento (LCP) */}
+        <section id="hero">
+          <HeroSection lang={lang} dict={dictionary} />
+        </section>
+
+        {/* ABOUT - Layout Responsivo Adaptável */}
+        <section
+          id="sobre"
+          className="mx-auto max-w-7xl px-4 py-16 sm:px-8 lg:px-12"
+        >
+          <AboutSection lang={lang} dict={dictionary} />
+        </section>
+
+        {/* EXPERIENCE - Alternância de fundo para escaneabilidade */}
+        <section
+          id="trajetoria"
+          className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10"
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-12">
+            <ExperienceSection lang={lang} dict={dictionary} />
+          </div>
+        </section>
+
+        {/* PROJECTS - Grid de Projetos Críticos */}
+        <section
+          id="projetos"
+          className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:px-12"
+        >
+          <FeaturedProjectsSection lang={lang} dict={dictionary} />
+
+          <div className="mt-12 border-t pt-12 dark:border-slate-800">
+            <ProjectSection
+              projects={initialProjects}
+              lang={lang}
+              dict={dictionary}
+            />
+          </div>
+        </section>
+
+        {/* ARTICLES - Integração com Medium */}
+        <section
+          id="artigos"
+          className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:px-12"
+        >
+          <FeaturedArticleSection lang={lang} dict={dictionary} />
+        </section>
+
+        {/* CONTACT - Conversão e CTA Final */}
+        <section
+          id="contato"
+          className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:px-12"
+        >
+          <ContactSection lang={lang} dict={dictionary} />
+        </section>
+      </main>
+
+      <Footer lang={lang} dict={dictionary} />
+    </PageWrapper>
+  )
+}
+
+
+
+>
 
 
 
 
 
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
 
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
+===== FILE: src/i18n-config.ts   =====
+<conteúdo completo do arquivo
 
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
 
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
+/**
+ * I18N CONFIG — FONTE ÚNICA DE VERDADE
+ * -----------------------------------------------------------------------------
+ * Sincronizado com: src/types/dictionary.ts e src/dictionaries/index.ts
+ */
+
+import type { Locale } from '@/types/dictionary';
+
+export const i18n = {
+  defaultLocale: 'pt-BR' as const,
+  /**
+   * Lista exaustiva baseada nos arquivos JSON e no tipo Locale.
+   * Manter em sincronia com src/types/dictionary.ts
+   */
+  locales: ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'] as const,
+} as const;
+
+/**
+ * Metadata por idioma para SEO e UI (Language Switcher)
+ */
+export const localeMetadata: Record<
+  Locale,
+  {
+    name: string;
+    label: string;
+    region: string;
+    flag: string;
+    hrefLang: string;
+    description: string;
+  }
+> = {
+  'pt-BR': {
+    name: 'Português',
+    label: 'PT',
+    region: 'pt-BR',
+    flag: '🇧🇷',
+    hrefLang: 'pt-BR',
+    description: 'Engenharia de Dados, Ciência de Dados, IA e Sistemas de Missão Crítica.',
+  },
+  'en-US': {
+    name: 'English',
+    label: 'EN',
+    region: 'en-US',
+    flag: '🇺🇸',
+    hrefLang: 'en-US',
+    description: 'Data Engineering, Data Science, AI, and Mission-Critical Systems.',
+  },
+  'es-ES': {
+    name: 'Español (España)',
+    label: 'ES',
+    region: 'es-ES',
+    flag: '🇪🇸',
+    hrefLang: 'es-ES',
+    description: 'Ingeniería de Datos, Ciencia de Datos, IA y Sistemas de Misión Crítica.',
+  },
+  'es-AR': {
+    name: 'Español (Argentina)',
+    label: 'AR',
+    region: 'es-AR',
+    flag: '🇦🇷',
+    hrefLang: 'es-AR',
+    description: 'Ingeniería de Datos, Ciencia de Datos, IA y Sistemas de Misión Crítica.',
+  },
+  'es-MX': {
+    name: 'Español (México)',
+    label: 'MX',
+    region: 'es-MX',
+    flag: '🇲🇽',
+    hrefLang: 'es-MX',
+    description: 'Ingeniería de Datos, Ciencia de Datos, IA y Sistemas de Misión Crítica.',
+  },
+};
+
+export const DEFAULT_HREFLANG = 'x-default';
+
+/**
+ * Validação segura de locale
+ * Verifica se uma string de rota é um locale suportado pela aplicação.
+ */
+export function isSupportedLocale(locale: string): locale is Locale {
+  return (i18n.locales as readonly string[]).includes(locale as Locale);
+}
+
+
+
+>
+
+
+
+
+
+
+
+
+
+===== FILE: src/lib/github.ts   =====
+<conteúdo completo do arquivo
+
+
+import type { Locale } from '@/i18n-config';
+import { ProjectCoreTag, resolveProjectFlags, resolveProjectTechnology } from '@/domain/projects';
+import type { Project } from '@/domain/projects';
+
+export async function getGitHubProjects(lang: Locale): Promise<Project[]> {
+  const token = process.env.GITHUB_ACCESS_TOKEN;
+  const url = `https://api.github.com/users/Santosdevbjj/repos?per_page=100&sort=updated`;
+
+  // Criamos um controle de interrupção (Timeout manual de 4 segundos)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+  try {
+    const res = await fetch(url, {
+      headers: { 
+        'Accept': 'application/vnd.github+json', 
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+        'User-Agent': 'Portfolio-Vercel'
+      },
+      next: { revalidate: 3600 },
+      signal: controller.signal // Conecta o timeout à requisição
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) return [];
+    const repos = await res.json();
+    if (!Array.isArray(repos)) return [];
+
+    return repos
+      .filter((r: any) => !r.fork && r.topics?.includes(ProjectCoreTag.PORTFOLIO))
+      .map((repo: any) => {
+        const topics = repo.topics || [];
+        const tech = resolveProjectTechnology(topics);
+        if (!tech) return null;
+
+        const langIndex = lang === 'pt' ? 0 : lang === 'en' ? 1 : 2;
+        const parts = repo.description?.split('|') || [];
+        const description = parts[langIndex]?.trim() || repo.description || '';
+
+        return {
+          id: String(repo.id),
+          name: repo.name.replace(/[-_]/g, ' '),
+          description,
+          htmlUrl: repo.html_url,
+          homepage: repo.homepage,
+          topics,
+          technology: tech,
+          ...resolveProjectFlags(topics)
+        } as Project;
+      })
+      .filter((p): p is Project => p !== null);
+
+  } catch (e: any) {
+    if (e.name === 'AbortError') {
+      console.error('[GitHub] Timeout: API demorou demais para responder.');
+    } else {
+      console.error('[GitHub] Erro na busca:', e);
+    }
+    return []; // Retorna vazio mas NÃO deixa a função da Vercel estourar o tempo
+  }
+}
+
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+===== FILE:  src/lib/getServerDictionary.ts    =====
+<conteúdo completo do arquivo
+
+import { getDictionary } from "@/dictionaries";
+import type { Locale } from "@/types/dictionary";
+
+export async function getServerDictionary(locale: Locale) {
+  return await getDictionary(locale);
+}
+
+
+
+>
+
+
+
+
+
+
+
+
+
+===== FILE: src/lib/analytics.ts     =====
+<conteúdo completo do arquivo
+
+
+/**
+ * LIB: Analytics Unified Layer (Versão Sênior - Anti-Hydration Error)
+ */
+
+import {
+  CONSENT_COOKIE_NAME,
+  DEFAULT_CONSENT,
+  getSafeConsent,
+  type ConsentPreferences,
+} from '@/lib/consent';
+
+export interface AnalyticsEvent {
+  readonly name: string;
+  readonly props?: Record<string, unknown>;
+}
+
+declare global {
+  interface Window {
+    gtag?: (command: any, targetId: any, config?: any) => void;
+    plausible?: (event: string, options?: { props?: any }) => void;
+    posthog?: { capture: (event: string, props?: any) => void };
+  }
+}
+
+/**
+ * Recupera o consentimento apenas no lado do cliente.
+ */
+function getActiveConsent(): ConsentPreferences {
+  // Se não estiver no navegador, retorna o padrão restritivo imediatamente
+  if (typeof window === 'undefined') return DEFAULT_CONSENT;
+
+  try {
+    const cookies = document.cookie.split('; ');
+    const consentRow = cookies.find((row) => row.startsWith(`${CONSENT_COOKIE_NAME}=`));
+
+    if (!consentRow || !consentRow.includes('=')) return DEFAULT_CONSENT;
+
+    const value = consentRow.split('=')[1];
+    if (!value) return DEFAULT_CONSENT;
+
+    const rawValue = decodeURIComponent(value).trim();
+    
+    // Proteção crucial: Só tenta o parse se a string parecer um objeto
+    if (rawValue.startsWith('{') && rawValue.endsWith('}')) {
+      const parsedValue = JSON.parse(rawValue);
+      return getSafeConsent(parsedValue);
+    }
+    
+    return DEFAULT_CONSENT;
+  } catch (error) {
+    console.warn('[Analytics] Consent recovery silent fail:', error);
+    return DEFAULT_CONSENT;
+  }
+}
+
+/**
+ * Dispara eventos de forma segura.
+ */
+export function track({ name, props }: AnalyticsEvent): void {
+  // 1. Bloqueio de execução no servidor (Hydration Shield)
+  if (typeof window === 'undefined') return;
+
+  try {
+    const consent = getActiveConsent();
+    
+    // 2. Só prossegue se o usuário deu ok para analytics
+    if (!consent?.analytics) return;
+
+    const eventProps = props || {};
+
+    // 3. Execução segura nos provedores
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', name, eventProps);
+    }
+
+    if (typeof window.plausible === 'function') {
+      window.plausible(name, { props: eventProps });
+    }
+
+    if (window.posthog && typeof window.posthog.capture === 'function') {
+      window.posthog.capture(name, eventProps);
+    }
+  } catch (err) {
+    // 4. Erros de tracking nunca devem derrubar a aplicação principal
+    console.error('[Analytics] Track failed:', err);
+  }
+}
+
+
+>
+
+
+
+
+
+===== FILE:   src/lib/consent.ts   =====
+<conteúdo completo do arquivo
+
+
+/**
+ * LIB: Consent Management
+ * -----------------------------------------------------------------------------
+ * Gerencia preferências de consentimento do usuário em conformidade com LGPD / GDPR.
+ * * * Foco: Integridade de dados para Analytics e Cookies Essenciais.
+ * * Este arquivo é o contrato de verdade para o Cookie Banner e Scripts de Terceiros.
+ */
+
+/**
+ * Versão do schema de consentimento.
+ * Incrementada apenas se a estrutura da interface mudar.
+ */
+export const CONSENT_VERSION = 'v1';
+
+/**
+ * Nome canônico do cookie de consentimento.
+ */
+export const CONSENT_COOKIE_NAME = `portfolio_consent_${CONSENT_VERSION}`;
+
+/**
+ * Estrutura oficial de preferências de consentimento.
+ * O uso de 'readonly' garante que as preferências não sejam alteradas acidentalmente em runtime.
+ */
+export interface ConsentPreferences {
+  /**
+   * Cookies estritamente necessários (Sessão, Idioma, Segurança).
+   * Obrigatório por lei → sempre true.
+   */
+  readonly necessary: true;
+
+  /**
+   * Cookies de performance e analytics (Google Analytics, Vercel Analytics).
+   */
+  readonly analytics: boolean;
+}
+
+/**
+ * Consentimento padrão (Privacy by Default).
+ * Em conformidade com a LGPD, analytics começa como 'false'.
+ */
+export const DEFAULT_CONSENT: Readonly<ConsentPreferences> = {
+  necessary: true,
+  analytics: false,
+};
+
+/**
+ * Opções de persistência para o cookie de consentimento.
+ */
+export const CONSENT_COOKIE_OPTIONS = {
+  path: '/',
+  sameSite: 'lax' as const,
+  httpOnly: false, // Precisa ser lido via JS para ativar scripts de Analytics
+  secure: process.env.NODE_ENV === 'production',
+  maxAge: 60 * 60 * 24 * 365, // 1 ano
+} as const;
+
+/**
+ * Type Guard: Valida se um objeto desconhecido (vindo do cookie) 
+ * respeita o contrato de consentimento.
+ */
+export function isValidConsent(value: unknown): value is ConsentPreferences {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const candidate = value as Record<string, unknown>;
+
+  return (
+    candidate.necessary === true &&
+    typeof candidate.analytics === 'boolean'
+  );
+}
+
+/**
+ * Helper: Retorna um objeto de consentimento seguro.
+ * Protege a aplicação contra valores corrompidos ou schemas antigos no navegador do usuário.
+ */
+export function getSafeConsent(value: unknown): ConsentPreferences {
+  if (isValidConsent(value)) {
+    return value;
+  }
+  return DEFAULT_CONSENT;
+}
+
+/**
+ * Nota Técnica:
+ * Para salvar o consentimento, utilize:
+ * cookieStore.set(CONSENT_COOKIE_NAME, JSON.stringify(preferences), CONSENT_COOKIE_OPTIONS);
+ */
+
+
+>
+
+
+
+
+
+
+
+
+===== FILE: src/lib/locale-cookie.ts   =====
+<conteúdo completo do arquivo
+
+
+/**
+ * LIB: Locale Cookie
+ * -----------------------------------------------------------------------------
+ * Responsável por gerenciar a persistência do idioma do usuário via Cookies.
+ * Este arquivo garante que a escolha do usuário seja respeitada entre 
+ * sessões e requisições, servindo como base para o Middleware e o LanguageSwitcher.
+ */
+
+import { i18n, type Locale } from '@/i18n-config';
+
+/**
+ * Nome canônico do cookie de idioma.
+ * 'NEXT_LOCALE' é o padrão reconhecido pelo ecossistema Next.js.
+ */
+export const LOCALE_COOKIE_NAME = 'NEXT_LOCALE';
+
+/**
+ * ALIAS PARA COMPATIBILIDADE:
+ * Adicionado para resolver o erro de build nos componentes que buscam 'LOCALE_COOKIE'.
+ */
+export const LOCALE_COOKIE = LOCALE_COOKIE_NAME;
+
+/**
+ * Reexportação do tipo para manter a independência do domínio de cookies
+ */
+export type SupportedLocale = Locale;
+
+/**
+ * Locale padrão obtido diretamente da configuração global (SSOT - Single Source of Truth)
+ */
+export const DEFAULT_LOCALE: SupportedLocale = i18n.defaultLocale;
+
+/**
+ * Opções de configuração do cookie.
+ * Configurado para durar 1 ano e ser acessível via Client/Server.
+ */
+export const LOCALE_COOKIE_OPTIONS = {
+  path: '/',
+  sameSite: 'lax' as const,
+  httpOnly: false, // Necessário para o LanguageSwitcher (Client Side) ler/gravar
+  secure: process.env.NODE_ENV === 'production',
+  maxAge: 60 * 60 * 24 * 365, // 1 ano (31.536.000 segundos)
+} as const;
+
+/**
+ * Type Guard: Valida se um valor de entrada é um idioma suportado pelo sistema.
+ */
+export function isValidLocale(value: unknown): value is SupportedLocale {
+  return (
+    typeof value === 'string' && 
+    (i18n.locales as readonly string[]).includes(value)
+  );
+}
+
+/**
+ * Helper: Retorna um locale válido garantido.
+ * Caso a entrada seja inválida ou nula, retorna o fallback (pt).
+ */
+export function getSafeLocale(
+  value: unknown,
+  fallback: SupportedLocale = DEFAULT_LOCALE,
+): SupportedLocale {
+  return isValidLocale(value) ? value : fallback;
+}
+
+
+
+>
+
+
+
+
+
+
+
+
+
+
+===== FILE:    src/lib/logger.ts   =====
+<conteúdo completo do arquivo
+
+
+// src/lib/logger.ts
+import { BaseError } from "@/lib/errors";
+
+/**
+ * Interface para logs estruturados
+ * Alinhado com padrões de observabilidade modernos (Datadog/Sentry)
+ */
+interface LogMetadata {
+  level: "INFO" | "WARN" | "ERROR" | "FATAL";
+  timestamp: string;
+  name?: string;
+  message: string;
+  errorId?: string;
+  requestId?: string;
+  location?: string;
+  context?: unknown;
+  stack?: string;
+  env: string;
+}
+
+export const logger = {
+  /**
+   * Registra erros de forma estruturada.
+   * Se for uma instância de BaseError, extrai metadados automáticos.
+   */
+  error: (error: unknown, additionalContext?: Record<string, unknown>) => {
+    const timestamp = new Date().toISOString();
+    const env = process.env.NODE_ENV || "development";
+
+    let logPayload: LogMetadata;
+
+    if (error instanceof BaseError) {
+      logPayload = {
+        level: "ERROR",
+        timestamp,
+        env,
+        name: error.name,
+        message: error.message,
+        errorId: error.errorId,
+        requestId: error.requestId,
+        location: error.errorLocationCode,
+        context: {
+          ...(typeof error.context === "object" ? error.context : {}),
+          ...additionalContext,
+        },
+        stack: error.stack,
+      };
+    } else {
+      // Fallback para erros nativos ou desconhecidos
+      const isError = error instanceof Error;
+      logPayload = {
+        level: "ERROR",
+        timestamp,
+        env,
+        name: isError ? error.name : "UNKNOWN_ERROR",
+        message: isError ? error.message : String(error),
+        context: additionalContext,
+        stack: isError ? error.stack : undefined,
+      };
+    }
+
+    // Em Desenvolvimento: Log visualmente rico
+    if (env === "development") {
+      console.error(
+        `🔴 [${logPayload.timestamp}] ${logPayload.name}${
+          logPayload.errorId ? ` (${logPayload.errorId})` : ""
+        }: ${logPayload.message}`,
+        logPayload.context || ""
+      );
+      
+      if (logPayload.stack) {
+        // Log trace resumido em dev para não poluir o terminal, mas manter utilidade
+        console.error(`🔍 Stack Trace: ${logPayload.stack.split("\n")[1]}`);
+      }
+    } else {
+      // Em Produção: Log estruturado (JSON) para ingestão por CloudWatch/Datadog/BetterStack
+      // Omitimos stack traces muito longos dependendo da política de custos/segurança
+      console.log(JSON.stringify(logPayload));
+    }
+  },
+
+  /**
+   * Registra informações operacionais
+   */
+  info: (message: string, context?: Record<string, unknown>) => {
+    const payload = {
+      level: "INFO",
+      timestamp: new Date().toISOString(),
+      message,
+      context,
+      env: process.env.NODE_ENV || "development",
+    };
+
+    if (process.env.NODE_ENV === "development") {
+      console.log(`🔵 [${payload.timestamp}] INFO: ${message}`, context || "");
+    } else {
+      console.log(JSON.stringify(payload));
+    }
+  },
+};
+
+
+
+
+>
+
+
+
+
+
+
+
+
+
+
+===== FILE:  src/lib/errors/index.ts    =====
+<conteúdo completo do arquivo
+
+// src/lib/errors/index.ts
+import crypto from "crypto";
+
+/**
+ * Contrato base de construção de erros alinhado com ErrorDictionary
+ */
+export interface BaseErrorParams {
+  name: string;
+  title?: string; // Adicionado para consistência com o dicionário
+  message: string;
+  action?: string;
+  statusCode?: number;
+  errorId?: string;
+  requestId?: string;
+  context?: unknown;
+  stack?: string;
+  cause?: unknown;
+  errorLocationCode?: string;
+  key?: string;
+  type?: string;
+  databaseErrorCode?: string;
+}
+
+export class BaseError extends Error {
+  public readonly title?: string;
+  public readonly statusCode: number;
+  public readonly errorId: string;
+  public readonly requestId?: string;
+  public readonly action?: string;
+  public readonly context?: unknown;
+  public readonly errorLocationCode?: string;
+  public readonly key?: string;
+  public readonly type?: string;
+  public readonly databaseErrorCode?: string;
+
+  constructor(params: BaseErrorParams) {
+    super(params.message);
+
+    this.name = params.name;
+    this.title = params.title;
+    this.statusCode = params.statusCode ?? 500;
+    this.errorId = params.errorId ?? crypto.randomUUID();
+    this.requestId = params.requestId;
+    this.action = params.action;
+    this.context = params.context;
+    this.errorLocationCode = params.errorLocationCode;
+    this.key = params.key;
+    this.type = params.type;
+    this.databaseErrorCode = params.databaseErrorCode;
+
+    // TypeScript 6.0+ captura de stack trace otimizada
+    if (params.stack) {
+      this.stack = params.stack;
+    }
+
+    if (params.cause) {
+      this.cause = params.cause;
+    }
+  }
+}
+
+/* =======================
+   Erros específicos
+   Nota: As mensagens default aqui servem apenas como "fallback"
+   técnico caso o dicionário i18n falhe.
+======================= */
+
+export class InternalServerError extends BaseError {
+  constructor(params: Partial<BaseErrorParams> = {}) {
+    super({
+      ...params,
+      name: "InternalServerError",
+      message: params.message ?? "Internal Server Error",
+      statusCode: 500,
+    });
+  }
+}
+
+export class NotFoundError extends BaseError {
+  constructor(params: Partial<BaseErrorParams> = {}) {
+    super({
+      ...params,
+      name: "NotFoundError",
+      message: params.message ?? "Resource Not Found",
+      statusCode: 404,
+    });
+  }
+}
+
+export class ValidationError extends BaseError {
+  constructor(params: Partial<BaseErrorParams> = {}) {
+    super({
+      ...params,
+      name: "ValidationError",
+      message: params.message ?? "Validation Failed",
+      statusCode: 400,
+    });
+  }
+}
+
+export class UnauthorizedError extends BaseError {
+  constructor(params: Partial<BaseErrorParams> = {}) {
+    super({
+      ...params,
+      name: "UnauthorizedError",
+      message: params.message ?? "Unauthorized",
+      statusCode: 401,
+    });
+  }
+}
+
+export class ForbiddenError extends BaseError {
+  constructor(params: Partial<BaseErrorParams> = {}) {
+    super({
+      ...params,
+      name: "ForbiddenError",
+      message: params.message ?? "Forbidden",
+      statusCode: 403,
+    });
+  }
+}
+
+export class TooManyRequestsError extends BaseError {
+  constructor(params: Partial<BaseErrorParams> = {}) {
+    super({
+      ...params,
+      name: "TooManyRequestsError",
+      message: params.message ?? "Too Many Requests",
+      statusCode: 429,
+    });
+  }
+}
+
+export class UnprocessableEntityError extends BaseError {
+  constructor(params: Partial<BaseErrorParams> = {}) {
+    super({
+      ...params,
+      name: "UnprocessableEntityError",
+      message: params.message ?? "Unprocessable Entity",
+      statusCode: 422,
+    });
+  }
+}
+
+export class MethodNotAllowedError extends BaseError {
+  constructor(params: Partial<BaseErrorParams> = {}) {
+    super({
+      ...params,
+      name: "MethodNotAllowedError",
+      message: params.message ?? "Method Not Allowed",
+      statusCode: 405,
+    });
+  }
+}
+
+
+
+>
+
+
+
+
+
+
+===== FILE:    src/lib/http/handleApiError.ts =====
+<conteúdo completo do arquivo
+
+// src/lib/http/handleApiError.ts
+import { NextRequest, NextResponse } from "next/server";
+import { BaseError, InternalServerError } from "@/lib/errors";
+import { logger } from "@/lib/logger";
+import { ErrorDictionary } from "@/types/error-dictionary";
+
+// Importação dinâmica dos dicionários (Pode ser ajustado conforme sua estratégia de build)
+import ptBR from "@/dictionaries/errors/pt-BR.json";
+import enUS from "@/dictionaries/errors/en-US.json";
+import esES from "@/dictionaries/errors/es-ES.json";
+import esAR from "@/dictionaries/errors/es-AR.json";
+import esMX from "@/dictionaries/errors/es-MX.json";
+
+const dictionaries: Record<string, { errors: ErrorDictionary }> = {
+  "pt-BR": ptBR,
+  "en-US": enUS,
+  "es-ES": esES,
+  "es-AR": esAR,
+  "es-MX": esMX,
+};
+
+/**
+ * Handle API Error
+ * Totalmente consistente com o dicionário de erros e suporte i18n.
+ */
+export function handleApiError(error: unknown, request?: NextRequest) {
+  // 1. Normalização do Erro
+  const err =
+    error instanceof BaseError
+      ? error
+      : new InternalServerError({
+          cause: error,
+          message: error instanceof Error ? error.message : undefined,
+        });
+
+  // 2. Registro do Log (Backend retém o erro técnico completo)
+  logger.error(err);
+
+  // 3. Identificação do Idioma (i18n)
+  // Tenta pegar do header Accept-Language, fallback para pt-BR
+  const acceptLanguage = request?.headers.get("accept-language")?.split(",")[0] || "pt-BR";
+  const locale = dictionaries[acceptLanguage] ? acceptLanguage : "pt-BR";
+  const dictionary = dictionaries[locale].errors;
+
+  // 4. Mapeamento da tradução baseada na classe do erro
+  // Se o erro for "NotFoundError", buscamos dictionary.NotFoundError
+  const errorKey = err.name as keyof ErrorDictionary;
+  const translation = dictionary[errorKey] || dictionary.InternalServerError;
+
+  // 5. Construção da Resposta para o Cliente
+  return NextResponse.json(
+    {
+      error: {
+        name: err.name,
+        title: translation.title, // Consistente com o dicionário
+        message: err.message || translation.message, // Prioriza mensagem específica ou a do dicionário
+        action: translation.action, // Instrução amigável do dicionário
+        error_id: err.errorId,
+        request_id: err.requestId,
+        // Segurança: Contexto apenas para erros de validação (ex: campos faltando)
+        context: err.name === "ValidationError" ? err.context : undefined,
+      },
+    },
+    { status: err.statusCode }
+  );
+}
+
+
+
+
+
+>
+
+
+
+
+
+
+
+
+
+
 
 
 
