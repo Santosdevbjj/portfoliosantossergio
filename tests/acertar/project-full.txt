@@ -1,5 +1,5 @@
 ===== FILE:    package.json =====
-<conteúdo completo do arquivo 
+<conteúdo completo do arquivo  
 
 {
   "name": "portfolio-sergio-santos",
@@ -10323,120 +10323,7 @@ export interface Project {
   updatedAt?: string;
 }
 
-
 >
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-===== FILE:     =====
-<conteúdo completo do arquivo>
-
-
-
-
-
-
-
-
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
-
-
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
-
-
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
-
-
-
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
