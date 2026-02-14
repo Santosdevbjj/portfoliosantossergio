@@ -7655,10 +7655,488 @@ export function handleApiError(error: unknown, request?: NextRequest) {
 }
 
 
+>
+
+
+
+
+
+
+
+
+
+
+===== FILE:  src/lib/seo/breadcrumbs.ts   =====
+<conteúdo completo do arquivo
+
+
+import type { Dictionary, Locale } from '@/types/dictionary';
+
+export interface BreadcrumbItem {
+  name: string;
+  item: string;
+}
+
+/**
+ * Gera breadcrumbs semânticos e SEO-friendly.
+ * Alinhado com a estrutura multi-regional (pt-BR, en-US, es-ES, es-AR, es-MX).
+ */
+export function generateBreadcrumbs(
+  pathname: string,
+  locale: Locale,
+  dict: Dictionary,
+  baseUrl: string
+): BreadcrumbItem[] {
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+  
+  // Remove o locale da URL para processar os segmentos de página
+  const segments = pathname
+    .split('/')
+    .filter(Boolean)
+    .filter((seg) => seg !== locale);
+
+  // O "Home" agora usa breadcrumb_root conforme seu labels.json
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      name: dict.labels?.breadcrumb_root || dict.labels?.home || 'Home',
+      item: `${normalizedBaseUrl}/${locale}`,
+    },
+  ];
+
+  let currentPath = `${normalizedBaseUrl}/${locale}`;
+
+  segments.forEach((segment) => {
+    const decodedSegment = decodeURIComponent(segment);
+    currentPath += `/${segment}`;
+
+    // Lógica de busca de Label:
+    // 1. Procura na seção SEO do dicionário (ex: seo.pages.projects.title)
+    // 2. Procura em labels genéricos
+    // 3. Fallback: Formata o slug (ex: "meus-projetos" -> "Meus Projetos")
+    const label = 
+      dict.seo?.pages?.[decodedSegment as keyof typeof dict.seo.pages]?.title ||
+      (dict.labels as any)?.[decodedSegment] ||
+      decodedSegment
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+
+    breadcrumbs.push({
+      name: label,
+      item: currentPath,
+    });
+  });
+
+  return breadcrumbs;
+}
+
+
+>
+
+
+
+
+
+
+
+
+===== FILE:  src/actions/user-actions.ts     =====
+<conteúdo completo do arquivo
+
+// src/actions/user-actions.ts
+'use server';
+
+import { logger } from "@/lib/logger";
+import { ValidationError, InternalServerError } from "@/lib/errors";
+
+/**
+ * ACTION: updateProfileAction
+ * Descrição: Atualiza os dados do perfil com validação rigorosa e log de observabilidade.
+ * Alinhado com: Next.js 16 e TypeScript 5.9+
+ */
+export async function updateProfileAction(formData: FormData) {
+  try {
+    // Tratamento seguro do FormData para satisfazer o TypeScript
+    const rawName = formData.get("name");
+    const name = typeof rawName === 'string' ? rawName.trim() : "";
+
+    // 1. Simulação de Validação
+    // Agora o TS sabe que 'name' é string, permitindo o uso de .length
+    if (!name || name.length < 3) {
+      throw new ValidationError({
+        message: "Nome muito curto", // Chave base para tradução
+        context: { field: "name", value: name },
+        errorLocationCode: "USER_ACTION_001"
+      });
+    }
+
+    // 2. Lógica de Negócio (Exemplo)
+    // No mundo real: await db.user.update({ data: { name } })
+    
+    return { success: true };
+
+  } catch (error: any) {
+    // 3. REGISTRO NO LOGGER (Ciclo de observabilidade para Engenharia de Dados)
+    // O erro completo (stack trace + contexto) fica apenas no servidor por segurança.
+    logger.error(error, { 
+      action: "updateProfileAction",
+      timestamp: new Date().toISOString() 
+    });
+
+    // 4. RETORNO PARA O CLIENTE (Normalização para o Dicionário de Erros)
+    // Retornamos apenas o necessário para a UI buscar a tradução nos JSONs.
+    
+    if (error instanceof ValidationError) {
+      return {
+        success: false,
+        error: {
+          name: "ValidationError", // Deve bater exatamente com a chave no ErrorDictionary
+          message: error.message,
+          errorId: error.errorId,
+          code: error.errorLocationCode
+        }
+      };
+    }
+
+    // Erro genérico/inesperado (Internal Server Error)
+    const internalErr = new InternalServerError({ cause: error });
+    return {
+      success: false,
+      error: {
+        name: "InternalServerError", // Chave do dicionário para erro 500
+        message: internalErr.message,
+        errorId: internalErr.errorId
+      }
+    };
+  }
+}
 
 
 
 >
+
+
+
+
+
+
+
+
+
+===== FILE:   src/contexts/ScrollSpyContext.tsx =====
+<conteúdo completo do arquivo
+
+
+'use client'
+
+/**
+ * CONTEXT: ScrollSpy
+ * -----------------------------------------------------------------------------
+ * Gerencia o estado da seção ativa durante a navegação por scroll.
+ * Essencial para o feedback visual da Navbar e sincronização de UI.
+ * Integrado com o domínio de Navegação (NavSection).
+ */
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react'
+
+type ActiveSection = string | null
+
+interface ScrollSpyContextValue {
+  activeSection: ActiveSection
+  setActiveSection: (section: ActiveSection) => void
+  resetActiveSection: () => void
+}
+
+const ScrollSpyContext = createContext<ScrollSpyContextValue | undefined>(
+  undefined,
+)
+
+interface ScrollSpyProviderProps {
+  readonly children: React.ReactNode
+  readonly sectionIds: readonly string[] | undefined
+}
+
+export function ScrollSpyProvider({
+  children,
+  sectionIds,
+}: ScrollSpyProviderProps): JSX.Element {
+  const [activeSection, setActiveSectionState] =
+    useState<ActiveSection>(null)
+
+  const setActiveSection = useCallback(
+    (section: ActiveSection) => {
+      setActiveSectionState((prev) =>
+        prev === section ? prev : section,
+      )
+    },
+    [],
+  )
+
+  const resetActiveSection = useCallback(() => {
+    setActiveSectionState(null)
+  }, [])
+
+  const value = useMemo<ScrollSpyContextValue>(
+    () => ({
+      activeSection,
+      setActiveSection,
+      resetActiveSection,
+    }),
+    [activeSection, setActiveSection, resetActiveSection],
+  )
+
+  return (
+    <ScrollSpyContext.Provider value={value}>
+      {children}
+    </ScrollSpyContext.Provider>
+  )
+}
+
+/**
+ * Hook oficial para consumir o ScrollSpy
+ */
+export function useScrollSpy(): ScrollSpyContextValue {
+  const context = useContext(ScrollSpyContext)
+
+  if (!context) {
+    throw new Error(
+      'useScrollSpy must be used within a ScrollSpyProvider',
+    )
+  }
+
+  return context
+}
+
+
+
+
+
+
+
+>
+
+
+
+
+
+
+
+
+
+
+
+===== FILE:       =====
+<conteúdo completo do arquivo
+
+
+
+
+
+>
+
+
+
+
+
+
+
+
+..
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+===== FILE: src/app/[lang]/page.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/app/[lang]/global-error.tsx =====
+<conteúdo completo do arquivo>
+
+===== FILE: src/components/AboutSection.tsx =====
+<conteúdo completo do arquivo>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
