@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, type ReactNode } from 'react'
-import { ScrollSpyProvider } from '@/contexts/ScrollSpyContext'
+import { ScrollSpyProvider } from '@/contexts/scroll-spy.client'
 import type { Locale } from '@/types/dictionary'
 
 /* -------------------------------------------------------------------------- */
