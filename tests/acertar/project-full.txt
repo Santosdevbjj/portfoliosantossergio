@@ -9804,10 +9804,61 @@ export const mapGitHubListToDomain = (repos: GitHubRepoResponse[]): ProjectDomai
 
 
 
-===== FILE:      =====
+===== FILE:    src/services/githubService.ts  =====
 <conteúdo completo do arquivo
 
 
+// src/services/githubService.ts
+
+import { ProjectDomain } from "@/domain/projects";
+import { GitHubRepoResponse, mapGitHubListToDomain } from "@/mappers/projectMapper";
+
+const GITHUB_API_URL = "https://api.github.com";
+const USERNAME = process.env.GITHUB_USERNAME;
+const TOKEN = process.env.GITHUB_TOKEN;
+
+/**
+ * Serviço especializado em buscar dados do GitHub.
+ * Utiliza o modelo de cache do Next.js 16.
+ */
+export async function getGitHubProjects(): Promise<ProjectDomain[]> {
+  if (!USERNAME) {
+    console.error("[GitHub Service] Username not found in environment variables.");
+    return [];
+  }
+
+  try {
+    const response = await fetch(`${GITHUB_API_URL}/users/${USERNAME}/repos?sort=updated&per_page=100`, {
+      headers: {
+        // O uso do Token aumenta o limite de requisições e permite ver repositórios privados se necessário
+        ...(TOKEN && { Authorization: `Bearer ${TOKEN}` }),
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+      // Next.js 16 Cache: Revalida os dados a cada 24 horas (86400 segundos)
+      next: { 
+        revalidate: 86400,
+        tags: ['github-projects'] 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`GitHub API returned ${response.status}: ${response.statusText}`);
+    }
+
+    const data: GitHubRepoResponse[] = await response.json();
+
+    // Transforma os dados brutos em Objetos de Domínio via Mapper
+    const domainProjects = mapGitHubListToDomain(data);
+
+    // Filtra apenas o que for relevante para o portfólio (opcional, já que o mapper também filtra)
+    return domainProjects.filter(p => p.isPortfolio || p.isFeatured);
+
+  } catch (error) {
+    console.error("[GitHub Service] Failed to fetch projects:", error);
+    return []; // Retorna lista vazia em caso de falha para não quebrar a UI
+  }
+}
 
 
 >
@@ -9825,28 +9876,483 @@ export const mapGitHubListToDomain = (repos: GitHubRepoResponse[]): ProjectDomai
 
 
 
-===== FILE: src/app/[lang]/global-error.tsx =====
+
+
+
+
+
+===== FILE:  src/styles/animations.css    =====
+<conteúdo completo do arquivo
+
+
+
+/* src/styles/animations.css */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    /* translate3d ativa aceleração de hardware (GPU) */
+    transform: translate3d(0, 15px, 0) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
+}
+
+/* Sistema de Stagger (Entrada Gradual Otimizada) */
+.stagger-load {
+  isolation: isolate; /* Cria um contexto de empilhamento independente */
+}
+
+.stagger-load > * {
+  opacity: 0;
+  /* Melhora a performance em telas ProMotion/120Hz */
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Delays baseados na sequência de leitura */
+.stagger-load > *:nth-child(1) { animation-delay: 100ms; }
+.stagger-load > *:nth-child(2) { animation-delay: 180ms; }
+.stagger-load > *:nth-child(3) { animation-delay: 260ms; }
+.stagger-load > *:nth-child(4) { animation-delay: 340ms; }
+.stagger-load > *:nth-child(5) { animation-delay: 420ms; }
+.stagger-load > *:nth-child(n+6) { animation-delay: 500ms; }
+
+/* Skeleton Shimmer de Alta Performance */
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: color-mix(in oklch, currentColor 5%, transparent);
+  border-radius: inherit;
+  transform: translateZ(0); /* Força nova camada de renderização */
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklch, currentColor 8%, transparent) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Ajustes de Ritmo Cognitivo (Localização) 
+   Idiomas latinos (PT/ES) tendem a ter textos mais longos, 
+   uma animação levemente mais lenta melhora a legibilidade durante o scroll.
+*/
+[lang^="es"] .stagger-load > * { animation-duration: 0.9s; }
+[lang^="pt"] .stagger-load > * { animation-duration: 0.85s; }
+[lang^="en"] .stagger-load > * { animation-duration: 0.7s; }
+
+/* Acessibilidade: Movimento Reduzido (Rigor 2026) */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .stagger-load > * {
+    opacity: 1; /* Garante visibilidade imediata sem movimento */
+    transform: none !important;
+  }
+}
+
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== FILE: src/types/dictionary.ts   =====
+<conteúdo completo do arquivo
+
+
+// src/types/dictionary.ts
+
+export type Locale = "pt-BR" | "en-US" | "es-ES" | "es-AR" | "es-MX";
+
+export interface DictionaryMeta {
+  version: string;
+  locale: Locale;
+  direction: "ltr" | "rtl";
+  lastUpdated: string;
+  author: string;
+  source: string;
+  contentVersion?: string;
+  contentHash?: string;
+  sourceType?: string;
+}
+
+export interface HeroDictionary {
+  greeting: string;
+  title: string;
+  subtitle: string;
+  headline: string;
+  ctaPrimary: string;
+}
+
+export interface AboutDictionary {
+  title: string;
+  differentialTitle: string;
+  description: string;
+  differentialContent: string;
+  highlights: string[];
+  stats: {
+    experienceValue: string;
+    experienceLabel: string;
+    availabilityValue: string;
+    availabilityLabel: string;
+    automation: string;
+  };
+}
+
+export interface ContactDictionary {
+  title: string;
+  subtitle: string;
+  cta: string;
+  emailLabel: string;
+  cvLabel: string;
+  linkedinLabel: string;
+}
+
+export interface ExperienceItem {
+  company: string;
+  period: string;
+  role: string;
+  description: string;
+}
+
+export interface ExperienceDictionary {
+  title: string;
+  items: ExperienceItem[];
+}
+
+export interface ArticleItem {
+  title: string;
+  description: string;
+  date: string;
+  category: string;
+  isAward: boolean;
+  link: string;
+}
+
+export interface ArticlesSectionDictionary {
+  title: string;
+  mediumProfile: string;
+  readMore: string;
+  publishedAt: string;
+  bestOfMonth: string;
+  awardWinner: string;
+  items: ArticleItem[];
+}
+
+export interface ProjectCategories {
+  dataScience: string;
+  cloud: string;
+  graphs: string;
+  analysis: string;
+  excel: string;
+  database: string;
+  dev: string;
+  security: string;
+}
+
+export interface ProjectsSectionDictionary {
+  title: string;
+  featuredLabel: string;
+  firstLabel: string;
+  impactLabel: string;
+  viewProject: string;
+  viewDemo: string;
+  viewAll: string;
+  categories: ProjectCategories;
+}
+
+export interface CommonDictionary {
+  navigation: string;
+  role: string;
+  footer: string;
+  rights: string;
+  builtWith: string;
+  loading: string;
+  error: string;
+  socialLinks: string;
+  languageSwitcher: string;
+  errorBoundary: {
+    title: string;
+    description: string;
+    actions: { retry: string; home: string };
+  };
+  notFound: {
+    title: string;
+    description: string;
+    button: string;
+  };
+  externalLinks: {
+    linkedin: string;
+    github: string;
+    medium: string;
+    email: string;
+  };
+  menu: {
+    open: string;
+    close: string;
+    aria: { open: string; close: string };
+  };
+}
+
+export interface StateDictionary {
+  loading: string;
+  empty: string;
+  error: string;
+  emptyProjects: { title: string; description: string; cta: string };
+  emptyExperience: string;
+  errorArticles: string;
+}
+
+export interface Dictionary {
+  meta: DictionaryMeta;
+  hero: HeroDictionary;
+  about: AboutDictionary;
+  contact: ContactDictionary;
+  experience: ExperienceDictionary;
+  articles: ArticlesSectionDictionary;
+  projects: ProjectsSectionDictionary;
+  common: CommonDictionary;
+  intl: {
+    locale: string;
+    fallbackLocale: string;
+    currency: string;
+    timezone: string;
+    unitDisplay: string;
+    numberFormat: string;
+  };
+  states: StateDictionary;
+  cookie: {
+    title: string;
+    description: string;
+    necessary: string;
+    alwaysActive: string;
+    analytics: string;
+    acceptAll: string;
+    savePreferences: string;
+  };
+  seo: {
+    siteName: string;
+    description: string;
+    keywords: string[];
+    pages: {
+      [key: string]: { title: string; description: string };
+    };
+  };
+  metrics: {
+    availability: string;
+    availabilityNormalized: { value: number; unit: string };
+  };
+}
+
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== FILE: src/types/error-dictionary.ts     =====
+<conteúdo completo do arquivo
+
+
+export interface ErrorDetail {
+  title: string;
+  message: string;
+  action: string;
+}
+
+export interface ErrorDictionary {
+  InternalServerError: ErrorDetail;
+  NotFoundError: ErrorDetail;
+  ValidationError: ErrorDetail;
+  UnauthorizedError: ErrorDetail;
+  ForbiddenError: ErrorDetail;
+  TooManyRequestsError: ErrorDetail;
+  UnprocessableEntityError: ErrorDetail;
+  MethodNotAllowedError: ErrorDetail;
+}
+
+
+
+>
+
+
+
+
+
+
+
+
+
+===== FILE:  src/types/i18n.d.ts   =====
+<conteúdo completo do arquivo
+
+
+// src/types/i18n.d.ts
+
+import { 
+  Locale as LocaleType, 
+  Dictionary as DictionaryType 
+} from "./dictionary";
+
+/**
+ * Tornamos os tipos disponíveis globalmente no projeto 
+ * para satisfazer o rigor do TS 6.0 sem precisar de imports em todo lugar.
+ */
+declare global {
+  type Locale = LocaleType;
+  type Dictionary = DictionaryType;
+
+  // Tipos auxiliares consistentes com seus dicionários
+  interface I18nParams {
+    params: {
+      lang: Locale;
+    };
+  }
+}
+
+export {};
+
+
+>
+
+
+
+
+
+
+
+
+===== FILE:   src/types/project.ts   =====
+<conteúdo completo do arquivo
+
+// src/types/project.ts
+
+import { Locale } from "./dictionary";
+
+export type ProjectLocaleContent = {
+  title: string;
+  description: string;
+  summary?: string;
+};
+
+export interface ProjectSEO {
+  title: string;
+  description: string;
+  keywords?: string[];
+}
+
+export interface ProjectLinks {
+  repository?: string;
+  demo?: string;
+  article?: string;
+}
+
+export interface Project {
+  id: string;
+  slug: string;
+  category: string;
+  featured: boolean;
+  order: number;
+  status: "active" | "archived" | "draft";
+
+  /**
+   * Conteúdo localizado do projeto.
+   * 'pt-BR' é obrigatório, os demais são opcionais.
+   */
+  content: {
+    "pt-BR": ProjectLocaleContent;
+  } & Partial<Record<Exclude<Locale, "pt-BR">, ProjectLocaleContent>>;
+
+  /**
+   * SEO localizado do projeto.
+   */
+  seo: {
+    "pt-BR": ProjectSEO;
+  } & Partial<Record<Exclude<Locale, "pt-BR">, ProjectSEO>>;
+
+  stack: string[];
+  links?: ProjectLinks;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== FILE:     =====
 <conteúdo completo do arquivo>
 
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
 
 
 
 
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
-<conteúdo completo do arquivo>
 
 
 
