@@ -9,7 +9,8 @@ import { NavSection, getSectionId } from '@/domain/navigation'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { useScrollSpy } from '@/contexts/ScrollSpyContext'
+import { ScrollSpyProvider } from '@/contexts/scroll-spy.client'
+
 
 interface NavbarProps {
   readonly lang: Locale
