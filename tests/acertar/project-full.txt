@@ -7913,12 +7913,871 @@ export function useScrollSpy(): ScrollSpyContextValue {
 }
 
 
+>
 
 
 
+
+
+
+
+
+
+
+
+===== FILE:  src/dictionaries/pt-BR.json     =====
+<conteúdo completo do arquivo
+
+{
+  "meta": {
+    "version": "1.0.0",
+    "locale": "pt-BR",
+    "direction": "ltr",
+    "lastUpdated": "2026-02-03T19:10:00Z",
+    "author": "Sérgio Santos",
+    "source": "manual",
+    "contentVersion": "2026.02.03",
+    "contentHash": "i18n-ptbr-2026-02-03",
+    "sourceType": "curated-manual"
+  },
+  "hero": {
+    "greeting": "Disponível para Projetos Críticos",
+    "title": "Analista de Ciência de Dados",
+    "subtitle": "Dados e Resiliência",
+    "headline": "Especialista em transformar infraestruturas complexas em sistemas de alta disponibilidade e pipelines de dados escaláveis.",
+    "ctaPrimary": "Ver Projetos"
+  },
+  "about": {
+    "title": "Sobre Mim",
+    "differentialTitle": "Engenharia de Dados com Foco em Missão Crítica",
+    "description": "Analista de Ciência de Dados com base sólida em sistemas críticos bancários e foco em transformar dados em decisões, redução de custos e eficiência operacional.",
+    "differentialContent": "Atuei por mais de 15 anos no Banco Bradesco em ambientes regulados de missão crítica. Atualmente direciono minha atuação para Ciência de Dados e IA, aplicando o rigor de sistemas críticos à criação de modelos preditivos.",
+    "highlights": ["15+ anos em Bancos", "Especialista Cloud", "Data Science & IA"],
+    "stats": {
+      "experienceValue": "+15",
+      "experienceLabel": "Anos",
+      "availabilityValue": "99.9%",
+      "availabilityLabel": "Uptime",
+      "automation": "Sistemas 100% Automatizados"
+    }
+  },
+  "contact": {
+    "title": "Vamos Conversar?",
+    "subtitle": "Busco oportunidades em projetos de governança e modernização.",
+    "cta": "Enviar Email",
+    "emailLabel": "Copiar Email",
+    "cvLabel": "Ver CV",
+    "linkedinLabel": "LinkedIn"
+  },
+  "experience": {
+    "title": "Experiência Profissional",
+    "items": [
+      {
+        "company": "Consultor Autônomo / Transição",
+        "period": "2008 - Atual",
+        "role": "Especialista em Sistemas Críticos",
+        "description": "Arquitetura e manutenção de pipelines de dados e infraestrutura resiliente. Foco em Ciência de Dados e automação inteligente."
+      }
+    ]
+  },
+  "articles": {
+    "title": "Artigos Técnicos",
+    "mediumProfile": "Ver perfil no Medium",
+    "readMore": "Ler artigo completo",
+    "publishedAt": "Publicado em",
+    "bestOfMonth": "Destaque do Mês",
+    "awardWinner": "Artigo Premiado",
+    "items": [
+      {
+        "title": "A Era dos Dados em Sistemas Críticos",
+        "description": "Como a governança de dados transforma sistemas legados em ativos estratégicos.",
+        "date": "2025",
+        "category": "Data Strategy",
+        "isAward": true,
+        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
+      }
+    ]
+  },
+  "projects": {
+    "title": "Projetos e Soluções",
+    "featuredLabel": "Destaque Técnico",
+    "firstLabel": "Desafio e Arquitetura",
+    "impactLabel": "Impacto e Resultado",
+    "viewProject": "Repositório GitHub",
+    "viewDemo": "Visualizar Demo",
+    "viewAll": "Ver Todos",
+    "categories": {
+      "dataScience": "Ciência de Dados",
+      "cloud": "Azure Databricks",
+      "graphs": "Neo4J",
+      "analysis": "Power BI & Análise",
+      "excel": "Excel",
+      "database": "Banco de Dados",
+      "dev": "Desenvolvimento (Python/C#/Java)",
+      "security": "Segurança"
+    }
+  },
+  "common": {
+    "navigation": "Navegação",
+    "role": "Analista de Ciência de Dados | Python | SQL | Azure",
+    "footer": "© 2026 Sérgio Santos. Todos os direitos reservados.",
+    "rights": "Todos os direitos reservados",
+    "builtWith": "Desenvolvido com Next.js 16 & TypeScript",
+    "loading": "Carregando...",
+    "error": "Algo deu errado.",
+    "socialLinks": "Abrir perfil de {platform}",
+    "languageSwitcher": "Alterar idioma",
+    "errorBoundary": {
+      "title": "Ops! Erro inesperado.",
+      "description": "Entre em contato se o problema persistir.",
+      "actions": { "retry": "Tentar novamente", "home": "Início" }
+    },
+    "notFound": {
+      "title": "Página não encontrada",
+      "description": "O link pode estar quebrado.",
+      "button": "Voltar"
+    },
+    "externalLinks": {
+      "linkedin": "https://www.linkedin.com/in/santossergioluiz",
+      "github": "https://github.com/Santosdevbjj",
+      "medium": "https://medium.com/@sergiosantosluiz",
+      "email": "santossergiorealbjj@outlook.com"
+    },
+    "menu": { "open": "Abrir", "close": "Fechar", "aria": { "open": "Abrir menu", "close": "Fechar menu" } }
+  },
+  "intl": {
+    "locale": "pt-BR",
+    "fallbackLocale": "pt",
+    "currency": "BRL",
+    "timezone": "America/Sao_Paulo",
+    "unitDisplay": "short",
+    "numberFormat": "pt-BR"
+  },
+  "states": {
+    "loading": "Carregando...",
+    "empty": "Sem dados.",
+    "error": "Erro ao carregar.",
+    "emptyProjects": { "title": "Nenhum projeto", "description": "Em breve.", "cta": "Voltar" },
+    "emptyExperience": "Sem registros.",
+    "errorArticles": "Erro nos artigos."
+  },
+  "cookie": {
+    "title": "Cookies",
+    "description": "Melhoramos sua experiência.",
+    "necessary": "Necessários",
+    "alwaysActive": "Ativo",
+    "analytics": "Analíticos",
+    "acceptAll": "Aceitar",
+    "savePreferences": "Salvar"
+  },
+  "seo": {
+    "siteName": "Sérgio Santos | Portfolio",
+    "description": "Ciência de Dados & Sistemas Críticos",
+    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "pages": {
+      "home": { "title": "Início", "description": "Portfólio de Sérgio Santos" },
+      "projects": { "title": "Projetos", "description": "Soluções de dados" },
+      "articles": { "title": "Artigos", "description": "Conteúdo técnico" }
+    }
+  },
+  "metrics": {
+    "availability": "99,5%",
+    "availabilityNormalized": { "value": 99.5, "unit": "%" }
+  }
+}
 
 
 >
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== FILE:  src/dictionaries/en-US.json   =====
+<conteúdo completo do arquivo
+
+
+
+{
+  "meta": {
+    "version": "1.0.0",
+    "locale": "en-US",
+    "direction": "ltr",
+    "lastUpdated": "2026-02-03T19:10:00Z",
+    "author": "Sérgio Santos",
+    "source": "manual",
+    "contentVersion": "2026.02.03",
+    "contentHash": "i18n-enus-2026-02-03",
+    "sourceType": "curated-manual"
+  },
+  "hero": {
+    "greeting": "Available for Mission-Critical Projects",
+    "title": "Data Science Analyst",
+    "subtitle": "Data & Resilience",
+    "headline": "Specialist in transforming complex infrastructures into high-availability systems and scalable data pipelines.",
+    "ctaPrimary": "View Projects"
+  },
+  "about": {
+    "title": "About Me",
+    "differentialTitle": "Data Engineering with a Mission-Critical Focus",
+    "description": "Data Science Analyst with a solid background in critical banking systems, focusing on transforming data into decisions, cost reduction, and operational efficiency.",
+    "differentialContent": "I served for over 15 years at Banco Bradesco in regulated mission-critical environments. Currently, I focus my work on Data Science and AI, applying the rigor of critical systems to the creation of predictive models.",
+    "highlights": ["15+ Years in Banking", "Cloud Specialist", "Data Science & AI"],
+    "stats": {
+      "experienceValue": "+15",
+      "experienceLabel": "Years",
+      "availabilityValue": "99.9%",
+      "availabilityLabel": "Uptime",
+      "automation": "100% Automated Systems"
+    }
+  },
+  "contact": {
+    "title": "Let's Talk?",
+    "subtitle": "Seeking opportunities in governance and modernization projects.",
+    "cta": "Send Email",
+    "emailLabel": "Copy Email",
+    "cvLabel": "View CV",
+    "linkedinLabel": "LinkedIn"
+  },
+  "experience": {
+    "title": "Professional Experience",
+    "items": [
+      {
+        "company": "Freelance Consultant / Transition",
+        "period": "2008 - Present",
+        "role": "Critical Systems Specialist",
+        "description": "Architecture and maintenance of resilient data pipelines and infrastructure. Focus on Data Science and intelligent automation."
+      }
+    ]
+  },
+  "articles": {
+    "title": "Technical Articles",
+    "mediumProfile": "View Medium Profile",
+    "readMore": "Read full article",
+    "publishedAt": "Published on",
+    "bestOfMonth": "Highlight of the Month",
+    "awardWinner": "Award-Winning Article",
+    "items": [
+      {
+        "title": "The Era of Data in Critical Systems",
+        "description": "How data governance transforms legacy systems into strategic assets.",
+        "date": "2025",
+        "category": "Data Strategy",
+        "isAward": true,
+        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
+      }
+    ]
+  },
+  "projects": {
+    "title": "Projects and Solutions",
+    "featuredLabel": "Technical Highlight",
+    "firstLabel": "Challenge & Architecture",
+    "impactLabel": "Impact & Results",
+    "viewProject": "GitHub Repository",
+    "viewDemo": "View Demo",
+    "viewAll": "View All",
+    "categories": {
+      "dataScience": "Data Science",
+      "cloud": "Azure Databricks",
+      "graphs": "Neo4J",
+      "analysis": "Power BI & Analysis",
+      "excel": "Excel",
+      "database": "Database",
+      "dev": "Development (Python/C#/Java)",
+      "security": "Security"
+    }
+  },
+  "common": {
+    "navigation": "Navigation",
+    "role": "Data Science Analyst | Python | SQL | Azure",
+    "footer": "© 2026 Sérgio Santos. All rights reserved.",
+    "rights": "All rights reserved",
+    "builtWith": "Built with Next.js 16 & TypeScript",
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "socialLinks": "Open {platform} profile",
+    "languageSwitcher": "Change language",
+    "errorBoundary": {
+      "title": "Oops! Unexpected error.",
+      "description": "Please contact me if the problem persists.",
+      "actions": { "retry": "Try again", "home": "Home" }
+    },
+    "notFound": {
+      "title": "Page not found",
+      "description": "The link may be broken.",
+      "button": "Go Back"
+    },
+    "externalLinks": {
+      "linkedin": "https://www.linkedin.com/in/santossergioluiz",
+      "github": "https://github.com/Santosdevbjj",
+      "medium": "https://medium.com/@sergiosantosluiz",
+      "email": "santossergiorealbjj@outlook.com"
+    },
+    "menu": { "open": "Open", "close": "Close", "aria": { "open": "Open menu", "close": "Close menu" } }
+  },
+  "intl": {
+    "locale": "en-US",
+    "fallbackLocale": "en",
+    "currency": "USD",
+    "timezone": "America/New_York",
+    "unitDisplay": "short",
+    "numberFormat": "en-US"
+  },
+  "states": {
+    "loading": "Loading...",
+    "empty": "No data.",
+    "error": "Error loading.",
+    "emptyProjects": { "title": "No projects", "description": "Coming soon.", "cta": "Go Back" },
+    "emptyExperience": "No records found.",
+    "errorArticles": "Error loading articles."
+  },
+  "cookie": {
+    "title": "Cookies",
+    "description": "We improve your experience.",
+    "necessary": "Necessary",
+    "alwaysActive": "Always Active",
+    "analytics": "Analytics",
+    "acceptAll": "Accept All",
+    "savePreferences": "Save"
+  },
+  "seo": {
+    "siteName": "Sérgio Santos | Portfolio",
+    "description": "Data Science & Critical Systems",
+    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "pages": {
+      "home": { "title": "Home", "description": "Portfolio of Sérgio Santos" },
+      "projects": { "title": "Projects", "description": "Data solutions" },
+      "articles": { "title": "Articles", "description": "Technical content" }
+    }
+  },
+  "metrics": {
+    "availability": "99.5%",
+    "availabilityNormalized": { "value": 99.5, "unit": "%" }
+  }
+}
+
+
+>
+
+
+
+
+
+
+
+
+===== FILE: src/dictionaries/es-ES.json =====
+<conteúdo completo do arquivo
+
+{
+  "meta": {
+    "version": "1.0.0",
+    "locale": "es-ES",
+    "direction": "ltr",
+    "lastUpdated": "2026-02-03T19:10:00Z",
+    "author": "Sérgio Santos",
+    "source": "manual",
+    "contentVersion": "2026.02.03",
+    "contentHash": "i18n-eses-2026-02-03",
+    "sourceType": "curated-manual"
+  },
+  "hero": {
+    "greeting": "Disponible para Proyectos Críticos",
+    "title": "Analista de Ciencia de Datos",
+    "subtitle": "Datos y Resiliencia",
+    "headline": "Especialista en transformar infraestructuras complejas en sistemas de alta disponibilidad y pipelines de datos escalables.",
+    "ctaPrimary": "Ver Proyectos"
+  },
+  "about": {
+    "title": "Sobre Mí",
+    "differentialTitle": "Ingeniería de Datos con Enfoque en Misión Crítica",
+    "description": "Analista de Ciencia de Datos con una base sólida en sistemas críticos bancarios y enfoque en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
+    "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente dirijo mi actividad hacia la Ciencia de Datos e IA, aplicando el rigor de los sistemas críticos a la creación de modelos predictivos.",
+    "highlights": ["15+ años en Banca", "Especialista Cloud", "Data Science e IA"],
+    "stats": {
+      "experienceValue": "+15",
+      "experienceLabel": "Años",
+      "availabilityValue": "99,9%",
+      "availabilityLabel": "Uptime",
+      "automation": "Sistemas 100% Automatizados"
+    }
+  },
+  "contact": {
+    "title": "¿Hablamos?",
+    "subtitle": "Busco oportunidades en proyectos de gobernanza y modernización.",
+    "cta": "Enviar Correo",
+    "emailLabel": "Copiar Correo",
+    "cvLabel": "Ver CV",
+    "linkedinLabel": "LinkedIn"
+  },
+  "experience": {
+    "title": "Experiencia Profesional",
+    "items": [
+      {
+        "company": "Consultor Autónomo / Transición",
+        "period": "2008 - Actualidad",
+        "role": "Especialista en Sistemas Críticos",
+        "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructura resiliente. Enfoque en Ciencia de Datos y automatización inteligente."
+      }
+    ]
+  },
+  "articles": {
+    "title": "Artículos Técnicos",
+    "mediumProfile": "Ver perfil en Medium",
+    "readMore": "Leer artículo completo",
+    "publishedAt": "Publicado el",
+    "bestOfMonth": "Destacado del Mes",
+    "awardWinner": "Artículo Premiado",
+    "items": [
+      {
+        "title": "La Era de los Datos en Sistemas Críticos",
+        "description": "Cómo el gobierno de datos transforma sistemas legados en activos estratégicos.",
+        "date": "2025",
+        "category": "Data Strategy",
+        "isAward": true,
+        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
+      }
+    ]
+  },
+  "projects": {
+    "title": "Proyectos y Soluciones",
+    "featuredLabel": "Destacado Técnico",
+    "firstLabel": "Desafío y Arquitectura",
+    "impactLabel": "Impacto y Resultado",
+    "viewProject": "Repositorio GitHub",
+    "viewDemo": "Visualizar Demo",
+    "viewAll": "Ver Todos",
+    "categories": {
+      "dataScience": "Ciencia de Datos",
+      "cloud": "Azure Databricks",
+      "graphs": "Neo4J",
+      "analysis": "Power BI y Análisis",
+      "excel": "Excel",
+      "database": "Base de Datos",
+      "dev": "Desarrollo (Python/C#/Java)",
+      "security": "Seguridad"
+    }
+  },
+  "common": {
+    "navigation": "Navegación",
+    "role": "Analista de Ciencia de Datos | Python | SQL | Azure",
+    "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
+    "rights": "Todos los derechos reservados",
+    "builtWith": "Desarrollado con Next.js 16 y TypeScript",
+    "loading": "Cargando...",
+    "error": "Algo ha salido mal.",
+    "socialLinks": "Abrir perfil de {platform}",
+    "languageSwitcher": "Cambiar idioma",
+    "errorBoundary": {
+      "title": "¡Ops! Error inesperado.",
+      "description": "Contacte con nosotros si el problema persiste.",
+      "actions": { "retry": "Reintentar", "home": "Inicio" }
+    },
+    "notFound": {
+      "title": "Página no encontrada",
+      "description": "Es posible que el enlace esté roto.",
+      "button": "Volver"
+    },
+    "externalLinks": {
+      "linkedin": "https://www.linkedin.com/in/santossergioluiz",
+      "github": "https://github.com/Santosdevbjj",
+      "medium": "https://medium.com/@sergiosantosluiz",
+      "email": "santossergiorealbjj@outlook.com"
+    },
+    "menu": { "open": "Abrir", "close": "Cerrar", "aria": { "open": "Abrir menú", "close": "Cerrar menú" } }
+  },
+  "intl": {
+    "locale": "es-ES",
+    "fallbackLocale": "es",
+    "currency": "EUR",
+    "timezone": "Europe/Madrid",
+    "unitDisplay": "short",
+    "numberFormat": "es-ES"
+  },
+  "states": {
+    "loading": "Cargando...",
+    "empty": "Sin datos.",
+    "error": "Error al cargar.",
+    "emptyProjects": { "title": "Ningún proyecto", "description": "Próximamente.", "cta": "Volver" },
+    "emptyExperience": "Sin registros.",
+    "errorArticles": "Error en los artículos."
+  },
+  "cookie": {
+    "title": "Cookies",
+    "description": "Mejoramos tu experiencia.",
+    "necessary": "Necesarias",
+    "alwaysActive": "Activa",
+    "analytics": "Analíticas",
+    "acceptAll": "Aceptar",
+    "savePreferences": "Guardar"
+  },
+  "seo": {
+    "siteName": "Sérgio Santos | Portfolio",
+    "description": "Ciencia de Datos y Sistemas Críticos",
+    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "pages": {
+      "home": { "title": "Inicio", "description": "Portfolio de Sérgio Santos" },
+      "projects": { "title": "Proyectos", "description": "Soluciones de datos" },
+      "articles": { "title": "Artículos", "description": "Contenido técnico" }
+    }
+  },
+  "metrics": {
+    "availability": "99,5%",
+    "availabilityNormalized": { "value": 99.5, "unit": "%" }
+  }
+}
+
+
+>
+
+
+
+
+
+
+===== FILE: src/dictionaries/es-AR.json  =====
+<conteúdo completo do arquivo
+
+{
+  "meta": {
+    "version": "1.0.0",
+    "locale": "es-AR",
+    "direction": "ltr",
+    "lastUpdated": "2026-02-03T19:10:00Z",
+    "author": "Sérgio Santos",
+    "source": "manual",
+    "contentVersion": "2026.02.03",
+    "contentHash": "i18n-esar-2026-02-03",
+    "sourceType": "curated-manual"
+  },
+  "hero": {
+    "greeting": "Disponible para Proyectos Críticos",
+    "title": "Analista de Ciencia de Datos",
+    "subtitle": "Datos y Resiliencia",
+    "headline": "Especialista en transformar infraestructuras complejas en sistemas de alta disponibilidad y pipelines de datos escalables.",
+    "ctaPrimary": "Ver Proyectos"
+  },
+  "about": {
+    "title": "Sobre Mí",
+    "differentialTitle": "Ingeniería de Datos con Foco en Misión Crítica",
+    "description": "Analista de Ciencia de Datos con base sólida en sistemas críticos bancarios y foco en transformar datos en decisiones, reducción de costos y eficiencia operativa.",
+    "differentialContent": "Laburé por más de 15 años en el Banco Bradesco en ambientes regulados de misión crítica. Actualmente direcciono mi actividad hacia la Ciencia de Datos e IA, aplicando el rigor de sistemas críticos a la creación de modelos predictivos.",
+    "highlights": ["15+ años en Bancos", "Especialista Cloud", "Data Science e IA"],
+    "stats": {
+      "experienceValue": "+15",
+      "experienceLabel": "Años",
+      "availabilityValue": "99,9%",
+      "availabilityLabel": "Uptime",
+      "automation": "Sistemas 100% Automatizados"
+    }
+  },
+  "contact": {
+    "title": "¿Charlamos?",
+    "subtitle": "Busco oportunidades en proyectos de gobernanza y modernización.",
+    "cta": "Enviar Email",
+    "emailLabel": "Copiar Email",
+    "cvLabel": "Ver CV",
+    "linkedinLabel": "LinkedIn"
+  },
+  "experience": {
+    "title": "Experiencia Profesional",
+    "items": [
+      {
+        "company": "Consultor Autónomo / Transición",
+        "period": "2008 - Actualidad",
+        "role": "Especialista en Sistemas Críticos",
+        "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructura resiliente. Foco en Ciencia de Datos y automatización inteligente."
+      }
+    ]
+  },
+  "articles": {
+    "title": "Artículos Técnicos",
+    "mediumProfile": "Ver perfil en Medium",
+    "readMore": "Leer artículo completo",
+    "publishedAt": "Publicado el",
+    "bestOfMonth": "Destacado del Mes",
+    "awardWinner": "Artículo Premiado",
+    "items": [
+      {
+        "title": "La Era de los Datos en Sistemas Críticos",
+        "description": "Cómo el gobierno de datos transforma sistemas legados en activos estratégicos.",
+        "date": "2025",
+        "category": "Data Strategy",
+        "isAward": true,
+        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
+      }
+    ]
+  },
+  "projects": {
+    "title": "Proyectos y Soluciones",
+    "featuredLabel": "Destacado Técnico",
+    "firstLabel": "Desafío y Arquitectura",
+    "impactLabel": "Impacto y Resultado",
+    "viewProject": "Repositorio GitHub",
+    "viewDemo": "Visualizar Demo",
+    "viewAll": "Ver Todos",
+    "categories": {
+      "dataScience": "Ciencia de Datos",
+      "cloud": "Azure Databricks",
+      "graphs": "Neo4J",
+      "analysis": "Power BI y Análisis",
+      "excel": "Excel",
+      "database": "Base de Datos",
+      "dev": "Desarrollo (Python/C#/Java)",
+      "security": "Seguridad"
+    }
+  },
+  "common": {
+    "navigation": "Navegación",
+    "role": "Analista de Ciencia de Datos | Python | SQL | Azure",
+    "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
+    "rights": "Todos los derechos reservados",
+    "builtWith": "Desarrollado con Next.js 16 y TypeScript",
+    "loading": "Cargando...",
+    "error": "Algo salió mal.",
+    "socialLinks": "Abrir perfil de {platform}",
+    "languageSwitcher": "Cambiar idioma",
+    "errorBoundary": {
+      "title": "¡Upa! Error inesperado.",
+      "description": "Ponete en contacto si el problema persiste.",
+      "actions": { "retry": "Reintentar", "home": "Inicio" }
+    },
+    "notFound": {
+      "title": "Página no encontrada",
+      "description": "El link puede estar roto.",
+      "button": "Volver"
+    },
+    "externalLinks": {
+      "linkedin": "https://www.linkedin.com/in/santossergioluiz",
+      "github": "https://github.com/Santosdevbjj",
+      "medium": "https://medium.com/@sergiosantosluiz",
+      "email": "santossergiorealbjj@outlook.com"
+    },
+    "menu": { "open": "Abrir", "close": "Cerrar", "aria": { "open": "Abrir menú", "close": "Cerrar menú" } }
+  },
+  "intl": {
+    "locale": "es-AR",
+    "fallbackLocale": "es",
+    "currency": "ARS",
+    "timezone": "America/Argentina/Buenos_Aires",
+    "unitDisplay": "short",
+    "numberFormat": "es-AR"
+  },
+  "states": {
+    "loading": "Cargando...",
+    "empty": "Sin datos.",
+    "error": "Error al cargar.",
+    "emptyProjects": { "title": "Ningún proyecto", "description": "Próximamente.", "cta": "Volver" },
+    "emptyExperience": "Sin registros.",
+    "errorArticles": "Error en los artículos."
+  },
+  "cookie": {
+    "title": "Cookies",
+    "description": "Mejoramos tu experiencia.",
+    "necessary": "Necesarias",
+    "alwaysActive": "Activo",
+    "analytics": "Analíticas",
+    "acceptAll": "Aceptar",
+    "savePreferences": "Guardar"
+  },
+  "seo": {
+    "siteName": "Sérgio Santos | Portfolio",
+    "description": "Ciencia de Datos y Sistemas Críticos",
+    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "pages": {
+      "home": { "title": "Inicio", "description": "Portfolio de Sérgio Santos" },
+      "projects": { "title": "Proyectos", "description": "Soluciones de datos" },
+      "articles": { "title": "Artículos", "description": "Contenido técnico" }
+    }
+  },
+  "metrics": {
+    "availability": "99,5%",
+    "availabilityNormalized": { "value": 99.5, "unit": "%" }
+  }
+}
+
+
+>
+
+
+
+
+
+
+
+===== FILE:  src/dictionaries/es-MX.json =====
+<conteúdo completo do arquivo
+
+{
+  "meta": {
+    "version": "1.0.0",
+    "locale": "es-MX",
+    "direction": "ltr",
+    "lastUpdated": "2026-02-03T19:10:00Z",
+    "author": "Sérgio Santos",
+    "source": "manual",
+    "contentVersion": "2026.02.03",
+    "contentHash": "i18n-esmx-2026-02-03",
+    "sourceType": "curated-manual"
+  },
+  "hero": {
+    "greeting": "Disponible para Proyectos Críticos",
+    "title": "Analista de Ciencia de Datos",
+    "subtitle": "Datos y Resiliencia",
+    "headline": "Especialista en transformar infraestructuras complejas en sistemas de alta disponibilidad y pipelines de datos escalables.",
+    "ctaPrimary": "Ver Proyectos"
+  },
+  "about": {
+    "title": "Sobre Mí",
+    "differentialTitle": "Ingeniería de Datos con Enfoque en Misión Crítica",
+    "description": "Analista de Ciencia de Datos con una base sólida en sistemas críticos bancarios y enfoque en transformar datos en decisiones, reducción de costos y eficiencia operativa.",
+    "differentialContent": "Colaboré por más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente enfoco mi labor en Ciencia de Datos e IA, aplicando el rigor de sistemas críticos a la creación de modelos predictivos.",
+    "highlights": ["15+ años en Bancos", "Especialista Cloud", "Data Science e IA"],
+    "stats": {
+      "experienceValue": "+15",
+      "experienceLabel": "Años",
+      "availabilityValue": "99.9%",
+      "availabilityLabel": "Uptime",
+      "automation": "Sistemas 100% Automatizados"
+    }
+  },
+  "contact": {
+    "title": "¿Platicamos?",
+    "subtitle": "Busco oportunidades en proyectos de gobernanza y modernización.",
+    "cta": "Enviar Correo",
+    "emailLabel": "Copiar Correo",
+    "cvLabel": "Ver CV",
+    "linkedinLabel": "LinkedIn"
+  },
+  "experience": {
+    "title": "Experiencia Profesional",
+    "items": [
+      {
+        "company": "Consultor Autónomo / Transición",
+        "period": "2008 - Actualidad",
+        "role": "Especialista en Sistemas Críticos",
+        "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructura resiliente. Enfoque en Ciencia de Datos y automatización inteligente."
+      }
+    ]
+  },
+  "articles": {
+    "title": "Artículos Técnicos",
+    "mediumProfile": "Ver perfil en Medium",
+    "readMore": "Leer artículo completo",
+    "publishedAt": "Publicado el",
+    "bestOfMonth": "Destacado del Mes",
+    "awardWinner": "Artículo Premiado",
+    "items": [
+      {
+        "title": "La Era de los Datos en Sistemas Críticos",
+        "description": "Cómo la gobernanza de datos transforma sistemas legados en activos estratégicos.",
+        "date": "2025",
+        "category": "Data Strategy",
+        "isAward": true,
+        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
+      }
+    ]
+  },
+  "projects": {
+    "title": "Proyectos y Soluciones",
+    "featuredLabel": "Destacado Técnico",
+    "firstLabel": "Desafío y Arquitectura",
+    "impactLabel": "Impacto y Resultado",
+    "viewProject": "Repositorio GitHub",
+    "viewDemo": "Visualizar Demo",
+    "viewAll": "Ver Todos",
+    "categories": {
+      "dataScience": "Ciencia de Datos",
+      "cloud": "Azure Databricks",
+      "graphs": "Neo4J",
+      "analysis": "Power BI y Análisis",
+      "excel": "Excel",
+      "database": "Base de Datos",
+      "dev": "Desarrollo (Python/C#/Java)",
+      "security": "Seguridad"
+    }
+  },
+  "common": {
+    "navigation": "Navegación",
+    "role": "Analista de Ciencia de Datos | Python | SQL | Azure",
+    "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
+    "rights": "Todos los derechos reservados",
+    "builtWith": "Desarrollado con Next.js 16 y TypeScript",
+    "loading": "Cargando...",
+    "error": "Algo salió mal.",
+    "socialLinks": "Abrir perfil de {platform}",
+    "languageSwitcher": "Cambiar idioma",
+    "errorBoundary": {
+      "title": "¡Ups! Error inesperado.",
+      "description": "Ponte en contacto si el problema persiste.",
+      "actions": { "retry": "Reintentar", "home": "Inicio" }
+    },
+    "notFound": {
+      "title": "Página no encontrada",
+      "description": "El enlace podría estar roto.",
+      "button": "Volver"
+    },
+    "externalLinks": {
+      "linkedin": "https://www.linkedin.com/in/santossergioluiz",
+      "github": "https://github.com/Santosdevbjj",
+      "medium": "https://medium.com/@sergiosantosluiz",
+      "email": "santossergiorealbjj@outlook.com"
+    },
+    "menu": { "open": "Abrir", "close": "Cerrar", "aria": { "open": "Abrir menú", "close": "Cerrar menú" } }
+  },
+  "intl": {
+    "locale": "es-MX",
+    "fallbackLocale": "es",
+    "currency": "MXN",
+    "timezone": "America/Mexico_City",
+    "unitDisplay": "short",
+    "numberFormat": "es-MX"
+  },
+  "states": {
+    "loading": "Cargando...",
+    "empty": "Sin datos.",
+    "error": "Error al cargar.",
+    "emptyProjects": { "title": "Ningún proyecto", "description": "Próximamente.", "cta": "Volver" },
+    "emptyExperience": "Sin registros.",
+    "errorArticles": "Error en los artículos."
+  },
+  "cookie": {
+    "title": "Cookies",
+    "description": "Mejoramos tu experiencia.",
+    "necessary": "Necesarias",
+    "alwaysActive": "Activo",
+    "analytics": "Analíticos",
+    "acceptAll": "Aceptar",
+    "savePreferences": "Guardar"
+  },
+  "seo": {
+    "siteName": "Sérgio Santos | Portfolio",
+    "description": "Ciencia de Datos y Sistemas Críticos",
+    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "pages": {
+      "home": { "title": "Inicio", "description": "Portafolio de Sérgio Santos" },
+      "projects": { "title": "Proyectos", "description": "Soluciones de datos" },
+      "articles": { "title": "Artículos", "description": "Contenido técnico" }
+    }
+  },
+  "metrics": {
+    "availability": "99,5%",
+    "availabilityNormalized": { "value": 99.5, "unit": "%" }
+  }
+}
+
+
+>
+
+
 
 
 
@@ -7931,47 +8790,21 @@ export function useScrollSpy(): ScrollSpyContextValue {
 
 
 ===== FILE:       =====
-<conteúdo completo do arquivo
-
-
-
-
-
->
-
-
-
-
-
-
-
-
-..
-
-
-
-
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/app/[lang]/global-error.tsx =====
-<conteúdo completo do arquivo>
-
-===== FILE: src/components/AboutSection.tsx =====
 <conteúdo completo do arquivo>
 
 
 
 
 
-===== FILE: src/app/[lang]/page.tsx =====
-<conteúdo completo do arquivo>
 
-===== FILE: src/app/[lang]/error.tsx =====
-<conteúdo completo do arquivo>
+
+
+
+
+
+
+
+
 
 ===== FILE: src/app/[lang]/global-error.tsx =====
 <conteúdo completo do arquivo>
