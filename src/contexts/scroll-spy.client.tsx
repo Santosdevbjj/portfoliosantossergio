@@ -1,13 +1,5 @@
 'use client'
 
-/**
- * CONTEXT: ScrollSpy
- * -----------------------------------------------------------------------------
- * Gerencia o estado da seção ativa durante a navegação por scroll.
- * Essencial para o feedback visual da Navbar e sincronização de UI.
- * Integrado com o domínio de Navegação (NavSection).
- */
-
 import {
   createContext,
   useCallback,
@@ -16,7 +8,12 @@ import {
   useState,
 } from 'react'
 
-type ActiveSection = string | null
+/**
+ * Seção ativa no ScrollSpy.
+ * string = id da seção
+ * null   = nenhuma seção ativa
+ */
+export type ActiveSection = string | null
 
 interface ScrollSpyContextValue {
   activeSection: ActiveSection
@@ -24,18 +21,15 @@ interface ScrollSpyContextValue {
   resetActiveSection: () => void
 }
 
-const ScrollSpyContext = createContext<ScrollSpyContextValue | undefined>(
-  undefined,
-)
+const ScrollSpyContext =
+  createContext<ScrollSpyContextValue | null>(null)
 
 interface ScrollSpyProviderProps {
   readonly children: React.ReactNode
-  readonly sectionIds: readonly string[] | undefined
 }
 
 export function ScrollSpyProvider({
   children,
-  sectionIds,
 }: ScrollSpyProviderProps): JSX.Element {
   const [activeSection, setActiveSectionState] =
     useState<ActiveSection>(null)
@@ -70,7 +64,7 @@ export function ScrollSpyProvider({
 }
 
 /**
- * Hook oficial para consumir o ScrollSpy
+ * Hook seguro para consumir o ScrollSpy
  */
 export function useScrollSpy(): ScrollSpyContextValue {
   const context = useContext(ScrollSpyContext)
