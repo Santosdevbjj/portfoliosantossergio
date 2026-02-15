@@ -9,7 +9,7 @@ import { NavSection, getSectionId } from '@/domain/navigation'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { useScrollSpy } from '@/contexts/scroll-spy.client' // ✅ IMPORT CORRETO
+import { useScrollSpy } from '@/contexts/scroll-spy.client'
 
 interface NavbarProps {
   readonly lang: Locale
@@ -18,20 +18,20 @@ interface NavbarProps {
 
 export default function Navbar({ lang, dict }: NavbarProps) {
   const { common, seo, about, experience, projects, articles, contact } = dict
-  const { activeSection } = useScrollSpy() // ✅ OK
+  const { activeSection } = useScrollSpy()
 
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  // resto do arquivo permanece IGUAL
-}
-  
+  // Montagem + scroll
   useEffect(() => {
     setMounted(true)
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
+
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -39,8 +39,11 @@ export default function Navbar({ lang, dict }: NavbarProps) {
   // Lock scroll quando menu mobile está aberto
   useEffect(() => {
     if (!mounted) return
+
     document.body.style.overflow = isOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+    }
   }, [isOpen, mounted])
 
   // Fecha menu ao trocar idioma
@@ -50,7 +53,6 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
   if (!mounted) return null
 
-  // Mapeamento das labels conforme a estrutura real dos seus JSONs
   const navLinks: ReadonlyArray<{
     id: NavSection
     href: string
