@@ -1,4 +1,5 @@
 // src/services/githubService.ts
+
 export interface GitHubRepo {
   id: number;
   name: string;
@@ -35,3 +36,6 @@ export async function fetchUserRepos(
 
   return (await response.json()) as GitHubRepo[];
 }
+
+// ✅ Alias explícito para compatibilidade
+export { fetchUserRepos as getGitHubProjects };
