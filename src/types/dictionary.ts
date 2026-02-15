@@ -108,6 +108,7 @@ export interface CommonDictionary {
   loading: string;
   error: string;
   socialLinks: string;
+  skipToContent: string;
   languageSwitcher: string;
   errorBoundary: {
     title: string;
