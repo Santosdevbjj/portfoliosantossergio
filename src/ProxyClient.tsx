@@ -3,12 +3,11 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
 
-// 1. Imports de Tipos (Metadados - SEMpre com .js no final em 2026)
+// Tipos
 import type { Locale, Dictionary } from '@/types/dictionary.js'
 import type { ProjectDomain } from '@/domain/projects.js'
 
-// 2. Imports de Valores (Componentes - Removido o 'type' para permitir o uso no JSX)
-// Nota: Em 2026, usamos a extensão .js mesmo para arquivos .tsx no ESM nativo
+// Componentes
 import PageWrapper from '@/components/PageWrapper.js'
 import Navbar from '@/components/Navbar.js'
 import HeroSection from '@/components/HeroSection.js'
@@ -22,7 +21,7 @@ import Footer from '@/components/Footer.js'
 
 interface ProxyClientProps {
   readonly lang: Locale
-  readonly initialProjects: ProjectDomain[]
+  readonly initialProjects: readonly ProjectDomain[]
   readonly dictionary: Dictionary
 }
 
@@ -31,33 +30,33 @@ export default function ProxyClient({
   initialProjects,
   dictionary,
 }: ProxyClientProps): React.JSX.Element {
-  
-  // Verificação robusta do dicionário
+
+  // Fail fast — evita render quebrado
   if (!dictionary || !dictionary.hero) {
     return notFound()
   }
 
   return (
-    <PageWrapper lang={lang} sectionIds={['sobre', 'trajetoria', 'projetos', 'artigos', 'contato']}>
+    <PageWrapper>
       <Navbar lang={lang} dict={dictionary} />
 
       <main className="relative flex w-full flex-col overflow-x-hidden bg-white antialiased dark:bg-[#020617]">
-        {/* HERO - Prioridade de carregamento (LCP) */}
+        {/* HERO */}
         <section id="hero">
           <HeroSection lang={lang} dict={dictionary} />
         </section>
 
-        {/* ABOUT - Layout Responsivo Adaptável */}
+        {/* ABOUT */}
         <section
-          id="sobre"
+          id="about"
           className="mx-auto max-w-7xl px-4 py-16 sm:px-8 lg:px-12"
         >
           <AboutSection lang={lang} dict={dictionary} />
         </section>
 
-        {/* EXPERIENCE - Alternância de fundo para escaneabilidade */}
+        {/* EXPERIENCE */}
         <section
-          id="trajetoria"
+          id="experience"
           className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10"
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-12">
@@ -65,9 +64,9 @@ export default function ProxyClient({
           </div>
         </section>
 
-        {/* PROJECTS - Grid de Projetos Críticos */}
+        {/* PROJECTS */}
         <section
-          id="projetos"
+          id="projects"
           className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:px-12"
         >
           <FeaturedProjectsSection lang={lang} dict={dictionary} />
@@ -81,17 +80,17 @@ export default function ProxyClient({
           </div>
         </section>
 
-        {/* ARTICLES - Integração com Medium */}
+        {/* ARTICLES */}
         <section
-          id="artigos"
+          id="articles"
           className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:px-12"
         >
           <FeaturedArticleSection lang={lang} dict={dictionary} />
         </section>
 
-        {/* CONTACT - Conversão e CTA Final */}
+        {/* CONTACT */}
         <section
-          id="contato"
+          id="contact"
           className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:px-12"
         >
           <ContactSection lang={lang} dict={dictionary} />
