@@ -1,7 +1,7 @@
 import type { GitHubRepo } from '@/services/githubService'
 import type { Project } from '@/domain/project'
 import { resolveProjectTechnology } from '@/domain/technology'
-
+ 
 export function mapGitHubRepoToProject(
   repo: GitHubRepo,
 ): Project {
