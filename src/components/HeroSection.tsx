@@ -2,7 +2,7 @@
  * HERO SECTION — SÉRGIO SANTOS
  * Compatível com:
  * - Next.js 16
- * - TypeScript 6.0
+ * - TypeScript 6.0 
  * - verbatimModuleSyntax enabled
  * - Arquitetura i18n multi-locale
  */
