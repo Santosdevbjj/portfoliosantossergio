@@ -1,11 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 
 import type { Locale, Dictionary } from '@/types/dictionary'
-import { NavSection, getSectionId } from '@/domain/navigation'
+import {
+  NavSection,
+  NAV_SECTIONS,
+  getSectionId,
+} from '@/domain/navigation'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -16,54 +20,79 @@ interface NavbarProps {
   readonly dict: Dictionary
 }
 
-export default function Navbar({ lang, dict }: NavbarProps) {
-  const { common, seo, about, experience, projects, articles, contact } = dict
+export default function Navbar({
+  lang,
+  dict,
+}: NavbarProps): JSX.Element {
+  const { common, seo, about, experience, projects, articles, contact } =
+    dict
+
   const { activeSection } = useScrollSpy()
 
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [mounted, setMounted] = useState(false)
 
-  // Montagem + scroll
+  /* -------------------------------------------------------------------------- */
+  /*                                SCROLL STATE                                */
+  /* -------------------------------------------------------------------------- */
+
   useEffect(() => {
-    setMounted(true)
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    handleScroll()
+
+    window.addEventListener('scroll', handleScroll, {
+      passive: true,
+    })
+
+    return () =>
+      window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock scroll quando menu mobile está aberto
-  useEffect(() => {
-    if (!mounted) return
+  /* -------------------------------------------------------------------------- */
+  /*                             BODY SCROLL LOCK                               */
+  /* -------------------------------------------------------------------------- */
 
+  useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : ''
     return () => {
       document.body.style.overflow = ''
     }
-  }, [isOpen, mounted])
+  }, [isOpen])
 
-  // Fecha menu ao trocar idioma
+  /* -------------------------------------------------------------------------- */
+  /*                          FECHA MENU AO TROCAR IDIOMA                       */
+  /* -------------------------------------------------------------------------- */
+
   useEffect(() => {
     setIsOpen(false)
   }, [lang])
 
-  if (!mounted) return null
+  /* -------------------------------------------------------------------------- */
+  /*                             NAV LINKS DERIVADOS                            */
+  /* -------------------------------------------------------------------------- */
 
-  const navLinks: ReadonlyArray<{
-    id: NavSection
-    href: string
-    label: string
-  }> = [
-    { id: NavSection.ABOUT, href: `/${lang}#${getSectionId(NavSection.ABOUT)}`, label: about.title },
-    { id: NavSection.EXPERIENCE, href: `/${lang}#${getSectionId(NavSection.EXPERIENCE)}`, label: experience.title },
-    { id: NavSection.PROJECTS, href: `/${lang}#${getSectionId(NavSection.PROJECTS)}`, label: projects.title },
-    { id: NavSection.ARTICLES, href: `/${lang}#${getSectionId(NavSection.ARTICLES)}`, label: articles.title },
-    { id: NavSection.CONTACT, href: `/${lang}#${getSectionId(NavSection.CONTACT)}`, label: contact.title },
-  ]
+  const navLinks = useMemo(
+    () =>
+      NAV_SECTIONS.map(section => {
+        const labels: Record<NavSection, string> = {
+          [NavSection.ABOUT]: about.title,
+          [NavSection.EXPERIENCE]: experience.title,
+          [NavSection.PROJECTS]: projects.title,
+          [NavSection.ARTICLES]: articles.title,
+          [NavSection.CONTACT]: contact.title,
+        }
+
+        return {
+          id: section,
+          href: `/${lang}#${getSectionId(section)}`,
+          label: labels[section],
+        }
+      }),
+    [lang, about.title, experience.title, projects.title, articles.title, contact.title],
+  )
 
   return (
     <nav
@@ -122,7 +151,13 @@ export default function Navbar({ lang, dict }: NavbarProps) {
         <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle />
           <button
-            aria-label={isOpen ? common.menu.aria.close : common.menu.aria.open}
+            aria-label={
+              isOpen
+                ? common.menu.aria.close
+                : common.menu.aria.open
+            }
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
             onClick={() => setIsOpen(prev => !prev)}
             className="p-2 text-slate-900 dark:text-white transition-transform active:scale-90"
           >
@@ -133,8 +168,11 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
       {/* MOBILE MENU */}
       <div
+        id="mobile-menu"
         className={`lg:hidden absolute top-full left-0 w-full overflow-y-auto border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ease-in-out ${
-          isOpen ? 'max-h-screen opacity-100 shadow-2xl' : 'max-h-0 opacity-0'
+          isOpen
+            ? 'max-h-screen opacity-100 shadow-2xl'
+            : 'max-h-0 opacity-0'
         }`}
       >
         <div className="flex flex-col gap-6 p-8">
@@ -147,7 +185,9 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={link.href}
                 onClick={() => setIsOpen(false)}
                 className={`text-2xl font-black tracking-tighter transition-colors ${
-                  isActive ? 'text-blue-600' : 'text-slate-900 dark:text-white hover:text-blue-600'
+                  isActive
+                    ? 'text-blue-600'
+                    : 'text-slate-900 dark:text-white hover:text-blue-600'
                 }`}
               >
                 {link.label}
