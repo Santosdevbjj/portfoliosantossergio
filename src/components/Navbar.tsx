@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -9,22 +10,24 @@ import { NavSection, getSectionId } from '@/domain/navigation'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { ScrollSpyProvider } from '@/contexts/scroll-spy.client'
-
+import { useScrollSpy } from '@/contexts/scroll-spy.client' // ✅ IMPORT CORRETO
 
 interface NavbarProps {
   readonly lang: Locale
   readonly dict: Dictionary
 }
 
-export  default function Navbar({ lang, dict }: NavbarProps) {
+export default function Navbar({ lang, dict }: NavbarProps) {
   const { common, seo, about, experience, projects, articles, contact } = dict
-  const { activeSection } = useScrollSpy()
+  const { activeSection } = useScrollSpy() // ✅ OK
 
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
 
+  // resto do arquivo permanece IGUAL
+}
+  
   useEffect(() => {
     setMounted(true)
     const handleScroll = () => {
