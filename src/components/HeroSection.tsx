@@ -23,7 +23,7 @@ export default function HeroSection({ dict, lang }: HeroSectionProps) {
 
   return (
     <section
-      id="inicio"
+      id="home"
       className="relative flex min-h-[95vh] w-full items-center justify-center overflow-hidden bg-slate-50 px-6 py-20 dark:bg-slate-950"
     >
       <div className="container relative z-10 mx-auto flex flex-col items-center text-center">
