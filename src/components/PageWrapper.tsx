@@ -1,19 +1,15 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import type { Locale } from '@/types/dictionary'
 
 import { ScrollSpyProvider } from '@/contexts/scroll-spy.client'
-import Navbar from '@/components/Navbar'
 
 export interface PageWrapperProps {
   readonly children: ReactNode
-  readonly locale: Locale
 }
 
 export default function PageWrapper({
   children,
-  locale,
 }: PageWrapperProps): JSX.Element {
   return (
     <ScrollSpyProvider>
@@ -39,8 +35,6 @@ export default function PageWrapper({
         >
           Skip to content
         </a>
-
-        <Navbar locale={locale} />
 
         <main
           id="main-content"
