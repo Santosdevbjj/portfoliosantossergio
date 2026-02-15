@@ -1,144 +1,140 @@
-/**
- * ROOT LAYOUT — NEXT.JS 16 — SÉRGIO SANTOS
- * -----------------------------------------------------------------------------
- * ✔️ TOTALMENTE ALINHADO: src/types/dictionary.ts e src/dictionaries/index.ts
- * ✔️ SEO: Suporte a multilingue (PT, EN, ES) com x-default
- * ✔️ ACESSIBILIDADE: Skip links e ARIA labels dinâmicos
- */
+import type { Metadata, Viewport } from "next";
+import { notFound } from "next/navigation";
+import { Inter } from "next/font/google";
+import Script from "next/script";
+import { cache } from "react";
+import type { ReactNode } from "react";
 
-import type { Metadata, Viewport } from 'next'
-import { Inter, Montserrat } from 'next/font/google'
-import Script from 'next/script'
-import '../globals.css'
+import { isValidLocale } from "@/dictionaries/locales";
+import type { Locale } from "@/types/dictionary";
+import { getServerDictionary } from "@/lib/getServerDictionary";
 
-import { ThemeProvider } from '@/components/ThemeToggle'
-import { CookieBanner } from '@/components/CookieBanner'
-import { getServerDictionary } from "@/lib/getServerDictionary"
-import type { Locale } from "@/types/dictionary"
-
-/* --- FONTS --- */
 const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
+  subsets: ["latin"],
+  display: "swap",
+});
 
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  variable: '--font-montserrat',
-  display: 'swap',
-})
+/**
+ * Cache do dicionário por locale (server-only)
+ */
+const getCachedDictionary = cache(async (locale: Locale) => {
+  return getServerDictionary(locale);
+});
 
-/* --- VIEWPORT --- */
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#020617' },
-  ],
-}
-
-/* --- SEO & METADATA --- */
 interface LayoutProps {
-  children: React.ReactNode
-  params: Promise<{ lang: Locale }>
+  readonly children: ReactNode;
+  readonly params: Promise<{ lang: Locale }>;
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ lang: Locale }> }): Promise<Metadata> {
-  const { lang } = await params
-  const dict = await getServerDictionary(lang)
-  
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://portfoliosantossergio.vercel.app'
+/**
+ * Metadata dinâmica por idioma
+ */
+export async function generateMetadata(
+  { params }: { params: Promise<{ lang: Locale }> }
+): Promise<Metadata> {
+  const { lang } = await params;
+
+  if (!isValidLocale(lang)) {
+    notFound();
+  }
+
+  const dict = await getCachedDictionary(lang);
+
+  const siteUrl = "https://portfoliosantossergio.vercel.app";
 
   return {
     metadataBase: new URL(siteUrl),
-    verification: {
-      google: '0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0',
-    },
     title: {
-      default: `Sérgio Santos | ${dict.common.role}`,
-      template: `%s | Sérgio Santos`,
+      default: dict.seo.siteName,
+      template: `%s | ${dict.seo.siteName}`,
     },
     description: dict.seo.description,
+    keywords: dict.seo.keywords,
+    verification: {
+      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
+    },
     alternates: {
       canonical: `${siteUrl}/${lang}`,
       languages: {
-        'pt-BR': `${siteUrl}/pt-BR`,
-        'en-US': `${siteUrl}/en-US`,
-        'es-ES': `${siteUrl}/es-ES`,
-        'es-AR': `${siteUrl}/es-AR`,
-        'es-MX': `${siteUrl}/es-MX`,
-        'x-default': `${siteUrl}/pt-BR`,
+        "pt-BR": `${siteUrl}/pt-BR`,
+        "en-US": `${siteUrl}/en-US`,
+        "es-ES": `${siteUrl}/es-ES`,
+        "es-AR": `${siteUrl}/es-AR`,
+        "es-MX": `${siteUrl}/es-MX`,
+        "x-default": `${siteUrl}/pt-BR`,
       },
     },
     openGraph: {
-      type: 'website',
-      url: `${siteUrl}/${lang}`,
-      title: "Sérgio Santos",
+      title: dict.seo.siteName,
       description: dict.seo.description,
+      url: `${siteUrl}/${lang}`,
       siteName: dict.seo.siteName,
-      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Sérgio Santos Portfolio' }],
+      locale: lang,
+      type: "website",
     },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
-  }
+  };
 }
 
-/* --- ROOT LAYOUT --- */
-export default async function RootLayout({ children, params }: LayoutProps) {
-  const { lang } = await params
-  const dict = await getServerDictionary(lang)
+/**
+ * Viewport
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#020617",
+};
+
+/**
+ * Root Layout
+ */
+export default async function LangLayout({
+  children,
+  params,
+}: LayoutProps): Promise<JSX.Element> {
+  const { lang } = await params;
+
+  if (!isValidLocale(lang)) {
+    notFound();
+  }
+
+  const dict = await getCachedDictionary(lang);
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
-    <html
-      lang={lang}
-      dir={dict.meta.direction}
-      suppressHydrationWarning
-      className={`${inter.variable} ${montserrat.variable} scroll-smooth`}
-    >
-      <head>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-3XF5BTP58V"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-3XF5BTP58V');
-          `}
-        </Script>
-      </head>
+    <html lang={lang} dir={dict.meta.direction}>
+      <body
+        className={`${inter.className} min-h-screen flex flex-col bg-background text-foreground antialiased`}
+      >
+        {/* Skip to content — acessibilidade */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-slate-900 text-white px-4 py-2 rounded-md"
+        >
+          {dict.common.skipToContent}
+        </a>
 
-      <body className="min-h-screen flex flex-col bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 antialiased font-inter">
-        <ThemeProvider>
-          {/* Skip Link para Acessibilidade — Texto corrigido para fluxo de navegação */}
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:p-4 focus:bg-blue-600 focus:text-white focus:rounded-b-lg shadow-lg"
-          >
-            {dict.common.navigation}
-          </a>
+        {/* Google Analytics */}
+        {gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaId}');
+              `}
+            </Script>
+          </>
+        )}
 
-          <main id="main-content" className="flex-grow">
-            {children}
-          </main>
-
-          <CookieBanner lang={lang} dict={dict} />
-        </ThemeProvider>
+        <main id="main-content" className="flex-grow">
+          {children}
+        </main>
       </body>
     </html>
-  )
+  );
 }
