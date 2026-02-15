@@ -1,5 +1,9 @@
 'use client'
 
+import { NavSection } from '@/domain/navigation'
+
+export type ActiveSection = NavSection | null
+
 import {
   createContext,
   useCallback,
