@@ -88,7 +88,7 @@
     }
   },
   "common": {
-    "navigation": "Navigation",
+    "navigation": "Main navigation",
     "role": "Data Science Analyst | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. All rights reserved.",
     "rights": "All rights reserved",
@@ -96,6 +96,7 @@
     "loading": "Loading...",
     "error": "Something went wrong.",
     "socialLinks": "Open {platform} profile",
+    "skipToContent": "Skip to content",
     "languageSwitcher": "Change language",
     "errorBoundary": {
       "title": "Oops! Unexpected error.",
