@@ -1,6 +1,18 @@
 // src/types/dictionary.ts
 
-export type Locale = "pt-BR" | "en-US" | "es-ES" | "es-AR" | "es-MX";
+import type { SupportedLocale } from "@/dictionaries/locales";
+
+/**
+ * Fonte única de verdade para Locale.
+ * ✔ Elimina duplicação
+ * ✔ Evita drift entre dicionários e domínio
+ * ✔ TS 6 compliant
+ */
+export type Locale = SupportedLocale;
+
+/* -------------------------------------------------------------------------- */
+/*                                   META                                     */
+/* -------------------------------------------------------------------------- */
 
 export interface DictionaryMeta {
   version: string;
@@ -14,6 +26,10 @@ export interface DictionaryMeta {
   sourceType?: string;
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                   HERO                                     */
+/* -------------------------------------------------------------------------- */
+
 export interface HeroDictionary {
   greeting: string;
   title: string;
@@ -21,6 +37,10 @@ export interface HeroDictionary {
   headline: string;
   ctaPrimary: string;
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                   ABOUT                                    */
+/* -------------------------------------------------------------------------- */
 
 export interface AboutDictionary {
   title: string;
@@ -37,6 +57,10 @@ export interface AboutDictionary {
   };
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                  CONTACT                                   */
+/* -------------------------------------------------------------------------- */
+
 export interface ContactDictionary {
   title: string;
   subtitle: string;
@@ -45,6 +69,10 @@ export interface ContactDictionary {
   cvLabel: string;
   linkedinLabel: string;
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                EXPERIENCE                                  */
+/* -------------------------------------------------------------------------- */
 
 export interface ExperienceItem {
   company: string;
@@ -57,6 +85,10 @@ export interface ExperienceDictionary {
   title: string;
   items: ExperienceItem[];
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                  ARTICLES                                  */
+/* -------------------------------------------------------------------------- */
 
 export interface ArticleItem {
   title: string;
@@ -76,6 +108,10 @@ export interface ArticlesSectionDictionary {
   awardWinner: string;
   items: ArticleItem[];
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                  PROJECTS                                  */
+/* -------------------------------------------------------------------------- */
 
 export interface ProjectCategories {
   dataScience: string;
@@ -99,6 +135,10 @@ export interface ProjectsSectionDictionary {
   categories: ProjectCategories;
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                   COMMON                                   */
+/* -------------------------------------------------------------------------- */
+
 export interface CommonDictionary {
   navigation: string;
   role: string;
@@ -110,40 +150,63 @@ export interface CommonDictionary {
   socialLinks: string;
   skipToContent: string;
   languageSwitcher: string;
+
   errorBoundary: {
     title: string;
     description: string;
-    actions: { retry: string; home: string };
+    actions: {
+      retry: string;
+      home: string;
+    };
   };
+
   notFound: {
     title: string;
     description: string;
     button: string;
   };
+
   externalLinks: {
     linkedin: string;
     github: string;
     medium: string;
     email: string;
   };
+
   menu: {
     open: string;
     close: string;
-    aria: { open: string; close: string };
+    aria: {
+      open: string;
+      close: string;
+    };
   };
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                   STATES                                   */
+/* -------------------------------------------------------------------------- */
 
 export interface StateDictionary {
   loading: string;
   empty: string;
   error: string;
-  emptyProjects: { title: string; description: string; cta: string };
+  emptyProjects: {
+    title: string;
+    description: string;
+    cta: string;
+  };
   emptyExperience: string;
   errorArticles: string;
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                 ROOT TYPE                                  */
+/* -------------------------------------------------------------------------- */
+
 export interface Dictionary {
   meta: DictionaryMeta;
+
   hero: HeroDictionary;
   about: AboutDictionary;
   contact: ContactDictionary;
@@ -151,15 +214,18 @@ export interface Dictionary {
   articles: ArticlesSectionDictionary;
   projects: ProjectsSectionDictionary;
   common: CommonDictionary;
+
   intl: {
-    locale: string;
+    locale: Locale;
     fallbackLocale: string;
     currency: string;
     timezone: string;
     unitDisplay: string;
     numberFormat: string;
   };
+
   states: StateDictionary;
+
   cookie: {
     title: string;
     description: string;
@@ -169,16 +235,25 @@ export interface Dictionary {
     acceptAll: string;
     savePreferences: string;
   };
+
   seo: {
     siteName: string;
     description: string;
     keywords: string[];
-    pages: {
-      [key: string]: { title: string; description: string };
-    };
+    pages: Record<
+      string,
+      {
+        title: string;
+        description: string;
+      }
+    >;
   };
+
   metrics: {
     availability: string;
-    availabilityNormalized: { value: number; unit: string };
+    availabilityNormalized: {
+      value: number;
+      unit: string;
+    };
   };
 }
