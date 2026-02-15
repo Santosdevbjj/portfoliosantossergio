@@ -2,9 +2,9 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
-import { getDictionary } from "@/dictionaries";
 import type { Locale, Dictionary } from "@/types/dictionary";
 import { getGitHubProjects } from "@/services/githubService";
+import { getServerDictionary } from "@/lib/getServerDictionary";
 
 import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
@@ -61,7 +61,8 @@ export async function generateMetadata(
     notFound();
   }
 
-  const dict = await getDictionary(lang);
+  const dict = await getServerDictionary(lang);
+
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app";
@@ -101,7 +102,6 @@ export default async function HomePage({ params }: PageProps) {
     <ProxyPage lang={lang}>
       {(dictionary: Dictionary) => (
         <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100">
-          
           {/* Hero */}
           <HeroSection dict={dictionary} lang={lang} />
 
@@ -125,9 +125,11 @@ export default async function HomePage({ params }: PageProps) {
                     className="group p-6 border rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10"
                   >
                     <span className="text-[10px] font-bold uppercase text-blue-600">
-                      {dictionary.projects.categories[
-                        project.technology.labelKey as keyof typeof dictionary.projects.categories
-                      ] ?? project.technology.id}
+                      {
+                        dictionary.projects.categories[
+                          project.technology.labelKey as keyof typeof dictionary.projects.categories
+                        ]
+                      }
                     </span>
 
                     <h3 className="text-xl font-bold mt-2">
