@@ -1,5 +1,9 @@
 // src/domain/navigation.ts
 
+/**
+ * Seções lógicas da navegação.
+ * NÃO dependem de idioma.
+ */
 export enum NavSection {
   ABOUT = 'about',
   EXPERIENCE = 'experience',
@@ -8,6 +12,10 @@ export enum NavSection {
   CONTACT = 'contact',
 }
 
+/**
+ * Ordem canônica das seções.
+ * Usada por Navbar, ScrollSpy e PageWrapper.
+ */
 export const NAV_SECTIONS: readonly NavSection[] = [
   NavSection.ABOUT,
   NavSection.EXPERIENCE,
@@ -17,16 +25,31 @@ export const NAV_SECTIONS: readonly NavSection[] = [
 ] as const;
 
 /**
- * Mapeia a seção para o ID da âncora no HTML.
- * Útil para scroll suave e SEO.
+ * Mapeia cada seção para um hash HTML estável.
+ * ❗ Nunca deve ser traduzido.
+ * ❗ Nunca depende de i18n.
  */
-export const NAV_HASH_MAP: Readonly<Record<NavSection, `#${string}`>> = {
-  [NavSection.ABOUT]: '#sobre',
-  [NavSection.EXPERIENCE]: '#trajetoria',
-  [NavSection.PROJECTS]: '#projetos',
-  [NavSection.ARTICLES]: '#artigos',
-  [NavSection.CONTACT]: '#contato',
+export const NAV_HASH_MAP: Readonly<
+  Record<NavSection, `#${NavSection}`>
+> = {
+  [NavSection.ABOUT]: '#about',
+  [NavSection.EXPERIENCE]: '#experience',
+  [NavSection.PROJECTS]: '#projects',
+  [NavSection.ARTICLES]: '#articles',
+  [NavSection.CONTACT]: '#contact',
 } as const;
 
-export const getNavHash = (section: NavSection): `#${string}` => NAV_HASH_MAP[section];
-export const getSectionId = (section: NavSection): string => NAV_HASH_MAP[section].replace('#', '');
+/**
+ * Retorna o hash (#section)
+ */
+export const getNavHash = (
+  section: NavSection,
+): `#${NavSection}` => NAV_HASH_MAP[section];
+
+/**
+ * Retorna o ID puro da seção (sem #)
+ * Usado em <section id="..." />
+ */
+export const getSectionId = (
+  section: NavSection,
+): NavSection => section;
