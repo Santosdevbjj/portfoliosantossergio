@@ -1,27 +1,31 @@
 // src/app/[lang]/page.tsx
+
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
 import type { Locale, Dictionary } from "@/types/dictionary";
+import type { ProjectDomain } from "@/domain/projects";
+
 import { getGitHubProjects } from "@/services/githubService";
+import { mapGitHubRepoToProject } from "@/mappers/projectMapper";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
 import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 
-// ---------------------------------------------
+// --------------------------------------------------
 // Tipos
-// ---------------------------------------------
+// --------------------------------------------------
 interface PageProps {
-  params: Promise<{
+  params: {
     lang: Locale;
-  }>;
+  };
 }
 
-// ---------------------------------------------
+// --------------------------------------------------
 // Constantes
-// ---------------------------------------------
+// --------------------------------------------------
 const SUPPORTED_LOCALES: readonly Locale[] = [
   "pt-BR",
   "en-US",
@@ -30,16 +34,16 @@ const SUPPORTED_LOCALES: readonly Locale[] = [
   "es-MX",
 ] as const;
 
-// ---------------------------------------------
-// Static Params (SSG)
-// ---------------------------------------------
-export async function generateStaticParams() {
+// --------------------------------------------------
+// SSG
+// --------------------------------------------------
+export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }));
 }
 
-// ---------------------------------------------
-// Viewport
-// ---------------------------------------------
+// --------------------------------------------------
+// Viewport (Next 16 padrão)
+// --------------------------------------------------
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -49,13 +53,13 @@ export const viewport: Viewport = {
   ],
 };
 
-// ---------------------------------------------
-// Metadata (SEO)
-// ---------------------------------------------
+// --------------------------------------------------
+// Metadata (SEO por idioma)
+// --------------------------------------------------
 export async function generateMetadata(
-  { params }: PageProps
+  { params }: PageProps,
 ): Promise<Metadata> {
-  const { lang } = await params;
+  const { lang } = params;
 
   if (!SUPPORTED_LOCALES.includes(lang)) {
     notFound();
@@ -68,10 +72,9 @@ export async function generateMetadata(
     "https://portfoliosantossergio.vercel.app";
 
   const homeSeo = dict.seo.pages?.home;
-  const pageTitle = `${homeSeo?.title ?? "Portfolio"} | ${dict.meta.author}`;
 
   return {
-    title: pageTitle,
+    title: `${homeSeo?.title ?? "Portfolio"} | ${dict.meta.author}`,
     description: homeSeo?.description ?? dict.seo.description,
     alternates: {
       canonical: `${siteUrl}/${lang}`,
@@ -86,35 +89,43 @@ export async function generateMetadata(
   };
 }
 
-// ---------------------------------------------
+// --------------------------------------------------
 // Page
-// ---------------------------------------------
+// --------------------------------------------------
 export default async function HomePage({ params }: PageProps) {
-  const { lang } = await params;
+  const { lang } = params;
 
   if (!SUPPORTED_LOCALES.includes(lang)) {
     notFound();
   }
 
-  const projects = await getGitHubProjects();
+  const [repos, dictionary] = await Promise.all([
+    getGitHubProjects("Santosdevbjj"),
+    getServerDictionary(lang),
+  ]);
+
+  const projects: ProjectDomain[] = repos.map(mapGitHubRepoToProject);
 
   return (
     <ProxyPage lang={lang}>
-      {(dictionary: Dictionary) => (
-        <main className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100">
-          {/* Hero */}
-          <HeroSection dict={dictionary} lang={lang} />
+      {(dict: Dictionary) => (
+        <main
+          id="main-content"
+          className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100"
+        >
+          {/* HERO */}
+          <HeroSection dict={dict} lang={lang} />
 
-          {/* About */}
-          <AboutSection dict={dictionary} lang={lang} />
+          {/* ABOUT */}
+          <AboutSection dict={dict} lang={lang} />
 
-          {/* Projects */}
+          {/* PROJECTS */}
           <section
             id="projects"
-            className="container mx-auto px-4 md:px-8 lg:px-16 py-12 md:py-24 max-w-7xl"
+            className="container mx-auto px-4 md:px-8 lg:px-16 py-16 md:py-24 max-w-7xl"
           >
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-12">
-              {dictionary.projects.title}
+            <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-12">
+              {dict.projects.title}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -122,17 +133,14 @@ export default async function HomePage({ params }: PageProps) {
                 projects.map((project) => (
                   <article
                     key={project.id}
-                    className="group p-6 border rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10"
+                    className="group p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/20 transition hover:shadow-xl"
                   >
-                    <span className="text-[10px] font-bold uppercase text-blue-600">
-                      {
-                        dictionary.projects.categories[
-                          project.technology.labelKey as keyof typeof dictionary.projects.categories
-                        ]
-                      }
+                    {/* Categoria (TIPAGEM CORRETA - SEM CAST) */}
+                    <span className="text-[11px] font-bold uppercase text-blue-600 tracking-wider">
+                      {dict.projects.categories[project.technology.labelKey]}
                     </span>
 
-                    <h3 className="text-xl font-bold mt-2">
+                    <h3 className="text-xl font-bold mt-3">
                       {project.name}
                     </h3>
 
@@ -144,26 +152,26 @@ export default async function HomePage({ params }: PageProps) {
                       href={project.htmlUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block mt-6 text-xs font-bold underline"
+                      className="inline-block mt-6 text-xs font-bold underline hover:opacity-70 transition"
                     >
-                      {dictionary.projects.viewProject}
+                      {dict.projects.viewProject}
                     </a>
                   </article>
                 ))
               ) : (
-                <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-200 rounded-3xl">
+                <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl">
                   <p className="text-slate-500">
-                    {dictionary.states.emptyProjects.description}
+                    {dict.states.emptyProjects.description}
                   </p>
                 </div>
               )}
             </div>
           </section>
 
-          {/* Footer */}
-          <footer className="border-t border-slate-200 py-12 text-center">
+          {/* FOOTER */}
+          <footer className="border-t border-slate-200 dark:border-slate-800 py-12 text-center">
             <p className="text-sm text-slate-500">
-              {dictionary.common.footer}
+              {dict.common.footer}
             </p>
           </footer>
         </main>
