@@ -1,20 +1,25 @@
-import type { GitHubRepo } from '@/services/githubService'
-import type { Project } from '@/domain/project'
-import { resolveProjectTechnology } from '@/domain/technology'
- 
+// src/mappers/projectMapper.ts
+import type { GitHubRepo } from "@/services/githubService";
+import type { ProjectDomain } from "@/domain/projects";
+import {
+  resolveProjectTechnology,
+  resolveProjectFlags,
+} from "@/domain/projects";
+
 export function mapGitHubRepoToProject(
   repo: GitHubRepo,
-): Project {
+): ProjectDomain {
+  const technology = resolveProjectTechnology(repo.topics ?? []);
+  const flags = resolveProjectFlags(repo.topics ?? []);
+
   return {
     id: String(repo.id),
     name: repo.name,
-    description: repo.description ?? '',
-    url: repo.html_url,
+    description: repo.description ?? "",
+    htmlUrl: repo.html_url,
     homepage: repo.homepage ?? null,
-    stars: repo.stargazers_count,
-    forks: repo.forks_count,
-    language: repo.language ?? null,
-    updatedAt: repo.updated_at,
-    technology: resolveProjectTechnology(repo),
-  }
+    topics: repo.topics ?? [],
+    technology,
+    ...flags,
+  };
 }
