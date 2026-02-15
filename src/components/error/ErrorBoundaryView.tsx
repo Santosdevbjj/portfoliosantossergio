@@ -55,32 +55,23 @@ export function ErrorBoundaryView({
       : 'InternalServerError';
 
   useEffect(() => {
-    console.error('APP_ERROR', {
-      name: error.name,
-      message: error.message,
-      digest: error.digest,
-      stack: error.stack,
-    });
+    console.error('APP_ERROR', error);
   }, [error]);
 
   const content = (
-    <main className="flex min-h-screen w-full items-center justify-center bg-white p-4 dark:bg-slate-950">
-      <ErrorDisplay
-        errorKey={errorKey}
-        dictionary={dictionary}
-        reset={reset}
-        {...(error.digest ? { errorId: error.digest } : {})}
-      />
-    </main>
+    <ErrorDisplay
+      errorKey={errorKey}
+      dictionary={dictionary}
+      reset={reset}
+      errorId={error.digest}
+    />
   );
 
-  if (!withHtmlWrapper) {
-    return content;
-  }
+  if (!withHtmlWrapper) return content;
 
   return (
     <html lang={locale.split('-')[0]}>
-      <body className="antialiased">{content}</body>
+      <body>{content}</body>
     </html>
   );
 }
