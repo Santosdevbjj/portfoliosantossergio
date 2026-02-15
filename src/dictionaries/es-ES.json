@@ -88,7 +88,7 @@
     }
   },
   "common": {
-    "navigation": "Navegación",
+    "navigation": "Navegación principal",
     "role": "Analista de Ciencia de Datos | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
     "rights": "Todos los derechos reservados",
@@ -96,6 +96,7 @@
     "loading": "Cargando...",
     "error": "Algo ha salido mal.",
     "socialLinks": "Abrir perfil de {platform}",
+    "skipToContent": "Saltar al contenido",
     "languageSwitcher": "Cambiar idioma",
     "errorBoundary": {
       "title": "¡Ops! Error inesperado.",
