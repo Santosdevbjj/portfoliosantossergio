@@ -34,9 +34,15 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { lang } = await params;
 
-  if (!isValidLocale(lang)) {
-    notFound();
-  }
+
+let locale: Locale;
+
+try {
+  locale = normalizeLocale(lang);
+} catch {
+  notFound();
+}
+  
 
   const dict = await getCachedDictionary(lang);
 
