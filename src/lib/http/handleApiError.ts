@@ -38,8 +38,15 @@ export function handleApiError(error: unknown, request?: NextRequest) {
 
   // 3. Identificação do Idioma (i18n)
   // Tenta pegar do header Accept-Language, fallback para pt-BR
-  const acceptLanguage = request?.headers.get("accept-language")?.split(",")[0] || "pt-BR";
-  const locale = dictionaries[acceptLanguage] ? acceptLanguage : "pt-BR";
+  
+
+  const rawLocale = request?.headers.get("accept-language")?.split(",")[0] ?? "pt-BR";
+
+  const locale = Object.keys(dictionaries).find(
+  (key) => rawLocale.startsWith(key.split("-")[0])
+) ?? "pt-BR";
+  
+
   const dictionary = dictionaries[locale].errors;
 
   // 4. Mapeamento da tradução baseada na classe do erro
