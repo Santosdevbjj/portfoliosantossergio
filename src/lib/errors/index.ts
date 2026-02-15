@@ -1,5 +1,5 @@
 // src/lib/errors/index.ts
-import crypto from "crypto";
+import { randomUUID } from "crypto";
 
 /**
  * Contrato base de construção de erros alinhado com ErrorDictionary
@@ -39,7 +39,7 @@ export class BaseError extends Error {
     this.name = params.name;
     this.title = params.title;
     this.statusCode = params.statusCode ?? 500;
-    this.errorId = params.errorId ?? crypto.randomUUID();
+    this.errorId = params.errorId ?? randomUUID();
     this.requestId = params.requestId;
     this.action = params.action;
     this.context = params.context;
