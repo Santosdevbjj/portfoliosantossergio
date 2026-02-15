@@ -24,6 +24,11 @@ export const normalizeLocale = (
 ): SupportedLocale => {
   if (!locale) return DEFAULT_LOCALE;
 
+  export const isValidLocale = (locale?: string): locale is SupportedLocale => {
+  if (!locale) return false;
+  return SUPPORTED_LOCALES.includes(locale as SupportedLocale);
+};
+
   // pt -> pt-BR
   if (locale === "pt") return "pt-BR";
   if (locale === "en") return "en-US";
