@@ -2,23 +2,18 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
 import Script from "next/script";
-import { cache } from "react";
 import type { ReactNode } from "react";
 
-import { isValidLocale } from "@/dictionaries/locales";
+import {
+  isValidLocale,
+  normalizeLocale,
+} from "@/dictionaries/locales";
 import type { Locale } from "@/types/dictionary";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-});
-
-/**
- * Cache do dicionário por locale (server-only)
- */
-const getCachedDictionary = cache(async (locale: Locale) => {
-  return getServerDictionary(locale);
 });
 
 interface LayoutProps {
@@ -34,18 +29,14 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { lang } = await params;
 
+  let locale: Locale;
+  try {
+    locale = normalizeLocale(lang);
+  } catch {
+    notFound();
+  }
 
-let locale: Locale;
-
-try {
-  locale = normalizeLocale(lang);
-} catch {
-  notFound();
-}
-  
-
-  const dict = await getCachedDictionary(lang);
-
+  const dict = await getServerDictionary(locale);
   const siteUrl = "https://portfoliosantossergio.vercel.app";
 
   return {
@@ -56,11 +47,12 @@ try {
     },
     description: dict.seo.description,
     keywords: dict.seo.keywords,
-    verification: {
+     verification: {
       google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
+
     },
     alternates: {
-      canonical: `${siteUrl}/${lang}`,
+      canonical: `${siteUrl}/${locale}`,
       languages: {
         "pt-BR": `${siteUrl}/pt-BR`,
         "en-US": `${siteUrl}/en-US`,
@@ -73,9 +65,9 @@ try {
     openGraph: {
       title: dict.seo.siteName,
       description: dict.seo.description,
-      url: `${siteUrl}/${lang}`,
+      url: `${siteUrl}/${locale}`,
       siteName: dict.seo.siteName,
-      locale: lang,
+      locale,
       type: "website",
     },
   };
@@ -103,7 +95,7 @@ export default async function LangLayout({
     notFound();
   }
 
-  const dict = await getCachedDictionary(lang);
+  const dict = await getServerDictionary(lang);
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
