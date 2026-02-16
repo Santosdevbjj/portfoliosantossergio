@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 
-import type { Locale, Dictionary } from '@/types/dictionary'
+import type { Locale, CommonDictionary } from '@/types/dictionary'
 import {
   NavSection,
   NAV_SECTIONS,
@@ -17,16 +17,14 @@ import { useScrollSpy } from '@/contexts/scroll-spy.client'
 
 interface NavbarProps {
   readonly lang: Locale
-  readonly dict: Dictionary
+  readonly dict: CommonDictionary
 }
 
 export default function Navbar({
   lang,
   dict,
-}: NavbarProps): JSX.Element {
-  const { common, seo, about, experience, projects, articles, contact } =
-    dict
-
+}: NavbarProps): React.JSX.Element {
+  const { navigation, menu, languageSwitcher } = dict
   const { activeSection } = useScrollSpy()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -42,13 +40,9 @@ export default function Navbar({
     }
 
     handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
 
-    window.addEventListener('scroll', handleScroll, {
-      passive: true,
-    })
-
-    return () =>
-      window.removeEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   /* -------------------------------------------------------------------------- */
@@ -63,7 +57,7 @@ export default function Navbar({
   }, [isOpen])
 
   /* -------------------------------------------------------------------------- */
-  /*                          FECHA MENU AO TROCAR IDIOMA                       */
+  /*                          FECHA MENU AO TROCAR IDIOMA                        */
   /* -------------------------------------------------------------------------- */
 
   useEffect(() => {
@@ -71,18 +65,18 @@ export default function Navbar({
   }, [lang])
 
   /* -------------------------------------------------------------------------- */
-  /*                             NAV LINKS DERIVADOS                            */
+  /*                             NAV LINKS DERIVADOS                             */
   /* -------------------------------------------------------------------------- */
 
   const navLinks = useMemo(
     () =>
       NAV_SECTIONS.map(section => {
         const labels: Record<NavSection, string> = {
-          [NavSection.ABOUT]: about.title,
-          [NavSection.EXPERIENCE]: experience.title,
-          [NavSection.PROJECTS]: projects.title,
-          [NavSection.ARTICLES]: articles.title,
-          [NavSection.CONTACT]: contact.title,
+          [NavSection.ABOUT]: dict.role, // título curto (acessível)
+          [NavSection.EXPERIENCE]: dict.role,
+          [NavSection.PROJECTS]: dict.role,
+          [NavSection.ARTICLES]: dict.role,
+          [NavSection.CONTACT]: dict.role,
         }
 
         return {
@@ -91,13 +85,13 @@ export default function Navbar({
           label: labels[section],
         }
       }),
-    [lang, about.title, experience.title, projects.title, articles.title, contact.title],
+    [lang, dict],
   )
 
   return (
     <nav
       role="navigation"
-      aria-label={common.navigation}
+      aria-label={navigation}
       className={`fixed top-0 z-[100] w-full transition-all duration-500 ${
         scrolled
           ? 'bg-white/95 dark:bg-[#020617]/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 py-3 shadow-lg'
@@ -108,7 +102,7 @@ export default function Navbar({
         {/* LOGO */}
         <Link
           href={`/${lang}`}
-          aria-label={seo.siteName}
+          aria-label="Home"
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
@@ -151,11 +145,7 @@ export default function Navbar({
         <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle />
           <button
-            aria-label={
-              isOpen
-                ? common.menu.aria.close
-                : common.menu.aria.open
-            }
+            aria-label={isOpen ? menu.aria.close : menu.aria.open}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
             onClick={() => setIsOpen(prev => !prev)}
@@ -169,35 +159,25 @@ export default function Navbar({
       {/* MOBILE MENU */}
       <div
         id="mobile-menu"
-        className={`lg:hidden absolute top-full left-0 w-full overflow-y-auto border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ease-in-out ${
-          isOpen
-            ? 'max-h-screen opacity-100 shadow-2xl'
-            : 'max-h-0 opacity-0'
+        className={`lg:hidden absolute top-full left-0 w-full overflow-y-auto border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ${
+          isOpen ? 'max-h-screen opacity-100 shadow-2xl' : 'max-h-0 opacity-0'
         }`}
       >
         <div className="flex flex-col gap-6 p-8">
-          {navLinks.map(link => {
-            const isActive = activeSection === link.id
-
-            return (
-              <Link
-                key={link.id}
-                href={link.href}
-                onClick={() => setIsOpen(false)}
-                className={`text-2xl font-black tracking-tighter transition-colors ${
-                  isActive
-                    ? 'text-blue-600'
-                    : 'text-slate-900 dark:text-white hover:text-blue-600'
-                }`}
-              >
-                {link.label}
-              </Link>
-            )
-          })}
+          {navLinks.map(link => (
+            <Link
+              key={link.id}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white hover:text-blue-600"
+            >
+              {link.label}
+            </Link>
+          ))}
 
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
             <p className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-              {common.languageSwitcher}
+              {languageSwitcher}
             </p>
             <LanguageSwitcher currentLang={lang} />
           </div>
