@@ -29,38 +29,42 @@ export default function ProxyClient({
   dictionary,
 }: ProxyClientProps): React.JSX.Element {
 
-  if (!dictionary?.hero) {
+  if (!dictionary?.meta?.locale) {
     notFound()
   }
 
+  const locale = dictionary.meta.locale
+
   return (
     <PageWrapper>
+
       <Navbar
-        lang={lang}
-        dict={dictionary.common}
+        locale={lang}
+        common={dictionary.common}
       />
 
       <main className="relative flex w-full flex-col overflow-x-hidden bg-white antialiased dark:bg-[#020617]">
 
         {/* HERO */}
-        
-         <section id="hero">
-            <HeroSection
+        <section id="hero">
+          <HeroSection
             hero={dictionary.hero}
-           contact={dictionary.contact}
-           about={dictionary.about}
-           metrics={dictionary.metrics}
-           locale={dictionary.meta.locale}
-           />
+            contact={dictionary.contact}
+            about={dictionary.about}
+            metrics={dictionary.metrics}
+            locale={locale}
+          />
         </section>
-        
-      
+
         {/* ABOUT */}
         <section
           id="about"
           className="mx-auto max-w-7xl px-4 py-16 sm:px-8 lg:px-12"
         >
-          <AboutSection dict={dictionary.about} />
+          <AboutSection
+            about={dictionary.about}
+            locale={locale}
+          />
         </section>
 
         {/* EXPERIENCE */}
@@ -69,7 +73,10 @@ export default function ProxyClient({
           className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10"
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-12">
-            <ExperienceSection dict={dictionary.experience} />
+            <ExperienceSection
+              experience={dictionary.experience}
+              locale={locale}
+            />
           </div>
         </section>
 
@@ -78,12 +85,16 @@ export default function ProxyClient({
           id="projects"
           className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:px-12"
         >
-          <FeaturedProjectsSection dict={dictionary.projects} />
+          <FeaturedProjectsSection
+            projects={dictionary.projects}
+            locale={locale}
+          />
 
           <div className="mt-12 border-t pt-12 dark:border-slate-800">
             <ProjectSection
               projects={initialProjects}
-              dict={dictionary.projects}
+              dictionary={dictionary.projects}
+              locale={locale}
             />
           </div>
         </section>
@@ -93,7 +104,10 @@ export default function ProxyClient({
           id="articles"
           className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:px-12"
         >
-          <FeaturedArticleSection dict={dictionary.articles} />
+          <FeaturedArticleSection
+            articles={dictionary.articles}
+            locale={locale}
+          />
         </section>
 
         {/* CONTACT */}
@@ -101,12 +115,16 @@ export default function ProxyClient({
           id="contact"
           className="mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:px-12"
         >
-          <ContactSection dict={dictionary.contact} />
+          <ContactSection
+            contact={dictionary.contact}
+            locale={locale}
+          />
         </section>
 
       </main>
 
-      <Footer dict={dictionary.common} />
+      <Footer common={dictionary.common} />
+
     </PageWrapper>
   )
 }
