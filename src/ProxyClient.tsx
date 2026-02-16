@@ -1,7 +1,6 @@
 // src/ProxyClient.tsx
 
 import { notFound } from 'next/navigation'
-
 import type { Locale, Dictionary } from '@/types/dictionary'
 import type { ProjectDomain } from '@/domain/projects'
 
@@ -28,18 +27,30 @@ export default function ProxyClient({
   dictionary,
 }: ProxyClientProps): React.JSX.Element {
 
-  // Validação segura para TS 6 + Next 16
+  /* -------------------------------------------------------------------------- */
+  /*                           🔒 Validação Estrutural                          */
+  /* -------------------------------------------------------------------------- */
+
   if (!dictionary?.meta?.locale) {
     notFound()
   }
 
   const locale: Locale = dictionary.meta.locale
 
+  // Segurança extra: evita mismatch entre rota e dicionário
+  if (locale !== lang) {
+    notFound()
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /*                                Render Tree                                 */
+  /* -------------------------------------------------------------------------- */
+
   return (
     <PageWrapper>
 
       <Navbar
-        locale={lang}
+        locale={locale}
         common={dictionary.common}
       />
 
