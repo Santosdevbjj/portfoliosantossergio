@@ -1,13 +1,15 @@
 // src/components/AboutSection.tsx
-import type { Dictionary } from "@/types/dictionary";
 
-// Definição estrita de Props — TS 5.9 / Next 16
+import type { AboutDictionary } from "@/types/dictionary";
+
 export interface AboutSectionProps {
-  readonly dict: Dictionary;
+  readonly dict: AboutDictionary;
 }
 
-export default function AboutSection({ dict }: AboutSectionProps) {
-  const { about } = dict;
+export default function AboutSection({
+  dict,
+}: AboutSectionProps): React.JSX.Element {
+
   const {
     title,
     differentialTitle,
@@ -15,16 +17,15 @@ export default function AboutSection({ dict }: AboutSectionProps) {
     differentialContent,
     highlights,
     stats,
-  } = about;
+  } = dict;
 
   return (
-    <section
-      id="sobre"
+    <div
       className="w-full bg-background px-4 py-16 text-foreground md:px-8 lg:px-16"
       aria-labelledby="about-title"
     >
       <div className="mx-auto max-w-6xl space-y-8">
-        {/* Header */}
+
         <header className="space-y-2">
           <h2
             id="about-title"
@@ -38,7 +39,6 @@ export default function AboutSection({ dict }: AboutSectionProps) {
           </p>
         </header>
 
-        {/* Description */}
         <div className="max-w-4xl space-y-6">
           <p className="text-balance text-base leading-relaxed md:text-lg">
             {description}
@@ -49,7 +49,6 @@ export default function AboutSection({ dict }: AboutSectionProps) {
           </p>
         </div>
 
-        {/* Highlights */}
         {highlights.length > 0 && (
           <ul className="flex flex-wrap gap-2 pt-4 md:gap-3">
             {highlights.map((item, index) => (
@@ -63,35 +62,42 @@ export default function AboutSection({ dict }: AboutSectionProps) {
           </ul>
         )}
 
-        {/* Stats */}
-        {stats && (
-          <div className="grid grid-cols-1 gap-4 pt-8 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
-            <div className="flex flex-col items-center justify-center rounded-xl border border-border p-6 transition-all hover:shadow-md">
-              <span className="text-3xl font-bold text-primary">
-                {stats.experienceValue}
-              </span>
-              <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                {stats.experienceLabel}
-              </span>
-            </div>
-
-            <div className="flex flex-col items-center justify-center rounded-xl border border-border p-6 transition-all hover:shadow-md">
-              <span className="text-3xl font-bold text-primary">
-                {stats.availabilityValue}
-              </span>
-              <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                {stats.availabilityLabel}
-              </span>
-            </div>
-
-            <div className="flex flex-col items-center justify-center rounded-xl border border-primary/20 bg-primary/5 p-6 sm:col-span-2">
-              <span className="text-center font-medium text-foreground">
-                {stats.automation}
-              </span>
-            </div>
+        <div className="grid grid-cols-1 gap-4 pt-8 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
+          <StatCard
+            value={stats.experienceValue}
+            label={stats.experienceLabel}
+          />
+          <StatCard
+            value={stats.availabilityValue}
+            label={stats.availabilityLabel}
+          />
+          <div className="flex flex-col items-center justify-center rounded-xl border border-primary/20 bg-primary/5 p-6 sm:col-span-2">
+            <span className="text-center font-medium text-foreground">
+              {stats.automation}
+            </span>
           </div>
-        )}
+        </div>
+
       </div>
-    </section>
+    </div>
+  );
+}
+
+function StatCard({
+  value,
+  label,
+}: {
+  readonly value: string;
+  readonly label: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-xl border border-border p-6 transition-all hover:shadow-md">
+      <span className="text-3xl font-bold text-primary">
+        {value}
+      </span>
+      <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+    </div>
   );
 }
