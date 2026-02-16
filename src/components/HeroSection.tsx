@@ -1,54 +1,83 @@
 /**
  * HERO SECTION — SÉRGIO SANTOS
- * Compatível com:
- * - Next.js 16
- * - TypeScript 6.0 
- * - verbatimModuleSyntax enabled
- * - Arquitetura i18n multi-locale
+ *
+ * ✔ Next.js 16 (App Router)
+ * ✔ TypeScript 6.0
+ * ✔ verbatimModuleSyntax
+ * ✔ i18n multi-locale (pt-BR | en-US | es-*)
+ * ✔ Sem dependência do Dictionary root
+ * ✔ Totalmente responsivo
  */
 
-import type { Dictionary, Locale } from "@/types/dictionary";
+import type {
+  HeroDictionary,
+  ContactDictionary,
+  AboutDictionary,
+  Locale,
+} from "@/types/dictionary";
 import { getNavHash, NavSection } from "@/domain/navigation";
 
 interface HeroSectionProps {
-  dict: Dictionary;
-  lang: Locale;
+  readonly hero: HeroDictionary;
+  readonly contact: ContactDictionary;
+  readonly about: AboutDictionary;
+  readonly metrics?: {
+    availability?: string;
+  };
+  readonly locale: Locale;
 }
 
-export default function HeroSection({ dict, lang }: HeroSectionProps) {
-  const { hero, contact, about, metrics } = dict;
-
-  const cvPath = `/cv-sergio-santos-${dict.meta.locale}.pdf`;
+export default function HeroSection({
+  hero,
+  contact,
+  about,
+  metrics,
+  locale,
+}: HeroSectionProps) {
   const projectsHash = getNavHash(NavSection.PROJECTS);
+  const cvPath = `/cv-sergio-santos-${locale}.pdf`;
 
   return (
     <section
       id="home"
-      className="relative flex min-h-[95vh] w-full items-center justify-center overflow-hidden bg-slate-50 px-6 py-20 dark:bg-slate-950"
+      className="relative flex min-h-[95vh] w-full items-center justify-center overflow-hidden
+                 bg-slate-50 px-6 py-20 dark:bg-slate-950"
     >
       <div className="container relative z-10 mx-auto flex flex-col items-center text-center">
-
-        <div className="mb-8 inline-flex items-center rounded-full border border-blue-200 bg-blue-50/50 px-4 py-1.5 dark:border-blue-800/50 dark:bg-blue-900/20">
-          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-blue-700 dark:text-blue-300 md:text-xs">
+        {/* Badge */}
+        <div className="mb-8 inline-flex items-center rounded-full border border-blue-200
+                        bg-blue-50/50 px-4 py-1.5 dark:border-blue-800/50 dark:bg-blue-900/20">
+          <span className="text-[10px] font-black uppercase tracking-[0.25em]
+                           text-blue-700 dark:text-blue-300 md:text-xs">
             {hero.greeting}
           </span>
         </div>
 
-        <h1 className="mb-6 max-w-4xl text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
+        {/* Title */}
+        <h1 className="mb-6 max-w-4xl text-4xl font-extrabold tracking-tight
+                       text-slate-900 dark:text-white
+                       sm:text-5xl md:text-6xl lg:text-7xl">
           {hero.title}{" "}
-          <span className="block bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent sm:inline">
+          <span className="block bg-gradient-to-r from-blue-600 to-cyan-500
+                           bg-clip-text text-transparent sm:inline">
             {hero.subtitle}
           </span>
         </h1>
 
-        <p className="mb-12 max-w-2xl text-lg font-medium leading-relaxed text-slate-600 dark:text-slate-400 md:text-xl">
+        {/* Headline */}
+        <p className="mb-12 max-w-2xl text-lg font-medium leading-relaxed
+                      text-slate-600 dark:text-slate-400 md:text-xl">
           {hero.headline}
         </p>
 
+        {/* CTA */}
         <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:gap-6">
           <a
             href={projectsHash}
-            className="inline-flex h-14 items-center justify-center rounded-xl bg-blue-600 px-8 text-base font-bold text-white transition-all hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/25 active:scale-95"
+            className="inline-flex h-14 items-center justify-center rounded-xl
+                       bg-blue-600 px-8 text-base font-bold text-white
+                       transition-all hover:bg-blue-700 hover:shadow-lg
+                       hover:shadow-blue-500/25 active:scale-95"
           >
             {hero.ctaPrimary}
           </a>
@@ -57,17 +86,26 @@ export default function HeroSection({ dict, lang }: HeroSectionProps) {
             href={cvPath}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-14 items-center justify-center rounded-xl border border-slate-200 bg-white px-8 text-base font-bold text-slate-700 transition-all hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 active:scale-95"
+            className="inline-flex h-14 items-center justify-center rounded-xl
+                       border border-slate-200 bg-white px-8 text-base font-bold
+                       text-slate-700 transition-all hover:bg-slate-50
+                       dark:border-slate-800 dark:bg-slate-900
+                       dark:text-slate-200 dark:hover:bg-slate-800
+                       active:scale-95"
           >
             {contact.cvLabel}
           </a>
         </div>
 
+        {/* Availability */}
         {metrics?.availability && (
-          <div className="mt-16 flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-500">
+          <div className="mt-16 flex items-center gap-2 text-sm font-medium
+                          text-slate-500 dark:text-slate-500">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+              <span className="absolute inline-flex h-full w-full animate-ping
+                               rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full
+                               bg-green-500" />
             </span>
             <span>
               {about.stats.availabilityLabel}:{" "}
@@ -79,11 +117,14 @@ export default function HeroSection({ dict, lang }: HeroSectionProps) {
         )}
       </div>
 
+      {/* Background Glow */}
       <div
-        className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 opacity-10 blur-[120px] dark:opacity-[0.05]"
+        className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[600px]
+                   -translate-x-1/2 -translate-y-1/2
+                   opacity-10 blur-[120px] dark:opacity-[0.05]"
         aria-hidden="true"
       >
-        <div className="h-full w-full rounded-full bg-blue-600"></div>
+        <div className="h-full w-full rounded-full bg-blue-600" />
       </div>
     </section>
   );
