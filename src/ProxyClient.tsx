@@ -43,10 +43,18 @@ export default function ProxyClient({
       <main className="relative flex w-full flex-col overflow-x-hidden bg-white antialiased dark:bg-[#020617]">
 
         {/* HERO */}
-        <section id="hero">
-          <HeroSection dict={dictionary.hero} />
+        
+         <section id="hero">
+            <HeroSection
+            hero={dictionary.hero}
+           contact={dictionary.contact}
+           about={dictionary.about}
+           metrics={dictionary.metrics}
+           locale={dictionary.meta.locale}
+           />
         </section>
-
+        
+      
         {/* ABOUT */}
         <section
           id="about"
