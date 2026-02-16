@@ -1,8 +1,11 @@
 // src/components/ProxyPage.tsx
+
 import type { ReactNode } from "react";
-import { getDictionary } from "@/dictionaries";
-import type { Locale, Dictionary } from "@/types/dictionary";
 import { notFound } from "next/navigation";
+
+import type { Locale, Dictionary } from "@/types/dictionary";
+import { isValidLocale } from "@/dictionaries/locales";
+import { getServerDictionary } from "@/lib/getServerDictionary";
 
 interface ProxyPageProps {
   lang: Locale;
@@ -11,28 +14,28 @@ interface ProxyPageProps {
 
 /**
  * ProxyPage (Server Component)
- * Responsável apenas por:
- * - validar locale
- * - carregar dicionário
- * - injetar o dicionário corretamente
+ * -----------------------------------------------------------------------------
+ * Responsável por:
+ * - Validar locale com a fonte oficial (SUPPORTED_LOCALES)
+ * - Carregar dicionário cacheado (React cache)
+ * - Injetar Dictionary tipado no children
+ *
+ * ✔ Next.js 16 App Router compliant
+ * ✔ TypeScript 6 strict safe
+ * ✔ Multilíngue
+ * ✔ SSR safe
  */
 export default async function ProxyPage({
   lang,
   children,
 }: ProxyPageProps) {
-  const supportedLocales: readonly Locale[] = [
-    "pt-BR",
-    "en-US",
-    "es-ES",
-    "es-AR",
-    "es-MX",
-  ] as const;
-
-  if (!supportedLocales.includes(lang)) {
+  // Validação robusta baseada na fonte oficial
+  if (!isValidLocale(lang)) {
     notFound();
   }
 
-  const dictionary = await getDictionary(lang);
+  // Carregamento cacheado server-side
+  const dictionary = await getServerDictionary(lang);
 
   return <>{children(dictionary)}</>;
 }
