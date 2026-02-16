@@ -1,86 +1,81 @@
-'use client';
+'use client'
 
-import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import { Menu, X } from 'lucide-react'
 
-import type { Locale, CommonDictionary } from '@/types/dictionary';
+import type { Locale, CommonDictionary, Dictionary } from '@/types/dictionary'
 import {
   NavSection,
   NAV_SECTIONS,
   getNavHash,
-} from '@/domain/navigation';
+} from '@/domain/navigation'
 
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { useScrollSpy } from '@/contexts/scroll-spy.client';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { useScrollSpy } from '@/contexts/scroll-spy.client'
+
+/* -------------------------------------------------------------------------- */
+/*                                   PROPS                                    */
+/* -------------------------------------------------------------------------- */
 
 interface NavbarProps {
-  readonly lang: Locale;
-  readonly common: CommonDictionary;
-  readonly seo: {
-    pages: Record<
-      string,
-      {
-        title: string;
-        description: string;
-      }
-    >;
-  };
+  readonly lang: Locale
+  readonly common: CommonDictionary
+  readonly seoPages: Dictionary['seo']['pages']
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                  COMPONENT                                 */
+/* -------------------------------------------------------------------------- */
 
 export default function Navbar({
   lang,
   common,
-  seo,
-}: NavbarProps): JSX.Element {
-  const { navigation, menu, languageSwitcher } = common;
-  const { activeSection } = useScrollSpy();
+  seoPages,
+}: NavbarProps): React.JSX.Element {
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const { navigation, menu, languageSwitcher } = common
+  const { activeSection } = useScrollSpy()
+
+  const [isOpen, setIsOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   /* -------------------------------------------------------------------------- */
-  /*                                SCROLL STATE                                */
+  /*                               SCROLL EFFECT                                */
   /* -------------------------------------------------------------------------- */
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+      setScrolled(window.scrollY > 20)
+    }
 
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
 
   /* -------------------------------------------------------------------------- */
-  /*                             BODY SCROLL LOCK                               */
+  /*                               BODY LOCK                                    */
   /* -------------------------------------------------------------------------- */
 
   useEffect(() => {
-    if (typeof document === 'undefined') return;
-
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-
+    if (typeof document === 'undefined') return
+    document.body.style.overflow = isOpen ? 'hidden' : ''
     return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  /* -------------------------------------------------------------------------- */
-  /*                          FECHA MENU AO TROCAR IDIOMA                        */
-  /* -------------------------------------------------------------------------- */
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
 
   useEffect(() => {
-    setIsOpen(false);
-  }, [lang]);
+    setIsOpen(false)
+  }, [lang])
 
   /* -------------------------------------------------------------------------- */
-  /*                             NAV LINKS DERIVADOS                             */
+  /*                               NAV LINKS                                    */
   /* -------------------------------------------------------------------------- */
 
   const navLinks = useMemo(
@@ -88,10 +83,10 @@ export default function Navbar({
       NAV_SECTIONS.map(section => ({
         id: section,
         href: `/${lang}${getNavHash(section)}`,
-        label: seo.pages[section]?.title ?? section,
+        label: seoPages[section]?.title ?? section,
       })),
-    [lang, seo.pages],
-  );
+    [lang, seoPages],
+  )
 
   return (
     <nav
@@ -104,10 +99,11 @@ export default function Navbar({
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
+
         {/* LOGO */}
         <Link
           href={`/${lang}`}
-          aria-label={seo.pages.home?.title ?? 'Home'}
+          aria-label={seoPages.home?.title ?? 'Home'}
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
@@ -117,9 +113,10 @@ export default function Navbar({
 
         {/* DESKTOP NAV */}
         <div className="hidden lg:flex items-center gap-8">
+
           <div className="flex gap-8">
             {navLinks.map(link => {
-              const isActive = activeSection === link.id;
+              const isActive = activeSection === link.id
 
               return (
                 <Link
@@ -134,7 +131,7 @@ export default function Navbar({
                 >
                   {link.label}
                 </Link>
-              );
+              )
             })}
           </div>
 
@@ -144,11 +141,13 @@ export default function Navbar({
             <LanguageSwitcher currentLang={lang} />
             <ThemeToggle />
           </div>
+
         </div>
 
-        {/* MOBILE ACTIONS */}
+        {/* MOBILE */}
         <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle />
+
           <button
             aria-label={isOpen ? menu.aria.close : menu.aria.open}
             aria-expanded={isOpen}
@@ -189,5 +188,5 @@ export default function Navbar({
         </div>
       </div>
     </nav>
-  );
+  )
 }
