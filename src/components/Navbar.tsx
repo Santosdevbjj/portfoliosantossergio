@@ -1,34 +1,44 @@
-'use client'
+'use client';
 
-import { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { Menu, X } from 'lucide-react';
 
-import type { Locale, CommonDictionary } from '@/types/dictionary'
+import type { Locale, CommonDictionary } from '@/types/dictionary';
 import {
   NavSection,
   NAV_SECTIONS,
-  getSectionId,
-} from '@/domain/navigation'
+  getNavHash,
+} from '@/domain/navigation';
 
-import { LanguageSwitcher } from '@/components/LanguageSwitcher'
-import { ThemeToggle } from '@/components/ThemeToggle'
-import { useScrollSpy } from '@/contexts/scroll-spy.client'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useScrollSpy } from '@/contexts/scroll-spy.client';
 
 interface NavbarProps {
-  readonly lang: Locale
-  readonly dict: CommonDictionary
+  readonly lang: Locale;
+  readonly common: CommonDictionary;
+  readonly seo: {
+    pages: Record<
+      string,
+      {
+        title: string;
+        description: string;
+      }
+    >;
+  };
 }
 
 export default function Navbar({
   lang,
-  dict,
-}: NavbarProps): React.JSX.Element {
-  const { navigation, menu, languageSwitcher } = dict
-  const { activeSection } = useScrollSpy()
+  common,
+  seo,
+}: NavbarProps): JSX.Element {
+  const { navigation, menu, languageSwitcher } = common;
+  const { activeSection } = useScrollSpy();
 
-  const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   /* -------------------------------------------------------------------------- */
   /*                                SCROLL STATE                                */
@@ -36,33 +46,38 @@ export default function Navbar({
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
+      setScrolled(window.scrollY > 20);
+    };
 
-    handleScroll()
-    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   /* -------------------------------------------------------------------------- */
   /*                             BODY SCROLL LOCK                               */
   /* -------------------------------------------------------------------------- */
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : ''
+    if (typeof document === 'undefined') return;
+
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+
     return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isOpen])
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   /* -------------------------------------------------------------------------- */
   /*                          FECHA MENU AO TROCAR IDIOMA                        */
   /* -------------------------------------------------------------------------- */
 
   useEffect(() => {
-    setIsOpen(false)
-  }, [lang])
+    setIsOpen(false);
+  }, [lang]);
 
   /* -------------------------------------------------------------------------- */
   /*                             NAV LINKS DERIVADOS                             */
@@ -70,23 +85,13 @@ export default function Navbar({
 
   const navLinks = useMemo(
     () =>
-      NAV_SECTIONS.map(section => {
-        const labels: Record<NavSection, string> = {
-          [NavSection.ABOUT]: dict.role, // título curto (acessível)
-          [NavSection.EXPERIENCE]: dict.role,
-          [NavSection.PROJECTS]: dict.role,
-          [NavSection.ARTICLES]: dict.role,
-          [NavSection.CONTACT]: dict.role,
-        }
-
-        return {
-          id: section,
-          href: `/${lang}#${getSectionId(section)}`,
-          label: labels[section],
-        }
-      }),
-    [lang, dict],
-  )
+      NAV_SECTIONS.map(section => ({
+        id: section,
+        href: `/${lang}${getNavHash(section)}`,
+        label: seo.pages[section]?.title ?? section,
+      })),
+    [lang, seo.pages],
+  );
 
   return (
     <nav
@@ -102,7 +107,7 @@ export default function Navbar({
         {/* LOGO */}
         <Link
           href={`/${lang}`}
-          aria-label="Home"
+          aria-label={seo.pages.home?.title ?? 'Home'}
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
@@ -114,7 +119,7 @@ export default function Navbar({
         <div className="hidden lg:flex items-center gap-8">
           <div className="flex gap-8">
             {navLinks.map(link => {
-              const isActive = activeSection === link.id
+              const isActive = activeSection === link.id;
 
               return (
                 <Link
@@ -129,7 +134,7 @@ export default function Navbar({
                 >
                   {link.label}
                 </Link>
-              )
+              );
             })}
           </div>
 
@@ -184,5 +189,5 @@ export default function Navbar({
         </div>
       </div>
     </nav>
-  )
+  );
 }
