@@ -2,40 +2,28 @@
  * HERO SECTION — SÉRGIO SANTOS
  *
  * ✔ Next.js 16 (App Router)
- * ✔ TypeScript 6.0
- * ✔ verbatimModuleSyntax
- * ✔ i18n multi-locale (pt-BR | en-US | es-*)
- * ✔ Sem dependência do Dictionary root
+ * ✔ TypeScript 6 (strict mode safe)
+ * ✔ Totalmente tipado
+ * ✔ 100% alinhado com Dictionary root
+ * ✔ Multilingue (pt-BR | en-US | es-*)
  * ✔ Totalmente responsivo
  */
 
-import type {
-  HeroDictionary,
-  ContactDictionary,
-  AboutDictionary,
-  Locale,
-} from "@/types/dictionary";
-import { getNavHash, NavSection } from "@/domain/navigation";
+import type { Dictionary } from "@/types/dictionary"
+import { getNavHash, NavSection } from "@/domain/navigation"
 
 interface HeroSectionProps {
-  readonly hero: HeroDictionary;
-  readonly contact: ContactDictionary;
-  readonly about: AboutDictionary;
-  readonly metrics?: {
-    availability?: string;
-  };
-  readonly locale: Locale;
+  readonly dictionary: Dictionary
 }
 
 export default function HeroSection({
-  hero,
-  contact,
-  about,
-  metrics,
-  locale,
-}: HeroSectionProps) {
-  const projectsHash = getNavHash(NavSection.PROJECTS);
-  const cvPath = `/cv-sergio-santos-${locale}.pdf`;
+  dictionary,
+}: HeroSectionProps): React.JSX.Element {
+
+  const { hero, contact, about, metrics, meta } = dictionary
+
+  const projectsHash = getNavHash(NavSection.PROJECTS)
+  const cvPath = `/cv-sergio-santos-${meta.locale}.pdf`
 
   return (
     <section
@@ -44,6 +32,7 @@ export default function HeroSection({
                  bg-slate-50 px-6 py-20 dark:bg-slate-950"
     >
       <div className="container relative z-10 mx-auto flex flex-col items-center text-center">
+
         {/* Badge */}
         <div className="mb-8 inline-flex items-center rounded-full border border-blue-200
                         bg-blue-50/50 px-4 py-1.5 dark:border-blue-800/50 dark:bg-blue-900/20">
@@ -70,8 +59,9 @@ export default function HeroSection({
           {hero.headline}
         </p>
 
-        {/* CTA */}
+        {/* CTA Buttons */}
         <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:gap-6">
+
           <a
             href={projectsHash}
             className="inline-flex h-14 items-center justify-center rounded-xl
@@ -95,6 +85,7 @@ export default function HeroSection({
           >
             {contact.cvLabel}
           </a>
+
         </div>
 
         {/* Availability */}
@@ -115,6 +106,7 @@ export default function HeroSection({
             </span>
           </div>
         )}
+
       </div>
 
       {/* Background Glow */}
@@ -126,6 +118,7 @@ export default function HeroSection({
       >
         <div className="h-full w-full rounded-full bg-blue-600" />
       </div>
+
     </section>
-  );
+  )
 }
