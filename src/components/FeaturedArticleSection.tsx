@@ -29,8 +29,7 @@ interface FeaturedArticleSectionProps {
 
 export default function FeaturedArticleSection({
   articles,
-  common,
-  errorLabel,
+  common.error,
 }: FeaturedArticleSectionProps): JSX.Element | null {
   const sectionRef = useRef<HTMLElement | null>(null);
 
