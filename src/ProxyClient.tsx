@@ -63,7 +63,12 @@ export default function ProxyClient({
           common={dictionary.common}
            errorLabel={dictionary.common.error}
         />   
-             
+
+    <FeaturedProjectsSection
+       lang={lang}
+       dict={dictionary}
+    />
+        
    <ProjectSection
      projects={initialProjects}
      lang={lang}
