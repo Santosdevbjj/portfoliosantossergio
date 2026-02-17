@@ -87,7 +87,13 @@ export default function ProxyClient({
 
       </main>
 
-      <Footer common={dictionary.common} />
+       <Footer
+         lang={locale}
+         common={dictionary.common}
+         contact={dictionary.contact}
+         articles={dictionary.articles}
+         seo={dictionary.seo}
+        />
 
     </PageWrapper>
   )
