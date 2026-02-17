@@ -19,6 +19,7 @@ import type {
   ArticlesSectionDictionary,
   CommonDictionary,
 } from '@/types/dictionary';
+
 import { NavSection, getSectionId } from '@/domain/navigation';
 
 interface FeaturedArticleSectionProps {
@@ -26,21 +27,16 @@ interface FeaturedArticleSectionProps {
   readonly common: CommonDictionary;
 }
 
-
 export default function FeaturedArticleSection({
   articles,
-  common.error,
+  common,
 }: FeaturedArticleSectionProps): JSX.Element | null {
   const sectionRef = useRef<HTMLElement | null>(null);
 
-  /**
-   * ✔ TS-safe:
-   * Artigo em destaque pode não existir
-   */
-  const featuredArticle = articles.items.at(0);
+  const featuredArticle = articles.items[0];
 
   /**
-   * ✔ Fail-fast com UX decente
+   * Fail-safe se não houver artigos
    */
   if (!featuredArticle) {
     return (
@@ -48,7 +44,7 @@ export default function FeaturedArticleSection({
         id={getSectionId(NavSection.ARTICLES)}
         className="py-20 text-center text-slate-500 dark:text-slate-400"
       >
-        {errorLabel}
+        {common.error}
       </section>
     );
   }
@@ -100,7 +96,6 @@ export default function FeaturedArticleSection({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaPerson) }}
       />
 
-      {/* BACKGROUND */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 opacity-[0.05] dark:opacity-[0.12] pointer-events-none"
@@ -112,7 +107,6 @@ export default function FeaturedArticleSection({
       </div>
 
       <div className="max-w-7xl mx-auto">
-        {/* HEADER */}
         <header className="flex items-center gap-4 md:gap-6 mb-12 md:mb-16">
           <div className="p-3 md:p-4 bg-amber-100 dark:bg-amber-900/40
                           rounded-2xl text-amber-600 dark:text-amber-400
@@ -129,7 +123,6 @@ export default function FeaturedArticleSection({
           </h2>
         </header>
 
-        {/* CARD */}
         <article
           className="group bg-white dark:bg-slate-900/40 rounded-[2.5rem]
                      p-6 md:p-12 lg:p-16 border border-slate-200
@@ -137,7 +130,6 @@ export default function FeaturedArticleSection({
                      hover:border-blue-500/30"
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* IMAGE */}
             <div className="relative overflow-hidden rounded-[2rem] shadow-xl
                             aspect-[4/3] md:aspect-video lg:aspect-square
                             bg-slate-200 dark:bg-slate-800">
@@ -151,7 +143,6 @@ export default function FeaturedArticleSection({
               />
             </div>
 
-            {/* CONTENT */}
             <div className="flex flex-col">
               <div className="flex flex-wrap items-center gap-3
                               text-blue-600 dark:text-blue-400
