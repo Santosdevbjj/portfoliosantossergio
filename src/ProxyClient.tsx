@@ -1,17 +1,17 @@
-import { notFound } from 'next/navigation'
-import type { Locale, Dictionary } from '@/types/dictionary'
-import type { ProjectDomain } from '@/domain/projects'
+import { notFound } from "next/navigation"
+import type { Locale, Dictionary } from "@/types/dictionary"
+import type { ProjectDomain } from "@/domain/projects"
 
-import PageWrapper from '@/components/PageWrapper'
-import Navbar from '@/components/Navbar'
-import HeroSection from '@/components/HeroSection'
-import AboutSection from '@/components/AboutSection'
-import ExperienceSection from '@/components/ExperienceSection'
-import FeaturedProjectsSection from '@/components/featured/FeaturedProjectsSection'
-import ProjectSection from '@/components/ProjectSection'
-import FeaturedArticleSection from '@/components/FeaturedArticleSection'
-import ContactSection from '@/components/ContactSection'
-import Footer from '@/components/Footer'
+import PageWrapper from "@/components/PageWrapper"
+import Navbar from "@/components/Navbar"
+import HeroSection from "@/components/HeroSection"
+import AboutSection from "@/components/AboutSection"
+import ExperienceSection from "@/components/ExperienceSection"
+import FeaturedProjectsSection from "@/components/featured/FeaturedProjectsSection"
+import ProjectSection from "@/components/ProjectSection"
+import FeaturedArticleSection from "@/components/FeaturedArticleSection"
+import ContactSection from "@/components/ContactSection"
+import Footer from "@/components/Footer"
 
 interface ProxyClientProps {
   readonly lang: Locale
@@ -39,7 +39,7 @@ export default function ProxyClient({
     <PageWrapper>
 
       <Navbar
-        lang={locale}
+        locale={locale}
         common={dictionary.common}
         seoPages={dictionary.seo.pages}
       />
@@ -48,7 +48,32 @@ export default function ProxyClient({
         id="main-content"
         className="relative flex w-full flex-col overflow-x-hidden bg-white antialiased dark:bg-[#020617]"
       >
-        {/* resto permanece igual */}
+
+        <HeroSection dictionary={dictionary} />
+
+        <AboutSection about={dictionary.about} />
+
+        <ExperienceSection experience={dictionary.experience} />
+
+        <FeaturedProjectsSection
+          projects={initialProjects}
+          dictionary={dictionary.projects}
+        />
+
+        <ProjectSection
+          projects={initialProjects}
+          dictionary={dictionary.projects}
+        />
+
+        <FeaturedArticleSection
+          articles={dictionary.articles}
+        />
+
+        <ContactSection
+          contact={dictionary.contact}
+          common={dictionary.common}
+        />
+
       </main>
 
       <Footer common={dictionary.common} />
