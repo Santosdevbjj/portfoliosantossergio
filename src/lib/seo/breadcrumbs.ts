@@ -10,7 +10,7 @@ export interface BreadcrumbItem {
  * Alinhado com a estrutura multi-regional (pt-BR, en-US, es-ES, es-AR, es-MX).
  */
 export function generateBreadcrumbs(
-  pathname: string,
+  pathname: string
   locale: Locale,
   dict: Dictionary,
   baseUrl: string
