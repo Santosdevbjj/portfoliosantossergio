@@ -62,12 +62,13 @@ export default function ProxyClient({
               lang={lang}
               dict={dictionary}
             />
-
-        <ProjectSection
-          projects={initialProjects}
-          dictionary={dictionary.projects}
-        />
-
+             
+   <ProjectSection
+     projects={initialProjects}
+     lang={lang}
+     dict={dictionary}
+   />
+        
         <FeaturedArticleSection
           articles={dictionary.articles}
         />
