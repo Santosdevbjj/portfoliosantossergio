@@ -58,11 +58,10 @@ export default function ProxyClient({
             emptyLabel={dictionary.experience.emptyLabel}
            />
 
-       
-        <FeaturedProjectsSection
-          projects={initialProjects}
-          dictionary={dictionary.projects}
-        />
+           <FeaturedProjectsSection
+              lang={lang}
+              dict={dictionary}
+            />
 
         <ProjectSection
           projects={initialProjects}
