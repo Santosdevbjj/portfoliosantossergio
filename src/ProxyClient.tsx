@@ -81,7 +81,8 @@ export default function ProxyClient({
             
         <ContactSection
           contact={dictionary.contact}
-          common={dictionary.common}
+          common={dictionary.common} 
+          locale={locale}
         />
 
       </main>
