@@ -61,7 +61,7 @@ export default function ProxyClient({
         <FeaturedArticleSection
           articles={dictionary.articles}
           common={dictionary.common}
-           errorLabel={dictionary.common.errorLabel}
+           errorLabel={dictionary.common.error}
         />   
              
    <ProjectSection
