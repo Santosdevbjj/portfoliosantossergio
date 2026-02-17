@@ -84,6 +84,7 @@ export interface ExperienceItem {
 export interface ExperienceDictionary {
   title: string;
   items: ExperienceItem[];
+  emptyLabel: string;
 }
 
 /* -------------------------------------------------------------------------- */
