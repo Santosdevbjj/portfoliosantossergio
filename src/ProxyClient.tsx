@@ -74,10 +74,11 @@ export default function ProxyClient({
      dict={dictionary}
    />
         
-        <FeaturedArticleSection
-          articles={dictionary.articles}
-        />
-
+          <FeaturedArticleSection
+             articles={dictionary.articles}
+             common={dictionary.common}
+          />
+            
         <ContactSection
           contact={dictionary.contact}
           common={dictionary.common}
