@@ -24,8 +24,8 @@ import { NavSection, getSectionId } from '@/domain/navigation';
 interface FeaturedArticleSectionProps {
   readonly articles: ArticlesSectionDictionary;
   readonly common: CommonDictionary;
-  readonly errorLabel: string;
 }
+
 
 export default function FeaturedArticleSection({
   articles,
