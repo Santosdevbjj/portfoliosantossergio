@@ -10,9 +10,8 @@ import type { ProjectDomain } from '@/domain/projects'
 type CategoryKey = keyof ProjectCategories
 type ActiveCategory = 'all' | CategoryKey
 
-
 interface ProjectSectionProps {
-  readonly projects: readonly ProjectDomain[]
+  readonly projects: ReadonlyArray<ProjectDomain>
   readonly lang: Locale
   readonly dict: Dictionary
 }
