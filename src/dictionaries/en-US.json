@@ -41,6 +41,7 @@
   },
   "experience": {
     "title": "Professional Experience",
+     "emptyLabel": "No experience found",
     "items": [
       {
         "company": "Freelance Consultant / Transition",
