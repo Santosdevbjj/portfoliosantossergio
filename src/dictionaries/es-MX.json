@@ -41,6 +41,7 @@
   },
   "experience": {
     "title": "Experiencia Profesional",
+    "emptyLabel":  "No se encontró ninguna experiencia",
     "items": [
       {
         "company": "Consultor Autónomo / Transición",
