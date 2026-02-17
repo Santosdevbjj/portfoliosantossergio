@@ -39,7 +39,7 @@ export default function ProxyClient({
     <PageWrapper>
 
       <Navbar
-        locale={locale}
+        lang={locale}
         common={dictionary.common}
         seoPages={dictionary.seo.pages}
       />
