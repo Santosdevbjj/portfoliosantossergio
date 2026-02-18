@@ -10,29 +10,20 @@ import { getGitHubProjects } from "@/services/githubService";
 import { mapGitHubRepoToProject } from "@/mappers/projectMapper";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
+import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
+
 import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 
 // --------------------------------------------------
-// Tipos
+// Types
 // --------------------------------------------------
 interface PageProps {
   params: {
     lang: Locale;
   };
 }
-
-// --------------------------------------------------
-// Constantes
-// --------------------------------------------------
-const SUPPORTED_LOCALES: readonly Locale[] = [
-  "pt-BR",
-  "en-US",
-  "es-ES",
-  "es-AR",
-  "es-MX",
-] as const;
 
 // --------------------------------------------------
 // SSG
@@ -61,7 +52,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { lang } = params;
 
-  if (!SUPPORTED_LOCALES.includes(lang)) {
+  if (!isValidLocale(lang)) {
     notFound();
   }
 
@@ -71,20 +62,19 @@ export async function generateMetadata(
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app";
 
-  const homeSeo = dict.seo.pages?.home;
+  const homeSeo = dict.seo.pages.home;
 
   return {
-    title: `${homeSeo?.title ?? "Portfolio"} | ${dict.meta.author}`,
-    description: homeSeo?.description ?? dict.seo.description,
+    title: `${homeSeo.title} | ${dict.meta.author}`,
+    description: homeSeo.description,
     alternates: {
       canonical: `${siteUrl}/${lang}`,
-      languages: {
-        "pt-BR": `${siteUrl}/pt-BR`,
-        "en-US": `${siteUrl}/en-US`,
-        "es-ES": `${siteUrl}/es-ES`,
-        "es-AR": `${siteUrl}/es-AR`,
-        "es-MX": `${siteUrl}/es-MX`,
-      },
+      languages: Object.fromEntries(
+        SUPPORTED_LOCALES.map((locale) => [
+          locale,
+          `${siteUrl}/${locale}`,
+        ]),
+      ),
     },
   };
 }
@@ -95,14 +85,12 @@ export async function generateMetadata(
 export default async function HomePage({ params }: PageProps) {
   const { lang } = params;
 
-  if (!SUPPORTED_LOCALES.includes(lang)) {
+  if (!isValidLocale(lang)) {
     notFound();
   }
 
-  const [repos, dictionary] = await Promise.all([
-    getGitHubProjects("Santosdevbjj"),
-    getServerDictionary(lang),
-  ]);
+  // Fetch apenas do GitHub
+  const repos = await getGitHubProjects("Santosdevbjj");
 
   const projects: ProjectDomain[] = repos.map(mapGitHubRepoToProject);
 
@@ -135,9 +123,12 @@ export default async function HomePage({ params }: PageProps) {
                     key={project.id}
                     className="group p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/20 transition hover:shadow-xl"
                   >
-                    {/* Categoria (TIPAGEM CORRETA - SEM CAST) */}
                     <span className="text-[11px] font-bold uppercase text-blue-600 tracking-wider">
-                      {dict.projects.categories[project.technology.labelKey]}
+                      {
+                        dict.projects.categories[
+                          project.technology.labelKey
+                        ]
+                      }
                     </span>
 
                     <h3 className="text-xl font-bold mt-3">
