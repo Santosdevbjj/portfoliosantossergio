@@ -1,42 +1,42 @@
-"errors": {
+{
   "InternalServerError": {
     "title": "Error Interno",
     "message": "Ocurrió un error inesperado en nuestros servidores.",
-    "action": "Proporciona el ID del error al equipo de soporte."
+    "action": "Informe el ID del error al soporte técnico."
   },
   "NotFoundError": {
     "title": "No Encontrado",
-    "message": "El recurso que buscas no existe o se movió.",
-    "action": "Checa la URL o regresa al inicio."
+    "message": "El recurso que busca no existe o fue movido.",
+    "action": "Verifique la URL o regrese a la página principal."
   },
   "ValidationError": {
     "title": "Error de Validación",
     "message": "Los datos enviados son inválidos o están incompletos.",
-    "action": "Revisa los campos señalados e intenta de nuevo."
+    "action": "Revise los campos resaltados e intente nuevamente."
   },
   "UnauthorizedError": {
     "title": "No Autenticado",
-    "message": "Tu sesión expiró o no has iniciado sesión.",
-    "action": "Por favor, inicia sesión para acceder."
+    "message": "Su sesión expiró o no ha iniciado sesión.",
+    "action": "Por favor, inicie sesión para acceder a esta área."
   },
   "ForbiddenError": {
     "title": "Acceso Denegado",
-    "message": "No tienes permiso para realizar esta acción.",
-    "action": "Contacta al administrador si crees que es un error."
+    "message": "No tiene permiso para realizar esta acción.",
+    "action": "Contacte al administrador si considera que esto es un error."
   },
   "TooManyRequestsError": {
-    "title": "Demasiadas Peticiones",
-    "message": "Superaste el límite temporal de intentos.",
-    "action": "Espera unos minutos antes de intentar de nuevo."
+    "title": "Demasiadas Solicitudes",
+    "message": "Ha alcanzado el límite temporal de intentos.",
+    "action": "Espere unos minutos antes de intentarlo de nuevo."
   },
   "UnprocessableEntityError": {
     "title": "Operación Inválida",
-    "message": "No se pudieron procesar las instrucciones.",
-    "action": "Verifica la lógica de los datos e intenta de nuevo."
+    "message": "No fue posible procesar las instrucciones enviadas.",
+    "action": "Verifique la lógica de los datos e intente nuevamente."
   },
   "MethodNotAllowedError": {
     "title": "Método No Permitido",
-    "message": "El método HTTP no está permitido aquí.",
-    "action": "Usa un método válido (GET, POST, etc)."
+    "message": "La solicitud HTTP utilizada no está soportada.",
+    "action": "Utilice un método válido (GET, POST, etc.)."
   }
 }
