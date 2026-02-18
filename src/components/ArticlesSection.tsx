@@ -38,7 +38,7 @@ export default function ArticlesSection({
   articles,
   common,
   states,
-}: ArticlesSectionProps): JSX.Element {
+}: ArticlesSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
