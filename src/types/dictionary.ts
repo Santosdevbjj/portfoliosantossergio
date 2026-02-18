@@ -203,6 +203,21 @@ export interface StateDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                                    SEO                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Chaves permitidas para páginas SEO.
+ * Se adicionar nova página, altere aqui.
+ */
+export type SeoPageKey = "home" | "about" | "projects";
+
+export interface SeoPage {
+  title: string;
+  description: string;
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                 ROOT TYPE                                  */
 /* -------------------------------------------------------------------------- */
 
@@ -242,13 +257,7 @@ export interface Dictionary {
     siteName: string;
     description: string;
     keywords: string[];
-    pages: Record<
-      string,
-      {
-        title: string;
-        description: string;
-      }
-    >;
+    pages: Record<SeoPageKey, SeoPage>;
   };
 
   metrics: {
