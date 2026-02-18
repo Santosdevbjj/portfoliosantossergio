@@ -19,19 +19,20 @@ export class BaseError extends Error {
 
     this.name = params.name;
     this.statusCode = params.statusCode ?? 500;
-    this.errorId =
-      params.errorId ?? crypto.randomUUID();
+    this.errorId = params.errorId ?? crypto.randomUUID();
     this.requestId = params.requestId;
     this.context = params.context;
 
     if (params.cause) {
       this.cause = params.cause;
     }
+
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
 /* ============================================================
-   ERROR CLASSES (100% alinhadas com ErrorDictionary)
+   ERROR CLASSES — 100% alinhadas com ErrorDictionary
 ============================================================ */
 
 export class InternalServerError extends BaseError {
