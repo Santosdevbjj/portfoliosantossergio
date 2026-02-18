@@ -137,7 +137,7 @@ function ArticleCard({
   awardLabel,
   readMoreLabel,
   publishedAtLabel,
-}: ArticleCardProps): JSX.Element {
+}: ArticleCardProps) {
   return (
     <article
       className="group relative flex flex-col bg-white
