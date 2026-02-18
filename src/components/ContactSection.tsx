@@ -26,7 +26,7 @@ export default function ContactSection({
   contact,
   common,
   locale,
-}: ContactSectionProps): JSX.Element {
+}: ContactSectionProps) {
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
 
