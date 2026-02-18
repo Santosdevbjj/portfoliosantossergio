@@ -47,6 +47,7 @@ export const viewport: Viewport = {
 // --------------------------------------------------
 // Metadata (SEO por idioma)
 // --------------------------------------------------
+
 export async function generateMetadata(
   { params }: PageProps,
 ): Promise<Metadata> {
@@ -62,7 +63,14 @@ export async function generateMetadata(
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app";
 
-  const homeSeo = dict.seo.pages.home;
+  const homeSeo = dict.seo?.pages?.home;
+
+  if (!homeSeo) {
+    return {
+      title: dict.meta.author,
+      description: dict.meta.description ?? "",
+    };
+  }
 
   return {
     title: `${homeSeo.title} | ${dict.meta.author}`,
@@ -78,6 +86,7 @@ export async function generateMetadata(
     },
   };
 }
+
 
 // --------------------------------------------------
 // Page
