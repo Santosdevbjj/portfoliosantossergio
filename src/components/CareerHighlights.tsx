@@ -7,7 +7,7 @@
  * ✔ Multilíngue (PT / EN / ES)
  * ✔ Responsivo (mobile-first)
  * ✔ Acessível (ARIA + semântica)
- * ✔ Compatível com TypeScript 6
+ * ✔ Compatível com TypeScript 6 (strict)
  * ✔ Compatível com Next.js 16
  */
 
@@ -28,7 +28,6 @@ interface CareerHighlightsProps {
 
 export function CareerHighlights({ dict }: CareerHighlightsProps) {
   const { about } = dict;
-
   const { highlights, stats, differentialTitle, title } = about;
 
   /**
@@ -66,8 +65,7 @@ export function CareerHighlights({ dict }: CareerHighlightsProps) {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
       >
         {highlights.map((text, index) => {
-          const Icon =
-            highlightIconMap[index] ?? Trophy;
+          const Icon = highlightIconMap[index] ?? Trophy;
 
           return (
             <article
@@ -188,9 +186,16 @@ function StatItem(props: StatItemProps) {
   let label: string;
 
   if ('fullText' in props) {
-    const tokens = props.fullText.trim().split(/\s+/);
-    value = tokens[0];
-    label = tokens.slice(1).join(' ');
+    const trimmed = props.fullText?.trim() ?? '';
+
+    if (!trimmed) {
+      value = '';
+      label = '';
+    } else {
+      const [first, ...rest] = trimmed.split(/\s+/);
+      value = first ?? '';
+      label = rest.join(' ') ?? '';
+    }
   } else {
     value = props.value;
     label = props.label;
@@ -199,9 +204,7 @@ function StatItem(props: StatItemProps) {
   return (
     <div
       className={`text-center ${
-        props.bordered
-          ? 'sm:border-l border-white/10 sm:pl-8'
-          : ''
+        props.bordered ? 'sm:border-l border-white/10 sm:pl-8' : ''
       }`}
     >
       <span className="block text-4xl md:text-5xl font-black tracking-tighter tabular-nums mb-1">
