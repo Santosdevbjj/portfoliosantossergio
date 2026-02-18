@@ -4,10 +4,7 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 import type { ReactNode } from "react";
 
-import {
-  isValidLocale,
-  normalizeLocale,
-} from "@/dictionaries/locales";
+import { normalizeLocale } from "@/dictionaries/locales";
 import type { Locale } from "@/types/dictionary";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
@@ -18,39 +15,37 @@ const inter = Inter({
 
 interface LayoutProps {
   readonly children: ReactNode;
-  readonly params: Promise<{ lang: Locale }>;
+  readonly params: { lang: string };
 }
 
-/**
- * Metadata dinâmica por idioma
- */
+/* -------------------------------------------------------------------------- */
+/*                                  METADATA                                  */
+/* -------------------------------------------------------------------------- */
+
 export async function generateMetadata(
-  { params }: { params: Promise<{ lang: Locale }> }
+  { params }: { params: { lang: string } }
 ): Promise<Metadata> {
-  const { lang } = await params;
-
-  let locale: Locale;
-  try {
-    locale = normalizeLocale(lang);
-  } catch {
-    notFound();
-  }
-
+  const locale = normalizeLocale(params.lang as Locale);
   const dict = await getServerDictionary(locale);
+
   const siteUrl = "https://portfoliosantossergio.vercel.app";
 
   return {
     metadataBase: new URL(siteUrl),
+
     title: {
       default: dict.seo.siteName,
       template: `%s | ${dict.seo.siteName}`,
     },
+
     description: dict.seo.description,
     keywords: dict.seo.keywords,
-     verification: {
-      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
 
+    /* ✅ GOOGLE VERIFICATION PRESERVADO */
+    verification: {
+      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
     },
+
     alternates: {
       canonical: `${siteUrl}/${locale}`,
       languages: {
@@ -62,48 +57,51 @@ export async function generateMetadata(
         "x-default": `${siteUrl}/pt-BR`,
       },
     },
+
     openGraph: {
       title: dict.seo.siteName,
       description: dict.seo.description,
       url: `${siteUrl}/${locale}`,
       siteName: dict.seo.siteName,
-      locale,
+      locale: dict.meta.locale,
       type: "website",
     },
   };
 }
 
-/**
- * Viewport
- */
+/* -------------------------------------------------------------------------- */
+/*                                   VIEWPORT                                 */
+/* -------------------------------------------------------------------------- */
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#020617",
 };
 
-/**
- * Root Layout
- */
+/* -------------------------------------------------------------------------- */
+/*                                  LAYOUT                                    */
+/* -------------------------------------------------------------------------- */
+
 export default async function LangLayout({
   children,
   params,
-}: LayoutProps): Promise<JSX.Element> {
-  const { lang } = await params;
+}: LayoutProps) {
+  const locale = normalizeLocale(params.lang as Locale);
+  const dict = await getServerDictionary(locale);
 
-  if (!isValidLocale(lang)) {
+  if (!dict) {
     notFound();
   }
 
-  const dict = await getServerDictionary(lang);
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
-    <html lang={lang} dir={dict.meta.direction}>
+    <html lang={dict.meta.locale} dir={dict.meta.direction}>
       <body
         className={`${inter.className} min-h-screen flex flex-col bg-background text-foreground antialiased`}
       >
-        {/* Skip to content — acessibilidade */}
+        {/* Acessibilidade */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-slate-900 text-white px-4 py-2 rounded-md"
