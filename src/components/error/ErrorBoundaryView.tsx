@@ -35,9 +35,10 @@ export function ErrorBoundaryView({
     getErrorDictionary(locale);
 
   const key: ErrorKey =
-    error.name in dictionary
-      ? (error.name as ErrorKey)
-      : 'InternalServerError';
+  error.name in dictionary
+    ? (error.name as ErrorKey)
+    : "InternalServerError";
+
 
   return (
     <ErrorDisplay
