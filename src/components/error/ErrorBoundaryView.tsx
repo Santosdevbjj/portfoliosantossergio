@@ -47,7 +47,7 @@ export function ErrorBoundaryView({
     return 'pt-BR';
   }, []);
 
-  const dictionary: ErrorDictionary = dictionaries[locale].errors;
+  const dictionary: ErrorDictionary = dictionaries[locale];
 
   const errorKey: keyof ErrorDictionary =
     error.name in dictionary
