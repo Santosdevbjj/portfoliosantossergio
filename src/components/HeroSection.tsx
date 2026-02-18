@@ -2,18 +2,21 @@
  * HERO SECTION — SÉRGIO SANTOS
  *
  * ✔ Next.js 16 (App Router)
- * ✔ TypeScript 6 (strict mode safe)
- * ✔ Totalmente tipado
- * ✔ 100% alinhado com Dictionary root
+ * ✔ TypeScript 6 strict safe
+ * ✔ 100% tipado
  * ✔ Multilingue (pt-BR | en-US | es-*)
  * ✔ Totalmente responsivo
+ * ✔ Arquitetura desacoplada
  */
 
 import type { Dictionary } from "@/types/dictionary"
-import { getNavHash, NavSection } from "@/domain/navigation"
+import { getSectionId, NavSection } from "@/domain/navigation"
 
 interface HeroSectionProps {
-  readonly dictionary: Dictionary
+  readonly dictionary: Pick<
+    Dictionary,
+    "hero" | "contact" | "about" | "metrics" | "meta"
+  >
 }
 
 export default function HeroSection({
@@ -22,12 +25,13 @@ export default function HeroSection({
 
   const { hero, contact, about, metrics, meta } = dictionary
 
-  const projectsHash = getNavHash(NavSection.PROJECTS)
+  const projectsHash = `#${getSectionId(NavSection.PROJECTS)}`
   const cvPath = `/cv-sergio-santos-${meta.locale}.pdf`
 
   return (
     <section
       id="home"
+      aria-labelledby="hero-title"
       className="relative flex min-h-[95vh] w-full items-center justify-center overflow-hidden
                  bg-slate-50 px-6 py-20 dark:bg-slate-950"
     >
@@ -43,9 +47,12 @@ export default function HeroSection({
         </div>
 
         {/* Title */}
-        <h1 className="mb-6 max-w-4xl text-4xl font-extrabold tracking-tight
-                       text-slate-900 dark:text-white
-                       sm:text-5xl md:text-6xl lg:text-7xl">
+        <h1
+          id="hero-title"
+          className="mb-6 max-w-4xl text-4xl font-extrabold tracking-tight
+                     text-slate-900 dark:text-white
+                     sm:text-5xl md:text-6xl lg:text-7xl"
+        >
           {hero.title}{" "}
           <span className="block bg-gradient-to-r from-blue-600 to-cyan-500
                            bg-clip-text text-transparent sm:inline">
@@ -88,33 +95,32 @@ export default function HeroSection({
 
         </div>
 
-        {/* Availability */}
-        {metrics?.availability && (
-          <div className="mt-16 flex items-center gap-2 text-sm font-medium
-                          text-slate-500 dark:text-slate-500">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping
-                               rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full
-                               bg-green-500" />
-            </span>
-            <span>
-              {about.stats.availabilityLabel}:{" "}
-              <b className="text-slate-700 dark:text-slate-300">
-                {metrics.availability}
-              </b>
-            </span>
-          </div>
-        )}
+        {/* Availability Indicator */}
+        <div className="mt-16 flex items-center gap-2 text-sm font-medium
+                        text-slate-500 dark:text-slate-500">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping
+                             rounded-full bg-green-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full
+                             bg-green-500" />
+          </span>
+
+          <span>
+            {about.stats.availabilityLabel}:{" "}
+            <b className="text-slate-700 dark:text-slate-300">
+              {metrics.availability}
+            </b>
+          </span>
+        </div>
 
       </div>
 
       {/* Background Glow */}
       <div
+        aria-hidden="true"
         className="absolute left-1/2 top-1/2 -z-10 h-[600px] w-[600px]
                    -translate-x-1/2 -translate-y-1/2
                    opacity-10 blur-[120px] dark:opacity-[0.05]"
-        aria-hidden="true"
       >
         <div className="h-full w-full rounded-full bg-blue-600" />
       </div>
