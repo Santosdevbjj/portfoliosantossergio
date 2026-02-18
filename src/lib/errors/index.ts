@@ -30,7 +30,9 @@ export class BaseError extends Error {
   }
 }
 
-/* ==== Specific Errors ==== */
+/* ============================================================
+   ERROR CLASSES (100% alinhadas com ErrorDictionary)
+============================================================ */
 
 export class InternalServerError extends BaseError {
   constructor(message = "Internal Server Error") {
@@ -48,6 +50,66 @@ export class NotFoundError extends BaseError {
       name: "NotFoundError",
       message,
       statusCode: 404,
+    });
+  }
+}
+
+export class ValidationError extends BaseError {
+  constructor(message = "Validation failed") {
+    super({
+      name: "ValidationError",
+      message,
+      statusCode: 400,
+    });
+  }
+}
+
+export class UnauthorizedError extends BaseError {
+  constructor(message = "Unauthorized") {
+    super({
+      name: "UnauthorizedError",
+      message,
+      statusCode: 401,
+    });
+  }
+}
+
+export class ForbiddenError extends BaseError {
+  constructor(message = "Forbidden") {
+    super({
+      name: "ForbiddenError",
+      message,
+      statusCode: 403,
+    });
+  }
+}
+
+export class TooManyRequestsError extends BaseError {
+  constructor(message = "Too Many Requests") {
+    super({
+      name: "TooManyRequestsError",
+      message,
+      statusCode: 429,
+    });
+  }
+}
+
+export class UnprocessableEntityError extends BaseError {
+  constructor(message = "Unprocessable Entity") {
+    super({
+      name: "UnprocessableEntityError",
+      message,
+      statusCode: 422,
+    });
+  }
+}
+
+export class MethodNotAllowedError extends BaseError {
+  constructor(message = "Method Not Allowed") {
+    super({
+      name: "MethodNotAllowedError",
+      message,
+      statusCode: 405,
     });
   }
 }
