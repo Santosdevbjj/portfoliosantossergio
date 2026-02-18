@@ -1,4 +1,4 @@
-"errors": {
+{
   "InternalServerError": {
     "title": "Erro Interno",
     "message": "Um erro inesperado aconteceu em nossos servidores.",
