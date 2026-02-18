@@ -113,8 +113,8 @@ export default async function HomePage({ params }: PageProps) {
           {/* HERO */}
            <HeroSection dictionary={dict} />
 
-          {/* ABOUT */}
-          <AboutSection dict={dict} lang={lang} />
+          {/* ABOUT */}  
+         <AboutSection dict={dict.about} lang={lang} />
 
           {/* PROJECTS */}
           <section
