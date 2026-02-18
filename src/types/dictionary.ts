@@ -210,7 +210,7 @@ export interface StateDictionary {
  * Chaves permitidas para páginas SEO.
  * Se adicionar nova página, altere aqui.
  */
-export type SeoPageKey = "home" | "about" | "projects";
+export type SeoPageKey = "home" | "projects" | "articles";
 
 export interface SeoPage {
   title: string;
