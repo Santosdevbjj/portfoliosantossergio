@@ -111,7 +111,7 @@ export default async function HomePage({ params }: PageProps) {
           className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100"
         >
           {/* HERO */}
-          <HeroSection dict={dict} lang={lang} />
+           <HeroSection dictionary={dict} />
 
           {/* ABOUT */}
           <AboutSection dict={dict} lang={lang} />
