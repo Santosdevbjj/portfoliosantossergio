@@ -3,9 +3,7 @@ import {
   BaseError,
   InternalServerError,
 } from "@/lib/errors";
-import {
-  getErrorDictionary,
-} from "@/dictionaries/errors";
+import { getErrorDictionary } from "@/dictionaries/errors";
 import {
   isSupportedLocale,
   type SupportedLocale,
@@ -54,8 +52,7 @@ export function handleApiError(
   logger.error(err);
 
   const locale = resolveLocale(request);
-  const dictionary =
-    getErrorDictionary(locale);
+  const dictionary = getErrorDictionary(locale);
 
   const key: ErrorKey = isErrorKey(
     err.name,
