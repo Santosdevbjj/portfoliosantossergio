@@ -41,14 +41,16 @@ export function ProfileForm() {
         </button>
       </form>
 
-      {state?.success === false && state.error && (
+      {state?.success === false && state.error && (       
         <ErrorBox
-          errorKey={state.error.name as keyof ErrorDictionary}
-          dictionary={dict}
-          errorId={state.error.errorId}
-          onRetry={() => document.getElementById('name')?.focus()}
-          retryLabel="Corrigir agora"
-        />
+         errorKey={state.error.name}
+         dictionary={dict}
+         errorId={state.error.errorId}
+         onRetry={() =>
+         document.getElementById("name")?.focus()
+      }
+     retryLabel="Corrigir agora"
+    />
       )}
 
       {state?.success && (
