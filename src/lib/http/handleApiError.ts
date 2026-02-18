@@ -11,7 +11,7 @@ import esES from "@/dictionaries/errors/es-ES.json";
 import esAR from "@/dictionaries/errors/es-AR.json";
 import esMX from "@/dictionaries/errors/es-MX.json";
 
-const dictionaries: Record<string, { errors: ErrorDictionary }> = {
+const dictionaries: Record<string, { ErrorDictionary }> = {
   "pt-BR": ptBR,
   "en-US": enUS,
   "es-ES": esES,
@@ -47,7 +47,7 @@ export function handleApiError(error: unknown, request?: NextRequest) {
 ) ?? "pt-BR";
   
 
-  const dictionary = dictionaries[locale].errors;
+  const dictionary = dictionaries[locale];
 
   // 4. Mapeamento da tradução baseada na classe do erro
   // Se o erro for "NotFoundError", buscamos dictionary.NotFoundError
