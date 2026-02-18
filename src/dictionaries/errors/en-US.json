@@ -1,4 +1,4 @@
-"errors": {
+{
   "InternalServerError": {
     "title": "Internal Error",
     "message": "An unexpected error occurred on our servers.",
@@ -6,12 +6,12 @@
   },
   "NotFoundError": {
     "title": "Not Found",
-    "message": "The resource you are looking for doesn't exist.",
+    "message": "The resource you are looking for does not exist or has been moved.",
     "action": "Check the URL or return to the home page."
   },
   "ValidationError": {
     "title": "Validation Error",
-    "message": "The provided data is invalid or incomplete.",
+    "message": "The submitted data is invalid or incomplete.",
     "action": "Review the highlighted fields and try again."
   },
   "UnauthorizedError": {
@@ -22,21 +22,21 @@
   "ForbiddenError": {
     "title": "Access Denied",
     "message": "You do not have permission to perform this action.",
-    "action": "Contact the admin if you believe this is an error."
+    "action": "Contact the administrator if you believe this is an error."
   },
   "TooManyRequestsError": {
     "title": "Too Many Requests",
-    "message": "You have reached the temporary request limit.",
+    "message": "You have reached the temporary attempt limit.",
     "action": "Wait a few minutes before trying again."
   },
   "UnprocessableEntityError": {
     "title": "Invalid Operation",
-    "message": "Unable to process the submitted instructions.",
-    "action": "Verify the data logic and try again."
+    "message": "The submitted instructions could not be processed.",
+    "action": "Check the data logic and try again."
   },
   "MethodNotAllowedError": {
     "title": "Method Not Allowed",
-    "message": "The HTTP method used is not supported.",
-    "action": "Use a valid method (GET, POST, etc)."
+    "message": "The HTTP request method used is not supported.",
+    "action": "Use a valid method (GET, POST, etc.)."
   }
 }
