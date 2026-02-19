@@ -1,24 +1,28 @@
 'use client'
 
 import * as React from 'react'
-import { Moon, Sun } from 'lucide-react'
+import { Moon, Sun, Monitor } from 'lucide-react'
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
+import type { CommonDictionary } from '@/types/dictionary'
 
 /* -------------------------------------------------------------------------- */
 /* TYPES                                                                      */
 /* -------------------------------------------------------------------------- */
 
-export interface ThemeToggleLabels {
-  enableDark: string
-  enableLight: string
-}
+/**
+ * Labels derivadas diretamente do contrato do dicionário.
+ * ✔ Zero duplicação
+ * ✔ 100% alinhado com CommonDictionary
+ * ✔ TS 6 safe
+ */
+export type ThemeToggleLabels = CommonDictionary['theme']
 
 interface ThemeToggleProps {
-  labels: ThemeToggleLabels
+  readonly labels: ThemeToggleLabels
 }
 
 /* -------------------------------------------------------------------------- */
-/* THEME PROVIDER (GLOBAL)                                                     */
+/* THEME PROVIDER (GLOBAL WRAPPER)                                            */
 /* -------------------------------------------------------------------------- */
 
 export function ThemeProvider({
@@ -59,14 +63,6 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
     setMounted(true)
   }, [])
 
-  const isDark = resolvedTheme === 'dark'
-
-  const toggleTheme = React.useCallback(() => {
-    setTheme(isDark ? 'light' : 'dark')
-  }, [isDark, setTheme])
-
-  const ariaLabel = isDark ? labels.enableLight : labels.enableDark
-
   if (!mounted) {
     return (
       <div
@@ -76,10 +72,30 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
     )
   }
 
+  const currentTheme = resolvedTheme ?? 'system'
+
+  const nextTheme =
+    currentTheme === 'light'
+      ? 'dark'
+      : currentTheme === 'dark'
+      ? 'system'
+      : 'light'
+
+  const handleChange = React.useCallback(() => {
+    setTheme(nextTheme)
+  }, [nextTheme, setTheme])
+
+  const ariaLabel =
+    nextTheme === 'light'
+      ? labels.light
+      : nextTheme === 'dark'
+      ? labels.dark
+      : labels.system
+
   return (
     <button
       type="button"
-      onClick={toggleTheme}
+      onClick={handleChange}
       aria-label={ariaLabel}
       title={ariaLabel}
       className="group relative w-11 h-11 flex items-center justify-center rounded-xl
@@ -91,17 +107,40 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
                  active:scale-95"
     >
       <div className="relative w-5 h-5 overflow-hidden">
+        {/* Light */}
         <Sun
           size={20}
-          className={`absolute inset-0 transform transition-all duration-500 text-amber-500
-            ${isDark ? 'translate-y-0 opacity-100 rotate-0' : 'translate-y-8 opacity-0 -rotate-90'}`}
+          className={`absolute inset-0 transition-all duration-500 text-amber-500
+            ${
+              currentTheme === 'light'
+                ? 'opacity-100 rotate-0'
+                : 'opacity-0 -rotate-90'
+            }`}
         />
+
+        {/* Dark */}
         <Moon
           size={20}
-          className={`absolute inset-0 transform transition-all duration-500 text-slate-600 dark:text-slate-400
-            ${!isDark ? 'translate-y-0 opacity-100 rotate-0' : '-translate-y-8 opacity-0 rotate-90'}`}
+          className={`absolute inset-0 transition-all duration-500 text-slate-600 dark:text-slate-400
+            ${
+              currentTheme === 'dark'
+                ? 'opacity-100 rotate-0'
+                : 'opacity-0 rotate-90'
+            }`}
+        />
+
+        {/* System */}
+        <Monitor
+          size={20}
+          className={`absolute inset-0 transition-all duration-500 text-blue-500
+            ${
+              currentTheme === 'system'
+                ? 'opacity-100 rotate-0'
+                : 'opacity-0 scale-75'
+            }`}
         />
       </div>
+
       <span className="absolute inset-0 rounded-xl ring-0 ring-blue-500/20 group-hover:ring-4 transition-all duration-300" />
     </button>
   )
