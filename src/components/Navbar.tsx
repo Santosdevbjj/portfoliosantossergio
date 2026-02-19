@@ -25,6 +25,17 @@ interface NavbarProps {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                            NAV LABEL RESOLVER                              */
+/* -------------------------------------------------------------------------- */
+
+function resolveNavLabel(
+  section: NavSection,
+  nav: CommonDictionary['nav'],
+): string {
+  return nav[section]
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                  COMPONENT                                 */
 /* -------------------------------------------------------------------------- */
 
@@ -33,7 +44,7 @@ export default function Navbar({
   common,
 }: NavbarProps): React.JSX.Element {
 
-  const { navigation, menu, languageSwitcher } = common
+  const { navigation, menu, languageSwitcher, nav } = common
   const { activeSection } = useScrollSpy()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -77,12 +88,12 @@ export default function Navbar({
 
   const navLinks = useMemo(
     () =>
-      NAV_SECTIONS.map((section: NavSection) => ({
+      NAV_SECTIONS.map((section) => ({
         id: section,
         href: `/${lang}${getNavHash(section)}`,
-        label: section.toUpperCase(), // idioma-independente
+        label: resolveNavLabel(section, nav),
       })),
-    [lang],
+    [lang, nav],
   )
 
   return (
