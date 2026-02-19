@@ -148,7 +148,6 @@ export const PortfolioGrid = ({
               <ProjectCard
                 key={project.id}
                 project={project}
-                lang={lang}
                 dict={dict}
               />
             ))
