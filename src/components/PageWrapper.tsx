@@ -1,7 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
-
+import type { ReactNode, ReactElement } from 'react'
 import { ScrollSpyProvider } from '@/contexts/scroll-spy.client'
 
 export interface PageWrapperProps {
@@ -10,11 +9,10 @@ export interface PageWrapperProps {
 
 export default function PageWrapper({
   children,
-}: PageWrapperProps): {
+}: PageWrapperProps): ReactElement {
   return (
     <ScrollSpyProvider>
       <div className="min-h-screen flex flex-col bg-background text-foreground">
-        {/* Acessibilidade: Skip to content */}
         <a
           href="#main-content"
           className="
