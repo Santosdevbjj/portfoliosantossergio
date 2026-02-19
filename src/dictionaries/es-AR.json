@@ -105,6 +105,13 @@
       "description": "Ponete en contacto si el problema persiste.",
       "actions": { "retry": "Reintentar", "home": "Inicio" }
     },
+     "nav": {
+       "about": "Sobre mí",
+       "experience": "Experiencia",
+       "projects": "Proyectos",
+       "articles": "Artículos",
+       "contact": "Contacto"
+    },
     "notFound": {
       "title": "Página no encontrada",
       "description": "El link puede estar roto.",
