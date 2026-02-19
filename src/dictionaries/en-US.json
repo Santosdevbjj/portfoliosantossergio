@@ -112,6 +112,12 @@
     "articles": "Articles",
     "contact": "Contact"
   },
+
+"theme": {
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System"
+ },
     "notFound": {
       "title": "Page not found",
       "description": "The link may be broken.",
