@@ -25,13 +25,20 @@ export default function ProxyClient({
   initialProjects,
   dictionary,
 }: ProxyClientProps) {
-
+  /**
+   * Segurança estrutural
+   * Garante que o dicionário é válido
+   */
   if (!dictionary?.meta?.locale) {
     notFound();
   }
 
   const locale: Locale = dictionary.meta.locale;
 
+  /**
+   * Segurança de rota
+   * Garante que URL e dicionário estão alinhados
+   */
   if (locale !== lang) {
     notFound();
   }
@@ -39,22 +46,36 @@ export default function ProxyClient({
   return (
     <PageWrapper common={dictionary.common}>
       <Navbar
-      lang={locale}
-      common={dictionary.common}
+        lang={locale}
+        common={dictionary.common}
+      />
 
       <main
         id="main-content"
         className="relative flex w-full flex-col overflow-x-hidden bg-white antialiased dark:bg-[#020617]"
       >
         <HeroSection dictionary={dictionary} />
+
         <AboutSection dict={dictionary.about} />
+
         <ExperienceSection experience={dictionary.experience} />
-        <FeaturedProjectsSection lang={lang} dict={dictionary} />
-        <ProjectSection projects={initialProjects} lang={lang} dict={dictionary} />
+
+        <FeaturedProjectsSection
+          lang={locale}
+          dict={dictionary}
+        />
+
+        <ProjectSection
+          projects={initialProjects}
+          lang={locale}
+          dict={dictionary}
+        />
+
         <FeaturedArticleSection
           articles={dictionary.articles}
           common={dictionary.common}
         />
+
         <ContactSection
           contact={dictionary.contact}
           common={dictionary.common}
