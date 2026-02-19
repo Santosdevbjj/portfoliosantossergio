@@ -10,12 +10,13 @@ import { LOCALE_COOKIE, LOCALE_COOKIE_OPTIONS } from '@/lib/locale-cookie';
 
 interface LanguageSwitcherProps {
   readonly currentLang: Locale;
+  readonly ariaLabel?: string; // opcional para integração com dictionary.common
 }
 
 /**
  * Labels curtos para exibição.
  * ✔ Tipado por Locale
- * ✔ Compatível com TS 6
+ * ✔ TS 6 safe
  */
 const LANGUAGE_LABELS: Record<Locale, string> = {
   'pt-BR': 'PT',
@@ -25,7 +26,10 @@ const LANGUAGE_LABELS: Record<Locale, string> = {
   'es-MX': 'MX',
 };
 
-function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
+function LanguageSwitcherContent({
+  currentLang,
+  ariaLabel,
+}: LanguageSwitcherProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
@@ -46,14 +50,14 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
       `path=${LOCALE_COOKIE_OPTIONS.path}; ` +
       `max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; ` +
       `SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}` +
-      `${location.protocol === 'https:' ? '; Secure' : ''}`;
+      (location.protocol === 'https:' ? '; Secure' : '');
   }
 
   const availableLocales = i18n.locales as readonly Locale[];
 
   return (
     <nav
-      aria-label="Language selector"
+      aria-label={ariaLabel ?? 'Language selector'}
       className="inline-flex items-center gap-1 rounded-xl border border-slate-200/50
                  bg-white/40 p-1 backdrop-blur-md shadow-sm
                  dark:border-slate-800/50 dark:bg-slate-900/40"
@@ -73,6 +77,10 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
         const query = searchParams?.toString();
         const href = query ? `${path}?${query}` : path;
 
+        const inactiveClasses =
+          'text-slate-600 hover:bg-white/60 hover:text-blue-600 ' +
+          'dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-blue-400';
+
         return (
           <Link
             key={locale}
@@ -80,13 +88,14 @@ function LanguageSwitcherContent({ currentLang }: LanguageSwitcherProps) {
             hrefLang={locale}
             onClick={() => writeLocaleCookie(locale)}
             className={`rounded-lg px-2.5 py-1.5 text-[10px] font-bold uppercase
-              transition-all duration-300
-              ${
-                isActive
-                  ? 'bg-blue-600 text-white shadow-md scale-105'
-                  : 'text-slate-600 hover:bg-white/60 hover:text-blue-600
-                     dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-blue-400'
-              }`}
+                        transition-all duration-300 focus:outline-none
+                        focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                        ${
+                          isActive
+                            ? 'bg-blue-600 text-white shadow-md scale-105'
+                            : inactiveClasses
+                        }`}
+            aria-current={isActive ? 'true' : undefined}
           >
             {LANGUAGE_LABELS[locale]}
           </Link>
