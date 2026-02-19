@@ -10,12 +10,13 @@ import {
   TrendingUp,
 } from 'lucide-react'
 
-import type { Dictionary } from '@/types/dictionary'
+import type { Locale } from '@/types/dictionary'
 import type { ProjectDomain } from '@/domain/projects'
 
 interface ProjectCardProps {
-  readonly project: ProjectDomain
-  readonly dict: Dictionary
+  project: ProjectDomain;
+  dict: Dictionary;
+  lang: Locale;
 }
 
 export function ProjectCard({ project, dict }: ProjectCardProps) {
