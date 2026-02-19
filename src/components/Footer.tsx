@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import {
   Linkedin,
   Github,
@@ -34,9 +35,7 @@ export default function Footer({
   contact,
   articles,
 }: FooterProps) {
-  const email = common.externalLinks.email;
-  const linkedinUrl = common.externalLinks.linkedin;
-  const githubUrl = common.externalLinks.github;
+  const { email, linkedin, github } = common.externalLinks;
 
   return (
     <footer
@@ -52,8 +51,7 @@ export default function Footer({
                      bg-gradient-to-br from-blue-600 to-indigo-700
                      text-white p-8 md:p-12 lg:p-16
                      flex flex-col lg:flex-row justify-between
-                     items-start lg:items-center gap-10
-                     shadow-2xl shadow-blue-500/20"
+                     items-start lg:items-center gap-10"
         >
           <div className="relative z-10 max-w-xl">
             <h3 className="text-2xl md:text-4xl font-black tracking-tight mb-4">
@@ -70,20 +68,11 @@ export default function Footer({
                        items-center gap-3 bg-white text-blue-700
                        px-8 py-4 rounded-2xl text-xs
                        font-black uppercase tracking-wider
-                       hover:bg-blue-50 transition-all
-                       shadow-xl active:scale-95"
+                       hover:bg-blue-50 transition-all"
           >
             {contact.cta}
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </a>
-
-          <div
-            aria-hidden
-            className="absolute top-0 right-0
-                       -translate-y-1/2 translate-x-1/4
-                       w-96 h-96 bg-white/10
-                       rounded-full blur-[80px]"
-          />
         </section>
 
         {/* GRID */}
@@ -151,62 +140,45 @@ export default function Footer({
             </h4>
 
             <a href={`mailto:${email}`} className="group block space-y-3">
-              <div
-                className="flex items-center gap-3 text-sm font-bold
+              <div className="flex items-center gap-3 text-sm font-bold
                            text-slate-500 group-hover:text-blue-600
-                           transition-colors"
-              >
-                <div
-                  className="p-2 rounded-lg
-                             bg-white dark:bg-slate-900
-                             border border-slate-200 dark:border-slate-800"
-                >
-                  <Mail className="w-4 h-4" aria-hidden />
-                </div>
+                           transition-colors">
+                <Mail className="w-4 h-4" aria-hidden />
                 <span>{contact.emailLabel}</span>
               </div>
 
-              <p
-                className="break-all rounded-xl border
+              <p className="break-all rounded-xl border
                            bg-slate-100/50 dark:bg-slate-800/30
                            p-4 text-[11px] font-mono font-bold
-                           text-slate-400"
-              >
+                           text-slate-400">
                 {email}
               </p>
             </a>
+
+            <div className="flex gap-3 pt-2">
+              <SocialIcon href={linkedin} label="LinkedIn">
+                <Linkedin className="w-4 h-4" />
+              </SocialIcon>
+
+              <SocialIcon href={github} label="GitHub">
+                <Github className="w-4 h-4" />
+              </SocialIcon>
+            </div>
           </div>
         </div>
 
         {/* FOOTER FINAL */}
-        <div
-          className="pt-10 border-t border-slate-200
+        <div className="pt-10 border-t border-slate-200
                      dark:border-slate-800/80
                      flex flex-col md:flex-row
-                     items-center justify-between gap-8"
-        >
+                     items-center justify-between gap-8">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
             {common.footer}
           </div>
 
-          <div className="flex items-center gap-4">
-            <SocialIcon href={linkedinUrl} label="LinkedIn">
-              <Linkedin className="w-4 h-4" />
-            </SocialIcon>
-
-            <SocialIcon href={githubUrl} label="GitHub">
-              <Github className="w-4 h-4" />
-            </SocialIcon>
-
-            <div className="hidden sm:block h-4 w-px bg-slate-200 dark:bg-slate-800" />
-
-            <div
-              className="flex items-center gap-2
-                         text-[10px] font-black uppercase text-slate-500"
-            >
-              <Code2 className="w-4 h-4 text-blue-600" aria-hidden />
-              {common.builtWith}
-            </div>
+          <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-500">
+            <Code2 className="w-4 h-4 text-blue-600" aria-hidden />
+            {common.builtWith}
           </div>
         </div>
       </div>
@@ -217,34 +189,24 @@ export default function Footer({
 interface SocialIconProps {
   readonly href: string;
   readonly label: string;
-  readonly children: React.ReactNode;
+  readonly children: ReactNode;
 }
 
-function SocialIcon({
-  href,
-  label,
-  children,
-}: SocialIconProps) {
+function SocialIcon({ href, label, children }: SocialIconProps) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="group flex items-center gap-2
-                 rounded-xl border border-slate-200
+      className="group rounded-xl border border-slate-200
                  dark:border-slate-800
                  bg-white dark:bg-slate-900
                  p-2.5 text-slate-400
-                 hover:text-blue-600 hover:border-blue-600/30
-                 hover:-translate-y-1 transition-all"
+                 hover:text-blue-600 transition-all"
     >
       {children}
-      <ExternalLink
-        className="w-3 h-3 opacity-0
-                   group-hover:opacity-40 transition-opacity"
-        aria-hidden
-      />
+      <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
     </a>
   );
 }
