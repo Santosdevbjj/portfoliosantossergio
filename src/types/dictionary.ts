@@ -141,7 +141,8 @@ export interface ProjectsSectionDictionary {
 /*                                   COMMON                                   */
 /* -------------------------------------------------------------------------- */
 
-export interface CommonDictionary {
+
+ export interface CommonDictionary {
   navigation: string;
   role: string;
   footer: string;
@@ -152,6 +153,14 @@ export interface CommonDictionary {
   socialLinks: string;
   skipToContent: string;
   languageSwitcher: string;
+
+  nav: {
+    about: string;
+    experience: string;
+    projects: string;
+    articles: string;
+    contact: string;
+  };
 
   errorBoundary: {
     title: string;
@@ -184,6 +193,7 @@ export interface CommonDictionary {
     };
   };
 }
+
 
 /* -------------------------------------------------------------------------- */
 /*                                   STATES                                   */
