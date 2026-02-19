@@ -5,9 +5,11 @@
  * ------------------------------------------------------------------
  * ✔ TS 6 strict-safe
  * ✔ Next.js 16 compatible
- * ✔ Responsivo
- * ✔ Multilíngue via dicionários
- * ✔ Alinhado com domínio de navegação
+ * ✔ Totalmente responsivo
+ * ✔ Multilíngue (5 locales)
+ * ✔ Alinhado com Dictionary contract
+ * ✔ Sem namespace JSX
+ * ✔ CI-safe (Vercel)
  */
 
 import { useEffect, useRef } from 'react';
@@ -30,13 +32,16 @@ interface FeaturedArticleSectionProps {
 export default function FeaturedArticleSection({
   articles,
   common,
-}: FeaturedArticleSectionProps): JSX.Element | null {
+}: FeaturedArticleSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
 
-  const featuredArticle = articles.items[0];
+  const featuredArticle =
+    Array.isArray(articles.items) && articles.items.length > 0
+      ? articles.items[0]
+      : null;
 
   /**
-   * Fail-safe se não houver artigos
+   * Fail-safe robusto (TS 6 strict)
    */
   if (!featuredArticle) {
     return (
@@ -49,6 +54,9 @@ export default function FeaturedArticleSection({
     );
   }
 
+  /**
+   * ScrollSpy observer
+   */
   useEffect(() => {
     const current = sectionRef.current;
     if (!current) return;
@@ -70,15 +78,18 @@ export default function FeaturedArticleSection({
     return () => observer.disconnect();
   }, []);
 
+  /**
+   * Structured Data (SEO)
+   */
   const schemaPerson = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    '@id': 'https://sergiosantos.dev/#sergio-santos',
     name: 'Sérgio Santos',
     jobTitle: common.role,
     sameAs: [
       common.externalLinks.linkedin,
       common.externalLinks.github,
+      common.externalLinks.medium,
     ],
   };
 
@@ -96,6 +107,7 @@ export default function FeaturedArticleSection({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaPerson) }}
       />
 
+      {/* Background gradients */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 opacity-[0.05] dark:opacity-[0.12] pointer-events-none"
@@ -107,6 +119,7 @@ export default function FeaturedArticleSection({
       </div>
 
       <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
         <header className="flex items-center gap-4 md:gap-6 mb-12 md:mb-16">
           <div className="p-3 md:p-4 bg-amber-100 dark:bg-amber-900/40
                           rounded-2xl text-amber-600 dark:text-amber-400
@@ -123,6 +136,7 @@ export default function FeaturedArticleSection({
           </h2>
         </header>
 
+        {/* Article Card */}
         <article
           className="group bg-white dark:bg-slate-900/40 rounded-[2.5rem]
                      p-6 md:p-12 lg:p-16 border border-slate-200
@@ -130,6 +144,7 @@ export default function FeaturedArticleSection({
                      hover:border-blue-500/30"
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            {/* Image */}
             <div className="relative overflow-hidden rounded-[2rem] shadow-xl
                             aspect-[4/3] md:aspect-video lg:aspect-square
                             bg-slate-200 dark:bg-slate-800">
@@ -143,6 +158,7 @@ export default function FeaturedArticleSection({
               />
             </div>
 
+            {/* Content */}
             <div className="flex flex-col">
               <div className="flex flex-wrap items-center gap-3
                               text-blue-600 dark:text-blue-400
@@ -161,7 +177,7 @@ export default function FeaturedArticleSection({
                   <span className="bg-amber-100 dark:bg-amber-900/40
                                    text-amber-700 dark:text-amber-400
                                    px-3 py-1.5 rounded-full">
-                    {articles.bestOfMonth}
+                    {articles.awardWinner}
                   </span>
                 )}
               </div>
@@ -181,6 +197,7 @@ export default function FeaturedArticleSection({
                   href={featuredArticle.link}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={articles.readMore}
                   className="bg-blue-600 hover:bg-blue-700 text-white
                              px-8 py-4 rounded-2xl font-black
                              inline-flex items-center justify-center
@@ -194,6 +211,7 @@ export default function FeaturedArticleSection({
                   href={common.externalLinks.medium}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={articles.mediumProfile}
                   className="px-8 py-4 rounded-2xl font-black
                              border border-slate-200
                              dark:border-slate-800"
