@@ -16,7 +16,6 @@ import type {
   CommonDictionary,
   ContactDictionary,
   ArticlesSectionDictionary,
-  Dictionary,
 } from '@/types/dictionary';
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -27,7 +26,6 @@ interface FooterProps {
   readonly common: CommonDictionary;
   readonly contact: ContactDictionary;
   readonly articles: ArticlesSectionDictionary;
-  readonly seo: Dictionary['seo'];
 }
 
 export default function Footer({
@@ -35,14 +33,10 @@ export default function Footer({
   common,
   contact,
   articles,
-  seo,
-}: FooterProps): JSX.Element {
+}: FooterProps) {
   const email = common.externalLinks.email;
   const linkedinUrl = common.externalLinks.linkedin;
   const githubUrl = common.externalLinks.github;
-
-  // SEO garantido por contrato (validateDictionary)
-  const articlesSeo = seo.pages.articles;
 
   return (
     <footer
@@ -63,10 +57,10 @@ export default function Footer({
         >
           <div className="relative z-10 max-w-xl">
             <h3 className="text-2xl md:text-4xl font-black tracking-tight mb-4">
-              {articlesSeo.title}
+              {articles.title}
             </h3>
             <p className="text-sm md:text-base font-medium leading-relaxed text-blue-50/90">
-              {articlesSeo.description}
+              {contact.subtitle}
             </p>
           </div>
 
@@ -133,7 +127,7 @@ export default function Footer({
                     href={`/${lang}${getNavHash(section)}`}
                     className={STYLES.footerLink}
                   >
-                    {seo.pages[section]?.title ?? section}
+                    {section}
                   </Link>
                 </li>
               ))}
@@ -152,7 +146,9 @@ export default function Footer({
 
           {/* CONTATO */}
           <div className="space-y-6">
-            <h4 className={STYLES.footerTitle}>Email</h4>
+            <h4 className={STYLES.footerTitle}>
+              {contact.title}
+            </h4>
 
             <a href={`mailto:${email}`} className="group block space-y-3">
               <div
@@ -228,12 +224,12 @@ function SocialIcon({
   href,
   label,
   children,
-}: SocialIconProps): JSX.Element {
+}: SocialIconProps) {
   return (
     <a
       href={href}
       target="_blank"
-      rel="noopener noreferrer me"
+      rel="noopener noreferrer"
       aria-label={label}
       className="group flex items-center gap-2
                  rounded-xl border border-slate-200
