@@ -111,6 +111,11 @@
       "projects": "Projetos",
       "articles": "Artigos",
       "contact": "Contato"
+    "theme": {
+       "light": "Claro",
+       "dark": "Escuro",
+      "system": "Sistema"
+    }
     },
     "notFound": {
       "title": "Página não encontrada",
