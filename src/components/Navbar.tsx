@@ -4,11 +4,11 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 
-import type { Locale, CommonDictionary, Dictionary } from '@/types/dictionary'
+import type { Locale, CommonDictionary } from '@/types/dictionary'
 import {
-  NavSection,
   NAV_SECTIONS,
   getNavHash,
+  type NavSection,
 } from '@/domain/navigation'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
@@ -22,7 +22,6 @@ import { useScrollSpy } from '@/contexts/scroll-spy.client'
 interface NavbarProps {
   readonly lang: Locale
   readonly common: CommonDictionary
-  readonly seoPages: Dictionary['seo']['pages']
 }
 
 /* -------------------------------------------------------------------------- */
@@ -32,7 +31,6 @@ interface NavbarProps {
 export default function Navbar({
   lang,
   common,
-  seoPages,
 }: NavbarProps): React.JSX.Element {
 
   const { navigation, menu, languageSwitcher } = common
@@ -63,7 +61,6 @@ export default function Navbar({
   /* -------------------------------------------------------------------------- */
 
   useEffect(() => {
-    if (typeof document === 'undefined') return
     document.body.style.overflow = isOpen ? 'hidden' : ''
     return () => {
       document.body.style.overflow = ''
@@ -80,12 +77,12 @@ export default function Navbar({
 
   const navLinks = useMemo(
     () =>
-      NAV_SECTIONS.map(section => ({
+      NAV_SECTIONS.map((section: NavSection) => ({
         id: section,
         href: `/${lang}${getNavHash(section)}`,
-        label: seoPages[section]?.title ?? section,
+        label: section.toUpperCase(), // idioma-independente
       })),
-    [lang, seoPages],
+    [lang],
   )
 
   return (
@@ -103,7 +100,7 @@ export default function Navbar({
         {/* LOGO */}
         <Link
           href={`/${lang}`}
-          aria-label={seoPages.home?.title ?? 'Home'}
+          aria-label="Home"
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
