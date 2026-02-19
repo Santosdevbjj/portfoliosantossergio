@@ -54,7 +54,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts" /* Mantido como sugerido pelo Next.js */
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts" 
   ],
 
   "exclude": [
