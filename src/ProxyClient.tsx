@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import type { ReactElement } from "react";
 
 import type { Locale, Dictionary } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
@@ -25,7 +24,7 @@ export default function ProxyClient({
   lang,
   initialProjects,
   dictionary,
-}: ProxyClientProps): ReactElement {
+}: ProxyClientProps) {
 
   if (!dictionary?.meta?.locale) {
     notFound();
@@ -50,29 +49,14 @@ export default function ProxyClient({
         className="relative flex w-full flex-col overflow-x-hidden bg-white antialiased dark:bg-[#020617]"
       >
         <HeroSection dictionary={dictionary} />
-
         <AboutSection dict={dictionary.about} />
-
-        <ExperienceSection
-          experience={dictionary.experience}
-        />
-
-        <FeaturedProjectsSection
-          lang={lang}
-          dict={dictionary}
-        />
-
-        <ProjectSection
-          projects={initialProjects}
-          lang={lang}
-          dict={dictionary}
-        />
-
+        <ExperienceSection experience={dictionary.experience} />
+        <FeaturedProjectsSection lang={lang} dict={dictionary} />
+        <ProjectSection projects={initialProjects} lang={lang} dict={dictionary} />
         <FeaturedArticleSection
           articles={dictionary.articles}
           common={dictionary.common}
         />
-
         <ContactSection
           contact={dictionary.contact}
           common={dictionary.common}
@@ -85,7 +69,6 @@ export default function ProxyClient({
         common={dictionary.common}
         contact={dictionary.contact}
         articles={dictionary.articles}
-        seo={dictionary.seo}
       />
     </PageWrapper>
   );
