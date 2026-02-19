@@ -20,11 +20,11 @@ export interface DictionaryMeta {
   direction: "ltr" | "rtl";
   lastUpdated: string;
   author: string;
-  description: string;
   source: string;
   contentVersion?: string;
   contentHash?: string;
   sourceType?: string;
+  description: string;
 }
 
 /* -------------------------------------------------------------------------- */
