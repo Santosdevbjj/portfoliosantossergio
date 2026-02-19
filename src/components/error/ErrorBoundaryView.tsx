@@ -12,7 +12,7 @@ import { ErrorDisplay } from '@/components/error-display';
 interface ErrorBoundaryViewProps {
   error: Error & { digest?: string };
   reset: () => void;
-  withHtmlWrapper?: boolean; // ✅ necessário para global-error.tsx
+  withHtmlWrapper?: boolean;
 }
 
 export function ErrorBoundaryView({
@@ -20,10 +20,9 @@ export function ErrorBoundaryView({
   reset,
   withHtmlWrapper = false,
 }: ErrorBoundaryViewProps) {
-
   /**
-   * Resolve locale no client de forma segura
-   * Compatível com Next.js 16 + App Router
+   * Resolve locale safely on client
+   * Fully compatible with Next.js 16 App Router
    */
   const locale: SupportedLocale = useMemo(() => {
     if (typeof navigator === 'undefined') {
@@ -42,29 +41,35 @@ export function ErrorBoundaryView({
   const dictionary = getErrorDictionary(locale);
 
   /**
-   * Narrowing seguro alinhado ao ErrorDictionary
+   * Type-safe narrowing aligned with ErrorDictionary
    */
   const key: ErrorKey =
     error.name in dictionary
       ? (error.name as ErrorKey)
       : 'InternalServerError';
 
+  /**
+   * IMPORTANT — TS 6 exactOptionalPropertyTypes safe
+   * Only pass errorId if it exists
+   */
   const content = (
     <ErrorDisplay
       errorKey={key}
       dictionary={dictionary}
       reset={reset}
-      errorId={error.digest}
+      {...(error.digest ? { errorId: error.digest } : {})}
     />
   );
 
   /**
-   * Next.js 16 exige <html><body> no global-error.tsx
+   * Required for Next.js 16 global-error.tsx
    */
   if (withHtmlWrapper) {
     return (
-      <html>
-        <body>{content}</body>
+      <html lang={locale}>
+        <body className="min-h-screen bg-white dark:bg-[#020617] antialiased">
+          {content}
+        </body>
       </html>
     );
   }
