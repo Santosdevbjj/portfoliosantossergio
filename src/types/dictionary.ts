@@ -161,7 +161,11 @@ export interface ProjectsSectionDictionary {
     articles: string;
     contact: string;
   };
-
+   theme: {
+     light: string;
+     dark: string;
+    system: string;
+  };
   errorBoundary: {
     title: string;
     description: string;
