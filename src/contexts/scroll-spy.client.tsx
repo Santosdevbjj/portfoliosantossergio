@@ -1,16 +1,14 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
-import { NavSection } from '@/domain/navigation'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react'
+import type { NavSection } from '@/domain/navigation'
 
-/**
- * Seção ativa no ScrollSpy.
- * - NavSection: seção lógica ativa
- * - null: nenhuma seção ativa
- *
- * ❗ NÃO usar string
- * ❗ NÃO depende de idioma
- */
 export type ActiveSection = NavSection | null
 
 interface ScrollSpyContextValue {
@@ -28,14 +26,10 @@ interface ScrollSpyProviderProps {
 
 export function ScrollSpyProvider({
   children,
-}: ScrollSpyProviderProps): JSX.Element {
+}: ScrollSpyProviderProps): React.JSX.Element {
   const [activeSection, setActiveSectionState] =
     useState<ActiveSection>(null)
 
-  /**
-   * Define a seção ativa.
-   * Evita re-render desnecessário se não houver mudança.
-   */
   const setActiveSection = useCallback(
     (section: ActiveSection) => {
       setActiveSectionState(prev =>
@@ -45,10 +39,6 @@ export function ScrollSpyProvider({
     [],
   )
 
-  /**
-   * Reseta o estado do ScrollSpy.
-   * Útil em mudanças de rota ou layout.
-   */
   const resetActiveSection = useCallback(() => {
     setActiveSectionState(null)
   }, [])
@@ -69,10 +59,6 @@ export function ScrollSpyProvider({
   )
 }
 
-/**
- * Hook seguro para consumir o ScrollSpy.
- * Garante uso apenas dentro do provider.
- */
 export function useScrollSpy(): ScrollSpyContextValue {
   const context = useContext(ScrollSpyContext)
 
