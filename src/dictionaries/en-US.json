@@ -8,7 +8,8 @@
     "source": "manual",
     "contentVersion": "2026.02.03",
     "contentHash": "i18n-enus-2026-02-03",
-    "sourceType": "curated-manual"
+    "sourceType": "curated-manual",
+    "description": "Multilingual portfolio of Sérgio Santos, specialist in Information Technology, Artificial Intelligence and Software Engineering."
   },
   "hero": {
     "greeting": "Available for Mission-Critical Projects",
