@@ -10,7 +10,7 @@ export interface PageWrapperProps {
 
 export default function PageWrapper({
   children,
-}: PageWrapperProps): JSX.Element {
+}: PageWrapperProps): {
   return (
     <ScrollSpyProvider>
       <div className="min-h-screen flex flex-col bg-background text-foreground">
