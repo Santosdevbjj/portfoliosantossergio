@@ -112,6 +112,12 @@
       "articles": "Artículos",
       "contact": "Contacto"
     },
+
+ "theme": {
+   "light": "Claro",
+   "dark": "Oscuro",
+   "system": "Sistema"
+  },   
     "notFound": {
       "title": "Página no encontrada",
       "description": "Es posible que el enlace esté roto.",
