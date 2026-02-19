@@ -11,7 +11,7 @@ import {
   type SupportedLocale,
 } from "@/dictionaries/locales";
 
-export const LOCALE_COOKIE_NAME = "NEXT_LOCALE" as const;
+export const LOCALE_COOKIE = "NEXT_LOCALE" as const;
 
 export type { SupportedLocale };
 
