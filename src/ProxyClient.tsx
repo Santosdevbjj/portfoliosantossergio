@@ -41,7 +41,6 @@ export default function ProxyClient({
       <Navbar
         lang={locale}
         common={dictionary.common}
-        seoPages={dictionary.seo.pages}
       />
 
       <main
