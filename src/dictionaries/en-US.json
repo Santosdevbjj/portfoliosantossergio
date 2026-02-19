@@ -105,6 +105,13 @@
       "description": "Please contact me if the problem persists.",
       "actions": { "retry": "Try again", "home": "Home" }
     },
+    "nav": {
+      "about": "About",
+     "experience": "Experience",
+     "projects": "Projects",
+    "articles": "Articles",
+    "contact": "Contact"
+  },
     "notFound": {
       "title": "Page not found",
       "description": "The link may be broken.",
