@@ -106,7 +106,6 @@ export default function ProjectSection({
               <ProjectCard
                 key={project.id}
                 project={project}
-                lang={lang}
                 dict={dict}
               />
             ))
