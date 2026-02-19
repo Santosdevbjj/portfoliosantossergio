@@ -43,16 +43,20 @@ export default function Navbar({
   lang,
   common,
 }: NavbarProps): React.JSX.Element {
+  const {
+    navigation,
+    menu,
+    languageSwitcher,
+    nav,
+    theme,
+  } = common
 
-  const { navigation, menu, languageSwitcher, nav } = common
   const { activeSection } = useScrollSpy()
 
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
-  /* -------------------------------------------------------------------------- */
-  /*                               SCROLL EFFECT                                */
-  /* -------------------------------------------------------------------------- */
+  /* ------------------------------ SCROLL EFFECT ----------------------------- */
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,9 +71,7 @@ export default function Navbar({
     }
   }, [])
 
-  /* -------------------------------------------------------------------------- */
-  /*                               BODY LOCK                                    */
-  /* -------------------------------------------------------------------------- */
+  /* ------------------------------ BODY LOCK -------------------------------- */
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : ''
@@ -78,13 +80,12 @@ export default function Navbar({
     }
   }, [isOpen])
 
+  /* Fecha menu ao trocar idioma */
   useEffect(() => {
     setIsOpen(false)
   }, [lang])
 
-  /* -------------------------------------------------------------------------- */
-  /*                               NAV LINKS                                    */
-  /* -------------------------------------------------------------------------- */
+  /* ------------------------------ NAV LINKS -------------------------------- */
 
   const navLinks = useMemo(
     () =>
@@ -111,7 +112,7 @@ export default function Navbar({
         {/* LOGO */}
         <Link
           href={`/${lang}`}
-          aria-label="Home"
+          aria-label={navigation}
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
@@ -147,14 +148,14 @@ export default function Navbar({
 
           <div className="flex items-center gap-4">
             <LanguageSwitcher currentLang={lang} />
-            <ThemeToggle />
+            <ThemeToggle labels={theme} />
           </div>
 
         </div>
 
         {/* MOBILE */}
         <div className="flex items-center gap-3 lg:hidden">
-          <ThemeToggle />
+          <ThemeToggle labels={theme} />
 
           <button
             aria-label={isOpen ? menu.aria.close : menu.aria.open}
