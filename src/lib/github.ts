@@ -27,6 +27,8 @@ const REQUEST_TIMEOUT = 4000;
 
 /**
  * Resolve descrição multilíngue baseada no locale.
+ * Formato esperado:
+ * "pt | en | es"
  */
 function resolveDescriptionByLocale(
   description: string | null,
@@ -45,11 +47,14 @@ function resolveDescriptionByLocale(
   };
 
   const index = localeMap[locale] ?? 0;
+
   return parts[index] ?? parts[0] ?? '';
 }
 
 /**
- * Resolve categoria do projeto a partir dos tópicos do GitHub.
+ * Resolve categoria baseada nos tópicos.
+ * Deve bater com:
+ * projects.categories do dicionário.
  */
 function resolveProjectCategory(topics: string[]): ProjectCategory {
   const categories: ProjectCategory[] = [
@@ -64,13 +69,19 @@ function resolveProjectCategory(topics: string[]): ProjectCategory {
   ];
 
   for (const cat of categories) {
-    if (topics.includes(cat)) return cat;
+    if (topics.includes(cat)) {
+      return cat;
+    }
   }
-  return 'dev'; // fallback
+
+  return 'dev';
 }
 
 /**
  * Busca projetos do GitHub
+ * Compatível com:
+ * - Next.js 16 (fetch cache + revalidate)
+ * - TypeScript 6 strict
  */
 export async function getGitHubProjects(
   locale: Locale
@@ -86,7 +97,7 @@ export async function getGitHubProjects(
       {
         headers: {
           Accept: 'application/vnd.github+json',
-          ...(token && { Authorization: `Bearer ${token}` }),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
           'User-Agent': 'portfolio-sergio-santos',
         },
         next: { revalidate: REVALIDATE_TIME },
@@ -101,16 +112,16 @@ export async function getGitHubProjects(
       return [];
     }
 
-    const repos: unknown = await response.json();
-    if (!Array.isArray(repos)) {
+    const data: unknown = await response.json();
+
+    if (!Array.isArray(data)) {
       console.error('[GitHub API] Unexpected response format.');
       return [];
     }
 
-    const typedRepos = repos as GitHubRepo[];
     const projects: Project[] = [];
 
-    for (const repo of typedRepos) {
+    for (const repo of data as GitHubRepo[]) {
       if (
         repo.fork ||
         !Array.isArray(repo.topics) ||
@@ -123,8 +134,46 @@ export async function getGitHubProjects(
       if (!technology) continue;
 
       const normalizedTitle = repo.name.replace(/[-_]/g, ' ');
-      const localizedDescription = resolveDescriptionByLocale(repo.description, locale);
+      const localizedDescription = resolveDescriptionByLocale(
+        repo.description,
+        locale
+      );
+
       const category = resolveProjectCategory(repo.topics);
+
+      /**
+       * Construção segura de conteúdo multilíngue
+       * Evita duplicação de chave dinâmica.
+       */
+      const content: Project['content'] = {
+        'pt-BR': {
+          title: normalizedTitle,
+          description: localizedDescription,
+        },
+      };
+
+      if (locale !== 'pt-BR') {
+        content[locale] = {
+          title: normalizedTitle,
+          description: localizedDescription,
+        };
+      }
+
+      const seo: Project['seo'] = {
+        'pt-BR': {
+          title: normalizedTitle,
+          description: localizedDescription,
+          keywords: repo.topics,
+        },
+      };
+
+      if (locale !== 'pt-BR') {
+        seo[locale] = {
+          title: normalizedTitle,
+          description: localizedDescription,
+          keywords: repo.topics,
+        };
+      }
 
       const project: Project = {
         id: String(repo.id),
@@ -133,38 +182,15 @@ export async function getGitHubProjects(
         featured: false,
         order: 0,
         status: 'active',
-
-        content: {
-          'pt-BR': {
-            title: normalizedTitle,
-            description: localizedDescription,
-          },
-          [locale]: {
-            title: normalizedTitle,
-            description: localizedDescription,
-          },
-        },
-
-        seo: {
-          'pt-BR': {
-            title: normalizedTitle,
-            description: localizedDescription,
-            keywords: repo.topics,
-          },
-          [locale]: {
-            title: normalizedTitle,
-            description: localizedDescription,
-            keywords: repo.topics,
-          },
-        },
-
+        content,
+        seo,
         stack: [technology],
         links: {
           repository: repo.html_url,
           demo: repo.homepage ?? undefined,
         },
         createdAt: repo.created_at ?? new Date().toISOString(),
-        updatedAt: repo.updated_at ?? new Date().toISOString(),
+        updatedAt: repo.updated_at ?? undefined,
         ...resolveProjectFlags(repo.topics),
       };
 
@@ -178,6 +204,7 @@ export async function getGitHubProjects(
     } else {
       console.error('[GitHub API] Unexpected error:', error);
     }
+
     return [];
   }
 }
