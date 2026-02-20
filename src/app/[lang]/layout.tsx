@@ -1,3 +1,5 @@
+// src/app/[lang]/layout.tsx
+
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
@@ -5,7 +7,6 @@ import Script from "next/script";
 import type { ReactNode } from "react";
 
 import { normalizeLocale, locales } from "@/dictionaries/locales";
-import type { Locale } from "@/types/dictionary";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
@@ -26,7 +27,9 @@ const inter = Inter({
 
 interface LayoutProps {
   readonly children: ReactNode;
-  readonly params: { lang: string };
+  readonly params: {
+    readonly lang: string;
+  };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -72,9 +75,9 @@ export async function generateMetadata(
     },
 
     alternates: {
-      canonical: `${siteUrl}/${locale}`,
+      canonical: `/${locale}`,
       languages: Object.fromEntries(
-        locales.map((lng) => [lng, `${siteUrl}/${lng}`])
+        locales.map((lng) => [lng, `/${lng}`])
       ),
     },
 
@@ -85,6 +88,12 @@ export async function generateMetadata(
       siteName: dict.seo.siteName,
       locale: dict.meta.locale,
       type: "website",
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: dict.seo.siteName,
+      description: dict.seo.description,
     },
   };
 }
@@ -113,6 +122,7 @@ export default async function LangLayout({
     notFound();
   }
 
+  // After notFound(), locale is guaranteed
   const dict = await getServerDictionary(locale);
 
   const siteUrl =
@@ -126,7 +136,7 @@ export default async function LangLayout({
       <body
         className={`${inter.className} min-h-screen flex flex-col bg-background text-foreground antialiased`}
       >
-        {/* Skip to content (Acessibilidade) */}
+        {/* Skip to content (Accessibility) */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-slate-900 text-white px-4 py-2 rounded-md"
@@ -148,7 +158,7 @@ export default async function LangLayout({
           dictionary={dict}
         />
 
-        {/* Google Analytics */}
+        {/* Google Analytics (MANTIDO) */}
         {gaId && (
           <>
             <Script
@@ -160,7 +170,9 @@ export default async function LangLayout({
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${gaId}');
+                gtag('config', '${gaId}', {
+                  page_path: window.location.pathname,
+                });
               `}
             </Script>
           </>
