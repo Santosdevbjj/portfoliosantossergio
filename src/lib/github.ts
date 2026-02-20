@@ -53,8 +53,7 @@ function resolveDescriptionByLocale(
 
 /**
  * Resolve categoria baseada nos tópicos.
- * Deve bater com:
- * projects.categories do dicionário.
+ * Deve bater com projects.categories do dicionário.
  */
 function resolveProjectCategory(topics: string[]): ProjectCategory {
   const categories: ProjectCategory[] = [
@@ -80,7 +79,7 @@ function resolveProjectCategory(topics: string[]): ProjectCategory {
 /**
  * Busca projetos do GitHub
  * Compatível com:
- * - Next.js 16 (fetch cache + revalidate)
+ * - Next.js 16
  * - TypeScript 6 strict
  */
 export async function getGitHubProjects(
@@ -141,39 +140,20 @@ export async function getGitHubProjects(
 
       const category = resolveProjectCategory(repo.topics);
 
-      /**
-       * Construção segura de conteúdo multilíngue
-       * Evita duplicação de chave dinâmica.
-       */
       const content: Project['content'] = {
-        'pt-BR': {
+        [locale]: {
           title: normalizedTitle,
           description: localizedDescription,
         },
       };
-
-      if (locale !== 'pt-BR') {
-        content[locale] = {
-          title: normalizedTitle,
-          description: localizedDescription,
-        };
-      }
 
       const seo: Project['seo'] = {
-        'pt-BR': {
+        [locale]: {
           title: normalizedTitle,
           description: localizedDescription,
           keywords: repo.topics,
         },
       };
-
-      if (locale !== 'pt-BR') {
-        seo[locale] = {
-          title: normalizedTitle,
-          description: localizedDescription,
-          keywords: repo.topics,
-        };
-      }
 
       const project: Project = {
         id: String(repo.id),
@@ -184,7 +164,7 @@ export async function getGitHubProjects(
         status: 'active',
         content,
         seo,
-        stack: [technology],
+        stack: [technology], // compatível com stack tipado corretamente
         links: {
           repository: repo.html_url,
           demo: repo.homepage ?? undefined,
