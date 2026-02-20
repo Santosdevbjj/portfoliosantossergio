@@ -1,19 +1,36 @@
 // src/dictionaries/validateCrossLocale.ts
 
-import { Dictionary } from "@/types/dictionary";
+import type { Dictionary } from "@/types/dictionary";
 
 /**
- * Função recursiva para extrair todos os caminhos (dots) de um dicionário.
- * Ex: "common.errorBoundary.actions.retry"
+ * Extrai todos os caminhos (dot notation) de um objeto.
+ * Exemplo:
+ * common.errorBoundary.actions.retry
+ *
+ * ✔ Ignora arrays
+ * ✔ Seguro para TS 6 strict
+ * ✔ Não usa any
  */
-function getAllPaths(obj: any, prefix = ""): string[] {
-  if (!obj || typeof obj !== "object") return [];
+function getAllPaths(
+  obj: unknown,
+  prefix = ""
+): string[] {
+  if (!obj || typeof obj !== "object") {
+    return [];
+  }
 
-  return Object.entries(obj).flatMap(([key, value]) => {
+  const entries = Object.entries(
+    obj as Record<string, unknown>
+  );
+
+  return entries.flatMap(([key, value]) => {
     const path = prefix ? `${prefix}.${key}` : key;
 
-    // Continua a recursão se for um objeto, mas ignora arrays (como intl.contract.requiredFields)
-    if (value && typeof value === "object" && !Array.isArray(value)) {
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value)
+    ) {
       return getAllPaths(value, path);
     }
 
@@ -22,8 +39,13 @@ function getAllPaths(obj: any, prefix = ""): string[] {
 }
 
 /**
- * Compara o dicionário base (pt-BR) com um dicionário alvo para encontrar 
- * chaves faltantes ou chaves extras não traduzidas.
+ * Compara dois dicionários e retorna inconsistências:
+ * - Chaves faltantes no target
+ * - Chaves extras no target
+ *
+ * ✔ Seguro para uso em build
+ * ✔ Não depende de runtime Next
+ * ✔ Compatível com JSON importado via App Router
  */
 export function validateCrossLocale(
   base: Dictionary,
@@ -34,20 +56,29 @@ export function validateCrossLocale(
   const basePaths = new Set(getAllPaths(base));
   const targetPaths = new Set(getAllPaths(target));
 
-  const missingInTarget = [...basePaths].filter(p => !targetPaths.has(p));
-  const extraInTarget = [...targetPaths].filter(p => !basePaths.has(p));
+  const missingInTarget = [...basePaths].filter(
+    (path) => !targetPaths.has(path)
+  );
+
+  const extraInTarget = [...targetPaths].filter(
+    (path) => !basePaths.has(path)
+  );
 
   const errors: string[] = [];
 
   if (missingInTarget.length > 0) {
     errors.push(
-      `[${targetName}] Faltando chaves presentes em ${baseName}:\n    ${missingInTarget.join("\n    ")}`
+      `[${targetName}] Missing keys present in ${baseName}:\n    ${missingInTarget.join(
+        "\n    "
+      )}`
     );
   }
 
   if (extraInTarget.length > 0) {
     errors.push(
-      `[${targetName}] Chaves extras que não existem em ${baseName}:\n    ${extraInTarget.join("\n    ")}`
+      `[${targetName}] Extra keys not present in ${baseName}:\n    ${extraInTarget.join(
+        "\n    "
+      )}`
     );
   }
 
