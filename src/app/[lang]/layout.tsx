@@ -43,7 +43,7 @@ export default async function LocaleLayout({
     <>
       <Breadcrumbs
         lang={params.locale}
-        baseUrl="https://seusite.com"
+        baseUrl="https://portfoliosantossergio.vercel.app"
         dictionary={dictionary}
       />
       {children}
