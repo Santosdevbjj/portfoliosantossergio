@@ -6,33 +6,34 @@ import { usePathname } from 'next/navigation';
 import { ChevronRight, Home } from 'lucide-react';
 
 import { generateBreadcrumbs } from '@/lib/seo/breadcrumbs';
-import { getDictionary } from '@/dictionaries';
-import type { Locale } from '@/types/dictionary';
+import type { Locale, Dictionary } from '@/types/dictionary';
 
 interface BreadcrumbsProps {
   lang: Locale;
   baseUrl: string;
+  dictionary: Dictionary; // ✅ agora vem do server
 }
 
-export function Breadcrumbs({ lang, baseUrl }: BreadcrumbsProps) {
+export function Breadcrumbs({
+  lang,
+  baseUrl,
+  dictionary,
+}: BreadcrumbsProps) {
   const pathname = usePathname();
-
-  // IMPORTANTE: getDictionary precisa ser síncrono
-  const dict = useMemo(() => getDictionary(lang), [lang]);
 
   const breadcrumbs = useMemo(() => {
     if (!pathname) return [];
-    return generateBreadcrumbs(pathname, lang, dict, baseUrl);
-  }, [pathname, lang, dict, baseUrl]);
+    return generateBreadcrumbs(pathname, lang, dictionary, baseUrl);
+  }, [pathname, lang, dictionary, baseUrl]);
 
-  if (breadcrumbs.length <= 1) return null;
+  if (!breadcrumbs || breadcrumbs.length <= 1) return null;
 
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex py-4 px-2 text-sm text-slate-600 dark:text-slate-400 overflow-x-auto no-scrollbar scroll-smooth"
+      className="w-full overflow-x-auto no-scrollbar"
     >
-      <ol className="flex items-center space-x-2 whitespace-nowrap">
+      <ol className="flex items-center gap-2 py-4 px-2 text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap min-w-max">
         {breadcrumbs.map((crumb, index) => {
           const isLast = index === breadcrumbs.length - 1;
 
@@ -41,14 +42,14 @@ export function Breadcrumbs({ lang, baseUrl }: BreadcrumbsProps) {
               {index > 0 && (
                 <ChevronRight
                   size={16}
-                  className="mx-1 text-slate-400 flex-shrink-0"
+                  className="text-slate-400 flex-shrink-0"
                   aria-hidden="true"
                 />
               )}
 
               {isLast ? (
                 <span
-                  className="font-semibold text-slate-900 dark:text-white truncate max-w-[160px] sm:max-w-none"
+                  className="font-semibold text-slate-900 dark:text-white truncate max-w-[160px] sm:max-w-xs md:max-w-md"
                   aria-current="page"
                 >
                   {crumb.name}
@@ -56,16 +57,18 @@ export function Breadcrumbs({ lang, baseUrl }: BreadcrumbsProps) {
               ) : (
                 <Link
                   href={crumb.item}
-                  className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                  className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
                 >
                   {index === 0 && (
                     <Home
                       size={16}
-                      className="mr-1.5 flex-shrink-0"
+                      className="flex-shrink-0"
                       aria-hidden="true"
                     />
                   )}
-                  <span>{crumb.name}</span>
+                  <span className="truncate max-w-[140px] sm:max-w-xs">
+                    {crumb.name}
+                  </span>
                 </Link>
               )}
             </li>
