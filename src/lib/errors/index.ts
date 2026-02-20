@@ -28,14 +28,20 @@ export class BaseError extends Error {
   constructor(params: BaseErrorParams) {
     super(params.message);
 
-    // Necessário para Edge / Node / TS strict
     Object.setPrototypeOf(this, new.target.prototype);
 
     this.name = params.name;
     this.statusCode = params.statusCode ?? 500;
     this.errorId = params.errorId ?? crypto.randomUUID();
-    this.requestId = params.requestId;
-    this.context = params.context;
+
+    // ✅ exactOptionalPropertyTypes-safe
+    if (params.requestId !== undefined) {
+      this.requestId = params.requestId;
+    }
+
+    if (params.context !== undefined) {
+      this.context = params.context;
+    }
 
     if (params.cause !== undefined) {
       this.cause = params.cause;
@@ -44,7 +50,7 @@ export class BaseError extends Error {
 }
 
 /* ============================================================
-   ERROR CLASSES — 100% alinhadas com ErrorDictionary
+   ERROR CLASSES
 ============================================================ */
 
 export class InternalServerError extends BaseError {
