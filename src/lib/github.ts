@@ -7,11 +7,8 @@ import {
   resolveProjectTechnology,
 } from '@/domain/projects';
 
-import type { Project } from '@/types/project';
+import type { Project, ProjectCategory } from '@/types/project';
 
-/**
- * Tipagem da resposta da API do GitHub
- */
 interface GitHubRepo {
   id: number;
   name: string;
@@ -20,19 +17,16 @@ interface GitHubRepo {
   homepage: string | null;
   topics: string[];
   fork: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
-/**
- * Configurações
- */
 const GITHUB_USERNAME = 'Santosdevbjj';
 const REVALIDATE_TIME = 3600;
 const REQUEST_TIMEOUT = 4000;
 
 /**
  * Resolve descrição multilíngue baseada no locale.
- * Formato esperado no GitHub:
- * "pt | en | es"
  */
 function resolveDescriptionByLocale(
   description: string | null,
@@ -51,8 +45,28 @@ function resolveDescriptionByLocale(
   };
 
   const index = localeMap[locale] ?? 0;
-
   return parts[index] ?? parts[0] ?? '';
+}
+
+/**
+ * Resolve categoria do projeto a partir dos tópicos do GitHub.
+ */
+function resolveProjectCategory(topics: string[]): ProjectCategory {
+  const categories: ProjectCategory[] = [
+    'dataScience',
+    'cloud',
+    'graphs',
+    'analysis',
+    'excel',
+    'database',
+    'dev',
+    'security',
+  ];
+
+  for (const cat of categories) {
+    if (topics.includes(cat)) return cat;
+  }
+  return 'dev'; // fallback
 }
 
 /**
@@ -88,14 +102,12 @@ export async function getGitHubProjects(
     }
 
     const repos: unknown = await response.json();
-
     if (!Array.isArray(repos)) {
       console.error('[GitHub API] Unexpected response format.');
       return [];
     }
 
     const typedRepos = repos as GitHubRepo[];
-
     const projects: Project[] = [];
 
     for (const repo of typedRepos) {
@@ -110,21 +122,49 @@ export async function getGitHubProjects(
       const technology = resolveProjectTechnology(repo.topics);
       if (!technology) continue;
 
+      const normalizedTitle = repo.name.replace(/[-_]/g, ' ');
+      const localizedDescription = resolveDescriptionByLocale(repo.description, locale);
+      const category = resolveProjectCategory(repo.topics);
+
       const project: Project = {
         id: String(repo.id),
+        slug: repo.name,
+        category,
+        featured: false,
+        order: 0,
+        status: 'active',
 
-        // 🔥 CORREÇÃO AQUI
-        title: repo.name.replace(/[-_]/g, ' '),
+        content: {
+          'pt-BR': {
+            title: normalizedTitle,
+            description: localizedDescription,
+          },
+          [locale]: {
+            title: normalizedTitle,
+            description: localizedDescription,
+          },
+        },
 
-        description: resolveDescriptionByLocale(
-          repo.description,
-          locale
-        ),
+        seo: {
+          'pt-BR': {
+            title: normalizedTitle,
+            description: localizedDescription,
+            keywords: repo.topics,
+          },
+          [locale]: {
+            title: normalizedTitle,
+            description: localizedDescription,
+            keywords: repo.topics,
+          },
+        },
 
-        htmlUrl: repo.html_url,
-        homepage: repo.homepage ?? undefined,
-        topics: repo.topics,
-        technology,
+        stack: [technology],
+        links: {
+          repository: repo.html_url,
+          demo: repo.homepage ?? undefined,
+        },
+        createdAt: repo.created_at ?? new Date().toISOString(),
+        updatedAt: repo.updated_at ?? new Date().toISOString(),
         ...resolveProjectFlags(repo.topics),
       };
 
@@ -138,7 +178,6 @@ export async function getGitHubProjects(
     } else {
       console.error('[GitHub API] Unexpected error:', error);
     }
-
     return [];
   }
 }
