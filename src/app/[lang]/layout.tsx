@@ -8,6 +8,8 @@ import { normalizeLocale } from "@/dictionaries/locales";
 import type { Locale } from "@/types/dictionary";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
+
+import { getDictionary } from '@/dictionaries';
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { BreadcrumbsJsonLd } from '@/components/seo/BreadcrumbsJsonLd';
 
