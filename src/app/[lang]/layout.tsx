@@ -8,6 +8,14 @@ import { normalizeLocale } from "@/dictionaries/locales";
 import type { Locale } from "@/types/dictionary";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
+/*      Breadcrumbs     */
+
+import { getDictionary } from '@/dictionaries';
+import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
+
+
+
+
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
@@ -17,6 +25,33 @@ interface LayoutProps {
   readonly children: ReactNode;
   readonly params: { lang: string };
 }
+
+
+/*   Breadcrumbs     */
+
+
+export default async function LocaleLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: { locale: string };
+}) {
+  const dictionary = await getDictionary(params.locale);
+
+  return (
+    <>
+      <Breadcrumbs
+        lang={params.locale}
+        baseUrl="https://seusite.com"
+        dictionary={dictionary}
+      />
+      {children}
+    </>
+  );
+}
+
+
 
 /* -------------------------------------------------------------------------- */
 /*                                  METADATA                                  */
