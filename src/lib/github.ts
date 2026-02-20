@@ -7,7 +7,7 @@ import {
   resolveProjectTechnology,
 } from '@/domain/projects';
 
-import type { Project } from '@/types/project'; // ✅ CORREÇÃO AQUI
+import type { Project } from '@/types/project';
 
 /**
  * Tipagem da resposta da API do GitHub
@@ -26,7 +26,7 @@ interface GitHubRepo {
  * Configurações
  */
 const GITHUB_USERNAME = 'Santosdevbjj';
-const REVALIDATE_TIME = 3600; // 1 hora
+const REVALIDATE_TIME = 3600;
 const REQUEST_TIMEOUT = 4000;
 
 /**
@@ -57,9 +57,6 @@ function resolveDescriptionByLocale(
 
 /**
  * Busca projetos do GitHub
- * Compatível com:
- * - Next.js 16 (App Router + ISR)
- * - TypeScript 6 strict
  */
 export async function getGitHubProjects(
   locale: Locale
@@ -111,16 +108,19 @@ export async function getGitHubProjects(
       }
 
       const technology = resolveProjectTechnology(repo.topics);
-
       if (!technology) continue;
 
       const project: Project = {
         id: String(repo.id),
-        name: repo.name.replace(/[-_]/g, ' '),
+
+        // 🔥 CORREÇÃO AQUI
+        title: repo.name.replace(/[-_]/g, ' '),
+
         description: resolveDescriptionByLocale(
           repo.description,
           locale
         ),
+
         htmlUrl: repo.html_url,
         homepage: repo.homepage ?? undefined,
         topics: repo.topics,
