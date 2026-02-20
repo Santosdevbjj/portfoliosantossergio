@@ -1,3 +1,5 @@
+// src/lib/seo/breadcrumbs.ts
+
 import type { Dictionary, Locale } from '@/types/dictionary';
 
 export interface BreadcrumbItem {
@@ -7,7 +9,7 @@ export interface BreadcrumbItem {
 
 /**
  * Gera breadcrumbs semânticos e SEO-friendly.
- * Alinhado com a estrutura multi-regional (pt-BR, en-US, es-ES, es-AR, es-MX).
+ * Compatível com Next.js 16 + TypeScript 6
  */
 export function generateBreadcrumbs(
   pathname: string,
@@ -16,17 +18,18 @@ export function generateBreadcrumbs(
   baseUrl: string
 ): BreadcrumbItem[] {
   const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
-  
-  // Remove o locale da URL para processar os segmentos de página
+
   const segments = pathname
     .split('/')
     .filter(Boolean)
     .filter((seg) => seg !== locale);
 
-  // O "Home" agora usa breadcrumb_root conforme seu labels.json
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      name: dict.labels?.breadcrumb_root || dict.labels?.home || 'Home',
+      name:
+        dict.seo?.pages?.home?.title ||
+        dict.common?.nav?.home ||
+        'Home',
       item: `${normalizedBaseUrl}/${locale}`,
     },
   ];
@@ -37,13 +40,16 @@ export function generateBreadcrumbs(
     const decodedSegment = decodeURIComponent(segment);
     currentPath += `/${segment}`;
 
-    // Lógica de busca de Label:
-    // 1. Procura na seção SEO do dicionário (ex: seo.pages.projects.title)
-    // 2. Procura em labels genéricos
-    // 3. Fallback: Formata o slug (ex: "meus-projetos" -> "Meus Projetos")
-    const label = 
-      dict.seo?.pages?.[decodedSegment as keyof typeof dict.seo.pages]?.title ||
-      (dict.labels as any)?.[decodedSegment] ||
+    const seoPages = dict.seo?.pages as Record<
+      string,
+      { title: string }
+    > | undefined;
+
+    const label =
+      seoPages?.[decodedSegment]?.title ||
+      (dict.common?.nav as Record<string, string> | undefined)?.[
+        decodedSegment
+      ] ||
       decodedSegment
         .replace(/-/g, ' ')
         .replace(/\b\w/g, (char) => char.toUpperCase());
