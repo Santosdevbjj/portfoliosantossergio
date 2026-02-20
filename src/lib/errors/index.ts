@@ -1,14 +1,25 @@
+import type { ErrorKey } from "@/types/error-dictionary";
+
+/* ============================================================
+   BASE ERROR PARAMS
+============================================================ */
+
 export interface BaseErrorParams {
-  name: string;
-  message: string;
-  statusCode?: number;
-  errorId?: string;
-  requestId?: string;
-  context?: unknown;
-  cause?: unknown;
+  readonly name: ErrorKey;
+  readonly message: string;
+  readonly statusCode?: number;
+  readonly errorId?: string;
+  readonly requestId?: string;
+  readonly context?: unknown;
+  readonly cause?: unknown;
 }
 
+/* ============================================================
+   BASE ERROR CLASS
+============================================================ */
+
 export class BaseError extends Error {
+  public readonly name: ErrorKey;
   public readonly statusCode: number;
   public readonly errorId: string;
   public readonly requestId?: string;
@@ -23,7 +34,7 @@ export class BaseError extends Error {
     this.requestId = params.requestId;
     this.context = params.context;
 
-    if (params.cause) {
+    if (params.cause !== undefined) {
       this.cause = params.cause;
     }
 
