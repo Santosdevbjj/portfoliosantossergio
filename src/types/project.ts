@@ -1,17 +1,12 @@
 // src/types/project.ts
 
-import { Locale } from "./dictionary";
+import type { SupportedLocale } from "@/dictionaries/locales";
 
 /**
- * Categorias válidas de projeto
+ * Categorias oficiais do sistema.
+ * Deve estar 100% alinhado com:
+ * dictionaries -> projects.categories
  */
-
-// export const PROJECT_CATEGORIES = [
-//  "data-analysis",
-//  "machine-learning",
-//  "data-engineering",
-// ] as const;
-
 export const PROJECT_CATEGORIES = [
   "dataScience",
   "cloud",
@@ -23,51 +18,102 @@ export const PROJECT_CATEGORIES = [
   "security",
 ] as const;
 
-
+/**
+ * Tipo derivado automaticamente das categorias
+ */
 export type ProjectCategory =
   (typeof PROJECT_CATEGORIES)[number];
 
-export type ProjectLocaleContent = {
+/**
+ * Status permitido
+ */
+export const PROJECT_STATUS = [
+  "active",
+  "archived",
+  "draft",
+] as const;
+
+export type ProjectStatus =
+  (typeof PROJECT_STATUS)[number];
+
+/**
+ * Conteúdo textual localizado
+ */
+export interface ProjectLocaleContent {
   title: string;
   description: string;
   summary?: string;
-};
+}
 
+/**
+ * SEO localizado
+ */
 export interface ProjectSEO {
   title: string;
   description: string;
   keywords?: string[];
 }
 
+/**
+ * Links externos do projeto
+ */
 export interface ProjectLinks {
   repository?: string;
   demo?: string;
   article?: string;
 }
 
+/**
+ * Estrutura base multilíngue:
+ * pt-BR obrigatório
+ * demais opcionais
+ */
+type LocalizedContent<T> = {
+  "pt-BR": T;
+} & Partial<
+  Record<
+    Exclude<SupportedLocale, "pt-BR">,
+    T
+  >
+>;
+
+/**
+ * Interface principal do Projeto
+ */
 export interface Project {
   id: string;
   slug: string;
 
   /**
-   * Agora tipado corretamente
+   * Categoria obrigatoriamente tipada
    */
   category: ProjectCategory;
 
   featured: boolean;
   order: number;
-  status: "active" | "archived" | "draft";
+  status: ProjectStatus;
 
-  content: {
-    "pt-BR": ProjectLocaleContent;
-  } & Partial<Record<Exclude<Locale, "pt-BR">, ProjectLocaleContent>>;
+  /**
+   * Conteúdo localizado
+   */
+  content: LocalizedContent<ProjectLocaleContent>;
 
-  seo: {
-    "pt-BR": ProjectSEO;
-  } & Partial<Record<Exclude<Locale, "pt-BR">, ProjectSEO>>;
+  /**
+   * SEO localizado
+   */
+  seo: LocalizedContent<ProjectSEO>;
 
+  /**
+   * Stack tecnológica
+   * Mantido string[] para evitar erro com github.ts
+   */
   stack: string[];
+
   links?: ProjectLinks;
+
+  /**
+   * Datas ISO string
+   */
   createdAt: string;
   updatedAt?: string;
 }
