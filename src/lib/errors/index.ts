@@ -19,7 +19,7 @@ export interface BaseErrorParams {
 ============================================================ */
 
 export class BaseError extends Error {
-  public readonly name: ErrorKey;
+  public override readonly name: ErrorKey;
   public readonly statusCode: number;
   public readonly errorId: string;
   public readonly requestId?: string;
@@ -27,6 +27,9 @@ export class BaseError extends Error {
 
   constructor(params: BaseErrorParams) {
     super(params.message);
+
+    // Necessário para Edge / Node / TS strict
+    Object.setPrototypeOf(this, new.target.prototype);
 
     this.name = params.name;
     this.statusCode = params.statusCode ?? 500;
@@ -37,8 +40,6 @@ export class BaseError extends Error {
     if (params.cause !== undefined) {
       this.cause = params.cause;
     }
-
-    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
