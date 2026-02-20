@@ -4,17 +4,18 @@ import { useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 
 import { generateBreadcrumbs } from '@/lib/seo/breadcrumbs';
-import { getDictionary } from '@/dictionaries';
-import type { Locale } from '@/types/dictionary';
+import type { Locale, Dictionary } from '@/types/dictionary';
 
 interface BreadcrumbsJsonLdProps {
   lang: Locale;
   baseUrl: string;
+  dict: Dictionary; // ✅ agora vem pronto do Server Component
 }
 
 export function BreadcrumbsJsonLd({
   lang,
   baseUrl,
+  dict,
 }: BreadcrumbsJsonLdProps) {
   const pathname = usePathname();
 
@@ -23,10 +24,9 @@ export function BreadcrumbsJsonLd({
     [baseUrl]
   );
 
-  const dict = useMemo(() => getDictionary(lang), [lang]);
-
   const breadcrumbs = useMemo(() => {
     if (!pathname) return [];
+
     return generateBreadcrumbs(
       pathname,
       lang,
