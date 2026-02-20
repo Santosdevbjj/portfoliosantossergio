@@ -5,11 +5,24 @@ import { Locale } from "./dictionary";
 /**
  * Categorias válidas de projeto
  */
+
+// export const PROJECT_CATEGORIES = [
+//  "data-analysis",
+//  "machine-learning",
+//  "data-engineering",
+// ] as const;
+
 export const PROJECT_CATEGORIES = [
-  "data-analysis",
-  "machine-learning",
-  "data-engineering",
+  "dataScience",
+  "cloud",
+  "graphs",
+  "analysis",
+  "excel",
+  "database",
+  "dev",
+  "security",
 ] as const;
+
 
 export type ProjectCategory =
   (typeof PROJECT_CATEGORIES)[number];
