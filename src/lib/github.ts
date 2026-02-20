@@ -6,8 +6,12 @@ import {
   resolveProjectFlags,
   resolveProjectTechnology,
 } from '@/domain/projects';
-import type { Project } from '@/domain/projects';
 
+import type { Project } from '@/types/project'; // ✅ CORREÇÃO AQUI
+
+/**
+ * Tipagem da resposta da API do GitHub
+ */
 interface GitHubRepo {
   id: number;
   name: string;
@@ -18,23 +22,27 @@ interface GitHubRepo {
   fork: boolean;
 }
 
+/**
+ * Configurações
+ */
 const GITHUB_USERNAME = 'Santosdevbjj';
-const REVALIDATE_TIME = 3600; // 1h
+const REVALIDATE_TIME = 3600; // 1 hora
 const REQUEST_TIMEOUT = 4000;
 
+/**
+ * Resolve descrição multilíngue baseada no locale.
+ * Formato esperado no GitHub:
+ * "pt | en | es"
+ */
 function resolveDescriptionByLocale(
   description: string | null,
   locale: Locale
 ): string {
   if (!description) return '';
 
-  /**
-   * Formato esperado no GitHub:
-   * pt | en | es
-   */
   const parts = description.split('|').map((p) => p.trim());
 
-  const localeMap: Record<string, number> = {
+  const localeMap: Record<Locale, number> = {
     'pt-BR': 0,
     'en-US': 1,
     'es-ES': 2,
@@ -47,6 +55,12 @@ function resolveDescriptionByLocale(
   return parts[index] ?? parts[0] ?? '';
 }
 
+/**
+ * Busca projetos do GitHub
+ * Compatível com:
+ * - Next.js 16 (App Router + ISR)
+ * - TypeScript 6 strict
+ */
 export async function getGitHubProjects(
   locale: Locale
 ): Promise<Project[]> {
@@ -85,33 +99,39 @@ export async function getGitHubProjects(
 
     const typedRepos = repos as GitHubRepo[];
 
-    return typedRepos
-      .filter(
-        (repo) =>
-          !repo.fork &&
-          Array.isArray(repo.topics) &&
-          repo.topics.includes(ProjectCoreTag.PORTFOLIO)
-      )
-      .map((repo) => {
-        const technology = resolveProjectTechnology(repo.topics);
+    const projects: Project[] = [];
 
-        if (!technology) return null;
+    for (const repo of typedRepos) {
+      if (
+        repo.fork ||
+        !Array.isArray(repo.topics) ||
+        !repo.topics.includes(ProjectCoreTag.PORTFOLIO)
+      ) {
+        continue;
+      }
 
-        return {
-          id: String(repo.id),
-          name: repo.name.replace(/[-_]/g, ' '),
-          description: resolveDescriptionByLocale(
-            repo.description,
-            locale
-          ),
-          htmlUrl: repo.html_url,
-          homepage: repo.homepage ?? undefined,
-          topics: repo.topics,
-          technology,
-          ...resolveProjectFlags(repo.topics),
-        } satisfies Project;
-      })
-      .filter((project): project is Project => project !== null);
+      const technology = resolveProjectTechnology(repo.topics);
+
+      if (!technology) continue;
+
+      const project: Project = {
+        id: String(repo.id),
+        name: repo.name.replace(/[-_]/g, ' '),
+        description: resolveDescriptionByLocale(
+          repo.description,
+          locale
+        ),
+        htmlUrl: repo.html_url,
+        homepage: repo.homepage ?? undefined,
+        topics: repo.topics,
+        technology,
+        ...resolveProjectFlags(repo.topics),
+      };
+
+      projects.push(project);
+    }
+
+    return projects;
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
       console.error('[GitHub API] Request timeout.');
