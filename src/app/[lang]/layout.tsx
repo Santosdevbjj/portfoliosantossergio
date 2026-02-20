@@ -9,6 +9,7 @@ import type { Locale } from "@/types/dictionary";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
+import { BreadcrumbsJsonLd } from '@/components/seo/BreadcrumbsJsonLd';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,7 +19,20 @@ const inter = Inter({
 interface LayoutProps {
   readonly children: ReactNode;
   readonly params: { lang: string };
+} 
+
+
+return (
+    <>
+      <BreadcrumbsJsonLd
+        lang={params.lang}
+        baseUrl={process.env.NEXT_PUBLIC_SITE_URL!}
+        dict={dict}
+      />
+    </>
+  );
 }
+
 
 /* -------------------------------------------------------------------------- */
 /*                                  METADATA                                  */
