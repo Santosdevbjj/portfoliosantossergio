@@ -16,9 +16,15 @@ export const SUPPORTED_LOCALES = [
 ] as const;
 
 /**
+ * Alias semântico opcional (evita erro de import errado)
+ * Compatível com generateStaticParams
+ */
+export const locales = SUPPORTED_LOCALES;
+
+/**
  * Tipo derivado automaticamente da constante.
  * ✔ 100% seguro
- * ✔ Compatível com TS 6
+ * ✔ Compatível com TS 6 strict
  */
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
@@ -28,39 +34,51 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: SupportedLocale = "pt-BR";
 
 /**
- * Verifica se um valor é um locale suportado.
- * Type guard seguro para TS 6.
+ * Type guard seguro.
+ * Sem cast.
+ * 100% compatível com TS 6 strict.
  */
 export function isValidLocale(
-  locale?: string,
+  locale: string,
 ): locale is SupportedLocale {
-  if (!locale) return false;
-  return SUPPORTED_LOCALES.includes(locale as SupportedLocale);
+  return SUPPORTED_LOCALES.some(
+    (supported) => supported === locale,
+  );
 }
 
 /**
  * Normaliza qualquer entrada (URL, cookie, header)
  * para um locale suportado.
  *
- * Exemplos:
- *  pt   -> pt-BR
- *  en   -> en-US
- *  es   -> es-ES
- *  null -> DEFAULT_LOCALE
+ * ✔ Case insensitive
+ * ✔ Trata ISO base (pt, en, es)
+ * ✔ Trata formato pt-br
+ * ✔ Nunca retorna null
+ * ✔ Sempre retorna SupportedLocale
  */
 export function normalizeLocale(
-  locale?: string,
+  input?: string | null,
 ): SupportedLocale {
-  if (!locale) return DEFAULT_LOCALE;
+  if (!input) return DEFAULT_LOCALE;
 
-  // Normalização curta (ISO base)
-  if (locale === "pt") return "pt-BR";
-  if (locale === "en") return "en-US";
-  if (locale === "es") return "es-ES";
+  const value = input.trim();
 
-  // Se já for suportado
-  if (isValidLocale(locale)) {
-    return locale;
+  // Normalização case-insensitive
+  const formatted =
+    value.length === 5
+      ? `${value.slice(0, 2).toLowerCase()}-${value
+          .slice(3)
+          .toUpperCase()}`
+      : value.toLowerCase();
+
+  // ISO base
+  if (formatted === "pt") return "pt-BR";
+  if (formatted === "en") return "en-US";
+  if (formatted === "es") return "es-ES";
+
+  // Se já for válido
+  if (isValidLocale(formatted)) {
+    return formatted;
   }
 
   return DEFAULT_LOCALE;
