@@ -4,49 +4,57 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 import type { ReactNode } from "react";
 
-import { normalizeLocale } from "@/dictionaries/locales";
+import { normalizeLocale, locales } from "@/dictionaries/locales";
 import type { Locale } from "@/types/dictionary";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
-
-import { getDictionary } from '@/dictionaries';
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
-import { BreadcrumbsJsonLd } from '@/components/seo/BreadcrumbsJsonLd';
+import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
+
+/* -------------------------------------------------------------------------- */
+/*                                   FONT                                     */
+/* -------------------------------------------------------------------------- */
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
 });
 
+/* -------------------------------------------------------------------------- */
+/*                                   TYPES                                    */
+/* -------------------------------------------------------------------------- */
+
 interface LayoutProps {
   readonly children: ReactNode;
   readonly params: { lang: string };
-} 
-
-
-return (
-    <>
-      <BreadcrumbsJsonLd
-        lang={params.lang}
-        baseUrl={process.env.NEXT_PUBLIC_SITE_URL!}
-        dict={dict}
-      />
-    </>
-  );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                        STATIC PARAMS (Next 16)                             */
+/* -------------------------------------------------------------------------- */
+
+export function generateStaticParams() {
+  return locales.map((lang) => ({ lang }));
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                  METADATA                                  */
 /* -------------------------------------------------------------------------- */
 
 export async function generateMetadata(
-  { params }: { params: { lang: string } }
+  { params }: LayoutProps
 ): Promise<Metadata> {
-  const locale = normalizeLocale(params.lang as Locale);
+  const locale = normalizeLocale(params.lang);
+
+  if (!locale) {
+    return {};
+  }
+
   const dict = await getServerDictionary(locale);
 
-  const siteUrl = "https://portfoliosantossergio.vercel.app";
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "https://portfoliosantossergio.vercel.app";
 
   return {
     metadataBase: new URL(siteUrl),
@@ -59,21 +67,15 @@ export async function generateMetadata(
     description: dict.seo.description,
     keywords: dict.seo.keywords,
 
-    /* ✅ GOOGLE VERIFICATION PRESERVADO */
     verification: {
       google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
     },
 
     alternates: {
       canonical: `${siteUrl}/${locale}`,
-      languages: {
-        "pt-BR": `${siteUrl}/pt-BR`,
-        "en-US": `${siteUrl}/en-US`,
-        "es-ES": `${siteUrl}/es-ES`,
-        "es-AR": `${siteUrl}/es-AR`,
-        "es-MX": `${siteUrl}/es-MX`,
-        "x-default": `${siteUrl}/pt-BR`,
-      },
+      languages: Object.fromEntries(
+        locales.map((lng) => [lng, `${siteUrl}/${lng}`])
+      ),
     },
 
     openGraph: {
@@ -105,12 +107,17 @@ export default async function LangLayout({
   children,
   params,
 }: LayoutProps) {
-  const locale = normalizeLocale(params.lang as Locale);
-  const dict = await getServerDictionary(locale);
+  const locale = normalizeLocale(params.lang);
 
-  if (!dict) {
+  if (!locale) {
     notFound();
   }
+
+  const dict = await getServerDictionary(locale);
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "https://portfoliosantossergio.vercel.app";
 
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
@@ -119,7 +126,7 @@ export default async function LangLayout({
       <body
         className={`${inter.className} min-h-screen flex flex-col bg-background text-foreground antialiased`}
       >
-        {/* Acessibilidade */}
+        {/* Skip to content (Acessibilidade) */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-slate-900 text-white px-4 py-2 rounded-md"
@@ -127,10 +134,17 @@ export default async function LangLayout({
           {dict.common.skipToContent}
         </a>
 
-        {/* Breadcrumbs */}
+        {/* Breadcrumb JSON-LD */}
+        <BreadcrumbsJsonLd
+          lang={locale}
+          baseUrl={siteUrl}
+          dict={dict}
+        />
+
+        {/* Breadcrumb visual */}
         <Breadcrumbs
           lang={locale}
-          baseUrl="https://portfoliosantossergio.vercel.app"
+          baseUrl={siteUrl}
           dictionary={dict}
         />
 
@@ -155,6 +169,10 @@ export default async function LangLayout({
         <main id="main-content" className="flex-grow">
           {children}
         </main>
+
+        <footer className="text-center py-6 text-sm text-muted-foreground">
+          {dict.common.footer}
+        </footer>
       </body>
     </html>
   );
