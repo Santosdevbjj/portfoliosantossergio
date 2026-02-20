@@ -8,13 +8,7 @@ import { normalizeLocale } from "@/dictionaries/locales";
 import type { Locale } from "@/types/dictionary";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
-/*      Breadcrumbs     */
-
-import { getDictionary } from '@/dictionaries';
-import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
-
-
-
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,33 +19,6 @@ interface LayoutProps {
   readonly children: ReactNode;
   readonly params: { lang: string };
 }
-
-
-/*   Breadcrumbs     */
-
-
-export default async function LocaleLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { locale: string };
-}) {
-  const dictionary = await getDictionary(params.locale);
-
-  return (
-    <>
-      <Breadcrumbs
-        lang={params.locale}
-        baseUrl="https://portfoliosantossergio.vercel.app"
-        dictionary={dictionary}
-      />
-      {children}
-    </>
-  );
-}
-
-
 
 /* -------------------------------------------------------------------------- */
 /*                                  METADATA                                  */
@@ -115,7 +82,7 @@ export const viewport: Viewport = {
 };
 
 /* -------------------------------------------------------------------------- */
-/*                                  LAYOUT                                    */
+/*                                   LAYOUT                                   */
 /* -------------------------------------------------------------------------- */
 
 export default async function LangLayout({
@@ -143,6 +110,13 @@ export default async function LangLayout({
         >
           {dict.common.skipToContent}
         </a>
+
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          lang={locale}
+          baseUrl="https://portfoliosantossergio.vercel.app"
+          dictionary={dict}
+        />
 
         {/* Google Analytics */}
         {gaId && (
