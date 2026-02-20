@@ -2,6 +2,18 @@
 
 import { Locale } from "./dictionary";
 
+/**
+ * Categorias válidas de projeto
+ */
+export const PROJECT_CATEGORIES = [
+  "data-analysis",
+  "machine-learning",
+  "data-engineering",
+] as const;
+
+export type ProjectCategory =
+  (typeof PROJECT_CATEGORIES)[number];
+
 export type ProjectLocaleContent = {
   title: string;
   description: string;
@@ -23,22 +35,20 @@ export interface ProjectLinks {
 export interface Project {
   id: string;
   slug: string;
-  category: string;
+
+  /**
+   * Agora tipado corretamente
+   */
+  category: ProjectCategory;
+
   featured: boolean;
   order: number;
   status: "active" | "archived" | "draft";
 
-  /**
-   * Conteúdo localizado do projeto.
-   * 'pt-BR' é obrigatório, os demais são opcionais.
-   */
   content: {
     "pt-BR": ProjectLocaleContent;
   } & Partial<Record<Exclude<Locale, "pt-BR">, ProjectLocaleContent>>;
 
-  /**
-   * SEO localizado do projeto.
-   */
   seo: {
     "pt-BR": ProjectSEO;
   } & Partial<Record<Exclude<Locale, "pt-BR">, ProjectSEO>>;
