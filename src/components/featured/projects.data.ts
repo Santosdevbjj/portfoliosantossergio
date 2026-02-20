@@ -1,32 +1,34 @@
-import type { SupportedLocale } from "@/dictionaries";
+// src/components/featured/projects.data.ts
+
+import type { SupportedLocale } from "@/dictionaries/locales";
 import type { ProjectCategory } from "@/types/project";
 
 /**
  * Modelo de projeto destacado (Featured).
- * - Não depende da API do GitHub
  * - Ordem fixa
- * - Conteúdo localizado
- * - TS 6 compliant
+ * - Independente da API do GitHub
+ * - Multilíngue
+ * - TS 6 strict compliant
  */
 export interface FeaturedProject {
   readonly id: string;
   readonly name: string;
   readonly repoUrl: string;
-  readonly priority: number;
+  readonly priority: 1 | 2 | 3;
   readonly categories: readonly ProjectCategory[];
   readonly description: Record<SupportedLocale, string>;
 }
 
 /**
- * Lista canônica de projetos em destaque.
- * ❗ Ordem controlada por `priority`
- * ❗ Locale SEMPRE alinhado com SupportedLocale
+ * Lista oficial dos 3 projetos destacados.
+ * A ordem visual é controlada por `priority`.
  */
 export const featuredProjects = [
   {
     id: "analise-riscos-atraso-obras",
     name: "Análise de Riscos de Atraso em Obras",
-    repoUrl: "https://github.com/Santosdevbjj/analiseRiscosAtrasoObras",
+    repoUrl:
+      "https://github.com/Santosdevbjj/analiseRiscosAtrasoObras",
     priority: 1,
     categories: ["dataScience", "analysis"],
     description: {
@@ -45,7 +47,8 @@ export const featuredProjects = [
   {
     id: "analise-dados-na-pratica",
     name: "Análise de Dados na Prática",
-    repoUrl: "https://github.com/Santosdevbjj/analiseDadosNaPratica",
+    repoUrl:
+      "https://github.com/Santosdevbjj/analiseDadosNaPratica",
     priority: 2,
     categories: ["dataScience", "graphs"],
     description: {
@@ -64,7 +67,8 @@ export const featuredProjects = [
   {
     id: "genai-pipeline-etl-python",
     name: "GenAI Pipeline ETL em Python",
-    repoUrl: "https://github.com/Santosdevbjj/genAIpipeETLPython",
+    repoUrl:
+      "https://github.com/Santosdevbjj/genAIpipeETLPython",
     priority: 3,
     categories: ["dataScience", "cloud"],
     description: {
@@ -84,9 +88,7 @@ export const featuredProjects = [
 
 /**
  * Tipo derivado automaticamente.
- * ✔ Seguro
- * ✔ Imutável
- * ✔ TS 6 friendly
+ * Seguro, imutável e alinhado com TS 6.
  */
 export type FeaturedProjectId =
   (typeof featuredProjects)[number]["id"];
