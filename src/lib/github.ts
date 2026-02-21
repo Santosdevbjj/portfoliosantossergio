@@ -7,7 +7,12 @@ import {
   resolveProjectTechnology,
 } from '@/domain/projects';
 
-import type { Project, ProjectCategory } from '@/types/project';
+import type {
+  Project,
+  ProjectCategory,
+  ProjectLocaleContent,
+  ProjectSEO,
+} from '@/types/project';
 
 interface GitHubRepo {
   id: number;
@@ -56,7 +61,7 @@ function resolveDescriptionByLocale(
  * Deve bater com projects.categories do dicionário.
  */
 function resolveProjectCategory(topics: string[]): ProjectCategory {
-  const categories: ProjectCategory[] = [
+  const categories: readonly ProjectCategory[] = [
     'dataScience',
     'cloud',
     'graphs',
@@ -74,6 +79,20 @@ function resolveProjectCategory(topics: string[]): ProjectCategory {
   }
 
   return 'dev';
+}
+
+/**
+ * Garante que "pt-BR" sempre exista,
+ * respeitando o contrato de LocalizedContent<T>
+ */
+function buildLocalizedContent<T>(
+  locale: Locale,
+  value: T
+): { 'pt-BR': T } & Partial<Record<Exclude<Locale, 'pt-BR'>, T>> {
+  return {
+    'pt-BR': value,
+    ...(locale !== 'pt-BR' && { [locale]: value }),
+  };
 }
 
 /**
@@ -140,20 +159,19 @@ export async function getGitHubProjects(
 
       const category = resolveProjectCategory(repo.topics);
 
-      const content: Project['content'] = {
-        [locale]: {
-          title: normalizedTitle,
-          description: localizedDescription,
-        },
+      const localeContent: ProjectLocaleContent = {
+        title: normalizedTitle,
+        description: localizedDescription,
       };
 
-      const seo: Project['seo'] = {
-        [locale]: {
-          title: normalizedTitle,
-          description: localizedDescription,
-          keywords: repo.topics,
-        },
+      const localeSEO: ProjectSEO = {
+        title: normalizedTitle,
+        description: localizedDescription,
+        keywords: repo.topics,
       };
+
+      const content = buildLocalizedContent(locale, localeContent);
+      const seo = buildLocalizedContent(locale, localeSEO);
 
       const project: Project = {
         id: String(repo.id),
@@ -164,7 +182,7 @@ export async function getGitHubProjects(
         status: 'active',
         content,
         seo,
-        stack: [technology], // compatível com stack tipado corretamente
+        stack: [technology],
         links: {
           repository: repo.html_url,
           demo: repo.homepage ?? undefined,
