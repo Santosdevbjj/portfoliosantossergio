@@ -182,7 +182,7 @@ export async function getGitHubProjects(
         status: 'active',
         content,
         seo,
-        stack: [technology],
+        stack: [technology.id],
         links: {
           repository: repo.html_url,
           demo: repo.homepage ?? undefined,
