@@ -36,7 +36,6 @@
     /* Removida stableTypeOrdering pois é experimental no TS 6.0 */
 
     /* --- INFRASTRUCTURE PATHS --- */
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "#/*": ["./src/*"]
