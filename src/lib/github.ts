@@ -3,7 +3,7 @@
 import type { Locale } from '@/types/dictionary';
 import {
   ProjectCoreTag,
-  resolveProjectFlags,
+ // resolveProjectFlags,
   resolveProjectTechnology,
 } from '@/domain/projects';
 
