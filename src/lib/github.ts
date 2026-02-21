@@ -3,7 +3,6 @@
 import type { Locale } from '@/types/dictionary';
 import {
   ProjectCoreTag,
- // resolveProjectFlags,
   resolveProjectTechnology,
 } from '@/domain/projects';
 
@@ -173,25 +172,6 @@ export async function getGitHubProjects(
       const content = buildLocalizedContent(locale, localeContent);
       const seo = buildLocalizedContent(locale, localeSEO);
 
-     /* const project: Project = {
-        id: String(repo.id),
-        slug: repo.name,
-        category,
-       // featured: false,
-        // order: 0,
-        // status: 'active',
-        content,
-        seo,
-          stack: [String(technology)],
-        links: {
-           repository: repo.html_url,
-           ...(repo.homepage && { demo: repo.homepage }),
-        },  
-        createdAt: repo.created_at ?? new Date().toISOString(),
-       // updatedAt: repo.updated_at ?? undefined,
-        ...(repo.updated_at && { updatedAt: repo.updated_at }),
-        ...resolveProjectFlags(repo.topics),
-      }; */
 
          const project: Project = {
            id: String(repo.id),
