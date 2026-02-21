@@ -173,7 +173,7 @@ export async function getGitHubProjects(
       const content = buildLocalizedContent(locale, localeContent);
       const seo = buildLocalizedContent(locale, localeSEO);
 
-      const project: Project = {
+     /* const project: Project = {
         id: String(repo.id),
         slug: repo.name,
         category,
@@ -191,8 +191,23 @@ export async function getGitHubProjects(
        // updatedAt: repo.updated_at ?? undefined,
         ...(repo.updated_at && { updatedAt: repo.updated_at }),
         ...resolveProjectFlags(repo.topics),
-      };
+      }; */
 
+         const project: Project = {
+           id: String(repo.id),
+           slug: repo.name,
+           category,
+          stack: [String(technology)],
+         content,
+         seo,
+        links: {
+       repository: repo.html_url,
+       ...(repo.homepage && { demo: repo.homepage }),
+       },
+        ...(repo.updated_at && { updatedAt: repo.updated_at }),
+       };
+      
+      
       projects.push(project);
     }
 
