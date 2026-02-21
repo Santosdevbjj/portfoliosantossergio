@@ -28,7 +28,7 @@
     /* --- INTEROP & SECURITY --- */
     "esModuleInterop": true,         
     "resolveJsonModule": true,
-    "allowJs": true,
+    "allowJs": false,
     "skipLibCheck": true,          
     "forceConsistentCasingInFileNames": true,
 
