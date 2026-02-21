@@ -182,7 +182,6 @@ export async function getGitHubProjects(
         status: 'active',
         content,
         seo,
-       // stack: [technology.id],
           stack: [String(technology)],
         links: {
            repository: repo.html_url,
