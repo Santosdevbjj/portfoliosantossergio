@@ -1,3 +1,5 @@
+// src/lib/http/handleApiError.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import {
   BaseError,
@@ -8,8 +10,15 @@ import {
   isSupportedLocale,
   type SupportedLocale,
 } from "@/lib/i18n/locale";
-import type { ErrorKey } from "@/types/error-dictionary";
+import type {
+  ErrorKey,
+  ErrorDictionary,
+} from "@/types/error-dictionary";
 import { logger } from "@/lib/logger";
+
+/* ============================================================
+   LOCALE RESOLUTION
+============================================================ */
 
 function resolveLocale(
   request?: NextRequest
@@ -29,17 +38,25 @@ function resolveLocale(
   return "pt-BR";
 }
 
+/* ============================================================
+   TYPE-SAFE ERROR KEY CHECK (TS 6 SAFE)
+============================================================ */
+
 function isErrorKey(
   value: string,
-  dictionary: Record<string, unknown>
+  dictionary: ErrorDictionary
 ): value is ErrorKey {
   return value in dictionary;
 }
 
+/* ============================================================
+   HANDLE API ERROR
+============================================================ */
+
 export function handleApiError(
   error: unknown,
   request?: NextRequest
-) {
+): NextResponse {
   const err =
     error instanceof BaseError
       ? error
