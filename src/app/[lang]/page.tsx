@@ -21,8 +21,8 @@ import AboutSection from "@/components/AboutSection";
 // --------------------------------------------------
 
 interface PageProps {
-  params: {
-    lang: Locale;
+  params?: {
+    lang?: Locale;
   };
 }
 
@@ -35,7 +35,7 @@ export function generateStaticParams() {
 }
 
 // --------------------------------------------------
-// Viewport (Next 16 padrão)
+// Viewport
 // --------------------------------------------------
 
 export const viewport: Viewport = {
@@ -48,15 +48,15 @@ export const viewport: Viewport = {
 };
 
 // --------------------------------------------------
-// Metadata (SEO por idioma)
+// Metadata
 // --------------------------------------------------
 
 export async function generateMetadata(
-  { params }: PageProps,
+  props: PageProps,
 ): Promise<Metadata> {
-  const { lang } = params;
+  const lang = props?.params?.lang;
 
-  if (!isValidLocale(lang)) {
+  if (!lang || !isValidLocale(lang)) {
     notFound();
   }
 
@@ -72,7 +72,8 @@ export async function generateMetadata(
     title: homeSeo.title
       ? `${homeSeo.title} | ${dict.meta.author}`
       : dict.meta.author,
-    description: homeSeo.description ?? dict.meta.description ?? "",
+    description:
+      homeSeo.description ?? dict.meta.description ?? "",
     alternates: {
       canonical: `${siteUrl}/${lang}`,
       languages: Object.fromEntries(
@@ -89,18 +90,19 @@ export async function generateMetadata(
 // Page
 // --------------------------------------------------
 
-export default async function HomePage({ params }: PageProps) {
-  const { lang } = params;
+export default async function HomePage(props: PageProps) {
+  const lang = props?.params?.lang;
 
-  if (!isValidLocale(lang)) {
+  if (!lang || !isValidLocale(lang)) {
     notFound();
   }
 
   const dict = await getServerDictionary(lang);
 
-  // Fetch GitHub (SSR seguro)
   const repos = await getGitHubProjects("Santosdevbjj");
-  const projects: ProjectDomain[] = repos.map(mapGitHubRepoToProject);
+  const projects: ProjectDomain[] = repos.map(
+    mapGitHubRepoToProject,
+  );
 
   return (
     <ProxyPage lang={lang}>
@@ -109,13 +111,9 @@ export default async function HomePage({ params }: PageProps) {
           id="main-content"
           className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100"
         >
-          {/* HERO */}
           <HeroSection dictionary={dict} />
-
-          {/* ABOUT */}
           <AboutSection dict={dict.about} />
 
-          {/* PROJECTS */}
           <section
             id="projects"
             className="container mx-auto px-4 md:px-8 lg:px-16 py-16 md:py-24 max-w-7xl"
@@ -170,7 +168,6 @@ export default async function HomePage({ params }: PageProps) {
             </div>
           </section>
 
-          {/* FOOTER */}
           <footer className="border-t border-slate-200 dark:border-slate-800 py-12 text-center">
             <p className="text-sm text-slate-500">
               {dict.common.footer}
