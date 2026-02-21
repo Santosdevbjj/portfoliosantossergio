@@ -3,7 +3,7 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
-import type { Locale, Dictionary } from "@/types/dictionary";
+import type { Locale } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
 
 import { getGitHubProjects } from "@/services/githubService";
@@ -54,9 +54,9 @@ export const viewport: Viewport = {
 export async function generateMetadata(
   { params }: PageProps,
 ): Promise<Metadata> {
-  const lang = params?.lang;
+  const { lang } = params;
 
-  if (!lang || !isValidLocale(lang)) {
+  if (!isValidLocale(lang)) {
     notFound();
   }
 
@@ -66,14 +66,13 @@ export async function generateMetadata(
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app";
 
-  const homeSeo = dict?.seo?.pages?.home;
+  const homeSeo = dict.seo.pages.home;
 
   return {
-    title: homeSeo?.title
+    title: homeSeo.title
       ? `${homeSeo.title} | ${dict.meta.author}`
       : dict.meta.author,
-    description:
-      homeSeo?.description ?? dict.meta.description ?? "",
+    description: homeSeo.description ?? dict.meta.description ?? "",
     alternates: {
       canonical: `${siteUrl}/${lang}`,
       languages: Object.fromEntries(
@@ -91,9 +90,9 @@ export async function generateMetadata(
 // --------------------------------------------------
 
 export default async function HomePage({ params }: PageProps) {
-  const lang = params?.lang;
+  const { lang } = params;
 
-  if (!lang || !isValidLocale(lang)) {
+  if (!isValidLocale(lang)) {
     notFound();
   }
 
@@ -101,7 +100,6 @@ export default async function HomePage({ params }: PageProps) {
 
   // Fetch GitHub (SSR seguro)
   const repos = await getGitHubProjects("Santosdevbjj");
-
   const projects: ProjectDomain[] = repos.map(mapGitHubRepoToProject);
 
   return (
