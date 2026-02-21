@@ -185,9 +185,9 @@ export async function getGitHubProjects(
        // stack: [technology.id],
           stack: [String(technology)],
         links: {
-          repository: repo.html_url,
-          demo: repo.homepage ?? undefined,
-        },
+           repository: repo.html_url,
+           ...(repo.homepage && { demo: repo.homepage }),
+        },  
         createdAt: repo.created_at ?? new Date().toISOString(),
         updatedAt: repo.updated_at ?? undefined,
         ...resolveProjectFlags(repo.topics),
