@@ -26,12 +26,12 @@ interface GitHubRepo {
 }
 
 const GITHUB_USERNAME = 'Santosdevbjj';
-const REVALIDATE_TIME = 3600;
-const REQUEST_TIMEOUT = 4000;
+const REVALIDATE_TIME = 3600; // 1 hora
+const REQUEST_TIMEOUT = 4000; // 4 segundos
 
 /**
  * Resolve descrição multilíngue baseada no locale.
- * Formato esperado:
+ * Formato esperado no GitHub:
  * "pt | en | es"
  */
 function resolveDescriptionByLocale(
@@ -90,15 +90,15 @@ function buildLocalizedContent<T>(
 ): { 'pt-BR': T } & Partial<Record<Exclude<Locale, 'pt-BR'>, T>> {
   return {
     'pt-BR': value,
-    ...(locale !== 'pt-BR' && { [locale]: value }),
+    ...(locale !== 'pt-BR' ? { [locale]: value } : {}),
   };
 }
 
 /**
  * Busca projetos do GitHub
  * Compatível com:
- * - Next.js 16
- * - TypeScript 6 strict
+ * - Next.js 16 (App Router)
+ * - TypeScript 6 strict mode
  */
 export async function getGitHubProjects(
   locale: Locale
@@ -139,6 +139,7 @@ export async function getGitHubProjects(
     const projects: Project[] = [];
 
     for (const repo of data as GitHubRepo[]) {
+      // Ignora forks e repositórios que não são de portfolio
       if (
         repo.fork ||
         !Array.isArray(repo.topics) ||
@@ -151,6 +152,7 @@ export async function getGitHubProjects(
       if (!technology) continue;
 
       const normalizedTitle = repo.name.replace(/[-_]/g, ' ');
+
       const localizedDescription = resolveDescriptionByLocale(
         repo.description,
         locale
@@ -172,22 +174,37 @@ export async function getGitHubProjects(
       const content = buildLocalizedContent(locale, localeContent);
       const seo = buildLocalizedContent(locale, localeSEO);
 
+      /**
+       * ADAPTAÇÃO DO MODELO EXTERNO (GitHub)
+       * PARA O MODELO DE DOMÍNIO (Project)
+       */
+      const project: Project = {
+        id: String(repo.id),
+        slug: repo.name,
+        category,
 
-         const project: Project = {
-           id: String(repo.id),
-           slug: repo.name,
-           category,
-          stack: [String(technology)],
-         content,
-         seo,
+        // Campos obrigatórios do domínio
+        featured: repo.topics.includes('featured'),
+        order: 0,
+        status: 'active',
+
+        stack: [String(technology)],
+        content,
+        seo,
+
         links: {
-       repository: repo.html_url,
-       ...(repo.homepage && { demo: repo.homepage }),
-       },
-        ...(repo.updated_at && { updatedAt: repo.updated_at }),
-       };
-      
-      
+          repository: repo.html_url,
+          ...(repo.homepage ? { demo: repo.homepage } : {}),
+        },
+
+        createdAt:
+          repo.created_at ?? new Date().toISOString(),
+
+        ...(repo.updated_at
+          ? { updatedAt: repo.updated_at }
+          : {}),
+      };
+
       projects.push(project);
     }
 
