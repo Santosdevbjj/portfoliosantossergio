@@ -19,6 +19,7 @@ import AboutSection from "@/components/AboutSection";
 // --------------------------------------------------
 // Types
 // --------------------------------------------------
+
 interface PageProps {
   params: {
     lang: Locale;
@@ -28,6 +29,7 @@ interface PageProps {
 // --------------------------------------------------
 // SSG
 // --------------------------------------------------
+
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }));
 }
@@ -35,6 +37,7 @@ export function generateStaticParams() {
 // --------------------------------------------------
 // Viewport (Next 16 padrão)
 // --------------------------------------------------
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -51,9 +54,9 @@ export const viewport: Viewport = {
 export async function generateMetadata(
   { params }: PageProps,
 ): Promise<Metadata> {
-  const { lang } = params;
+  const lang = params?.lang;
 
-  if (!isValidLocale(lang)) {
+  if (!lang || !isValidLocale(lang)) {
     notFound();
   }
 
@@ -63,18 +66,14 @@ export async function generateMetadata(
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app";
 
-  const homeSeo = dict.seo?.pages?.home;
-
-  if (!homeSeo) {
-    return {
-      title: dict.meta.author,
-      description: dict.meta.description ?? "",
-    };
-  }
+  const homeSeo = dict?.seo?.pages?.home;
 
   return {
-    title: `${homeSeo.title} | ${dict.meta.author}`,
-    description: homeSeo.description,
+    title: homeSeo?.title
+      ? `${homeSeo.title} | ${dict.meta.author}`
+      : dict.meta.author,
+    description:
+      homeSeo?.description ?? dict.meta.description ?? "",
     alternates: {
       canonical: `${siteUrl}/${lang}`,
       languages: Object.fromEntries(
@@ -87,34 +86,36 @@ export async function generateMetadata(
   };
 }
 
-
 // --------------------------------------------------
 // Page
 // --------------------------------------------------
-export default async function HomePage({ params }: PageProps) {
-  const { lang } = params;
 
-  if (!isValidLocale(lang)) {
+export default async function HomePage({ params }: PageProps) {
+  const lang = params?.lang;
+
+  if (!lang || !isValidLocale(lang)) {
     notFound();
   }
 
-  // Fetch apenas do GitHub
+  const dict = await getServerDictionary(lang);
+
+  // Fetch GitHub (SSR seguro)
   const repos = await getGitHubProjects("Santosdevbjj");
 
   const projects: ProjectDomain[] = repos.map(mapGitHubRepoToProject);
 
   return (
     <ProxyPage lang={lang}>
-      {(dict: Dictionary) => (
+      {() => (
         <main
           id="main-content"
           className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100"
         >
           {/* HERO */}
-           <HeroSection dictionary={dict} />
+          <HeroSection dictionary={dict} />
 
-          {/* ABOUT */}  
-            <AboutSection dict={dict.about} />
+          {/* ABOUT */}
+          <AboutSection dict={dict.about} />
 
           {/* PROJECTS */}
           <section
@@ -127,37 +128,40 @@ export default async function HomePage({ params }: PageProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {projects.length > 0 ? (
-                projects.map((project) => (
-                  <article
-                    key={project.id}
-                    className="group p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/20 transition hover:shadow-xl"
-                  >
-                    <span className="text-[11px] font-bold uppercase text-blue-600 tracking-wider">
-                      {
-                        dict.projects.categories[
-                          project.technology.labelKey
-                        ]
-                      }
-                    </span>
+                projects.map((project) => {
+                  const categoryLabel =
+                    dict.projects.categories[
+                      project.technology.labelKey
+                    ] ?? project.technology.labelKey;
 
-                    <h3 className="text-xl font-bold mt-3">
-                      {project.name}
-                    </h3>
-
-                    <p className="text-sm mt-3 text-slate-600 dark:text-slate-400 line-clamp-3">
-                      {project.description}
-                    </p>
-
-                    <a
-                      href={project.htmlUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block mt-6 text-xs font-bold underline hover:opacity-70 transition"
+                  return (
+                    <article
+                      key={project.id}
+                      className="group p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/20 transition hover:shadow-xl"
                     >
-                      {dict.projects.viewProject}
-                    </a>
-                  </article>
-                ))
+                      <span className="text-[11px] font-bold uppercase text-blue-600 tracking-wider">
+                        {categoryLabel}
+                      </span>
+
+                      <h3 className="text-xl font-bold mt-3">
+                        {project.name}
+                      </h3>
+
+                      <p className="text-sm mt-3 text-slate-600 dark:text-slate-400 line-clamp-3">
+                        {project.description}
+                      </p>
+
+                      <a
+                        href={project.htmlUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block mt-6 text-xs font-bold underline hover:opacity-70 transition"
+                      >
+                        {dict.projects.viewProject}
+                      </a>
+                    </article>
+                  );
+                })
               ) : (
                 <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl">
                   <p className="text-slate-500">
