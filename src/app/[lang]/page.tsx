@@ -17,17 +17,17 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 
 // --------------------------------------------------
-// Types
+// Types (Next 16 Compatible)
 // --------------------------------------------------
 
 interface PageProps {
-  params?: {
-    lang?: Locale;
+  params: {
+    lang: Locale;
   };
 }
 
 // --------------------------------------------------
-// SSG
+// Static Generation (SSG)
 // --------------------------------------------------
 
 export function generateStaticParams() {
@@ -48,15 +48,15 @@ export const viewport: Viewport = {
 };
 
 // --------------------------------------------------
-// Metadata
+// Metadata (SEO Multilíngue)
 // --------------------------------------------------
 
 export async function generateMetadata(
-  props: PageProps,
+  { params }: PageProps,
 ): Promise<Metadata> {
-  const lang = props?.params?.lang;
+  const { lang } = params;
 
-  if (!lang || !isValidLocale(lang)) {
+  if (!isValidLocale(lang)) {
     notFound();
   }
 
@@ -90,19 +90,21 @@ export async function generateMetadata(
 // Page
 // --------------------------------------------------
 
-export default async function HomePage(props: PageProps) {
-  const lang = props?.params?.lang;
+export default async function HomePage(
+  { params }: PageProps,
+) {
+  const { lang } = params;
 
-  if (!lang || !isValidLocale(lang)) {
+  if (!isValidLocale(lang)) {
     notFound();
   }
 
   const dict = await getServerDictionary(lang);
 
   const repos = await getGitHubProjects("Santosdevbjj");
-  const projects: ProjectDomain[] = repos.map(
-    mapGitHubRepoToProject,
-  );
+
+  const projects: ProjectDomain[] =
+    repos.map(mapGitHubRepoToProject);
 
   return (
     <ProxyPage lang={lang}>
