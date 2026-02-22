@@ -3,6 +3,8 @@
     /* --- MOTOR NATIVO TS 6.0 & NEXT.JS 16 --- */
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "outDir": "./dist",   // Diretório de saída para deploy
+    "rootDir": "./src",    
     "module": "ESNext",
     "moduleResolution": "Bundler",   
     "verbatimModuleSyntax": true,    /* Exige import type para tipos */
