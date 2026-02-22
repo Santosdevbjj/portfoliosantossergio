@@ -12,7 +12,7 @@ import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 
 /* -------------------------------------------------------------------------- */
-/*                                   FONT                                     */
+/* FONT                                     */
 /* -------------------------------------------------------------------------- */
 
 const inter = Inter({
@@ -21,21 +21,29 @@ const inter = Inter({
 });
 
 /* -------------------------------------------------------------------------- */
-/*                        STATIC PARAMS (Next 16)                             */
+/* STATIC PARAMS (Next 16)                             */
 /* -------------------------------------------------------------------------- */
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                  METADATA                                  */
+/* METADATA                                  */
 /* -------------------------------------------------------------------------- */
 
+// Tipagem correta para Props assíncronos no Next 16
+type LayoutProps = {
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+};
+
 export async function generateMetadata(
-  props: LayoutProps<"/[lang]">
+  { params }: LayoutProps
 ): Promise<Metadata> {
-  const { lang } = await props.params;
+  // AWAIT OBRIGATÓRIO: Resolve o erro de undefined (reading 'lang')
+  const resolvedParams = await params;
+  const lang = resolvedParams.lang;
 
   const locale = normalizeLocale(lang);
   if (!locale) return {};
@@ -48,26 +56,21 @@ export async function generateMetadata(
 
   return {
     metadataBase: new URL(siteUrl),
-
     title: {
       default: dict.seo.siteName,
       template: `%s | ${dict.seo.siteName}`,
     },
-
     description: dict.seo.description,
     keywords: dict.seo.keywords,
-
     verification: {
-      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
+      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0", // TAG MANTIDA
     },
-
     alternates: {
       canonical: `/${locale}`,
       languages: Object.fromEntries(
-        locales.map((lng) => [lng, `/${lng}`])
+        locales.map((lng) => [lng, `${siteUrl}/${lng}`])
       ),
     },
-
     openGraph: {
       title: dict.seo.siteName,
       description: dict.seo.description,
@@ -76,7 +79,6 @@ export async function generateMetadata(
       locale: dict.meta.locale,
       type: "website",
     },
-
     twitter: {
       card: "summary_large_image",
       title: dict.seo.siteName,
@@ -86,7 +88,7 @@ export async function generateMetadata(
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                   VIEWPORT                                 */
+/* VIEWPORT                                 */
 /* -------------------------------------------------------------------------- */
 
 export const viewport: Viewport = {
@@ -96,33 +98,31 @@ export const viewport: Viewport = {
 };
 
 /* -------------------------------------------------------------------------- */
-/*                                   LAYOUT                                   */
+/* LAYOUT                                   */
 /* -------------------------------------------------------------------------- */
 
-export default async function LangLayout(
-  props: LayoutProps<"/[lang]">
-) {
-  const { lang } = await props.params;
+export default async function LangLayout({ children, params }: LayoutProps) {
+  // AWAIT OBRIGATÓRIO para evitar TypeError no Prerender da Vercel
+  const resolvedParams = await params;
+  const lang = resolvedParams.lang;
 
   const locale = normalizeLocale(lang);
+  
+  // Segurança adicional para o compilador TS 6.0
   if (!locale) {
     notFound();
   }
 
   const dict = await getServerDictionary(locale);
-
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "https://portfoliosantossergio.vercel.app";
-
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
 
   return (
-    <html lang={dict.meta.locale} dir={dict.meta.direction}>
+    <html lang={dict.meta.locale} dir={dict.meta.direction} className="scroll-smooth">
       <body
         className={`${inter.className} min-h-screen flex flex-col bg-background text-foreground antialiased`}
       >
-        {/* Skip to content */}
+        {/* Skip to content para Acessibilidade */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-slate-900 text-white px-4 py-2 rounded-md"
@@ -130,19 +130,22 @@ export default async function LangLayout(
           {dict.common.skipToContent}
         </a>
 
+        {/* SEO Estruturado */}
         <BreadcrumbsJsonLd
           lang={locale}
           baseUrl={siteUrl}
           dict={dict}
         />
 
-        <Breadcrumbs
-          lang={locale}
-          baseUrl={siteUrl}
-          dictionary={dict}
-        />
+        <header>
+           <Breadcrumbs
+            lang={locale}
+            baseUrl={siteUrl}
+            dictionary={dict}
+          />
+        </header>
 
-        {/* Google Analytics (MANTIDO) */}
+        {/* Google Analytics (MANTIDO CONFORME SOLICITADO) */}
         {gaId && (
           <>
             <Script
@@ -162,12 +165,14 @@ export default async function LangLayout(
           </>
         )}
 
-        <main id="main-content" className="flex-grow">
-          {props.children}
+        <main id="main-content" className="flex-grow w-full">
+          {children}
         </main>
 
-        <footer className="text-center py-6 text-sm text-muted-foreground">
-          {dict.common.footer}
+        <footer className="w-full border-t border-border py-6 text-center text-sm text-muted-foreground">
+          <div className="container mx-auto px-4">
+            {dict.common.footer}
+          </div>
         </footer>
       </body>
     </html>
