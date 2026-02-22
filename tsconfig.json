@@ -4,7 +4,7 @@
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "outDir": "./dist",   // Diretório de saída para deploy
-    "rootDir": "./src",    
+    "rootDir": ".",
     "module": "ESNext",
     "moduleResolution": "Bundler",   
     "verbatimModuleSyntax": true,    /* Exige import type para tipos */
@@ -56,6 +56,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/**/*",
+    "next.config.ts",
     ".next/dev/types/**/*.ts" 
   ],
 
