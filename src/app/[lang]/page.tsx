@@ -21,9 +21,9 @@ import AboutSection from "@/components/AboutSection";
 // --------------------------------------------------
 
 interface PageProps {
-  params: {
+  params: Promise<{
     lang: Locale;
-  };
+  }>;
 }
 
 // --------------------------------------------------
@@ -52,9 +52,9 @@ export const viewport: Viewport = {
 // --------------------------------------------------
 
 export async function generateMetadata(
-  { params }: PageProps,
+  props: PageProps,
 ): Promise<Metadata> {
-  const { lang } = params;
+  const { lang } = await props.params;
 
   if (!isValidLocale(lang)) {
     notFound();
@@ -91,9 +91,9 @@ export async function generateMetadata(
 // --------------------------------------------------
 
 export default async function HomePage(
-  { params }: PageProps,
+  props: PageProps,
 ) {
-  const { lang } = params;
+  const { lang } = await props.params;
 
   if (!isValidLocale(lang)) {
     notFound();
