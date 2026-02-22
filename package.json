@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build --no-turbo",
+    "build": "next build",
     "build:fast": "next build --no-lint",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
