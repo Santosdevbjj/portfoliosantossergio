@@ -1,33 +1,32 @@
 // src/app/[lang]/page.tsx
-
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
+// Types
 import type { Locale } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
 
+// Services & Helpers
 import { getGitHubProjects } from "@/services/githubService";
 import { mapGitHubRepoToProject } from "@/mappers/projectMapper";
 import { getServerDictionary } from "@/lib/getServerDictionary";
-
 import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
 
+// Components
 import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 
 // --------------------------------------------------
-// Types (Next 16 Safe Mode)
+// Types (Next 16 & TS 6.0 Strict)
 // --------------------------------------------------
-
 interface PageProps {
-  params: Promise<{ lang?: string }>;
+  params: Promise<{ lang: string }>; // Obrigatório ser Promise no Next 16
 }
 
 // --------------------------------------------------
-// Static Generation
+// Static Generation (Performance)
 // --------------------------------------------------
-
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }));
 }
@@ -35,71 +34,74 @@ export function generateStaticParams() {
 // --------------------------------------------------
 // Viewport
 // --------------------------------------------------
-
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  themeColor: "#020617",
 };
 
 // --------------------------------------------------
-// Metadata
+// Metadata (SEO Multilíngue)
 // --------------------------------------------------
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const { lang } = await props.params; // Await obrigatório
 
-export async function generateMetadata(
-  props: PageProps,
-): Promise<Metadata> {
-  const resolvedParams = await props.params;
+  if (!isValidLocale(lang)) notFound();
 
-  if (!resolvedParams?.lang || !isValidLocale(resolvedParams.lang)) {
-    notFound();
-  }
-
-  const lang = resolvedParams.lang as Locale;
-
-  const dict = await getServerDictionary(lang);
-
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "https://portfoliosantossergio.vercel.app";
+  const dict = await getServerDictionary(lang as Locale);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
 
   return {
     title: dict.seo.pages.home.title,
     description: dict.seo.pages.home.description,
     alternates: {
       canonical: `${siteUrl}/${lang}`,
+      languages: {
+        "pt-BR": `${siteUrl}/pt-BR`,
+        "en-US": `${siteUrl}/en-US`,
+        "es-ES": `${siteUrl}/es-ES`,
+        "es-AR": `${siteUrl}/es-AR`,
+        "es-MX": `${siteUrl}/es-MX`,
+      },
     },
   };
 }
 
 // --------------------------------------------------
-// Page
+// Page Component
 // --------------------------------------------------
+export default async function HomePage(props: PageProps) {
+  // 1. Resolução assíncrona dos parâmetros (Next 16 Rule)
+  const { lang: rawLang } = await props.params;
 
-export default async function HomePage(
-  props: PageProps,
-) {
-  const resolvedParams = await props.params;
-
-  if (!resolvedParams?.lang || !isValidLocale(resolvedParams.lang)) {
+  // 2. Validação de segurança de rota
+  if (!isValidLocale(rawLang)) {
     notFound();
   }
 
-  const lang = resolvedParams.lang as Locale;
+  const lang = rawLang as Locale;
 
-  const dict = await getServerDictionary(lang);
+  // 3. Busca de dados paralela (Otimização de Performance)
+  const [dict, repos] = await Promise.all([
+    getServerDictionary(lang),
+    getGitHubProjects("Santosdevbjj")
+  ]);
 
-  const repos = await getGitHubProjects("Santosdevbjj");
-  const projects: ProjectDomain[] =
-    repos.map(mapGitHubRepoToProject);
+  const projects: ProjectDomain[] = repos.map(mapGitHubRepoToProject);
 
   return (
     <ProxyPage lang={lang}>
-      <main className="min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100">
+      <main className="min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 transition-colors duration-300">
+        
+        {/* Seção Hero - Responsiva */}
         <HeroSection dictionary={dict} />
+
+        {/* Seção Sobre - Rigor Técnico */}
         <AboutSection dict={dict.about} />
 
-        <section className="container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-7xl">
-          <h2 className="text-4xl md:text-6xl font-black mb-12">
+        {/* Seção de Projetos - Grid Adaptativo */}
+        <section className="container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-7xl" id="projects">
+          <h2 className="text-4xl md:text-6xl font-black mb-12 tracking-tighter">
             {dict.projects.title}
           </h2>
 
@@ -108,29 +110,36 @@ export default async function HomePage(
               projects.map((project) => (
                 <article
                   key={project.id}
-                  className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800"
+                  className="group p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 bg-slate-50/50 dark:bg-slate-900/50"
                 >
-                  <h3 className="text-xl font-bold">
-                    {project.name}
-                  </h3>
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      {project.name}
+                    </h3>
+                    <span className="text-[10px] px-2 py-1 rounded-full bg-slate-200 dark:bg-slate-800 font-mono">
+                      {dict.projects.categories[project.technology.labelKey]}
+                    </span>
+                  </div>
 
-                  <p className="text-sm mt-3 text-slate-600 dark:text-slate-400">
+                  <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-3">
                     {project.description}
                   </p>
 
-                  <a
-                    href={project.htmlUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-6 text-xs font-bold underline"
-                  >
-                    {dict.projects.viewProject}
-                  </a>
+                  <div className="flex items-center gap-4 mt-6">
+                    <a
+                      href={project.htmlUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-bold underline decoration-2 underline-offset-4 hover:text-blue-600"
+                    >
+                      {dict.projects.viewProject}
+                    </a>
+                  </div>
                 </article>
               ))
             ) : (
-              <div className="col-span-full text-center py-20">
-                {dict.states.emptyProjects.description}
+              <div className="col-span-full text-center py-20 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
+                <p className="text-slate-500">{dict.states.emptyProjects.description}</p>
               </div>
             )}
           </div>
