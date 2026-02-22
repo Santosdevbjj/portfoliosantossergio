@@ -9,9 +9,6 @@ import type { NextConfig } from "next";
  */
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  turbopack: {
-    enabled: false,
-  },
   
   // Suporte nativo para telemetria no Node 24 (Otimizado para Sharp)
   serverExternalPackages: ["@microsoft/applicationinsights-web"], 
