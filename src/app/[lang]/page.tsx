@@ -17,17 +17,15 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 
 // --------------------------------------------------
-// Types (Next 16 Compatible)
+// Types (Next 16 Safe Mode)
 // --------------------------------------------------
 
 interface PageProps {
-  params: Promise<{
-    lang: Locale;
-  }>;
+  params: Promise<{ lang?: string }>;
 }
 
 // --------------------------------------------------
-// Static Generation (SSG)
+// Static Generation
 // --------------------------------------------------
 
 export function generateStaticParams() {
@@ -41,24 +39,22 @@ export function generateStaticParams() {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#020617" },
-  ],
 };
 
 // --------------------------------------------------
-// Metadata (SEO Multilíngue)
+// Metadata
 // --------------------------------------------------
 
 export async function generateMetadata(
   props: PageProps,
 ): Promise<Metadata> {
-  const { lang } = await props.params;
+  const resolvedParams = await props.params;
 
-  if (!isValidLocale(lang)) {
+  if (!resolvedParams?.lang || !isValidLocale(resolvedParams.lang)) {
     notFound();
   }
+
+  const lang = resolvedParams.lang as Locale;
 
   const dict = await getServerDictionary(lang);
 
@@ -66,22 +62,11 @@ export async function generateMetadata(
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app";
 
-  const homeSeo = dict.seo.pages.home;
-
   return {
-    title: homeSeo.title
-      ? `${homeSeo.title} | ${dict.meta.author}`
-      : dict.meta.author,
-    description:
-      homeSeo.description ?? dict.meta.description ?? "",
+    title: dict.seo.pages.home.title,
+    description: dict.seo.pages.home.description,
     alternates: {
       canonical: `${siteUrl}/${lang}`,
-      languages: Object.fromEntries(
-        SUPPORTED_LOCALES.map((locale) => [
-          locale,
-          `${siteUrl}/${locale}`,
-        ]),
-      ),
     },
   };
 }
@@ -93,90 +78,64 @@ export async function generateMetadata(
 export default async function HomePage(
   props: PageProps,
 ) {
-  const { lang } = await props.params;
+  const resolvedParams = await props.params;
 
-  if (!isValidLocale(lang)) {
+  if (!resolvedParams?.lang || !isValidLocale(resolvedParams.lang)) {
     notFound();
   }
+
+  const lang = resolvedParams.lang as Locale;
 
   const dict = await getServerDictionary(lang);
 
   const repos = await getGitHubProjects("Santosdevbjj");
-
   const projects: ProjectDomain[] =
     repos.map(mapGitHubRepoToProject);
 
   return (
     <ProxyPage lang={lang}>
-      {() => (
-        <main
-          id="main-content"
-          className="relative min-h-screen w-full overflow-x-hidden bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100"
-        >
-          <HeroSection dictionary={dict} />
-          <AboutSection dict={dict.about} />
+      <main className="min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100">
+        <HeroSection dictionary={dict} />
+        <AboutSection dict={dict.about} />
 
-          <section
-            id="projects"
-            className="container mx-auto px-4 md:px-8 lg:px-16 py-16 md:py-24 max-w-7xl"
-          >
-            <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-12">
-              {dict.projects.title}
-            </h2>
+        <section className="container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-7xl">
+          <h2 className="text-4xl md:text-6xl font-black mb-12">
+            {dict.projects.title}
+          </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {projects.length > 0 ? (
-                projects.map((project) => {
-                  const categoryLabel =
-                    dict.projects.categories[
-                      project.technology.labelKey
-                    ] ?? project.technology.labelKey;
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {projects.length > 0 ? (
+              projects.map((project) => (
+                <article
+                  key={project.id}
+                  className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800"
+                >
+                  <h3 className="text-xl font-bold">
+                    {project.name}
+                  </h3>
 
-                  return (
-                    <article
-                      key={project.id}
-                      className="group p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/20 transition hover:shadow-xl"
-                    >
-                      <span className="text-[11px] font-bold uppercase text-blue-600 tracking-wider">
-                        {categoryLabel}
-                      </span>
-
-                      <h3 className="text-xl font-bold mt-3">
-                        {project.name}
-                      </h3>
-
-                      <p className="text-sm mt-3 text-slate-600 dark:text-slate-400 line-clamp-3">
-                        {project.description}
-                      </p>
-
-                      <a
-                        href={project.htmlUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block mt-6 text-xs font-bold underline hover:opacity-70 transition"
-                      >
-                        {dict.projects.viewProject}
-                      </a>
-                    </article>
-                  );
-                })
-              ) : (
-                <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl">
-                  <p className="text-slate-500">
-                    {dict.states.emptyProjects.description}
+                  <p className="text-sm mt-3 text-slate-600 dark:text-slate-400">
+                    {project.description}
                   </p>
-                </div>
-              )}
-            </div>
-          </section>
 
-          <footer className="border-t border-slate-200 dark:border-slate-800 py-12 text-center">
-            <p className="text-sm text-slate-500">
-              {dict.common.footer}
-            </p>
-          </footer>
-        </main>
-      )}
+                  <a
+                    href={project.htmlUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-6 text-xs font-bold underline"
+                  >
+                    {dict.projects.viewProject}
+                  </a>
+                </article>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-20">
+                {dict.states.emptyProjects.description}
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
     </ProxyPage>
   );
 }
