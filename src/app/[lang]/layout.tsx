@@ -22,17 +22,6 @@ const inter = Inter({
 });
 
 /* -------------------------------------------------------------------------- */
-/*                                   TYPES                                    */
-/* -------------------------------------------------------------------------- */
-
-interface LayoutProps {
-  readonly children: ReactNode;
-  readonly params: {
-    readonly lang: string;
-  };
-}
-
-/* -------------------------------------------------------------------------- */
 /*                        STATIC PARAMS (Next 16)                             */
 /* -------------------------------------------------------------------------- */
 
@@ -45,13 +34,12 @@ export function generateStaticParams() {
 /* -------------------------------------------------------------------------- */
 
 export async function generateMetadata(
-  { params }: LayoutProps
+  props: LayoutProps<"/[lang]">
 ): Promise<Metadata> {
-  const locale = normalizeLocale(params.lang);
+  const { lang } = await props.params;
 
-  if (!locale) {
-    return {};
-  }
+  const locale = normalizeLocale(lang);
+  if (!locale) return {};
 
   const dict = await getServerDictionary(locale);
 
@@ -112,17 +100,16 @@ export const viewport: Viewport = {
 /*                                   LAYOUT                                   */
 /* -------------------------------------------------------------------------- */
 
-export default async function LangLayout({
-  children,
-  params,
-}: LayoutProps) {
-  const locale = normalizeLocale(params.lang);
+export default async function LangLayout(
+  props: LayoutProps<"/[lang]">
+) {
+  const { lang } = await props.params;
 
+  const locale = normalizeLocale(lang);
   if (!locale) {
     notFound();
   }
 
-  // After notFound(), locale is guaranteed
   const dict = await getServerDictionary(locale);
 
   const siteUrl =
@@ -136,7 +123,7 @@ export default async function LangLayout({
       <body
         className={`${inter.className} min-h-screen flex flex-col bg-background text-foreground antialiased`}
       >
-        {/* Skip to content (Accessibility) */}
+        {/* Skip to content */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-slate-900 text-white px-4 py-2 rounded-md"
@@ -144,14 +131,12 @@ export default async function LangLayout({
           {dict.common.skipToContent}
         </a>
 
-        {/* Breadcrumb JSON-LD */}
         <BreadcrumbsJsonLd
           lang={locale}
           baseUrl={siteUrl}
           dict={dict}
         />
 
-        {/* Breadcrumb visual */}
         <Breadcrumbs
           lang={locale}
           baseUrl={siteUrl}
@@ -179,7 +164,7 @@ export default async function LangLayout({
         )}
 
         <main id="main-content" className="flex-grow">
-          {children}
+          {props.children}
         </main>
 
         <footer className="text-center py-6 text-sm text-muted-foreground">
