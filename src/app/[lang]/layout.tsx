@@ -4,7 +4,6 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
 import Script from "next/script";
-import type { ReactNode } from "react";
 
 import { normalizeLocale, locales } from "@/dictionaries/locales";
 import { getServerDictionary } from "@/lib/getServerDictionary";
