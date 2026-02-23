@@ -87,23 +87,6 @@ export default async function LangLayout({ children, params }: LayoutProps) {
             articles={dict.articles}
           />
         </ScrollSpyProvider> 
-
-
-      //  <BreadcrumbsJsonLd
-        //  lang={locale}
-      //    baseUrl={process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app"}
-         // baseUrl={siteUrl}
-       //   dict={dict}
-     //   />
-
-     //   <Breadcrumbs
-      //    lang={locale} 
-        //  baseUrl={process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app"}
-      //    dictionary={dict}
-    //    /> 
-        
-
-      
         {gaId && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
