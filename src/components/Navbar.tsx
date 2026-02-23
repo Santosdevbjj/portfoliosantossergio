@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 
+// Importação corrigida dos tipos
 import type { Locale, CommonDictionary } from '@/types/dictionary'
 import {
   NAV_SECTIONS,
@@ -16,17 +17,17 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { useScrollSpy } from '@/contexts/scroll-spy.client'
 
 /* -------------------------------------------------------------------------- */
-/*                                   PROPS                                    */
+/* PROPS                                    */
 /* -------------------------------------------------------------------------- */
 
 interface NavbarProps {
   readonly lang: Locale
   readonly common: CommonDictionary
-  dict: Dictionary;
+  // Removido o 'dict: Dictionary' que causava o erro de build
 }
 
 /* -------------------------------------------------------------------------- */
-/*                            NAV LABEL RESOLVER                              */
+/* NAV LABEL RESOLVER                              */
 /* -------------------------------------------------------------------------- */
 
 function resolveNavLabel(
@@ -37,7 +38,7 @@ function resolveNavLabel(
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                  COMPONENT                                 */
+/* COMPONENT                                 */
 /* -------------------------------------------------------------------------- */
 
 export default function Navbar({
@@ -75,9 +76,13 @@ export default function Navbar({
   /* ------------------------------ BODY LOCK -------------------------------- */
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : ''
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = isOpen ? 'hidden' : ''
+    }
     return () => {
-      document.body.style.overflow = ''
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = ''
+      }
     }
   }, [isOpen])
 
@@ -113,7 +118,6 @@ export default function Navbar({
         {/* LOGO */}
         <Link
           href={`/${lang}`}
-          aria-label={navigation}
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
@@ -123,7 +127,6 @@ export default function Navbar({
 
         {/* DESKTOP NAV */}
         <div className="hidden lg:flex items-center gap-8">
-
           <div className="flex gap-8">
             {navLinks.map(link => {
               const isActive = activeSection === link.id
@@ -151,17 +154,14 @@ export default function Navbar({
             <LanguageSwitcher currentLang={lang} />
             <ThemeToggle labels={theme} />
           </div>
-
         </div>
 
-        {/* MOBILE */}
+        {/* MOBILE TOGGLE */}
         <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle labels={theme} />
-
           <button
             aria-label={isOpen ? menu.aria.close : menu.aria.open}
             aria-expanded={isOpen}
-            aria-controls="mobile-menu"
             onClick={() => setIsOpen(prev => !prev)}
             className="p-2 text-slate-900 dark:text-white transition-transform active:scale-90"
           >
@@ -174,7 +174,7 @@ export default function Navbar({
       <div
         id="mobile-menu"
         className={`lg:hidden absolute top-full left-0 w-full overflow-y-auto border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ${
-          isOpen ? 'max-h-screen opacity-100 shadow-2xl' : 'max-h-0 opacity-0'
+          isOpen ? 'max-h-screen opacity-100 shadow-2xl' : 'max-h-0 opacity-0 pointer-events-none'
         }`}
       >
         <div className="flex flex-col gap-6 p-8">
