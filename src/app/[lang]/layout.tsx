@@ -86,8 +86,22 @@ export default async function LangLayout({ children, params }: LayoutProps) {
             contact={dict.contact}
             articles={dict.articles}
           />
-        </ScrollSpyProvider>
+        </ScrollSpyProvider> 
 
+
+        <BreadcrumbsJsonLd
+          lang={locale}
+          baseUrl={siteUrl}
+          dict={dict}
+        />
+
+        <Breadcrumbs
+          lang={locale}
+          baseUrl={siteUrl}
+          dictionary={dict}
+        />
+
+      
         {gaId && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
