@@ -22,6 +22,7 @@ import { useScrollSpy } from '@/contexts/scroll-spy.client'
 interface NavbarProps {
   readonly lang: Locale
   readonly common: CommonDictionary
+  dict: Dictionary;
 }
 
 /* -------------------------------------------------------------------------- */
