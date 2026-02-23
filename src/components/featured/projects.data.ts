@@ -1,3 +1,5 @@
+'use client';
+
 // src/components/featured/projects.data.ts
 
 import type { SupportedLocale } from "@/dictionaries/locales";
