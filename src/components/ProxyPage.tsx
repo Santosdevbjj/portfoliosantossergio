@@ -1,3 +1,5 @@
+'use client';
+
 // src/components/ProxyPage.tsx
 
 import type { ReactNode } from "react";
