@@ -1,3 +1,5 @@
+'use client';
+
 import FeaturedGrid from './FeaturedGrid';
 import { featuredProjects } from './projects.data';
 import type { Locale, Dictionary } from '@/types/dictionary';
