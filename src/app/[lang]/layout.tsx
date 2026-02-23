@@ -98,7 +98,7 @@ export default async function LangLayout({ children, params }: LayoutProps) {
 
         <Breadcrumbs
           lang={locale} 
-          baseUrl={"https://portfoliosantossergio.vercel.app"}
+          baseUrl={process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app"}
           dictionary={dict}
         />
 
