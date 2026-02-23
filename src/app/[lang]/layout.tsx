@@ -91,12 +91,13 @@ export default async function LangLayout({ children, params }: LayoutProps) {
 
         <BreadcrumbsJsonLd
           lang={locale}
-          baseUrl={siteUrl}
+          baseUrl={process.env.NEXT_PUBLIC_SITE_URL}
+         // baseUrl={siteUrl}
           dict={dict}
         />
 
         <Breadcrumbs
-          lang={locale}
+          lang={locale} 
           baseUrl={siteUrl}
           dictionary={dict}
         />
