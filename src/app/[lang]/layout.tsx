@@ -7,8 +7,8 @@ import Script from "next/script";
 
 import { normalizeLocale, locales } from "@/dictionaries/locales";
 import { getServerDictionary } from "@/lib/getServerDictionary";
-import { ThemeToggle } from "@/components/ThemeToggle",
 
+import { ThemeToggle } from "@/components/ThemeToggle",
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 
