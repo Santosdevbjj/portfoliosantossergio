@@ -20,6 +20,7 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+// Tipagem alinhada com Next.js 16 (params como Promise)
 type LayoutProps = {
   children: React.ReactNode;
   params: Promise<{ lang: string }>;
@@ -45,6 +46,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
     description: dict.seo.description,
     keywords: dict.seo.keywords,
     verification: {
+      // TAG DO GOOGLE MANTIDA
       google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
     },
     alternates: {
@@ -61,7 +63,7 @@ export const viewport: Viewport = {
 };
 
 export default async function LangLayout({ children, params }: LayoutProps) {
-  // Em Next.js 15/16, params deve ser aguardado (awaited)
+  // Em Next.js 15/16, params DEVE ser aguardado (awaited)
   const { lang } = await params;
   const locale = normalizeLocale(lang);
   const dict = await getServerDictionary(locale);
@@ -77,13 +79,16 @@ export default async function LangLayout({ children, params }: LayoutProps) {
           {dict.common.skipToContent}
         </a>
 
-        {/* IMPORTANTE: Se o erro persistir no Vercel, você deve abrir o arquivo 
-            do componente Navbar e garantir que a interface NavbarProps 
-            inclua: dict: Dictionary;
+        {/* Atenção: Garanta que em src/components/Navbar.tsx 
+            a interface aceite 'dict: Dictionary' 
         */}
         <Navbar lang={locale} dict={dict} />
         
-        <BreadcrumbsJsonLd lang={locale} baseUrl="https://portfoliosantossergio.vercel.app" dict={dict} />
+        <BreadcrumbsJsonLd 
+          lang={locale} 
+          baseUrl="https://portfoliosantossergio.vercel.app" 
+          dict={dict} 
+        />
 
         <main id="main-content" className="flex-grow">
           {children}
@@ -91,10 +96,13 @@ export default async function LangLayout({ children, params }: LayoutProps) {
 
         <Footer dict={dict} />
 
-        {/* Google Tag (GA4) - Mantida conforme solicitado */}
+        {/* Google Tag (GA4) - Mantida */}
         {gaId && (
           <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
+            <Script 
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} 
+              strategy="afterInteractive" 
+            />
             <Script id="ga-init" strategy="afterInteractive">
               {`
                 window.dataLayer = window.dataLayer || [];
