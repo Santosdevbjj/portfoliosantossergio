@@ -46,8 +46,9 @@ export default function ProxyClient({
   return (
     <PageWrapper common={dictionary.common}>
       <Navbar
-        lang={locale}
-        common={dictionary.common}
+        lang={locale} 
+        dict={dictionary}
+        // common={dictionary.common} 
       />
 
       <main
