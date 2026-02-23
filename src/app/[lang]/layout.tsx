@@ -87,7 +87,7 @@ export default async function LangLayout({ children, params }: LayoutProps) {
         </main>
 
         <Footer 
-           lang={lang} 
+           lang={lang as Locale} 
            common={dict.common} 
            contact={dict.contact} 
            articles={dict.articles} 
