@@ -8,6 +8,7 @@ import { ScrollSpyProvider } from "@/contexts/scroll-spy.client";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 
 import "@/app/globals.css";
