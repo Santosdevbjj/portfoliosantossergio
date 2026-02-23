@@ -1,3 +1,5 @@
+'use client';
+
 // src/components/AboutSection.tsx
 
 import type { AboutDictionary } from "@/types/dictionary";
