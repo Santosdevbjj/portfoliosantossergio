@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * HERO SECTION — SÉRGIO SANTOS
  *
