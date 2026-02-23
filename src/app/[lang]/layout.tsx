@@ -1,14 +1,12 @@
 // src/app/[lang]/layout.tsx
 import type { Metadata, Viewport } from "next";
-import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 
 import { normalizeLocale, locales } from "@/dictionaries/locales";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
-// Componentes (Certifique-se que possuem 'use client' internamente)
-import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
+// Componentes
 import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -62,6 +60,7 @@ export const viewport: Viewport = {
 };
 
 export default async function LangLayout({ children, params }: LayoutProps) {
+  // Em Next.js 15/16, params é uma Promise
   const { lang } = await params;
   const locale = normalizeLocale(lang);
   const dict = await getServerDictionary(locale);
@@ -70,7 +69,10 @@ export default async function LangLayout({ children, params }: LayoutProps) {
   return (
     <html lang={locale} className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased font-sans">
-        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md">
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+        >
           {dict.common.skipToContent}
         </a>
 
