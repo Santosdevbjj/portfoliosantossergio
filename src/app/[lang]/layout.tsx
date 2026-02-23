@@ -8,9 +8,17 @@ import Script from "next/script";
 import { normalizeLocale, locales } from "@/dictionaries/locales";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
+import { ThemeProvider } from "@/components/ThemeToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
+
+
+
+
+
+
+
 
 /* -------------------------------------------------------------------------- */
 /* FONT                                     */
@@ -97,6 +105,27 @@ export const viewport: Viewport = {
   initialScale: 1,
   themeColor: "#020617",
 };
+
+// aqui
+
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <header>
+            <ThemeToggle />
+          </header>
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  )
+};
+
+
+
 
 /* -------------------------------------------------------------------------- */
 /* LAYOUT                                   */
