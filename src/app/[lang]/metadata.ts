@@ -9,26 +9,31 @@ const SITE_URL = 'https://portfoliosantossergio.vercel.app';
 
 interface MetadataProps {
   params: Promise<{
-    lang: string; // Tipado como string inicialmente para validação
+    lang: string;
   }>;
 }
 
+/**
+ * Gerador de Metadados robusto e tipado para TS 6.0
+ */
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
 
-  // Validação rigorosa do locale
+  // Validação rigorosa do locale usando o Type Guard já existente
   if (!isValidLocale(rawLang)) {
     notFound();
   }
 
-  const lang = rawLang as Locale;
+  // Agora o TS sabe que 'lang' é um SupportedLocale válido
+  const lang: Locale = rawLang;
   const dict = await getDictionary(lang);
 
-  const pageTitle = dict.seo.pages?.home?.title ?? dict.seo.siteName;
-  const pageDescription = dict.seo.pages?.home?.description ?? dict.seo.description;
+  // Fallbacks seguros para evitar strings vazias ou undefined
+  const pageTitle = dict.seo.pages?.home?.title || dict.seo.siteName;
+  const pageDescription = dict.seo.pages?.home?.description || dict.seo.description;
 
-  // Mapeamento de imagens OG (Baseado nos seus arquivos na pasta public/)
-  const ogImageMap: Record<string, string> = {
+  // Mapeamento de imagens OG com tipagem estrita
+  const ogImageMap: Record<Locale, string> = {
     'pt-BR': '/og-image-pt.png',
     'en-US': '/og-image-en.png',
     'es-ES': '/og-image-es.png',
@@ -44,6 +49,9 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     'es-AR': 'es_AR',
     'es-MX': 'es_MX',
   };
+
+  // Resolução da imagem com Fallback garantido para o TS
+  const finalOgImage = ogImageMap[lang] ?? ogImageMap['pt-BR'];
 
   // Construção dos links alternativos (SEO Multilíngue)
   const languages = SUPPORTED_LOCALES.reduce((acc, loc) => {
@@ -75,7 +83,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       description: pageDescription,
       images: [
         {
-          url: ogImageMap[lang] || ogImageMap['pt-BR'],
+          url: finalOgImage,
           width: 1200,
           height: 630,
           alt: pageTitle,
@@ -86,7 +94,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       card: 'summary_large_image',
       title: pageTitle,
       description: pageDescription,
-      images: [ogImageMap[lang] || ogImageMap['pt-BR']],
+      images: [finalOgImage],
     },
     icons: {
       icon: [
