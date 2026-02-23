@@ -1,4 +1,3 @@
-// src/app/[lang]/layout.tsx
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
@@ -6,7 +5,6 @@ import Script from "next/script";
 import { normalizeLocale, locales } from "@/dictionaries/locales";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 
-// Componentes
 import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -20,7 +18,6 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
-// Tipagem alinhada com Next.js 16 (params como Promise)
 type LayoutProps = {
   children: React.ReactNode;
   params: Promise<{ lang: string }>;
@@ -34,7 +31,6 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   const { lang } = await params;
   const locale = normalizeLocale(lang);
   const dict = await getServerDictionary(locale);
-
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
 
   return {
@@ -62,7 +58,6 @@ export const viewport: Viewport = {
 };
 
 export default async function LangLayout({ children, params }: LayoutProps) {
-  // Em Next.js 16, params DEVE ser aguardado
   const { lang } = await params;
   const locale = normalizeLocale(lang);
   const dict = await getServerDictionary(locale);
@@ -71,7 +66,6 @@ export default async function LangLayout({ children, params }: LayoutProps) {
   return (
     <html lang={locale} className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased font-sans">
-        {/* Skip to Content para Acessibilidade */}
         <a 
           href="#main-content" 
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
@@ -79,8 +73,8 @@ export default async function LangLayout({ children, params }: LayoutProps) {
           {dict.common.skipToContent}
         </a>
 
-        {/* Navbar corrigida recebendo dict */}
-        <Navbar lang={locale} dict={dict} />
+        {/* Corrigido: Passando common em vez do dicionário inteiro para alinhar com a NavbarProps */}
+        <Navbar lang={locale} common={dict.common} />
         
         <BreadcrumbsJsonLd 
           lang={locale} 
@@ -94,13 +88,9 @@ export default async function LangLayout({ children, params }: LayoutProps) {
 
         <Footer dict={dict} />
 
-        {/* Google Tag (GA4) */}
         {gaId && (
           <>
-            <Script 
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} 
-              strategy="afterInteractive" 
-            />
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
             <Script id="ga-init" strategy="afterInteractive">
               {`
                 window.dataLayer = window.dataLayer || [];
