@@ -43,6 +43,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
       template: `%s | ${dict.seo.siteName}`,
     },
     description: dict.seo.description,
+    keywords: dict.seo.keywords,
     verification: {
       google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
     },
@@ -60,7 +61,7 @@ export const viewport: Viewport = {
 };
 
 export default async function LangLayout({ children, params }: LayoutProps) {
-  // Em Next.js 15/16, params é uma Promise
+  // Em Next.js 15/16, params deve ser aguardado (awaited)
   const { lang } = await params;
   const locale = normalizeLocale(lang);
   const dict = await getServerDictionary(locale);
@@ -76,6 +77,10 @@ export default async function LangLayout({ children, params }: LayoutProps) {
           {dict.common.skipToContent}
         </a>
 
+        {/* IMPORTANTE: Se o erro persistir no Vercel, você deve abrir o arquivo 
+            do componente Navbar e garantir que a interface NavbarProps 
+            inclua: dict: Dictionary;
+        */}
         <Navbar lang={locale} dict={dict} />
         
         <BreadcrumbsJsonLd lang={locale} baseUrl="https://portfoliosantossergio.vercel.app" dict={dict} />
@@ -86,6 +91,7 @@ export default async function LangLayout({ children, params }: LayoutProps) {
 
         <Footer dict={dict} />
 
+        {/* Google Tag (GA4) - Mantida conforme solicitado */}
         {gaId && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
