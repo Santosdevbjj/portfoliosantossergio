@@ -8,8 +8,8 @@ import { ScrollSpyProvider } from "@/contexts/scroll-spy.client";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
-import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
+// import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
+// import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 
 import "@/app/globals.css";
 import "@/styles/animations.css";
@@ -89,18 +89,19 @@ export default async function LangLayout({ children, params }: LayoutProps) {
         </ScrollSpyProvider> 
 
 
-        <BreadcrumbsJsonLd
-          lang={locale}
-          baseUrl={process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app"}
+      //  <BreadcrumbsJsonLd
+        //  lang={locale}
+      //    baseUrl={process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app"}
          // baseUrl={siteUrl}
-          dict={dict}
-        />
+       //   dict={dict}
+     //   />
 
-        <Breadcrumbs
-          lang={locale} 
-          baseUrl={process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app"}
-          dictionary={dict}
-        />
+     //   <Breadcrumbs
+      //    lang={locale} 
+        //  baseUrl={process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app"}
+      //    dictionary={dict}
+    //    /> 
+        
 
       
         {gaId && (
