@@ -1,45 +1,44 @@
 // src/app/[lang]/manifest.ts
 import type { MetadataRoute } from 'next';
 import { getDictionary } from '@/dictionaries';
-// CORREÇÃO: Usando 'import type' para satisfazer o verbatimModuleSyntax
+import { normalizeLocale } from '@/dictionaries/locales';
 import type { Locale } from '@/types/dictionary';
 
-const SITE_URL = 'https://portfoliosantossergio.vercel.app';
+interface ManifestProps {
+  params: Promise<{ lang: string }>;
+}
 
 export default async function manifest(
-  props: { params: Promise<{ lang: Locale }> }
+  { params }: ManifestProps
 ): Promise<MetadataRoute.Manifest> {
   
-  // Resolve os parâmetros (Next.js 16 padrão)
-  const { lang: rawLang } = await props.params;
+  const { lang: rawLang } = await params;
   
-  // Lista de locales suportados conforme seu arquivo de tipos
-  const supportedLocales: Locale[] = ['pt-BR', 'en-US', 'es-ES', 'es-AR', 'es-MX'];
-  
-  const lang = supportedLocales.includes(rawLang) 
-    ? rawLang 
-    : 'pt-BR'; // Fallback seguro
-
+  // Normalização segura para garantir que o manifesto nunca quebre
+  const lang = normalizeLocale(rawLang) as Locale;
   const dict = await getDictionary(lang);
 
+  // Extração do prefixo para imagem (pt, en, es)
+  const langPrefix = lang.split('-')[0];
+
   return {
-    id: `${SITE_URL}/${lang}`,
-    lang,
+    id: `portfolio-sergio-${lang}`,
+    lang: lang,
     dir: 'ltr',
     name: dict.seo.siteName,
-    short_name: dict.seo.siteName.split(' | ')[0],
+    short_name: "Sérgio Santos",
     description: dict.seo.description,
     start_url: `/${lang}/`,
     scope: `/${lang}/`,
     display: 'standalone',
     background_color: '#020617',
     theme_color: '#020617',
+    orientation: 'portrait',
     categories: [
       'technology',
       'education',
       'portfolio',
       'software',
-      'productivity',
     ],
     icons: [
       {
@@ -62,11 +61,11 @@ export default async function manifest(
     ],
     screenshots: [
       {
-        src: `/og-image-${lang.split('-')[0]}.png`, // Pega 'pt', 'en' ou 'es'
+        src: `/og-image-${langPrefix}.png`,
         sizes: '1200x630',
         type: 'image/png',
         form_factor: 'wide',
-        label: dict.seo.siteName,
+        label: dict.seo.pages.home.title,
       },
     ],
   };
