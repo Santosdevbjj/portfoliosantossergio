@@ -4,12 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 
-// Importação corrigida dos tipos
-
-import { Dictionary } from "@/types/dictionary";
-import { SupportedLocale } from "@/dictionaries/locales";
-
-import type { Locale, CommonDictionary } from '@/types/dictionary'
+import type { SupportedLocale } from "@/dictionaries/locales"
+import type { CommonDictionary } from '@/types/dictionary'
 import {
   NAV_SECTIONS,
   getNavHash,
@@ -20,21 +16,10 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useScrollSpy } from '@/contexts/scroll-spy.client'
 
-/* -------------------------------------------------------------------------- */
-/* PROPS                                    */
-/* -------------------------------------------------------------------------- */
-
 interface NavbarProps {
-  lang: SupportedLocale;
-  dict: Dictionary; // Adicione esta linha
-  // readonly lang: Locale
-  // readonly common: CommonDictionary
-  // Removido o 'dict: Dictionary' que causava o erro de build
+  readonly lang: SupportedLocale;
+  readonly common: CommonDictionary;
 }
-
-/* -------------------------------------------------------------------------- */
-/* NAV LABEL RESOLVER                              */
-/* -------------------------------------------------------------------------- */
 
 function resolveNavLabel(
   section: NavSection,
@@ -42,10 +27,6 @@ function resolveNavLabel(
 ): string {
   return nav[section]
 }
-
-/* -------------------------------------------------------------------------- */
-/* COMPONENT                                 */
-/* -------------------------------------------------------------------------- */
 
 export default function Navbar({
   lang,
@@ -60,44 +41,25 @@ export default function Navbar({
   } = common
 
   const { activeSection } = useScrollSpy()
-
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
-  /* ------------------------------ SCROLL EFFECT ----------------------------- */
-
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
-
+    const handleScroll = () => setScrolled(window.scrollY > 20)
     handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
-
-  /* ------------------------------ BODY LOCK -------------------------------- */
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.body.style.overflow = isOpen ? 'hidden' : ''
     }
-    return () => {
-      if (typeof document !== 'undefined') {
-        document.body.style.overflow = ''
-      }
-    }
   }, [isOpen])
 
-  /* Fecha menu ao trocar idioma */
   useEffect(() => {
     setIsOpen(false)
   }, [lang])
-
-  /* ------------------------------ NAV LINKS -------------------------------- */
 
   const navLinks = useMemo(
     () =>
@@ -120,8 +82,6 @@ export default function Navbar({
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
-
-        {/* LOGO */}
         <Link
           href={`/${lang}`}
           className="group rounded outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
@@ -131,12 +91,10 @@ export default function Navbar({
           </span>
         </Link>
 
-        {/* DESKTOP NAV */}
         <div className="hidden lg:flex items-center gap-8">
           <div className="flex gap-8">
             {navLinks.map(link => {
               const isActive = activeSection === link.id
-
               return (
                 <Link
                   key={link.id}
@@ -153,16 +111,13 @@ export default function Navbar({
               )
             })}
           </div>
-
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
-
           <div className="flex items-center gap-4">
             <LanguageSwitcher currentLang={lang} />
             <ThemeToggle labels={theme} />
           </div>
         </div>
 
-        {/* MOBILE TOGGLE */}
         <div className="flex items-center gap-3 lg:hidden">
           <ThemeToggle labels={theme} />
           <button
@@ -176,9 +131,7 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* MOBILE MENU */}
       <div
-        id="mobile-menu"
         className={`lg:hidden absolute top-full left-0 w-full overflow-y-auto border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] transition-all duration-300 ${
           isOpen ? 'max-h-screen opacity-100 shadow-2xl' : 'max-h-0 opacity-0 pointer-events-none'
         }`}
@@ -194,7 +147,6 @@ export default function Navbar({
               {link.label}
             </Link>
           ))}
-
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
             <p className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
               {languageSwitcher}
