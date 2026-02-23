@@ -6,6 +6,8 @@ import {
   useContext,
   useMemo,
   useState,
+  type ReactNode,
+  type JSX
 } from 'react'
 import type { NavSection } from '@/domain/navigation'
 
@@ -17,39 +19,26 @@ interface ScrollSpyContextValue {
   readonly resetActiveSection: () => void
 }
 
-const ScrollSpyContext =
-  createContext<ScrollSpyContextValue | null>(null)
+const ScrollSpyContext = createContext<ScrollSpyContextValue | null>(null)
 
 interface ScrollSpyProviderProps {
-  readonly children: React.ReactNode
+  readonly children: ReactNode
 }
 
-export function ScrollSpyProvider({
-  children,
-}: ScrollSpyProviderProps): React.JSX.Element {
-  const [activeSection, setActiveSectionState] =
-    useState<ActiveSection>(null)
+export function ScrollSpyProvider({ children }: ScrollSpyProviderProps): JSX.Element {
+  const [activeSection, setActiveSectionState] = useState<ActiveSection>(null)
 
-  const setActiveSection = useCallback(
-    (section: ActiveSection) => {
-      setActiveSectionState(prev =>
-        prev === section ? prev : section,
-      )
-    },
-    [],
-  )
+  const setActiveSection = useCallback((section: ActiveSection) => {
+    setActiveSectionState(prev => (prev === section ? prev : section))
+  }, [])
 
   const resetActiveSection = useCallback(() => {
     setActiveSectionState(null)
   }, [])
 
   const value = useMemo<ScrollSpyContextValue>(
-    () => ({
-      activeSection,
-      setActiveSection,
-      resetActiveSection,
-    }),
-    [activeSection, setActiveSection, resetActiveSection],
+    () => ({ activeSection, setActiveSection, resetActiveSection }),
+    [activeSection, setActiveSection, resetActiveSection]
   )
 
   return (
@@ -61,12 +50,8 @@ export function ScrollSpyProvider({
 
 export function useScrollSpy(): ScrollSpyContextValue {
   const context = useContext(ScrollSpyContext)
-
   if (!context) {
-    throw new Error(
-      'useScrollSpy must be used within a ScrollSpyProvider',
-    )
+    throw new Error('useScrollSpy must be used within a ScrollSpyProvider')
   }
-
   return context
 }
