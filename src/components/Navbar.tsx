@@ -5,6 +5,10 @@ import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 
 // Importação corrigida dos tipos
+
+import { Dictionary } from "@/types/dictionary";
+import { SupportedLocale } from "@/dictionaries/locales";
+
 import type { Locale, CommonDictionary } from '@/types/dictionary'
 import {
   NAV_SECTIONS,
@@ -21,8 +25,10 @@ import { useScrollSpy } from '@/contexts/scroll-spy.client'
 /* -------------------------------------------------------------------------- */
 
 interface NavbarProps {
-  readonly lang: Locale
-  readonly common: CommonDictionary
+  lang: SupportedLocale;
+  dict: Dictionary; // Adicione esta linha
+  // readonly lang: Locale
+  // readonly common: CommonDictionary
   // Removido o 'dict: Dictionary' que causava o erro de build
 }
 
