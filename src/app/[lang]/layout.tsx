@@ -86,7 +86,14 @@ export default async function LangLayout({ children, params }: LayoutProps) {
           {children}
         </main>
 
-        <Footer dict={dict} />
+        <Footer 
+           lang={lang} 
+           common={dict.common} 
+           contact={dict.contact} 
+           articles={dict.articles} 
+          />
+
+        
 
         {gaId && (
           <>
