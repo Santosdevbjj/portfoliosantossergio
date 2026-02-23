@@ -46,7 +46,6 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
     description: dict.seo.description,
     keywords: dict.seo.keywords,
     verification: {
-      // TAG DO GOOGLE MANTIDA
       google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
     },
     alternates: {
@@ -63,7 +62,7 @@ export const viewport: Viewport = {
 };
 
 export default async function LangLayout({ children, params }: LayoutProps) {
-  // Em Next.js 15/16, params DEVE ser aguardado (awaited)
+  // Em Next.js 16, params DEVE ser aguardado
   const { lang } = await params;
   const locale = normalizeLocale(lang);
   const dict = await getServerDictionary(locale);
@@ -72,6 +71,7 @@ export default async function LangLayout({ children, params }: LayoutProps) {
   return (
     <html lang={locale} className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased font-sans">
+        {/* Skip to Content para Acessibilidade */}
         <a 
           href="#main-content" 
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
@@ -79,9 +79,7 @@ export default async function LangLayout({ children, params }: LayoutProps) {
           {dict.common.skipToContent}
         </a>
 
-        {/* Atenção: Garanta que em src/components/Navbar.tsx 
-            a interface aceite 'dict: Dictionary' 
-        */}
+        {/* Navbar corrigida recebendo dict */}
         <Navbar lang={locale} dict={dict} />
         
         <BreadcrumbsJsonLd 
@@ -96,7 +94,7 @@ export default async function LangLayout({ children, params }: LayoutProps) {
 
         <Footer dict={dict} />
 
-        {/* Google Tag (GA4) - Mantida */}
+        {/* Google Tag (GA4) */}
         {gaId && (
           <>
             <Script 
