@@ -8,8 +8,8 @@ import { ScrollSpyProvider } from "@/contexts/scroll-spy.client";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-// import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
-// import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
+import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
+import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 
 import "@/app/globals.css";
 import "@/styles/animations.css";
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
     description: dict.seo.description,
     keywords: dict.seo.keywords,
      verification: {
-      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
+      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0", // TAG DO GOOGLE MANTIDA
     },
     alternates: {
       canonical: `/${locale}`,
@@ -65,6 +65,7 @@ export default async function LangLayout({ children, params }: LayoutProps) {
   const locale = normalizeLocale(lang);
   const dict = await getServerDictionary(locale);
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app/';
 
   return (
     <html lang={locale} className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
@@ -77,6 +78,12 @@ export default async function LangLayout({ children, params }: LayoutProps) {
           <Navbar lang={locale} common={dict.common} />
 
           <main id="main-content" className="flex-grow">
+            {/* SEO e Navegação Breadcrumbs */}
+            <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
+            <div className="container mx-auto px-4 pt-4">
+               <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
+            </div>
+            
             {children}
           </main>
 
@@ -87,6 +94,8 @@ export default async function LangLayout({ children, params }: LayoutProps) {
             articles={dict.articles}
           />
         </ScrollSpyProvider> 
+        
+        {/* Google Analytics Script MANTIDO */}
         {gaId && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
