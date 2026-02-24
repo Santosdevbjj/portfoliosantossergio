@@ -1,4 +1,5 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata, Viewport, LayoutProps } from "next";
+import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 
@@ -17,25 +18,37 @@ import "@/styles/animations.css";
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: '--font-inter',
+  variable: "--font-inter",
 });
 
-type LayoutProps = {
-  children: React.ReactNode;
-  params: Promise<{ lang: string }>;
-};
-
+/* ===============================
+   STATIC PARAMS (SSG)
+================================= */
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
-export async function generateMetadata({ params }: LayoutProps): Promise<Metadata> {
-  const { lang } = await params;
+/* ===============================
+   METADATA
+================================= */
+export async function generateMetadata(
+  props: LayoutProps<"/[lang]">
+): Promise<Metadata> {
+  const { lang } = await props.params;
+
   const locale = normalizeLocale(lang);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
+
+  if (!locales.includes(locale)) {
+    notFound();
+  }
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://portfoliosantossergio.vercel.app";
 
   try {
     const dict = await getServerDictionary(locale);
+
     return {
       metadataBase: new URL(siteUrl),
       title: {
@@ -48,64 +61,97 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
         google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
       },
       alternates: {
-        canonical: `/${locale}`,
-        languages: Object.fromEntries(locales.map((lng) => [lng, `${siteUrl}/${lng}`])),
+        canonical: `${siteUrl}/${locale}`,
+        languages: Object.fromEntries(
+          locales.map((lng) => [lng, `${siteUrl}/${lng}`])
+        ),
       },
     };
-  } catch (e) {
-    return { title: "Portfolio - Sergio Santos" };
+  } catch {
+    return {
+      title: "Portfolio - Sergio Santos",
+    };
   }
 }
 
+/* ===============================
+   VIEWPORT
+================================= */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#020617",
 };
 
-export default async function LangLayout({ children, params }: LayoutProps) {
-  // 1. No Next.js 15/16, params PRECISA de await antes de qualquer uso
-  const { lang } = await params;
+/* ===============================
+   LAYOUT
+================================= */
+export default async function LangLayout(
+  props: LayoutProps<"/[lang]">
+) {
+  const { lang } = await props.params;
+
   const locale = normalizeLocale(lang);
-  
-  // 2. Carregamento do dicionário
+
+  if (!locales.includes(locale)) {
+    notFound();
+  }
+
   const dict = await getServerDictionary(locale);
-  
+
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app';
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://portfoliosantossergio.vercel.app";
 
   return (
-    <html lang={locale} className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
+    <html
+      lang={locale}
+      className={`${inter.variable} scroll-smooth`}
+      suppressHydrationWarning
+    >
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased font-sans">
         <ScrollSpyProvider>
-          {/* Skip Link para Acessibilidade */}
-          <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-4 py-2 rounded-md">
+          {/* Skip Link (Acessibilidade) */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-4 py-2 rounded-md"
+          >
             {dict.common.skipToContent}
           </a>
 
-          {/* Navegação Principal */}
+          {/* Navbar */}
           <Navbar lang={locale} common={dict.common} />
 
           <main id="main-content" className="flex-grow">
-            {/* 3. Integração Breadcrumbs (SEO e Visual) */}
-            <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
-            
+            {/* Breadcrumb SEO JSON-LD */}
+            <BreadcrumbsJsonLd
+              lang={locale}
+              dict={dict}
+              baseUrl={baseUrl}
+            />
+
             <div className="container mx-auto px-4 pt-4">
-              <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
+              <Breadcrumbs
+                lang={locale}
+                dictionary={dict}
+                baseUrl={baseUrl}
+              />
             </div>
 
-            {children}
+            {props.children}
           </main>
 
-          <Footer 
+          {/* Footer */}
+          <Footer
             lang={locale}
             common={dict.common}
             contact={dict.contact}
             articles={dict.articles}
           />
-        </ScrollSpyProvider> 
+        </ScrollSpyProvider>
 
-        {/* Google Analytics - Implementação Segura */}
+        {/* Google Analytics */}
         {gaId && (
           <>
             <Script
@@ -117,12 +163,14 @@ export default async function LangLayout({ children, params }: LayoutProps) {
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${gaId}');
+                gtag('config', '${gaId}', {
+                  page_path: window.location.pathname,
+                });
               `}
             </Script>
           </>
         )}
-      </body> 
+      </body>
     </html>
   );
 }
