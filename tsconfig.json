@@ -4,7 +4,7 @@
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "outDir": "./dist",   // Diretório de saída para deploy
-   // "rootDir": ".",
+    "rootDir": ".",
     "rootDir": "./src",
     "module": "ESNext",
     "moduleResolution": "Bundler",   
