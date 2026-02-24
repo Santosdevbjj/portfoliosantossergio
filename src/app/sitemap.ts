@@ -1,92 +1,94 @@
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next";
+import {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  type SupportedLocale,
+} from "@/dictionaries/locales";
 
 /**
- * SITEMAP DINÂMICO — NEXT.JS 16 (APP ROUTER)
+ * SITEMAP DINÂMICO — NEXT 16 + TS 6 STRICT
  * -----------------------------------------------------------------------------
- * ✔ SEO internacional correto (pt / en / es)
- * ✔ Alinhado com estrutura de navegação do dicionário
- * ✔ Google Search Console friendly
- * ✔ Produção-ready
+ * ✔ Totalmente alinhado com SUPPORTED_LOCALES
+ * ✔ SEO internacional correto (hreflang real)
+ * ✔ x-default consistente
+ * ✔ Google Search Console ready
+ * ✔ Escalável para blog futuro
  */
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = (
     process.env.NEXT_PUBLIC_SITE_URL ??
-    'https://portfoliosantossergio.vercel.app'
-  ).replace(/\/$/, '')
+    "https://portfoliosantossergio.vercel.app"
+  ).replace(/\/$/, "");
 
-  const lastModified = new Date()
+  const lastModified = new Date();
 
-  const locales = ['pt', 'en', 'es'] as const
-
-  /**
-   * Rotas principais do site
-   * Devem refletir o dicionário (nav)
-   */
   const pages = [
-    '', // home
-    'about',
-    'experience',
-    'projects',
-    'articles',
-    'contact',
-  ]
+    "", // home
+    "about",
+    "experience",
+    "projects",
+    "articles",
+    "contact",
+  ] as const;
 
   /**
-   * 1️⃣ Páginas Internacionalizadas
+   * Gera objeto hreflang consistente
    */
-  const pageEntries: MetadataRoute.Sitemap = locales.flatMap(locale =>
-    pages.map(page => {
-      const path = page ? `/${page}` : ''
+  function buildAlternates(path: string) {
+    const languages: Record<string, string> = {};
 
-      return {
-        url: `${baseUrl}/${locale}${path}`,
-        lastModified,
-        changeFrequency: 'monthly',
-        priority:
-          page === '' && locale === 'pt'
-            ? 1.0
-            : page === ''
-            ? 0.9
-            : 0.8,
-        alternates: {
-          languages: {
-            pt: `${baseUrl}/pt${path}`,
-            en: `${baseUrl}/en${path}`,
-            es: `${baseUrl}/es${path}`,
-            'x-default': `${baseUrl}/pt${path}`,
-          },
-        },
-      }
-    }),
-  )
+    for (const locale of SUPPORTED_LOCALES) {
+      languages[locale] = `${baseUrl}/${locale}${path}`;
+    }
 
-  /**
-   * 2️⃣ Entrada raiz (fallback canônico)
-   */
-  const rootEntry: MetadataRoute.Sitemap[0] = {
-    url: baseUrl,
-    lastModified,
-    changeFrequency: 'monthly',
-    priority: 1.0,
-    alternates: {
-      languages: {
-        pt: `${baseUrl}/pt`,
-        en: `${baseUrl}/en`,
-        es: `${baseUrl}/es`,
-        'x-default': `${baseUrl}/pt`,
-      },
-    },
+    languages["x-default"] = `${baseUrl}/${DEFAULT_LOCALE}${path}`;
+
+    return { languages };
   }
 
   /**
-   * 3️⃣ Documentos estratégicos (CVs por idioma)
-   * PDFs não usam priority nem changeFrequency
+   * 1️⃣ Páginas internacionalizadas
    */
-  const documentEntries: MetadataRoute.Sitemap = locales.map(locale => ({
-    url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
-    lastModified,
-  }))
+  const pageEntries: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap(
+    (locale: SupportedLocale) =>
+      pages.map((page) => {
+        const path = page ? `/${page}` : "";
 
-  return [rootEntry, ...pageEntries, ...documentEntries]
+        return {
+          url: `${baseUrl}/${locale}${path}`,
+          lastModified,
+          changeFrequency: page === "" ? "weekly" : "monthly",
+          priority: page === "" && locale === DEFAULT_LOCALE
+            ? 1.0
+            : page === ""
+            ? 0.9
+            : 0.8,
+          alternates: buildAlternates(path),
+        };
+      })
+  );
+
+  /**
+   * 2️⃣ Entrada raiz canônica
+   */
+  const rootEntry: MetadataRoute.Sitemap[number] = {
+    url: baseUrl,
+    lastModified,
+    changeFrequency: "weekly",
+    priority: 1.0,
+    alternates: buildAlternates(""),
+  };
+
+  /**
+   * 3️⃣ PDFs estratégicos por locale
+   */
+  const documentEntries: MetadataRoute.Sitemap = SUPPORTED_LOCALES.map(
+    (locale) => ({
+      url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
+      lastModified,
+    })
+  );
+
+  return [rootEntry, ...pageEntries, ...documentEntries];
 }
