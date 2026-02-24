@@ -32,25 +32,32 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: LayoutProps): Promise<Metadata> {
   const { lang } = await params;
   const locale = normalizeLocale(lang);
-  const dict = await getServerDictionary(locale);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
+  
+  // Try/catch para evitar erro 500 se o dicionário falhar na Metadata
+  try {
+    const dict = await getServerDictionary(locale);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
 
-  return {
-    metadataBase: new URL(siteUrl),
-    title: {
-      default: dict.seo.siteName,
-      template: `%s | ${dict.seo.siteName}`,
-    },
-    description: dict.seo.description,
-    keywords: dict.seo.keywords,
-     verification: {
-      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0", // TAG DO GOOGLE MANTIDA
-    },
-    alternates: {
-      canonical: `/${locale}`,
-      languages: Object.fromEntries(locales.map((lng) => [lng, `${siteUrl}/${lng}`])),
-    },
-  };
+    return {
+      metadataBase: new URL(siteUrl),
+      title: {
+        default: dict.seo.siteName,
+        template: `%s | ${dict.seo.siteName}`,
+      },
+      description: dict.seo.description,
+      keywords: dict.seo.keywords,
+      verification: {
+        google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
+      },
+      alternates: {
+        canonical: `/${locale}`,
+        languages: Object.fromEntries(locales.map((lng) => [lng, `${siteUrl}/${lng}`])),
+      },
+    };
+  } catch (error) {
+    console.error("Metadata error:", error);
+    return { title: "Portfolio - Sergio Santos" };
+  }
 }
 
 export const viewport: Viewport = {
@@ -60,33 +67,46 @@ export const viewport: Viewport = {
 };
 
 export default async function LangLayout({ children, params }: LayoutProps) {
-  // No Next.js 16, params DEVE ser aguardado (await)
+  // No Next.js 15/16, params DEVE ser aguardado
   const { lang } = await params;
   const locale = normalizeLocale(lang);
-  const dict = await getServerDictionary(locale);
+  
+  // Fallback para evitar que o site caia se o dicionário falhar
+  let dict;
+  try {
+    dict = await getServerDictionary(locale);
+  } catch (error) {
+    console.error("Dictionary load error:", error);
+    // Se o dicionário falhar, o Next.js pode renderizar uma página de erro ou fallback
+    throw error; 
+  }
+
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app/';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://portfoliosantossergio.vercel.app';
 
   return (
     <html lang={locale} className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased font-sans">
         <ScrollSpyProvider>
+          {/* Acesso rápido para teclado */}
           <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-4 py-2 rounded-md">
             {dict.common.skipToContent}
           </a>
 
+          {/* Cabeçalho */}
           <Navbar lang={locale} common={dict.common} />
 
           <main id="main-content" className="flex-grow">
-            {/* SEO e Navegação Breadcrumbs */}
+            {/* Integração dos Breadcrumbs (SEO e Visual) */}
             <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
             <div className="container mx-auto px-4 pt-4">
-               <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
+              <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
             </div>
-            
+
             {children}
           </main>
 
+          {/* Rodapé */}
           <Footer 
             lang={locale}
             common={dict.common}
@@ -94,8 +114,8 @@ export default async function LangLayout({ children, params }: LayoutProps) {
             articles={dict.articles}
           />
         </ScrollSpyProvider> 
-        
-        {/* Google Analytics Script MANTIDO */}
+
+        {/* Google Analytics Script */}
         {gaId && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
