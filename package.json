@@ -6,7 +6,7 @@
   "description": "Portfólio de Engenharia de Dados - Tailwind v4.0.6 & Lucide 0.563",
   "type": "module",
   "engines": {
-    "node": "25.7.0"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "next dev",
