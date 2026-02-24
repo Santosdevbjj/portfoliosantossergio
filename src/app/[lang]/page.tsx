@@ -28,16 +28,6 @@ interface PageProps {
 // Static Generation (Crucial para evitar erro de Prerender)
 // --------------------------------------------------
 
-export default async function Page({ params }: { params: Promise<{ lang: string }> }) {
-  "use cache"; // <--- Esta é a nova forma de dizer que este componente deve ser cacheado
-  
-  const { lang } = await params;
-  // ... resto da sua lógica
-}
-
-
-
-
 export async function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }));
 }
