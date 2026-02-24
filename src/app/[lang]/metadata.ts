@@ -14,34 +14,41 @@ interface MetadataProps {
 }
 
 /**
- * Gerador de Metadados robusto e tipado para TS 6.0
+ * Gerador de Metadados robusto e tipado para TS 6.0 e Next.js 16
+ * Alinhado com a nova estrutura de arquivos da pasta /public
  */
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
+  // No Next.js 16, params é uma Promise que deve ser aguardada
   const { lang: rawLang } = await params;
 
-  // Validação rigorosa do locale usando o Type Guard já existente
+  // Validação do locale
   if (!isValidLocale(rawLang)) {
     notFound();
   }
 
-  // Agora o TS sabe que 'lang' é um SupportedLocale válido
   const lang: Locale = rawLang;
   const dict = await getDictionary(lang);
 
-  // Fallbacks seguros para evitar strings vazias ou undefined
+  // Fallbacks de conteúdo baseados no dicionário verificado
   const pageTitle = dict.seo.pages?.home?.title || dict.seo.siteName;
   const pageDescription = dict.seo.pages?.home?.description || dict.seo.description;
 
-  // Mapeamento de imagens OG com tipagem estrita
+  /**
+   * MAPA DE IMAGENS OG (Open Graph)
+   * Corrigido para bater exatamente com os novos arquivos na pasta /public
+   */
   const ogImageMap: Record<Locale, string> = {
-    'pt-BR': '/og-image-pt.png',
-    'en-US': '/og-image-en.png',
-    'es-ES': '/og-image-es.png',
-    'es-AR': '/og-image-es.png',
-    'es-MX': '/og-image-es.png',
+    'pt-BR': '/og-image-pt-BR.png',
+    'en-US': '/og-image-en-US.png',
+    'es-ES': '/og-image-es-ES.png',
+    'es-AR': '/og-image-es-AR.png',
+    'es-MX': '/og-image-es-MX.png',
   };
 
-  // Mapeamento de locale para meta tags (padrão ISO: ll_CC)
+  /**
+   * MAPA DE LOCALES ISO
+   * Necessário para as redes sociais entenderem a região correta
+   */
   const ogLocaleMap: Record<Locale, string> = {
     'pt-BR': 'pt_BR',
     'en-US': 'en_US',
@@ -50,10 +57,10 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     'es-MX': 'es_MX',
   };
 
-  // Resolução da imagem com Fallback garantido para o TS
-  const finalOgImage = ogImageMap[lang] ?? ogImageMap['pt-BR'];
+  // Resolução da imagem (Caminho absoluto é melhor para SEO)
+  const finalOgImage = `${SITE_URL}${ogImageMap[lang]}`;
 
-  // Construção dos links alternativos (SEO Multilíngue)
+  // Geração dinâmica de tags alternadas para SEO internacional
   const languages = SUPPORTED_LOCALES.reduce((acc, loc) => {
     acc[loc] = `${SITE_URL}/${loc}`;
     return acc;
