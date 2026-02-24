@@ -1,7 +1,8 @@
-import type { Metadata, Viewport, LayoutProps } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
 import Script from "next/script";
+import type { ReactNode } from "react";
 
 import { normalizeLocale, locales } from "@/dictionaries/locales";
 import { getServerDictionary } from "@/lib/getServerDictionary";
@@ -32,11 +33,9 @@ export async function generateStaticParams() {
    METADATA
 ================================= */
 export async function generateMetadata(
-  props: LayoutProps<"/[lang]">
+  { params }: { params: { lang: string } }
 ): Promise<Metadata> {
-  const { lang } = await props.params;
-
-  const locale = normalizeLocale(lang);
+  const locale = normalizeLocale(params.lang);
 
   if (!locales.includes(locale)) {
     notFound();
@@ -86,12 +85,14 @@ export const viewport: Viewport = {
 /* ===============================
    LAYOUT
 ================================= */
-export default async function LangLayout(
-  props: LayoutProps<"/[lang]">
-) {
-  const { lang } = await props.params;
-
-  const locale = normalizeLocale(lang);
+export default async function LangLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: { lang: string };
+}) {
+  const locale = normalizeLocale(params.lang);
 
   if (!locales.includes(locale)) {
     notFound();
@@ -139,7 +140,7 @@ export default async function LangLayout(
               />
             </div>
 
-            {props.children}
+            {children}
           </main>
 
           {/* Footer */}
