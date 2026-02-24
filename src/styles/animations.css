@@ -1,4 +1,11 @@
-/* src/styles/animations.css */
+/* ==========================================================================
+   ANIMATION SYSTEM — PERFORMANCE + ACCESSIBILITY + I18N
+   Next.js 16 + Tailwind v4
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   KEYFRAMES
+   -------------------------------------------------------------------------- */
 
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -8,7 +15,6 @@
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    /* translate3d ativa aceleração de hardware (GPU) */
     transform: translate3d(0, 15px, 0) scale(0.98);
   }
   100% {
@@ -22,34 +28,40 @@
   100% { transform: translate3d(100%, 0, 0); }
 }
 
-/* Sistema de Stagger (Entrada Gradual Otimizada) */
+/* --------------------------------------------------------------------------
+   STAGGER SYSTEM
+   -------------------------------------------------------------------------- */
+
 .stagger-load {
-  isolation: isolate; /* Cria um contexto de empilhamento independente */
+  isolation: isolate;
 }
 
 .stagger-load > * {
   opacity: 0;
-  /* Melhora a performance em telas ProMotion/120Hz */
   backface-visibility: hidden;
-  will-change: transform, opacity;
+  transform: translateZ(0);
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Delays baseados na sequência de leitura */
+/* Sequência progressiva otimizada */
 .stagger-load > *:nth-child(1) { animation-delay: 100ms; }
 .stagger-load > *:nth-child(2) { animation-delay: 180ms; }
 .stagger-load > *:nth-child(3) { animation-delay: 260ms; }
 .stagger-load > *:nth-child(4) { animation-delay: 340ms; }
 .stagger-load > *:nth-child(5) { animation-delay: 420ms; }
-.stagger-load > *:nth-child(n+6) { animation-delay: 500ms; }
+.stagger-load > *:nth-child(6) { animation-delay: 500ms; }
+.stagger-load > *:nth-child(n+7) { animation-delay: 550ms; }
 
-/* Skeleton Shimmer de Alta Performance */
+/* --------------------------------------------------------------------------
+   SKELETON SHIMMER
+   -------------------------------------------------------------------------- */
+
 .skeleton-shimmer {
   position: relative;
   overflow: hidden;
   background-color: color-mix(in oklch, currentColor 5%, transparent);
   border-radius: inherit;
-  transform: translateZ(0); /* Força nova camada de renderização */
+  transform: translateZ(0);
 }
 
 .skeleton-shimmer::after {
@@ -63,28 +75,41 @@
     transparent 100%
   );
   animation: shimmer 1.8s ease-in-out infinite;
-  will-change: transform;
 }
 
-/* Ajustes de Ritmo Cognitivo (Localização) 
-   Idiomas latinos (PT/ES) tendem a ter textos mais longos, 
-   uma animação levemente mais lenta melhora a legibilidade durante o scroll.
-*/
-[lang^="es"] .stagger-load > * { animation-duration: 0.9s; }
-[lang^="pt"] .stagger-load > * { animation-duration: 0.85s; }
-[lang^="en"] .stagger-load > * { animation-duration: 0.7s; }
+/* --------------------------------------------------------------------------
+   IDIOMA — AJUSTE COGNITIVO DE RITMO
+   -------------------------------------------------------------------------- */
 
-/* Acessibilidade: Movimento Reduzido (Rigor 2026) */
+/* Espanhol — textos mais longos */
+[lang^="es"] .stagger-load > * {
+  animation-duration: 0.9s;
+}
+
+/* Português */
+[lang^="pt"] .stagger-load > * {
+  animation-duration: 0.85s;
+}
+
+/* Inglês — leitura mais curta */
+[lang^="en"] .stagger-load > * {
+  animation-duration: 0.7s;
+}
+
+/* --------------------------------------------------------------------------
+   ACESSIBILIDADE — PREFERS REDUCED MOTION
+   -------------------------------------------------------------------------- */
+
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-  
-  .stagger-load > * {
-    opacity: 1; /* Garante visibilidade imediata sem movimento */
+  .stagger-load > *,
+  .skeleton-shimmer::after {
+    animation: none !important;
+    transition: none !important;
     transform: none !important;
+    opacity: 1 !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
   }
 }
