@@ -1,35 +1,36 @@
 @import "tailwindcss";
-
-/* A engine Oxide do Tailwind v4 processa o bundling automaticamente.
-   TS 6.0 ajuda na tipagem de variáveis CSS em componentes.
-*/
 @import "../styles/animations.css";
 
+/* ==========================================================================
+   GLOBAL DESIGN SYSTEM — NEXT 16 + TAILWIND v4 + OKLCH
+   ========================================================================== */
+
 @theme {
-  /* --- Palette de Cores OKLCH (Perceptualmente Uniforme) --- */
+  /* --- OKLCH Brand Palette --- */
   --color-brand-50: oklch(0.97 0.01 256.4);
   --color-brand-100: oklch(0.92 0.04 256.4);
   --color-brand-500: oklch(0.62 0.17 256.4);
   --color-brand-700: oklch(0.45 0.12 256.4);
   --color-brand-900: oklch(0.28 0.07 256.4);
 
-  /* --- Design Tokens Semânticos com Fallbacks --- */
+  /* --- Typography --- */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-heading: var(--font-montserrat), ui-serif, Georgia, serif;
-  
-  --breakpoint-xs: 375px;
-  --breakpoint-2xl: 1440px;
 
-  /* --- Efeitos de Elevação de Alta Definição --- */
+  /* --- Shadows --- */
   --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
   --shadow-glow: 0 0 20px color-mix(in oklch, oklch(0.62 0.17 256.4), transparent 70%);
 
-  /* --- Mapeamento de Variáveis de Sistema --- */
+  /* --- System Mapping --- */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-border: var(--border);
   --color-card: var(--card);
 }
+
+/* ==========================================================================
+   BASE LAYER
+   ========================================================================== */
 
 @layer base {
   :root {
@@ -37,8 +38,7 @@
     --foreground: oklch(0.15 0.02 256.4);
     --card: oklch(1 0 0);
     --border: oklch(0.92 0.01 256.4);
-    
-    /* Suporte a esquemas de cores do navegador */
+
     color-scheme: light;
   }
 
@@ -47,21 +47,21 @@
     --foreground: oklch(0.95 0.01 256.4);
     --card: oklch(0.18 0.02 256.4);
     --border: oklch(0.25 0.02 256.4);
-    
+
     color-scheme: dark;
   }
 
-  *, ::after, ::before {
-    @apply border-[var(--color-border)];
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
   }
 
   html {
     @apply scroll-smooth antialiased;
     background-color: var(--color-background);
     text-rendering: optimizeLegibility;
-    /* Impede o layout de "balançar" ao abrir modais */
     scrollbar-gutter: stable;
-    /* Melhora o toque em dispositivos móveis */
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -69,15 +69,33 @@
     @apply min-h-screen flex flex-col transition-colors duration-500 overflow-x-hidden;
     color: var(--color-foreground);
     background-color: var(--color-background);
-    /* Tratamento para telas com entalhes/notches */
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+
+    padding: env(safe-area-inset-top)
+      env(safe-area-inset-right)
+      env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
+
+    font-family: var(--font-sans);
+    line-height: 1.6;
   }
 
-  /* Foco acessível para navegação via teclado */
+  /* Idiomas latinos otimizados */
+  :lang(pt),
+  :lang(en),
+  :lang(es) {
+    hyphens: auto;
+    font-feature-settings: "kern", "liga", "clig", "calt";
+  }
+
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-brand-500;
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
   }
 }
+
+/* ==========================================================================
+   COMPONENTS
+   ========================================================================== */
 
 @layer components {
   .main-container {
@@ -85,15 +103,19 @@
   }
 
   .glass-effect {
-    @apply backdrop-blur-xl shadow-premium transition-all duration-300;
+    @apply backdrop-blur-xl transition-all duration-300;
     background-color: color-mix(in oklch, var(--color-card) 75%, transparent);
-    border: 1px solid color-mix(in oklch, var(--color-border) 50%, transparent);
+    border: 1px solid
+      color-mix(in oklch, var(--color-border) 50%, transparent);
+    box-shadow: var(--shadow-premium);
+    contain: layout paint;
   }
 
   .project-card {
-    @apply relative overflow-hidden rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-card)] transition-all duration-500;
-    /* Melhora performance de animação via GPU */
+    @apply relative overflow-hidden rounded-[2rem] border bg-[var(--color-card)] transition-all duration-500;
+    border-color: var(--color-border);
     will-change: transform, box-shadow;
+    contain: layout paint;
   }
 
   .text-balance {
