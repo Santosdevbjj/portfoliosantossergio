@@ -101,27 +101,6 @@ export default async function LangLayout({ children, params }: LayoutProps) {
           </>
         )}
       </body> 
-
-   // Dentro do seu componente de Layout ou Page
-return (
-  <div className="min-h-screen flex flex-col"> 
-    {/* 1. JSON-LD para SEO (Não renderiza visualmente) */}
-    <BreadcrumbsJsonLd lang={lang} dict={dict} baseUrl={baseUrl} />
-
-    {/* 2. Navegação Visual (Aparece no topo da página) */}
-    <nav className="container mx-auto px-4 py-2">
-      <Breadcrumbs lang={lang} dictionary={dict} baseUrl={baseUrl} />
-    </nav>
-
-    {/* 3. Conteúdo da Página */}
-    <main className="flex-grow">
-      {children}
-    </main>
-  </div>
-);
-
-
-      
     </html>
   );
 }
