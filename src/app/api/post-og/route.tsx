@@ -31,7 +31,7 @@ const formatDateSafe = (): string => {
   return `${day}/${month}/${year}`
 }
 
-// -------------------- I18N (leve e isolado) --------------------
+// -------------------- I18N --------------------
 
 type Locale = 'pt' | 'en' | 'es'
 
@@ -48,7 +48,6 @@ const getReadingLabel = (locale: Locale) => {
 
 const normalizeLocale = (value: string | null): Locale => {
   if (!value) return 'pt'
-
   if (value.startsWith('en')) return 'en'
   if (value.startsWith('es')) return 'es'
   return 'pt'
@@ -101,7 +100,6 @@ export async function GET(request: NextRequest) {
             backgroundImage:
               'radial-gradient(circle at 25px 25px, #1e293b 2%, transparent 0%)',
             backgroundSize: '50px 50px',
-            padding: 0,
           }}
         >
           <div
@@ -146,7 +144,6 @@ export async function GET(request: NextRequest) {
                 lineHeight: 1.1,
                 marginBottom: 22,
                 maxWidth: 1000,
-                overflow: 'hidden',
               }}
             >
               {title}
@@ -160,7 +157,6 @@ export async function GET(request: NextRequest) {
                 lineHeight: 1.4,
                 marginBottom: 42,
                 maxWidth: 900,
-                overflow: 'hidden',
               }}
             >
               {description}
