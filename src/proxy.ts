@@ -1,5 +1,3 @@
-// src/proxy.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import {
   isValidLocale,
@@ -7,17 +5,12 @@ import {
   type SupportedLocale,
 } from "@/dictionaries/locales";
 
-/**
- * Extrai o primeiro segmento da URL.
- */
 function getFirstSegment(pathname: string): string | null {
   const segments = pathname.split("/");
-  return segments.length > 1 ? segments[1] : null;
+  const first = segments[1];
+  return first ?? null;
 }
 
-/**
- * Verifica se a rota já contém um locale válido.
- */
 function hasValidLocale(pathname: string): boolean {
   const first = getFirstSegment(pathname);
   if (!first) return false;
@@ -27,7 +20,6 @@ function hasValidLocale(pathname: string): boolean {
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Ignorar internals, api e arquivos estáticos
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -36,12 +28,10 @@ export default function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Já tem locale válido
   if (hasValidLocale(pathname)) {
     return NextResponse.next();
   }
 
-  // Detecta idioma do navegador
   const acceptLanguage = request.headers.get("accept-language");
   const firstLanguage =
     acceptLanguage?.split(",")[0]?.trim() ?? null;
@@ -49,14 +39,12 @@ export default function proxy(request: NextRequest) {
   const detectedLocale: SupportedLocale =
     normalizeLocale(firstLanguage);
 
-  // Root "/"
   if (pathname === "/") {
     const url = request.nextUrl.clone();
     url.pathname = `/${detectedLocale}`;
     return NextResponse.redirect(url);
   }
 
-  // Outras rotas
   const url = request.nextUrl.clone();
   url.pathname = `/${detectedLocale}${pathname}`;
 
