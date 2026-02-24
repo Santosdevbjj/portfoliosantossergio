@@ -45,7 +45,7 @@ export function normalizeLocale(
   const raw = input.trim();
 
   // Substitui underscore por hífen
-  const cleaned = raw.replace("_", "-");
+  const cleaned = raw.replace(/_/g, "-");
 
   const lower = cleaned.toLowerCase();
 
@@ -54,13 +54,18 @@ export function normalizeLocale(
   if (lower === "en") return "en-US";
   if (lower === "es") return "es-ES";
 
-  // Formato xx-YY
-  if (lower.length === 5 && lower.includes("-")) {
-    const [lang, region] = lower.split("-");
-    const formatted = `${lang}-${region.toUpperCase()}`;
+  // Formato xx-YY seguro
+  const parts = lower.split("-");
 
-    if (isValidLocale(formatted)) {
-      return formatted;
+  if (parts.length === 2) {
+    const [lang, region] = parts;
+
+    if (lang.length === 2 && region.length === 2) {
+      const formatted = `${lang}-${region.toUpperCase()}`;
+
+      if (isValidLocale(formatted)) {
+        return formatted;
+      }
     }
   }
 
