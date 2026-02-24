@@ -1,74 +1,48 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
-
 import { generateBreadcrumbs } from '@/lib/seo/breadcrumbs';
 import type { Locale, Dictionary } from '@/types/dictionary';
 
 interface BreadcrumbsJsonLdProps {
   lang: Locale;
   baseUrl: string;
-  dict: Dictionary; // ✅ agora vem pronto do Server Component
+  dict: Dictionary;
 }
 
-export function BreadcrumbsJsonLd({
-  lang,
-  baseUrl,
-  dict,
-}: BreadcrumbsJsonLdProps) {
+/**
+ * Injeta Schema.org JSON-LD para SEO
+ * ✔ Evita conteúdo duplicado com ID único
+ * ✔ Atualiza automaticamente na mudança de rota
+ */
+export function BreadcrumbsJsonLd({ lang, baseUrl, dict }: BreadcrumbsJsonLdProps) {
   const pathname = usePathname();
 
-  const normalizedBaseUrl = useMemo(
-    () => baseUrl.replace(/\/+$/, ''),
-    [baseUrl]
-  );
+  const jsonLd = useMemo(() => {
+    if (!pathname) return null;
 
-  const breadcrumbs = useMemo(() => {
-    if (!pathname) return [];
+    const breadcrumbs = generateBreadcrumbs(pathname, lang, dict, baseUrl);
 
-    return generateBreadcrumbs(
-      pathname,
-      lang,
-      dict,
-      normalizedBaseUrl
-    );
-  }, [pathname, lang, dict, normalizedBaseUrl]);
-
-  useEffect(() => {
-    if (!breadcrumbs.length) return;
-
-    const scriptId = `breadcrumbs-jsonld-${lang}`;
-
-    const jsonLd = {
+    return {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
-      itemListElement: breadcrumbs.map((crumb, index) => ({
+      'itemListElement': breadcrumbs.map((crumb, index) => ({
         '@type': 'ListItem',
-        position: index + 1,
-        name: crumb.name,
-        item: crumb.item,
+        'position': index + 1,
+        'name': crumb.name,
+        'item': crumb.item,
       })),
     };
+  }, [pathname, lang, dict, baseUrl]);
 
-    let script = document.getElementById(
-      scriptId
-    ) as HTMLScriptElement | null;
+  if (!jsonLd) return null;
 
-    if (!script) {
-      script = document.createElement('script');
-      script.id = scriptId;
-      script.type = 'application/ld+json';
-      document.head.appendChild(script);
-    }
-
-    script.textContent = JSON.stringify(jsonLd);
-
-    return () => {
-      const existing = document.getElementById(scriptId);
-      if (existing) existing.remove();
-    };
-  }, [breadcrumbs, lang]);
-
-  return null;
+  return (
+    <script
+      type="application/ld-json"
+      id={`json-ld-breadcrumbs-${lang}`}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
 }
