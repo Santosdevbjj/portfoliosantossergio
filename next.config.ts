@@ -12,6 +12,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   trailingSlash: true,
+  cacheComponents: true,
   
   // Suporte nativo para telemetria no Node 24 (Otimizado para Sharp)
   serverExternalPackages: ["@microsoft/applicationinsights-web"], 
