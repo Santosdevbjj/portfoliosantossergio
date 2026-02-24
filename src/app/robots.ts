@@ -1,60 +1,33 @@
-import type { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next";
 
 /**
- * ROBOTS.TXT — NEXT.JS 16 (ESTRATÉGIA 2026)
+ * ROBOTS.TXT — NEXT.JS 16 (SEO Internacional 2026)
  * -----------------------------------------------------------------------------
- * ✔ SEO internacional (pt / en / es)
- * ✔ Compatível com App Router e RSC
- * ✔ Seguro para buscadores e LLMs
+ * ✔ SEO multilíngue (pt-BR / en-US / es-*)
+ * ✔ Compatível com App Router
+ * ✔ Seguro para APIs
+ * ✔ Edge-safe
  * ✔ Produção-ready
  */
 
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = (
     process.env.NEXT_PUBLIC_SITE_URL ??
-    'https://portfoliosantossergio.vercel.app'
-  ).replace(/\/$/, '')
+    "https://portfoliosantossergio.vercel.app"
+  ).replace(/\/$/, "");
 
   return {
     rules: [
       /**
-       * 1️⃣ BUSCADORES GERAIS
-       * Permite indexação total do conteúdo público
-       * Bloqueia apenas áreas sensíveis
+       * 1️⃣ Todos os buscadores e crawlers
        */
       {
-        userAgent: '*',
-        allow: '/',
+        userAgent: "*",
+        allow: "/",
         disallow: [
-          '/api/',
-          '/private/',
-          '/admin/',
-        ],
-      },
-
-      /**
-       * 2️⃣ AGENTES DE IA / LLMs
-       * Permite leitura semântica do conteúdo público
-       * Protege APIs e áreas internas
-       */
-      {
-        userAgent: [
-          'GPTBot',
-          'ChatGPT-User',
-          'Claude-bot',
-          'Google-Extended',
-          'PerplexityBot',
-          'CCBot', // Common Crawl
-        ],
-        allow: [
-          '/pt',
-          '/en',
-          '/es',
-        ],
-        disallow: [
-          '/api/',
-          '/private/',
-          '/admin/',
+          "/api/",
+          "/private/",
+          "/admin/",
         ],
       },
     ],
@@ -63,5 +36,10 @@ export default function robots(): MetadataRoute.Robots {
      * Sitemap internacional
      */
     sitemap: `${baseUrl}/sitemap.xml`,
-  }
+
+    /**
+     * Host canônico
+     */
+    host: baseUrl,
+  };
 }
