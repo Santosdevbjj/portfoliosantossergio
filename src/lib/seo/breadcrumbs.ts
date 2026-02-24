@@ -1,13 +1,5 @@
 // src/lib/seo/breadcrumbs.ts
-
 import type { Locale, Dictionary } from "@/types/dictionary";
-
-/**
- * Deriva as chaves válidas de seo.pages
- * Totalmente type-safe com TS 6 strict
- */
-type SeoPages = NonNullable<Dictionary["seo"]>["pages"];
-type SeoPageKey = keyof SeoPages;
 
 export interface BreadcrumbItem {
   name: string;
@@ -15,16 +7,8 @@ export interface BreadcrumbItem {
 }
 
 /**
- * Gera breadcrumbs multilíngues baseados em:
- * - pathname atual
- * - locale ativo
- * - dicionário carregado
- * - baseUrl do site
- *
- * ✔ Compatível com Next.js 16 (App Router)
- * ✔ Compatível com TypeScript 6 strict
- * ✔ Seguro para JSON-LD
- * ✔ Funciona com rotas dinâmicas
+ * Gera breadcrumbs multilíngues 100% Type-Safe
+ * ✔ Compatível com TS 6 strict e Next.js 16
  */
 export function generateBreadcrumbs(
   pathname: string,
@@ -32,25 +16,26 @@ export function generateBreadcrumbs(
   dict: Dictionary,
   baseUrl: string
 ): BreadcrumbItem[] {
-  const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
+  const normalizedBaseUrl = baseUrl.replace(/\/+$/, "");
   const segments = extractPathSegments(pathname, locale);
 
   const breadcrumbs: BreadcrumbItem[] = [];
 
-  // 1️⃣ Home sempre primeiro
+  // 1️⃣ Home (Sempre aponta para a raiz do idioma)
   breadcrumbs.push({
-    name: resolveHomeLabel(dict),
+    name: dict.seo.pages.home.title,
     item: `${normalizedBaseUrl}/${locale}`,
   });
 
-  // 2️⃣ Demais segmentos
+  // 2️⃣ Processamento de Segmentos
   let cumulativePath = `/${locale}`;
 
   for (const segment of segments) {
+    const decodedSegment = decodeURIComponent(segment);
     cumulativePath += `/${segment}`;
 
     breadcrumbs.push({
-      name: resolveSegmentLabel(segment, dict),
+      name: resolveLabel(decodedSegment, dict),
       item: `${normalizedBaseUrl}${cumulativePath}`,
     });
   }
@@ -58,60 +43,29 @@ export function generateBreadcrumbs(
   return breadcrumbs;
 }
 
-/* ======================================================
-   Helpers Privados (100% Type-Safe)
-====================================================== */
-
-function normalizeBaseUrl(url: string): string {
-  return url.replace(/\/+$/, "");
-}
-
-function extractPathSegments(
-  pathname: string,
-  locale: Locale
-): string[] {
+function extractPathSegments(pathname: string, locale: Locale): string[] {
   return pathname
     .split("/")
     .filter(Boolean)
-    .filter((segment) => segment !== locale);
+    // Filtra tanto o locale completo (pt-BR) quanto o prefixo curto se houver (pt)
+    .filter((s) => s !== locale && s !== locale.split("-")[0]);
 }
 
-function resolveHomeLabel(dict: Dictionary): string {
-  return dict.seo?.pages?.home?.title ?? "Home";
-}
-
-/**
- * Type guard seguro para SeoPageKey
- */
-function isSeoPageKey(
-  key: string,
-  pages: SeoPages
-): key is SeoPageKey {
-  return key in pages;
-}
-
-function resolveSegmentLabel(
-  segment: string,
-  dict: Dictionary
-): string {
-  const decoded = decodeURIComponent(segment);
-
-  const pages = dict.seo?.pages;
-
-  if (pages && isSeoPageKey(decoded, pages)) {
-    return pages[decoded].title;
+function resolveLabel(segment: string, dict: Dictionary): string {
+  // 1. Tenta buscar em seo.pages (mapeamento oficial de rotas)
+  const pages = dict.seo.pages;
+  if (segment in pages) {
+    return pages[segment as keyof typeof pages].title;
   }
 
-  const nav = dict.common?.nav;
-  if (nav && decoded in nav) {
-    return nav[decoded as keyof typeof nav];
+  // 2. Tenta buscar em common.nav
+  const nav = dict.common.nav;
+  if (segment in nav) {
+    return nav[segment as keyof typeof nav];
   }
 
-  return formatSlug(decoded);
-}
-
-function formatSlug(slug: string): string {
-  return slug
+  // 3. Fallback: Formatação de Slug
+  return segment
     .replace(/-/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
