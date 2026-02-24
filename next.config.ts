@@ -7,12 +7,13 @@ import type { NextConfig } from "next";
  * TS Engine: 6.0 Ready
  * i18n Strategy: App Router Middleware (Configuração removida para evitar erro de build)
  */
-const nextConfig = {
-  trailingSlash: true,
-};
+// const nextConfig = {
+  // trailingSlash: true,
+// };
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  trailingSlash: true,
   
   // Suporte nativo para telemetria no Node 24 (Otimizado para Sharp)
   serverExternalPackages: ["@microsoft/applicationinsights-web"], 
