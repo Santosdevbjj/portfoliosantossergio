@@ -1,19 +1,29 @@
 import { ImageResponse } from 'next/og'
 import type { NextRequest } from 'next/server'
 
-// export const runtime = 'edge'
+export const runtime = 'edge'
+
+export const size = {
+  width: 1200,
+  height: 630,
+}
+
+export const contentType = 'image/png'
 
 // -------------------- Helpers --------------------
 
-const sanitizeText = (value: string, max = 120) =>
+const sanitizeText = (value: string, max = 120): string =>
   value.replace(/\s+/g, ' ').trim().slice(0, max)
 
-const sanitizePositiveInt = (value: string | null, fallback: number) => {
+const sanitizePositiveInt = (
+  value: string | null,
+  fallback: number,
+): number => {
   const n = Number(value)
   return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback
 }
 
-const formatDateSafe = () => {
+const formatDateSafe = (): string => {
   const d = new Date()
   const day = String(d.getUTCDate()).padStart(2, '0')
   const month = String(d.getUTCMonth() + 1).padStart(2, '0')
@@ -21,11 +31,36 @@ const formatDateSafe = () => {
   return `${day}/${month}/${year}`
 }
 
+// -------------------- I18N (leve e isolado) --------------------
+
+type Locale = 'pt' | 'en' | 'es'
+
+const getReadingLabel = (locale: Locale) => {
+  switch (locale) {
+    case 'en':
+      return 'MIN READ'
+    case 'es':
+      return 'MIN DE LECTURA'
+    default:
+      return 'MIN DE LEITURA'
+  }
+}
+
+const normalizeLocale = (value: string | null): Locale => {
+  if (!value) return 'pt'
+
+  if (value.startsWith('en')) return 'en'
+  if (value.startsWith('es')) return 'es'
+  return 'pt'
+}
+
 // -------------------- Handler --------------------
 
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
+
+    const locale = normalizeLocale(searchParams.get('lang'))
 
     const title = sanitizeText(
       searchParams.get('title') ?? 'Sérgio Santos',
@@ -51,6 +86,8 @@ export function GET(request: NextRequest) {
       5,
     )
 
+    const readingLabel = getReadingLabel(locale)
+
     return new ImageResponse(
       (
         <div
@@ -64,6 +101,7 @@ export function GET(request: NextRequest) {
             backgroundImage:
               'radial-gradient(circle at 25px 25px, #1e293b 2%, transparent 0%)',
             backgroundSize: '50px 50px',
+            padding: 0,
           }}
         >
           <div
@@ -95,7 +133,7 @@ export function GET(request: NextRequest) {
                   letterSpacing: 0.5,
                 }}
               >
-                {readingTime} MIN DE LEITURA
+                {readingTime} {readingLabel}
               </span>
             </div>
 
@@ -108,6 +146,7 @@ export function GET(request: NextRequest) {
                 lineHeight: 1.1,
                 marginBottom: 22,
                 maxWidth: 1000,
+                overflow: 'hidden',
               }}
             >
               {title}
@@ -121,6 +160,7 @@ export function GET(request: NextRequest) {
                 lineHeight: 1.4,
                 marginBottom: 42,
                 maxWidth: 900,
+                overflow: 'hidden',
               }}
             >
               {description}
@@ -184,8 +224,7 @@ export function GET(request: NextRequest) {
         </div>
       ),
       {
-        width: 1200,
-        height: 630,
+        ...size,
         headers: {
           'Cache-Control': 'public, immutable, max-age=31536000',
         },
