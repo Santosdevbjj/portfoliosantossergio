@@ -32,8 +32,8 @@ export function isValidLocale(
  * Normaliza qualquer entrada para um locale suportado.
  *
  * ✔ Case insensitive
- * ✔ Aceita pt-br, pt_BR, pt
- * ✔ Aceita en, es
+ * ✔ Aceita pt-br, pt_BR
+ * ✔ Aceita pt, en, es
  * ✔ Nunca retorna null
  * ✔ Sempre retorna SupportedLocale
  */
@@ -42,23 +42,19 @@ export function normalizeLocale(
 ): SupportedLocale {
   if (!input) return DEFAULT_LOCALE;
 
-  const raw = input.trim();
-
-  // Substitui underscore por hífen
-  const cleaned = raw.replace(/_/g, "-");
-
-  const lower = cleaned.toLowerCase();
+  const cleaned = input.trim().replace(/_/g, "-").toLowerCase();
 
   // ISO base
-  if (lower === "pt") return "pt-BR";
-  if (lower === "en") return "en-US";
-  if (lower === "es") return "es-ES";
+  if (cleaned === "pt") return "pt-BR";
+  if (cleaned === "en") return "en-US";
+  if (cleaned === "es") return "es-ES";
 
-  // Formato xx-YY seguro
-  const parts = lower.split("-");
+  // Formato xx-YY
+  const dashIndex = cleaned.indexOf("-");
 
-  if (parts.length === 2) {
-    const [lang, region] = parts;
+  if (dashIndex > 0) {
+    const lang = cleaned.slice(0, dashIndex);
+    const region = cleaned.slice(dashIndex + 1);
 
     if (lang.length === 2 && region.length === 2) {
       const formatted = `${lang}-${region.toUpperCase()}`;
