@@ -2,8 +2,6 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import {
-  SUPPORTED_LOCALES,
-  DEFAULT_LOCALE,
   isValidLocale,
   normalizeLocale,
   type SupportedLocale,
@@ -11,7 +9,6 @@ import {
 
 /**
  * Extrai o primeiro segmento da URL.
- * Ex: "/pt-BR/about" → "pt-BR"
  */
 function getFirstSegment(pathname: string): string | null {
   const segments = pathname.split("/");
@@ -30,12 +27,7 @@ function hasValidLocale(pathname: string): boolean {
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  /**
-   * Ignorar:
-   * - Next internals
-   * - API
-   * - Arquivos públicos com extensão
-   */
+  // Ignorar internals, api e arquivos estáticos
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -44,16 +36,12 @@ export default function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  /**
-   * Se já tiver locale válido → não faz nada
-   */
+  // Já tem locale válido
   if (hasValidLocale(pathname)) {
     return NextResponse.next();
   }
 
-  /**
-   * Detecta idioma do navegador
-   */
+  // Detecta idioma do navegador
   const acceptLanguage = request.headers.get("accept-language");
   const firstLanguage =
     acceptLanguage?.split(",")[0]?.trim() ?? null;
@@ -61,32 +49,20 @@ export default function proxy(request: NextRequest) {
   const detectedLocale: SupportedLocale =
     normalizeLocale(firstLanguage);
 
-  /**
-   * Se for root "/"
-   */
+  // Root "/"
   if (pathname === "/") {
     const url = request.nextUrl.clone();
     url.pathname = `/${detectedLocale}`;
     return NextResponse.redirect(url);
   }
 
-  /**
-   * Para qualquer outra rota:
-   * /about → /pt-BR/about
-   */
+  // Outras rotas
   const url = request.nextUrl.clone();
   url.pathname = `/${detectedLocale}${pathname}`;
 
   return NextResponse.redirect(url);
 }
 
-/**
- * Matcher oficial recomendado para Next.js 16
- * Evita interceptar:
- * - _next
- * - arquivos estáticos
- * - api
- */
 export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|api).*)",
