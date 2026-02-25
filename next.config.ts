@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
 
 /**
- * NEXT.JS 16 & NODE 24 CONFIGURATION — SÉRGIO SANTOS PORTFOLIO
+ * NEXT.JS 16.1.6 & NODE 24 CONFIGURATION — SÉRGIO SANTOS PORTFOLIO
  * -----------------------------------------------------------------------------
  * ✔ TypeScript 6.0 Strict Ready
- * ✔ Next.js 16.1.6 Optimized
- * ✔ FIXED: Simplified source strings to prevent path-to-regexp errors
+ * ✔ Turbopack (Rust Engine) Optimized
+ * ✔ FIXED: "Can not repeat lang" error by using standard path-to-regexp syntax
  */
 
 const nextConfig: NextConfig = {
@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    // TypeScript 6.0 exige 'as const' para validar tipos literais de tuplas
+    // TS 6.0: 'as const' é obrigatório para inferência de tuplas literais
     formats: ['image/avif', 'image/webp'] as const,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128],
@@ -56,7 +56,6 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Aplica cabeçalhos de segurança básicos em todas as rotas
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -65,16 +64,18 @@ const nextConfig: NextConfig = {
         ],
       },
       /**
-       * SOLUÇÃO DEFINITIVA PARA O ERRO DE PARSING:
-       * Removemos qualquer parêntese ou regex complexo.
-       * Usamos caminhos diretos que o Next.js mapeia para a pasta /public automaticamente.
+       * SOLUÇÃO DO ERRO "Can not repeat lang":
+       * Substituímos ":lang*" por "(.*)". 
+       * De acordo com a documentação que você enviou, envolver o regex em 
+       * parênteses duplos trata o padrão como um parâmetro não nomeado, 
+       * o que evita o conflito de repetição do Turbopack.
        */
       {
-        source: '/cv-sergio-santos-:lang*',
+        source: '/cv-sergio-santos-((.*))',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        source: '/og-image-:lang*',
+        source: '/og-image-((.*))',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
@@ -92,7 +93,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Suporte para Node 24 e pacotes externos
   serverExternalPackages: ["@microsoft/applicationinsights-web"],
   transpilePackages: ['lucide-react'],
 };
