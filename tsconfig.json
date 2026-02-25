@@ -3,15 +3,13 @@
     /* --- MOTOR NATIVO TS 6.0 & NEXT.JS 16 --- */
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "outDir": "./dist",   // Diretório de saída para deploy
-    "rootDir": ".",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",   
-    "verbatimModuleSyntax": true,    /* Exige import type para tipos */
-    "moduleDetection": "force",
     "noEmit": true,
-
-    /* --- RIGOR DE MISSÃO CRÍTICA (Padrão Bancário) --- */
+    "module": "ESNext",
+    "moduleResolution": "Bundler", 
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    
+    /* --- RIGOR DE MISSÃO CRÍTICA --- */
     "strict": true,
     "noUncheckedIndexedAccess": true, 
     "exactOptionalPropertyTypes": true, 
@@ -19,25 +17,24 @@
     "useUnknownInCatchVariables": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false, 
-    /* "noUncheckedSideEffectImports": true, */ /* Removido: pode causar erro com CSS imports */
 
     /* --- NEXT.JS 16 & REACT 19 ARCHITECTURE --- */
-    "jsx": "react-jsx",
+    "jsx": "preserve", /* Alterado para 'preserve' para delegar ao SWC do Next.js */
     "incremental": true,
     "tsBuildInfoFile": "node_modules/.cache/tsconfig.tsbuildinfo",
     
     /* --- INTEROP & SECURITY --- */
     "esModuleInterop": true,         
     "resolveJsonModule": true,
-    "allowJs": false,
+    "allowJs": true, /* Alterado para true: sua lista tem 'mcp-env.js' e 'eslint.config.js' */
     "skipLibCheck": true,          
     "forceConsistentCasingInFileNames": true,
 
     /* --- PERFORMANCE & TYPES --- */
     "types": ["node"],
-    /* Removida stableTypeOrdering pois é experimental no TS 6.0 */
 
-    /* --- INFRASTRUCTURE PATHS --- */
+    /* --- INFRASTRUCTURE PATHS (Alinhado com sua estrutura src/) --- */
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "#/*": ["./src/*"]
@@ -55,9 +52,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/**/*",
+    "src/**/*",         /* Cobre toda sua estrutura de dicionários e libs */
     "next.config.ts",
-    ".next/dev/types/**/*.ts" 
+    "tests/**/*.ts"     /* Adicionado para cobrir seu 'tests/i18n.spec.ts' */
   ],
 
   "exclude": [
