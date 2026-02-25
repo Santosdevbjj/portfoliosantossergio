@@ -1,12 +1,18 @@
 #!/usr/bin/env node
+
+/**
+ * Wrapper MCP para Next.js 16
+ * Este arquivo permanece na raiz para ser chamado pelo .mcp.json
+ */
+
 const { spawn } = require("child_process");
 const net = require("net");
 
-// Função para checar porta padrão ou próxima disponível
-function detectPort(host = "localhost", defaultPort = 3000) {
+// Função para checar porta disponível (Melhorada para TS 6/Node 22+)
+async function detectPort(host = "localhost", defaultPort = 3000) {
   return new Promise((resolve) => {
     const server = net.createServer();
-    server.once("error", () => resolve(defaultPort)); 
+    server.once("error", () => resolve(defaultPort + 1)); // Tenta a próxima se estiver ocupada
     server.once("listening", () => {
       server.close(() => resolve(defaultPort));
     });
@@ -16,7 +22,7 @@ function detectPort(host = "localhost", defaultPort = 3000) {
 
 (async () => {
   const host = process.env.NEXT_DEV_SERVER_HOST || "localhost";
-  const port = process.env.NEXT_DEV_SERVER_PORT || (await detectPort(host, 3000));
+  const port = await detectPort(host, parseInt(process.env.NEXT_DEV_SERVER_PORT || "3000"));
 
   const env = {
     ...process.env,
@@ -26,16 +32,13 @@ function detectPort(host = "localhost", defaultPort = 3000) {
     NODE_ENV: process.env.NODE_ENV || "development"
   };
 
-  console.error(`✅ MCP Environment: ${env.NEXT_DEV_SERVER_URL}`);
+  console.error(`\x1b[32m✅ MCP Environment Active: ${env.NEXT_DEV_SERVER_URL}\x1b[0m`);
 
-  // Inicia o servidor MCP real como um processo filho
-  // Isso permite que o .mcp.json chame apenas este script
-  const cmd = "npx";
-  const args = ["-y", "next-devtools-mcp@latest"];
-
-  const child = spawn(cmd, args, {
+  // Inicia o servidor MCP real. 
+  // Em 2026, usamos npx para garantir a versão estável do devtools
+  const child = spawn("npx", ["-y", "next-devtools-mcp@latest"], {
     env,
-    stdio: "inherit", // Mantém a comunicação stdio necessária para o protocolo MCP
+    stdio: "inherit", 
     shell: true
   });
 
