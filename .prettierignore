@@ -1,0 +1,40 @@
+# --- Build e Artifacts ---
+.next
+node_modules
+dist
+build
+out
+.vercel
+
+# --- Logs e Testes ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage
+.nyc_output
+
+# --- Infraestrutura e Ferramentas ---
+.husky
+.vscode
+.mcp.json
+mcp-env.js
+.npmrc
+.env*
+
+# --- Assets Estáticos (Não formatar binários ou SVGs otimizados) ---
+public/
+**/*.min.js
+**/*.min.css
+
+# --- TypeScript & Configs Estáticas ---
+next-env.d.ts
+tsbuildinfo
+.eslintcache
+
+# --- Ignore o próprio ignore e arquivos de texto puro ---
+.prettierignore
+.stylelintignore
+.editorconfig
+LICENSE
+*.md
