@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
  * -----------------------------------------------------------------------------
  * ✔ TypeScript 6.0 Strict Ready
  * ✔ Turbopack Optimized
- * ✔ Security & i18n Path Consistency
+ * ✔ Fixed path-to-regexp source for Headers
  */
 
 const nextConfig: NextConfig = {
@@ -15,7 +15,6 @@ const nextConfig: NextConfig = {
 
   // Configurações de Compilação e Otimização de Pacotes
   experimental: {
-    // Next 16: Otimização agressiva para bibliotecas de UI e Icons
     optimizePackageImports: [
       "lucide-react",
       "framer-motion",
@@ -23,16 +22,14 @@ const nextConfig: NextConfig = {
       "tailwind-merge",
       "date-fns"
     ],
-    // React 19/20 Taint API: Proteção contra vazamento de objetos do servidor para o cliente
     taint: true, 
-    // Gestão estável de cache para rotas dinâmicas [lang]
     staleTimes: {
       dynamic: 30,
       static: 180,
     },
   },
 
-  // Configuração de Imagens (TypeScript 6.0 Safe via 'as const')
+  // Configuração de Imagens (Otimizado para Sharp/Node 24)
   images: {
     formats: ['image/avif', 'image/webp'] as const,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
@@ -47,11 +44,10 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Redirecionamentos para evitar Erros 404 (Sincronizado com seus Assets)
+  // Redirecionamentos (Sincronizado com os locales do seu dicionário)
   async redirects() {
     return [
       {
-        // Garante que a raiz aponte para o locale completo usado no seu sistema
         source: '/',
         destination: '/pt-BR',
         permanent: true,
@@ -59,11 +55,11 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Cabeçalhos de Cache e Segurança para PDFs e Assets
+  // Cabeçalhos de Cache e Segurança
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
@@ -71,18 +67,23 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Cache agressivo para currículos e imagens da pasta public
-        source: '/(cv-|og-image-|images|icons).*',
+        /**
+         * CORREÇÃO AQUI: 
+         * Utilizamos parênteses duplos ((...)) para envolver o parâmetro não nomeado
+         * conforme exigido pela nova especificação do Next.js/Vercel.
+         */
+        source: '/((cv-|og-image-|images/|icons/).*)',
         headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
         ],
       },
     ];
   },
 
-  // Configurações de Infraestrutura
   serverExternalPackages: ["@microsoft/applicationinsights-web"],
-  // Transpilação caso existam pacotes locais ou bibliotecas ESM puras
   transpilePackages: ['lucide-react'],
 };
 
