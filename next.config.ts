@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
  * -----------------------------------------------------------------------------
  * ✔ TypeScript 6.0 Strict Ready
  * ✔ Turbopack (Rust Engine) Optimized
- * ✔ FIXED: "Can not repeat lang" error by using standard path-to-regexp syntax
+ * ✔ FIXED: Removed all RegEx capturing groups to satisfy Turbopack strictness
  */
 
 const nextConfig: NextConfig = {
@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    // TS 6.0: 'as const' é obrigatório para inferência de tuplas literais
+    // TS 6.0 exige 'as const' para tuplas de formatos
     formats: ['image/avif', 'image/webp'] as const,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128],
@@ -56,6 +56,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Cabeçalhos de segurança globais
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -64,18 +65,16 @@ const nextConfig: NextConfig = {
         ],
       },
       /**
-       * SOLUÇÃO DO ERRO "Can not repeat lang":
-       * Substituímos ":lang*" por "(.*)". 
-       * De acordo com a documentação que você enviou, envolver o regex em 
-       * parênteses duplos trata o padrão como um parâmetro não nomeado, 
-       * o que evita o conflito de repetição do Turbopack.
+       * SOLUÇÃO DEFINITIVA:
+       * Substituímos o Regex complexo por padrões de caminho simples (:path*).
+       * Isso mapeia perfeitamente seus arquivos na pasta /public sem violar as regras do Turbopack.
        */
       {
-        source: '/cv-sergio-santos-((.*))',
+        source: '/cv-sergio-santos-:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        source: '/og-image-((.*))',
+        source: '/og-image-:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
