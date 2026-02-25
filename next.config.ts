@@ -4,8 +4,8 @@ import type { NextConfig } from "next";
  * NEXT.JS 16 & NODE 24 CONFIGURATION — SÉRGIO SANTOS PORTFOLIO
  * -----------------------------------------------------------------------------
  * ✔ TypeScript 6.0 Strict Ready
- * ✔ Turbopack Optimized
- * ✔ FIXED: Route source without illegal capturing groups
+ * ✔ Next.js 16.1.6 Optimized
+ * ✔ FIXED: Simplified source strings to prevent path-to-regexp errors
  */
 
 const nextConfig: NextConfig = {
@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
   },
 
   images: {
+    // TypeScript 6.0 exige 'as const' para validar tipos literais de tuplas
     formats: ['image/avif', 'image/webp'] as const,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128],
@@ -55,6 +56,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Aplica cabeçalhos de segurança básicos em todas as rotas
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -63,17 +65,16 @@ const nextConfig: NextConfig = {
         ],
       },
       /**
-       * SOLUÇÃO DO ERRO DE BUILD:
-       * Em vez de tentar agrupar com Regex complexo (que causa erro de parsing),
-       * definimos regras explícitas para os prefixos dos seus arquivos.
-       * Isso é mais rápido e 100% compatível com o parser do Next.js 16.
+       * SOLUÇÃO DEFINITIVA PARA O ERRO DE PARSING:
+       * Removemos qualquer parêntese ou regex complexo.
+       * Usamos caminhos diretos que o Next.js mapeia para a pasta /public automaticamente.
        */
       {
-        source: '/cv-:slug*',
+        source: '/cv-sergio-santos-:lang*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        source: '/og-image-:slug*',
+        source: '/og-image-:lang*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
@@ -84,9 +85,14 @@ const nextConfig: NextConfig = {
         source: '/icons/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
+      {
+        source: '/sitemap.xml',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, must-revalidate' }],
+      }
     ];
   },
 
+  // Suporte para Node 24 e pacotes externos
   serverExternalPackages: ["@microsoft/applicationinsights-web"],
   transpilePackages: ['lucide-react'],
 };
