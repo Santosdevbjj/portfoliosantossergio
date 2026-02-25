@@ -1,5 +1,5 @@
-// import "./src/env"; 
-import { env } from "./src/env";
+ import "./src/env"; 
+// import { env } from "./src/env";
 import type { NextConfig } from "next";
 
 /**
@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   typedRoutes: true,
+  serverExternalPackages: ["@modelcontextprotocol/sdk"],
 
   experimental: {
     optimizePackageImports: [
