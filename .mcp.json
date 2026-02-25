@@ -1,21 +1,36 @@
 {
   "mcpServers": {
     "next-devtools": {
-      "description": "Next.js DevTools MCP - Auto-detecting env",
+      "description": "Next.js 16 DevTools MCP - Conectado ao mcp-env.js",
       "command": "node",
       "args": ["mcp-env.js"],
       "env": {
-        "NODE_ENV": "development"
+        "NODE_ENV": "development",
+        "NEXT_RUNTIME": "nodejs"
       }
     },
     "typescript-analyzer": {
-      "description": "TypeScript analysis server using MCP",
+      "description": "TypeScript 6.0 Analyzer - Mapeamento de pasta src/",
       "command": "npx",
       "args": [
         "-y",
         "@modelcontextprotocol/server-typescript",
         "--project",
-        "."
+        "tsconfig.json",
+        "--include",
+        "src"
+      ],
+      "env": {
+        "TS_NODE_PROJECT": "tsconfig.json"
+      }
+    },
+    "i18n-dictionary-helper": {
+      "description": "Auxiliar de dicionários e traduções do portfólio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-filesystem",
+        "./src/dictionaries"
       ]
     }
   }
