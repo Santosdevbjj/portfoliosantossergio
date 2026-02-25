@@ -4,8 +4,8 @@ import type { NextConfig } from "next";
  * NEXT.JS 16.1.6 & NODE 24 CONFIGURATION — SÉRGIO SANTOS PORTFOLIO
  * -----------------------------------------------------------------------------
  * ✔ TypeScript 6.0 Strict Ready
- * ✔ Turbopack (Rust Engine) Optimized
- * ✔ FIXED: Removed all RegEx capturing groups to satisfy Turbopack strictness
+ * ✔ Turbopack (Rust Engine) Compatibility FIXED
+ * ✔ FIXED: "Can not repeat path" by renaming and restructuring wildcards
  */
 
 const nextConfig: NextConfig = {
@@ -29,7 +29,6 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    // TS 6.0 exige 'as const' para tuplas de formatos
     formats: ['image/avif', 'image/webp'] as const,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128],
@@ -56,8 +55,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Cabeçalhos de segurança globais
-        source: '/:path*',
+        // Alterado de :path* para :all* para evitar conflito com a palavra reservada 'path' no Turbopack
+        source: '/:all*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
@@ -65,24 +64,25 @@ const nextConfig: NextConfig = {
         ],
       },
       /**
-       * SOLUÇÃO DEFINITIVA:
-       * Substituímos o Regex complexo por padrões de caminho simples (:path*).
-       * Isso mapeia perfeitamente seus arquivos na pasta /public sem violar as regras do Turbopack.
+       * SOLUÇÃO DEFINITIVA PARA O ERRO DE REPETIÇÃO:
+       * Usamos prefixos fixos e capturamos o restante sem usar modificadores de repetição complexos.
+       * O Next.js 16 trata :slug como o nome do arquivo.
        */
       {
-        source: '/cv-sergio-santos-:path*',
+        source: '/cv-sergio-santos-:slug.pdf',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        source: '/og-image-:path*',
+        source: '/og-image-:slug.png',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        source: '/images/:path*',
+        // Para pastas, usamos :file* que é mais aceito pelo parser Rust
+        source: '/images/:file*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        source: '/icons/:path*',
+        source: '/icons/:file*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
