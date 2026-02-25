@@ -9,7 +9,7 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     
-    /* --- RIGOR DE MISSÃO CRÍTICA --- */
+    /* --- RIGOR DE MISSÃO CRÍTICA (Padrão Bancário) --- */
     "strict": true,
     "noUncheckedIndexedAccess": true, 
     "exactOptionalPropertyTypes": true, 
@@ -19,22 +19,22 @@
     "noUnusedParameters": false, 
 
     /* --- NEXT.JS 16 & REACT 19 ARCHITECTURE --- */
-    "jsx": "preserve", /* Alterado para 'preserve' para delegar ao SWC do Next.js */
+    "jsx": "react-jsx", /* Next.js exige react-jsx no build production */
     "incremental": true,
     "tsBuildInfoFile": "node_modules/.cache/tsconfig.tsbuildinfo",
     
     /* --- INTEROP & SECURITY --- */
     "esModuleInterop": true,         
     "resolveJsonModule": true,
-    "allowJs": true, /* Alterado para true: sua lista tem 'mcp-env.js' e 'eslint.config.js' */
+    "allowJs": true, 
     "skipLibCheck": true,          
     "forceConsistentCasingInFileNames": true,
 
     /* --- PERFORMANCE & TYPES --- */
     "types": ["node"],
 
-    /* --- INFRASTRUCTURE PATHS (Alinhado com sua estrutura src/) --- */
-    "baseUrl": ".",
+    /* --- INFRASTRUCTURE PATHS (TS 6.0 Compliance) --- */
+    /* Removido 'baseUrl: .' conforme guia de migração TS 6.0 para evitar erro no deploy */
     "paths": {
       "@/*": ["./src/*"],
       "#/*": ["./src/*"]
@@ -52,9 +52,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/**/*",         /* Cobre toda sua estrutura de dicionários e libs */
+    ".next/dev/types/**/*.ts",
+    "src/**/*",
     "next.config.ts",
-    "tests/**/*.ts"     /* Adicionado para cobrir seu 'tests/i18n.spec.ts' */
+    "tests/**/*.ts"
   ],
 
   "exclude": [
