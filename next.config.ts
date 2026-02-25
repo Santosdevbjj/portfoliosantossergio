@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   typedRoutes: true,
+  tsconfigPath: 'tsconfig.build.json',
 
   experimental: {
     optimizePackageImports: [
