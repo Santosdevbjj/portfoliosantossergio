@@ -1,3 +1,4 @@
+import "./src/env"; 
 import type { NextConfig } from "next";
 
 /**
@@ -10,9 +11,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  reactCompiler: true,
   poweredByHeader: false,
   compress: true,
   typedRoutes: true,
+  serverExternalPackages: ["@modelcontextprotocol/sdk"],
 
   experimental: {
     optimizePackageImports: [
