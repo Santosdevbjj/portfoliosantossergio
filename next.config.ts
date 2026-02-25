@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
  * -----------------------------------------------------------------------------
  * ✔ TypeScript 6.0 Strict Ready
  * ✔ Turbopack Optimized
- * ✔ Fixed path-to-regexp source for Headers
+ * ✔ FIXED: Route source without illegal capturing groups
  */
 
 const nextConfig: NextConfig = {
@@ -13,7 +13,6 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
 
-  // Configurações de Compilação e Otimização de Pacotes
   experimental: {
     optimizePackageImports: [
       "lucide-react",
@@ -29,7 +28,6 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // Configuração de Imagens (Otimizado para Sharp/Node 24)
   images: {
     formats: ['image/avif', 'image/webp'] as const,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
@@ -44,7 +42,6 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Redirecionamentos (Sincronizado com os locales do seu dicionário)
   async redirects() {
     return [
       {
@@ -55,7 +52,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Cabeçalhos de Cache e Segurança
   async headers() {
     return [
       {
@@ -66,19 +62,27 @@ const nextConfig: NextConfig = {
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
+      /**
+       * SOLUÇÃO DO ERRO DE BUILD:
+       * Em vez de tentar agrupar com Regex complexo (que causa erro de parsing),
+       * definimos regras explícitas para os prefixos dos seus arquivos.
+       * Isso é mais rápido e 100% compatível com o parser do Next.js 16.
+       */
       {
-        /**
-         * CORREÇÃO AQUI: 
-         * Utilizamos parênteses duplos ((...)) para envolver o parâmetro não nomeado
-         * conforme exigido pela nova especificação do Next.js/Vercel.
-         */
-        source: '/((cv-|og-image-|images/|icons/).*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
+        source: '/cv-:slug*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        source: '/og-image-:slug*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        source: '/images/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        source: '/icons/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
     ];
   },
