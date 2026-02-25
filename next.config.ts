@@ -16,7 +16,6 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   typedRoutes: true,
-  serverExternalPackages: ["@modelcontextprotocol/sdk"],
 
   experimental: {
     optimizePackageImports: [
