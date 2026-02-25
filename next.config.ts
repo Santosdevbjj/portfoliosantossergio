@@ -3,21 +3,19 @@ import type { NextConfig } from "next";
 /**
  * NEXT.JS 16 & NODE 24 CONFIGURATION — SÉRGIO SANTOS PORTFOLIO
  * -----------------------------------------------------------------------------
- * Node.js: 24.x (LTS)
- * TS Engine: 6.0 Ready
- * i18n Strategy: App Router Middleware (Configuração removida para evitar erro de build)
+ * ✔ TypeScript 6.0 Strict Ready
+ * ✔ Turbopack Optimized
+ * ✔ Security & i18n Path Consistency
  */
-
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
- //  trailingSlash: true,
-  
-  // Suporte nativo para telemetria no Node 24 (Otimizado para Sharp)
-  serverExternalPackages: ["@microsoft/applicationinsights-web"], 
+  poweredByHeader: false,
+  compress: true,
 
+  // Configurações de Compilação e Otimização de Pacotes
   experimental: {
-    // Next 16: Otimização agressiva de pacotes de UI
+    // Next 16: Otimização agressiva para bibliotecas de UI e Icons
     optimizePackageImports: [
       "lucide-react",
       "framer-motion",
@@ -25,55 +23,67 @@ const nextConfig: NextConfig = {
       "tailwind-merge",
       "date-fns"
     ],
-    // React 19/20 Taint API: Segurança para dados sensíveis do backend
+    // React 19/20 Taint API: Proteção contra vazamento de objetos do servidor para o cliente
     taint: true, 
-    // Habilita o novo motor de cache estável do Next 16
+    // Gestão estável de cache para rotas dinâmicas [lang]
     staleTimes: {
       dynamic: 30,
       static: 180,
     },
   },
 
-  /* * NOTA: O bloco 'i18n' foi removido porque o App Router lida com isso 
-   * via diretórios [lang] e Middleware. Mantê-lo aqui causaria erro de build.
-   */
-
+  // Configuração de Imagens (TypeScript 6.0 Safe via 'as const')
   images: {
-    // AVIF priorizado (Padrão ouro em 2026)
-    formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    formats: ['image/avif', 'image/webp'] as const,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'avatars.githubusercontent.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.githubusercontent.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.medium.com',
-      }
-    ],
-    minimumCacheTTL: 3600, 
+    minimumCacheTTL: 3600,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    remotePatterns: [
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
+      { protocol: 'https', hostname: '**.githubusercontent.com' },
+      { protocol: 'https', hostname: '**.medium.com' }
+    ],
   },
 
-  typescript: {
-    // Rigor do TS 6.0: Impede deploys com bugs de tipagem
-    ignoreBuildErrors: false,
-    tsconfigPath: './tsconfig.json'
+  // Redirecionamentos para evitar Erros 404 (Sincronizado com seus Assets)
+  async redirects() {
+    return [
+      {
+        // Garante que a raiz aponte para o locale completo usado no seu sistema
+        source: '/',
+        destination: '/pt-BR',
+        permanent: true,
+      },
+    ];
   },
 
-  // Segurança e Performance
-  poweredByHeader: false, 
-  compress: true,        
-  
-  // Transpilação de lógica de negócio compartilhada
-  transpilePackages: ['@santos/portfolio-logic'], 
+  // Cabeçalhos de Cache e Segurança para PDFs e Assets
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
+      {
+        // Cache agressivo para currículos e imagens da pasta public
+        source: '/(cv-|og-image-|images|icons).*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+    ];
+  },
+
+  // Configurações de Infraestrutura
+  serverExternalPackages: ["@microsoft/applicationinsights-web"],
+  // Transpilação caso existam pacotes locais ou bibliotecas ESM puras
+  transpilePackages: ['lucide-react'],
 };
 
 export default nextConfig;
