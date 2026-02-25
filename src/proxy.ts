@@ -1,33 +1,37 @@
+// src/proxy.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * CONFIGURAÇÃO DE IDIOMAS
- * Alinhado com as tags 'alternate' encontradas no seu site:
- * pt-BR (padrão), en-US, es-ES, es-AR, es-MX
+ * CONFIGURAÇÃO DE IDIOMAS OFICIAIS
+ * Sincronizado com src/dictionaries/locales.ts
  */
 const SUPPORTED_LOCALES = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"];
 const DEFAULT_LOCALE = "pt-BR";
 
+/**
+ * LÓGICA DE PROXY / MIDDLEWARE
+ * Responsável por garantir que o usuário sempre caia em uma rota com idioma.
+ */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. FILTRO DE SEGURANÇA (Evita Erro 500 e processamento desnecessário)
-  // Ignora se for um arquivo estático (ex: .pdf, .png, .ico) ou pastas internas
-  const isPublicFile = /\.(.*)$/.test(pathname);
-  const isInternalPath = 
+  // 1. PROTEÇÃO DE ARQUIVOS ESTÁTICOS E SISTEMA
+  // Evita que o middleware tente processar PDFs, imagens ou arquivos do Next.js
+  const isInternal = 
     pathname.startsWith('/_next') || 
     pathname.startsWith('/api') ||
-    pathname.startsWith('/_vercel') ||
-    pathname.startsWith('/icons/') ||
-    pathname.startsWith('/images/');
+    pathname.startsWith('/_vercel');
 
-  if (isPublicFile || isInternalPath) {
+  // Regex para detectar extensões de arquivos no diretório public/
+  const hasExtension = /\.(.*)$/.test(pathname);
+
+  if (isInternal || hasExtension) {
     return NextResponse.next();
   }
 
-  // 2. VALIDAÇÃO DE LOCALE EXISTENTE
-  // Verifica se o pathname já começa com um dos idiomas suportados
+  // 2. VERIFICAÇÃO DE LOCALIZAÇÃO EXISTENTE
+  // Verifica se a URL já possui o locale correto para evitar loops (ex: /pt-BR/pt)
   const pathnameHasLocale = SUPPORTED_LOCALES.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
@@ -36,31 +40,34 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 3. REDIRECIONAMENTO PARA O IDIOMA PADRÃO
-  // Caso 3a: Se for a raiz exata "/", vai para "/pt-BR"
+  // 3. REDIRECIONAMENTO INTELIGENTE
+  // Se for a raiz "/", vai para o idioma padrão
   if (pathname === '/') {
     return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}`, request.url));
   }
 
-  // Caso 3b: Se for uma rota sem locale (ex: /sobre), injeta o locale padrão
-  // Isso evita o erro de rota duplicada (/pt-BR/pt) verificado nos logs
-  const url = request.nextUrl.clone();
-  url.pathname = `/${DEFAULT_LOCALE}${pathname}`;
-
-  return NextResponse.redirect(url);
+  // Se for uma página sem locale (ex: /contato), anexa o padrão
+  // Usamos rewrite em vez de redirect para manter a URL limpa se preferir, 
+  // mas o redirect é mais seguro para SEO neste caso.
+  return NextResponse.redirect(
+    new URL(`/${DEFAULT_LOCALE}${pathname}`, request.url)
+  );
 }
 
-// 4. MATCHER OTIMIZADO
-// Esta configuração instrui o Next.js a nem chamar este middleware para arquivos estáticos
+/**
+ * MATCHER DE ALTA PERFORMANCE (Turbopack Ready)
+ * Filtra as requisições antes mesmo de chamarem o código acima.
+ */
 export const config = {
   matcher: [
     /*
-     * Ignora todos os caminhos que:
-     * 1. Contenham um ponto (arquivos como favicon.ico, cv.pdf)
-     * 2. Comecem com _next (arquivos internos do framework)
-     * 3. Comecem com api (rotas de API)
-     * 4. Comecem com _static ou _vercel
+     * Ignora:
+     * - api (rotas de backend)
+     * - _next/static (arquivos compilados)
+     * - _next/image (otimização de imagens)
+     * - favicon.ico, sitemap.xml, robots.txt
+     * - Todos os arquivos com extensão (pdf, png, svg)
      */
-    '/((?!api|_next|_static|_vercel|[\\w-]+\\.\\w+).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\..*).*)',
   ],
 };
