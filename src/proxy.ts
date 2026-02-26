@@ -1,73 +1,39 @@
-// src/proxy.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from "@/dictionaries/locales";
 
-/**
- * CONFIGURAÇÃO DE IDIOMAS OFICIAIS
- * Sincronizado com src/dictionaries/locales.ts
- */
-const SUPPORTED_LOCALES = ["pt-BR", "en-US", "es-ES", "es-AR", "es-MX"];
-const DEFAULT_LOCALE = "pt-BR";
-
-/**
- * LÓGICA DE PROXY / MIDDLEWARE
- * Responsável por garantir que o usuário sempre caia em uma rota com idioma.
- */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. PROTEÇÃO DE ARQUIVOS ESTÁTICOS E SISTEMA
-  // Evita que o middleware tente processar PDFs, imagens ou arquivos do Next.js
-  const isInternal = 
+  // 1. IGNORAR INTERNALIZAÇÃO DA VERCEL E NEXT
+  if (
     pathname.startsWith('/_next') || 
     pathname.startsWith('/api') ||
-    pathname.startsWith('/_vercel');
-
-  // Regex para detectar extensões de arquivos no diretório public/
-  const hasExtension = /\.(.*)$/.test(pathname);
-
-  if (isInternal || hasExtension) {
+    pathname.startsWith('/_vercel') ||
+    pathname.includes('.') // Ignora qualquer ficheiro com extensão (pdf, png, etc)
+  ) {
     return NextResponse.next();
   }
 
-  // 2. VERIFICAÇÃO DE LOCALIZAÇÃO EXISTENTE
-  // Verifica se a URL já possui o locale correto para evitar loops (ex: /pt-BR/pt)
+  // 2. CHECAR SE O LOCALE JÁ ESTÁ NA URL
   const pathnameHasLocale = SUPPORTED_LOCALES.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
-  if (pathnameHasLocale) {
-    return NextResponse.next();
-  }
+  if (pathnameHasLocale) return NextResponse.next();
 
-  // 3. REDIRECIONAMENTO INTELIGENTE
-  // Se for a raiz "/", vai para o idioma padrão
-  if (pathname === '/') {
-    return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}`, request.url));
-  }
-
-  // Se for uma página sem locale (ex: /contato), anexa o padrão
-  // Usamos rewrite em vez de redirect para manter a URL limpa se preferir, 
-  // mas o redirect é mais seguro para SEO neste caso.
-  return NextResponse.redirect(
-    new URL(`/${DEFAULT_LOCALE}${pathname}`, request.url)
-  );
+  // 3. REDIRECIONAMENTO DE RAIZ OU SEM LOCALE
+  // Usamos redirect (307) para garantir que o motor de renderização do Next.js 16 
+  // receba o parâmetro [lang] corretamente
+  const url = request.nextUrl.clone();
+  url.pathname = `/${DEFAULT_LOCALE}${pathname === '/' ? '' : pathname}`;
+  
+  return NextResponse.redirect(url);
 }
 
-/**
- * MATCHER DE ALTA PERFORMANCE (Turbopack Ready)
- * Filtra as requisições antes mesmo de chamarem o código acima.
- */
 export const config = {
+  // Matcher atualizado para syntax Next.js 16
   matcher: [
-    /*
-     * Ignora:
-     * - api (rotas de backend)
-     * - _next/static (arquivos compilados)
-     * - _next/image (otimização de imagens)
-     * - favicon.ico, sitemap.xml, robots.txt
-     * - Todos os arquivos com extensão (pdf, png, svg)
-     */
     '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\..*).*)',
   ],
 };
