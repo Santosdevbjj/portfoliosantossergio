@@ -1,25 +1,15 @@
 /* ==========================================================================
-   ANIMATION SYSTEM — PERFORMANCE + ACCESSIBILITY + I18N
-   Next.js 16 + Tailwind v4
+   ANIMATION SYSTEM — NEXT 16 + TAILWIND v4
    ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   KEYFRAMES
-   -------------------------------------------------------------------------- */
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translate3d(0, 15px, 0) scale(0.98);
+    transform: translate3d(0, 15px, 0);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -28,88 +18,23 @@
   100% { transform: translate3d(100%, 0, 0); }
 }
 
-/* --------------------------------------------------------------------------
-   STAGGER SYSTEM
-   -------------------------------------------------------------------------- */
-
-.stagger-load {
-  isolation: isolate;
-}
-
 .stagger-load > * {
   opacity: 0;
-  backface-visibility: hidden;
-  transform: translateZ(0);
-  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+  animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Sequência progressiva otimizada */
-.stagger-load > *:nth-child(1) { animation-delay: 100ms; }
-.stagger-load > *:nth-child(2) { animation-delay: 180ms; }
-.stagger-load > *:nth-child(3) { animation-delay: 260ms; }
-.stagger-load > *:nth-child(4) { animation-delay: 340ms; }
-.stagger-load > *:nth-child(5) { animation-delay: 420ms; }
-.stagger-load > *:nth-child(6) { animation-delay: 500ms; }
-.stagger-load > *:nth-child(n+7) { animation-delay: 550ms; }
+/* Delays progressivos */
+.stagger-load > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-load > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-load > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-load > *:nth-child(4) { animation-delay: 0.4s; }
 
-/* --------------------------------------------------------------------------
-   SKELETON SHIMMER
-   -------------------------------------------------------------------------- */
-
-.skeleton-shimmer {
-  position: relative;
-  overflow: hidden;
-  background-color: color-mix(in oklch, currentColor 5%, transparent);
-  border-radius: inherit;
-  transform: translateZ(0);
-}
-
-.skeleton-shimmer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    color-mix(in oklch, currentColor 8%, transparent) 50%,
-    transparent 100%
-  );
-  animation: shimmer 1.8s ease-in-out infinite;
-}
-
-/* --------------------------------------------------------------------------
-   IDIOMA — AJUSTE COGNITIVO DE RITMO
-   -------------------------------------------------------------------------- */
-
-/* Espanhol — textos mais longos */
-[lang^="es"] .stagger-load > * {
-  animation-duration: 0.9s;
-}
-
-/* Português */
-[lang^="pt"] .stagger-load > * {
-  animation-duration: 0.85s;
-}
-
-/* Inglês — leitura mais curta */
-[lang^="en"] .stagger-load > * {
-  animation-duration: 0.7s;
-}
-
-/* --------------------------------------------------------------------------
-   ACESSIBILIDADE — PREFERS REDUCED MOTION
-   -------------------------------------------------------------------------- */
-
+/* Acessibilidade: Respeita a preferência do usuário por menos movimento */
 @media (prefers-reduced-motion: reduce) {
-  .stagger-load > *,
-  .skeleton-shimmer::after {
+  .stagger-load > * {
     animation: none !important;
-    transition: none !important;
-    transform: none !important;
     opacity: 1 !important;
-  }
-
-  html {
-    scroll-behavior: auto !important;
+    transform: none !important;
   }
 }
