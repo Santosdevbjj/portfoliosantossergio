@@ -1,30 +1,8 @@
 // import "./src/env"; 
-import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
-
-import remarkGfm from "remark-gfm";
-import remarkSlug from "remark-slug";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypePrettyCode from "rehype-pretty-code";
-import rehypeSanitize from "rehype-sanitize";
-
-
-const withMDX = createMDX({
-  extension: /\.mdx?$/,
-  options: {
-    remarkPlugins: [remarkGfm, remarkSlug],
-    rehypePlugins: [
-      rehypeAutolinkHeadings,
-      rehypePrettyCode,
-      rehypeSanitize,
-    ],
-  },
-});
-
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  pageExtensions: ["ts", "tsx", "mdx"],
   poweredByHeader: false,
   compress: true,
   reactCompiler: true,
@@ -98,6 +76,8 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["@microsoft/applicationinsights-web"],
 };
 
-// export default nextConfig;
-   export default withMDX(nextConfig);
+export default nextConfig;
+
+
+
 
