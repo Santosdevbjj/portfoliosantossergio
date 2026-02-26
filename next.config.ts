@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
       "tailwind-merge",
       "date-fns"
     ],
-    taint: false, 
+    taint: true, 
     staleTimes: {
       dynamic: 30,
       static: 180,
