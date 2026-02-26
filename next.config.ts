@@ -18,9 +18,9 @@ const nextConfig: NextConfig = {
        turbo: {
         rules: {
         // Garante que o Turbopack processe corretamente os arquivos de estilo
-        '*.css': ['postcss-loader'],
+        "*.css": ["postcss-loader"],
       },
-     }
+     },
                                
       "date-fns"
     ],
