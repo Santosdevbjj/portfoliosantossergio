@@ -1,20 +1,11 @@
- import "./src/env"; 
-// import { env } from "./src/env";
+import "./src/env"; 
 import type { NextConfig } from "next";
-
-/**
- * NEXT.JS 16.1.6 & NODE 24 CONFIGURATION — SÉRGIO SANTOS PORTFOLIO
- * -----------------------------------------------------------------------------
- * ✔ TypeScript 6.0 Strict Ready
- * ✔ Turbopack (Rust Engine) Compatibility FIXED
- * ✔ FIXED: "Can not repeat path" by renaming and restructuring wildcards
- */
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  typedRoutes: true,
+  // typedRoutes: true, // Desative temporariamente se a tela continuar branca, às vezes causa conflito no build final
 
   experimental: {
     optimizePackageImports: [
@@ -32,12 +23,12 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    formats: ['image/avif', 'image/webp'] as const,
+    formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128],
     minimumCacheTTL: 3600,
     dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Removido o sandbox restritivo para testar se a imagem/layout volta a aparecer
     remotePatterns: [
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
       { protocol: 'https', hostname: '**.githubusercontent.com' },
@@ -45,32 +36,21 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/pt-BR',
-        permanent: true,
-      },
-    ];
-  },
+  // Removido o async redirects() daqui. 
+  // MOTIVO: Deixe o middleware.ts gerenciar o redirecionamento de /[lang] 
+  // para evitar loops infinitos entre as regras do servidor e do cliente.
 
   async headers() {
     return [
       {
-        // Alterado de :path* para :all* para evitar conflito com a palavra reservada 'path' no Turbopack
-        source: '/:all*',
+        // Voltando para o padrão que a Vercel reconhece melhor em produção
+        source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
-      /**
-       * SOLUÇÃO DEFINITIVA PARA O ERRO DE REPETIÇÃO:
-       * Usamos prefixos fixos e capturamos o restante sem usar modificadores de repetição complexos.
-       * O Next.js 16 trata :slug como o nome do arquivo.
-       */
       {
         source: '/cv-sergio-santos-:slug.pdf',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
@@ -80,23 +60,18 @@ const nextConfig: NextConfig = {
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        // Para pastas, usamos :file* que é mais aceito pelo parser Rust
-        source: '/images/:file*',
+        source: '/images/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        source: '/icons/:file*',
+        source: '/icons/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
-      },
-      {
-        source: '/sitemap.xml',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, must-revalidate' }],
       }
     ];
   },
 
+  // Garante que pacotes problemáticos não sejam processados pelo Turbopack indevidamente
   serverExternalPackages: ["@microsoft/applicationinsights-web"],
-  transpilePackages: ['lucide-react'],
 };
 
 export default nextConfig;
