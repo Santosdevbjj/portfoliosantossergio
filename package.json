@@ -28,12 +28,12 @@
     "tailwind-merge": "3.4.0",
     "class-variance-authority": "0.7.1",
     "next-themes": "0.4.6",
-    "tailwindcss": "4.1.18"
+    "tailwindcss": "4.2.1"
   },
   "devDependencies": {
     "typescript": "^6.0.0-dev.20260222",
     "babel-plugin-react-compiler": "^1.0.0",
-    "@tailwindcss/postcss": "4.1.18",
+    "@tailwindcss/postcss": "4.2.1",
     "postcss": "8.5.6",
     "@types/node": "25.2.3",
     "@types/react": "19.2.14",
