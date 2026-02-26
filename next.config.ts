@@ -13,14 +13,7 @@ const nextConfig: NextConfig = {
       "lucide-react",
       "framer-motion",
       "clsx",
-      "tailwind-merge",
-      
-       turbo: {
-        rules: {
-        "*.css":["postcss-loader"],
-      },
-     },
-                               
+      "tailwind-merge",                      
       "date-fns"
     ],
     taint: true, 
