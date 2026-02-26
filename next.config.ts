@@ -4,11 +4,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  // O React Compiler é habilitado via experimental no Next 16
+  reactCompiler: true,
+  typedRoutes: true,
   
   experimental: {
-    reactCompiler: true,
-    typedRoutes: true,
     taint: true, 
     optimizePackageImports: [
       "lucide-react",
@@ -21,7 +20,6 @@ const nextConfig: NextConfig = {
       dynamic: 30,
       static: 180,
     },
-    // AQUI É O LUGAR CORRETO DO TURBO NO NEXT 16
     turbo: {
       rules: {
         "*.css": ["postcss-loader"],
