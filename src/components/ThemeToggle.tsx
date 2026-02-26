@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Moon, Sun } from 'lucide-react' // Removido 'Monitor' para evitar erro de build
+import { Moon, Sun } from 'lucide-react'
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
 import type { CommonDictionary } from '@/types/dictionary'
 
@@ -47,14 +47,18 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
 
   // Lógica de ciclo simplificada: Light -> Dark -> System
   const cycleTheme = () => {
-    const themes = ['light', 'dark', 'system']
-    const currentIndex = themes.indexOf(theme || 'system')
+    // Definimos explicitamente os tipos para o TypeScript
+    const themes = ['light', 'dark', 'system'] as const
+    const currentIndex = themes.indexOf((theme as 'light' | 'dark' | 'system') || 'system')
     const nextIndex = (currentIndex + 1) % themes.length
-    setTheme(themes[nextIndex])
+    
+    // Forçamos o tipo para garantir compatibilidade com o setTheme
+    setTheme(themes[nextIndex] as string)
   }
 
-  // Define qual label usar com base no tema atual
-  const currentLabel = labels[theme as keyof typeof labels] || labels.system
+  // Define qual label usar com base no tema atual (Safe access para TS 6)
+  const themeKey = (theme as keyof typeof labels) || 'system'
+  const currentLabel = labels[themeKey] || labels.system
 
   return (
     <button
