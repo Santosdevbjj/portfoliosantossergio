@@ -15,10 +15,10 @@ const nextConfig: NextConfig = {
       "clsx",
       "tailwind-merge",
       
-       turbo: {
+       turbo: 
        rules: {'*.css': ['postcss-loader'],
       },
-    },
+    
                                
       "date-fns"
     ],
