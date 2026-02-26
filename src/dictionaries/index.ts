@@ -1,7 +1,7 @@
 // src/dictionaries/index.ts
 
 import "server-only";
-import { cache } from "react";
+// import { cache } from "react";
 import type { Dictionary } from "@/types/dictionary";
 import {
   DEFAULT_LOCALE,
@@ -41,10 +41,6 @@ const loaders: Record<SupportedLocale, DictionaryLoader> = {
  * ✔ Sempre resolve para SupportedLocale
  * ✔ Seguro para uso em Server Components
  */
-
-const getDictionary = cache(async (locale: string) => {
-  // sua lógica aqui
-});
 
 export async function getDictionary(
   locale?: string | null,
