@@ -6,47 +6,18 @@ import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
 import type { CommonDictionary } from '@/types/dictionary'
 
 /* -------------------------------------------------------------------------- */
-/* TYPES                                                                      */
+/* THEME PROVIDER                                                            */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Labels derivadas diretamente do contrato do dicionário.
- * ✔ Zero duplicação
- * ✔ 100% alinhado com CommonDictionary
- * ✔ TS 6 safe
- */
-export type ThemeToggleLabels = CommonDictionary['theme']
-
-interface ThemeToggleProps {
-  readonly labels: ThemeToggleLabels
-}
-
-/* -------------------------------------------------------------------------- */
-/* THEME PROVIDER (GLOBAL WRAPPER)                                            */
-/* -------------------------------------------------------------------------- */
-
-export function ThemeProvider({
-  children,
-}: {
-  readonly children: React.ReactNode
-}) {
-  const [mounted, setMounted] = React.useState(false)
-
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
-
+export function ThemeProvider({ children }: { readonly children: React.ReactNode }) {
   return (
     <NextThemesProvider
       attribute="class"
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
-      storageKey="sergio-portfolio-theme"
     >
-      <div style={{ visibility: mounted ? 'visible' : 'hidden' }}>
-        {children}
-      </div>
+      {children}
     </NextThemesProvider>
   )
 }
@@ -55,93 +26,44 @@ export function ThemeProvider({
 /* THEME TOGGLE                                                               */
 /* -------------------------------------------------------------------------- */
 
+interface ThemeToggleProps {
+  readonly labels: CommonDictionary['theme']
+}
+
 export function ThemeToggle({ labels }: ThemeToggleProps) {
-  const { resolvedTheme, setTheme } = useTheme()
+  const { resolvedTheme, setTheme, theme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
+  // Evita erro de hidratação no Next.js 16
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
   if (!mounted) {
-    return (
-      <div
-        aria-hidden
-        className="w-11 h-11 rounded-xl bg-slate-200/50 dark:bg-slate-800/50 animate-pulse"
-      />
-    )
+    return <div className="w-11 h-11 rounded-xl bg-slate-200/20 animate-pulse" />
   }
 
-  const currentTheme = resolvedTheme ?? 'system'
-
-  const nextTheme =
-    currentTheme === 'light'
-      ? 'dark'
-      : currentTheme === 'dark'
-      ? 'system'
-      : 'light'
-
-  const handleChange = React.useCallback(() => {
-    setTheme(nextTheme)
-  }, [nextTheme, setTheme])
-
-  const ariaLabel =
-    nextTheme === 'light'
-      ? labels.light
-      : nextTheme === 'dark'
-      ? labels.dark
-      : labels.system
+  const cycleTheme = () => {
+    const themes = ['light', 'dark', 'system']
+    const currentIndex = themes.indexOf(theme || 'system')
+    const nextIndex = (currentIndex + 1) % themes.length
+    setTheme(themes[nextIndex])
+  }
 
   return (
     <button
-      type="button"
-      onClick={handleChange}
-      aria-label={ariaLabel}
-      title={ariaLabel}
-      className="group relative w-11 h-11 flex items-center justify-center rounded-xl
-                 bg-white/80 dark:bg-slate-900/80
-                 border border-slate-200 dark:border-slate-800/60
-                 shadow-sm backdrop-blur-md
-                 transition-all duration-300
-                 hover:border-blue-500/50 dark:hover:border-amber-500/50
-                 active:scale-95"
+      onClick={cycleTheme}
+      aria-label={labels[theme as keyof typeof labels] || labels.system}
+      className="group relative w-11 h-11 flex items-center justify-center rounded-xl 
+                 bg-white/80 dark:bg-slate-900/80 border border-slate-200 
+                 dark:border-slate-800 backdrop-blur-md hover:scale-105 active:scale-95 
+                 transition-all duration-300"
     >
-      <div className="relative w-5 h-5 overflow-hidden">
-        {/* Light */}
-        <Sun
-          size={20}
-          className={`absolute inset-0 transition-all duration-500 text-amber-500
-            ${
-              currentTheme === 'light'
-                ? 'opacity-100 rotate-0'
-                : 'opacity-0 -rotate-90'
-            }`}
-        />
-
-        {/* Dark */}
-        <Moon
-          size={20}
-          className={`absolute inset-0 transition-all duration-500 text-slate-600 dark:text-slate-400
-            ${
-              currentTheme === 'dark'
-                ? 'opacity-100 rotate-0'
-                : 'opacity-0 rotate-90'
-            }`}
-        />
-
-        {/* System */}
-        <Monitor
-          size={20}
-          className={`absolute inset-0 transition-all duration-500 text-blue-500
-            ${
-              currentTheme === 'system'
-                ? 'opacity-100 rotate-0'
-                : 'opacity-0 scale-75'
-            }`}
-        />
-      </div>
-
-      <span className="absolute inset-0 rounded-xl ring-0 ring-blue-500/20 group-hover:ring-4 transition-all duration-300" />
+      {resolvedTheme === 'dark' ? (
+        <Moon className="text-amber-400" size={20} />
+      ) : (
+        <Sun className="text-amber-600" size={20} />
+      )}
     </button>
   )
 }
