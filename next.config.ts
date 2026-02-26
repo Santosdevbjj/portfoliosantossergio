@@ -1,4 +1,4 @@
-import "./src/env"; 
+// import "./src/env"; 
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
       "tailwind-merge",
       "date-fns"
     ],
-    taint: true, 
+    taint: false, 
     staleTimes: {
       dynamic: 30,
       static: 180,
