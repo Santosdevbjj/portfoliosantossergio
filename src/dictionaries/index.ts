@@ -1,5 +1,7 @@
 // src/dictionaries/index.ts
 
+import "server-only";
+import { cache } from "react";
 import type { Dictionary } from "@/types/dictionary";
 import {
   DEFAULT_LOCALE,
