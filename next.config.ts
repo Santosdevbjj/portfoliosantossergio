@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  reactCompiler: true,
   typedRoutes: true, // Desative temporariamente se a tela continuar branca, às vezes causa conflito no build final
 
   experimental: {
