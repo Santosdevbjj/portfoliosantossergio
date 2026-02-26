@@ -22,18 +22,20 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-/* ===============================
+/* =========================================
    STATIC PARAMS (SSG)
-================================= */
-export async function generateStaticParams() {
+========================================= */
+export async function generateStaticParams(): Promise<
+  { lang: string }[]
+> {
   return locales.map((lang) => ({ lang }));
 }
 
-/* ===============================
+/* =========================================
    METADATA
-================================= */
+========================================= */
 export async function generateMetadata(
-  { params }: { params: { lang: string } }
+  { params }: { readonly params: { readonly lang: string } }
 ): Promise<Metadata> {
   const locale = normalizeLocale(params.lang);
 
@@ -42,55 +44,66 @@ export async function generateMetadata(
   }
 
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app";
+
+  const metadataBase = new URL(siteUrl);
 
   try {
     const dict = await getServerDictionary(locale);
 
     return {
-      metadataBase: new URL(siteUrl),
+      metadataBase,
+
       title: {
         default: dict.seo.siteName,
         template: `%s | ${dict.seo.siteName}`,
       },
+
       description: dict.seo.description,
       keywords: dict.seo.keywords,
+
       verification: {
         google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
       },
+
       alternates: {
-        canonical: `${siteUrl}/${locale}`,
-        languages: Object.fromEntries(
-          locales.map((lng) => [lng, `${siteUrl}/${lng}`])
-        ),
+        canonical: `/${locale}`,
+        languages: {
+          ...Object.fromEntries(
+            locales.map((lng) => [lng, `/${lng}`])
+          ),
+          "x-default": `/en-US`,
+        },
       },
     };
   } catch {
     return {
-      title: "Portfolio - Sergio Santos",
+      metadataBase,
+      title: "Sergio Santos Portfolio",
+      description: "Full Stack Developer Portfolio",
     };
   }
 }
 
-/* ===============================
+/* =========================================
    VIEWPORT
-================================= */
+========================================= */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#020617",
 };
 
-/* ===============================
+/* =========================================
    LAYOUT
-================================= */
+========================================= */
 export default async function LangLayout({
   children,
   params,
 }: {
-  children: ReactNode;
-  params: { lang: string };
+  readonly children: ReactNode;
+  readonly params: { readonly lang: string };
 }) {
   const locale = normalizeLocale(params.lang);
 
@@ -102,18 +115,20 @@ export default async function LangLayout({
 
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app";
+
+  const baseLanguage = locale.split("-")[0]; // en-US -> en
 
   return (
     <html
-      lang={locale}
+      lang={baseLanguage}
       className={`${inter.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased font-sans">
         <ScrollSpyProvider>
-          {/* Skip Link (Acessibilidade) */}
+          {/* Skip Link */}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-4 py-2 rounded-md"
@@ -125,7 +140,7 @@ export default async function LangLayout({
           <Navbar lang={locale} common={dict.common} />
 
           <main id="main-content" className="flex-grow">
-            {/* Breadcrumb SEO JSON-LD */}
+            {/* SEO Breadcrumb JSON-LD */}
             <BreadcrumbsJsonLd
               lang={locale}
               dict={dict}
