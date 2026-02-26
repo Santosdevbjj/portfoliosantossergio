@@ -16,12 +16,10 @@ const nextConfig: NextConfig = {
       "tailwind-merge",
       
        turbo: {
-      rules: {
-        // Garante que o Turbopack processe corretamente os arquivos de estilo
-        '*.css': ['postcss-loader'],
+       rules: {'*.css': ['postcss-loader'],
       },
     },
-      
+                               
       "date-fns"
     ],
     taint: true, 
