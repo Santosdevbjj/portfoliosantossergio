@@ -15,6 +15,7 @@
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
     "type-check": "next typegen && tsc --noEmit",
+    "i18n:validate": "tsx src/dictionaries/validate-i18n.ts",
     "clean": "rm -rf .next node_modules package-lock.json && npm install"
   },
   "dependencies": {
