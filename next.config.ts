@@ -1,14 +1,15 @@
-// import "./src/env"; 
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  reactCompiler: true,
-  typedRoutes: true, 
-
+  // O React Compiler é habilitado via experimental no Next 16
+  
   experimental: {
+    reactCompiler: true,
+    typedRoutes: true,
+    taint: true, 
     optimizePackageImports: [
       "lucide-react",
       "framer-motion",
@@ -16,15 +17,15 @@ const nextConfig: NextConfig = {
       "tailwind-merge",                      
       "date-fns"
     ],
-    taint: true, 
     staleTimes: {
       dynamic: 30,
       static: 180,
     },
-  },
-  turbo: {
-    rules: {
-      "*.css": ["postcss-loader"],
+    // AQUI É O LUGAR CORRETO DO TURBO NO NEXT 16
+    turbo: {
+      rules: {
+        "*.css": ["postcss-loader"],
+      },
     },
   },
 
@@ -34,7 +35,6 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128],
     minimumCacheTTL: 3600,
     dangerouslyAllowSVG: true,
-    // Removido o sandbox restritivo para testar se a imagem/layout volta a aparecer
     remotePatterns: [
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
       { protocol: 'https', hostname: '**.githubusercontent.com' },
@@ -42,14 +42,9 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Removido o async redirects() daqui. 
-  // MOTIVO: Deixe o middleware.ts gerenciar o redirecionamento de /[lang] 
-  // para evitar loops infinitos entre as regras do servidor e do cliente.
-
   async headers() {
     return [
       {
-        // Voltando para o padrão que a Vercel reconhece melhor em produção
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -58,19 +53,11 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: '/cv-sergio-santos-:slug.pdf',
+        source: '/(cv-sergio-santos|og-image)-:slug.(pdf|png)',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        source: '/og-image-:slug.png',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
-      },
-      {
-        source: '/images/:path*',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
-      },
-      {
-        source: '/icons/:path*',
+        source: '/(images|icons)/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       }
     ];
