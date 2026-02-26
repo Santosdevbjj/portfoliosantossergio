@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "typescript": "^6.0.0-dev.20260222",
+    "babel-plugin-react-compiler": "^1.0.0",
     "@tailwindcss/postcss": "4.1.18",
     "postcss": "8.5.6",
     "@types/node": "25.2.3",
