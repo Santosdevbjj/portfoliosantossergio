@@ -54,7 +54,7 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
         <Link href={`/${lang}`} className="group outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
           <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
-            SÉRGIO<span className="text-blue-600">SANTOS</span>
+            SÉRGIO<span className="text-blue-600"> SANTOS</span>
           </span>
         </Link>
 
