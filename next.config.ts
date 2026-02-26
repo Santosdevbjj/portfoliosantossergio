@@ -2,14 +2,21 @@
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
+import remarkGfm from "remark-gfm";
+import remarkSlug from "remark-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypePrettyCode from "rehype-pretty-code";
+import rehypeSanitize from "rehype-sanitize";
+
+
 const withMDX = createMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [require("remark-gfm"), require("remark-slug")],
+    remarkPlugins: [remarkGfm, remarkSlug],
     rehypePlugins: [
-      require("rehype-autolink-headings"),
-      require("rehype-pretty-code"),
-      require("rehype-sanitize"),
+      rehypeAutolinkHeadings,
+      rehypePrettyCode,
+      rehypeSanitize,
     ],
   },
 });
