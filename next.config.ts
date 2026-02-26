@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
       static: 180,
     },
   },
-  turbopack: {
+  turbo: {
     rules: {
       "*.css": ["postcss-loader"],
     },
