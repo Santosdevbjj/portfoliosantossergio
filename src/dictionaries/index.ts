@@ -41,6 +41,11 @@ const loaders: Record<SupportedLocale, DictionaryLoader> = {
  * ✔ Sempre resolve para SupportedLocale
  * ✔ Seguro para uso em Server Components
  */
+
+const getDictionary = cache(async (locale: string) => {
+  // sua lógica aqui
+});
+
 export async function getDictionary(
   locale?: string | null,
 ): Promise<Dictionary> {
