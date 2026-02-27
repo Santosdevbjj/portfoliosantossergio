@@ -1,4 +1,3 @@
-// import "./src/env"; 
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -8,6 +7,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   typedRoutes: true, 
 
+  
   experimental: {
     optimizePackageImports: [
       "lucide-react",
@@ -21,13 +21,11 @@ const nextConfig: NextConfig = {
       dynamic: 30,
       static: 180,
     },
-    // No Next.js 16+, a configuração do turbo fica dentro de experimental
-    turbopack: {
-      rules: {
-        "*.css": ["postcss-loader"],
-      },
-    },
   },
+
+  // No Next 16 com Turbopack habilitado via CLI, a configuração de rules 
+  // pode ser simplificada ou tratada via PostCSS diretamente.
+  // Removendo a chave 'turbo' de experimental para evitar erro de tipo.
 
   images: {
     formats: ['image/avif', 'image/webp'],
