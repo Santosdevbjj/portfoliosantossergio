@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Moon, Sun, Monitor } from 'lucide-react'
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
 import type { CommonDictionary } from '@/types/dictionary'
+import clsx from 'clsx'
 
 /* -------------------------------------------------------------------------- */
 /* THEME PROVIDER - Otimizado para Next.js 16 e React 19                      */
@@ -43,7 +44,18 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
     return (
       <div className="w-11 h-11 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
     )
-  }
+  } 
+
+   <button
+      onClick={handleTheme}
+      className={clsx(
+        'rounded-lg p-2 transition-colors duration-200',
+        'hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-blue-400',
+        isDark ? 'bg-gray-800 text-yellow-300' : 'bg-blue-100 text-gray-800',
+      )}
+    >
+
+
 
   // Lógica de Ciclo com Type Guard para TypeScript 6.0
   const cycleTheme = () => {
