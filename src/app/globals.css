@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @import "../styles/animations.css";
-@variant dark (&:where(.dark, .dark *));
+
+/* ==========================================================================
+   DARK MODE CONFIG — TAILWIND v4
+   ========================================================================== */
+
+/* Ativa suporte a dark via classe .dark */
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ==========================================================================
    GLOBAL DESIGN SYSTEM — NEXT 16 + TAILWIND v4 + OKLCH
@@ -23,20 +29,24 @@
   --shadow-glow: 0 0 20px color-mix(in oklch, oklch(0.62 0.17 256.4), transparent 70%);
 }
 
-/* --- DARK MODE FIX PARA V4 (FORA DO @theme) --- */
-/* Esta linha garante que a variante 'dark:' funcione com a classe .dark do next-themes */
-@custom-variant dark (&:where(.dark, .dark *));
-
 /* ==========================================================================
    BASE LAYER
    ========================================================================== */
 
 @layer base {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+    border-color: var(--border);
+  }
+
   :root {
     --background: oklch(0.98 0.01 256.4);
     --foreground: oklch(0.15 0.02 256.4);
     --card: oklch(1 0 0);
     --border: oklch(0.92 0.01 256.4);
+
     color-scheme: light;
   }
 
@@ -45,11 +55,8 @@
     --foreground: oklch(0.95 0.01 256.4);
     --card: oklch(0.18 0.02 256.4);
     --border: oklch(0.25 0.02 256.4);
-    color-scheme: dark;
-  }
 
-  *, ::before, ::after {
-    border-color: var(--border);
+    color-scheme: dark;
   }
 
   html {
@@ -65,29 +72,34 @@
     color: var(--foreground);
     background-color: var(--background);
     font-family: var(--font-sans);
-    /* Suporte para Safe Areas (iPhone Notch / Android) */
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+
+    /* Safe Areas (iOS / Android) */
+    padding: env(safe-area-inset-top)
+             env(safe-area-inset-right)
+             env(safe-area-inset-bottom)
+             env(safe-area-inset-left);
   }
 }
 
 /* ==========================================================================
-   COMPONENTS (Utilitários Reutilizáveis)
+   COMPONENTS
    ========================================================================== */
 
 @layer components {
+
   /* Layout Responsivo Central */
   .main-container {
     @apply w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12;
   }
 
-  /* Efeito de Vidro (Glassmorphism) */
+  /* Glassmorphism */
   .glass-effect {
     @apply backdrop-blur-xl transition-all duration-300 border shadow-sm;
     background-color: color-mix(in oklch, var(--card) 75%, transparent);
     border-color: color-mix(in oklch, var(--border) 50%, transparent);
   }
-  
-  /* Melhora a legibilidade de títulos */
+
+  /* Melhor legibilidade de títulos */
   .text-balance {
     text-wrap: balance;
   }
