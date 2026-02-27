@@ -5,16 +5,15 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  reactCompiler: true,
   typedRoutes: true, 
 
   experimental: {
+    reactCompiler: true, // No Next 16, o compiler fica dentro de experimental
     optimizePackageImports: [
       "lucide-react",
       "framer-motion",
       "clsx",
       "tailwind-merge",
-                               
       "date-fns"
     ],
     taint: true, 
@@ -22,16 +21,13 @@ const nextConfig: NextConfig = {
       dynamic: 30,
       static: 180,
     },
-    
-    },
-  
-     turbo: {
+    // No Next.js 16+, a configuração do turbo fica dentro de experimental
+    turbo: {
       rules: {
         "*.css": ["postcss-loader"],
       },
     },
   },
-
 
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -39,7 +35,6 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128],
     minimumCacheTTL: 3600,
     dangerouslyAllowSVG: true,
-    // Removido o sandbox restritivo para testar se a imagem/layout volta a aparecer
     remotePatterns: [
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
       { protocol: 'https', hostname: '**.githubusercontent.com' },
@@ -47,14 +42,9 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Removido o async redirects() daqui. 
-  // MOTIVO: Deixe o middleware.ts gerenciar o redirecionamento de /[lang] 
-  // para evitar loops infinitos entre as regras do servidor e do cliente.
-
   async headers() {
     return [
       {
-        // Voltando para o padrão que a Vercel reconhece melhor em produção
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -81,12 +71,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Garante que pacotes problemáticos não sejam processados pelo Turbopack indevidamente
   serverExternalPackages: ["@microsoft/applicationinsights-web"],
 };
 
 export default nextConfig;
-
-
-
-
