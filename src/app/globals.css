@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/animations.css";
+@variant dark (&:where(.dark, .dark *));
 
 /* ==========================================================================
    GLOBAL DESIGN SYSTEM — NEXT 16 + TAILWIND v4 + OKLCH
