@@ -28,10 +28,87 @@ export async function generateStaticParams(): Promise<{ lang: string }[]> {
   return locales.map((lang) => ({ lang }));
 }
 
+
 /* =========================================
-   METADATA DINÂMICA (SEO, OG, LINKEDIN)
+   METADATA DINÂMICA (SEO, OG, LINKEDIN, X)
 ========================================= */
 export async function generateMetadata(
+  { params }: { params: { lang: string } }
+): Promise<Metadata> {
+  const locale = normalizeLocale(params.lang);
+
+  if (!locales.includes(locale)) {
+    notFound();
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
+  const dict = await getServerDictionary(locale);
+  
+  const ogImage = `/og-image-${locale}.png`; 
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: "Sérgio Santos | Analista de Dados e Resiliência",
+      template: `%s | Sérgio Santos`,
+    },
+    description: "Especialista em Ciência de Dados e Resiliência. Projetos de agentes inteligentes com Azure OpenAI e segurança STRIDE.",
+    keywords: dict.seo.keywords,
+    
+    verification: {
+      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
+    },
+
+    openGraph: {
+      title: "Sérgio Santos | Analista de Dados e Resiliência",
+      description: "Especialista em Ciência de Dados e Resiliência com foco em soluções de IA Generativa (Azure OpenAI) e segurança arquitetural STRIDE.",
+      url: `${siteUrl}/${locale}`,
+      siteName: "Portfólio Sérgio Santos",
+      locale: locale,
+      type: "website",
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `Portfólio Sérgio Santos - ${locale}`,
+        },
+      ],
+    },
+
+    // --- VALIDAÇÃO TWITTER CARD (X) ---
+    twitter: {
+      card: "summary_large_image", // Garante o card grande
+      title: "Sérgio Santos | Analista de Dados e Resiliência",
+      description: "Confira meu portfólio de Ciência de Dados, Agentes Inteligentes e Segurança de Sistemas.",
+      creator: "@seu_usuario", // Substitua pelo seu @ se desejar
+      images: [
+        {
+          url: ogImage,
+          alt: "Preview do Portfólio de Sérgio Santos",
+        }
+      ],
+    },
+
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        "pt-BR": "/pt-BR",
+        "en-US": "/en-US",
+        "es-ES": "/es-ES",
+        "es-MX": "/es-MX",
+        "es-AR": "/es-AR",
+        "x-default": "/en-US",
+      },
+    },
+  };
+}
+
+
+
+
+
+/* OLD export async function generateMetadata(
   { params }: { params: { lang: string } }
 ): Promise<Metadata> {
   const locale = normalizeLocale(params.lang);
@@ -100,6 +177,10 @@ export async function generateMetadata(
     },
   };
 }
+
+
+*/
+
 
 /* =========================================
    VIEWPORT
