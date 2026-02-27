@@ -83,7 +83,7 @@ export default function Footer({
             <div className="flex flex-col gap-1">
               <span className="text-3xl font-black tracking-tighter uppercase
                                text-slate-900 dark:text-white">
-                Sérgio<span className="text-blue-600">Santos</span>
+                Sérgio<span className="text-blue-600"> Santos</span>
               </span>
               <p className="text-[10px] font-bold uppercase tracking-widest
                             text-slate-400 leading-tight">
