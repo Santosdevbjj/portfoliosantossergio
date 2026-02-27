@@ -6,7 +6,7 @@ import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
 import type { CommonDictionary } from '@/types/dictionary'
 
 /* -------------------------------------------------------------------------- */
-/* THEME PROVIDER - Otimizado para Next.js 16 e React 19                      */
+/* THEME PROVIDER - Suporte React 19 / Next 16                                */
 /* -------------------------------------------------------------------------- */
 
 export function ThemeProvider({ children }: { readonly children: React.ReactNode }) {
@@ -23,7 +23,7 @@ export function ThemeProvider({ children }: { readonly children: React.ReactNode
 }
 
 /* -------------------------------------------------------------------------- */
-/* THEME TOGGLE - Responsivo, Multilingue e Type-Safe                         */
+/* THEME TOGGLE - Responsivo e Type-Safe (TS 6.0)                             */
 /* -------------------------------------------------------------------------- */
 
 interface ThemeToggleProps {
@@ -34,30 +34,23 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
   const { resolvedTheme, setTheme, theme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
-  // Evita Hydration Mismatch no Next.js 16 (Turbopack)
+  // Previne Erro de Hidratação
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Lógica de Ciclo com Type Guard para TypeScript 6.0
+  if (!mounted) {
+    return <div className="w-11 h-11 rounded-xl bg-slate-200/20 animate-pulse" />
+  }
+
+  // Lógica de Ciclo: Light -> Dark -> System
   const cycleTheme = () => {
     const themes = ['light', 'dark', 'system'] as const
     const currentTheme = (theme as typeof themes[number]) || 'system'
     const nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length
-    
-    // Garantia de que o valor nunca será undefined para o setTheme
-    const nextTheme = themes[nextIndex] ?? 'system'
-    setTheme(nextTheme)
+    setTheme(themes[nextIndex] ?? 'system')
   }
 
-  // Placeholder para evitar pulo de layout durante a hidratação
-  if (!mounted) {
-    return (
-      <div className="w-11 h-11 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
-    )
-  }
-
-  // Type-safe label access
   const themeKey = (theme as keyof typeof labels) || 'system'
   const currentLabel = labels[themeKey] || labels.system
 
@@ -73,25 +66,14 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
                  transition-all duration-300 shadow-sm ring-brand-500/50 hover:ring-2"
     >
       <div className="relative w-5 h-5 flex items-center justify-center">
-        {/* Renderização baseada no resolvedTheme (considera a preferência do sistema) */}
         {resolvedTheme === 'dark' ? (
-          <Moon 
-            className="text-amber-400 transition-all duration-500 rotate-0 group-hover:rotate-12" 
-            size={20} 
-          />
+          <Moon className="text-amber-400 transition-all duration-500 rotate-0 group-hover:rotate-12" size={20} />
         ) : (
-          <Sun 
-            className="text-amber-600 transition-all duration-500 rotate-0 group-hover:rotate-90" 
-            size={20} 
-          />
+          <Sun className="text-amber-600 transition-all duration-500 rotate-0 group-hover:rotate-90" size={20} />
         )}
         
-        {/* Indicador visual discreto de que está no modo 'Sistema' */}
         {theme === 'system' && (
-          <Monitor 
-            size={8} 
-            className="absolute -bottom-1 -right-1 text-slate-400 opacity-70" 
-          />
+          <Monitor size={8} className="absolute -bottom-1 -right-1 text-slate-400 opacity-70" />
         )}
       </div>
     </button>
