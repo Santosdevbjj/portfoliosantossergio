@@ -4,10 +4,47 @@ import * as React from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
 import type { CommonDictionary } from '@/types/dictionary'
-import { useTheme } from 'next-themes'
+
 /* -------------------------------------------------------------------------- */
 /* THEME PROVIDER                                                            */
 /* -------------------------------------------------------------------------- */
+
+export function ThemeProvider({ children }: { readonly children: React.ReactNode }) {
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      {children}
+    </NextThemesProvider>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* THEME TOGGLE                                                               */
+/* -------------------------------------------------------------------------- */
+
+interface ThemeToggleProps {
+  readonly labels: CommonDictionary['theme']
+}
+
+/* export function ThemeToggle({ labels }: ThemeToggleProps) {
+  const { resolvedTheme, setTheme, theme } = useTheme()
+  const [mounted, setMounted] = React.useState(false)
+
+  // Evita erro de hidratação no Next.js 16/Turbo
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div className="w-11 h-11 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
+    )
+  } 
+   */
 
 
 export function ThemeToggle() {
@@ -38,42 +75,6 @@ export function ThemeToggle() {
 
 
 
-
-export function ThemeProvider({ children }: { readonly children: React.ReactNode }) {
-  return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
-      {children}
-    </NextThemesProvider>
-  )
-}
-
-/* -------------------------------------------------------------------------- */
-/* THEME TOGGLE                                                               */
-/* -------------------------------------------------------------------------- */
-
-interface ThemeToggleProps {
-  readonly labels: CommonDictionary['theme']
-}
-
-export function ThemeToggle({ labels }: ThemeToggleProps) {
-  const { resolvedTheme, setTheme, theme } = useTheme()
-  const [mounted, setMounted] = React.useState(false)
-
-  // Evita erro de hidratação no Next.js 16/Turbo
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return (
-      <div className="w-11 h-11 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
-    )
-  }
 
   // Lógica de ciclo simplificada: Light -> Dark -> System
   const cycleTheme = () => {
