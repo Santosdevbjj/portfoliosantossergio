@@ -14,7 +14,6 @@ import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 
 import "@/app/globals.css";
-import "@/styles/animations.css";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -54,19 +53,12 @@ export async function generateMetadata(
 
     return {
       metadataBase,
-
       title: {
         default: dict.seo.siteName,
         template: `%s | ${dict.seo.siteName}`,
       },
-
       description: dict.seo.description,
       keywords: dict.seo.keywords,
-
-      verification: {
-        google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
-      },
-
       alternates: {
         canonical: `/${locale}`,
         languages: {
@@ -75,6 +67,9 @@ export async function generateMetadata(
           ),
           "x-default": `/en-US`,
         },
+      },
+      verification: {
+        google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
       },
     };
   } catch {
@@ -118,20 +113,20 @@ export default async function LangLayout({
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app";
 
-  const baseLanguage = locale.split("-")[0]; // en-US -> en
+  const baseLanguage = locale.split("-")[0];
 
   return (
     <html
       lang={baseLanguage}
-      className={`${inter.variable} scroll-smooth`}
+      className={inter.variable}
       suppressHydrationWarning
     >
-      <body className="min-h-screen flex flex-col bg-background text-foreground antialiased font-sans">
+      <body className="min-h-screen flex flex-col bg-background text-foreground font-sans antialiased transition-colors duration-500">
         <ScrollSpyProvider>
           {/* Skip Link */}
           <a
             href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-4 py-2 rounded-md"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-brand-500 text-white px-4 py-2 rounded-md"
           >
             {dict.common.skipToContent}
           </a>
@@ -140,14 +135,13 @@ export default async function LangLayout({
           <Navbar lang={locale} common={dict.common} />
 
           <main id="main-content" className="flex-grow">
-            {/* SEO Breadcrumb JSON-LD */}
             <BreadcrumbsJsonLd
               lang={locale}
               dict={dict}
               baseUrl={baseUrl}
             />
 
-            <div className="container mx-auto px-4 pt-4">
+            <div className="main-container pt-4">
               <Breadcrumbs
                 lang={locale}
                 dictionary={dict}
