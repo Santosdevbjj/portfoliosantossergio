@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ANIMATION SYSTEM — NEXT 16 + TAILWIND v4
+   ANIMATION SYSTEM — NEXT 16 + TAILWIND v4.1
    ========================================================================== */
 
 @keyframes fadeInUp {
@@ -18,13 +18,14 @@
   100% { transform: translate3d(100%, 0, 0); }
 }
 
+/* Sistema de carregamento em cascata (Stagger) */
 .stagger-load > * {
   opacity: 0;
   will-change: transform, opacity;
   animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Delays progressivos */
+/* Delays progressivos usando lógica moderna */
 .stagger-load > *:nth-child(1) { animation-delay: 0.1s; }
 .stagger-load > *:nth-child(2) { animation-delay: 0.2s; }
 .stagger-load > *:nth-child(3) { animation-delay: 0.3s; }
@@ -36,5 +37,6 @@
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+    transition: none !important;
   }
 }
