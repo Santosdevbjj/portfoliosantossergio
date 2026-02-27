@@ -269,6 +269,7 @@ export interface Dictionary {
 
   seo: {
     siteName: string;
+    title: string;
     description: string;
     keywords: string[];
     pages: Record<SeoPageKey, SeoPage>;
