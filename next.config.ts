@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
       static: 180,
     },
     
+    },
+  
      turbo: {
       rules: {
         "*.css": ["postcss-loader"],
@@ -30,8 +32,6 @@ const nextConfig: NextConfig = {
     },
   },
 
-    
-  },
 
   images: {
     formats: ['image/avif', 'image/webp'],
