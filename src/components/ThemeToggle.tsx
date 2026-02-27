@@ -6,7 +6,7 @@ import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
 import type { CommonDictionary } from '@/types/dictionary'
 
 /* -------------------------------------------------------------------------- */
-/* THEME PROVIDER - Otimizado para Next.js 16                                 */
+/* THEME PROVIDER - Otimizado para Next.js 16 e React 19                      */
 /* -------------------------------------------------------------------------- */
 
 export function ThemeProvider({ children }: { readonly children: React.ReactNode }) {
@@ -23,7 +23,7 @@ export function ThemeProvider({ children }: { readonly children: React.ReactNode
 }
 
 /* -------------------------------------------------------------------------- */
-/* THEME TOGGLE - Responsivo e Multilingue                                    */
+/* THEME TOGGLE - Responsivo, Multilingue e Type-Safe                         */
 /* -------------------------------------------------------------------------- */
 
 interface ThemeToggleProps {
@@ -34,27 +34,29 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
   const { resolvedTheme, setTheme, theme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
-  // Previne erro de hidratação (Hydration Mismatch)
+  // Evita Hydration Mismatch no Next.js 16 (Turbopack)
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Placeholder enquanto o componente não monta no cliente
   if (!mounted) {
     return (
       <div className="w-11 h-11 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
     )
   }
 
-  // Ciclo: Claro -> Escuro -> Sistema
+  // Lógica de Ciclo com Type Guard para TypeScript 6.0
   const cycleTheme = () => {
     const themes = ['light', 'dark', 'system'] as const
     const currentTheme = (theme as typeof themes[number]) || 'system'
     const nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length
-    setTheme(themes[nextIndex])
+    
+    // Garantia de que o valor nunca será undefined para o setTheme
+    const nextTheme = themes[nextIndex] ?? 'system'
+    setTheme(nextTheme)
   }
 
-  // Seleciona o label correto com base no dicionário (PT, EN, ES)
+  // Type-safe label access
   const themeKey = (theme as keyof typeof labels) || 'system'
   const currentLabel = labels[themeKey] || labels.system
 
@@ -70,7 +72,7 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
                  transition-all duration-300 shadow-sm ring-brand-500/50 hover:ring-2"
     >
       <div className="relative w-5 h-5 flex items-center justify-center">
-        {/* Ícone muda conforme o estado real do tema (considerando o sistema) */}
+        {/* Renderização baseada no resolvedTheme (considera a preferência do sistema) */}
         {resolvedTheme === 'dark' ? (
           <Moon 
             className="text-amber-400 transition-all duration-500 rotate-0 group-hover:rotate-12" 
@@ -83,11 +85,11 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
           />
         )}
         
-        {/* Pequeno indicador de modo "Sistema" */}
+        {/* Indicador visual discreto de que está no modo 'Sistema' */}
         {theme === 'system' && (
           <Monitor 
             size={8} 
-            className="absolute -bottom-1 -right-1 text-slate-400" 
+            className="absolute -bottom-1 -right-1 text-slate-400 opacity-70" 
           />
         )}
       </div>
