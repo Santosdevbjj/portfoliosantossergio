@@ -157,6 +157,7 @@
   },
   "seo": {
     "siteName": "Sérgio Santos | Portfolio",
+    "title": "Sérgio Santos",
     "description": "Ciência de Dados & Sistemas Críticos",
     "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
     "pages": {
