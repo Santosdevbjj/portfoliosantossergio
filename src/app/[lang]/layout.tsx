@@ -24,27 +24,29 @@ const inter = Inter({
 /* =========================================
    STATIC PARAMS (SSG)
 ========================================= */
-export async function generateStaticParams(): Promise<{ lang: string }[]> {
+export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
 /* =========================================
    METADATA DINÂMICA (SEO, OG, X, WHATSAPP)
 ========================================= */
-export async function generateMetadata(
-  { params }: { params: { lang: string } }
-): Promise<Metadata> {
-  const locale = normalizeLocale(params.lang);
+type Props = {
+  params: Promise<{ lang: string }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { lang } = await params;
+  const locale = normalizeLocale(lang);
 
   if (!locales.includes(locale)) {
     notFound();
   }
 
-  // URL Base obrigatória para imagens funcionarem em redes sociais
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
   const dict = await getServerDictionary(locale);
   
-  // Caminho ABSOLUTO da imagem (Crucial para WhatsApp e X)
+  // Caminho ABSOLUTO da imagem específica por idioma
   const ogImageUrl = `${siteUrl}/og-image-${locale}.png`; 
 
   return {
@@ -56,20 +58,21 @@ export async function generateMetadata(
     description: dict.seo.description,
     keywords: dict.seo.keywords,
     
+    // TAG DO GOOGLE PRESERVADA
     verification: {
       google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
     },
 
     openGraph: {
-      title: dict.seo.title || "Sérgio Santos",
-      description: dict.seo.description, // Puxa a tradução correta do arquivo de idioma
+      title: dict.seo.title,
+      description: dict.seo.description,
       url: `${siteUrl}/${locale}`,
       siteName: dict.seo.siteName,
-      locale: locale,
+      locale: locale.replace("-", "_"), // Formato padrão OG (ex: pt_BR)
       type: "website",
       images: [
         {
-          url: ogImageUrl, // URL Completa https://...
+          url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: dict.seo.title,
@@ -81,7 +84,7 @@ export async function generateMetadata(
       card: "summary_large_image",
       title: dict.seo.title,
       description: dict.seo.description,
-      images: [ogImageUrl], // URL Completa para evitar corte
+      images: [ogImageUrl],
     },
 
     alternates: {
@@ -110,14 +113,13 @@ export const viewport: Viewport = {
 /* =========================================
    LAYOUT PRINCIPAL
 ========================================= */
-export default async function LangLayout({
-  children,
-  params,
-}: {
-  readonly children: ReactNode;
-  readonly params: { readonly lang: string };
+export default async function LangLayout(props: {
+  children: ReactNode;
+  params: Promise<{ lang: string }>;
 }) {
-  const locale = normalizeLocale(params.lang);
+  const { lang } = await props.params;
+  const children = props.children;
+  const locale = normalizeLocale(lang);
 
   if (!locales.includes(locale)) {
     notFound();
@@ -131,7 +133,7 @@ export default async function LangLayout({
   return (
     <html
       lang={baseLanguage}
-      className={inter.variable}
+      className={`${inter.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground font-sans antialiased transition-colors duration-500">
@@ -139,7 +141,7 @@ export default async function LangLayout({
           {/* Acessibilidade: Skip Link */}
           <a
             href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-brand-500 text-white px-4 py-2 rounded-md"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-4 py-2 rounded-md"
           >
             {dict.common.skipToContent}
           </a>
@@ -153,7 +155,7 @@ export default async function LangLayout({
               baseUrl={baseUrl}
             />
 
-            <div className="main-container pt-4">
+            <div className="container mx-auto px-4 pt-4">
               <Breadcrumbs
                 lang={locale}
                 dictionary={dict}
@@ -172,7 +174,7 @@ export default async function LangLayout({
           />
         </ScrollSpyProvider>
 
-        {/* Google Analytics */}
+        {/* Google Analytics - Mantido conforme solicitado */}
         {gaId && (
           <>
             <Script
