@@ -2,18 +2,18 @@
 @import "../styles/animations.css";
 
 /* ==========================================================================
-   DARK MODE CONFIG — TAILWIND v4
+   DARK MODE CONFIG — TAILWIND v4.1 (CSS-First)
    ========================================================================== */
 
-/* Ativa suporte a dark via classe .dark */
-@custom-variant dark (&:where(.dark, .dark *));
+/* Configuração crucial para o modo escuro funcionar via classe */
+@variant dark (&:where(.dark, .dark *));
 
 /* ==========================================================================
-   GLOBAL DESIGN SYSTEM — NEXT 16 + TAILWIND v4 + OKLCH
+   GLOBAL DESIGN SYSTEM — OKLCH + NEXT 16
    ========================================================================== */
 
 @theme {
-  /* --- OKLCH Brand Palette --- */
+  /* --- OKLCH Brand Palette (Perceptualmente Uniforme) --- */
   --color-brand-50: oklch(0.97 0.01 256.4);
   --color-brand-100: oklch(0.92 0.04 256.4);
   --color-brand-500: oklch(0.62 0.17 256.4);
@@ -21,32 +21,24 @@
   --color-brand-900: oklch(0.28 0.07 256.4);
 
   /* --- Typography --- */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-heading: var(--font-montserrat), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-montserrat), sans-serif;
 
-  /* --- Shadows --- */
+  /* --- Shadows (v4.1 Colored Shadows) --- */
   --shadow-premium: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 20px color-mix(in oklch, oklch(0.62 0.17 256.4), transparent 70%);
+  --shadow-glow: 0 0 20px color-mix(in oklch, var(--color-brand-500), transparent 70%);
 }
 
 /* ==========================================================================
-   BASE LAYER
+   BASE LAYER & THEME VARIABLES
    ========================================================================== */
 
 @layer base {
-  *,
-  ::before,
-  ::after {
-    box-sizing: border-box;
-    border-color: var(--border);
-  }
-
   :root {
     --background: oklch(0.98 0.01 256.4);
     --foreground: oklch(0.15 0.02 256.4);
     --card: oklch(1 0 0);
     --border: oklch(0.92 0.01 256.4);
-
     color-scheme: light;
   }
 
@@ -55,52 +47,33 @@
     --foreground: oklch(0.95 0.01 256.4);
     --card: oklch(0.18 0.02 256.4);
     --border: oklch(0.25 0.02 256.4);
-
     color-scheme: dark;
   }
 
   html {
     @apply scroll-smooth antialiased;
     background-color: var(--background);
-    text-rendering: optimizeLegibility;
-    scrollbar-gutter: stable;
-    -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    @apply min-h-screen flex flex-col transition-colors duration-500 overflow-x-hidden;
+    @apply min-h-screen flex flex-col transition-colors duration-500;
     color: var(--foreground);
     background-color: var(--background);
     font-family: var(--font-sans);
-
-    /* Safe Areas (iOS / Android) */
-    padding: env(safe-area-inset-top)
-             env(safe-area-inset-right)
-             env(safe-area-inset-bottom)
-             env(safe-area-inset-left);
+    
+    /* Suporte a Safe Areas para Mobile Responsivo */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 }
 
-/* ==========================================================================
-   COMPONENTS
-   ========================================================================== */
-
 @layer components {
-
-  /* Layout Responsivo Central */
   .main-container {
     @apply w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12;
   }
 
-  /* Glassmorphism */
   .glass-effect {
     @apply backdrop-blur-xl transition-all duration-300 border shadow-sm;
     background-color: color-mix(in oklch, var(--card) 75%, transparent);
     border-color: color-mix(in oklch, var(--border) 50%, transparent);
-  }
-
-  /* Melhor legibilidade de títulos */
-  .text-balance {
-    text-wrap: balance;
   }
 }
