@@ -28,9 +28,8 @@ export async function generateStaticParams(): Promise<{ lang: string }[]> {
   return locales.map((lang) => ({ lang }));
 }
 
-
 /* =========================================
-   METADATA DINÂMICA (SEO, OG, LINKEDIN, X)
+   METADATA DINÂMICA (SEO, OG, X, WHATSAPP)
 ========================================= */
 export async function generateMetadata(
   { params }: { params: { lang: string } }
@@ -41,18 +40,20 @@ export async function generateMetadata(
     notFound();
   }
 
+  // URL Base obrigatória para imagens funcionarem em redes sociais
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
   const dict = await getServerDictionary(locale);
   
-  const ogImage = `/og-image-${locale}.png`; 
+  // Caminho ABSOLUTO da imagem (Crucial para WhatsApp e X)
+  const ogImageUrl = `${siteUrl}/og-image-${locale}.png`; 
 
   return {
     metadataBase: new URL(siteUrl),
     title: {
-      default: "Sérgio Santos | Analista de Dados e Resiliência",
-      template: `%s | Sérgio Santos`,
+      default: dict.seo.title || "Sérgio Santos",
+      template: `%s | ${dict.seo.siteName || "Sérgio Santos"}`,
     },
-    description: "Especialista em Ciência de Dados e Resiliência. Projetos de agentes inteligentes com Azure OpenAI e segurança STRIDE.",
+    description: dict.seo.description,
     keywords: dict.seo.keywords,
     
     verification: {
@@ -60,127 +61,42 @@ export async function generateMetadata(
     },
 
     openGraph: {
-      title: "Sérgio Santos | Analista de Dados e Resiliência",
-      description: "Especialista em Ciência de Dados e Resiliência com foco em soluções de IA Generativa (Azure OpenAI) e segurança arquitetural STRIDE.",
+      title: dict.seo.title || "Sérgio Santos",
+      description: dict.seo.description, // Puxa a tradução correta do arquivo de idioma
       url: `${siteUrl}/${locale}`,
-      siteName: "Portfólio Sérgio Santos",
+      siteName: dict.seo.siteName,
       locale: locale,
       type: "website",
       images: [
         {
-          url: ogImage,
+          url: ogImageUrl, // URL Completa https://...
           width: 1200,
           height: 630,
-          alt: `Portfólio Sérgio Santos - ${locale}`,
+          alt: dict.seo.title,
         },
       ],
     },
 
-    // --- VALIDAÇÃO TWITTER CARD (X) ---
-    twitter: {
-      card: "summary_large_image", // Garante o card grande
-      title: "Sérgio Santos | Analista de Dados e Resiliência",
-      description: "Confira meu portfólio de Ciência de Dados, Agentes Inteligentes e Segurança de Sistemas.",
-      creator: "@seu_usuario", // Substitua pelo seu @ se desejar
-      images: [
-        {
-          url: ogImage,
-          alt: "Preview do Portfólio de Sérgio Santos",
-        }
-      ],
-    },
-
-    alternates: {
-      canonical: `/${locale}`,
-      languages: {
-        "pt-BR": "/pt-BR",
-        "en-US": "/en-US",
-        "es-ES": "/es-ES",
-        "es-MX": "/es-MX",
-        "es-AR": "/es-AR",
-        "x-default": "/en-US",
-      },
-    },
-  };
-}
-
-
-
-
-
-/* OLD export async function generateMetadata(
-  { params }: { params: { lang: string } }
-): Promise<Metadata> {
-  const locale = normalizeLocale(params.lang);
-
-  if (!locales.includes(locale)) {
-    notFound();
-  }
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
-  const dict = await getServerDictionary(locale);
-  
-  // Define a imagem correta baseada no idioma detectado
-  const ogImage = `/og-image-${locale}.png`; 
-
-  return {
-    metadataBase: new URL(siteUrl),
-    title: {
-      default: "Sérgio Santos | Analista de Dados e Resiliência",
-      template: `%s | Sérgio Santos`,
-    },
-    description: "Especialista em Ciência de Dados e Resiliência. Projetos de agentes inteligentes com Azure OpenAI e segurança STRIDE.",
-    keywords: dict.seo.keywords,
-    
-    // Verificação do Google (Sua TAG mantida)
-    verification: {
-      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
-    },
-
-    // Open Graph (LinkedIn, Facebook, WhatsApp)
-    openGraph: {
-      title: "Sérgio Santos | Analista de Dados e Resiliência",
-      description: "Especialista em Ciência de Dados e Resiliência com foco em soluções de IA Generativa (Azure OpenAI) e segurança arquitetural STRIDE. Explore meus projetos e expertise técnica.",
-      url: `${siteUrl}/${locale}`,
-      siteName: "Portfólio Sérgio Santos",
-      locale: locale,
-      type: "website",
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: `Portfólio Sérgio Santos - ${locale}`,
-        },
-      ],
-    },
-
-    // Twitter / X
     twitter: {
       card: "summary_large_image",
-      title: "Sérgio Santos | Analista de Dados e Resiliência",
-      description: "Ciência de Dados e Agentes Inteligentes de Segurança.",
-      images: [ogImage],
+      title: dict.seo.title,
+      description: dict.seo.description,
+      images: [ogImageUrl], // URL Completa para evitar corte
     },
 
-    // Alternates (Multilíngue)
     alternates: {
-      canonical: `/${locale}`,
+      canonical: `${siteUrl}/${locale}`,
       languages: {
-        "pt-BR": "/pt-BR",
-        "en-US": "/en-US",
-        "es-ES": "/es-ES",
-        "es-MX": "/es-MX",
-        "es-AR": "/es-AR",
-        "x-default": "/en-US",
+        "pt-BR": `${siteUrl}/pt-BR`,
+        "en-US": `${siteUrl}/en-US`,
+        "es-ES": `${siteUrl}/es-ES`,
+        "es-MX": `${siteUrl}/es-MX`,
+        "es-AR": `${siteUrl}/es-AR`,
+        "x-default": `${siteUrl}/en-US`,
       },
     },
   };
 }
-
-
-*/
-
 
 /* =========================================
    VIEWPORT
@@ -220,6 +136,7 @@ export default async function LangLayout({
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground font-sans antialiased transition-colors duration-500">
         <ScrollSpyProvider>
+          {/* Acessibilidade: Skip Link */}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-brand-500 text-white px-4 py-2 rounded-md"
@@ -255,7 +172,7 @@ export default async function LangLayout({
           />
         </ScrollSpyProvider>
 
-        {/* Google Analytics (Sua TAG mantida e protegida) */}
+        {/* Google Analytics */}
         {gaId && (
           <>
             <Script
