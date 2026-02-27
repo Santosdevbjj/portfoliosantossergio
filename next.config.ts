@@ -5,10 +5,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  reactCompiler: true,
   typedRoutes: true, 
 
   experimental: {
-    reactCompiler: true, // No Next 16, o compiler fica dentro de experimental
     optimizePackageImports: [
       "lucide-react",
       "framer-motion",
