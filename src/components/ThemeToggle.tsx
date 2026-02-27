@@ -4,10 +4,40 @@ import * as React from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
 import type { CommonDictionary } from '@/types/dictionary'
-
+import { useTheme } from 'next-themes'
 /* -------------------------------------------------------------------------- */
 /* THEME PROVIDER                                                            */
 /* -------------------------------------------------------------------------- */
+
+
+export function ThemeToggle() {
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = React.useState(false)
+
+  // Garante que o componente só renderize no cliente para evitar hidratação falha
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return <div className="w-10 h-10" />
+
+  return (
+    <button
+      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+      className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 transition-all hover:ring-2 ring-brand-500"
+      aria-label="Toggle Theme"
+    >
+      {resolvedTheme === 'dark' ? (
+        <Sun className="text-amber-400" size={20} />
+      ) : (
+        <Moon className="text-slate-700" size={20} />
+      )}
+    </button>
+  )
+}
+
+
+
 
 export function ThemeProvider({ children }: { readonly children: React.ReactNode }) {
   return (
