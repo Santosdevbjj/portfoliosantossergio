@@ -22,6 +22,15 @@ const nextConfig: NextConfig = {
       dynamic: 30,
       static: 180,
     },
+    
+     turbo: {
+      rules: {
+        "*.css": ["postcss-loader"],
+      },
+    },
+  },
+
+    
   },
 
   images: {
