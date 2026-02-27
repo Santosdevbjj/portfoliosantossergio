@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
       static: 180,
     },
     // No Next.js 16+, a configuração do turbo fica dentro de experimental
-    turbo: {
+    turbopack: {
       rules: {
         "*.css": ["postcss-loader"],
       },
