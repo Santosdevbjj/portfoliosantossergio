@@ -7,6 +7,7 @@ import type { GitHubRepo, ProcessedProject } from "@/types/github";
  * ✔ Filtra apenas repositórios do usuário (evita forks e projetos de terceiros)
  * ✔ Exige a tag 'portfolio'
  * ✔ Processa a estrutura de Pipes (|)
+ * ✔ TS 6.0 & Next.js 16 Compliant
  */
 export function processRepositories(repos: GitHubRepo[], username: string): ProcessedProject[] {
   if (!repos || !Array.isArray(repos)) return [];
@@ -15,8 +16,8 @@ export function processRepositories(repos: GitHubRepo[], username: string): Proc
     .filter(repo => {
       // TRAVA DE SEGURANÇA: 
       // 1. Deve ter a tag 'portfolio'
-      // 2. Não pode ser Fork (isso remove o beer_api automaticamente)
-      // 3. O dono deve ser você (username)
+      // 2. Não pode ser Fork (agora reconhecido pelo TS)
+      // 3. O dono deve ser o usuário configurado
       const hasTag = repo.topics?.includes("portfolio");
       const isNotFork = !repo.fork;
       const isMine = repo.owner?.login.toLowerCase() === username.toLowerCase();
@@ -58,15 +59,21 @@ export function processRepositories(repos: GitHubRepo[], username: string): Proc
       };
     })
     .sort((a, b) => {
+      // ORDEM DE PRIORIDADE:
+      // 1. Tag "primeiro" (Cabeça do portfólio)
       if (a.isHead && !b.isHead) return -1;
       if (!a.isHead && b.isHead) return 1;
+
+      // 2. Tag "featured/destaque" (Cards principais)
       if (a.isFeatured && !b.isFeatured) return -1;
       if (!a.isFeatured && b.isFeatured) return 1;
 
+      // 3. Ordem das Categorias definida no config
       const orderA = CATEGORY_ORDER[a.category] ?? 99;
       const orderB = CATEGORY_ORDER[b.category] ?? 99;
       if (orderA !== orderB) return orderA - orderB;
 
+      // 4. Alfabeto (Desempate)
       return a.name.localeCompare(b.name);
     });
 }
