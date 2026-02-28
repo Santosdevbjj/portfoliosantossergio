@@ -28,7 +28,7 @@ export interface ProcessedProject {
 
 /**
  * CONFIGURAÇÃO DE ORDEM E CATEGORIAS
- * Alinhado com a sua lista de 17 itens.
+ * Ordem estrita conforme sua solicitação (1 a 17)
  */
 const CATEGORY_ORDER: Record<string, number> = {
   "Ciência de Dados": 1,
@@ -74,7 +74,7 @@ const TOPIC_TO_CATEGORY: Record<string, string> = {
   "artificial-intelligence": "Inteligência Artificial",
   "ia": "Inteligência Artificial",
   "ai": "Inteligência Artificial",
-  "azure": "Azure Databricks", // Mapeado para Databricks conforme sua lista
+  "azure": "Azure Databricks",
   "amazon-aws": "Amazon AWS",
   "aws": "Amazon AWS",
   "cybersecurity": "Cibersegurança",
@@ -97,27 +97,31 @@ export function processRepositories(repos: GitHubRepo[]): ProcessedProject[] {
   if (!repos || !Array.isArray(repos)) return [];
 
   return repos
-    .filter(repo => repo.topics?.includes("portfolio")) // Segurança: Apenas meus projetos
+    .filter(repo => repo.topics?.includes("portfolio")) // Segurança absoluta contra forks/outros
     .map(repo => {
-      // Lógica dos Pipes (|)
-      // Padrão: O Problema | A Solução | O Impacto
+      // 1. Processamento dos Pipes (|)
+      // O Problema | A Solução | O Impacto
       const descriptionParts = repo.description?.split("|") || [];
-      const problem = descriptionParts[0]?.trim() || "Descrição pendente";
+      const problem = descriptionParts[0]?.trim() || "Descrição não definida";
       const solution = descriptionParts[1]?.trim() || "";
       const impact = descriptionParts[2]?.trim() || "";
 
-      // Determinação da Categoria baseada na prioridade da sua lista
+      // 2. Determinação da Categoria (Resolvendo erro de tipo do Vercel)
       let category = "Outros";
       const matchedCategories = repo.topics
-        .filter(topic => TOPIC_TO_CATEGORY[topic])
+        .filter(topic => !!TOPIC_TO_CATEGORY[topic])
         .map(topic => TOPIC_TO_CATEGORY[topic]);
 
       if (matchedCategories.length > 0) {
-        // Ordena as categorias encontradas pela prioridade da sua lista e pega a primeira
-        category = matchedCategories.sort((a, b) => 
-          (CATEGORY_ORDER[a] || 99) - (CATEGORY_ORDER[b] || 99)
-        )[0];
+        const sorted = matchedCategories.sort((a, b) => 
+          (CATEGORY_ORDER[a] ?? 99) - (CATEGORY_ORDER[b] ?? 99)
+        );
+        category = sorted[0] ?? "Outros"; // Garantia de string não nula
       }
+
+      // 3. Flags de Destaque
+      const isFeatured = repo.topics.includes("featured") || repo.topics.includes("destaque");
+      const isHead = repo.topics.includes("primeiro");
 
       return {
         id: repo.id,
@@ -127,8 +131,8 @@ export function processRepositories(repos: GitHubRepo[]): ProcessedProject[] {
         problem,
         solution,
         impact,
-        isFeatured: repo.topics.includes("featured") || repo.topics.includes("destaque"),
-        isHead: repo.topics.includes("primeiro"),
+        isFeatured,
+        isHead,
         category,
         technologies: repo.topics.filter(t => 
           !["portfolio", "destaque", "featured", "primeiro"].includes(t)
@@ -136,23 +140,24 @@ export function processRepositories(repos: GitHubRepo[]): ProcessedProject[] {
       };
     })
     .sort((a, b) => {
-      // 1. O "Cabeça" (primeiro) sempre no topo absoluto
+      // ORDEM DE EXIBIÇÃO:
+      // 1. O "Cabeça" (primeiro)
       if (a.isHead && !b.isHead) return -1;
       if (!a.isHead && b.isHead) return 1;
 
-      // 2. Projetos com selo "featured/destaque" vem em seguida
+      // 2. Destaques (featured)
       if (a.isFeatured && !b.isFeatured) return -1;
       if (!a.isFeatured && b.isFeatured) return 1;
 
-      // 3. Ordenação por categoria conforme sua lista (1 a 17)
-      const orderA = CATEGORY_ORDER[a.category] || 99;
-      const orderB = CATEGORY_ORDER[b.category] || 99;
+      // 3. Pela sua lista de prioridade de categorias (1 a 17)
+      const orderA = CATEGORY_ORDER[a.category] ?? 99;
+      const orderB = CATEGORY_ORDER[b.category] ?? 99;
       
       if (orderA !== orderB) {
         return orderA - orderB;
       }
 
-      // 4. Critério de desempate: Nome
+      // 4. Alfabeto (Desempate)
       return a.name.localeCompare(b.name);
     });
 }
