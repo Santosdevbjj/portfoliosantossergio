@@ -4,11 +4,10 @@ import { notFound } from "next/navigation";
 
 // Types
 import type { Locale } from "@/types/dictionary";
-import type { ProjectDomain } from "@/domain/projects";
+import type { ProcessedProject } from "@/types/github";
 
 // Services & Helpers
 import { getGitHubProjects } from "@/services/githubService";
-// import { mapGitHubRepoToProject } from "@/mappers/projectMapper";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
 
@@ -25,9 +24,8 @@ interface PageProps {
 }
 
 // --------------------------------------------------
-// Static Generation (Crucial para evitar erro de Prerender)
+// Static Generation
 // --------------------------------------------------
-
 export async function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }));
 }
@@ -41,9 +39,8 @@ export const viewport: Viewport = {
   themeColor: "#020617",
 };
 
-// Força a geração estática e evita que APIs dinâmicas quebrem o build
 export const dynamic = "force-static";
-export const revalidate = 3600; // Revalida o cache a cada hora
+export const revalidate = 3600; 
 
 // --------------------------------------------------
 // Metadata (SEO Multilíngue)
@@ -77,32 +74,30 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 // Page Component
 // --------------------------------------------------
 export default async function HomePage(props: PageProps) {
-  // 1. Resolução segura dos parâmetros
   const resolvedParams = await props.params;
   const rawLang = resolvedParams?.lang;
 
-  // 2. Validação rigorosa para evitar o erro "undefined reading lang"
   if (!rawLang || !isValidLocale(rawLang)) {
     notFound();
   }
 
   const lang = rawLang as Locale;
 
-  // 3. Busca de dados paralela
-  // Adicionamos um try/catch interno ou fallback para garantir que o build não quebre se o GitHub falhar
-  let projects: ProjectDomain[] = [];
+  let projects: ProcessedProject[] = [];
   let dict;
 
   try {
-    const [dictionaryData, repos] = await Promise.all([
+    // getGitHubProjects agora já retorna os projetos filtrados e mapeados!
+    const [dictionaryData, projectsData] = await Promise.all([
       getServerDictionary(lang),
       getGitHubProjects("Santosdevbjj")
     ]);
+    
     dict = dictionaryData;
-    projects = repos.map(mapGitHubRepoToProject);
+    projects = projectsData; // Não precisa de .map(mapGitHubRepoToProject)
+    
   } catch (error) {
     console.error("Erro ao carregar dados da página:", error);
-    // Se o dicionário falhar, não temos como renderizar
     if (!dict) notFound();
   }
 
@@ -110,13 +105,11 @@ export default async function HomePage(props: PageProps) {
     <ProxyPage lang={lang}>
       <main className="min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 transition-colors duration-300">
         
-        {/* Seção Hero - Responsividade intrínseca */}
         <HeroSection dictionary={dict} />
 
-        {/* Seção Sobre */}
         <AboutSection dict={dict.about} />
 
-        {/* Seção de Projetos - Grid Adaptativo 1 col (mobile) -> 2 cols (desktop) */}
+        {/* Seção de Projetos */}
         <section className="container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-7xl" id="projects">
           <header className="mb-12">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
@@ -137,18 +130,26 @@ export default async function HomePage(props: PageProps) {
                         {project.name}
                       </h3>
                       <span className="text-[10px] px-2 py-1 rounded-full bg-slate-200 dark:bg-slate-800 font-mono font-medium">
-                        {dict.projects.categories[project.technology.labelKey] || project.technology.labelKey}
+                        {project.category}
                       </span>
                     </div>
 
-                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-3">
-                      {project.description || dict.states.emptyProjects.description}
-                    </p>
+                    {/* Exibição amigável do Problema/Solução */}
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                        {project.problem}
+                      </p>
+                      {project.solution && (
+                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                          {project.solution}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-4 mt-8">
                     <a
-                      href={project.htmlUrl}
+                      href={project.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs font-bold uppercase tracking-wider underline decoration-2 underline-offset-4 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
