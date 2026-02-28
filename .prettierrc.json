@@ -30,7 +30,7 @@
     "^@/dictionaries/(.*)$",
      "^@/config/(.*)$",
     "^@/domain/(.*)$",
-    "^@/services/(.*)$",
+    // "^@/services/(.*)$",
     "^@/lib/(.*)$",
     "^@/hooks/(.*)$",
     "^@/components/(.*)$",
