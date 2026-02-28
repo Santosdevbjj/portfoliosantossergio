@@ -27,9 +27,8 @@ export interface ProcessedProject {
 }
 
 /**
- * CONFIGURAÇÃO DE ORDEM E CATEGORIAS
+ * CONFIGURAÇÃO DE ORDEM E CATEGORIAS (1 a 17)
  */
-// Usamos Record<string, number> para permitir acesso dinâmico por string sem erro de índice
 const CATEGORY_ORDER: Record<string, number> = {
   "Ciência de Dados": 1,
   "Azure Databricks": 2,
@@ -105,22 +104,16 @@ export function processRepositories(repos: GitHubRepo[]): ProcessedProject[] {
       const solution = descriptionParts[1]?.trim() || "";
       const impact = descriptionParts[2]?.trim() || "";
 
-      // 2. Determinação da Categoria
+      // 2. Determinação da Categoria (Corrigido para TS 6.0)
       let category = "Outros";
-      
-      // Filtramos tópicos que existem no nosso de-para
       const matchedCategories = repo.topics
         .map(topic => TOPIC_TO_CATEGORY[topic])
-        .filter((cat): cat is string => !!cat);
+        .filter((cat): cat is string => typeof cat === 'string');
 
       if (matchedCategories.length > 0) {
-        // Ordenação segura para TypeScript 6.0
-        matchedCategories.sort((a, b) => {
-          const valA = CATEGORY_ORDER[a] ?? 99;
-          const valB = CATEGORY_ORDER[b] ?? 99;
-          return valA - valB;
-        });
-        category = matchedCategories[0];
+        matchedCategories.sort((a, b) => (CATEGORY_ORDER[a] ?? 99) - (CATEGORY_ORDER[b] ?? 99));
+        // O uso do ?? "Outros" garante que 'category' nunca receba undefined
+        category = matchedCategories[0] ?? "Outros";
       }
 
       return {
@@ -140,23 +133,21 @@ export function processRepositories(repos: GitHubRepo[]): ProcessedProject[] {
       };
     })
     .sort((a, b) => {
-      // 1. Prioridade Máxima: Tag "primeiro"
+      // ORDEM DE PRIORIDADE:
+      // 1. Tag "primeiro" (Cabeça do portfólio)
       if (a.isHead && !b.isHead) return -1;
       if (!a.isHead && b.isHead) return 1;
 
-      // 2. Segunda Prioridade: Tag "featured/destaque"
+      // 2. Tag "featured/destaque" (Cards principais)
       if (a.isFeatured && !b.isFeatured) return -1;
       if (!a.isFeatured && b.isFeatured) return 1;
 
-      // 3. Terceira Prioridade: Ordem das Categorias (1 a 17)
+      // 3. Ordem das Categorias definida (1 a 17)
       const orderA = CATEGORY_ORDER[a.category] ?? 99;
       const orderB = CATEGORY_ORDER[b.category] ?? 99;
-      
-      if (orderA !== orderB) {
-        return orderA - orderB;
-      }
+      if (orderA !== orderB) return orderA - orderB;
 
-      // 4. Quarta Prioridade: Alfabeto
+      // 4. Alfabeto (Desempate)
       return a.name.localeCompare(b.name);
     });
 }
