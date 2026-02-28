@@ -1,4 +1,4 @@
-// config/categories.ts
+// src/config/categories.ts
 
 export const CATEGORY_ORDER: Record<string, number> = {
   "Ciência de Dados": 1,
