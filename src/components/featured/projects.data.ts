@@ -3,27 +3,23 @@
 // src/components/featured/projects.data.ts
 
 import type { SupportedLocale } from "@/dictionaries/locales";
-import type { ProjectCategory } from "@/types/project";
 
 /**
  * Modelo de projeto destacado (Featured).
- * - Ordem fixa
- * - Independente da API do GitHub
- * - Multilíngue
- * - TS 6 strict compliant
+ * Atualizado para as novas categorias do portfólio.
  */
 export interface FeaturedProject {
   readonly id: string;
   readonly name: string;
   readonly repoUrl: string;
   readonly priority: 1 | 2 | 3;
-  readonly categories: readonly ProjectCategory[];
+  readonly categories: readonly string[]; // Agora aceita as novas categorias (1 a 17)
   readonly description: Record<SupportedLocale, string>;
 }
 
 /**
  * Lista oficial dos 3 projetos destacados.
- * A ordem visual é controlada por `priority`.
+ * Categorias atualizadas para o novo padrão de 17 itens.
  */
 export const featuredProjects = [
   {
@@ -32,7 +28,7 @@ export const featuredProjects = [
     repoUrl:
       "https://github.com/Santosdevbjj/analiseRiscosAtrasoObras",
     priority: 1,
-    categories: ["dataScience", "analysis"],
+    categories: ["Ciência de Dados", "Banco de Dados"],
     description: {
       "pt-BR":
         "Projeto de ciência de dados para análise preditiva de riscos de atraso em obras.",
@@ -52,7 +48,7 @@ export const featuredProjects = [
     repoUrl:
       "https://github.com/Santosdevbjj/analiseDadosNaPratica",
     priority: 2,
-    categories: ["dataScience", "graphs"],
+    categories: ["Ciência de Dados", "Neo4J"],
     description: {
       "pt-BR":
         "Projeto prático focado em análise exploratória de dados e geração de insights.",
@@ -72,7 +68,7 @@ export const featuredProjects = [
     repoUrl:
       "https://github.com/Santosdevbjj/genAIpipeETLPython",
     priority: 3,
-    categories: ["dataScience", "cloud"],
+    categories: ["Python", "Azure Databricks"],
     description: {
       "pt-BR":
         "Pipeline ETL moderno em Python com integração de IA generativa.",
@@ -90,7 +86,6 @@ export const featuredProjects = [
 
 /**
  * Tipo derivado automaticamente.
- * Seguro, imutável e alinhado com TS 6.
  */
 export type FeaturedProjectId =
   (typeof featuredProjects)[number]["id"];
