@@ -18,27 +18,35 @@ export const CATEGORY_ORDER: Record<string, number> = {
   "HTML": 15,
   "Node - React - TS": 16,
   "Artigos Técnicos": 17,
+  "Outros": 99
 };
 
-// Mapeia o tópico do GitHub para a categoria visual
 export const TOPIC_TO_CATEGORY: Record<string, string> = {
   "data-science": "Ciência de Dados",
   "ciencia-de-dados": "Ciência de Dados",
+  "databricks": "Azure Databricks",
   "azure-databricks": "Azure Databricks",
   "neo4j": "Neo4J",
+  "graph-analysis": "Neo4J",
   "power-bi": "Power BI e Análise de Dados",
+  "data-analysis": "Power BI e Análise de Dados",
   "excel": "Excel",
   "sql": "Banco de Dados",
+  "database": "Banco de Dados",
   "python": "Python",
   "dotnet": "C# / .NET",
+  "csharp": "C# / .NET",
   "java": "Java",
   "machine-learning": "Machine Learning",
   "ia": "Inteligência Artificial",
   "ai": "Inteligência Artificial",
   "amazon-aws": "Amazon AWS",
+  "aws": "Amazon AWS",
   "cybersecurity": "Cibersegurança",
   "programming-logic": "Lógica de Programação",
   "html": "HTML", 
   "react": "Node - React - TS",
-  "articles": "Artigos Técnicos",
+  "nextjs": "Node - React - TS",
+  "typescript": "Node - React - TS",
+  "articles": "Artigos Técnicos"
 };
