@@ -28,6 +28,7 @@
     "",
     "^@/types/(.*)$",
     "^@/dictionaries/(.*)$",
+     "^@/config/(.*)$",
     "^@/domain/(.*)$",
     "^@/services/(.*)$",
     "^@/lib/(.*)$",
