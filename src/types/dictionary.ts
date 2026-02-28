@@ -131,6 +131,8 @@ export interface ProjectsSectionDictionary {
   featuredLabel: string;
   firstLabel: string;
   impactLabel: string;
+  problem: string;
+  solution: string;
   viewProject: string;
   viewDemo: string;
   viewAll: string;
