@@ -5,6 +5,7 @@
 /* DARK MODE CONFIG — Tailwind v4.2 */
 /* ========================================================================== */
 @variant dark (&:where(.dark, .dark *));
+@variant neon (&:where(.neon, .neon *));
 
 /* ========================================================================== */
 /* GLOBAL DESIGN SYSTEM — OKLCH + Next 16 */
@@ -40,6 +41,15 @@
     --foreground: oklch(0.95 0.01 256.4);
     --card: oklch(0.18 0.02 256.4);
     --border: oklch(0.25 0.02 256.4);
+    color-scheme: dark;
+  }
+
+  .neon {
+    --background: oklch(0.15 0.08 280);
+    --foreground: oklch(0.95 0.05 200);
+    --card: oklch(0.20 0.10 280);
+    --border: oklch(0.40 0.15 280);
+    --glow: 0 0 20px oklch(0.65 0.20 280 / 0.8);
     color-scheme: dark;
   }
 
