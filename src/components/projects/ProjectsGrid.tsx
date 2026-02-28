@@ -1,24 +1,23 @@
 'use client'
 
+// src/components/projects/ProjectsGrid.tsx
+
 import type { Locale } from '@/types/dictionary'
-import type { Dictionary, ProjectCategories } from '@/types/dictionary'
-import type { FeaturedProject } from '@/components/featured/projects.data'
+import type { Dictionary } from '@/types/dictionary'
 import { ProjectCategoryBadge } from './ProjectCategoryBadge'
+import type { Project } from '@/types/project'
 
 interface ProjectsGridProps {
-  readonly projects: readonly FeaturedProject[]
+  readonly projects: readonly Project[]
   readonly lang: Locale
   readonly dict: Dictionary
 }
 
 /**
- * Grid de projetos.
- *
- * ✔ Totalmente responsivo
- * ✔ 100% multilíngue (pt-BR, en-US, es-*)
- * ✔ Alinhado com o contrato do Dictionary
- * ✔ TS 6 compliant
- * ✔ Compatível com Next.js 16
+ * Grid de projetos unificado.
+ * * ✔ Suporta os projetos processados do GitHub (Pipes |)
+ * ✔ Exibe Problema, Solução e Impacto
+ * ✔ TS 6 compliant & Next.js 16
  */
 export function ProjectsGrid({
   projects,
@@ -60,25 +59,76 @@ export function ProjectsGrid({
           "
         >
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-              {project.name}
-            </h3>
+            <header className="flex items-start justify-between gap-2">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                {project.name}
+              </h3>
+              {project.isHead && (
+                <span className="shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                  TOP
+                </span>
+              )}
+            </header>
 
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              {project.description[lang]}
-            </p>
-
+            {/* Renderização da Categoria Principal */}
             <div className="flex flex-wrap gap-2">
-              {project.categories.map(
-                (cat: keyof ProjectCategories) => (
-                  <ProjectCategoryBadge
-                    key={cat}
-                    label={dict.projects.categories[cat]}
-                  />
-                ),
+              <ProjectCategoryBadge
+                label={project.category} 
+              />
+            </div>
+
+            {/* Seção de Conteúdo (Pipes |) */}
+            <div className="space-y-2 text-sm">
+              <p className="text-slate-600 dark:text-slate-400 line-clamp-3">
+                <span className="font-semibold text-slate-800 dark:text-slate-200">
+                  {dict.projects.problem || "Problema"}:
+                </span>{" "}
+                {project.problem}
+              </p>
+              
+              {project.solution && (
+                <p className="text-slate-600 dark:text-slate-400 line-clamp-3">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {dict.projects.solution || "Solução"}:
+                  </span>{" "}
+                  {project.solution}
+                </p>
               )}
             </div>
+
+            {/* Lista de Tecnologias */}
+            <div className="flex flex-wrap gap-1 mt-auto pt-2">
+              {project.technologies.slice(0, 4).map((tech) => (
+                <span 
+                  key={tech}
+                  className="text-[10px] text-neutral-500 bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-400 px-2 py-0.5 rounded"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
           </div>
+
+          <footer className="mt-6 flex items-center gap-4">
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold text-blue-600 hover:text-blue-500 dark:text-blue-400"
+            >
+              GitHub
+            </a>
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-bold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400"
+              >
+                Live Demo
+              </a>
+            )}
+          </footer>
         </article>
       ))}
     </div>
