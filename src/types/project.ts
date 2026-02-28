@@ -1,10 +1,12 @@
 // src/types/project.ts
 
-import { ProcessedProject } from "./github";
+import type { ProcessedProject } from "./github";
 
 /**
  * Este arquivo agora serve como um alias para os tipos processados do GitHub.
  * Isso evita que você precise alterar os imports em todos os componentes.
+ * * ✔ Corrigido: 'import type' para compatibilidade com verbatimModuleSyntax
+ * ✔ TS 6 Strict Compliant
  */
 
 export type Project = ProcessedProject;
@@ -14,7 +16,9 @@ export type Project = ProcessedProject;
  */
 export type ProjectStatus = "active" | "archived" | "draft";
 
-// Você pode manter as interfaces de SEO se o seu componente de Metadata ainda as usar
+/**
+ * SEO localizado
+ */
 export interface ProjectSEO {
   title: string;
   description: string;
