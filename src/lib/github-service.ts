@@ -28,8 +28,8 @@ export interface ProcessedProject {
 
 /**
  * CONFIGURAÇÃO DE ORDEM E CATEGORIAS
- * Ordem estrita conforme sua solicitação (1 a 17)
  */
+// Usamos Record<string, number> para permitir acesso dinâmico por string sem erro de índice
 const CATEGORY_ORDER: Record<string, number> = {
   "Ciência de Dados": 1,
   "Azure Databricks": 2,
@@ -97,31 +97,31 @@ export function processRepositories(repos: GitHubRepo[]): ProcessedProject[] {
   if (!repos || !Array.isArray(repos)) return [];
 
   return repos
-    .filter(repo => repo.topics?.includes("portfolio")) // Segurança absoluta contra forks/outros
+    .filter(repo => repo.topics?.includes("portfolio"))
     .map(repo => {
       // 1. Processamento dos Pipes (|)
-      // O Problema | A Solução | O Impacto
       const descriptionParts = repo.description?.split("|") || [];
       const problem = descriptionParts[0]?.trim() || "Descrição não definida";
       const solution = descriptionParts[1]?.trim() || "";
       const impact = descriptionParts[2]?.trim() || "";
 
-      // 2. Determinação da Categoria (Resolvendo erro de tipo do Vercel)
+      // 2. Determinação da Categoria
       let category = "Outros";
+      
+      // Filtramos tópicos que existem no nosso de-para
       const matchedCategories = repo.topics
-        .filter(topic => !!TOPIC_TO_CATEGORY[topic])
-        .map(topic => TOPIC_TO_CATEGORY[topic]);
+        .map(topic => TOPIC_TO_CATEGORY[topic])
+        .filter((cat): cat is string => !!cat);
 
       if (matchedCategories.length > 0) {
-        const sorted = matchedCategories.sort((a, b) => 
-          (CATEGORY_ORDER[a] ?? 99) - (CATEGORY_ORDER[b] ?? 99)
-        );
-        category = sorted[0] ?? "Outros"; // Garantia de string não nula
+        // Ordenação segura para TypeScript 6.0
+        matchedCategories.sort((a, b) => {
+          const valA = CATEGORY_ORDER[a] ?? 99;
+          const valB = CATEGORY_ORDER[b] ?? 99;
+          return valA - valB;
+        });
+        category = matchedCategories[0];
       }
-
-      // 3. Flags de Destaque
-      const isFeatured = repo.topics.includes("featured") || repo.topics.includes("destaque");
-      const isHead = repo.topics.includes("primeiro");
 
       return {
         id: repo.id,
@@ -131,8 +131,8 @@ export function processRepositories(repos: GitHubRepo[]): ProcessedProject[] {
         problem,
         solution,
         impact,
-        isFeatured,
-        isHead,
+        isFeatured: repo.topics.includes("featured") || repo.topics.includes("destaque"),
+        isHead: repo.topics.includes("primeiro"),
         category,
         technologies: repo.topics.filter(t => 
           !["portfolio", "destaque", "featured", "primeiro"].includes(t)
@@ -140,16 +140,15 @@ export function processRepositories(repos: GitHubRepo[]): ProcessedProject[] {
       };
     })
     .sort((a, b) => {
-      // ORDEM DE EXIBIÇÃO:
-      // 1. O "Cabeça" (primeiro)
+      // 1. Prioridade Máxima: Tag "primeiro"
       if (a.isHead && !b.isHead) return -1;
       if (!a.isHead && b.isHead) return 1;
 
-      // 2. Destaques (featured)
+      // 2. Segunda Prioridade: Tag "featured/destaque"
       if (a.isFeatured && !b.isFeatured) return -1;
       if (!a.isFeatured && b.isFeatured) return 1;
 
-      // 3. Pela sua lista de prioridade de categorias (1 a 17)
+      // 3. Terceira Prioridade: Ordem das Categorias (1 a 17)
       const orderA = CATEGORY_ORDER[a.category] ?? 99;
       const orderB = CATEGORY_ORDER[b.category] ?? 99;
       
@@ -157,7 +156,7 @@ export function processRepositories(repos: GitHubRepo[]): ProcessedProject[] {
         return orderA - orderB;
       }
 
-      // 4. Alfabeto (Desempate)
+      // 4. Quarta Prioridade: Alfabeto
       return a.name.localeCompare(b.name);
     });
 }
