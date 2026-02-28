@@ -1,7 +1,10 @@
+
+
+
 'use client'
 
 import * as React from 'react'
-import { Moon, Sun, Monitor, Zap } from 'lucide-react'
+import { Moon, Sun, Monitor } from 'lucide-react'
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
 import type { CommonDictionary } from '@/types/dictionary'
 
@@ -13,7 +16,6 @@ export function ThemeProvider({ children }: { readonly children: React.ReactNode
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
-      themes={['light', 'dark', 'neon', 'system']}
     >
       {children}
     </NextThemesProvider>
@@ -36,7 +38,7 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
   }
 
   const cycleTheme = () => {
-    const themes = ['light', 'dark', 'neon', 'system'] as const
+    const themes = ['light', 'dark', 'system'] as const
     const currentTheme = (theme as typeof themes[number]) || 'system'
     const nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length
     setTheme(themes[nextIndex] ?? 'system')
@@ -52,19 +54,15 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
       aria-label={currentLabel}
       title={currentLabel}
       className="group relative w-11 h-11 flex items-center justify-center rounded-xl
-      bg-white/80 dark:bg-slate-900/80 neon:bg-black/80 border border-slate-200
-      dark:border-slate-800/60 neon:border-cyan-400/60 backdrop-blur-md hover:scale-105 active:scale-95
+      bg-white/80 dark:bg-slate-900/80 border border-slate-200
+      dark:border-slate-800/60 backdrop-blur-md hover:scale-105 active:scale-95
       transition-all duration-300 shadow-sm ring-brand-500/50 hover:ring-2"
     >
       <div className="relative w-5 h-5 flex items-center justify-center">
-        {resolvedTheme === 'dark' && (
+        {resolvedTheme === 'dark' ? (
           <Moon className="text-amber-400 transition-all duration-500 group-hover:rotate-12" size={20} />
-        )}
-        {resolvedTheme === 'light' && (
+        ) : (
           <Sun className="text-amber-600 transition-all duration-500 group-hover:rotate-90" size={20} />
-        )}
-        {resolvedTheme === 'neon' && (
-          <Zap className="text-cyan-400 transition-all duration-500 group-hover:scale-110 drop-shadow-[0_0_6px_cyan]" size={20} />
         )}
         {theme === 'system' && (
           <Monitor size={8} className="absolute -bottom-1 -right-1 text-slate-400 opacity-70" />
@@ -72,4 +70,9 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
       </div>
     </button>
   )
-}
+} 
+
+
+
+
+
