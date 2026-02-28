@@ -15,7 +15,7 @@ interface ProjectsGridProps {
 
 /**
  * Grid de projetos unificado.
- * ✔ Resolve erro de tipagem de chaves inexistentes no dict
+ * ✔ 100% Tipado (Type-Safe) após atualização do dicionário
  * ✔ Suporta os projetos processados do GitHub (Pipes |)
  * ✔ TS 6 compliant & Next.js 16
  */
@@ -63,9 +63,9 @@ export function ProjectsGrid({
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                 {project.name}
               </h3>
-              {project.isHead && (
-                <span className="shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                  TOP
+              {(project.isHead || project.isFeatured) && (
+                <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                  {project.isHead ? 'TOP' : 'FEATURED'}
                 </span>
               )}
             </header>
@@ -77,13 +77,11 @@ export function ProjectsGrid({
               />
             </div>
 
-            {/* Seção de Conteúdo (Pipes |) com Fallback Seguro */}
+            {/* Seção de Conteúdo (Pipes |) - Agora com tipagem nativa do dict */}
             <div className="space-y-2 text-sm">
               <p className="text-slate-600 dark:text-slate-400 line-clamp-3">
                 <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {/* Forçamos o acesso como 'any' para evitar que o TS barre o build 
-                      enquanto as chaves não existem no JSON */}
-                  {(dict.projects as any).problem || "Problema"}:
+                  {dict.projects.problem}:
                 </span>{" "}
                 {project.problem}
               </p>
@@ -91,7 +89,7 @@ export function ProjectsGrid({
               {project.solution && (
                 <p className="text-slate-600 dark:text-slate-400 line-clamp-3">
                   <span className="font-semibold text-slate-800 dark:text-slate-200">
-                    {(dict.projects as any).solution || "Solução"}:
+                    {dict.projects.solution}:
                   </span>{" "}
                   {project.solution}
                 </p>
@@ -100,10 +98,10 @@ export function ProjectsGrid({
 
             {/* Lista de Tecnologias */}
             <div className="flex flex-wrap gap-1 mt-auto pt-2">
-              {project.technologies.slice(0, 4).map((tech) => (
+              {project.technologies.slice(0, 5).map((tech) => (
                 <span 
                   key={tech}
-                  className="text-[10px] text-neutral-500 bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-400 px-2 py-0.5 rounded"
+                  className="text-[10px] text-neutral-500 bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-400 px-2 py-0.5 rounded border border-neutral-200 dark:border-neutral-700"
                 >
                   {tech}
                 </span>
@@ -111,12 +109,12 @@ export function ProjectsGrid({
             </div>
           </div>
 
-          <footer className="mt-6 flex items-center gap-4">
+          <footer className="mt-6 flex items-center gap-4 border-t border-neutral-100 dark:border-neutral-800 pt-4">
             <a
               href={project.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-bold text-blue-600 hover:text-blue-500 dark:text-blue-400"
+              className="text-xs font-bold text-blue-600 hover:underline dark:text-blue-400"
             >
               GitHub
             </a>
@@ -125,7 +123,7 @@ export function ProjectsGrid({
                 href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-bold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400"
+                className="text-xs font-bold text-emerald-600 hover:underline dark:text-emerald-400"
               >
                 Live Demo
               </a>
