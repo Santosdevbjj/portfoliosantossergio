@@ -5,8 +5,12 @@ export interface GitHubRepo {
   name: string;
   description: string | null;
   html_url: string;
-  topics: string[]; // Aqui estão nossas tags: portfolio, destaque, etc.
+  topics: string[];
   homepage: string | null;
+  fork: boolean; // Essencial para filtrar o 'beer_api'
+  owner: {
+    login: string;
+  };
 }
 
 export interface ProcessedProject {
@@ -17,8 +21,8 @@ export interface ProcessedProject {
   problem: string;
   solution: string;
   impact: string;
-  isFeatured: boolean; // Tag 'destaque' ou 'featured'
-  isHead: boolean;     // Tag 'primeiro'
+  isFeatured: boolean;
+  isHead: boolean;
   category: string;
   technologies: string[];
 }
