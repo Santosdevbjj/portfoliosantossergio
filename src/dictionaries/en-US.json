@@ -86,6 +86,8 @@
       "excel": "Excel",
       "database": "Database",
       "dev": "Development (Python/C#/Java)",
+      "problem": "Problem",
+      "solution": "Solution",
       "security": "Security"
     }
   },
