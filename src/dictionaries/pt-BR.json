@@ -75,6 +75,8 @@
     "featuredLabel": "Destaque Técnico",
     "firstLabel": "Desafio e Arquitetura",
     "impactLabel": "Impacto e Resultado",
+    "problem": "Problema",
+    "solution": "Solução",
     "viewProject": "Repositório GitHub",
     "viewDemo": "Visualizar Demo",
     "viewAll": "Ver Todos",
@@ -86,8 +88,6 @@
       "excel": "Excel",
       "database": "Banco de Dados",
       "dev": "Desenvolvimento (Python/C#/Java)",
-       "problem": "Problema",
-       "solution": "Solução",
       "security": "Segurança"
     }
   },
