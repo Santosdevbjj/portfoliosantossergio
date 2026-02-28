@@ -30,9 +30,11 @@ export const TOPIC_TO_CATEGORY: Record<string, string> = {
   "graph-analysis": "Neo4J",
   "power-bi": "Power BI e Análise de Dados",
   "data-analysis": "Power BI e Análise de Dados",
+  "analise-de-dados": "Power BI e Análise de Dados", // Adicionado para cobertura total
   "excel": "Excel",
   "sql": "Banco de Dados",
   "database": "Banco de Dados",
+  "banco-de-dados": "Banco de Dados", // Adicionado
   "python": "Python",
   "dotnet": "C# / .NET",
   "csharp": "C# / .NET",
@@ -40,13 +42,19 @@ export const TOPIC_TO_CATEGORY: Record<string, string> = {
   "machine-learning": "Machine Learning",
   "ia": "Inteligência Artificial",
   "ai": "Inteligência Artificial",
+  "artificial-intelligence": "Inteligência Artificial", // Adicionado
   "amazon-aws": "Amazon AWS",
   "aws": "Amazon AWS",
   "cybersecurity": "Cibersegurança",
+  "ciberseguranca": "Cibersegurança", // Adicionado
   "programming-logic": "Lógica de Programação",
+  "logica-de-programacao": "Lógica de Programação", // Adicionado
   "html": "HTML", 
   "react": "Node - React - TS",
   "nextjs": "Node - React - TS",
   "typescript": "Node - React - TS",
-  "articles": "Artigos Técnicos"
+  "node": "Node - React - TS", // Adicionado
+  "articles": "Artigos Técnicos",
+  "artigos": "Artigos Técnicos", // Adicionado para redundância
+  "artigos-tecnicos": "Artigos Técnicos" // ADICIONADO (A tag que você usa no GitHub)
 };
