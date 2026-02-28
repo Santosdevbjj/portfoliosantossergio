@@ -8,7 +8,7 @@ import type { ProjectDomain } from "@/domain/projects";
 
 // Services & Helpers
 import { getGitHubProjects } from "@/services/githubService";
-import { mapGitHubRepoToProject } from "@/mappers/projectMapper";
+// import { mapGitHubRepoToProject } from "@/mappers/projectMapper";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
 
