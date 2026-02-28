@@ -30,8 +30,9 @@ export const viewport: Viewport = {
   themeColor: "#020617",
 };
 
+// Forçamos a revalidação para ser mais frequente durante os seus testes
 export const dynamic = "force-static";
-export const revalidate = 3600; 
+export const revalidate = 60; // Alterado para 60 segundos para atualizar quase em tempo real
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const params = await props.params;
@@ -68,6 +69,7 @@ export default async function HomePage(props: PageProps) {
   let dict;
 
   try {
+    // A função getGitHubProjects já faz a ordenação do 1 ao 17
     const [dictionaryData, projectsData] = await Promise.all([
       getServerDictionary(lang),
       getGitHubProjects("Santosdevbjj")
@@ -88,7 +90,6 @@ export default async function HomePage(props: PageProps) {
         <HeroSection dictionary={dict} />
         <AboutSection dict={dict.about} />
 
-        {/* LISTA ÚNICA DE PROJETOS (DO 1 AO 17) */}
         <section className="container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-7xl" id="projects">
           <header className="mb-12">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
@@ -108,7 +109,6 @@ export default async function HomePage(props: PageProps) {
                       {project.name}
                     </h3>
                     <span className="text-[10px] px-2 py-1 rounded-full bg-slate-200 dark:bg-slate-800 font-mono font-medium">
-                      {/* Mostra a categoria vinda do GitHub (Artigos Técnicos será a 17) */}
                       {project.category}
                     </span>
                   </div>
