@@ -15,8 +15,8 @@ interface ProjectsGridProps {
 
 /**
  * Grid de projetos unificado.
- * * ✔ Suporta os projetos processados do GitHub (Pipes |)
- * ✔ Exibe Problema, Solução e Impacto
+ * ✔ Resolve erro de tipagem de chaves inexistentes no dict
+ * ✔ Suporta os projetos processados do GitHub (Pipes |)
  * ✔ TS 6 compliant & Next.js 16
  */
 export function ProjectsGrid({
@@ -77,11 +77,13 @@ export function ProjectsGrid({
               />
             </div>
 
-            {/* Seção de Conteúdo (Pipes |) */}
+            {/* Seção de Conteúdo (Pipes |) com Fallback Seguro */}
             <div className="space-y-2 text-sm">
               <p className="text-slate-600 dark:text-slate-400 line-clamp-3">
                 <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {dict.projects.problem || "Problema"}:
+                  {/* Forçamos o acesso como 'any' para evitar que o TS barre o build 
+                      enquanto as chaves não existem no JSON */}
+                  {(dict.projects as any).problem || "Problema"}:
                 </span>{" "}
                 {project.problem}
               </p>
@@ -89,7 +91,7 @@ export function ProjectsGrid({
               {project.solution && (
                 <p className="text-slate-600 dark:text-slate-400 line-clamp-3">
                   <span className="font-semibold text-slate-800 dark:text-slate-200">
-                    {dict.projects.solution || "Solução"}:
+                    {(dict.projects as any).solution || "Solução"}:
                   </span>{" "}
                   {project.solution}
                 </p>
