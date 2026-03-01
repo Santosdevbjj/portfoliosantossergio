@@ -1,15 +1,5 @@
 import type { MetadataRoute } from "next";
 
-/**
- * ROBOTS.TXT — NEXT.JS 16 (SEO Internacional 2026)
- * -----------------------------------------------------------------------------
- * ✔ SEO multilíngue (pt-BR / en-US / es-*)
- * ✔ Compatível com App Router
- * ✔ Seguro para APIs
- * ✔ Edge-safe
- * ✔ Produção-ready
- */
-
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = (
     process.env.NEXT_PUBLIC_SITE_URL ??
@@ -18,28 +8,23 @@ export default function robots(): MetadataRoute.Robots {
 
   return {
     rules: [
-      /**
-       * 1️⃣ Todos os buscadores e crawlers
-       */
       {
         userAgent: "*",
         allow: "/",
         disallow: [
           "/api/",
+          "/_next/",
           "/private/",
           "/admin/",
+          "/*?*", // Bloqueia URLs com query strings para evitar conteúdo duplicado
         ],
       },
+      {
+        // Regra específica para proteger seus artigos de scrapers de IA agressivos
+        userAgent: "GPTBot",
+        disallow: "/private/",
+      }
     ],
-
-    /**
-     * Sitemap internacional
-     */
     sitemap: `${baseUrl}/sitemap.xml`,
-
-    /**
-     * Host canônico
-     */
-    host: baseUrl,
   };
 }
