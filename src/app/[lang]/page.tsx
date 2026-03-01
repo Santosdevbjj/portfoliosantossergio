@@ -144,7 +144,7 @@ export default async function HomePage(props: PageProps) {
         <section className="container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-7xl border-t border-slate-200 dark:border-slate-800" id="articles">
           <header className="mb-12">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">
-              17) Repositório de Artigos Técnicos
+               Repositório de Artigos Técnicos
             </h2>
           </header>
 
