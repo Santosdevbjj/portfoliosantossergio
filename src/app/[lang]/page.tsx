@@ -169,7 +169,25 @@ export default async function HomePage(props: PageProps) {
                     Artigos sobre Ciência de Dados, Python e SQL renderizados via MDX.
                   </p>
                 </div>
-              </div>
+              </div> 
+
+              <div className="mt-8 flex flex-col gap-3">
+                  {/* AGORA LEVA PARA A LISTA DE SELEÇÃO */}
+                <a 
+                   href={`/${lang}/artigos`} 
+                   className="text-xs font-black underline decoration-4 decoration-blue-500/30 underline-offset-8 uppercase tracking-widest text-blue-600 hover:decoration-blue-500 transition-all"
+                   >
+                    EXPLORAR POR ASSUNTO (Escolher Artigo) →
+                 </a>
+
+                 <a 
+                   href={`/${lang}/artigos/README`} 
+                   className="text-xs font-black opacity-60 hover:opacity-100 transition-all uppercase tracking-widest"
+                 >
+                   Ver README Geral
+                 </a>
+             </div>
+
 
               {/* INTEGRAÇÃO DOS CAMINHOS DE ARTIGO */}
               <div className="mt-8 flex flex-col gap-3">
