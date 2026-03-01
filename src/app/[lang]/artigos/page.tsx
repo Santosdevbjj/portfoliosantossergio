@@ -1,19 +1,16 @@
 import Link from "next/link";
 import MdxLayout from "@/components/mdx-layout";
 
-// Página de Seleção de Artigos
-// Mapeamento dos seus artigos conforme sua estrutura no GitHub
-const CATEGORIES = [
-  { name: "TypeScript", slug: "artigos/typescript/typescript-6-e-o-futuro" },
-  { name: "Python", slug: "artigos/python/ide-pycharm-spyder" },
-  { name: "Low Code", slug: "artigos/low_code/low_code_saude" },
-  { name: "Java", slug: "artigos/java/java-na-pratica" },
-  { name: "DotNet", slug: "artigos/dotnet/visual-studio-vs-code" },
-  { name: "Grafo (DIO)", slug: "artigos/dio_Campus_Expert_14/analise_grafos_carreira" },
-  { name: "Data Science", slug: "artigos/data/dados-reduzir-custos" },
-  { name: "Azure", slug: "artigos/azure-cloud-native/azure-cloud-native-article" },
-  { name: "AWS", slug: "artigos/aws/aws-em-colapso" },
-  { name: "IA Generativa", slug: "artigos/IAGenerativa/guardrail_security" },
+const ARTIGOS = [
+  { cat: "Cloud", title: "AWS em Colapso", path: "artigos/aws/aws-em-colapso" },
+  { cat: "Cloud", title: "Azure Cloud Native", path: "artigos/azure-cloud-native/azure-cloud-native-article" },
+  { cat: "Dados", title: "Redução de Custos com Dados", path: "artigos/data/dados-reduzir-custos" },
+  { cat: "Dados", title: "Análise de Grafos", path: "artigos/dio_Campus_Expert_14/analise_grafos_carreira" },
+  { cat: "Dev", title: "TypeScript 6 e o Futuro", path: "artigos/typescript/typescript-6-e-o-futuro" },
+  { cat: "Dev", title: "Java na Prática", path: "artigos/java/java-na-pratica" },
+  { cat: "Dev", title: "Python: PyCharm vs Spyder", path: "artigos/python/ide-pycharm-spyder" },
+  { cat: "IA", title: "Guardrail Security (IA)", path: "artigos/IAGenerativa/guardrail_security" },
+  { cat: "Soft Skills", title: "Aprendizado Contínuo", path: "artigos/autoconhecimento/aprend_continuo" },
 ];
 
 export default async function ArticlesListPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -21,23 +18,31 @@ export default async function ArticlesListPage({ params }: { params: Promise<{ l
 
   return (
     <MdxLayout>
-      <header className="mb-12 border-b border-slate-200 dark:border-slate-800 pb-8">
-        <h1 className="text-5xl font-black italic tracking-tighter uppercase">Repositório Técnico</h1>
-        <p className="text-slate-500 mt-4 text-xl">Selecione um tópico para explorar o conteúdo direto do GitHub.</p>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 not-prose">
-        {CATEGORIES.map((art) => (
-          <Link 
-            key={art.slug} 
-            href={`/${lang}/artigos/${encodeURIComponent(art.slug)}`}
-            className="group p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 bg-slate-50 dark:bg-slate-900/50 transition-all"
-          >
-            <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2 block">Assunto</span>
-            <h2 className="text-xl font-bold group-hover:text-blue-600 transition-colors">{art.name}</h2>
-            <p className="text-sm text-slate-500 mt-2 italic">Acessar documentação completa →</p>
-          </Link>
-        ))}
+      <div className="not-prose">
+        <h1 className="text-6xl font-black tracking-tighter uppercase italic mb-4">Journal Técnico</h1>
+        <p className="text-slate-500 text-xl mb-12 max-w-2xl">Documentação de estudos e implementações em Engenharia e Ciência de Dados.</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {ARTIGOS.map((item) => (
+            <Link 
+              key={item.path} 
+              href={`/${lang}/artigos/${item.path}`}
+              className="group p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:border-blue-500 transition-all duration-300"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 bg-white dark:bg-slate-800 rounded-full border border-slate-100 dark:border-slate-700">
+                  {item.cat}
+                </span>
+              </div>
+              <h2 className="text-2xl font-bold group-hover:text-blue-600 transition-colors leading-tight">
+                {item.title}
+              </h2>
+              <p className="mt-4 text-xs font-black uppercase tracking-widest text-blue-600/50 group-hover:text-blue-600 transition-all">
+                Acessar Artigo →
+              </p>
+            </Link>
+          ))}
+        </div>
       </div>
     </MdxLayout>
   );
