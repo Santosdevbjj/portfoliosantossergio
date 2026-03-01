@@ -1,20 +1,11 @@
-
-
-
 // src/app/[lang]/page.tsx
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-
-// Types
 import type { Locale } from "@/types/dictionary";
 import type { ProcessedProject } from "@/types/github";
-
-// Services & Helpers
 import { getGitHubProjects } from "@/services/githubService";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
-
-// Components
 import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
@@ -33,29 +24,17 @@ export const viewport: Viewport = {
   themeColor: "#020617",
 };
 
-// Forçamos a revalidação para ser mais frequente durante os seus testes
 export const dynamic = "force-static";
-export const revalidate = 60; // Alterado para 60 segundos para atualizar quase em tempo real
+export const revalidate = 60; 
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const params = await props.params;
   const lang = params?.lang;
   if (!lang || !isValidLocale(lang)) return {};
-
   const dict = await getServerDictionary(lang as Locale);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
-
   return {
     title: dict.seo.pages.home.title,
     description: dict.seo.pages.home.description,
-    alternates: {
-      canonical: `${siteUrl}/${lang}`,
-      languages: {
-        "pt-BR": `${siteUrl}/pt-BR`,
-        "en-US": `${siteUrl}/en-US`,
-        "es-ES": `${siteUrl}/es-ES`,
-      },
-    },
   };
 }
 
@@ -63,28 +42,30 @@ export default async function HomePage(props: PageProps) {
   const resolvedParams = await props.params;
   const rawLang = resolvedParams?.lang;
 
-  if (!rawLang || !isValidLocale(rawLang)) {
-    notFound();
-  }
+  if (!rawLang || !isValidLocale(rawLang)) notFound();
 
   const lang = rawLang as Locale;
-  let projects: ProcessedProject[] = [];
+  let allProjects: ProcessedProject[] = [];
   let dict;
 
   try {
-    // A função getGitHubProjects já faz a ordenação do 1 ao 17
     const [dictionaryData, projectsData] = await Promise.all([
       getServerDictionary(lang),
       getGitHubProjects("Santosdevbjj")
     ]);
-    
     dict = dictionaryData;
-    projects = projectsData; 
-    
+    allProjects = projectsData; 
   } catch (error) {
-    console.error("Erro ao carregar dados:", error);
+    console.error("Erro:", error);
     if (!dict) notFound();
   }
+
+  // SEPARAÇÃO SIMPLES
+  // 1. Projetos Normais (Tudo exceto o myArticles)
+  const regularProjects = allProjects.filter(p => !p.name.toLowerCase().includes("articles"));
+  
+  // 2. O Artigo (Busca por qualquer menção a 'articles' no nome)
+  const articleProject = allProjects.find(p => p.name.toLowerCase().includes("articles"));
 
   return (
     <ProxyPage lang={lang}>
@@ -93,56 +74,89 @@ export default async function HomePage(props: PageProps) {
         <HeroSection dictionary={dict} />
         <AboutSection dict={dict.about} />
 
+        {/* SEÇÃO 1 A 16 */}
         <section className="container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-7xl" id="projects">
           <header className="mb-12">
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter italic uppercase">
               {dict.projects.title}
+            </h2>
+          </header>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {regularProjects.map((project) => (
+              <ProjectCard key={project.id} project={project} dict={dict} />
+            ))}
+          </div>
+        </section>
+
+        {/* SEÇÃO 17 - REPOSITÓRIO DE ARTIGOS */}
+        <section className="container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-7xl border-t border-slate-200 dark:border-slate-800" id="articles">
+          <header className="mb-12">
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter italic uppercase">
+              17) Repositório de Artigos Técnicos
             </h2>
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {projects.map((project) => (
-              <article
-                key={project.id}
-                className="group flex flex-col justify-between p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 bg-slate-50/50 dark:bg-slate-900/50"
+            {articleProject ? (
+              <ProjectCard project={articleProject} dict={dict} isArticle />
+            ) : (
+              <div className="p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                <p className="text-slate-500 italic">Conectando ao repositório de artigos...</p>
+              </div>
+            )}
+          </div>
+
+          {/* BANNER DE CONTATO ÚNICO NO FINAL */}
+          <div className="mt-20 p-12 rounded-[2rem] bg-blue-600 text-white shadow-2xl shadow-blue-500/20">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+              <div>
+                <h3 className="text-3xl font-black mb-2">Vamos Conversar?</h3>
+                <p className="text-blue-100 text-lg">Busco oportunidades em projetos de governança e modernização.</p>
+              </div>
+              <a 
+                href="mailto:santossergiorealbjj@outlook.com" 
+                className="px-10 py-5 bg-white text-blue-600 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-xl"
               >
-                <div>
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                      {project.name}
-                    </h3>
-                    <span className="text-[10px] px-2 py-1 rounded-full bg-slate-200 dark:bg-slate-800 font-mono font-medium">
-                      {project.category}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                      {project.problem}
-                    </p>
-                    {project.solution && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
-                        {project.solution}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 mt-8">
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs font-bold uppercase tracking-wider underline decoration-2 underline-offset-4 hover:text-blue-600 dark:hover:text-blue-400"
-                  >
-                    {dict.projects.viewProject}
-                  </a>
-                </div>
-              </article>
-            ))}
+                ENVIAR EMAIL →
+              </a>
+            </div>
           </div>
         </section>
       </main>
     </ProxyPage>
+  );
+}
+
+// Sub-componente para garantir que o padrão visual seja IDÊNTICO em ambas as seções
+function ProjectCard({ project, dict, isArticle = false }: { project: ProcessedProject, dict: any, isArticle?: boolean }) {
+  return (
+    <article className="group flex flex-col justify-between p-8 rounded-3xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 bg-slate-50/50 dark:bg-slate-900/50">
+      <div>
+        <div className="flex justify-between items-start mb-6">
+          <h3 className="text-2xl font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400">
+            {project.name}
+          </h3>
+          <span className="text-[10px] px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-800 font-mono font-black uppercase tracking-widest">
+            {isArticle ? "Artigos" : project.category}
+          </span>
+        </div>
+        <div className="space-y-3">
+          <p className="text-base font-bold text-blue-600 dark:text-blue-400">
+            {project.problem}
+          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3">
+            {project.solution}
+          </p>
+        </div>
+      </div>
+      <div className="mt-10">
+        <a
+          href={isArticle ? "/pt-BR/artigos/meu-primeiro-artigo" : project.url}
+          className="text-xs font-black uppercase tracking-[0.2em] underline decoration-4 underline-offset-8 decoration-blue-500/30 hover:decoration-blue-500 transition-all"
+        >
+          {isArticle ? "LER ARTIGOS →" : dict.projects.viewProject}
+        </a>
+      </div>
+    </article>
   );
 }
