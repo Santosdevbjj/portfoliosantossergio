@@ -21,4 +21,21 @@ export default async function RemoteArticlePage({ params }: { params: Promise<{ 
       <MDXRemote source={source} />
     </MdxLayout>
   );
+} 
+
+// Adicione esta função simples no final do arquivo
+function getReadingTime(text: string) {
+  const wordsPerMinute = 200;
+  const words = text.split(/\s+/g).length;
+  return Math.ceil(words / wordsPerMinute);
 }
+
+// Dentro do seu componente RemoteArticlePage, antes do return:
+const readingTime = getReadingTime(source);
+
+// No seu return, antes do <MDXRemote />, adicione:
+<div className="flex items-center gap-4 mb-8 text-xs font-bold uppercase tracking-widest text-slate-400">
+  <span>{readingTime} min de leitura</span>
+  <span className="w-1 h-1 rounded-full bg-slate-300" />
+  <span>Fonte: GitHub</span>
+</div>
