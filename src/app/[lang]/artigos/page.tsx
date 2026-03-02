@@ -1,6 +1,3 @@
-
-
-
 import Link from "next/link";
 import MdxLayout from "@/components/mdx-layout";
 
