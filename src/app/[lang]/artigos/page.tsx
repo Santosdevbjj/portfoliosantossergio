@@ -1,15 +1,13 @@
 import Link from "next/link";
 import MdxLayout from "@/components/mdx-layout";
 
-// Função para buscar a estrutura de arquivos do seu GitHub automaticamente
 async function getArticlesFromGithub() {
   const GITHUB_USER = "Santosdevbjj";
   const REPO = "myArticles";
-
   const url = `https://api.github.com/repos/${GITHUB_USER}/${REPO}/git/trees/main?recursive=1`;
 
   try {
-    const res = await fetch(url, { next: { revalidate: 3600 } }); // Cache de 1 hora
+    const res = await fetch(url, { next: { revalidate: 3600 } });
     const data = await res.json();
 
     return data.tree
@@ -46,7 +44,6 @@ export default async function ArticlesListPage({
         <h1 className="text-6xl font-black tracking-tighter uppercase italic mb-12">
           Journal Automático
         </h1>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {artigos.map((item: any) => (
             <Link
