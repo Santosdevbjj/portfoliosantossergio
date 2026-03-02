@@ -1,5 +1,3 @@
-
-
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { notFound } from 'next/navigation';
 import MdxLayout from '@/components/mdx-layout';
