@@ -8,21 +8,24 @@ interface PageProps {
   params: Promise<{ slug: string[]; lang: string }>;
 }
 
-/**
- * Função de busca resiliente no GitHub
- * Tenta encontrar o arquivo com diferentes extensões para evitar erro 404/500
- */
 async function fetchGithubContent(slugArray: string[]) {
-  // Remove 'artigos' se ele vier duplicado no início do array
+  // 1. Limpeza radical: remove qualquer menção a 'artigos' no início para evitar duplicação
   const cleanSlug = slugArray.filter(part => part !== 'artigos');
-  const fullPath = cleanSlug.join('/');
+  
+  // 2. Se o caminho estiver vazio após a limpeza, o usuário quer o README
+  const isReadme = cleanSlug.length === 0;
+  const path = isReadme ? 'README' : cleanSlug.join('/');
   
   const extensions = ['.md', '.mdx'];
   const baseUrl = `https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/artigos`;
+  
+  // Caso especial para o README que pode estar na raiz ou dentro de /artigos
+  const urlsToTry = isReadme 
+    ? [`https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/README.md`, `${baseUrl}/README.md`]
+    : extensions.map(ext => `${baseUrl}/${path}${ext}`);
 
-  for (const ext of extensions) {
+  for (const url of urlsToTry) {
     try {
-      const url = `${baseUrl}/${fullPath}${ext}`;
       const res = await fetch(url, { 
         next: { revalidate: 3600 },
         headers: { 'Accept': 'text/plain; charset=utf-8' }
@@ -37,20 +40,17 @@ async function fetchGithubContent(slugArray: string[]) {
 }
 
 export default async function RemoteArticlePage(props: PageProps) {
-  // Next.js 16 exige o await no params
   const { slug } = await props.params;
   
-  // Busca o conteúdo com suporte a .md e .mdx
   const source = await fetchGithubContent(slug);
 
-  // Se o conteúdo não existir no GitHub, mostramos 404 em vez de Erro Interno
-  if (!source) {
+  // Evita o "Erro Interno" enviando para 404 se o conteúdo for nulo
+  if (!source || source.trim() === "") {
     return notFound();
   }
 
-  // Extração segura do título (primeiro H1 do markdown)
   const titleMatch = source.match(/^#\s+(.*)$/m);
-  const articleTitle = titleMatch?.[1]?.trim() ?? "Artigo Técnico";
+  const articleTitle = titleMatch?.[1]?.trim() ?? "Documentação Técnica";
 
   return (
     <MdxLayout>
@@ -64,13 +64,12 @@ export default async function RemoteArticlePage(props: PageProps) {
         </div>
       </header>
 
-      {/* Renderização do MDX com Fallback de Carregamento */}
       <article className="prose dark:prose-invert max-w-none 
         prose-headings:tracking-tighter prose-headings:font-black
         prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 prose-pre:rounded-3xl
         prose-img:rounded-[2.5rem] prose-img:shadow-2xl">
         
-        <Suspense fallback={<div className="h-screen w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-3xl" />}>
+        <Suspense fallback={<div className="h-96 w-full animate-pulse bg-slate-100 dark:bg-slate-900 rounded-3xl" />}>
           <MDXRemote source={source} />
         </Suspense>
       </article>
