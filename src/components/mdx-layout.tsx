@@ -1,17 +1,18 @@
 import Link from "next/link";
 import TableOfContents from "./TableOfContents";
 
+// TypeScript 6.0: Definindo e UTILIZANDO a interface para evitar erro de 'never used'
 interface MdxLayoutProps {
   children: React.ReactNode;
 }
 
-export default function MdxLayout({ children }: { children: React.ReactNode }) {
+export default function MdxLayout({ children }: MdxLayoutProps) {
   return (
     <main className="min-h-screen bg-white dark:bg-[#020617] pt-24 pb-20 selection:bg-blue-500/30">
       <div className="container mx-auto px-6 max-w-7xl flex flex-col lg:flex-row gap-12">
         
         <article className="flex-1 max-w-4xl">
-          {/* Botão de Voltar Otimizado com Next.js Link */}
+          {/* Navegação SPA via Next.js 16 Link */}
           <div className="mb-12">
             <Link 
               href="/pt-BR/artigos" 
@@ -40,7 +41,7 @@ export default function MdxLayout({ children }: { children: React.ReactNode }) {
           </div>
         </article>
 
-        {/* Sumário - Coluna Lateral */}
+        {/* Sidebar fixa para Sumário */}
         <aside className="lg:w-80">
           <div className="sticky top-32">
             <TableOfContents />
