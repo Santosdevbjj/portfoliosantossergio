@@ -1,7 +1,14 @@
+// src/app/[lang]/artigos/[...slug]/page.tsx
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { notFound } from 'next/navigation';
 import MdxLayout from '@/components/mdx-layout';
 import ShareArticle from '@/components/ShareArticle';
+import { Suspense } from 'react';
+
+// Tipagem rigorosa para TypeScript 6.0
+interface PageProps {
+  params: Promise<{ slug: string[]; lang: string }>;
+}
 
 /**
  * Calcula o tempo de leitura (200 ppm)
@@ -13,80 +20,88 @@ function getReadingTime(text: string): number {
 }
 
 /**
- * Limpa o caminho para garantir compatibilidade com a URL do GitHub.
- * Decodifica caracteres da URL e remove acentos se existirem.
+ * Sanitização de caminho para compatibilidade com URLs do GitHub
  */
-function sanitizePath(path: string) {
+function sanitizePath(path: string): string {
   return decodeURIComponent(path)
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, ""); 
 }
 
-interface PageProps {
-  params: Promise<{ slug: string[]; lang: string }>;
-}
+// Forçamos a revalidação para garantir que novos commits no GitHub apareçam
+export const revalidate = 3600; 
 
 export default async function RemoteArticlePage(props: PageProps) {
-  // No Next.js 16, params é uma Promise que deve ser aguardada
-  const resolvedParams = await props.params;
-  const { slug } = resolvedParams;
+  // Resolução da Promise de params (Padrão Next.js 16)
+  const { slug } = await props.params;
   
-  // O slug chega como um array. Ex: ["artigos", "aws", "aws-em-colapso"]
-  // O join('/') transforma em: "artigos/aws/aws-em-colapso"
-  const safeSlug = slug.map(part => sanitizePath(part));
+  if (!slug || slug.length === 0) {
+    notFound();
+  }
+
+  const safeSlug = slug.map(sanitizePath);
   const fullPath = safeSlug.join('/');
 
   try {
-    // Monta a URL final para buscar o conteúdo bruto (.md) no GitHub
     const githubUrl = `https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/${fullPath}.md`;
     
+    // Fetch com tratamento de erro de rede e cache
     const response = await fetch(githubUrl, { 
-      next: { revalidate: 3600 }, // Cache de 1 hora
-      headers: { 'Accept': 'text/plain' }
+      next: { revalidate: 3600 },
+      headers: { 
+        'Accept': 'text/plain',
+        'User-Agent': 'Portfolio-Next-16' 
+      }
     });
 
-    // Se o GitHub retornar 404, acionamos a página notFound do Next.js
     if (!response.ok) {
-      console.error(`Artigo não encontrado no GitHub: ${githubUrl}`);
-      return notFound();
+      console.warn(`[404] Artigo ausente: ${githubUrl}`);
+      notFound();
     }
 
     const source = await response.text();
-    const readingTime = getReadingTime(source);
     
-    // Tenta extrair o título do H1 do Markdown (# Título)
+    // Extração de metadados simples
+    const readingTime = getReadingTime(source);
     const titleMatch = source.match(/^#\s+(.*)$/m);
-    const articleTitle: string = (titleMatch && titleMatch[1]) ? titleMatch[1].trim() : "Artigo Técnico";
+    const articleTitle = titleMatch?.[1]?.trim() ?? "Artigo Técnico";
 
     return (
       <MdxLayout>
-        {/* Metadados do Artigo */}
-        <div className="flex items-center gap-4 mb-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 not-prose">
-          <span className="flex items-center gap-2">
-            <svg className="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {readingTime} min de leitura
-          </span>
-          <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-800" />
-          <span className="uppercase font-bold hover:text-blue-500 transition-colors cursor-default">
-            Fonte: GitHub Open Source
-          </span>
-        </div>
+        {/* Cabeçalho do Artigo */}
+        <header className="mb-8 not-prose">
+          <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+            <span className="flex items-center gap-2">
+              <svg className="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {readingTime} min de leitura
+            </span>
+            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-800" />
+            <span className="font-bold">GitHub Source</span>
+          </div>
+        </header>
 
-        {/* Renderização do MDX */}
-        <article className="prose dark:prose-invert max-w-none prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 prose-img:rounded-3xl">
-          <MDXRemote source={source} />
+        {/* Renderização MDX com Tailwind 4.2 Typography */}
+        <article className="prose dark:prose-invert max-w-none 
+          prose-headings:tracking-tighter prose-headings:font-black 
+          prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+          prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 
+          prose-img:rounded-3xl prose-img:shadow-2xl">
+          <Suspense fallback={<div className="h-96 w-full animate-pulse bg-slate-100 dark:bg-slate-800 rounded-3xl" />}>
+            <MDXRemote source={source} />
+          </Suspense>
         </article>
 
-        {/* Rodapé com botão de compartilhamento */}
-        <div className="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800">
+        {/* Footer de Compartilhamento */}
+        <footer className="mt-16 pt-8 border-t border-slate-100 dark:border-slate-800">
           <ShareArticle title={articleTitle} />
-        </div>
+        </footer>
       </MdxLayout>
     );
   } catch (error) {
-    console.error("Erro crítico na renderização remota:", error);
-    return notFound();
+    // Erros de DNS ou conexão caem aqui
+    console.error("Erro de conexão com GitHub:", error);
+    notFound();
   }
 }
