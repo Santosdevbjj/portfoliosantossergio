@@ -1,4 +1,4 @@
-// import Link from "next/link";
+import Link from "next/link";
 import MdxLayout from "@/components/mdx-layout";
 
 // Função para buscar a estrutura de arquivos do seu GitHub automaticamente
