@@ -8,30 +8,43 @@ interface PageProps {
   params: Promise<{ slug: string[]; lang: string }>;
 }
 
+/**
+ * Função de busca ultra-resiliente
+ */
 async function fetchGithubContent(slugArray: string[]) {
-  // 1. Limpeza radical: remove qualquer menção a 'artigos' no início para evitar duplicação
-  const cleanSlug = slugArray.filter(part => part !== 'artigos');
+  // 1. Normalização do Slug: remove 'artigos' e partes vazias
+  const cleanSlug = slugArray.filter(part => part !== 'artigos' && part !== '');
   
-  // 2. Se o caminho estiver vazio após a limpeza, o usuário quer o README
-  const isReadme = cleanSlug.length === 0;
-  const path = isReadme ? 'README' : cleanSlug.join('/');
+  // 2. Se não sobrar nada no slug, o usuário clicou em "Documentação (README)"
+  const isReadmeRequest = cleanSlug.length === 0;
   
-  const extensions = ['.md', '.mdx'];
-  const baseUrl = `https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/artigos`;
-  
-  // Caso especial para o README que pode estar na raiz ou dentro de /artigos
-  const urlsToTry = isReadme 
-    ? [`https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/README.md`, `${baseUrl}/README.md`]
-    : extensions.map(ext => `${baseUrl}/${path}${ext}`);
+  const GITHUB_BASE = "https://raw.githubusercontent.com/Santosdevbjj/myArticles/main";
+  const urlsToTry: string[] = [];
+
+  if (isReadmeRequest) {
+    // Tenta o README em todos os locais possíveis
+    urlsToTry.push(`${GITHUB_BASE}/artigos/README.md`);
+    urlsToTry.push(`${GITHUB_BASE}/README.md`);
+  } else {
+    const path = cleanSlug.join('/');
+    // Tenta extensões comuns e caminhos relativos
+    urlsToTry.push(`${GITHUB_BASE}/artigos/${path}.md`);
+    urlsToTry.push(`${GITHUB_BASE}/artigos/${path}.mdx`);
+    // Caso especial para pastas que contêm index ou readme interno
+    urlsToTry.push(`${GITHUB_BASE}/artigos/${path}/README.md`);
+  }
 
   for (const url of urlsToTry) {
     try {
       const res = await fetch(url, { 
-        next: { revalidate: 3600 },
-        headers: { 'Accept': 'text/plain; charset=utf-8' }
+        next: { revalidate: 60 }, // Revalidação mais rápida para testes
+        headers: { 'Cache-Control': 'no-cache' }
       });
       
-      if (res.ok) return await res.text();
+      if (res.ok) {
+        const text = await res.text();
+        if (text.trim().length > 0) return text;
+      }
     } catch (e) {
       continue;
     }
@@ -44,13 +57,14 @@ export default async function RemoteArticlePage(props: PageProps) {
   
   const source = await fetchGithubContent(slug);
 
-  // Evita o "Erro Interno" enviando para 404 se o conteúdo for nulo
-  if (!source || source.trim() === "") {
+  // Se não encontrar nada, retorna 404 em vez de deixar o Next.js quebrar com Erro 500
+  if (!source) {
     return notFound();
   }
 
+  // Extração do título para o ShareArticle
   const titleMatch = source.match(/^#\s+(.*)$/m);
-  const articleTitle = titleMatch?.[1]?.trim() ?? "Documentação Técnica";
+  const articleTitle = titleMatch?.[1]?.trim() ?? "Documentação";
 
   return (
     <MdxLayout>
@@ -60,7 +74,7 @@ export default async function RemoteArticlePage(props: PageProps) {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
           </span>
-          Sincronizado via GitHub OSS
+          GitHub Live Sync
         </div>
       </header>
 
@@ -69,7 +83,12 @@ export default async function RemoteArticlePage(props: PageProps) {
         prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 prose-pre:rounded-3xl
         prose-img:rounded-[2.5rem] prose-img:shadow-2xl">
         
-        <Suspense fallback={<div className="h-96 w-full animate-pulse bg-slate-100 dark:bg-slate-900 rounded-3xl" />}>
+        <Suspense fallback={
+          <div className="space-y-4 w-full animate-pulse">
+            <div className="h-12 bg-slate-200 dark:bg-slate-800 rounded-xl w-3/4"></div>
+            <div className="h-64 bg-slate-100 dark:bg-slate-900 rounded-3xl w-full"></div>
+          </div>
+        }>
           <MDXRemote source={source} />
         </Suspense>
       </article>
