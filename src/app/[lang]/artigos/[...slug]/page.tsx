@@ -28,8 +28,8 @@ async function fetchGithubContent(fullPath: string) {
   return null;
 }
 
-export default async function RemoteArticlePage(props: PageProps) {
-  const { slug } = props.params;
+export default async function RemoteArticlePage({ params }: PageProps) {
+  const { slug } = params;
   const fullPath = slug.join("/");
   const source = await fetchGithubContent(fullPath);
 
@@ -52,7 +52,6 @@ export default async function RemoteArticlePage(props: PageProps) {
             }}
           />
         </article>
-
         <footer className="mt-12 pt-8 border-t border-slate-800">
           <ShareArticle title={articleTitle} />
         </footer>
