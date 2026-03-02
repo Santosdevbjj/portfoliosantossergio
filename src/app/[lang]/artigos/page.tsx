@@ -1,7 +1,7 @@
 import Link from "next/link";
 import MdxLayout from "@/components/mdx-layout";
 
-// Definição de interface para satisfazer o rigor do TypeScript 6.0
+// Interface rigorosa para TypeScript 6.0
 interface GitHubTreeFile {
   path: string;
   type: string;
@@ -9,7 +9,6 @@ interface GitHubTreeFile {
 
 /**
  * Função para buscar a estrutura de arquivos do seu GitHub automaticamente.
- * Alinhado com Node 24 usando fetch nativo.
  */
 async function getArticlesFromGithub() {
   const GITHUB_USER = "Santosdevbjj";
@@ -26,21 +25,28 @@ async function getArticlesFromGithub() {
     
     const data = await res.json();
     
-    // Filtramos apenas arquivos .md ou .mdx dentro da pasta /artigos
-    return data.tree
-      .filter((file: GitHubTreeFile) => 
+    // Garantimos que data.tree existe antes de mapear
+    const tree = (data.tree || []) as GitHubTreeFile[];
+
+    return tree
+      .filter((file) => 
         file.path.startsWith('artigos/') && 
         (file.path.endsWith('.md') || file.path.endsWith('.mdx'))
       )
-      .map((file: GitHubTreeFile) => {
+      .map((file) => {
         const pathParts = file.path.replace(/\.mdx?$/, '').split('/');
-        // O slug final para o link não deve repetir 'artigos' se ele já estiver na URL base
+        
+        // CORREÇÃO DO ERRO TS: Verificamos se o array tem partes antes de acessar
+        const lastPart = pathParts[pathParts.length - 1] || "Artigo sem Titulo";
+        const category = pathParts[1] || "Geral";
+
+        // O slug para a URL deve remover o prefixo 'artigos/' para não duplicar na rota
         const slug = file.path.replace(/\.mdx?$/, '').replace(/^artigos\//, '');
         
         return {
-          title: pathParts[pathParts.length - 1].replace(/-/g, ' '),
+          title: lastPart.replace(/-/g, ' '),
           path: slug, 
-          cat: pathParts[1] || "Geral"
+          cat: category
         };
       });
   } catch (error) {
@@ -50,7 +56,7 @@ async function getArticlesFromGithub() {
 }
 
 export default async function ArticlesListPage(props: { params: Promise<{ lang: string }> }) {
-  // Padrão React 19 / Next.js 16: params é uma Promise
+  // Padrão Next.js 16: params é uma Promise
   const { lang } = await props.params;
   const artigos = await getArticlesFromGithub();
 
@@ -62,7 +68,7 @@ export default async function ArticlesListPage(props: { params: Promise<{ lang: 
             Journal <span className="text-blue-600">Técnico</span>
           </h1>
           <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xl leading-relaxed">
-            Repositório dinâmico de documentações, estudos de caso e implementações técnicas sincronizadas via GitHub.
+            Repositório dinâmico sincronizado via GitHub OSS.
           </p>
         </header>
         
@@ -94,6 +100,15 @@ export default async function ArticlesListPage(props: { params: Promise<{ lang: 
             </Link>
           ))}
         </div>
+
+        {/* Fallback caso não existam artigos */}
+        {artigos.length === 0 && (
+          <div className="text-center py-20 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem]">
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">
+              Nenhum artigo encontrado no repositório.
+            </p>
+          </div>
+        )}
       </div>
     </MdxLayout>
   );
