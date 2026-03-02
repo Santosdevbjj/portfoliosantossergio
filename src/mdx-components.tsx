@@ -1,5 +1,6 @@
 import type { MDXComponents } from "mdx/types";
-import Image, { ImageProps } from "next/image";
+import Image from "next/image";
+import type { ImageProps } from "next/image";
 
 const components: MDXComponents = {
   h1: ({ children }) => (
