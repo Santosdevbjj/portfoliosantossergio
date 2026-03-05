@@ -3,11 +3,11 @@
     "version": "1.0.0",
     "locale": "en-US",
     "direction": "ltr",
-    "lastUpdated": "2026-02-03T19:10:00Z",
+    "lastUpdated": "2026-03-05T20:40:00Z",
     "author": "Sérgio Santos",
     "source": "manual",
-    "contentVersion": "2026.02.03",
-    "contentHash": "i18n-enus-2026-02-03",
+    "contentVersion": "2026.03.05",
+    "contentHash": "i18n-enus-2026-03-05",
     "sourceType": "curated-manual",
     "description": "Multilingual portfolio of Sérgio Santos, specialist in Information Technology, Artificial Intelligence and Software Engineering."
   },
@@ -23,7 +23,11 @@
     "differentialTitle": "Data Engineering with a Mission-Critical Focus",
     "description": "Data Science Analyst with a solid background in critical banking systems, focusing on transforming data into decisions, cost reduction, and operational efficiency.",
     "differentialContent": "I served for over 15 years at Banco Bradesco in regulated mission-critical environments. Currently, I focus my work on Data Science and AI, applying the rigor of critical systems to the creation of predictive models.",
-    "highlights": ["15+ Years in Banking", "Cloud Specialist", "Data Science & AI"],
+    "highlights": [
+      "15+ Years in Banking",
+      "Cloud Specialist",
+      "Data Science & AI"
+    ],
     "stats": {
       "experienceValue": "+15",
       "experienceLabel": "Years",
@@ -38,11 +42,13 @@
     "cta": "Send Email",
     "emailLabel": "Copy Email",
     "cvLabel": "View CV",
-    "linkedinLabel": "LinkedIn"
+    "linkedinLabel": "LinkedIn",
+    "ctaTitle": "Let's build something together?",
+    "buttonText": "Get in Touch →"
   },
   "experience": {
     "title": "Professional Experience",
-     "emptyLabel": "No experience found",
+    "emptyLabel": "No experience found",
     "items": [
       {
         "company": "Freelance Consultant / Transition",
@@ -102,23 +108,27 @@
     "socialLinks": "Open {platform} profile",
     "skipToContent": "Skip to content",
     "languageSwitcher": "Change language",
+    "email": "santossergiorealbjj@outlook.com",
     "errorBoundary": {
       "title": "Oops! Unexpected error.",
       "description": "Please contact me if the problem persists.",
-      "actions": { "retry": "Try again", "home": "Home" }
+      "actions": {
+        "retry": "Try again",
+        "home": "Home"
+      }
     },
     "nav": {
       "about": "About",
-     "experience": "Experience",
-     "projects": "Projects",
-    "articles": "Articles",
-    "contact": "Contact"
-  },
-"theme": {
-  "light": "Light",
-  "dark": "Dark",
-  "system": "System"
- },
+      "experience": "Experience",
+      "projects": "Projects",
+      "articles": "Articles",
+      "contact": "Contact"
+    },
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
     "notFound": {
       "title": "Page not found",
       "description": "The link may be broken.",
@@ -128,9 +138,16 @@
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
       "medium": "https://medium.com/@sergiosantosluiz",
-      "email": "santossergiorealbjj@outlook.com"
+      "email": "mailto:santossergiorealbjj@outlook.com"
     },
-    "menu": { "open": "Open", "close": "Close", "aria": { "open": "Open menu", "close": "Close menu" } }
+    "menu": {
+      "open": "Open",
+      "close": "Close",
+      "aria": {
+        "open": "Open menu",
+        "close": "Close menu"
+      }
+    }
   },
   "intl": {
     "locale": "en-US",
@@ -144,7 +161,11 @@
     "loading": "Loading...",
     "empty": "No data.",
     "error": "Error loading.",
-    "emptyProjects": { "title": "No projects", "description": "Coming soon.", "cta": "Go Back" },
+    "emptyProjects": {
+      "title": "No projects",
+      "description": "Coming soon.",
+      "cta": "Go Back"
+    },
     "emptyExperience": "No records found.",
     "errorArticles": "Error loading articles."
   },
@@ -159,17 +180,35 @@
   },
   "seo": {
     "siteName": "Sérgio Santos | Portfolio",
-     "title": "Sérgio Santos",
+    "title": "Sérgio Santos",
     "description": "Data Science & Critical Systems",
-    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "keywords": [
+      "python",
+      "databricks",
+      "sql",
+      "neo4j",
+      "data science"
+    ],
     "pages": {
-      "home": { "title": "Home", "description": "Portfolio of Sérgio Santos" },
-      "projects": { "title": "Projects", "description": "Data solutions" },
-      "articles": { "title": "Articles", "description": "Technical content" }
+      "home": {
+        "title": "Home",
+        "description": "Portfolio of Sérgio Santos"
+      },
+      "projects": {
+        "title": "Projects",
+        "description": "Data solutions"
+      },
+      "articles": {
+        "title": "Articles",
+        "description": "Technical content"
+      }
     }
   },
   "metrics": {
     "availability": "99.5%",
-    "availabilityNormalized": { "value": 99.5, "unit": "%" }
+    "availabilityNormalized": {
+      "value": 99.5,
+      "unit": "%"
+    }
   }
 }
