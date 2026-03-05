@@ -5,13 +5,12 @@ import type { SupportedLocale } from "@/dictionaries/locales";
 /**
  * Fonte única de verdade para Locale.
  * ✔ Elimina duplicação
- * ✔ Evita drift entre dicionários e domínio
- * ✔ TS 6 compliant
+ * ✔ TS 6.0 compliant (strict mapping)
  */
 export type Locale = SupportedLocale;
 
 /* -------------------------------------------------------------------------- */
-/*                                   META                                     */
+/* META                                     */
 /* -------------------------------------------------------------------------- */
 
 export interface DictionaryMeta {
@@ -28,7 +27,7 @@ export interface DictionaryMeta {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                   HERO                                     */
+/* HERO                                     */
 /* -------------------------------------------------------------------------- */
 
 export interface HeroDictionary {
@@ -40,7 +39,7 @@ export interface HeroDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                   ABOUT                                    */
+/* ABOUT                                    */
 /* -------------------------------------------------------------------------- */
 
 export interface AboutDictionary {
@@ -59,9 +58,13 @@ export interface AboutDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                  CONTACT                                   */
+/* CONTACT                                   */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Atualizado para incluir ctaTitle e buttonText usados no banner final.
+ * Isso resolve o erro de build: Property 'ctaTitle' does not exist.
+ */
 export interface ContactDictionary {
   title: string;
   subtitle: string;
@@ -69,10 +72,13 @@ export interface ContactDictionary {
   emailLabel: string;
   cvLabel: string;
   linkedinLabel: string;
+  // Novas propriedades para o CTA de rodapé
+  ctaTitle?: string;
+  buttonText?: string;
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                EXPERIENCE                                  */
+/* EXPERIENCE                                  */
 /* -------------------------------------------------------------------------- */
 
 export interface ExperienceItem {
@@ -89,7 +95,7 @@ export interface ExperienceDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                  ARTICLES                                  */
+/* ARTICLES                                  */
 /* -------------------------------------------------------------------------- */
 
 export interface ArticleItem {
@@ -112,7 +118,7 @@ export interface ArticlesSectionDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                  PROJECTS                                  */
+/* PROJECTS                                  */
 /* -------------------------------------------------------------------------- */
 
 export interface ProjectCategories {
@@ -140,11 +146,10 @@ export interface ProjectsSectionDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                   COMMON                                   */
+/* COMMON                                   */
 /* -------------------------------------------------------------------------- */
 
-
- export interface CommonDictionary {
+export interface CommonDictionary {
   navigation: string;
   role: string;
   footer: string;
@@ -155,6 +160,7 @@ export interface ProjectsSectionDictionary {
   socialLinks: string;
   skipToContent: string;
   languageSwitcher: string;
+  email: string; // Adicionado para centralizar o e-mail de contato
 
   nav: {
     about: string;
@@ -163,9 +169,9 @@ export interface ProjectsSectionDictionary {
     articles: string;
     contact: string;
   };
-   theme: {
-     light: string;
-     dark: string;
+  theme: {
+    light: string;
+    dark: string;
     system: string;
   };
   errorBoundary: {
@@ -200,9 +206,8 @@ export interface ProjectsSectionDictionary {
   };
 }
 
-
 /* -------------------------------------------------------------------------- */
-/*                                   STATES                                   */
+/* STATES                                   */
 /* -------------------------------------------------------------------------- */
 
 export interface StateDictionary {
@@ -219,13 +224,9 @@ export interface StateDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                    SEO                                     */
+/* SEO                                     */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Chaves permitidas para páginas SEO.
- * Se adicionar nova página, altere aqui.
- */
 export type SeoPageKey = "home" | "projects" | "articles";
 
 export interface SeoPage {
@@ -234,12 +235,11 @@ export interface SeoPage {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                 ROOT TYPE                                  */
+/* ROOT TYPE                                  */
 /* -------------------------------------------------------------------------- */
 
 export interface Dictionary {
   meta: DictionaryMeta;
-
   hero: HeroDictionary;
   about: AboutDictionary;
   contact: ContactDictionary;
