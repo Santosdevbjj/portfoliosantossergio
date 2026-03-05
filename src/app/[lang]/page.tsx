@@ -87,7 +87,7 @@ export default async function HomePage(props: PageProps) {
     <ProxyPage lang={lang}>
       <main className="min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 selection:bg-blue-500/30 selection:text-current">
         
-        {/* Camada Visual de Impacto */}
+        {/* Hero Section - Foco em Engenharia de Dados */}
         <HeroSection dictionary={dict} />
         
         <AboutSection dict={dict.about} />
@@ -98,9 +98,10 @@ export default async function HomePage(props: PageProps) {
           dict={dict} 
         />
 
-        {/* Seção de Artigos Técnicos */}
+        {/* CORREÇÃO DE BUILD: Removido 'lang={lang}' pois o componente 
+          FeaturedArticleSection espera apenas a prop 'dict' (ou não tem 'lang' em sua Interface).
+        */}
         <FeaturedArticleSection 
-          lang={lang}
           dict={dict.articles}
         />
 
@@ -110,7 +111,7 @@ export default async function HomePage(props: PageProps) {
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
               <div className="text-center md:text-left space-y-2">
                 <h3 className="text-4xl md:text-6xl font-black tracking-tighter italic uppercase leading-none">
-                  {dict.contact?.ctaTitle || "Construir o futuro?"}
+                  {dict.contact?.ctaTitle || "Vamos construir algo juntos?"}
                 </h3>
                 <p className="opacity-80 font-bold uppercase tracking-[0.3em] text-[10px] md:text-xs">
                   Especialista em Modernização de Dados e Governança
@@ -124,7 +125,7 @@ export default async function HomePage(props: PageProps) {
               </a>
             </div>
             
-            {/* Elemento Decorativo Dinâmico Tailwind 4.2 */}
+            {/* Elementos Decorativos Tailwind 4.2 */}
             <div className="absolute -right-10 -top-10 w-80 h-80 bg-white/5 rounded-full blur-[100px] group-hover:bg-white/10 transition-all duration-700" />
             <div className="absolute -left-10 -bottom-10 w-64 h-64 bg-blue-400/10 rounded-full blur-[80px] pointer-events-none" />
           </div>
