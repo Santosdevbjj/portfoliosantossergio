@@ -51,7 +51,24 @@ export default function ProjectCard({
         <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-400">
           {project.description[lang]}
         </p>
-      </div>
+      </div> 
+
+
+   // Fragmento do ProjectCard.tsx para melhoria visual no Dark Mode
+        <article
+  id={project.id}
+  className={`
+    relative flex h-full flex-col justify-between
+    rounded-3xl border border-slate-200 bg-white/50
+    p-6 sm:p-8 backdrop-blur-sm
+    shadow-sm transition-all duration-500
+    hover:-translate-y-2 hover:shadow-2xl hover:border-blue-500/50
+    dark:border-slate-800 dark:bg-slate-900/50
+    ${featured ? 'lg:col-span-2 lg:row-span-1' : ''}
+  `}
+>
+
+
 
       {/* Ações */}
       <div className="mt-6 flex items-center gap-4">
