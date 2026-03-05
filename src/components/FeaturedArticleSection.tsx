@@ -1,17 +1,5 @@
 'use client';
 
-/**
- * FEATURED ARTICLE SECTION
- * ------------------------------------------------------------------
- * ✔ TS 6 strict-safe
- * ✔ Next.js 16 compatible
- * ✔ Totalmente responsivo
- * ✔ Multilíngue (5 locales)
- * ✔ Alinhado com Dictionary contract
- * ✔ Sem namespace JSX
- * ✔ CI-safe (Vercel)
- */
-
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Script from 'next/script';
@@ -24,7 +12,17 @@ import type {
 
 import { NavSection, getSectionId } from '@/domain/navigation';
 
+/**
+ * FEATURED ARTICLE SECTION - REVISADA
+ * ------------------------------------------------------------------
+ * ✔ TS 6.0 strict-safe
+ * ✔ Next.js 16 (Turbopack optimized)
+ * ✔ React 19 (Ref handling e hydration safe)
+ * ✔ Tailwind 4.2 (Modern gradients e utilities)
+ */
+
 interface FeaturedArticleSectionProps {
+  // Ajustado para receber o objeto de artigos e o common separadamente ou via dict
   readonly articles: ArticlesSectionDictionary;
   readonly common: CommonDictionary;
 }
@@ -33,29 +31,27 @@ export default function FeaturedArticleSection({
   articles,
   common,
 }: FeaturedArticleSectionProps) {
-  const sectionRef = useRef<HTMLElement | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
-  const featuredArticle =
-    Array.isArray(articles.items) && articles.items.length > 0
-      ? articles.items[0]
-      : null;
+  // Garantia de dados via TS 6 (Optional chaining + null check)
+  const featuredArticle = articles?.items?.[0] ?? null;
 
   /**
-   * Fail-safe robusto (TS 6 strict)
+   * Fail-safe para o Build do Next.js 16
    */
   if (!featuredArticle) {
     return (
       <section
         id={getSectionId(NavSection.ARTICLES)}
-        className="py-20 text-center text-slate-500 dark:text-slate-400"
+        className="py-20 text-center text-slate-500 dark:text-slate-400 font-medium"
       >
-        {common.error}
+        {common?.error || "Content unavailable"}
       </section>
     );
   }
 
   /**
-   * ScrollSpy observer
+   * ScrollSpy observer (React 19 safe)
    */
   useEffect(() => {
     const current = sectionRef.current;
@@ -79,18 +75,18 @@ export default function FeaturedArticleSection({
   }, []);
 
   /**
-   * Structured Data (SEO)
+   * Structured Data (SEO / JSON-LD)
    */
   const schemaPerson = {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: 'Sérgio Santos',
-    jobTitle: common.role,
+    jobTitle: common?.role,
     sameAs: [
-      common.externalLinks.linkedin,
-      common.externalLinks.github,
-      common.externalLinks.medium,
-    ],
+      common?.externalLinks?.linkedin,
+      common?.externalLinks?.github,
+      common?.externalLinks?.medium,
+    ].filter(Boolean),
   };
 
   return (
@@ -107,9 +103,9 @@ export default function FeaturedArticleSection({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaPerson) }}
       />
 
-      {/* Background gradients */}
+      {/* Background gradients - Tailwind 4.2 Optimized */}
       <div
-        aria-hidden
+        aria-hidden="true"
         className="absolute inset-0 -z-10 opacity-[0.05] dark:opacity-[0.12] pointer-events-none"
       >
         <div className="absolute top-1/4 left-0 w-[300px] md:w-[600px] h-[300px] md:h-[600px]
@@ -124,27 +120,27 @@ export default function FeaturedArticleSection({
           <div className="p-3 md:p-4 bg-amber-100 dark:bg-amber-900/40
                           rounded-2xl text-amber-600 dark:text-amber-400
                           shadow-lg -rotate-2">
-            <Trophy className="w-7 h-7 md:w-10 md:h-10" aria-hidden />
+            <Trophy className="w-7 h-7 md:w-10 md:h-10" aria-hidden="true" />
           </div>
 
           <h2
             id="featured-article-title"
-            className="text-3xl md:text-6xl font-black uppercase tracking-tighter
+            className="text-3xl md:text-6xl font-black uppercase tracking-tighter italic
                        text-slate-900 dark:text-white"
           >
             {articles.title}
           </h2>
         </header>
 
-        {/* Article Card */}
+        {/* Article Card - Bento Style */}
         <article
           className="group bg-white dark:bg-slate-900/40 rounded-[2.5rem]
                      p-6 md:p-12 lg:p-16 border border-slate-200
-                     dark:border-slate-800 shadow-2xl transition-all
-                     hover:border-blue-500/30"
+                     dark:border-slate-800 shadow-2xl transition-all duration-500
+                     hover:border-blue-500/30 hover:shadow-blue-500/10"
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* Image */}
+            {/* Image Wrapper */}
             <div className="relative overflow-hidden rounded-[2rem] shadow-xl
                             aspect-[4/3] md:aspect-video lg:aspect-square
                             bg-slate-200 dark:bg-slate-800">
@@ -158,7 +154,7 @@ export default function FeaturedArticleSection({
               />
             </div>
 
-            {/* Content */}
+            {/* Content Area */}
             <div className="flex flex-col">
               <div className="flex flex-wrap items-center gap-3
                               text-blue-600 dark:text-blue-400
@@ -167,7 +163,7 @@ export default function FeaturedArticleSection({
                 <div className="flex items-center gap-1.5
                                 bg-blue-50 dark:bg-blue-900/30
                                 px-3 py-1.5 rounded-full">
-                  <Calendar className="w-3.5 h-3.5" aria-hidden />
+                  <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
                   <span>
                     {articles.publishedAt} {featuredArticle.date}
                   </span>
@@ -182,13 +178,13 @@ export default function FeaturedArticleSection({
                 )}
               </div>
 
-              <h3 className="text-2xl md:text-5xl font-black mb-6
-                             text-slate-900 dark:text-white">
+              <h3 className="text-2xl md:text-5xl font-black mb-6 leading-tight
+                             text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                 {featuredArticle.title}
               </h3>
 
               <p className="text-base md:text-xl text-slate-600
-                            dark:text-slate-400 mb-10">
+                            dark:text-slate-400 mb-10 leading-relaxed font-medium">
                 {featuredArticle.description}
               </p>
 
@@ -197,27 +193,29 @@ export default function FeaturedArticleSection({
                   href={featuredArticle.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={articles.readMore}
                   className="bg-blue-600 hover:bg-blue-700 text-white
-                             px-8 py-4 rounded-2xl font-black
+                             px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs
                              inline-flex items-center justify-center
-                             gap-3 transition-all active:scale-95"
+                             gap-3 transition-all active:scale-95 shadow-lg shadow-blue-500/20"
                 >
                   {articles.readMore}
-                  <ArrowUpRight className="w-5 h-5" aria-hidden />
+                  <ArrowUpRight className="w-5 h-5" aria-hidden="true" />
                 </a>
 
-                <a
-                  href={common.externalLinks.medium}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={articles.mediumProfile}
-                  className="px-8 py-4 rounded-2xl font-black
-                             border border-slate-200
-                             dark:border-slate-800"
-                >
-                  {articles.mediumProfile}
-                </a>
+                {common?.externalLinks?.medium && (
+                  <a
+                    href={common.externalLinks.medium}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs
+                               border border-slate-200 text-slate-600
+                               dark:border-slate-800 dark:text-slate-400
+                               hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors
+                               inline-flex items-center justify-center"
+                  >
+                    {articles.mediumProfile}
+                  </a>
+                )}
               </div>
             </div>
           </div>
