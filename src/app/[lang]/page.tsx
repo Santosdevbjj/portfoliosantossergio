@@ -102,7 +102,8 @@ export default async function HomePage(props: PageProps) {
           FeaturedArticleSection espera apenas a prop 'dict' (ou não tem 'lang' em sua Interface).
         */}
         <FeaturedArticleSection 
-          dict={dict.articles}
+          dict={dict.articles} 
+          common={dict.common}
         />
 
         {/* Banner de CTA Final - Tailwind 4.2 Optimized */}
