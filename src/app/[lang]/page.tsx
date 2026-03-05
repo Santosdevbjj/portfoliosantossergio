@@ -22,6 +22,7 @@ interface PageProps {
 
 /**
  * Configurações de Performance e Build para Next.js 16+
+ * Node 24 otimiza a resolução de promessas em Static Generation
  */
 export const dynamic = "force-static";
 export const revalidate = 60; 
@@ -37,7 +38,7 @@ export const viewport: Viewport = {
 };
 
 /**
- * Geração de Metadados com suporte a React 19 e Next.js 16 (Async Params)
+ * Geração de Metadados com suporte a React 19 (Async Params)
  */
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const { lang } = await props.params;
@@ -65,7 +66,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function HomePage(props: PageProps) {
-  // No Next.js 16/React 19, params DEVE ser aguardado (await)
+  // No Next.js 16/React 19, params DEVE ser aguardado via await
   const { lang: rawLang } = await props.params;
 
   if (!rawLang || !isValidLocale(rawLang)) {
@@ -73,15 +74,14 @@ export default async function HomePage(props: PageProps) {
   }
 
   const lang = rawLang as Locale;
-  let dict: any;
 
-  try {
-    // Carregamento de dicionário otimizado para Node 24
-    dict = await getServerDictionary(lang);
-  } catch (error) {
-    console.error("Erro ao carregar dados da Home:", error);
+  /**
+   * Carregamento de dados com tratamento robusto para Node 24
+   */
+  const dict = await getServerDictionary(lang).catch((error) => {
+    console.error("Critical: Failed to load dictionary for Home:", error);
     notFound();
-  }
+  });
 
   return (
     <ProxyPage lang={lang}>
@@ -92,21 +92,19 @@ export default async function HomePage(props: PageProps) {
         
         <AboutSection dict={dict.about} />
 
-        {/* Seção Especial: 3 Projetos de Destaque */}
+        {/* Seção Especial: Projetos de Destaque */}
         <FeaturedProjectsSection 
           lang={lang}
           dict={dict} 
         />
 
-        {/* CORREÇÃO DE BUILD: Removido 'lang={lang}' pois o componente 
-          FeaturedArticleSection espera apenas a prop 'dict' (ou não tem 'lang' em sua Interface).
-        */}
+        {/* Seção de Artigo: Consistente com a Interface do Componente */}
         <FeaturedArticleSection 
-          dict={dict.articles} 
+          articles={dict.articles} 
           common={dict.common}
         />
 
-        {/* Banner de CTA Final - Tailwind 4.2 Optimized */}
+        {/* Banner de CTA Final - Tailwind 4.2 Utility Optimized */}
         <section className="container mx-auto px-4 md:px-8 lg:px-16 py-24 max-w-7xl">
           <div className="p-10 md:p-16 rounded-[3rem] bg-slate-900 dark:bg-blue-600 text-white relative overflow-hidden group transition-all duration-700">
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
@@ -119,14 +117,14 @@ export default async function HomePage(props: PageProps) {
                 </p>
               </div>
               <a 
-                href="mailto:santossergiorealbjj@outlook.com" 
-                className="bg-white text-slate-900 px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-105 transition-all active:scale-95 shadow-2xl hover:bg-slate-100"
+                href={`mailto:${dict.common?.email || "santossergiorealbjj@outlook.com"}`} 
+                className="bg-white text-slate-900 px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs hover:scale-105 transition-all active:scale-95 shadow-2xl hover:bg-slate-100"
               >
                 {dict.contact?.buttonText || "Entrar em Contato →"}
               </a>
             </div>
             
-            {/* Elementos Decorativos Tailwind 4.2 */}
+            {/* Elementos Decorativos (Tailwind 4.2 Modern Blurs) */}
             <div className="absolute -right-10 -top-10 w-80 h-80 bg-white/5 rounded-full blur-[100px] group-hover:bg-white/10 transition-all duration-700" />
             <div className="absolute -left-10 -bottom-10 w-64 h-64 bg-blue-400/10 rounded-full blur-[80px] pointer-events-none" />
           </div>
