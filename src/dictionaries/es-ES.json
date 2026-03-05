@@ -3,11 +3,11 @@
     "version": "1.0.0",
     "locale": "es-ES",
     "direction": "ltr",
-    "lastUpdated": "2026-02-03T19:10:00Z",
+    "lastUpdated": "2026-03-05T20:40:00Z",
     "author": "Sérgio Santos",
     "source": "manual",
-    "contentVersion": "2026.02.03",
-    "contentHash": "i18n-eses-2026-02-03",
+    "contentVersion": "2026.03.05",
+    "contentHash": "i18n-eses-2026-03-05",
     "sourceType": "curated-manual",
     "description": "Portafolio multilingüe de Sérgio Santos, especialista en Tecnología de la Información, Inteligencia Artificial e Ingeniería de Software."
   },
@@ -23,7 +23,11 @@
     "differentialTitle": "Ingeniería de Datos con Enfoque en Misión Crítica",
     "description": "Analista de Ciencia de Datos con una base sólida en sistemas críticos bancarios y enfoque en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
     "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente dirijo mi actividad hacia la Ciencia de Datos e IA, aplicando el rigor de los sistemas críticos a la creación de modelos predictivos.",
-    "highlights": ["15+ años en Banca", "Especialista Cloud", "Data Science e IA"],
+    "highlights": [
+      "15+ años en Banca",
+      "Especialista Cloud",
+      "Data Science e IA"
+    ],
     "stats": {
       "experienceValue": "+15",
       "experienceLabel": "Años",
@@ -38,7 +42,9 @@
     "cta": "Enviar Correo",
     "emailLabel": "Copiar Correo",
     "cvLabel": "Ver CV",
-    "linkedinLabel": "LinkedIn"
+    "linkedinLabel": "LinkedIn",
+    "ctaTitle": "¿Construimos algo juntos?",
+    "buttonText": "Contactar →"
   },
   "experience": {
     "title": "Experiencia Profesional",
@@ -92,7 +98,7 @@
     }
   },
   "common": {
-    "navigation": "Navegación principal",
+    "navigation": "Navegação principal",
     "role": "Analista de Ciencia de Datos | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
     "rights": "Todos los derechos reservados",
@@ -102,10 +108,14 @@
     "socialLinks": "Abrir perfil de {platform}",
     "skipToContent": "Saltar al contenido",
     "languageSwitcher": "Cambiar idioma",
+    "email": "santossergiorealbjj@outlook.com",
     "errorBoundary": {
       "title": "¡Ops! Error inesperado.",
       "description": "Contacte con nosotros si el problema persiste.",
-      "actions": { "retry": "Reintentar", "home": "Inicio" }
+      "actions": {
+        "retry": "Reintentar",
+        "home": "Inicio"
+      }
     },
     "nav": {
       "about": "Sobre mí",
@@ -114,24 +124,30 @@
       "articles": "Artículos",
       "contact": "Contacto"
     },
-
- "theme": {
-   "light": "Claro",
-   "dark": "Oscuro",
-   "system": "Sistema"
-  },   
+    "theme": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    },
     "notFound": {
       "title": "Página no encontrada",
       "description": "Es posible que el enlace esté roto.",
-      "button": "Volver"
+      "button": "Voltar"
     },
     "externalLinks": {
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
       "medium": "https://medium.com/@sergiosantosluiz",
-      "email": "santossergiorealbjj@outlook.com"
+      "email": "mailto:santossergiorealbjj@outlook.com"
     },
-    "menu": { "open": "Abrir", "close": "Cerrar", "aria": { "open": "Abrir menú", "close": "Cerrar menú" } }
+    "menu": {
+      "open": "Abrir",
+      "close": "Cerrar",
+      "aria": {
+        "open": "Abrir menú",
+        "close": "Cerrar menú"
+      }
+    }
   },
   "intl": {
     "locale": "es-ES",
@@ -145,7 +161,11 @@
     "loading": "Cargando...",
     "empty": "Sin datos.",
     "error": "Error al cargar.",
-    "emptyProjects": { "title": "Ningún proyecto", "description": "Próximamente.", "cta": "Volver" },
+    "emptyProjects": {
+      "title": "Ningún proyecto",
+      "description": "Próximamente.",
+      "cta": "Volver"
+    },
     "emptyExperience": "Sin registros.",
     "errorArticles": "Error en los artículos."
   },
@@ -162,15 +182,33 @@
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
     "description": "Ciencia de Datos y Sistemas Críticos",
-    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "keywords": [
+      "python",
+      "databricks",
+      "sql",
+      "neo4j",
+      "data science"
+    ],
     "pages": {
-      "home": { "title": "Inicio", "description": "Portfolio de Sérgio Santos" },
-      "projects": { "title": "Proyectos", "description": "Soluciones de datos" },
-      "articles": { "title": "Artículos", "description": "Contenido técnico" }
+      "home": {
+        "title": "Inicio",
+        "description": "Portfolio de Sérgio Santos"
+      },
+      "projects": {
+        "title": "Proyectos",
+        "description": "Soluciones de datos"
+      },
+      "articles": {
+        "title": "Artículos",
+        "description": "Contenido técnico"
+      }
     }
   },
   "metrics": {
     "availability": "99,5%",
-    "availabilityNormalized": { "value": 99.5, "unit": "%" }
+    "availabilityNormalized": {
+      "value": 99.5,
+      "unit": "%"
+    }
   }
 }
