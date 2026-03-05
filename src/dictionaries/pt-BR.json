@@ -3,11 +3,11 @@
     "version": "1.0.0",
     "locale": "pt-BR",
     "direction": "ltr",
-    "lastUpdated": "2026-02-03T19:10:00Z",
+    "lastUpdated": "2026-03-05T20:40:00Z",
     "author": "Sérgio Santos",
     "source": "manual",
-    "contentVersion": "2026.02.03",
-    "contentHash": "i18n-ptbr-2026-02-03",
+    "contentVersion": "2026.03.05",
+    "contentHash": "i18n-ptbr-2026-03-05",
     "sourceType": "curated-manual",
     "description": "Portfólio multilíngue de Sérgio Santos, especialista em Tecnologia da Informação, Inteligência Artificial e Engenharia de Software."
   },
@@ -23,7 +23,11 @@
     "differentialTitle": "Engenharia de Dados com Foco em Missão Crítica",
     "description": "Analista de Ciência de Dados com base sólida em sistemas críticos bancários e foco em transformar dados em decisões, redução de custos e eficiência operacional.",
     "differentialContent": "Atuei por mais de 15 anos no Banco Bradesco em ambientes regulados de missão crítica. Atualmente direciono minha atuação para Ciência de Dados e IA, aplicando o rigor de sistemas críticos à criação de modelos preditivos.",
-    "highlights": ["15+ anos em Bancos", "Especialista Cloud", "Data Science & IA"],
+    "highlights": [
+      "15+ anos em Bancos",
+      "Especialista Cloud",
+      "Data Science & IA"
+    ],
     "stats": {
       "experienceValue": "+15",
       "experienceLabel": "Anos",
@@ -38,11 +42,13 @@
     "cta": "Enviar Email",
     "emailLabel": "Copiar Email",
     "cvLabel": "Ver CV",
-    "linkedinLabel": "LinkedIn"
+    "linkedinLabel": "LinkedIn",
+    "ctaTitle": "Vamos construir algo juntos?",
+    "buttonText": "Entrar em Contato →"
   },
   "experience": {
     "title": "Experiência Profissional",
-     "emptyLabel": "Nenhuma experiência encontrada",
+    "emptyLabel": "Nenhuma experiência encontrada",
     "items": [
       {
         "company": "Consultor Autônomo / Transição",
@@ -102,10 +108,14 @@
     "socialLinks": "Abrir perfil de {platform}",
     "skipToContent": "Pular para o conteúdo",
     "languageSwitcher": "Alterar idioma",
+    "email": "santossergiorealbjj@outlook.com",
     "errorBoundary": {
       "title": "Ops! Erro inesperado.",
       "description": "Entre em contato se o problema persistir.",
-      "actions": { "retry": "Tentar novamente", "home": "Início" }
+      "actions": {
+        "retry": "Tentar novamente",
+        "home": "Início"
+      }
     },
     "nav": {
       "about": "Sobre",
@@ -115,8 +125,8 @@
       "contact": "Contato"
     },
     "theme": {
-       "light": "Claro",
-       "dark": "Escuro",
+      "light": "Claro",
+      "dark": "Escuro",
       "system": "Sistema"
     },
     "notFound": {
@@ -128,9 +138,16 @@
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
       "medium": "https://medium.com/@sergiosantosluiz",
-      "email": "santossergiorealbjj@outlook.com"
+      "email": "mailto:santossergiorealbjj@outlook.com"
     },
-    "menu": { "open": "Abrir", "close": "Fechar", "aria": { "open": "Abrir menu", "close": "Fechar menu" } }
+    "menu": {
+      "open": "Abrir",
+      "close": "Fechar",
+      "aria": {
+        "open": "Abrir menu",
+        "close": "Fechar menu"
+      }
+    }
   },
   "intl": {
     "locale": "pt-BR",
@@ -144,7 +161,11 @@
     "loading": "Carregando...",
     "empty": "Sem dados.",
     "error": "Erro ao carregar.",
-    "emptyProjects": { "title": "Nenhum projeto", "description": "Em breve.", "cta": "Voltar" },
+    "emptyProjects": {
+      "title": "Nenhum projeto",
+      "description": "Em breve.",
+      "cta": "Voltar"
+    },
     "emptyExperience": "Sem registros.",
     "errorArticles": "Erro nos artigos."
   },
@@ -161,15 +182,33 @@
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
     "description": "Ciência de Dados & Sistemas Críticos",
-    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "keywords": [
+      "python",
+      "databricks",
+      "sql",
+      "neo4j",
+      "data science"
+    ],
     "pages": {
-      "home": { "title": "Início", "description": "Portfólio de Sérgio Santos" },
-      "projects": { "title": "Projetos", "description": "Soluções de dados" },
-      "articles": { "title": "Artigos", "description": "Conteúdo técnico" }
+      "home": {
+        "title": "Início",
+        "description": "Portfólio de Sérgio Santos"
+      },
+      "projects": {
+        "title": "Projetos",
+        "description": "Soluções de dados"
+      },
+      "articles": {
+        "title": "Artigos",
+        "description": "Conteúdo técnico"
+      }
     }
   },
   "metrics": {
     "availability": "99,5%",
-    "availabilityNormalized": { "value": 99.5, "unit": "%" }
+    "availabilityNormalized": {
+      "value": 99.5,
+      "unit": "%"
+    }
   }
 }
