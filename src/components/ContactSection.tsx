@@ -111,7 +111,7 @@ export default function ContactSection({
 
                 {/* CV */}
                 <a
-                  href="/resume.pdf"
+                  href={`/cv-sergio-santos-${locale}.pdf`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-blue-900/20 px-6 py-4 text-base font-bold text-white transition-all hover:bg-blue-900/40 sm:w-auto"
