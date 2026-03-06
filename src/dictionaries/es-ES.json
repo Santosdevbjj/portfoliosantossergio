@@ -20,8 +20,8 @@
   },
   "about": {
     "title": "Sobre Mí",
-    "differentialTitle": "Ingeniería de Datos con Enfoque en Misión Crítica",
-    "description": "Analista de Ciencia de Datos con una base sólida en sistemas críticos bancarios y enfoque en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
+    "differentialTitle": "Ingeniería de Dados con Enfoque en Misión Crítica",
+    "description": "Analista de Ciencia de Datos con una base sólida en sistemas críticos bancários y enfoque en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
     "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente dirijo mi actividad hacia la Ciencia de Datos e IA, aplicando el rigor de los sistemas críticos a la creación de modelos predictivos.",
     "highlights": [
       "15+ años en Banca",
@@ -95,10 +95,21 @@
       "database": "Base de Datos",
       "dev": "Desarrollo (Python/C#/Java)",
       "security": "Seguridad"
-    }
+    },
+    "featuredProjects": [
+      {
+        "id": "sentinela-data",
+        "title": "Pipeline de Datos Centinela",
+        "description": "Pipeline automatizado para el monitoreo de sistemas críticos.",
+        "image": "/projects/sentinela.jpg",
+        "tags": ["Python", "Azure", "SQL"],
+        "category": "dataScience",
+        "github": "https://github.com/Santosdevbjj"
+      }
+    ]
   },
   "common": {
-    "navigation": "Navegação principal",
+    "navigation": "Navegación principal",
     "role": "Analista de Ciencia de Datos | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
     "rights": "Todos los derechos reservados",
@@ -132,7 +143,7 @@
     "notFound": {
       "title": "Página no encontrada",
       "description": "Es posible que el enlace esté roto.",
-      "button": "Voltar"
+      "button": "Volver"
     },
     "externalLinks": {
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
@@ -182,26 +193,11 @@
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
     "description": "Ciencia de Datos y Sistemas Críticos",
-    "keywords": [
-      "python",
-      "databricks",
-      "sql",
-      "neo4j",
-      "data science"
-    ],
+    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
     "pages": {
-      "home": {
-        "title": "Inicio",
-        "description": "Portfolio de Sérgio Santos"
-      },
-      "projects": {
-        "title": "Proyectos",
-        "description": "Soluciones de datos"
-      },
-      "articles": {
-        "title": "Artículos",
-        "description": "Contenido técnico"
-      }
+      "home": { "title": "Inicio", "description": "Portfolio de Sérgio Santos" },
+      "projects": { "title": "Proyectos", "description": "Soluciones de datos" },
+      "articles": { "title": "Artículos", "description": "Contenido técnico" }
     }
   },
   "metrics": {
