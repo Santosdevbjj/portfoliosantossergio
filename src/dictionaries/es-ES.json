@@ -96,7 +96,7 @@
       "dev": "Desarrollo (Python/C#/Java)",
       "security": "Seguridad"
     },
-    "featuredProjects": [
+    "featuredProjects": []
       {
         "id": "sentinela-data",
         "title": "Pipeline de Datos Centinela",
