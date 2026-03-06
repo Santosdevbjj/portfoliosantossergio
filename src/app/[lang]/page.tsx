@@ -16,7 +16,7 @@ import FeaturedProjectsSection from "@/components/featured/FeaturedProjectsSecti
 import FeaturedArticleSection from "@/components/FeaturedArticleSection";
 
 interface PageProps {
-  params: Promise<{ lang: string }>; // No Next.js 16 params é uma Promise
+  params: Promise<{ lang: string }>;
 }
 
 export const dynamic = "force-static";
@@ -74,9 +74,6 @@ export default async function HomePage(props: PageProps) {
     notFound();
   }
 
-  // Garantindo que as seções recebam dados válidos mesmo se o JSON falhar parcialmente
-  const featuredProjects = dict.projects?.featuredProjects ?? [];
-
   return (
     <ProxyPage lang={lang}>
       <main className="flex flex-col min-h-screen bg-white dark:bg-[#020617]">
@@ -87,7 +84,7 @@ export default async function HomePage(props: PageProps) {
         {/* ABOUT */}
         <AboutSection dict={dict.about} />
 
-        {/* FEATURED PROJECTS - Renderização Blindada */}
+        {/* FEATURED PROJECTS - A lógica de proteção agora está dentro do componente */}
         <FeaturedProjectsSection lang={lang} dict={dict} />
 
         {/* ARTICLES */}
@@ -99,7 +96,7 @@ export default async function HomePage(props: PageProps) {
         {/* FINAL CTA */}
         <section className="py-28 px-6 text-center bg-slate-950">
           <div className="max-w-3xl mx-auto space-y-8">
-            <h2 className="text-3xl md:text-5xl font-black text-white uppercase italic italic tracking-tighter">
+            <h2 className="text-3xl md:text-5xl font-black text-white uppercase italic tracking-tighter">
               {dict.contact?.ctaTitle || "Vamos Conversar?"}
             </h2>
             <p className="text-slate-400 max-w-xl mx-auto">
