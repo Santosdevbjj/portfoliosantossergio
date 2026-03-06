@@ -8,59 +8,45 @@ interface FeaturedProjectsSectionProps {
   readonly dict: Dictionary;
 }
 
-export default function FeaturedProjectsSection({
-  lang,
-  dict,
-}: FeaturedProjectsSectionProps) {
+export default function FeaturedProjectsSection({ lang, dict }: FeaturedProjectsSectionProps) {
   
-  // 1. Extração segura do JSON
+  // 1. Extração segura
   const rawProjects = Array.isArray(dict.projects?.featuredProjects) 
     ? dict.projects.featuredProjects 
     : [];
 
-  // 2. MAPEAMENTO DE TIPOS (DE: ProjectItem -> PARA: FeaturedProject)
-  // Isso resolve o erro: "Type 'ProjectItem' is missing the following properties: name, repoUrl..."
-  const projects = rawProjects.slice(0, 3).map((proj: ProjectItem) => ({
-    ...proj,
-    name: proj.title,           // Mapeia title para name
-    repoUrl: proj.github || "", // Mapeia github para repoUrl
-    priority: 1,                // Adiciona propriedades obrigatórias que faltavam
-    categories: [proj.category]  // Converte a categoria única em array
+  // 2. Mapeamento Robusto
+  // Verifique se no seu JSON as chaves são: title, description, github, category
+  const projects = rawProjects.slice(0, 3).map((proj: any) => ({
+    id: proj.id || Math.random().toString(),
+    name: proj.title || "Projeto sem título",
+    description: proj.description || "",
+    repoUrl: proj.github || proj.repoUrl || "#",
+    liveUrl: proj.demo || proj.liveUrl || "",
+    image: proj.image || "/images/projects/placeholder.jpg",
+    categories: proj.categories || [proj.category].filter(Boolean) || ["Tecnologia"],
+    priority: proj.priority || 1
   }));
 
-  // Se não houver projetos, a seção não aparece
   if (projects.length === 0) return null;
 
   const sectionId = getSectionId(NavSection.PROJECTS);
   const headingId = `${sectionId}-heading`;
 
   return (
-    <section
-      id={sectionId}
-      aria-labelledby={headingId}
-      className="relative border-y border-slate-100 bg-white py-24 dark:border-slate-900 dark:bg-[#020617]/50 sm:py-32"
-    >
+    <section id={sectionId} className="relative border-y border-slate-100 bg-white py-24 dark:border-slate-900 dark:bg-[#020617]/50 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <header className="mb-16 max-w-3xl">
-          <span className="mb-4 inline-block rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-            {dict.projects?.featuredLabel || "Destaque Técnico"}
+          <span className="mb-4 inline-block rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-600">
+            {dict.projects?.featuredLabel || "Destaques"}
           </span>
-
-          <h2
-            id={headingId}
-            className="mb-6 text-4xl font-black tracking-tight dark:text-white sm:text-5xl uppercase italic"
-          >
-            {dict.projects?.title || "Projetos"}
+          <h2 id={headingId} className="mb-6 text-4xl font-black tracking-tight dark:text-white sm:text-5xl uppercase italic">
+            {dict.projects?.title}
           </h2>
-
-          <p className="text-lg text-slate-600 dark:text-slate-400">
-            {dict.seo?.pages?.home?.description || ""} 
-          </p>
         </header>
 
-        {/* Agora o 'projects' tem o formato exato que o FeaturedGrid exige */}
         <FeaturedGrid
-          projects={projects as any} 
+          projects={projects as any}
           lang={lang}
           dict={dict}
         />
