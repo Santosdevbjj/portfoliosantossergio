@@ -96,17 +96,21 @@
       "dev": "Development (Python/C#/Java)",
       "security": "Security"
     },
-    "featuredProjects": []
+    "featuredProjects": [
       {
         "id": "sentinela-data",
         "title": "Sentinel Data Pipeline",
         "description": "Automated pipeline for critical systems monitoring.",
         "image": "/projects/sentinela.jpg",
-        "tags": ["Python", "Azure", "SQL"],
+        "tags": [
+          "Python",
+          "Azure",
+          "SQL"
+        ],
         "category": "dataScience",
         "github": "https://github.com/Santosdevbjj"
       }
-    
+    ]
   },
   "common": {
     "navigation": "Main navigation",
@@ -193,11 +197,26 @@
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
     "description": "Data Science & Critical Systems",
-    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "keywords": [
+      "python",
+      "databricks",
+      "sql",
+      "neo4j",
+      "data science"
+    ],
     "pages": {
-      "home": { "title": "Home", "description": "Portfolio of Sérgio Santos" },
-      "projects": { "title": "Projects", "description": "Data solutions" },
-      "articles": { "title": "Articles", "description": "Technical content" }
+      "home": {
+        "title": "Home",
+        "description": "Portfolio of Sérgio Santos"
+      },
+      "projects": {
+        "title": "Projects",
+        "description": "Data solutions"
+      },
+      "articles": {
+        "title": "Articles",
+        "description": "Technical content"
+      }
     }
   },
   "metrics": {
