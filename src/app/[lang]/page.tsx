@@ -1,57 +1,30 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
-/* -------------------------------------------------------------------------- */
-/* TYPES                                                                      */
-/* -------------------------------------------------------------------------- */
-
+// Types
 import type { Locale, Dictionary } from "@/types/dictionary";
 
-/* -------------------------------------------------------------------------- */
-/* SERVICES                                                                   */
-/* -------------------------------------------------------------------------- */
-
+// Services & Helpers
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
 
-/* -------------------------------------------------------------------------- */
-/* COMPONENTS                                                                 */
-/* -------------------------------------------------------------------------- */
-
+// Components
 import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import FeaturedProjectsSection from "@/components/featured/FeaturedProjectsSection";
 import FeaturedArticleSection from "@/components/FeaturedArticleSection";
 
-/* -------------------------------------------------------------------------- */
-/* TYPES                                                                      */
-/* -------------------------------------------------------------------------- */
-
 interface PageProps {
-  params: {
-    lang: string;
-  };
+  params: Promise<{ lang: string }>; // No Next.js 16 params é uma Promise
 }
-
-/* -------------------------------------------------------------------------- */
-/* PERFORMANCE CONFIG                                                         */
-/* -------------------------------------------------------------------------- */
 
 export const dynamic = "force-static";
 export const revalidate = 60;
 
-/* -------------------------------------------------------------------------- */
-/* STATIC PARAMS                                                              */
-/* -------------------------------------------------------------------------- */
-
 export async function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }));
 }
-
-/* -------------------------------------------------------------------------- */
-/* VIEWPORT                                                                   */
-/* -------------------------------------------------------------------------- */
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -59,50 +32,20 @@ export const viewport: Viewport = {
   themeColor: "#020617",
 };
 
-/* -------------------------------------------------------------------------- */
-/* METADATA                                                                   */
-/* -------------------------------------------------------------------------- */
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const { lang: rawLang } = await props.params;
 
-export async function generateMetadata(
-  { params }: PageProps
-): Promise<Metadata> {
-
-  const rawLang = params?.lang;
-
-  if (!rawLang || !isValidLocale(rawLang)) {
-    return {};
-  }
-
-  const lang = rawLang as Locale;
+  if (!rawLang || !isValidLocale(rawLang)) return {};
 
   try {
-
-    const dict: Dictionary = await getServerDictionary(lang);
-
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ??
-      "https://portfoliosantossergio.vercel.app";
-
-    const title =
-      dict?.seo?.pages?.home?.title ??
-      dict?.seo?.title ??
-      "Sérgio Santos";
-
-    const description =
-      dict?.seo?.pages?.home?.description ??
-      dict?.seo?.description ??
-      "Portfolio";
+    const dict: Dictionary = await getServerDictionary(rawLang as Locale);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
 
     return {
-      title,
-      description,
-
-      verification: {
-        google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
-      },
-
+      title: dict?.seo?.pages?.home?.title ?? "Sérgio Santos",
+      description: dict?.seo?.pages?.home?.description ?? "Portfolio",
       alternates: {
-        canonical: `${siteUrl}/${lang}`,
+        canonical: `${siteUrl}/${rawLang}`,
         languages: {
           "pt-BR": `${siteUrl}/pt-BR`,
           "en-US": `${siteUrl}/en-US`,
@@ -112,153 +55,64 @@ export async function generateMetadata(
         },
       },
     };
-
-  } catch (error) {
-
-    console.error("Metadata generation failed:", error);
-
-    return {
-      title: "Sérgio Santos",
-    };
+  } catch {
+    return { title: "Sérgio Santos" };
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* PAGE                                                                       */
-/* -------------------------------------------------------------------------- */
-
-export default async function HomePage({ params }: PageProps) {
-
-  const rawLang = params?.lang;
+export default async function HomePage(props: PageProps) {
+  const { lang: rawLang } = await props.params;
 
   if (!rawLang || !isValidLocale(rawLang)) {
     notFound();
   }
 
   const lang = rawLang as Locale;
-
-  const dict: Dictionary | null = await getServerDictionary(lang)
-    .then((d) => d)
-    .catch((error) => {
-      console.error("Critical: Error loading dictionary:", error);
-      return null;
-    });
+  const dict = await getServerDictionary(lang).catch(() => null);
 
   if (!dict) {
     notFound();
   }
 
-  /* ---------------------------------------------------------------------- */
-  /* SAFE DATA EXTRACTION                                                   */
-  /* ---------------------------------------------------------------------- */
-
-  const featuredProjects =
-    dict.projects?.featuredProjects ?? [];
-
-  const articles =
-    dict.articles ?? {
-      title: "",
-      mediumProfile: "",
-      readMore: "",
-      publishedAt: "",
-      bestOfMonth: "",
-      awardWinner: "",
-      items: [],
-    };
-
-  const contactEmail =
-    dict.common?.email ?? "contact@example.com";
-
-  /* ---------------------------------------------------------------------- */
-  /* RENDER                                                                 */
-  /* ---------------------------------------------------------------------- */
+  // Garantindo que as seções recebam dados válidos mesmo se o JSON falhar parcialmente
+  const featuredProjects = dict.projects?.featuredProjects ?? [];
 
   return (
     <ProxyPage lang={lang}>
-      <main className="flex flex-col">
-
+      <main className="flex flex-col min-h-screen bg-white dark:bg-[#020617]">
+        
         {/* HERO */}
-
         <HeroSection dictionary={dict} />
 
         {/* ABOUT */}
-
         <AboutSection dict={dict.about} />
 
-        {/* FEATURED PROJECTS */}
-
-        {featuredProjects.length > 0 ? (
-
-          <FeaturedProjectsSection
-            lang={lang}
-            dict={dict}
-          />
-
-        ) : (
-
-          <section className="py-20 text-center">
-
-            <h2 className="text-xl font-semibold">
-              {dict.states?.emptyProjects?.title ?? "No projects"}
-            </h2>
-
-            <p className="opacity-70">
-              {dict.states?.emptyProjects?.description ?? ""}
-            </p>
-
-          </section>
-
-        )}
+        {/* FEATURED PROJECTS - Renderização Blindada */}
+        <FeaturedProjectsSection lang={lang} dict={dict} />
 
         {/* ARTICLES */}
-
-        <FeaturedArticleSection
-          articles={articles}
-          common={dict.common}
+        <FeaturedArticleSection 
+          articles={dict.articles} 
+          common={dict.common} 
         />
 
         {/* FINAL CTA */}
-
-        <section className="py-28 px-6 text-center bg-gradient-to-b from-slate-950 to-black">
-
+        <section className="py-28 px-6 text-center bg-slate-950">
           <div className="max-w-3xl mx-auto space-y-8">
-
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
-              {dict.contact?.ctaTitle ?? "Let's build something together"}
+            <h2 className="text-3xl md:text-5xl font-black text-white uppercase italic italic tracking-tighter">
+              {dict.contact?.ctaTitle || "Vamos Conversar?"}
             </h2>
-
-            <p className="text-slate-300">
-              {dict.contact?.subtitle ?? ""}
+            <p className="text-slate-400 max-w-xl mx-auto">
+              {dict.contact?.subtitle}
             </p>
-
             <a
-              href={`mailto:${contactEmail}`}
-              className="
-                inline-flex
-                items-center
-                justify-center
-                bg-white
-                text-slate-950
-                px-10
-                py-5
-                rounded-xl
-                font-black
-                uppercase
-                tracking-widest
-                text-[11px]
-                hover:bg-slate-100
-                transition-transform
-                active:scale-95
-                shadow-xl
-              "
+              href={`mailto:${dict.common.email}`}
+              className="inline-flex items-center justify-center bg-white text-slate-950 px-10 py-5 rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-slate-100 transition-transform active:scale-95 shadow-xl"
             >
-              {dict.contact?.buttonText ?? "Contact"}
+              {dict.contact?.buttonText || "Entrar em Contato"}
             </a>
-
           </div>
-
         </section>
-
       </main>
     </ProxyPage>
   );
