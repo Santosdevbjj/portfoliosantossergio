@@ -29,8 +29,10 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
       let categoryName = "Outros";
       
       const matchedTopic = project.topics.find(t => TOPIC_TO_CATEGORY[t.toLowerCase()]);
+      
       if (matchedTopic) {
-        categoryName = TOPIC_TO_CATEGORY[matchedTopic.toLowerCase()];
+        // Correção: Adicionado fallback para garantir que o retorno seja string
+        categoryName = TOPIC_TO_CATEGORY[matchedTopic.toLowerCase()] || "Outros";
       } else {
         // Fallback para a tradução do dicionário se não houver tag específica
         categoryName = labels.categories[project.technology.labelKey] || labels.categories.dev;
