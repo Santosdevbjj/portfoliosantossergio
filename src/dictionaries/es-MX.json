@@ -22,7 +22,7 @@
     "title": "Sobre Mí",
     "differentialTitle": "Ingeniería de Datos con Enfoque en Misión Crítica",
     "description": "Analista de Ciencia de Datos con una base sólida en sistemas críticos bancarios y enfoque en transformar datos en decisiones, reducción de costos y eficiencia operativa.",
-    "differentialContent": "Colaboré por más de 15 anos en Banco Bradesco en entornos regulados de misión crítica. Actualmente enfoco mi labor en Ciencia de Datos e IA, aplicando el rigor de sistemas críticos a la creación de modelos predictivos.",
+    "differentialContent": "Colaboré por más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente enfoco mi labor en Ciencia de Datos e IA, aplicando el rigor de sistemas críticos a la creación de modelos predictivos.",
     "highlights": [
       "15+ años en Bancos",
       "Especialista Cloud",
@@ -95,13 +95,14 @@
       "database": "Base de Datos",
       "dev": "Desarrollo (Python/C#/Java)",
       "security": "Seguridad"
-    }
+    },
+    "featuredProjects": []
   },
   "common": {
     "navigation": "Navegación principal",
     "role": "Analista de Ciencia de Datos | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
-    "rights": "Todos os direitos reservados",
+    "rights": "Todos los derechos reservados",
     "builtWith": "Desarrollado con Next.js 16 y TypeScript",
     "loading": "Cargando...",
     "error": "Algo salió mal.",
