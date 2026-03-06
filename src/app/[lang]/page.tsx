@@ -2,7 +2,7 @@
  * HOME PAGE - PORTFÓLIO SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
  * ✔ Stack: Next.js 16, React 19, TS 6.0, Tailwind 4.2
- * ✔ Filtros de tecnologia corrigidos via config/categories
+ * ✔ Filtros de tecnologia sincronizados com CATEGORY_ORDER
  */
 
 import type { Metadata, Viewport } from "next";
@@ -86,11 +86,12 @@ export default async function HomePage(props: PageProps) {
 
   if (!dictData) notFound();
 
-  // Processamento com lógica de tags para evitar que tudo caia em "Ciência de Dados"
+  // Processamento rigoroso dos projetos do GitHub
   const domainProjects: readonly ProjectDomain[] = (githubProjects as any[])
     .filter(p => {
-      const topics = Array.isArray(p.topics) ? p.topics : [];
-      // Só entra no portfólio se tiver a tag 'portfolio' e não for artigo
+      const topics = Array.isArray(p.topics) ? p.topics.map((t: string) => t.toLowerCase()) : [];
+      // Regra 1: Deve ter a tag 'portfolio'
+      // Regra 2: Ignorar repositórios de artigos para não duplicar seções
       return topics.includes("portfolio") && 
              !p.name.toLowerCase().includes("articles") &&
              !p.name.toLowerCase().includes("artigos");
@@ -150,7 +151,7 @@ export default async function HomePage(props: PageProps) {
 
         <ExperienceSection experience={dict.experience} />
 
-        {/* Componente Corrigido: Agora agrupa por tecnologia e respeita a ordem */}
+        {/* Grid de Portfólio com injeção de dados processados */}
         <PortfolioGrid 
           projects={domainProjects} 
           lang={lang} 
