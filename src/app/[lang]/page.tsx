@@ -81,21 +81,28 @@ export default async function HomePage(props: PageProps) {
     notFound();
   }
 
+  // Filtra projetos que não são artigos
   const filteredGitHubProjects = githubProjects.filter(
     p => !p.name.toLowerCase().includes("articles") && !p.name.toLowerCase().includes("artigos")
   );
 
+  // Mapeia o PDF correto baseado no idioma
+  const cvPath = `/cv-sergio-santos-${lang}.pdf`;
+
+  // Prepara o dicionário injetando os projetos do GitHub nos destaques se necessário
   const dict = {
     ...dictData,
     projects: {
       ...dictData.projects,
-      featuredProjects: filteredGitHubProjects.length > 0 ? filteredGitHubProjects.slice(0, 3) : dictData.projects?.featuredProjects
+      // Se o dicionário não tiver destaques fixos, usamos os 3 primeiros do GitHub
+      featuredProjects: dictData.projects?.featuredProjects?.length 
+        ? dictData.projects.featuredProjects 
+        : filteredGitHubProjects.slice(0, 3)
     }
   };
 
   return (
     <ProxyPage lang={lang}>
-      {/* Ajuste de Acessibilidade: "Skip to content" oculto visualmente */}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] bg-blue-600 text-white p-4 rounded-lg">
         Pular para o conteúdo
       </a>
@@ -106,12 +113,13 @@ export default async function HomePage(props: PageProps) {
           <HeroSection dictionary={dict} />
         </div>
 
+        {/* ABOUT SECTION COM CORREÇÃO DO CV DINÂMICO */}
         <section id="about-section" className="relative">
           <AboutSection dict={dict.about} />
           
           <div className="container mx-auto px-6 pb-12 -mt-8 flex flex-wrap gap-4 justify-center md:justify-start max-w-7xl">
             <a 
-              href="/resume.pdf" 
+              href={cvPath} 
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-lg active:scale-95"
@@ -120,15 +128,17 @@ export default async function HomePage(props: PageProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              Visualizar CV
+              {dict.about?.viewCV || "Visualizar CV"}
             </a>
           </div>
         </section>
 
         <ExperienceSection experience={dict.experience} />
 
+        {/* PROJETOS EM DESTAQUE - Passando os dados processados */}
         <FeaturedProjectsSection lang={lang} dict={dict as any} />
 
+        {/* GRADE COMPLETA DE PROJETOS (GITHUB) */}
         <section className="container mx-auto px-6 py-16 max-w-7xl" id="all-projects">
           <header className="mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic dark:text-white">
@@ -151,7 +161,6 @@ export default async function HomePage(props: PageProps) {
                     </span>
                   </div>
                   <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 mb-6 leading-relaxed">
-                    {/* CORREÇÃO AQUI: Trocado 'description' por 'problem' que existe no tipo ProcessedProject */}
                     {project.solution || project.problem || "Explorar código e análise técnica no repositório oficial."}
                   </p>
                 </div>
