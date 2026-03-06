@@ -86,19 +86,24 @@ export default async function HomePage(props: PageProps) {
     p => !p.name.toLowerCase().includes("articles") && !p.name.toLowerCase().includes("artigos")
   );
 
-  // Mapeia o PDF correto baseado no idioma
+  // 1. Mapeia o PDF correto baseado no idioma para a pasta public
   const cvPath = `/cv-sergio-santos-${lang}.pdf`;
 
-  // Prepara o dicionário injetando os projetos do GitHub nos destaques se necessário
-  // Garantimos que o objeto tenha as propriedades que o FeaturedProjectsSection espera
+  // 2. Prepara o dicionário injetando os projetos e corrigindo os links de CV em todas as seções
   const dict = {
     ...dictData,
+    // Corrigindo o link do CV dentro da seção de contato para o segundo botão
+    contact: {
+      ...dictData.contact,
+      resumeUrl: cvPath, // Força o componente ContactSection a usar o caminho correto
+      cvUrl: cvPath     // Fallback caso o componente use cvUrl
+    },
     projects: {
       ...dictData.projects,
       featuredProjects: dictData.projects?.featuredProjects?.length 
         ? dictData.projects.featuredProjects.map((p: any) => ({
             ...p,
-            repoUrl: p.github || p.repoUrl || p.url || "#", // Garante que o link exista
+            repoUrl: p.github || p.repoUrl || p.url || "#",
           }))
         : filteredGitHubProjects.slice(0, 3).map(p => ({
             id: p.id,
@@ -122,7 +127,7 @@ export default async function HomePage(props: PageProps) {
           <HeroSection dictionary={dict} />
         </div>
 
-        {/* SECTION SOBRE COM FIX DO CV */}
+        {/* SECTION SOBRE COM PRIMEIRO BOTÃO DE CV */}
         <section id="about-section" className="relative">
           <AboutSection dict={dict.about} />
           
@@ -137,7 +142,6 @@ export default async function HomePage(props: PageProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              {/* Uso de (dict.about as any) para evitar erro de compilação se viewCV não estiver na interface */}
               {(dict.about as any)?.viewCV || "Visualizar CV"}
             </a>
           </div>
@@ -145,10 +149,8 @@ export default async function HomePage(props: PageProps) {
 
         <ExperienceSection experience={dict.experience} />
 
-        {/* PROJETOS EM DESTAQUE */}
         <FeaturedProjectsSection lang={lang} dict={dict as any} />
 
-        {/* GRADE COMPLETA (GITHUB) */}
         <section className="container mx-auto px-6 py-16 max-w-7xl" id="all-projects">
           <header className="mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic dark:text-white">
@@ -219,6 +221,7 @@ export default async function HomePage(props: PageProps) {
           </div>
         </section>
 
+        {/* CONTACT SECTION - Agora recebe o dict já com o cvPath corrigido internamente */}
         <ContactSection 
           contact={dict.contact} 
           common={dict.common} 
