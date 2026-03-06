@@ -130,7 +130,7 @@ export default async function HomePage(props: PageProps) {
   const featuredProjects = dict.projects?.featuredProjects ?? [];
 
   return (
-    <ProxyPage lang={lang} dict={dict}>
+    <ProxyPage lang={lang}>
       <main className="flex flex-col">
 
         {/* HERO */}
