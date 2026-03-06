@@ -29,7 +29,9 @@ import FeaturedArticleSection from "@/components/FeaturedArticleSection";
 /* -------------------------------------------------------------------------- */
 
 interface PageProps {
-  params: { lang: string };
+  params: {
+    lang: string;
+  };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -65,23 +67,35 @@ export async function generateMetadata(
   { params }: PageProps
 ): Promise<Metadata> {
 
-  const lang = params.lang;
+  const rawLang = params?.lang;
 
-  if (!lang || !isValidLocale(lang)) {
+  if (!rawLang || !isValidLocale(rawLang)) {
     return {};
   }
 
+  const lang = rawLang as Locale;
+
   try {
 
-    const dict: Dictionary = await getServerDictionary(lang as Locale);
+    const dict: Dictionary = await getServerDictionary(lang);
 
     const siteUrl =
       process.env.NEXT_PUBLIC_SITE_URL ??
       "https://portfoliosantossergio.vercel.app";
 
+    const title =
+      dict?.seo?.pages?.home?.title ??
+      dict?.seo?.title ??
+      "Sérgio Santos";
+
+    const description =
+      dict?.seo?.pages?.home?.description ??
+      dict?.seo?.description ??
+      "Portfolio";
+
     return {
-      title: dict.seo.pages.home.title,
-      description: dict.seo.pages.home.description,
+      title,
+      description,
 
       verification: {
         google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
@@ -99,14 +113,14 @@ export async function generateMetadata(
       },
     };
 
-  } catch {
+  } catch (error) {
+
+    console.error("Metadata generation failed:", error);
 
     return {
       title: "Sérgio Santos",
     };
-
   }
-
 }
 
 /* -------------------------------------------------------------------------- */
@@ -115,7 +129,7 @@ export async function generateMetadata(
 
 export default async function HomePage({ params }: PageProps) {
 
-  const rawLang = params.lang;
+  const rawLang = params?.lang;
 
   if (!rawLang || !isValidLocale(rawLang)) {
     notFound();
@@ -123,32 +137,56 @@ export default async function HomePage({ params }: PageProps) {
 
   const lang = rawLang as Locale;
 
-  const dict = await getServerDictionary(lang).catch((error) => {
-
-    console.error("Critical: Error loading dictionary:", error);
-    return null;
-
-  });
+  const dict: Dictionary | null = await getServerDictionary(lang)
+    .then((d) => d)
+    .catch((error) => {
+      console.error("Critical: Error loading dictionary:", error);
+      return null;
+    });
 
   if (!dict) {
     notFound();
   }
 
-  const featuredProjects = dict.projects?.featuredProjects ?? [];
+  /* ---------------------------------------------------------------------- */
+  /* SAFE DATA EXTRACTION                                                   */
+  /* ---------------------------------------------------------------------- */
+
+  const featuredProjects =
+    dict.projects?.featuredProjects ?? [];
+
+  const articles =
+    dict.articles ?? {
+      title: "",
+      mediumProfile: "",
+      readMore: "",
+      publishedAt: "",
+      bestOfMonth: "",
+      awardWinner: "",
+      items: [],
+    };
+
+  const contactEmail =
+    dict.common?.email ?? "contact@example.com";
+
+  /* ---------------------------------------------------------------------- */
+  /* RENDER                                                                 */
+  /* ---------------------------------------------------------------------- */
 
   return (
-
     <ProxyPage lang={lang}>
-
       <main className="flex flex-col">
 
         {/* HERO */}
+
         <HeroSection dictionary={dict} />
 
         {/* ABOUT */}
+
         <AboutSection dict={dict.about} />
 
         {/* FEATURED PROJECTS */}
+
         {featuredProjects.length > 0 ? (
 
           <FeaturedProjectsSection
@@ -161,11 +199,11 @@ export default async function HomePage({ params }: PageProps) {
           <section className="py-20 text-center">
 
             <h2 className="text-xl font-semibold">
-              {dict.states.emptyProjects.title}
+              {dict.states?.emptyProjects?.title ?? "No projects"}
             </h2>
 
             <p className="opacity-70">
-              {dict.states.emptyProjects.description}
+              {dict.states?.emptyProjects?.description ?? ""}
             </p>
 
           </section>
@@ -173,26 +211,28 @@ export default async function HomePage({ params }: PageProps) {
         )}
 
         {/* ARTICLES */}
+
         <FeaturedArticleSection
-          articles={dict.articles}
+          articles={articles}
           common={dict.common}
         />
 
         {/* FINAL CTA */}
+
         <section className="py-28 px-6 text-center bg-gradient-to-b from-slate-950 to-black">
 
           <div className="max-w-3xl mx-auto space-y-8">
 
             <h2 className="text-3xl md:text-4xl font-bold text-white">
-              {dict.contact.ctaTitle ?? "Vamos Conversar?"}
+              {dict.contact?.ctaTitle ?? "Let's build something together"}
             </h2>
 
             <p className="text-slate-300">
-              {dict.contact.subtitle}
+              {dict.contact?.subtitle ?? ""}
             </p>
 
             <a
-              href={`mailto:${dict.common.email}`}
+              href={`mailto:${contactEmail}`}
               className="
                 inline-flex
                 items-center
@@ -212,7 +252,7 @@ export default async function HomePage({ params }: PageProps) {
                 shadow-xl
               "
             >
-              {dict.contact.buttonText ?? "Entrar em Contato"}
+              {dict.contact?.buttonText ?? "Contact"}
             </a>
 
           </div>
@@ -220,9 +260,6 @@ export default async function HomePage({ params }: PageProps) {
         </section>
 
       </main>
-
     </ProxyPage>
-
   );
-
 }
