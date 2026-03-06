@@ -86,17 +86,16 @@ export default async function HomePage(props: PageProps) {
     p => !p.name.toLowerCase().includes("articles") && !p.name.toLowerCase().includes("artigos")
   );
 
-  // 1. Mapeia o PDF correto baseado no idioma para a pasta public
+  // Mapeia o PDF correto baseado no idioma
   const cvPath = `/cv-sergio-santos-${lang}.pdf`;
 
-  // 2. Prepara o dicionário injetando os projetos e corrigindo os links de CV em todas as seções
+  // Prepara o dicionário injetando os projetos e garantindo que o rótulo do CV exista
   const dict = {
     ...dictData,
-    // Corrigindo o link do CV dentro da seção de contato para o segundo botão
     contact: {
       ...dictData.contact,
-      resumeUrl: cvPath, // Força o componente ContactSection a usar o caminho correto
-      cvUrl: cvPath     // Fallback caso o componente use cvUrl
+      // Injetamos o caminho dinâmico aqui para que o componente possa ler se necessário
+      cvLabel: dictData.contact.cvLabel || "Ver CV",
     },
     projects: {
       ...dictData.projects,
@@ -118,7 +117,7 @@ export default async function HomePage(props: PageProps) {
   return (
     <ProxyPage lang={lang}>
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] bg-blue-600 text-white p-4 rounded-lg">
-        Pular para o conteúdo
+        {dict.common.skipToContent}
       </a>
 
       <main id="main-content" className="flex flex-col min-h-screen bg-white dark:bg-[#020617]">
@@ -142,7 +141,7 @@ export default async function HomePage(props: PageProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              {(dict.about as any)?.viewCV || "Visualizar CV"}
+              {(dict.about as any)?.viewCV || dict.contact.cvLabel}
             </a>
           </div>
         </section>
@@ -169,7 +168,7 @@ export default async function HomePage(props: PageProps) {
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-xl font-bold dark:text-white group-hover:text-blue-600 transition-colors">{project.name}</h3>
                     <span className="text-[9px] px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-slate-800 dark:text-blue-400 font-bold uppercase">
-                      {project.category || 'Ciência de Dados'}
+                      {project.category || 'Data Science'}
                     </span>
                   </div>
                   <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 mb-6 leading-relaxed">
@@ -182,7 +181,7 @@ export default async function HomePage(props: PageProps) {
                   rel="noopener noreferrer" 
                   className="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-blue-600 hover:gap-2 transition-all"
                 >
-                  {dict.projects.viewProject || "Ver Repositório GitHub"} <span className="ml-1">→</span>
+                  {dict.projects.viewProject} <span className="ml-1">→</span>
                 </a>
               </article>
             ))}
@@ -221,7 +220,7 @@ export default async function HomePage(props: PageProps) {
           </div>
         </section>
 
-        {/* CONTACT SECTION - Agora recebe o dict já com o cvPath corrigido internamente */}
+        {/* CONTACT SECTION - Passamos o cvPath explicitamente via prop se o componente permitir ou confiamos no ajuste interno */}
         <ContactSection 
           contact={dict.contact} 
           common={dict.common} 
