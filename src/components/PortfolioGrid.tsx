@@ -25,30 +25,30 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
     const groups: Record<string, ProjectDomain[]> = {};
     
     projects.forEach(project => {
-      // Tenta encontrar a categoria amigável baseada nos tópicos do projeto
-      let categoryName = "Outros";
+      // Determinação da categoria com fallbacks seguros
+      let categoryName: string;
       
-      const matchedTopic = project.topics.find(t => TOPIC_TO_CATEGORY[t.toLowerCase()]);
+      const matchedTopicKey = project.topics.find(t => t.toLowerCase() in TOPIC_TO_CATEGORY);
       
-      if (matchedTopic) {
-        // Correção: Adicionado fallback para garantir que o retorno seja string
-        categoryName = TOPIC_TO_CATEGORY[matchedTopic.toLowerCase()] || "Outros";
+      if (matchedTopicKey) {
+        categoryName = TOPIC_TO_CATEGORY[matchedTopicKey.toLowerCase()] ?? "Outros";
       } else {
-        // Fallback para a tradução do dicionário se não houver tag específica
         categoryName = labels.categories[project.technology.labelKey] || labels.categories.dev;
       }
 
-      if (!groups[categoryName]) {
-        groups[categoryName] = [];
-      }
-      groups[categoryName].push(project);
+      // Correção do erro de deploy: Garantia de inicialização do array
+      // Se não existir, inicializa como array vazio; depois faz o push com segurança.
+      (groups[categoryName] ??= []).push(project);
     });
 
     // 2. Ordenação das Categorias (conforme CATEGORY_ORDER) e dos projetos internos
     return Object.keys(groups)
       .sort((a, b) => (CATEGORY_ORDER[a] ?? 99) - (CATEGORY_ORDER[b] ?? 99))
       .map(categoryKey => {
-        const sortedInnerProjects = [...groups[categoryKey]].sort((a, b) => {
+        // Garantia de que o grupo existe antes do spread (ajuda o TS 6.0)
+        const currentGroup = groups[categoryKey] ?? [];
+        
+        const sortedInnerProjects = [...currentGroup].sort((a, b) => {
           // 1º Lugar: Tag 'primeiro' (isFirst)
           if (a.isFirst && !b.isFirst) return -1;
           if (!a.isFirst && b.isFirst) return 1;
