@@ -2,81 +2,78 @@
 
 import { useMemo } from 'react';
 import { ProjectCard } from './ProjectCard';
-import { CATEGORY_ORDER } from '@/config/categories';
+import { CATEGORY_ORDER, TOPIC_TO_CATEGORY } from '@/config/categories';
 import type { ProjectDomain } from '@/domain/projects';
 import type { Dictionary } from '@/types/dictionary';
 
-/**
- * Interface rigorosa seguindo padrões do TypeScript 6.0
- */
 interface PortfolioGridProps {
   readonly projects: readonly ProjectDomain[];
   readonly lang: string;
   readonly dict: Dictionary;
 }
 
-/**
- * Interface para a estrutura de agrupamento
- */
 interface ProjectGroup {
   name: string;
   projects: ProjectDomain[];
 }
 
-/**
- * PortfolioGrid - Componente Responsivo e Multilíngue (PT, EN, ES)
- * Alinhado com React 19, Next.js 16 (Turbopack), Node 24 e Tailwind CSS 4.2
- */
 export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
   const { projects: labels } = dict;
 
-  // 1. Processamento e Ordenação dos Projetos
-  const sortedProjects = useMemo(() => {
-    return [...projects].sort((a, b) => {
-      // Prioridade 1: Tag "primeiro" (isFirst)
-      if (a.isFirst && !b.isFirst) return -1;
-      if (!a.isFirst && b.isFirst) return 1;
-
-      // Prioridade 2: Tag "destaque" (isFeatured)
-      if (a.isFeatured && !b.isFeatured) return -1;
-      if (!a.isFeatured && b.isFeatured) return 1;
-
-      // Prioridade 3: Ordem de Categorias definida no Config (Baseado na tradução atual)
-      const catA = labels.categories[a.technology.labelKey] ?? "";
-      const catB = labels.categories[b.technology.labelKey] ?? "";
-
-      const orderA = CATEGORY_ORDER[catA] ?? 99;
-      const orderB = CATEGORY_ORDER[catB] ?? 99;
-
-      return orderA - orderB;
-    });
-  }, [projects, labels.categories]);
-
-  // 2. Agrupamento por Categoria para exibição com Tipagem Explícita
+  // 1. Processamento e Agrupamento
   const groupedProjects = useMemo((): ProjectGroup[] => {
     const groups: Record<string, ProjectDomain[]> = {};
     
-    sortedProjects.forEach(project => {
-      const categoryName = labels.categories[project.technology.labelKey] || labels.categories.dev;
+    projects.forEach(project => {
+      // Tenta encontrar a categoria amigável baseada nos tópicos do projeto
+      let categoryName = "Outros";
+      
+      const matchedTopic = project.topics.find(t => TOPIC_TO_CATEGORY[t.toLowerCase()]);
+      if (matchedTopic) {
+        categoryName = TOPIC_TO_CATEGORY[matchedTopic.toLowerCase()];
+      } else {
+        // Fallback para a tradução do dicionário se não houver tag específica
+        categoryName = labels.categories[project.technology.labelKey] || labels.categories.dev;
+      }
+
       if (!groups[categoryName]) {
         groups[categoryName] = [];
       }
       groups[categoryName].push(project);
     });
 
-    // Ordenar as chaves do grupo baseado no CATEGORY_ORDER global
+    // 2. Ordenação das Categorias (conforme CATEGORY_ORDER) e dos projetos internos
     return Object.keys(groups)
       .sort((a, b) => (CATEGORY_ORDER[a] ?? 99) - (CATEGORY_ORDER[b] ?? 99))
-      .map(key => ({
-        name: key,
-        projects: groups[key] || []
-      }));
-  }, [sortedProjects, labels.categories]);
+      .map(categoryKey => {
+        const sortedInnerProjects = [...groups[categoryKey]].sort((a, b) => {
+          // 1º Lugar: Tag 'primeiro' (isFirst)
+          if (a.isFirst && !b.isFirst) return -1;
+          if (!a.isFirst && b.isFirst) return 1;
 
-  // Estado vazio: Totalmente responsivo e centralizado
+          // 2º Lugar: Tag 'destaque' (isFeatured)
+          if (a.isFeatured && !b.isFeatured) return -1;
+          if (!a.isFeatured && b.isFeatured) return 1;
+
+          return a.name.localeCompare(b.name);
+        });
+
+        return {
+          name: categoryKey,
+          projects: sortedInnerProjects
+        };
+      });
+  }, [projects, labels]);
+
   if (projects.length === 0) {
     return (
-      <section className="py-24 text-center px-6">
+      <section id="projects" className="py-24 text-center px-6">
+        <div className="inline-flex p-4 rounded-full bg-slate-100 dark:bg-slate-800 mb-6">
+          <div className="animate-pulse w-8 h-8 bg-blue-500 rounded-full" />
+        </div>
+        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          {dict.states.emptyProjects.title}
+        </h3>
         <p className="text-slate-500 dark:text-slate-400 font-medium">
           {dict.states.emptyProjects.description}
         </p>
@@ -90,7 +87,6 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
       className="py-24 bg-slate-50/50 dark:bg-[#020617]/50 transition-colors duration-300"
     >
       <div className="container mx-auto px-6 max-w-7xl">
-        {/* Header com Tipografia Moderna, Itálica e Responsiva */}
         <header className="mb-16">
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white">
             {labels.title.split(' ')[0]}{" "}
@@ -101,11 +97,9 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
           <div className="h-2 w-24 bg-blue-600 mt-6 rounded-full shadow-lg shadow-blue-500/20" />
         </header>
 
-        {/* Listagem em Grupos Dinâmicos */}
         <div className="space-y-20">
           {groupedProjects.map((group) => (
             <div key={group.name} className="space-y-8">
-              {/* Separador de Categoria Estilizado */}
               <div className="flex items-center gap-4">
                 <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400 whitespace-nowrap">
                   {group.name}
@@ -113,7 +107,6 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
                 <div className="h-px flex-grow bg-slate-200 dark:bg-slate-800/50" />
               </div>
 
-              {/* Grid Responsivo: 1 col (mobile), 2 cols (tablet), 3 cols (desktop) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {group.projects.map((project) => (
                   <ProjectCard 
