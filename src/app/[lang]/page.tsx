@@ -29,7 +29,7 @@ import FeaturedArticleSection from "@/components/FeaturedArticleSection";
 /* -------------------------------------------------------------------------- */
 
 interface PageProps {
-  params: Promise<{ lang: string }>;
+  params: { lang: string };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -62,9 +62,9 @@ export const viewport: Viewport = {
 /* -------------------------------------------------------------------------- */
 
 export async function generateMetadata(
-  props: PageProps
+  { params }: PageProps
 ): Promise<Metadata> {
-  const params = await props.params;
+
   const lang = params.lang;
 
   if (!lang || !isValidLocale(lang)) {
@@ -72,6 +72,7 @@ export async function generateMetadata(
   }
 
   try {
+
     const dict: Dictionary = await getServerDictionary(lang as Locale);
 
     const siteUrl =
@@ -97,19 +98,23 @@ export async function generateMetadata(
         },
       },
     };
+
   } catch {
+
     return {
       title: "Sérgio Santos",
     };
+
   }
+
 }
 
 /* -------------------------------------------------------------------------- */
 /* PAGE                                                                       */
 /* -------------------------------------------------------------------------- */
 
-export default async function HomePage(props: PageProps) {
-  const params = await props.params;
+export default async function HomePage({ params }: PageProps) {
+
   const rawLang = params.lang;
 
   if (!rawLang || !isValidLocale(rawLang)) {
@@ -119,8 +124,10 @@ export default async function HomePage(props: PageProps) {
   const lang = rawLang as Locale;
 
   const dict = await getServerDictionary(lang).catch((error) => {
+
     console.error("Critical: Error loading dictionary:", error);
     return null;
+
   });
 
   if (!dict) {
@@ -130,37 +137,43 @@ export default async function HomePage(props: PageProps) {
   const featuredProjects = dict.projects?.featuredProjects ?? [];
 
   return (
+
     <ProxyPage lang={lang}>
+
       <main className="flex flex-col">
 
         {/* HERO */}
-        <HeroSection hero={dict.hero} common={dict.common} />
+        <HeroSection dict={dict} />
 
         {/* ABOUT */}
-        <AboutSection about={dict.about} />
+        <AboutSection dict={dict} />
 
         {/* FEATURED PROJECTS */}
         {featuredProjects.length > 0 ? (
+
           <FeaturedProjectsSection
             lang={lang}
             dict={dict}
           />
+
         ) : (
+
           <section className="py-20 text-center">
+
             <h2 className="text-xl font-semibold">
               {dict.states.emptyProjects.title}
             </h2>
+
             <p className="opacity-70">
               {dict.states.emptyProjects.description}
             </p>
+
           </section>
+
         )}
 
         {/* ARTICLES */}
-        <FeaturedArticleSection
-          articles={dict.articles}
-          common={dict.common}
-        />
+        <FeaturedArticleSection dict={dict} />
 
         {/* FINAL CTA */}
         <section className="py-28 px-6 text-center bg-gradient-to-b from-slate-950 to-black">
@@ -200,9 +213,13 @@ export default async function HomePage(props: PageProps) {
             </a>
 
           </div>
+
         </section>
 
       </main>
+
     </ProxyPage>
+
   );
+
 }
