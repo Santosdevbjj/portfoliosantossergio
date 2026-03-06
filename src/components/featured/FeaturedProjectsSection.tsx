@@ -13,13 +13,12 @@ export default function FeaturedProjectsSection({
   dict,
 }: FeaturedProjectsSectionProps) {
   
-  // CORREÇÃO: Pegamos os projetos do DICTIONARY (JSON) e não do arquivo estático externo
-  // Isso garante que se o JSON estiver certo, o projeto aparece traduzido.
+  // Extração segura: Prioriza o que vem do JSON traduzido
   const projects = Array.isArray(dict.projects?.featuredProjects) 
     ? [...dict.projects.featuredProjects].slice(0, 3)
     : [];
 
-  // Se não houver projetos, não renderizamos a seção para não quebrar a página
+  // Se não houver projetos no JSON, a seção não é renderizada (evita erros de iteração)
   if (projects.length === 0) return null;
 
   const sectionId = getSectionId(NavSection.PROJECTS);
@@ -34,18 +33,18 @@ export default function FeaturedProjectsSection({
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <header className="mb-16 max-w-3xl">
           <span className="mb-4 inline-block rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-            {dict.projects?.featuredLabel || "Projetos"}
+            {dict.projects?.featuredLabel || "Destaque Técnico"}
           </span>
 
           <h2
             id={headingId}
             className="mb-6 text-4xl font-black tracking-tight dark:text-white sm:text-5xl uppercase italic"
           >
-            {dict.projects?.title}
+            {dict.projects?.title || "Projetos"}
           </h2>
 
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            {dict.seo?.pages?.home?.description} 
+            {dict.seo?.pages?.home?.description || ""} 
           </p>
         </header>
 
