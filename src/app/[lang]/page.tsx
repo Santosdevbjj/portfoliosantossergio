@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
 // Types
-import type { Locale } from "@/types/dictionary";
+import type { Locale, Dictionary } from "@/types/dictionary";
 
 // Services & Helpers
 import { getServerDictionary } from "@/lib/getServerDictionary";
@@ -21,8 +21,7 @@ interface PageProps {
 }
 
 /**
- * Configurações de Performance e Build para Next.js 16+
- * O Node 24 gerencia melhor o streaming de componentes estáticos
+ * Configurações de Performance - Next.js 16 + Node 24
  */
 export const dynamic = "force-static";
 export const revalidate = 60; 
@@ -38,20 +37,21 @@ export const viewport: Viewport = {
 };
 
 /**
- * Geração de Metadados - React 19 / Next.js 16 (Async Params)
+ * Geração de Metadados - Alinhado com React 19 / Next.js 16
  */
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { lang } = await props.params;
+  const params = await props.params;
+  const lang = params.lang;
   
   if (!lang || !isValidLocale(lang)) return {};
 
   try {
-    const dict = await getServerDictionary(lang as Locale);
+    const dict: Dictionary = await getServerDictionary(lang as Locale);
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
 
     return {
-      title: dict.seo?.pages?.home?.title || "Sérgio Santos | Portfolio",
-      description: dict.seo?.pages?.home?.description || "Engenheiro de Dados",
+      title: dict.seo.pages.home.title,
+      description: dict.seo.pages.home.description,
       verification: {
         google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
       },
@@ -61,6 +61,8 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
           "pt-BR": `${siteUrl}/pt-BR`,
           "en-US": `${siteUrl}/en-US`,
           "es-ES": `${siteUrl}/es-ES`,
+          "es-AR": `${siteUrl}/es-AR`,
+          "es-MX": `${siteUrl}/es-MX`,
         },
       },
     };
@@ -70,8 +72,9 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function HomePage(props: PageProps) {
-  // Obrigatório 'await' para params no Next.js 16
-  const { lang: rawLang } = await props.params;
+  // O await é obrigatório para params no Next.js 16
+  const params = await props.params;
+  const rawLang = params.lang;
 
   if (!rawLang || !isValidLocale(rawLang)) {
     notFound();
@@ -80,19 +83,16 @@ export default async function HomePage(props: PageProps) {
   const lang = rawLang as Locale;
 
   /**
-   * Carregamento do dicionário com tratamento de erro robusto
+   * Carregamento do dicionário tipado
    */
-  const dict = await getServerDictionary(lang).catch((error) => {
-    console.error("Erro ao carregar dicionário:", error);
+  const dict: Dictionary = await getServerDictionary(lang).catch((error) => {
+    console.error("Critical: Error loading dictionary:", error);
     notFound();
   });
 
-  // Helper para evitar erros de tipagem no ContactDictionary durante o build
-  const contactDict = (dict.contact || {}) as any;
-
   return (
     <ProxyPage lang={lang}>
-      <main className="min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 selection:bg-blue-500/30 selection:text-current">
+      <main className="min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-100 selection:bg-blue-500/30">
         
         {/* Hero Section */}
         <HeroSection dictionary={dict} />
@@ -106,35 +106,37 @@ export default async function HomePage(props: PageProps) {
           dict={dict} 
         />
 
-        {/* Artigos - Passagem de props validada */}
+        {/* Artigos Técnicos */}
         <FeaturedArticleSection 
           articles={dict.articles} 
           common={dict.common}
         />
 
-        {/* Banner de CTA Final - Tailwind 4.2 Optimized */}
+        {/* Banner de CTA Final - Tailwind 4.2 High Contrast */}
         <section className="container mx-auto px-4 md:px-8 lg:px-16 py-24 max-w-7xl">
-          <div className="p-10 md:p-16 rounded-[3rem] bg-slate-900 dark:bg-blue-600 text-white relative overflow-hidden group transition-all duration-700">
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
-              <div className="text-center md:text-left space-y-2">
-                <h2 className="text-4xl md:text-6xl font-black tracking-tighter italic uppercase leading-none">
-                  {contactDict.ctaTitle || "Vamos construir algo juntos?"}
+          <div className="p-10 md:p-16 rounded-[2.5rem] bg-slate-950 dark:bg-blue-600 text-white relative overflow-hidden group transition-all duration-500 hover:shadow-2xl dark:hover:shadow-blue-500/20">
+            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+              
+              <div className="text-center lg:text-left space-y-4 max-w-2xl">
+                <h2 className="text-4xl md:text-6xl font-black tracking-tighter italic uppercase leading-[0.9]">
+                  {dict.contact.ctaTitle}
                 </h2>
-                <p className="opacity-80 font-bold uppercase tracking-[0.3em] text-[10px] md:text-xs">
-                  Especialista em Modernização de Dados e Governança
+                <p className="opacity-70 font-bold uppercase tracking-[0.2em] text-[10px] md:text-xs">
+                  {dict.meta.description}
                 </p>
               </div>
+
               <a 
-                href={`mailto:${dict.common?.email || "santossergiorealbjj@outlook.com"}`} 
-                className="bg-white text-slate-900 px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs hover:scale-105 transition-all active:scale-95 shadow-2xl hover:bg-slate-100"
+                href={`mailto:${dict.common.email}`} 
+                className="inline-flex items-center justify-center bg-white text-slate-950 px-10 py-5 rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-slate-100 transition-transform active:scale-95 shadow-xl"
               >
-                {contactDict.buttonText || "Entrar em Contato →"}
+                {dict.contact.buttonText}
               </a>
             </div>
             
-            {/* Decoração Visual (Glows de fundo) */}
-            <div className="absolute -right-10 -top-10 w-80 h-80 bg-white/5 rounded-full blur-[100px] group-hover:bg-white/10 transition-all duration-700 pointer-events-none" />
-            <div className="absolute -left-10 -bottom-10 w-64 h-64 bg-blue-400/10 rounded-full blur-[80px] pointer-events-none" />
+            {/* Decoração Visual (Abstract Shapers) */}
+            <div className="absolute -right-20 -top-20 w-96 h-96 bg-white/5 rounded-full blur-[120px] group-hover:bg-white/10 transition-colors pointer-events-none" />
+            <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-blue-400/10 rounded-full blur-[100px] pointer-events-none" />
           </div>
         </section>
       </main>
