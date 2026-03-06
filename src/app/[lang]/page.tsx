@@ -143,7 +143,7 @@ export default async function HomePage({ params }: PageProps) {
       <main className="flex flex-col">
 
         {/* HERO */}
-        <HeroSection dict={dict} />
+        <HeroSection dictionary={dict} />
 
         {/* ABOUT */}
         <AboutSection dict={dict} />
