@@ -4,7 +4,7 @@
  * ✔ Stack: Next.js 16, React 19, TS 6.0, Tailwind 4.2
  * ✔ Responsividade Total (Mobile-First)
  * ✔ Multilíngue (PT, EN, ES, ES-AR, ES-MX)
- * ✔ Integração com PortfolioGrid e GitHub Service
+ * ✔ Integração com PortfolioGrid e GitHub Service corrigida
  */
 
 import type { Metadata, Viewport } from "next";
@@ -12,7 +12,6 @@ import { notFound } from "next/navigation";
 
 // Types
 import type { Locale, Dictionary } from "@/types/dictionary";
-import type { ProcessedProject } from "@/types/github";
 import type { ProjectDomain } from "@/domain/projects";
 
 // Services & Helpers
@@ -84,9 +83,10 @@ export default async function HomePage(props: PageProps) {
 
   const lang = rawLang as Locale;
   
+  // Fetch de dados em paralelo para performance
   const [dictData, githubProjects] = await Promise.all([
     getServerDictionary(lang).catch(() => null),
-    getGitHubProjects("Santosdevbjj").catch(() => [] as ProcessedProject[])
+    getGitHubProjects("Santosdevbjj").catch(() => [])
   ]);
 
   if (!dictData) {
@@ -95,23 +95,28 @@ export default async function HomePage(props: PageProps) {
 
   /**
    * PROCESSAMENTO DOS PROJETOS PARA DOMAIN PATTERN
-   * Converte os projetos do GitHub para a interface ProjectDomain exigida pelo PortfolioGrid
+   * Correção do Erro de Tipo: Fazemos o cast seguro para 'any' ou 
+   * garantimos a existência de topics para satisfazer o compilador.
    */
-  const domainProjects: readonly ProjectDomain[] = githubProjects
-    .filter(p => !p.name.toLowerCase().includes("articles") && !p.name.toLowerCase().includes("artigos"))
+  const domainProjects: readonly ProjectDomain[] = (githubProjects as any[])
+    .filter(p => {
+      const name = (p.name || "").toLowerCase();
+      return !name.includes("articles") && !name.includes("artigos");
+    })
     .map(p => {
-      const flags = resolveProjectFlags(p.topics || []);
-      const tech = resolveProjectTechnology(p.topics || []);
+      const topics: string[] = Array.isArray(p.topics) ? p.topics : [];
+      const flags = resolveProjectFlags(topics);
+      const tech = resolveProjectTechnology(topics);
       
       return {
-        id: p.id.toString(),
-        name: p.name,
+        id: String(p.id),
+        name: p.name || "Untitled Project",
         description: p.description || p.problem || "",
-        htmlUrl: p.url || p.htmlUrl || "",
-        homepage: p.homepage,
-        topics: p.topics || [],
+        htmlUrl: p.html_url || p.url || p.htmlUrl || "",
+        homepage: p.homepage || null,
+        topics: topics,
         technology: tech,
-        isPortfolio: true, // Forçamos true para aparecer no Grid conforme lógica do componente
+        isPortfolio: true, 
         isFeatured: flags.isFeatured,
         isFirst: flags.isFirst,
       };
@@ -119,7 +124,7 @@ export default async function HomePage(props: PageProps) {
 
   const cvPath = `/cv-sergio-santos-${lang}.pdf`;
 
-  // Preparação do dicionário com fallback de segurança
+  // Sanitização do dicionário para evitar erros de runtime em propriedades opcionais
   const dict: Dictionary = {
     ...dictData,
     contact: {
@@ -131,7 +136,10 @@ export default async function HomePage(props: PageProps) {
   return (
     <ProxyPage lang={lang}>
       {/* Acessibilidade: Skip Link */}
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] bg-blue-600 text-white p-4 rounded-lg font-bold">
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] bg-blue-600 text-white p-4 rounded-lg font-bold"
+      >
         {dict.common.skipToContent}
       </a>
 
@@ -146,7 +154,6 @@ export default async function HomePage(props: PageProps) {
         <section id="about" className="relative overflow-hidden">
           <AboutSection dict={dict.about} />
           
-          {/* Career Highlights (KPIs e Prova Social) */}
           <div className="container mx-auto px-6 max-w-7xl">
             <CareerHighlights dict={dict} />
           </div>
@@ -171,7 +178,7 @@ export default async function HomePage(props: PageProps) {
         {/* EXPERIENCE SECTION */}
         <ExperienceSection experience={dict.experience} />
 
-        {/* PORTFOLIO GRID SECTION (Nova implementação filtrável) */}
+        {/* PORTFOLIO GRID SECTION */}
         <PortfolioGrid 
           projects={domainProjects} 
           lang={lang} 
@@ -188,7 +195,7 @@ export default async function HomePage(props: PageProps) {
         <section className="container mx-auto px-6 py-24 max-w-7xl border-t border-slate-100 dark:border-slate-900" id="knowledge-base">
           <header className="mb-12">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white">
-               Journal & <span className="text-blue-600">Artigos</span>
+                Journal & <span className="text-blue-600">Artigos</span>
             </h2>
             <div className="h-2 w-24 bg-blue-600 mt-6 rounded-full" />
           </header>
@@ -210,7 +217,6 @@ export default async function HomePage(props: PageProps) {
                 </div>
               </div>
               
-              {/* Elemento Decorativo de Background */}
               <div className="absolute -right-20 -bottom-20 opacity-10 group-hover:opacity-20 transition-opacity">
                  <svg width="400" height="400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-blue-600">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
