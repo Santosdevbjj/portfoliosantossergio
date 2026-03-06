@@ -173,7 +173,10 @@ export default async function HomePage({ params }: PageProps) {
         )}
 
         {/* ARTICLES */}
-        <FeaturedArticleSection dict={dict} />
+        <FeaturedArticleSection
+          articles={dict.articles}
+          common={dict.common}
+        />
 
         {/* FINAL CTA */}
         <section className="py-28 px-6 text-center bg-gradient-to-b from-slate-950 to-black">
