@@ -4,17 +4,20 @@ import { notFound } from "next/navigation";
 /* -------------------------------------------------------------------------- */
 /* TYPES                                                                      */
 /* -------------------------------------------------------------------------- */
+
 import type { Locale, Dictionary } from "@/types/dictionary";
 
 /* -------------------------------------------------------------------------- */
 /* SERVICES                                                                   */
 /* -------------------------------------------------------------------------- */
+
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
 
 /* -------------------------------------------------------------------------- */
 /* COMPONENTS                                                                 */
 /* -------------------------------------------------------------------------- */
+
 import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
@@ -22,21 +25,26 @@ import FeaturedProjectsSection from "@/components/featured/FeaturedProjectsSecti
 import FeaturedArticleSection from "@/components/FeaturedArticleSection";
 
 /* -------------------------------------------------------------------------- */
-/* INTERFACES                                                                 */
+/* TYPES                                                                      */
 /* -------------------------------------------------------------------------- */
+
 interface PageProps {
-  params: Promise<{ lang: string }>;
+  params: {
+    lang: string;
+  };
 }
 
 /* -------------------------------------------------------------------------- */
-/* PERFORMANCE CONFIG                                                          */
+/* PERFORMANCE CONFIG                                                         */
 /* -------------------------------------------------------------------------- */
+
 export const dynamic = "force-static";
 export const revalidate = 60;
 
 /* -------------------------------------------------------------------------- */
 /* STATIC PARAMS                                                              */
 /* -------------------------------------------------------------------------- */
+
 export async function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }));
 }
@@ -44,6 +52,7 @@ export async function generateStaticParams() {
 /* -------------------------------------------------------------------------- */
 /* VIEWPORT                                                                   */
 /* -------------------------------------------------------------------------- */
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -53,24 +62,45 @@ export const viewport: Viewport = {
 /* -------------------------------------------------------------------------- */
 /* METADATA                                                                   */
 /* -------------------------------------------------------------------------- */
-export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const params = await props.params;
-  const lang = params.lang;
 
-  if (!lang || !isValidLocale(lang)) {
+export async function generateMetadata(
+  { params }: PageProps
+): Promise<Metadata> {
+
+  const rawLang = params?.lang;
+
+  if (!rawLang || !isValidLocale(rawLang)) {
     return {};
   }
 
+  const lang = rawLang as Locale;
+
   try {
-    const dict: Dictionary = await getServerDictionary(lang as Locale);
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
+
+    const dict: Dictionary = await getServerDictionary(lang);
+
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      "https://portfoliosantossergio.vercel.app";
+
+    const title =
+      dict?.seo?.pages?.home?.title ??
+      dict?.seo?.title ??
+      "Sérgio Santos";
+
+    const description =
+      dict?.seo?.pages?.home?.description ??
+      dict?.seo?.description ??
+      "Portfolio";
 
     return {
-      title: dict.seo.pages.home.title,
-      description: dict.seo.pages.home.description,
+      title,
+      description,
+
       verification: {
         google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
       },
+
       alternates: {
         canonical: `${siteUrl}/${lang}`,
         languages: {
@@ -82,7 +112,11 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
         },
       },
     };
-  } catch {
+
+  } catch (error) {
+
+    console.error("Metadata generation failed:", error);
+
     return {
       title: "Sérgio Santos",
     };
@@ -92,108 +126,139 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 /* -------------------------------------------------------------------------- */
 /* PAGE                                                                       */
 /* -------------------------------------------------------------------------- */
-export default async function HomePage(props: PageProps) {
-  const params = await props.params;
-  const rawLang = params.lang;
 
-  // Validação do Idioma
+export default async function HomePage({ params }: PageProps) {
+
+  const rawLang = params?.lang;
+
   if (!rawLang || !isValidLocale(rawLang)) {
     notFound();
   }
 
   const lang = rawLang as Locale;
 
-  // Carregamento do Dicionário
-  const dict = await getServerDictionary(lang).catch((error) => {
-    console.error("Critical: Error loading dictionary:", error);
-    return null;
-  });
+  const dict: Dictionary | null = await getServerDictionary(lang)
+    .then((d) => d)
+    .catch((error) => {
+      console.error("Critical: Error loading dictionary:", error);
+      return null;
+    });
 
   if (!dict) {
     notFound();
   }
 
-  // Garantia de segurança para iteração de projetos (evita erro "is not iterable")
-  const featuredProjects = Array.isArray(dict.projects?.featuredProjects) 
-    ? dict.projects.featuredProjects 
-    : [];
+  /* ---------------------------------------------------------------------- */
+  /* SAFE DATA EXTRACTION                                                   */
+  /* ---------------------------------------------------------------------- */
+
+  const featuredProjects =
+    dict.projects?.featuredProjects ?? [];
+
+  const articles =
+    dict.articles ?? {
+      title: "",
+      mediumProfile: "",
+      readMore: "",
+      publishedAt: "",
+      bestOfMonth: "",
+      awardWinner: "",
+      items: [],
+    };
+
+  const contactEmail =
+    dict.common?.email ?? "contact@example.com";
+
+  /* ---------------------------------------------------------------------- */
+  /* RENDER                                                                 */
+  /* ---------------------------------------------------------------------- */
 
   return (
     <ProxyPage lang={lang}>
-      <main className="flex flex-col min-h-screen">
-        
+      <main className="flex flex-col">
+
         {/* HERO */}
+
         <HeroSection dictionary={dict} />
 
         {/* ABOUT */}
+
         <AboutSection dict={dict.about} />
 
         {/* FEATURED PROJECTS */}
+
         {featuredProjects.length > 0 ? (
-          <FeaturedProjectsSection lang={lang} dict={dict} />
+
+          <FeaturedProjectsSection
+            lang={lang}
+            dict={dict}
+          />
+
         ) : (
-          <section className="py-20 text-center bg-slate-50 dark:bg-slate-900/50">
-            <div className="max-w-xl mx-auto px-6">
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                {dict.states.emptyProjects.title}
-              </h2>
-              <p className="mt-2 text-slate-600 dark:text-slate-400">
-                {dict.states.emptyProjects.description}
-              </p>
-            </div>
+
+          <section className="py-20 text-center">
+
+            <h2 className="text-xl font-semibold">
+              {dict.states?.emptyProjects?.title ?? "No projects"}
+            </h2>
+
+            <p className="opacity-70">
+              {dict.states?.emptyProjects?.description ?? ""}
+            </p>
+
           </section>
+
         )}
 
         {/* ARTICLES */}
-        <FeaturedArticleSection articles={dict.articles} common={dict.common} />
 
-        {/* FINAL CTA - Banner de Alta Conversão */}
-        <section className="py-28 px-6 text-center bg-slate-950 relative overflow-hidden">
-          {/* Efeito visual de fundo */}
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500 via-transparent to-transparent"></div>
-          
-          <div className="relative z-10 max-w-3xl mx-auto space-y-8">
-            <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase italic leading-[0.9]">
-              {dict.contact.ctaTitle || "Vamos construir algo juntos?"}
+        <FeaturedArticleSection
+          articles={articles}
+          common={dict.common}
+        />
+
+        {/* FINAL CTA */}
+
+        <section className="py-28 px-6 text-center bg-gradient-to-b from-slate-950 to-black">
+
+          <div className="max-w-3xl mx-auto space-y-8">
+
+            <h2 className="text-3xl md:text-4xl font-bold text-white">
+              {dict.contact?.ctaTitle ?? "Let's build something together"}
             </h2>
 
-            <p className="text-lg text-slate-400 font-medium">
-              {dict.contact.subtitle}
+            <p className="text-slate-300">
+              {dict.contact?.subtitle ?? ""}
             </p>
 
-            <div className="pt-4">
-              <a
-                href={`mailto:${dict.common.email}`}
-                className="
-                  inline-flex
-                  items-center
-                  justify-center
-                  bg-white
-                  text-slate-950
-                  px-12
-                  py-5
-                  rounded-xl
-                  font-black
-                  uppercase
-                  tracking-widest
-                  text-xs
-                  hover:bg-blue-50
-                  hover:scale-105
-                  transition-all
-                  active:scale-95
-                  shadow-[0_20px_50px_rgba(255,255,255,0.1)]
-                "
-              >
-                {dict.contact.buttonText || "Entrar em Contato"}
-              </a>
-            </div>
-            
-            {/* Meta info discreta */}
-            <p className="text-[10px] text-slate-600 uppercase tracking-[0.3em] font-bold">
-              {dict.meta.description}
-            </p>
+            <a
+              href={`mailto:${contactEmail}`}
+              className="
+                inline-flex
+                items-center
+                justify-center
+                bg-white
+                text-slate-950
+                px-10
+                py-5
+                rounded-xl
+                font-black
+                uppercase
+                tracking-widest
+                text-[11px]
+                hover:bg-slate-100
+                transition-transform
+                active:scale-95
+                shadow-xl
+              "
+            >
+              {dict.contact?.buttonText ?? "Contact"}
+            </a>
+
           </div>
+
         </section>
+
       </main>
     </ProxyPage>
   );
