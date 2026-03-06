@@ -70,7 +70,7 @@ export default async function HomePage(props: PageProps) {
 
   const lang = rawLang as Locale;
   
-  [span_1](start_span)[span_2](start_span)// 1. Busca de dados em paralelo[span_1](end_span)[span_2](end_span)
+  // 1. Busca de dados em paralelo
   const [dictData, githubProjects] = await Promise.all([
     getServerDictionary(lang).catch(() => null),
     getGitHubProjects("Santosdevbjj").catch(() => [] as ProcessedProject[])
@@ -80,12 +80,12 @@ export default async function HomePage(props: PageProps) {
     notFound();
   }
 
-  [span_3](start_span)[span_4](start_span)// 2. Filtro de projetos (remove artigos da grade principal)[span_3](end_span)[span_4](end_span)
+  // 2. Filtro de projetos (remove artigos da grade principal)
   const filteredGitHubProjects = githubProjects.filter(
     p => !p.name.toLowerCase().includes("articles") && !p.name.toLowerCase().includes("artigos")
   );
 
-  [span_5](start_span)// 3. Unificação dos dados para o componente de Destaques[span_5](end_span)
+  // 3. Unificação dos dados para o componente de Destaques
   const dict = {
     ...dictData,
     projects: {
@@ -101,31 +101,31 @@ export default async function HomePage(props: PageProps) {
         {/* HERO */}
         <HeroSection dictionary={dict} />
 
-        [span_6](start_span){/* ABOUT & CV TREATMENT - Adicionado botão de download para o CV[span_6](end_span) */}
+        {/* ABOUT & CV SECTION */}
         <section id="about-section" className="relative">
           <AboutSection dict={dict.about} />
           <div className="container mx-auto px-6 pb-12 -mt-8 flex justify-center md:justify-start max-w-7xl">
             <a 
               href="/curriculo.pdf" 
               download="Curriculo_Sergio_Santos.pdf"
-              className="inline-flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-lg active:scale-95"
+              className="inline-flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-lg active:scale-95"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d=" clerks 4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
               Download CV (PDF)
             </a>
           </div>
         </section>
 
-        [span_7](start_span){/* PROJETOS EM DESTAQUE - Usa os 3 primeiros projetos mapeados[span_7](end_span) */}
+        {/* PROJETOS EM DESTAQUE */}
         <FeaturedProjectsSection lang={lang} dict={dict as any} />
 
-        [span_8](start_span)[span_9](start_span){/* GRADE COMPLETA DE PROJETOS - Recuperada da versão antiga para mostrar todos[span_8](end_span)[span_9](end_span) */}
+        {/* GRADE COMPLETA DE PROJETOS (TODOS OS REPOS) */}
         <section className="container mx-auto px-6 py-16 max-w-7xl" id="all-projects">
           <header className="mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic dark:text-white">
-              {dict.projects.title} (All Repos)
+              {dict.projects.title} (GitHub)
             </h2>
             <div className="h-1.5 w-20 bg-blue-600 mt-4" />
           </header>
@@ -134,29 +134,39 @@ export default async function HomePage(props: PageProps) {
             {filteredGitHubProjects.map((project) => (
               <article
                 key={project.id}
-                className="group flex flex-col justify-between p-6 rounded-[1.5rem] border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-all bg-slate-50/30 dark:bg-slate-900/30"
+                className="group flex flex-col justify-between p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-all duration-300 bg-slate-50/30 dark:bg-slate-900/30"
               >
                 <div>
-                  <h3 className="text-xl font-bold mb-3 dark:text-white">{project.name}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 mb-4">
-                    {project.solution || project.problem}
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold dark:text-white group-hover:text-blue-600 transition-colors">{project.name}</h3>
+                    <span className="text-[9px] px-2 py-1 rounded-full bg-slate-200 dark:bg-slate-800 font-bold uppercase">
+                      {project.category || 'Repo'}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 mb-6 leading-relaxed">
+                    {project.solution || project.problem || "Explorar código no repositório oficial do GitHub."}
                   </p>
                 </div>
-                <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-xs font-black text-blue-600 uppercase tracking-widest">
-                  {dict.projects.viewProject} →
+                <a 
+                  href={project.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-blue-600 hover:gap-2 transition-all"
+                >
+                  {dict.projects.viewProject} <span className="ml-1">→</span>
                 </a>
               </article>
             ))}
           </div>
         </section>
 
-        [span_10](start_span){/* ARTIGO VENCEDOR[span_10](end_span) */}
+        {/* ARTIGO VENCEDOR */}
         <FeaturedArticleSection 
           articles={dict.articles} 
           common={dict.common} 
         />
 
-        [span_11](start_span)[span_12](start_span){/* KNOWLEDGE BASE[span_11](end_span)[span_12](end_span) */}
+        {/* KNOWLEDGE BASE */}
         <section className="container mx-auto px-6 py-24 max-w-7xl border-t border-slate-100 dark:border-slate-900" id="knowledge-base">
           <header className="mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic dark:text-white">
@@ -168,15 +178,15 @@ export default async function HomePage(props: PageProps) {
             <article className="group flex flex-col justify-between p-10 rounded-[2.5rem] border-2 border-blue-600 bg-blue-50/5 dark:bg-blue-900/5 relative overflow-hidden">
               <div className="relative z-10">
                 <h3 className="text-3xl font-black italic text-blue-600 mb-6">myArticles</h3>
-                <p className="text-slate-500 dark:text-slate-400 max-w-2xl mb-10">
-                  [span_13](start_span)Artigos renderizados dinamicamente via MDX diretamente do GitHub.[span_13](end_span)
+                <p className="text-slate-600 dark:text-slate-400 max-w-2xl mb-10 text-lg leading-relaxed">
+                  Artigos técnicos e documentação de arquitetura renderizados dinamicamente via MDX diretamente do GitHub.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <a href={`/${lang}/artigos`} className="bg-blue-600 text-white px-8 py-4 rounded-xl font-black uppercase text-[10px] text-center">
+                  <a href={`/${lang}/artigos`} className="bg-blue-600 text-white px-8 py-4 rounded-xl font-black uppercase text-[10px] text-center hover:bg-blue-700 transition-colors">
                     Explorar Biblioteca →
                   </a>
-                  <a href={`/${lang}/artigos/README`} className="border-2 border-slate-200 dark:border-slate-800 px-8 py-4 rounded-xl font-black uppercase text-[10px] dark:text-white text-center">
-                    README
+                  <a href={`/${lang}/artigos/README`} className="border-2 border-slate-200 dark:border-slate-800 px-8 py-4 rounded-xl font-black uppercase text-[10px] dark:text-white text-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    Documentação (README)
                   </a>
                 </div>
               </div>
@@ -184,15 +194,15 @@ export default async function HomePage(props: PageProps) {
           </div>
         </section>
 
-        [span_14](start_span){/* FINAL CTA[span_14](end_span) */}
+        {/* FINAL CTA */}
         <section className="py-28 px-6 text-center bg-slate-950">
           <div className="max-w-3xl mx-auto space-y-8">
             <h2 className="text-3xl md:text-5xl font-black text-white uppercase italic tracking-tighter">
-              {dict.contact?.ctaTitle || "Vamos Conversar?"}
+              {dict.contact?.ctaTitle || "Vamos Construir Algo Juntos?"}
             </h2>
             <a
               href={`mailto:${dict.common.email}`}
-              className="inline-flex items-center justify-center bg-white text-slate-950 px-10 py-5 rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-slate-100 shadow-xl"
+              className="inline-flex items-center justify-center bg-white text-slate-950 px-10 py-5 rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-slate-100 transition-transform active:scale-95 shadow-xl"
             >
               {dict.contact?.buttonText || "Entrar em Contato"}
             </a>
