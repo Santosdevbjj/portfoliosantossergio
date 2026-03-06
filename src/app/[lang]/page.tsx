@@ -70,20 +70,31 @@ export default async function HomePage(props: PageProps) {
 
   const lang = rawLang as Locale;
   
-  // Executa as buscas em paralelo para performance (Unindo Antigo e Atual)
-  const [dict, githubProjects] = await Promise.all([
+  // Executa as buscas em paralelo (GitHub + Dicionário)
+  const [dictData, githubProjects] = await Promise.all([
     getServerDictionary(lang).catch(() => null),
     getGitHubProjects("Santosdevbjj").catch(() => [] as ProcessedProject[])
   ]);
 
-  if (!dict) {
+  if (!dictData) {
     notFound();
   }
 
-  // Filtra os projetos do GitHub removendo o que for artigo (Lógica do Antigo)
+  // Filtra os projetos do GitHub (Lógica do arquivo antigo)
   const filteredGitHubProjects = githubProjects.filter(
     p => !p.name.toLowerCase().includes("articles") && !p.name.toLowerCase().includes("artigos")
   );
+
+  // Unindo os dados: Injetamos os projetos do GitHub no dicionário 
+  // para que o componente FeaturedProjectsSection possa lê-los sem erro de tipo
+  const dict = {
+    ...dictData,
+    projects: {
+      ...dictData.projects,
+      // Se o JSON de tradução estiver vazio ou curto, usamos os dados do GitHub
+      featuredProjects: filteredGitHubProjects.length > 0 ? filteredGitHubProjects : dictData.projects?.featuredProjects
+    }
+  };
 
   return (
     <ProxyPage lang={lang}>
@@ -95,16 +106,16 @@ export default async function HomePage(props: PageProps) {
         {/* ABOUT */}
         <AboutSection dict={dict.about} />
 
-        {/* PROJETOS - Unindo a lógica modular com os dados do GitHub */}
-        <FeaturedProjectsSection lang={lang} dict={dict} githubProjects={filteredGitHubProjects} />
+        {/* PROJETOS - Agora o 'dict' já contém os projetos do GitHub injetados acima */}
+        <FeaturedProjectsSection lang={lang} dict={dict as any} />
 
-        {/* ARTIGO VENCEDOR (Onde você notou que estava em destaque) */}
+        {/* ARTIGO VENCEDOR */}
         <FeaturedArticleSection 
           articles={dict.articles} 
           common={dict.common} 
         />
 
-        {/* SEÇÃO KNOWLEDGE BASE (Recuperada do Antigo para não ser encoberta) */}
+        {/* SEÇÃO KNOWLEDGE BASE (Recuperada do Antigo) */}
         <section className="container mx-auto px-6 py-24 max-w-7xl border-t border-slate-100 dark:border-slate-900" id="knowledge-base">
           <header className="mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic dark:text-white">
@@ -115,7 +126,7 @@ export default async function HomePage(props: PageProps) {
             </p>
           </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
+          <div className="grid grid-cols-1 gap-8">
             <article className="group flex flex-col justify-between p-10 rounded-[2.5rem] border-2 border-blue-600 bg-blue-50/5 dark:bg-blue-900/5 relative overflow-hidden">
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-6">
