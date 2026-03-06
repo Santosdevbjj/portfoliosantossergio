@@ -95,24 +95,21 @@ export default async function HomePage(props: PageProps) {
 
   return (
     <ProxyPage lang={lang}>
-      {/* Ajuste de Acessibilidade: "Skip to content" oculto visualmente até o tab, evitando sobreposição */}
+      {/* Ajuste de Acessibilidade: "Skip to content" oculto visualmente */}
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] bg-blue-600 text-white p-4 rounded-lg">
         Pular para o conteúdo
       </a>
 
       <main id="main-content" className="flex flex-col min-h-screen bg-white dark:bg-[#020617]">
         
-        {/* HERO - Padding-top adicionado para evitar sobreposição com o Header fixo */}
         <div className="pt-20 md:pt-0">
           <HeroSection dictionary={dict} />
         </div>
 
-        {/* ABOUT & CV SECTION */}
         <section id="about-section" className="relative">
           <AboutSection dict={dict.about} />
           
           <div className="container mx-auto px-6 pb-12 -mt-8 flex flex-wrap gap-4 justify-center md:justify-start max-w-7xl">
-            {/* CORREÇÃO DO CV: O arquivo deve estar em public/resume.pdf e o link deve ser absoluto ou relativo à raiz */}
             <a 
               href="/resume.pdf" 
               target="_blank"
@@ -130,10 +127,8 @@ export default async function HomePage(props: PageProps) {
 
         <ExperienceSection experience={dict.experience} />
 
-        {/* PROJETOS EM DESTAQUE */}
         <FeaturedProjectsSection lang={lang} dict={dict as any} />
 
-        {/* GRADE COMPLETA DE PROJETOS */}
         <section className="container mx-auto px-6 py-16 max-w-7xl" id="all-projects">
           <header className="mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic dark:text-white">
@@ -156,10 +151,10 @@ export default async function HomePage(props: PageProps) {
                     </span>
                   </div>
                   <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 mb-6 leading-relaxed">
-                    {project.solution || project.description || "Explorar código e análise técnica no repositório oficial."}
+                    {/* CORREÇÃO AQUI: Trocado 'description' por 'problem' que existe no tipo ProcessedProject */}
+                    {project.solution || project.problem || "Explorar código e análise técnica no repositório oficial."}
                   </p>
                 </div>
-                {/* CORREÇÃO DO LINK: Garantindo que aponte para o GitHub e não para a própria página */}
                 <a 
                   href={project.url} 
                   target="_blank" 
@@ -178,7 +173,6 @@ export default async function HomePage(props: PageProps) {
           common={dict.common} 
         />
 
-        {/* KNOWLEDGE BASE */}
         <section className="container mx-auto px-6 py-24 max-w-7xl border-t border-slate-100 dark:border-slate-900" id="knowledge-base">
           <header className="mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic dark:text-white">
