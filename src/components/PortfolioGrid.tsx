@@ -2,9 +2,10 @@
 
 import { useMemo } from 'react';
 import { ProjectCard } from './ProjectCard';
-import { ProjectDomain } from '@/domain/projects';
-import { Dictionary } from '@/types/dictionary';
 import { CATEGORY_ORDER } from '@/config/categories';
+// Correção do erro: Importações de tipos devem usar 'import type'
+import type { ProjectDomain } from '@/domain/projects';
+import type { Dictionary } from '@/types/dictionary';
 
 /**
  * Interface rigorosa seguindo padrões do TypeScript 6.0
@@ -17,8 +18,7 @@ interface PortfolioGridProps {
 
 /**
  * PortfolioGrid - Componente Responsivo e Multilíngue
- * Alinhado com React 19 (sem necessidade de import React explícito para JSX)
- * Estilizado com Tailwind CSS 4.2
+ * Alinhado com React 19, Next.js 16 e Tailwind CSS 4.2
  */
 export function PortfolioGrid({ projects, lang, dict }: PortfolioGridProps) {
   const { projects: labels } = dict;
@@ -34,13 +34,10 @@ export function PortfolioGrid({ projects, lang, dict }: PortfolioGridProps) {
       if (a.isFeatured && !b.isFeatured) return -1;
       if (!a.isFeatured && b.isFeatured) return 1;
 
-      // Prioridade 3: Ordem de Categorias do Config
-      const catA = Object.keys(CATEGORY_ORDER).find(key => 
-        labels.categories[a.technology.labelKey] === key
-      ) ?? "";
-      const catB = Object.keys(CATEGORY_ORDER).find(key => 
-        labels.categories[b.technology.labelKey] === key
-      ) ?? "";
+      // Prioridade 3: Ordem de Categorias definida no Config
+      // Buscamos o nome da categoria traduzida para comparar com o CATEGORY_ORDER
+      const catA = labels.categories[a.technology.labelKey] ?? "";
+      const catB = labels.categories[b.technology.labelKey] ?? "";
 
       const orderA = CATEGORY_ORDER[catA] ?? 99;
       const orderB = CATEGORY_ORDER[catB] ?? 99;
@@ -102,7 +99,7 @@ export function PortfolioGrid({ projects, lang, dict }: PortfolioGridProps) {
         <div className="space-y-20">
           {groupedProjects.map((group) => (
             <div key={group.name} className="space-y-8">
-              {/* Separador de Categoria */}
+              {/* Separador de Categoria - Design semântico e acessível */}
               <div className="flex items-center gap-4">
                 <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400 whitespace-nowrap">
                   {group.name}
@@ -110,7 +107,7 @@ export function PortfolioGrid({ projects, lang, dict }: PortfolioGridProps) {
                 <div className="h-px flex-grow bg-slate-200 dark:bg-slate-800/50" />
               </div>
 
-              {/* Grid Responsivo Inteligente */}
+              {/* Grid Responsivo Inteligente: 1 col mobile, 2 tablet, 3 desktop */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {group.projects.map((project) => (
                   <ProjectCard 
