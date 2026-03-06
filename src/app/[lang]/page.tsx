@@ -14,8 +14,10 @@ import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
 import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
+import ExperienceSection from "@/components/ExperienceSection"; // Adicionado
 import FeaturedProjectsSection from "@/components/featured/FeaturedProjectsSection";
 import FeaturedArticleSection from "@/components/FeaturedArticleSection";
+import ContactSection from "@/components/ContactSection"; // Adicionado
 
 interface PageProps {
   params: Promise<{ lang: string }>;
@@ -85,12 +87,12 @@ export default async function HomePage(props: PageProps) {
     p => !p.name.toLowerCase().includes("articles") && !p.name.toLowerCase().includes("artigos")
   );
 
-  // 3. Unificação dos dados para o componente de Destaques
+  // 3. Unificação dos dados para os Destaques (Garante os 3 primeiros do GitHub se disponíveis)
   const dict = {
     ...dictData,
     projects: {
       ...dictData.projects,
-      featuredProjects: filteredGitHubProjects.length > 0 ? filteredGitHubProjects : dictData.projects?.featuredProjects
+      featuredProjects: filteredGitHubProjects.length > 0 ? filteredGitHubProjects.slice(0, 3) : dictData.projects?.featuredProjects
     }
   };
 
@@ -104,24 +106,33 @@ export default async function HomePage(props: PageProps) {
         {/* ABOUT & CV SECTION */}
         <section id="about-section" className="relative">
           <AboutSection dict={dict.about} />
-          <div className="container mx-auto px-6 pb-12 -mt-8 flex justify-center md:justify-start max-w-7xl">
+          
+          <div className="container mx-auto px-6 pb-12 -mt-8 flex flex-wrap gap-4 justify-center md:justify-start max-w-7xl">
+            {/* BOTÃO CORRIGIDO: Abre o currículo na mesma aba ou nova, sem forçar download problemático */}
             <a 
-              href="/curriculo.pdf" 
-              download="Curriculo_Sergio_Santos.pdf"
+              href="/resume.pdf" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-lg active:scale-95"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              Download CV (PDF)
+              Visualizar CV
             </a>
+
+            {/* Link para voltar ao topo ou home caso esteja no visualizador (opcional no componente de navegação) */}
           </div>
         </section>
 
-        {/* PROJETOS EM DESTAQUE */}
+        {/* EXPERIÊNCIA - Inserido aqui */}
+        <ExperienceSection experience={dict.experience} />
+
+        {/* PROJETOS EM DESTAQUE (3 Principais) */}
         <FeaturedProjectsSection lang={lang} dict={dict as any} />
 
-        {/* GRADE COMPLETA DE PROJETOS (TODOS OS REPOS) */}
+        {/* GRADE COMPLETA DE PROJETOS (GitHub) */}
         <section className="container mx-auto px-6 py-16 max-w-7xl" id="all-projects">
           <header className="mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic dark:text-white">
@@ -170,7 +181,7 @@ export default async function HomePage(props: PageProps) {
         <section className="container mx-auto px-6 py-24 max-w-7xl border-t border-slate-100 dark:border-slate-900" id="knowledge-base">
           <header className="mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic dark:text-white">
-               Journal & Artigos
+                Journal & Artigos
             </h2>
           </header>
 
@@ -194,20 +205,13 @@ export default async function HomePage(props: PageProps) {
           </div>
         </section>
 
-        {/* FINAL CTA */}
-        <section className="py-28 px-6 text-center bg-slate-950">
-          <div className="max-w-3xl mx-auto space-y-8">
-            <h2 className="text-3xl md:text-5xl font-black text-white uppercase italic tracking-tighter">
-              {dict.contact?.ctaTitle || "Vamos Construir Algo Juntos?"}
-            </h2>
-            <a
-              href={`mailto:${dict.common.email}`}
-              className="inline-flex items-center justify-center bg-white text-slate-950 px-10 py-5 rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-slate-100 transition-transform active:scale-95 shadow-xl"
-            >
-              {dict.contact?.buttonText || "Entrar em Contato"}
-            </a>
-          </div>
-        </section>
+        {/* CONTATO - Substituído pelo componente ContactSection para usar a lógica completa */}
+        <ContactSection 
+          contact={dict.contact} 
+          common={dict.common} 
+          locale={lang} 
+        />
+
       </main>
     </ProxyPage>
   );
