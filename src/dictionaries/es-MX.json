@@ -3,11 +3,11 @@
     "version": "1.0.0",
     "locale": "es-MX",
     "direction": "ltr",
-    "lastUpdated": "2026-02-03T19:10:00Z",
+    "lastUpdated": "2026-03-05T21:00:00Z",
     "author": "Sérgio Santos",
     "source": "manual",
-    "contentVersion": "2026.02.03",
-    "contentHash": "i18n-esmx-2026-02-03",
+    "contentVersion": "2026.03.05",
+    "contentHash": "i18n-esmx-2026-03-05",
     "sourceType": "curated-manual",
     "description": "Portafolio multilingüe de Sérgio Santos, especialista en Tecnología de la Información, Inteligencia Artificial e Ingeniería de Software."
   },
@@ -22,8 +22,12 @@
     "title": "Sobre Mí",
     "differentialTitle": "Ingeniería de Datos con Enfoque en Misión Crítica",
     "description": "Analista de Ciencia de Datos con una base sólida en sistemas críticos bancarios y enfoque en transformar datos en decisiones, reducción de costos y eficiencia operativa.",
-    "differentialContent": "Colaboré por más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente enfoco mi labor en Ciencia de Datos e IA, aplicando el rigor de sistemas críticos a la creación de modelos predictivos.",
-    "highlights": ["15+ años en Bancos", "Especialista Cloud", "Data Science e IA"],
+    "differentialContent": "Colaboré por más de 15 anos en Banco Bradesco en entornos regulados de misión crítica. Actualmente enfoco mi labor en Ciencia de Datos e IA, aplicando el rigor de sistemas críticos a la creación de modelos predictivos.",
+    "highlights": [
+      "15+ años en Bancos",
+      "Especialista Cloud",
+      "Data Science e IA"
+    ],
     "stats": {
       "experienceValue": "+15",
       "experienceLabel": "Años",
@@ -38,11 +42,13 @@
     "cta": "Enviar Correo",
     "emailLabel": "Copiar Correo",
     "cvLabel": "Ver CV",
-    "linkedinLabel": "LinkedIn"
+    "linkedinLabel": "LinkedIn",
+    "ctaTitle": "¿Hacemos algo juntos?",
+    "buttonText": "Ponte en contacto →"
   },
   "experience": {
     "title": "Experiencia Profesional",
-    "emptyLabel":  "No se encontró ninguna experiencia",
+    "emptyLabel": "No se encontró ninguna experiencia",
     "items": [
       {
         "company": "Consultor Autónomo / Transición",
@@ -87,7 +93,7 @@
       "analysis": "Power BI y Análisis",
       "excel": "Excel",
       "database": "Base de Datos",
-      "dev": "Desarrollo (Python/C#/Java)", 
+      "dev": "Desarrollo (Python/C#/Java)",
       "security": "Seguridad"
     }
   },
@@ -95,30 +101,34 @@
     "navigation": "Navegación principal",
     "role": "Analista de Ciencia de Datos | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
-    "rights": "Todos los derechos reservados",
+    "rights": "Todos os direitos reservados",
     "builtWith": "Desarrollado con Next.js 16 y TypeScript",
     "loading": "Cargando...",
     "error": "Algo salió mal.",
     "socialLinks": "Abrir perfil de {platform}",
     "skipToContent": "Brincar al contenido",
     "languageSwitcher": "Cambiar idioma",
+    "email": "santossergiorealbjj@outlook.com",
     "errorBoundary": {
       "title": "¡Ups! Error inesperado.",
       "description": "Ponte en contacto si el problema persiste.",
-      "actions": { "retry": "Reintentar", "home": "Inicio" }
+      "actions": {
+        "retry": "Reintentar",
+        "home": "Inicio"
+      }
     },
-     "nav": {
-       "about": "Sobre mí",
-       "experience": "Experiencia",
-       "projects": "Proyectos",
-       "articles": "Artículos",
-       "contact": "Contacto"
-     },
-  "theme": {
-    "light": "Claro",
-    "dark": "Oscuro",
-   "system": "Sistema"
-   },
+    "nav": {
+      "about": "Sobre mí",
+      "experience": "Experiencia",
+      "projects": "Proyectos",
+      "articles": "Artículos",
+      "contact": "Contacto"
+    },
+    "theme": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    },
     "notFound": {
       "title": "Página no encontrada",
       "description": "El enlace podría estar roto.",
@@ -128,9 +138,16 @@
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
       "medium": "https://medium.com/@sergiosantosluiz",
-      "email": "santossergiorealbjj@outlook.com"
+      "email": "mailto:santossergiorealbjj@outlook.com"
     },
-    "menu": { "open": "Abrir", "close": "Cerrar", "aria": { "open": "Abrir menú", "close": "Cerrar menú" } }
+    "menu": {
+      "open": "Abrir",
+      "close": "Cerrar",
+      "aria": {
+        "open": "Abrir menú",
+        "close": "Cerrar menú"
+      }
+    }
   },
   "intl": {
     "locale": "es-MX",
@@ -144,7 +161,11 @@
     "loading": "Cargando...",
     "empty": "Sin datos.",
     "error": "Error al cargar.",
-    "emptyProjects": { "title": "Ningún proyecto", "description": "Próximamente.", "cta": "Volver" },
+    "emptyProjects": {
+      "title": "Ningún proyecto",
+      "description": "Próximamente.",
+      "cta": "Volver"
+    },
     "emptyExperience": "Sin registros.",
     "errorArticles": "Error en los artículos."
   },
@@ -161,15 +182,33 @@
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
     "description": "Ciencia de Datos y Sistemas Críticos",
-    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+    "keywords": [
+      "python",
+      "databricks",
+      "sql",
+      "neo4j",
+      "data science"
+    ],
     "pages": {
-      "home": { "title": "Inicio", "description": "Portafolio de Sérgio Santos" },
-      "projects": { "title": "Proyectos", "description": "Soluciones de datos" },
-      "articles": { "title": "Artículos", "description": "Contenido técnico" }
+      "home": {
+        "title": "Inicio",
+        "description": "Portafolio de Sérgio Santos"
+      },
+      "projects": {
+        "title": "Proyectos",
+        "description": "Soluciones de datos"
+      },
+      "articles": {
+        "title": "Artículos",
+        "description": "Contenido técnico"
+      }
     }
   },
   "metrics": {
     "availability": "99,5%",
-    "availabilityNormalized": { "value": 99.5, "unit": "%" }
+    "availabilityNormalized": {
+      "value": 99.5,
+      "unit": "%"
+    }
   }
 }
