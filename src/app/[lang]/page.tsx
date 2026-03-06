@@ -83,12 +83,19 @@ export default async function HomePage(props: PageProps) {
   const lang = rawLang as Locale;
 
   /**
-   * Carregamento do dicionário tipado
+   * Carregamento do dicionário tipado com tratamento de erro rigoroso
    */
-  const dict: Dictionary = await getServerDictionary(lang).catch((error) => {
+  const dict = await getServerDictionary(lang).catch((error) => {
     console.error("Critical: Error loading dictionary:", error);
-    notFound();
+    return null;
   });
+
+  if (!dict) {
+    notFound();
+  }
+
+  // Garantia extra contra o erro "is not iterable"
+  const hasProjects = dict.projects?.featuredProjects && Array.isArray(dict.projects.featuredProjects);
 
   return (
     <ProxyPage lang={lang}>
@@ -100,11 +107,17 @@ export default async function HomePage(props: PageProps) {
         {/* About Section */}
         <AboutSection dict={dict.about} />
 
-        {/* Projetos de Destaque */}
-        <FeaturedProjectsSection 
-          lang={lang}
-          dict={dict} 
-        />
+        {/* Projetos de Destaque - Só renderiza se for iterável */}
+        {hasProjects ? (
+          <FeaturedProjectsSection 
+            lang={lang}
+            dict={dict} 
+          />
+        ) : (
+          <div className="py-20 text-center opacity-50">
+            {dict.states.emptyProjects.title}
+          </div>
+        )}
 
         {/* Artigos Técnicos */}
         <FeaturedArticleSection 
@@ -112,14 +125,14 @@ export default async function HomePage(props: PageProps) {
           common={dict.common}
         />
 
-        {/* Banner de CTA Final - Tailwind 4.2 High Contrast */}
+        {/* Banner de CTA Final */}
         <section className="container mx-auto px-4 md:px-8 lg:px-16 py-24 max-w-7xl">
           <div className="p-10 md:p-16 rounded-[2.5rem] bg-slate-950 dark:bg-blue-600 text-white relative overflow-hidden group transition-all duration-500 hover:shadow-2xl dark:hover:shadow-blue-500/20">
             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
               
               <div className="text-center lg:text-left space-y-4 max-w-2xl">
                 <h2 className="text-4xl md:text-6xl font-black tracking-tighter italic uppercase leading-[0.9]">
-                  {dict.contact.ctaTitle}
+                  {dict.contact.ctaTitle || "Vamos Conversar?"}
                 </h2>
                 <p className="opacity-70 font-bold uppercase tracking-[0.2em] text-[10px] md:text-xs">
                   {dict.meta.description}
@@ -130,11 +143,11 @@ export default async function HomePage(props: PageProps) {
                 href={`mailto:${dict.common.email}`} 
                 className="inline-flex items-center justify-center bg-white text-slate-950 px-10 py-5 rounded-xl font-black uppercase tracking-widest text-[11px] hover:bg-slate-100 transition-transform active:scale-95 shadow-xl"
               >
-                {dict.contact.buttonText}
+                {dict.contact.buttonText || "Entrar em Contato"}
               </a>
             </div>
             
-            {/* Decoração Visual (Abstract Shapers) */}
+            {/* Decoração Visual */}
             <div className="absolute -right-20 -top-20 w-96 h-96 bg-white/5 rounded-full blur-[120px] group-hover:bg-white/10 transition-colors pointer-events-none" />
             <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-blue-400/10 rounded-full blur-[100px] pointer-events-none" />
           </div>
