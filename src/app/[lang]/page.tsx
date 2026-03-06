@@ -14,10 +14,10 @@ import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
 import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
-import ExperienceSection from "@/components/ExperienceSection"; // Adicionado
+import ExperienceSection from "@/components/ExperienceSection";
 import FeaturedProjectsSection from "@/components/featured/FeaturedProjectsSection";
 import FeaturedArticleSection from "@/components/FeaturedArticleSection";
-import ContactSection from "@/components/ContactSection"; // Adicionado
+import ContactSection from "@/components/ContactSection";
 
 interface PageProps {
   params: Promise<{ lang: string }>;
@@ -72,7 +72,6 @@ export default async function HomePage(props: PageProps) {
 
   const lang = rawLang as Locale;
   
-  // 1. Busca de dados em paralelo
   const [dictData, githubProjects] = await Promise.all([
     getServerDictionary(lang).catch(() => null),
     getGitHubProjects("Santosdevbjj").catch(() => [] as ProcessedProject[])
@@ -82,12 +81,10 @@ export default async function HomePage(props: PageProps) {
     notFound();
   }
 
-  // 2. Filtro de projetos (remove artigos da grade principal)
   const filteredGitHubProjects = githubProjects.filter(
     p => !p.name.toLowerCase().includes("articles") && !p.name.toLowerCase().includes("artigos")
   );
 
-  // 3. Unificação dos dados para os Destaques (Garante os 3 primeiros do GitHub se disponíveis)
   const dict = {
     ...dictData,
     projects: {
@@ -98,17 +95,24 @@ export default async function HomePage(props: PageProps) {
 
   return (
     <ProxyPage lang={lang}>
-      <main className="flex flex-col min-h-screen bg-white dark:bg-[#020617]">
+      {/* Ajuste de Acessibilidade: "Skip to content" oculto visualmente até o tab, evitando sobreposição */}
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] bg-blue-600 text-white p-4 rounded-lg">
+        Pular para o conteúdo
+      </a>
+
+      <main id="main-content" className="flex flex-col min-h-screen bg-white dark:bg-[#020617]">
         
-        {/* HERO */}
-        <HeroSection dictionary={dict} />
+        {/* HERO - Padding-top adicionado para evitar sobreposição com o Header fixo */}
+        <div className="pt-20 md:pt-0">
+          <HeroSection dictionary={dict} />
+        </div>
 
         {/* ABOUT & CV SECTION */}
         <section id="about-section" className="relative">
           <AboutSection dict={dict.about} />
           
           <div className="container mx-auto px-6 pb-12 -mt-8 flex flex-wrap gap-4 justify-center md:justify-start max-w-7xl">
-            {/* BOTÃO CORRIGIDO: Abre o currículo na mesma aba ou nova, sem forçar download problemático */}
+            {/* CORREÇÃO DO CV: O arquivo deve estar em public/resume.pdf e o link deve ser absoluto ou relativo à raiz */}
             <a 
               href="/resume.pdf" 
               target="_blank"
@@ -121,18 +125,15 @@ export default async function HomePage(props: PageProps) {
               </svg>
               Visualizar CV
             </a>
-
-            {/* Link para voltar ao topo ou home caso esteja no visualizador (opcional no componente de navegação) */}
           </div>
         </section>
 
-        {/* EXPERIÊNCIA - Inserido aqui */}
         <ExperienceSection experience={dict.experience} />
 
-        {/* PROJETOS EM DESTAQUE (3 Principais) */}
+        {/* PROJETOS EM DESTAQUE */}
         <FeaturedProjectsSection lang={lang} dict={dict as any} />
 
-        {/* GRADE COMPLETA DE PROJETOS (GitHub) */}
+        {/* GRADE COMPLETA DE PROJETOS */}
         <section className="container mx-auto px-6 py-16 max-w-7xl" id="all-projects">
           <header className="mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic dark:text-white">
@@ -145,33 +146,33 @@ export default async function HomePage(props: PageProps) {
             {filteredGitHubProjects.map((project) => (
               <article
                 key={project.id}
-                className="group flex flex-col justify-between p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-all duration-300 bg-slate-50/30 dark:bg-slate-900/30"
+                className="group flex flex-col justify-between p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-all duration-300 bg-slate-50/30 dark:bg-slate-900/30 shadow-sm hover:shadow-xl"
               >
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-xl font-bold dark:text-white group-hover:text-blue-600 transition-colors">{project.name}</h3>
-                    <span className="text-[9px] px-2 py-1 rounded-full bg-slate-200 dark:bg-slate-800 font-bold uppercase">
-                      {project.category || 'Repo'}
+                    <span className="text-[9px] px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-slate-800 dark:text-blue-400 font-bold uppercase">
+                      {project.category || 'Ciência de Dados'}
                     </span>
                   </div>
                   <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 mb-6 leading-relaxed">
-                    {project.solution || project.problem || "Explorar código no repositório oficial do GitHub."}
+                    {project.solution || project.description || "Explorar código e análise técnica no repositório oficial."}
                   </p>
                 </div>
+                {/* CORREÇÃO DO LINK: Garantindo que aponte para o GitHub e não para a própria página */}
                 <a 
                   href={project.url} 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-blue-600 hover:gap-2 transition-all"
                 >
-                  {dict.projects.viewProject} <span className="ml-1">→</span>
+                  {dict.projects.viewProject || "Ver Repositório GitHub"} <span className="ml-1">→</span>
                 </a>
               </article>
             ))}
           </div>
         </section>
 
-        {/* ARTIGO VENCEDOR */}
         <FeaturedArticleSection 
           articles={dict.articles} 
           common={dict.common} 
@@ -205,13 +206,11 @@ export default async function HomePage(props: PageProps) {
           </div>
         </section>
 
-        {/* CONTATO - Substituído pelo componente ContactSection para usar a lógica completa */}
         <ContactSection 
           contact={dict.contact} 
           common={dict.common} 
           locale={lang} 
         />
-
       </main>
     </ProxyPage>
   );
