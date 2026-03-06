@@ -1,6 +1,6 @@
 // src/components/featured/FeaturedProjectsSection.tsx
 import FeaturedGrid from './FeaturedGrid';
-import type { Locale, Dictionary } from '@/types/dictionary';
+import type { Locale, Dictionary, ProjectItem } from '@/types/dictionary';
 import { NavSection, getSectionId } from '@/domain/navigation';
 
 interface FeaturedProjectsSectionProps {
@@ -13,12 +13,22 @@ export default function FeaturedProjectsSection({
   dict,
 }: FeaturedProjectsSectionProps) {
   
-  // Extração segura: Prioriza o que vem do JSON traduzido
-  const projects = Array.isArray(dict.projects?.featuredProjects) 
-    ? [...dict.projects.featuredProjects].slice(0, 3)
+  // 1. Extração segura do JSON
+  const rawProjects = Array.isArray(dict.projects?.featuredProjects) 
+    ? dict.projects.featuredProjects 
     : [];
 
-  // Se não houver projetos no JSON, a seção não é renderizada (evita erros de iteração)
+  // 2. MAPEAMENTO DE TIPOS (DE: ProjectItem -> PARA: FeaturedProject)
+  // Isso resolve o erro: "Type 'ProjectItem' is missing the following properties: name, repoUrl..."
+  const projects = rawProjects.slice(0, 3).map((proj: ProjectItem) => ({
+    ...proj,
+    name: proj.title,           // Mapeia title para name
+    repoUrl: proj.github || "", // Mapeia github para repoUrl
+    priority: 1,                // Adiciona propriedades obrigatórias que faltavam
+    categories: [proj.category]  // Converte a categoria única em array
+  }));
+
+  // Se não houver projetos, a seção não aparece
   if (projects.length === 0) return null;
 
   const sectionId = getSectionId(NavSection.PROJECTS);
@@ -48,8 +58,9 @@ export default function FeaturedProjectsSection({
           </p>
         </header>
 
+        {/* Agora o 'projects' tem o formato exato que o FeaturedGrid exige */}
         <FeaturedGrid
-          projects={projects}
+          projects={projects as any} 
           lang={lang}
           dict={dict}
         />
