@@ -24,10 +24,10 @@ interface ProjectGroup {
 }
 
 /**
- * PortfolioGrid - Componente Responsivo e Multilíngue
- * Alinhado com React 19, Next.js 16, Node 24 e Tailwind CSS 4.2
+ * PortfolioGrid - Componente Responsivo e Multilíngue (PT, EN, ES)
+ * Alinhado com React 19, Next.js 16 (Turbopack), Node 24 e Tailwind CSS 4.2
  */
-export function PortfolioGrid({ projects, lang, dict }: PortfolioGridProps) {
+export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
   const { projects: labels } = dict;
 
   // 1. Processamento e Ordenação dos Projetos
@@ -41,7 +41,7 @@ export function PortfolioGrid({ projects, lang, dict }: PortfolioGridProps) {
       if (a.isFeatured && !b.isFeatured) return -1;
       if (!a.isFeatured && b.isFeatured) return 1;
 
-      // Prioridade 3: Ordem de Categorias definida no Config
+      // Prioridade 3: Ordem de Categorias definida no Config (Baseado na tradução atual)
       const catA = labels.categories[a.technology.labelKey] ?? "";
       const catB = labels.categories[b.technology.labelKey] ?? "";
 
@@ -64,12 +64,12 @@ export function PortfolioGrid({ projects, lang, dict }: PortfolioGridProps) {
       groups[categoryName].push(project);
     });
 
-    // Ordenar as chaves do grupo baseado no CATEGORY_ORDER
+    // Ordenar as chaves do grupo baseado no CATEGORY_ORDER global
     return Object.keys(groups)
       .sort((a, b) => (CATEGORY_ORDER[a] ?? 99) - (CATEGORY_ORDER[b] ?? 99))
       .map(key => ({
         name: key,
-        projects: groups[key] || [] // Garantia de array vazio caso a chave falhe
+        projects: groups[key] || []
       }));
   }, [sortedProjects, labels.categories]);
 
@@ -90,7 +90,7 @@ export function PortfolioGrid({ projects, lang, dict }: PortfolioGridProps) {
       className="py-24 bg-slate-50/50 dark:bg-[#020617]/50 transition-colors duration-300"
     >
       <div className="container mx-auto px-6 max-w-7xl">
-        {/* Header com Tipografia Moderna e Responsiva */}
+        {/* Header com Tipografia Moderna, Itálica e Responsiva */}
         <header className="mb-16">
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white">
             {labels.title.split(' ')[0]}{" "}
@@ -101,11 +101,11 @@ export function PortfolioGrid({ projects, lang, dict }: PortfolioGridProps) {
           <div className="h-2 w-24 bg-blue-600 mt-6 rounded-full shadow-lg shadow-blue-500/20" />
         </header>
 
-        {/* Listagem em Grupos */}
+        {/* Listagem em Grupos Dinâmicos */}
         <div className="space-y-20">
           {groupedProjects.map((group) => (
             <div key={group.name} className="space-y-8">
-              {/* Separador de Categoria */}
+              {/* Separador de Categoria Estilizado */}
               <div className="flex items-center gap-4">
                 <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400 whitespace-nowrap">
                   {group.name}
@@ -113,15 +113,13 @@ export function PortfolioGrid({ projects, lang, dict }: PortfolioGridProps) {
                 <div className="h-px flex-grow bg-slate-200 dark:bg-slate-800/50" />
               </div>
 
-              {/* Grid Responsivo Inteligente: 1 col mobile, 2 tablet, 3 desktop */}
+              {/* Grid Responsivo: 1 col (mobile), 2 cols (tablet), 3 cols (desktop) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                {/* Solução para o erro de undefined: Acesso seguro e fallback */}
-                {(group.projects ?? []).map((project) => (
+                {group.projects.map((project) => (
                   <ProjectCard 
                     key={project.id} 
                     project={project} 
                     dict={dict} 
-                    lang={lang}
                   />
                 ))}
               </div>
