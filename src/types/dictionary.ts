@@ -10,7 +10,7 @@ import type { SupportedLocale } from "@/dictionaries/locales";
 export type Locale = SupportedLocale;
 
 /* -------------------------------------------------------------------------- */
-/* META                                     */
+/* META                                                                       */
 /* -------------------------------------------------------------------------- */
 
 export interface DictionaryMeta {
@@ -27,7 +27,7 @@ export interface DictionaryMeta {
 }
 
 /* -------------------------------------------------------------------------- */
-/* HERO                                     */
+/* HERO                                                                       */
 /* -------------------------------------------------------------------------- */
 
 export interface HeroDictionary {
@@ -39,7 +39,7 @@ export interface HeroDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ABOUT                                    */
+/* ABOUT                                                                      */
 /* -------------------------------------------------------------------------- */
 
 export interface AboutDictionary {
@@ -58,7 +58,7 @@ export interface AboutDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/* CONTACT                                   */
+/* CONTACT                                                                    */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -72,13 +72,13 @@ export interface ContactDictionary {
   emailLabel: string;
   cvLabel: string;
   linkedinLabel: string;
-  // Novas propriedades para o CTA de rodapé
+  // Propriedades para o CTA de rodapé
   ctaTitle?: string;
   buttonText?: string;
 }
 
 /* -------------------------------------------------------------------------- */
-/* EXPERIENCE                                  */
+/* EXPERIENCE                                                                 */
 /* -------------------------------------------------------------------------- */
 
 export interface ExperienceItem {
@@ -95,7 +95,7 @@ export interface ExperienceDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ARTICLES                                  */
+/* ARTICLES                                                                   */
 /* -------------------------------------------------------------------------- */
 
 export interface ArticleItem {
@@ -118,7 +118,7 @@ export interface ArticlesSectionDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/* PROJECTS                                  */
+/* PROJECTS                                                                   */
 /* -------------------------------------------------------------------------- */
 
 export interface ProjectCategories {
@@ -132,6 +132,24 @@ export interface ProjectCategories {
   security: string;
 }
 
+/**
+ * Interface para itens individuais de projeto.
+ * Essencial para evitar o erro "is not iterable" no deploy.
+ */
+export interface ProjectItem {
+  id: string;
+  title: string;
+  description: string;
+  longDescription?: string;
+  image: string;
+  tags: string[];
+  category: keyof ProjectCategories;
+  link?: string;
+  github?: string;
+  video?: string;
+  features?: string[];
+}
+
 export interface ProjectsSectionDictionary {
   title: string;
   featuredLabel: string;
@@ -143,10 +161,12 @@ export interface ProjectsSectionDictionary {
   viewDemo: string;
   viewAll: string;
   categories: ProjectCategories;
+  // Lista de projetos injetada para renderização dinâmica
+  featuredProjects: ProjectItem[]; 
 }
 
 /* -------------------------------------------------------------------------- */
-/* COMMON                                   */
+/* COMMON                                                                     */
 /* -------------------------------------------------------------------------- */
 
 export interface CommonDictionary {
@@ -160,7 +180,7 @@ export interface CommonDictionary {
   socialLinks: string;
   skipToContent: string;
   languageSwitcher: string;
-  email: string; // Adicionado para centralizar o e-mail de contato
+  email: string;
 
   nav: {
     about: string;
@@ -207,7 +227,7 @@ export interface CommonDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/* STATES                                   */
+/* STATES                                                                     */
 /* -------------------------------------------------------------------------- */
 
 export interface StateDictionary {
@@ -224,7 +244,7 @@ export interface StateDictionary {
 }
 
 /* -------------------------------------------------------------------------- */
-/* SEO                                     */
+/* SEO                                                                        */
 /* -------------------------------------------------------------------------- */
 
 export type SeoPageKey = "home" | "projects" | "articles";
@@ -235,7 +255,7 @@ export interface SeoPage {
 }
 
 /* -------------------------------------------------------------------------- */
-/* ROOT TYPE                                  */
+/* ROOT TYPE                                                                  */
 /* -------------------------------------------------------------------------- */
 
 export interface Dictionary {
