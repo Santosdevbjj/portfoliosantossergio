@@ -68,11 +68,11 @@
     "items": [
       {
         "title": "La Era de los Datos en Sistemas Críticos",
-        "description": "Cómo la gobernanza de datos transforma sistemas legados en activos estratégicos.",
+        "description": "Cómo la gobernanza de dados transforma sistemas legados en activos estratégicos.",
         "date": "2025",
         "category": "Data Strategy",
         "isAward": true,
-        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
+        "link": "https://medium.com/@sergiosantosluiz"
       }
     ]
   },
@@ -87,14 +87,23 @@
     "viewDemo": "Visualizar Demo",
     "viewAll": "Ver Todos",
     "categories": {
-      "dataScience": "Ciencia de Datos",
-      "cloud": "Azure Databricks",
-      "graphs": "Neo4J",
-      "analysis": "Power BI y Análisis",
-      "excel": "Excel",
-      "database": "Base de Datos",
-      "dev": "Desarrollo (Python/C#/Java)",
-      "security": "Seguridad"
+      "Data Engineering": { "labelKey": "Ingeniería de Datos" },
+      "Cloud & Infrastructure": { "labelKey": "Nube e Infraestructura" },
+      "Data Science": { "labelKey": "Ciencia de Datos" },
+      "Data Analytics": { "labelKey": "Análisis de Datos" },
+      "Outros": { "labelKey": "Otros Proyectos" },
+      "dataScience": { "labelKey": "Ciencia de Datos" },
+      "cloud": { "labelKey": "Azure Databricks" },
+      "graphs": { "labelKey": "Neo4J" },
+      "analysis": { "labelKey": "Power BI y Análisis" },
+      "excel": { "labelKey": "Excel" },
+      "database": { "labelKey": "Base de Datos" },
+      "dev": { "labelKey": "Desarrollo" },
+      "security": { "labelKey": "Seguridad" }
+    },
+    "portfolio": {
+      "all": "Todos",
+      "viewProject": "Ver Proyecto"
     },
     "featuredProjects": []
   },
@@ -107,7 +116,7 @@
     "loading": "Cargando...",
     "error": "Algo salió mal.",
     "socialLinks": "Abrir perfil de {platform}",
-    "skipToContent": "Brincar al contenido",
+    "skipToContent": "Ir al contenido",
     "languageSwitcher": "Cambiar idioma",
     "email": "santossergiorealbjj@outlook.com",
     "errorBoundary": {
@@ -206,7 +215,7 @@
     }
   },
   "metrics": {
-    "availability": "99,5%",
+    "availability": "99.5%",
     "availabilityNormalized": {
       "value": 99.5,
       "unit": "%"
