@@ -1,34 +1,87 @@
 import { ImageResponse } from 'next/og';
 import { Octokit } from 'octokit';
 
-// Stack: Next.js 16 + React 19 + TypeScript 6.0
-// Runtime: Edge ou Node 24 (suportado pelo Next.js)
+/**
+ * CONFIGURAÇÃO DE RUNTIME E CACHE (Next.js 16 + Node 24)
+ * -----------------------------------------------------------------------------
+ * runtime: 'nodejs' é necessário para usar o cache em memória (Map) persistente na instância.
+ * revalidate: 86400 (24 horas) - Instrução ISR para o Vercel Edge Cache.
+ */
 export const runtime = 'nodejs';
+export const revalidate = 86400;
 
 // Configurações da imagem para Redes Sociais
 export const alt = 'GitHub Project Detail - Sérgio Santos';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-// Instância do Octokit para buscar o nome do repositório
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+// Instância do Octokit
+const octokit = new Octokit({ 
+  auth: process.env.GITHUB_TOKEN,
+  request: { timeout: 5000 } 
+});
 
+/**
+ * IMPLEMENTAÇÃO DE SIMPLE MEMORY CACHE (Node 24)
+ * Evita chamadas redundantes à API do GitHub se múltiplos usuários acessarem 
+ * o link antes da CDN propagar a imagem.
+ */
+interface RepoData {
+  name: string;
+  description: string;
+  timestamp: number;
+}
+
+const repoCache = new Map<string, RepoData>();
+const CACHE_TTL = 1000 * 60 * 60; // 1 hora de cache interno
+
+async function getCachedRepoData(username: string, slug: string): Promise<{ name: string; description: string }> {
+  const now = Date.now();
+  const cached = repoCache.get(slug);
+
+  // Se estiver no cache e não expirou, retorna imediatamente
+  if (cached && (now - cached.timestamp < CACHE_TTL)) {
+    return { name: cached.name, description: cached.description };
+  }
+
+  // Busca do GitHub com cabeçalhos de controle de cache
+  const { data } = await octokit.rest.repos.get({
+    owner: username,
+    repo: slug,
+    headers: {
+      'cache-control': 's-maxage=86400, stale-while-revalidate=3600'
+    }
+  });
+
+  const result = {
+    name: data.name,
+    description: data.description || "Engenharia de Dados & Automação",
+    timestamp: now
+  };
+
+  repoCache.set(slug, result);
+  return { name: result.name, description: result.description };
+}
+
+/**
+ * COMPONENTE PRINCIPAL (React 19 Server Component)
+ */
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params; // No Next.js 16, params é uma Promise
-  const username = "SEU_USUARIO_GITHUB"; // Substitua pelo seu login
+  // No Next.js 16, params deve ser aguardado (Promise)
+  const { slug } = await params;
+  const username = "SEU_USUARIO_GITHUB"; // Importante: Substitua pelo seu login real
 
-  let repoData = { name: slug, description: "Engenharia de Dados & Automação" };
+  let repoData = { 
+    name: slug, 
+    description: "Engenharia de Dados & Automação" 
+  };
 
   try {
-    // Busca dados em tempo real para a imagem ser fiel ao GitHub
-    const { data } = await octokit.rest.repos.get({
-      owner: username,
-      repo: slug,
-    });
-    repoData.name = data.name;
-    repoData.description = data.description || repoData.description;
-  } catch (e) {
-    console.error("Erro ao buscar dados para OG Image:", e);
+    const data = await getCachedRepoData(username, slug);
+    repoData = data;
+  } catch (error) {
+    console.error(`❌ [OG-IMAGE] Erro ao buscar dados para ${slug}:`, error);
+    // Mantém o fallback definido acima
   }
 
   return new ImageResponse(
@@ -41,7 +94,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'center',
-          backgroundColor: '#0f172a', // Slate 950
+          backgroundColor: '#0f172a', // Slate 950 (Tailwind 4.2 style)
           backgroundImage: 'radial-gradient(circle at 25% 25%, #1e293b 0%, #0f172a 100%)',
           padding: '80px',
         }}
@@ -61,7 +114,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           Data Project
         </div>
 
-        {/* Nome do Repositório (Slug dinâmico) */}
+        {/* Nome do Repositório (Dinâmico) */}
         <h1 style={{
           fontSize: '84px',
           fontWeight: 'bold',
