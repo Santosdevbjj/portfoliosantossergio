@@ -3,9 +3,9 @@
 /**
  * PORTFOLIO GRID COMPONENT - NEXT.JS 16 & REACT 19
  * -----------------------------------------------------------------------------
- * ✔ Fix: Erro "Parameter 't' implicitly has an 'any' type" (Tipagem explícita)
+ * ✔ Fix: Erro de atribuição de CategoryDetail para string (Acesso via .labelKey)
  * ✔ Stack: TS 6.0, Next.js 16, React 19, Node 24, Tailwind 4.2
- * ✔ I18n: Suporte nativo a PT-BR, EN e ES via dicionários dinâmicos
+ * ✔ I18n: Suporte nativo a PT-BR, EN e ES via dicionários
  * ✔ Responsivo: Sistema de grid adaptativo 1-2-3 colunas
  */
 
@@ -13,7 +13,7 @@ import { useMemo } from 'react';
 import { ProjectCard } from './ProjectCard';
 import { CATEGORY_ORDER, TOPIC_TO_CATEGORY } from '@/config/categories';
 import type { ProjectDomain } from '@/domain/projects';
-import type { Dictionary } from '@/types/dictionary';
+import type { Dictionary, CategoryDetail } from '@/types/dictionary';
 
 interface PortfolioGridProps {
   readonly projects?: readonly ProjectDomain[];
@@ -27,72 +27,77 @@ interface ProjectGroup {
 }
 
 export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
-  // Garantia de fallbacks para o dicionário
-  const labels = dict?.projects ?? {
-    title: "Portfolio",
-    categories: { dev: "Development" }
-  };
+  // Garantia de fallbacks seguros para o dicionário
+  const labels = dict?.projects;
+  const states = dict?.states;
 
   /**
    * Agrupamento de Projetos com Tipagem Rigorosa
    */
   const groupedProjects = useMemo((): ProjectGroup[] => {
-    if (!projects || !Array.isArray(projects)) return [];
+    if (!projects || !Array.isArray(projects) || !labels) return [];
 
     const groups: Record<string, ProjectDomain[]> = {};
     
+    // Fallback para nome da categoria de desenvolvimento
+    const devCategoryLabel = labels.categories.dev?.labelKey || "Development";
+
     projects.forEach(project => {
       if (!project) return;
 
-      let categoryDisplayName: string = labels.categories.dev || "Development"; 
+      let categoryDisplayName: string = devCategoryLabel;
       
-      // SOLUÇÃO DO ERRO: Tipagem explícita do parâmetro 't' como string
-      const topics: string[] = Array.isArray(project.topics) ? project.topics : [];
+      const topics: readonly string[] = Array.isArray(project.topics) ? project.topics : [];
+      
+      // Busca por tópico mapeado no config/categories.ts
       const matchedTopicKey = topics.find((t: string) => 
         t && t.toLowerCase() in TOPIC_TO_CATEGORY
       );
       
       if (matchedTopicKey) {
-        const categoryId = TOPIC_TO_CATEGORY[matchedTopicKey.toLowerCase() as keyof typeof TOPIC_TO_CATEGORY];
-        if (categoryId) {
-          const translatedCategory = labels.categories[categoryId as keyof typeof labels.categories];
-          categoryDisplayName = translatedCategory || categoryId;
-        }
+        const categoryId = TOPIC_TO_CATEGORY[matchedTopicKey.toLowerCase()];
+        const categoryObj = labels.categories[categoryId as keyof typeof labels.categories] as CategoryDetail | undefined;
+        
+        // CORREÇÃO: Acessa .labelKey em vez do objeto completo
+        categoryDisplayName = categoryObj?.labelKey || categoryId || devCategoryLabel;
       } else {
-        const techKey = project.technology?.labelKey as keyof typeof labels.categories;
-        categoryDisplayName = labels.categories[techKey] || labels.categories.dev || "Other";
+        // Fallback para a tecnologia principal do domínio
+        const techKey = project.technology?.labelKey;
+        const categoryObj = labels.categories[techKey] as CategoryDetail | undefined;
+        
+        categoryDisplayName = categoryObj?.labelKey || devCategoryLabel;
       }
 
       if (!groups[categoryDisplayName]) {
         groups[categoryDisplayName] = [];
       }
       
-      const currentGroup = groups[categoryDisplayName];
-      if (currentGroup) {
-        currentGroup.push(project);
-      }
+      groups[categoryDisplayName].push(project);
     });
 
-    // Ordenação Editorial
+    // Ordenação Editorial baseada no CATEGORY_ORDER
     return Object.keys(groups)
       .sort((a, b) => {
-        const weightA = CATEGORY_ORDER[a as keyof typeof CATEGORY_ORDER] ?? 99;
-        const weightB = CATEGORY_ORDER[b as keyof typeof CATEGORY_ORDER] ?? 99;
+        const weightA = CATEGORY_ORDER[a] ?? 99;
+        const weightB = CATEGORY_ORDER[b] ?? 99;
         return weightA - weightB;
       })
       .map(groupName => ({
         name: groupName,
         projects: (groups[groupName] ?? []).sort((a, b) => {
+          // Prioridade 1: Projetos marcados como "Primeiro" (isFirst)
           if (a.isFirst && !b.isFirst) return -1;
           if (!a.isFirst && b.isFirst) return 1;
+          // Prioridade 2: Projetos em Destaque (isFeatured)
           if (a.isFeatured && !b.isFeatured) return -1;
           if (!a.isFeatured && b.isFeatured) return 1;
+          // Ordenação alfabética residual
           return (a.name || '').localeCompare(b.name || '');
         })
       }));
   }, [projects, labels]);
 
-  // UI de Estado Vazio / Carregamento
+  // UI de Estado Vazio / Sincronização
   if (projects.length === 0) {
     return (
       <section id="projects" className="py-24 text-center px-6 bg-slate-50/50 dark:bg-slate-900/10">
@@ -100,10 +105,10 @@ export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
           <div className="animate-pulse w-10 h-10 bg-blue-600 rounded-xl shadow-lg shadow-blue-500/40" />
         </div>
         <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
-          {dict?.states?.emptyProjects?.title || "Sincronizando GitHub..."}
+          {states?.emptyProjects?.title || "Sincronizando GitHub..."}
         </h3>
         <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-          {dict?.states?.emptyProjects?.description || "Obtendo dados para renderizar o portfólio."}
+          {states?.emptyProjects?.description || "Obtendo dados para renderizar o portfólio."}
         </p>
       </section>
     );
@@ -117,9 +122,9 @@ export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
       <div className="container mx-auto px-6 max-w-7xl">
         <header className="mb-24">
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white leading-[0.85]">
-            {(labels.title || "Selected").split(' ')[0]}{" "}
+            {(labels?.title || "Projetos").split(' ')[0]}{" "}
             <span className="text-blue-600 dark:text-blue-500 block sm:inline">
-              {(labels.title || "Works").split(' ').slice(1).join(' ')}
+              {(labels?.title || "Soluções").split(' ').slice(1).join(' ')}
             </span>
           </h2>
           <div className="h-2.5 w-32 bg-blue-600 mt-8 rounded-full shadow-[0_10px_20px_rgba(37,99,235,0.3)]" />
@@ -138,6 +143,7 @@ export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
                 </span>
               </div>
 
+              {/* GRID RESPONSIVO: 1 coluna (mobile), 2 colunas (tablet), 3 colunas (desktop) */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
                 {group.projects.map((project) => (
                   <ProjectCard 
