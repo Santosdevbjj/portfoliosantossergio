@@ -1,10 +1,11 @@
 'use client';
 
 /**
- * PORTFOLIO GRID
- * ✔ Responsividade: Grid 1 -> 2 -> 3 colunas
- * ✔ TS 6.0: Strict Null Checks e Non-null assertions otimizados
- * ✔ Tailwind 4.2: Utiliza novas classes de container e gaps
+ * PORTFOLIO GRID COMPONENT
+ * -----------------------------------------------------------------------------
+ * ✔ Stack: React 19, Next.js 16, TS 6.0, Tailwind 4.2
+ * ✔ Responsividade: Grid Adaptativo 1 -> 2 -> 3 colunas (max-7xl)
+ * ✔ I18n: Agrupamento dinâmico baseado em chaves do dicionário
  */
 
 import { useMemo } from 'react';
@@ -27,34 +28,45 @@ interface ProjectGroup {
 export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
   const { projects: labels } = dict;
 
+  /**
+   * Agrupamento Inteligente de Projetos
+   * TS 6.0: Utiliza inferência estrita para garantir que as chaves existam no dicionário
+   */
   const groupedProjects = useMemo((): ProjectGroup[] => {
     const groups: Record<string, ProjectDomain[]> = {};
     
     projects.forEach(project => {
-      let categoryName: string;
+      let categoryDisplayName: string;
       
-      // Busca correspondência nos tópicos do GitHub com o de-para de categorias
+      // 1. Tenta encontrar por tópicos (Data Science, Web, etc)
       const matchedTopicKey = project.topics.find(t => t.toLowerCase() in TOPIC_TO_CATEGORY);
       
       if (matchedTopicKey) {
-        categoryName = TOPIC_TO_CATEGORY[matchedTopicKey.toLowerCase()] ?? "Outros";
+        const categoryId = TOPIC_TO_CATEGORY[matchedTopicKey.toLowerCase()];
+        categoryDisplayName = labels.categories[categoryId as keyof typeof labels.categories] || categoryId;
       } else {
-        // Fallback para a tecnologia principal detectada
-        categoryName = labels.categories[project.technology.labelKey] || labels.categories.dev;
+        // 2. Fallback para a tecnologia principal detectada pelo serviço
+        const techKey = project.technology.labelKey as keyof typeof labels.categories;
+        categoryDisplayName = labels.categories[techKey] || labels.categories.dev;
       }
 
-      if (!groups[categoryName]) {
-        groups[categoryName] = [];
+      if (!groups[categoryDisplayName]) {
+        groups[categoryDisplayName] = [];
       }
-      groups[categoryName].push(project);
+      groups[categoryDisplayName].push(project);
     });
 
-    // Ordenação baseada no CATEGORY_ORDER e depois nos flags de destaque
+    // Ordenação baseada no peso definido em CATEGORY_ORDER
     return Object.keys(groups)
-      .sort((a, b) => (CATEGORY_ORDER[a] ?? 99) - (CATEGORY_ORDER[b] ?? 99))
-      .map(categoryKey => ({
-        name: categoryKey,
-        projects: [...(groups[categoryKey] ?? [])].sort((a, b) => {
+      .sort((a, b) => {
+        const weightA = CATEGORY_ORDER[a as keyof typeof CATEGORY_ORDER] ?? 99;
+        const weightB = CATEGORY_ORDER[b as keyof typeof CATEGORY_ORDER] ?? 99;
+        return weightA - weightB;
+      })
+      .map(groupName => ({
+        name: groupName,
+        projects: [...(groups[groupName] ?? [])].sort((a, b) => {
+          // Prioridade: 1º 'isFirst' (Projeto Principal), 2º 'isFeatured' (Destaque)
           if (a.isFirst && !b.isFirst) return -1;
           if (!a.isFirst && b.isFirst) return 1;
           if (a.isFeatured && !b.isFeatured) return -1;
@@ -64,18 +76,21 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
       }));
   }, [projects, labels]);
 
-  // Estado Vazio (Empty State)
+  /**
+   * EMPTY STATE
+   * Caso não existam projetos com a tag 'portfolio' no GitHub
+   */
   if (projects.length === 0) {
     return (
-      <section id="projects" className="py-24 text-center px-6 bg-slate-50 dark:bg-slate-900/20">
-        <div className="inline-flex p-6 rounded-full bg-blue-50 dark:bg-blue-900/20 mb-6">
-          <div className="animate-bounce w-8 h-8 bg-blue-600 rounded-lg shadow-lg" />
+      <section id="projects" className="py-24 text-center px-6 bg-slate-50/50 dark:bg-slate-900/10">
+        <div className="inline-flex items-center justify-center p-6 rounded-3xl bg-blue-50 dark:bg-blue-900/20 mb-8">
+          <div className="animate-pulse w-10 h-10 bg-blue-600 rounded-xl shadow-lg shadow-blue-500/40" />
         </div>
-        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-          {dict.states.emptyProjects.title}
+        <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
+          {dict.states?.emptyProjects?.title || "Projetos em atualização"}
         </h3>
-        <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-          {dict.states.emptyProjects.description}
+        <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+          {dict.states?.emptyProjects?.description || "Aguardando sincronização com a API do GitHub..."}
         </p>
       </section>
     );
@@ -84,34 +99,37 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
   return (
     <section 
       id="projects" 
-      className="py-24 bg-slate-50/50 dark:bg-[#020617]/50 transition-colors duration-300"
+      className="py-24 bg-slate-50/30 dark:bg-[#020617]/30 backdrop-blur-sm transition-colors duration-500"
     >
       <div className="container mx-auto px-6 max-w-7xl">
-        <header className="mb-20">
-          <h2 className="text-4xl sm:text-6xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white">
+        {/* TÍTULO DA SEÇÃO - Estilo Editorial Impactante */}
+        <header className="mb-24">
+          <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white leading-[0.9]">
             {labels.title.split(' ')[0]}{" "}
-            <span className="text-blue-600 dark:text-blue-500">
+            <span className="text-blue-600 dark:text-blue-500 block sm:inline">
               {labels.title.split(' ').slice(1).join(' ')}
             </span>
           </h2>
-          <div className="h-2 w-24 bg-blue-600 mt-6 rounded-full shadow-xl shadow-blue-500/20" />
+          <div className="h-2.5 w-32 bg-blue-600 mt-8 rounded-full shadow-2xl shadow-blue-500/30" />
         </header>
 
-        <div className="space-y-24">
+        {/* LISTAGEM AGRUPADA */}
+        <div className="space-y-32">
           {groupedProjects.map((group) => (
-            <div key={group.name} className="group/section space-y-10">
-              <div className="flex items-center gap-6">
-                <h3 className="text-sm md:text-base font-black uppercase tracking-[0.4em] text-blue-600 dark:text-blue-400">
+            <div key={group.name} className="group/section space-y-12">
+              {/* HEADER DO GRUPO (ex: DATA SCIENCE, WEB DEV) */}
+              <div className="flex items-center gap-8">
+                <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.5em] text-blue-600 dark:text-blue-400">
                   {group.name}
                 </h3>
-                <div className="h-px flex-grow bg-slate-200 dark:bg-slate-800 transition-colors group-hover/section:bg-blue-500/30" />
-                <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">
-                  {group.projects.length} {group.projects.length === 1 ? 'Item' : 'Items'}
+                <div className="h-px flex-grow bg-slate-200 dark:bg-slate-800 transition-colors group-hover/section:bg-blue-500/40" />
+                <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-white dark:bg-slate-900 px-3 py-1 rounded-full border border-slate-100 dark:border-slate-800">
+                  {group.projects.length} {group.projects.length === 1 ? 'Project' : 'Projects'}
                 </span>
               </div>
 
-              {/* GRID RESPONSIVO: 1 coluna mobile, 2 tablet, 3 desktop */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* GRID DOS CARDS - Totalmente Responsivo */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
                 {group.projects.map((project) => (
                   <ProjectCard 
                     key={project.id} 
