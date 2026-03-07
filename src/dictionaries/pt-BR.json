@@ -5,11 +5,7 @@
     "direction": "ltr",
     "lastUpdated": "2026-03-05T20:40:00Z",
     "author": "Sérgio Santos",
-    "source": "manual",
-    "contentVersion": "2026.03.05",
-    "contentHash": "i18n-ptbr-2026-03-05",
-    "sourceType": "curated-manual",
-    "description": "Portfólio multilíngue de Sérgio Santos, especialista em Tecnologia da Informação, Inteligência Artificial e Engenharia de Software."
+    "description": "Portfólio multilíngue de Sérgio Santos, especialista em Ciência de Dados e Engenharia de Software."
   },
   "hero": {
     "greeting": "Disponível para Projetos Críticos",
@@ -22,7 +18,7 @@
     "title": "Sobre Mim",
     "differentialTitle": "Engenharia de Dados com Foco em Missão Crítica",
     "description": "Analista de Ciência de Dados com base sólida em sistemas críticos bancários e foco em transformar dados em decisões, redução de custos e eficiência operacional.",
-    "differentialContent": "Atuei por mais de 15 anos no Banco Bradesco em ambientes regulados de missão crítica. Atualmente direciono minha atuação para Ciência de Dados e IA, aplicando o rigor de sistemas críticos à criação de modelos predictivos.",
+    "differentialContent": "Atuei por mais de 15 anos no Banco Bradesco em ambientes regulados de missão crítica. Atualmente direciono minha atuação para Ciência de Dados e IA.",
     "highlights": [
       "15+ anos em Bancos",
       "Especialista Cloud",
@@ -54,7 +50,7 @@
         "company": "Consultor Autônomo / Transição",
         "period": "2008 - Atual",
         "role": "Especialista em Sistemas Críticos",
-        "description": "Arquitetura e manutenção de pipelines de dados e infraestrutura resiliente. Foco em Ciência de Dados e automação inteligente."
+        "description": "Arquitetura e manutenção de pipelines de dados e infraestrutura resiliente."
       }
     ]
   },
@@ -72,7 +68,7 @@
         "date": "2025",
         "category": "Data Strategy",
         "isAward": true,
-        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
+        "link": "https://medium.com/@sergiosantosluiz"
       }
     ]
   },
@@ -87,30 +83,21 @@
     "viewDemo": "Visualizar Demo",
     "viewAll": "Ver Todos",
     "categories": {
-      "dataScience": "Ciência de Dados",
-      "cloud": "Azure Databricks",
-      "graphs": "Neo4J",
-      "analysis": "Power BI & Análise",
-      "excel": "Excel",
-      "database": "Banco de Dados",
-      "dev": "Desenvolvimento (Python/C#/Java)",
-      "security": "Segurança"
+      "Data Engineering": { "labelKey": "Engenharia de Dados" },
+      "Cloud & Infrastructure": { "labelKey": "Nuvem e Infraestrutura" },
+      "Data Science": { "labelKey": "Ciência de Dados" },
+      "Data Analytics": { "labelKey": "Análise de Dados" },
+      "Outros": { "labelKey": "Outros Projetos" },
+      "dataScience": { "labelKey": "Ciência de Dados" },
+      "cloud": { "labelKey": "Azure Databricks" },
+      "graphs": { "labelKey": "Neo4J" },
+      "analysis": { "labelKey": "Power BI & Análise" },
+      "excel": { "labelKey": "Excel" },
+      "database": { "labelKey": "Banco de Dados" },
+      "dev": { "labelKey": "Desenvolvimento" },
+      "security": { "labelKey": "Segurança" }
     },
-    "featuredProjects": [
-      {
-        "id": "sentinela-data",
-        "title": "Data Pipeline Sentinela",
-        "description": "Pipeline automatizado para monitoramento de sistemas críticos.",
-        "image": "/projects/sentinela.jpg",
-        "tags": [
-          "Python",
-          "Azure",
-          "SQL"
-        ],
-        "category": "dataScience",
-        "github": "https://github.com/Santosdevbjj"
-      }
-    ]
+    "featuredProjects": []
   },
   "common": {
     "navigation": "Navegação principal",
@@ -124,14 +111,6 @@
     "skipToContent": "Pular para o conteúdo",
     "languageSwitcher": "Alterar idioma",
     "email": "santossergiorealbjj@outlook.com",
-    "errorBoundary": {
-      "title": "Ops! Erro inesperado.",
-      "description": "Entre em contato se o problema persistir.",
-      "actions": {
-        "retry": "Tentar novamente",
-        "home": "Início"
-      }
-    },
     "nav": {
       "about": "Sobre",
       "experience": "Experiência",
@@ -139,10 +118,11 @@
       "articles": "Artigos",
       "contact": "Contato"
     },
-    "theme": {
-      "light": "Claro",
-      "dark": "Escuro",
-      "system": "Sistema"
+    "theme": { "light": "Claro", "dark": "Escuro", "system": "Sistema" },
+    "errorBoundary": {
+      "title": "Ops! Erro inesperado.",
+      "description": "Entre em contato se o problema persistir.",
+      "actions": { "retry": "Tentar novamente", "home": "Início" }
     },
     "notFound": {
       "title": "Página não encontrada",
@@ -156,12 +136,8 @@
       "email": "mailto:santossergiorealbjj@outlook.com"
     },
     "menu": {
-      "open": "Abrir",
-      "close": "Fechar",
-      "aria": {
-        "open": "Abrir menu",
-        "close": "Fechar menu"
-      }
+      "open": "Abrir", "close": "Fechar",
+      "aria": { "open": "Abrir menu", "close": "Fechar menu" }
     }
   },
   "intl": {
@@ -176,11 +152,7 @@
     "loading": "Carregando...",
     "empty": "Sem dados.",
     "error": "Erro ao carregar.",
-    "emptyProjects": {
-      "title": "Nenhum projeto",
-      "description": "Em breve.",
-      "cta": "Voltar"
-    },
+    "emptyProjects": { "title": "Nenhum projeto", "description": "Em breve.", "cta": "Voltar" },
     "emptyExperience": "Sem registros.",
     "errorArticles": "Erro nos artigos."
   },
@@ -197,33 +169,15 @@
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
     "description": "Ciência de Dados & Sistemas Críticos",
-    "keywords": [
-      "python",
-      "databricks",
-      "sql",
-      "neo4j",
-      "data science"
-    ],
+    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
     "pages": {
-      "home": {
-        "title": "Início",
-        "description": "Portfólio de Sérgio Santos"
-      },
-      "projects": {
-        "title": "Projetos",
-        "description": "Soluções de dados"
-      },
-      "articles": {
-        "title": "Artigos",
-        "description": "Conteúdo técnico"
-      }
+      "home": { "title": "Início", "description": "Portfólio de Sérgio Santos" },
+      "projects": { "title": "Projetos", "description": "Soluções de dados" },
+      "articles": { "title": "Artigos", "description": "Conteúdo técnico" }
     }
   },
   "metrics": {
     "availability": "99,5%",
-    "availabilityNormalized": {
-      "value": 99.5,
-      "unit": "%"
-    }
+    "availabilityNormalized": { "value": 99.5, "unit": "%" }
   }
 }
