@@ -3,11 +3,10 @@
 /**
  * FEATURED PROJECT
  * -----------------------------------------------------------------------------
- * ✔ Alinhado com ProjectDomain
+ * ✔ Alinhado com ProjectDomain e Dictionary Types
  * ✔ Multilíngue (PT / EN / ES)
  * ✔ 100% Responsivo
- * ✔ Compatível com TypeScript 6
- * ✔ Compatível com Next.js 16
+ * ✔ Compatível com TypeScript 6.0 e Next.js 16 (Turbopack)
  */
 
 import Script from 'next/script'
@@ -55,7 +54,7 @@ export const FeaturedProject = ({
       : descriptionParts[1] ?? null
 
   /**
-   * Remove tags estruturais internas
+   * Remove tags estruturais internas para exibição limpa de badges
    */
   const displayTopics = project.topics.filter(
     (t) =>
@@ -70,13 +69,16 @@ export const FeaturedProject = ({
   )
 
   /**
-   * Categoria traduzida via labelKey
+   * CORREÇÃO DO ERRO DE TIPO:
+   * Acessa a propriedade .labelKey conforme definido em Dictionary.ts
+   * Fallback para o ID da tecnologia caso a tradução falhe.
    */
-  const categoryLabel =
-    projects.categories[project.technology.labelKey]
+  const categoryLabel = 
+    projects.categories[project.technology.labelKey]?.labelKey ?? 
+    project.technology.id
 
   /**
-   * Structured Data (SEO)
+   * Structured Data (SEO) - Schema.org
    */
   const softwareSchema = {
     '@context': 'https://schema.org',
@@ -109,7 +111,7 @@ export const FeaturedProject = ({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[580px]">
 
-          {/* COLUNA VISUAL */}
+          {/* COLUNA VISUAL (RESPONSIVA) */}
           <div className="relative h-72 sm:h-80 lg:h-auto bg-slate-50 dark:bg-slate-950/40 flex items-center justify-center overflow-hidden border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800/50">
 
             <div className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20">
@@ -137,7 +139,7 @@ export const FeaturedProject = ({
               {project.name.replace(/[_-]/g, ' ')}
             </h3>
 
-            {/* Categoria Traduzida */}
+            {/* Categoria Traduzida (Corrigido para renderizar string) */}
             <p className="text-xs uppercase tracking-widest text-blue-500 font-bold mb-6">
               {categoryLabel}
             </p>
@@ -169,7 +171,7 @@ export const FeaturedProject = ({
               )}
             </div>
 
-            {/* STACK */}
+            {/* STACK BADGES */}
             <div className="flex flex-wrap gap-2 mb-10 lg:mb-14">
               {displayTopics.slice(0, 8).map((topic) => (
                 <span
@@ -181,9 +183,8 @@ export const FeaturedProject = ({
               ))}
             </div>
 
-            {/* BOTÕES */}
+            {/* AÇÕES */}
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
-
               <a
                 href={project.htmlUrl}
                 target="_blank"
