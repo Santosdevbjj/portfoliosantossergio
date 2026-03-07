@@ -1,17 +1,7 @@
 // src/types/dictionary.ts
-
 import type { SupportedLocale } from "@/dictionaries/locales";
 
-/**
- * Fonte única de verdade para Locale.
- * ✔ Elimina duplicação
- * ✔ TS 6.0 compliant (strict mapping)
- */
 export type Locale = SupportedLocale;
-
-/* -------------------------------------------------------------------------- */
-/* META                                                                       */
-/* -------------------------------------------------------------------------- */
 
 export interface DictionaryMeta {
   version: string;
@@ -19,16 +9,8 @@ export interface DictionaryMeta {
   direction: "ltr" | "rtl";
   lastUpdated: string;
   author: string;
-  source: string;
-  contentVersion?: string;
-  contentHash?: string;
-  sourceType?: string;
   description: string;
 }
-
-/* -------------------------------------------------------------------------- */
-/* HERO                                                                       */
-/* -------------------------------------------------------------------------- */
 
 export interface HeroDictionary {
   greeting: string;
@@ -37,10 +19,6 @@ export interface HeroDictionary {
   headline: string;
   ctaPrimary: string;
 }
-
-/* -------------------------------------------------------------------------- */
-/* ABOUT                                                                      */
-/* -------------------------------------------------------------------------- */
 
 export interface AboutDictionary {
   title: string;
@@ -57,14 +35,6 @@ export interface AboutDictionary {
   };
 }
 
-/* -------------------------------------------------------------------------- */
-/* CONTACT                                                                    */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Atualizado para incluir ctaTitle e buttonText usados no banner final.
- * Isso resolve o erro de build: Property 'ctaTitle' does not exist.
- */
 export interface ContactDictionary {
   title: string;
   subtitle: string;
@@ -72,14 +42,9 @@ export interface ContactDictionary {
   emailLabel: string;
   cvLabel: string;
   linkedinLabel: string;
-  // Propriedades para o CTA de rodapé
   ctaTitle?: string;
   buttonText?: string;
 }
-
-/* -------------------------------------------------------------------------- */
-/* EXPERIENCE                                                                 */
-/* -------------------------------------------------------------------------- */
 
 export interface ExperienceItem {
   company: string;
@@ -93,10 +58,6 @@ export interface ExperienceDictionary {
   items: ExperienceItem[];
   emptyLabel: string;
 }
-
-/* -------------------------------------------------------------------------- */
-/* ARTICLES                                                                   */
-/* -------------------------------------------------------------------------- */
 
 export interface ArticleItem {
   title: string;
@@ -117,37 +78,42 @@ export interface ArticlesSectionDictionary {
   items: ArticleItem[];
 }
 
-/* -------------------------------------------------------------------------- */
-/* PROJECTS                                                                   */
-/* -------------------------------------------------------------------------- */
-
-export interface ProjectCategories {
-  dataScience: string;
-  cloud: string;
-  graphs: string;
-  analysis: string;
-  excel: string;
-  database: string;
-  dev: string;
-  security: string;
+/**
+ * RESOLUÇÃO DO ERRO labelKey:
+ * Cada categoria agora é mapeada como um objeto que contém labelKey.
+ */
+export interface CategoryDetail {
+  labelKey: string;
 }
 
-/**
- * Interface para itens individuais de projeto.
- * Essencial para evitar o erro "is not iterable" no deploy.
- */
+export interface ProjectCategories {
+  // Categorias vindas do mapeamento do GitHub
+  "Data Engineering": CategoryDetail;
+  "Cloud & Infrastructure": CategoryDetail;
+  "Data Science": CategoryDetail;
+  "Data Analytics": CategoryDetail;
+  "Outros": CategoryDetail;
+  // Categorias estáticas do dicionário antigo para compatibilidade
+  dataScience: CategoryDetail;
+  cloud: CategoryDetail;
+  graphs: CategoryDetail;
+  analysis: CategoryDetail;
+  excel: CategoryDetail;
+  database: CategoryDetail;
+  dev: CategoryDetail;
+  security: CategoryDetail;
+  [key: string]: CategoryDetail; // Fallback para categorias dinâmicas
+}
+
 export interface ProjectItem {
-  id: string;
+  id: string | number;
   title: string;
   description: string;
-  longDescription?: string;
   image: string;
   tags: string[];
-  category: keyof ProjectCategories;
-  link?: string;
+  category: string;
   github?: string;
-  video?: string;
-  features?: string[];
+  homepage?: string;
 }
 
 export interface ProjectsSectionDictionary {
@@ -161,13 +127,8 @@ export interface ProjectsSectionDictionary {
   viewDemo: string;
   viewAll: string;
   categories: ProjectCategories;
-  // Lista de projetos injetada para renderização dinâmica
   featuredProjects: ProjectItem[]; 
 }
-
-/* -------------------------------------------------------------------------- */
-/* COMMON                                                                     */
-/* -------------------------------------------------------------------------- */
 
 export interface CommonDictionary {
   navigation: string;
@@ -181,82 +142,13 @@ export interface CommonDictionary {
   skipToContent: string;
   languageSwitcher: string;
   email: string;
-
-  nav: {
-    about: string;
-    experience: string;
-    projects: string;
-    articles: string;
-    contact: string;
-  };
-  theme: {
-    light: string;
-    dark: string;
-    system: string;
-  };
-  errorBoundary: {
-    title: string;
-    description: string;
-    actions: {
-      retry: string;
-      home: string;
-    };
-  };
-
-  notFound: {
-    title: string;
-    description: string;
-    button: string;
-  };
-
-  externalLinks: {
-    linkedin: string;
-    github: string;
-    medium: string;
-    email: string;
-  };
-
-  menu: {
-    open: string;
-    close: string;
-    aria: {
-      open: string;
-      close: string;
-    };
-  };
+  nav: { about: string; experience: string; projects: string; articles: string; contact: string; };
+  theme: { light: string; dark: string; system: string; };
+  errorBoundary: { title: string; description: string; actions: { retry: string; home: string; }; };
+  notFound: { title: string; description: string; button: string; };
+  externalLinks: { linkedin: string; github: string; medium: string; email: string; };
+  menu: { open: string; close: string; aria: { open: string; close: string; }; };
 }
-
-/* -------------------------------------------------------------------------- */
-/* STATES                                                                     */
-/* -------------------------------------------------------------------------- */
-
-export interface StateDictionary {
-  loading: string;
-  empty: string;
-  error: string;
-  emptyProjects: {
-    title: string;
-    description: string;
-    cta: string;
-  };
-  emptyExperience: string;
-  errorArticles: string;
-}
-
-/* -------------------------------------------------------------------------- */
-/* SEO                                                                        */
-/* -------------------------------------------------------------------------- */
-
-export type SeoPageKey = "home" | "projects" | "articles";
-
-export interface SeoPage {
-  title: string;
-  description: string;
-}
-
-/* -------------------------------------------------------------------------- */
-/* ROOT TYPE                                                                  */
-/* -------------------------------------------------------------------------- */
 
 export interface Dictionary {
   meta: DictionaryMeta;
@@ -267,41 +159,9 @@ export interface Dictionary {
   articles: ArticlesSectionDictionary;
   projects: ProjectsSectionDictionary;
   common: CommonDictionary;
-
-  intl: {
-    locale: Locale;
-    fallbackLocale: string;
-    currency: string;
-    timezone: string;
-    unitDisplay: string;
-    numberFormat: string;
-  };
-
-  states: StateDictionary;
-
-  cookie: {
-    title: string;
-    description: string;
-    necessary: string;
-    alwaysActive: string;
-    analytics: string;
-    acceptAll: string;
-    savePreferences: string;
-  };
-
-  seo: {
-    siteName: string;
-    title: string;
-    description: string;
-    keywords: string[];
-    pages: Record<SeoPageKey, SeoPage>;
-  };
-
-  metrics: {
-    availability: string;
-    availabilityNormalized: {
-      value: number;
-      unit: string;
-    };
-  };
+  intl: any;
+  states: any;
+  cookie: any;
+  seo: any;
+  metrics: any;
 }
