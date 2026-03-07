@@ -9,6 +9,10 @@ export interface DictionaryMeta {
   direction: "ltr" | "rtl";
   lastUpdated: string;
   author: string;
+  source?: string;
+  contentVersion?: string;
+  contentHash?: string;
+  sourceType?: string;
   description: string;
 }
 
@@ -93,7 +97,7 @@ export interface ProjectCategories {
   "Data Science": CategoryDetail;
   "Data Analytics": CategoryDetail;
   "Outros": CategoryDetail;
-  // Categorias estáticas do dicionário antigo para compatibilidade
+  // Categorias estáticas para compatibilidade
   dataScience: CategoryDetail;
   cloud: CategoryDetail;
   graphs: CategoryDetail;
@@ -102,7 +106,7 @@ export interface ProjectCategories {
   database: CategoryDetail;
   dev: CategoryDetail;
   security: CategoryDetail;
-  [key: string]: CategoryDetail; // Fallback para categorias dinâmicas
+  [key: string]: CategoryDetail; // Fallback para chaves dinâmicas
 }
 
 export interface ProjectItem {
@@ -128,6 +132,10 @@ export interface ProjectsSectionDictionary {
   viewAll: string;
   categories: ProjectCategories;
   featuredProjects: ProjectItem[]; 
+  portfolio?: {
+    all: string;
+    viewProject: string;
+  };
 }
 
 export interface CommonDictionary {
@@ -150,6 +158,60 @@ export interface CommonDictionary {
   menu: { open: string; close: string; aria: { open: string; close: string; }; };
 }
 
+// Interfaces formais para substituir o 'any'
+export interface StateDictionary {
+  loading: string;
+  empty: string;
+  error: string;
+  emptyProjects: {
+    title: string;
+    description: string;
+    cta: string;
+  };
+  emptyExperience: string;
+  errorArticles: string;
+}
+
+export interface IntlDictionary {
+  locale: string;
+  fallbackLocale: string;
+  currency: string;
+  timezone: string;
+  unitDisplay: string;
+  numberFormat: string;
+}
+
+export interface CookieDictionary {
+  title: string;
+  description: string;
+  necessary: string;
+  alwaysActive: string;
+  analytics: string;
+  acceptAll: string;
+  savePreferences: string;
+}
+
+export interface SeoDictionary {
+  siteName: string;
+  title: string;
+  description: string;
+  keywords: string[];
+  pages: {
+    [key: string]: {
+      title: string;
+      description: string;
+    };
+  };
+}
+
+export interface MetricsDictionary {
+  availability: string;
+  availabilityNormalized: {
+    value: number;
+    unit: string;
+  };
+}
+
 export interface Dictionary {
   meta: DictionaryMeta;
   hero: HeroDictionary;
@@ -159,9 +221,9 @@ export interface Dictionary {
   articles: ArticlesSectionDictionary;
   projects: ProjectsSectionDictionary;
   common: CommonDictionary;
-  intl: any;
-  states: any;
-  cookie: any;
-  seo: any;
-  metrics: any;
+  intl: IntlDictionary;
+  states: StateDictionary;
+  cookie: CookieDictionary;
+  seo: SeoDictionary;
+  metrics: MetricsDictionary;
 }
