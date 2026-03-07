@@ -20,8 +20,8 @@
   },
   "about": {
     "title": "Sobre Mí",
-    "differentialTitle": "Ingeniería de Dados con Enfoque en Misión Crítica",
-    "description": "Analista de Ciencia de Datos con una base sólida en sistemas críticos bancários y enfoque en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
+    "differentialTitle": "Ingeniería de Datos con Enfoque en Misión Crítica",
+    "description": "Analista de Ciencia de Datos con una base sólida en sistemas críticos bancarios y enfoque en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
     "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente dirijo mi actividad hacia la Ciencia de Datos e IA, aplicando el rigor de los sistemas críticos a la creación de modelos predictivos.",
     "highlights": [
       "15+ años en Banca",
@@ -72,7 +72,7 @@
         "date": "2025",
         "category": "Data Strategy",
         "isAward": true,
-        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
+        "link": "https://medium.com/@sergiosantosluiz"
       }
     ]
   },
@@ -82,35 +82,30 @@
     "firstLabel": "Desafío y Arquitectura",
     "impactLabel": "Impacto y Resultado",
     "problem": "Problema",
-    "solution": "Solución",
+    "solution": "Solução",
     "viewProject": "Repositorio GitHub",
     "viewDemo": "Visualizar Demo",
     "viewAll": "Ver Todos",
     "categories": {
-      "dataScience": "Ciencia de Datos",
-      "cloud": "Azure Databricks",
-      "graphs": "Neo4J",
-      "analysis": "Power BI y Análisis",
-      "excel": "Excel",
-      "database": "Base de Datos",
-      "dev": "Desarrollo (Python/C#/Java)",
-      "security": "Seguridad"
+      "Data Engineering": { "labelKey": "Ingeniería de Datos" },
+      "Cloud & Infrastructure": { "labelKey": "Nube e Infraestructura" },
+      "Data Science": { "labelKey": "Ciencia de Datos" },
+      "Data Analytics": { "labelKey": "Análisis de Datos" },
+      "Outros": { "labelKey": "Otros Proyectos" },
+      "dataScience": { "labelKey": "Ciencia de Datos" },
+      "cloud": { "labelKey": "Azure Databricks" },
+      "graphs": { "labelKey": "Neo4J" },
+      "analysis": { "labelKey": "Power BI y Análisis" },
+      "excel": { "labelKey": "Excel" },
+      "database": { "labelKey": "Base de Datos" },
+      "dev": { "labelKey": "Desarrollo" },
+      "security": { "labelKey": "Seguridad" }
     },
-    "featuredProjects": [
-      {
-        "id": "sentinela-data",
-        "title": "Pipeline de Datos Centinela",
-        "description": "Pipeline automatizado para el monitoreo de sistemas críticos.",
-        "image": "/projects/sentinela.jpg",
-        "tags": [
-          "Python",
-          "Azure",
-          "SQL"
-        ],
-        "category": "dataScience",
-        "github": "https://github.com/Santosdevbjj"
-      }
-    ]
+    "portfolio": {
+      "all": "Todos",
+      "viewProject": "Ver Proyecto"
+    },
+    "featuredProjects": []
   },
   "common": {
     "navigation": "Navegación principal",
