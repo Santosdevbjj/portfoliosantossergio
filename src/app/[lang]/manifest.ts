@@ -11,7 +11,8 @@ interface ManifestProps {
 /**
  * Gera o Manifesto do PWA dinâmico e localizado.
  * ✔ Compatível com Next.js 16 (params como Promise)
- * ✔ Compatível com TypeScript 6.0 (Strict null checks & Template Literals)
+ * ✔ TypeScript 6.0 Safe (Resolução de tipos opcionais)
+ * ✔ Suporte a 5 Locales (PT-BR, EN-US, ES-ES, ES-AR, ES-MX)
  */
 export default async function manifest(
   { params }: ManifestProps
@@ -19,9 +20,13 @@ export default async function manifest(
   
   const { lang: rawLang } = await params;
   
-  // Normalização para garantir que usemos um dos 5 locales suportados
+  // Normalização para garantir o uso de um dos locales suportados
   const lang = normalizeLocale(rawLang) as Locale;
   const dict = await getDictionary(lang);
+
+  // Solução para o erro de Type: 'dict.seo.pages.home' is possibly 'undefined'
+  // Forçamos o reconhecimento da página home ou usamos o título geral como fallback
+  const homeTitle = dict.seo.pages?.home?.title || dict.seo.siteName;
 
   // Background e Theme alinhados com o design Slate-950 do portfólio
   const themeColor = '#020617';
@@ -66,12 +71,12 @@ export default async function manifest(
     ],
     screenshots: [
       {
-        // Corrigido: Agora aponta exatamente para os arquivos físicos informados (ex: og-image-pt-BR.png)
+        // Aponta para os arquivos físicos confirmados (ex: og-image-pt-BR.png)
         src: `/og-image-${lang}.png`,
         sizes: '1200x630',
         type: 'image/png',
         form_factor: 'wide',
-        label: dict.seo.pages.home.title,
+        label: homeTitle,
       },
     ],
   };
