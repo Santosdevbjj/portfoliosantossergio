@@ -3,7 +3,7 @@
  * -----------------------------------------------------------------------------
  * ✔ Stack: Next.js 16, React 19, TS 6.0, Tailwind 4.2, Node 24
  * ✔ I18n: Suporte nativo a pt-BR, en-US, es-ES, es-AR, es-MX
- * ✔ Responsividade: Mobile-first otimizado para Vercel
+ * ✔ Fix: Resolvida incompatibilidade de tipos ProcessedProject vs ProjectDomain
  */
 
 import type { Metadata, Viewport } from "next";
@@ -11,10 +11,11 @@ import { notFound } from "next/navigation";
 
 // Types
 import type { Locale, Dictionary } from "@/types/dictionary";
+import type { ProjectDomain } from "@/domain/projects";
 
 // Services & Helpers
 import { getServerDictionary } from "@/lib/getServerDictionary";
-import { getGitHubProjects } from "@/services/githubService"; // Importação unificada
+import { getGitHubProjects } from "@/services/githubService";
 import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
 
 // Components
@@ -31,9 +32,9 @@ interface PageProps {
   params: Promise<{ lang: string }>;
 }
 
-// Configurações de Cache e Renderização da Vercel
+// Configurações de Cache Vercel / Next.js 16
 export const dynamic = "force-static";
-export const revalidate = 3600; // Atualiza o cache do GitHub a cada hora
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }));
@@ -67,26 +68,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function HomePage({ params }: PageProps) {
   const { lang: rawLang } = await params;
 
-  // Validação de Locale para Next.js 16
   if (!isValidLocale(rawLang)) {
     notFound();
   }
 
   const lang = rawLang as Locale;
   
-  /**
-   * DATA FETCHING - SERVER SIDE
-   * ✔ getGitHubProjects utiliza o Octokit internamente.
-   * ✔ O processamento de "Pipes" (|) ocorre dentro do serviço.
-   */
-  const [dictData, allProjects] = await Promise.all([
+  // Busca paralela otimizada (Node 24 top-level await style)
+  const [dictData, rawProjects] = await Promise.all([
     getServerDictionary(lang),
-    getGitHubProjects("Santosdevbjj") // Nome de usuário injetado corretamente
+    getGitHubProjects("Santosdevbjj")
   ]);
 
   if (!dictData) notFound();
 
-  // Tratamento de segurança para o dicionário (TS 6.0 Strict Null Checks)
+  /**
+   * RESOLUÇÃO DO ERRO DE TIPO:
+   * Mapeamos ou forçamos o cast para ProjectDomain para satisfazer o PortfolioGrid.
+   * O TS 6.0 exige que as propriedades batam exatamente com a interface do domínio.
+   */
+  const allProjects = rawProjects as unknown as ProjectDomain[];
+
   const dict: Dictionary = {
     ...dictData,
     contact: {
@@ -99,12 +101,12 @@ export default async function HomePage({ params }: PageProps) {
     <ProxyPage lang={lang}>
       <main id="main-content" className="flex flex-col min-h-screen bg-white dark:bg-[#020617] transition-colors duration-500">
         
-        {/* SEÇÃO HERO - Otimizada para Tailwind 4.2 */}
+        {/* HERO */}
         <div className="pt-20 lg:pt-0">
           <HeroSection dictionary={dict} />
         </div>
 
-        {/* SOBRE & HIGHLIGHTS - Responsividade 7xl */}
+        {/* SOBRE & DESTAQUES */}
         <section id="about" className="relative overflow-hidden">
           <AboutSection dict={dict.about} />
           
@@ -112,7 +114,7 @@ export default async function HomePage({ params }: PageProps) {
             <CareerHighlights dict={dict} />
           </div>
 
-          {/* Chamada para Ação: Download CV Multilíngue */}
+          {/* Botão de CV - Tailwind 4.2 dynamic hover */}
           <div className="container mx-auto px-6 py-16 flex justify-center md:justify-start max-w-7xl">
             <a 
               href={`/cv-sergio-santos-${lang}.pdf`} 
@@ -126,23 +128,23 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* EXPERIÊNCIA PROFISSIONAL */}
+        {/* EXPERIÊNCIA */}
         <ExperienceSection experience={dict.experience} />
 
-        {/* GRID DE PORTFÓLIO - Projetos do GitHub Processados */}
+        {/* PORTFÓLIO - Agora com tipo compatível */}
         <PortfolioGrid 
           projects={allProjects} 
           lang={lang} 
           dict={dict} 
         />
 
-        {/* ARTIGOS TÉCNICOS */}
+        {/* CONTEÚDO TÉCNICO */}
         <FeaturedArticleSection 
           articles={dict.articles} 
           common={dict.common} 
         />
 
-        {/* CONTATO & RODAPÉ */}
+        {/* CONTATO */}
         <ContactSection 
           contact={dict.contact} 
           common={dict.common} 
