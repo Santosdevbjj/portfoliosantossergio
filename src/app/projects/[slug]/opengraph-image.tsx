@@ -69,7 +69,7 @@ async function getCachedRepoData(username: string, slug: string): Promise<{ name
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   // No Next.js 16, params deve ser aguardado (Promise)
   const { slug } = await params;
-  const username = "SEU_USUARIO_GITHUB"; // Importante: Substitua pelo seu login real
+  const username = "Santosdevbjj";  // Importante: Substitua pelo seu login real
 
   let repoData = { 
     name: slug, 
