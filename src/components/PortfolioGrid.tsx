@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * PORTFOLIO GRID
+ * ✔ Responsividade: Grid 1 -> 2 -> 3 colunas
+ * ✔ TS 6.0: Strict Null Checks e Non-null assertions otimizados
+ * ✔ Tailwind 4.2: Utiliza novas classes de container e gaps
+ */
+
 import { useMemo } from 'react';
 import { ProjectCard } from './ProjectCard';
 import { CATEGORY_ORDER, TOPIC_TO_CATEGORY } from '@/config/categories';
@@ -20,63 +27,54 @@ interface ProjectGroup {
 export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
   const { projects: labels } = dict;
 
-  // 1. Processamento e Agrupamento
   const groupedProjects = useMemo((): ProjectGroup[] => {
     const groups: Record<string, ProjectDomain[]> = {};
     
     projects.forEach(project => {
-      // Determinação da categoria com fallbacks seguros
       let categoryName: string;
       
+      // Busca correspondência nos tópicos do GitHub com o de-para de categorias
       const matchedTopicKey = project.topics.find(t => t.toLowerCase() in TOPIC_TO_CATEGORY);
       
       if (matchedTopicKey) {
         categoryName = TOPIC_TO_CATEGORY[matchedTopicKey.toLowerCase()] ?? "Outros";
       } else {
+        // Fallback para a tecnologia principal detectada
         categoryName = labels.categories[project.technology.labelKey] || labels.categories.dev;
       }
 
-      // Correção do erro de deploy: Garantia de inicialização do array
-      // Se não existir, inicializa como array vazio; depois faz o push com segurança.
-      (groups[categoryName] ??= []).push(project);
+      if (!groups[categoryName]) {
+        groups[categoryName] = [];
+      }
+      groups[categoryName].push(project);
     });
 
-    // 2. Ordenação das Categorias (conforme CATEGORY_ORDER) e dos projetos internos
+    // Ordenação baseada no CATEGORY_ORDER e depois nos flags de destaque
     return Object.keys(groups)
       .sort((a, b) => (CATEGORY_ORDER[a] ?? 99) - (CATEGORY_ORDER[b] ?? 99))
-      .map(categoryKey => {
-        // Garantia de que o grupo existe antes do spread (ajuda o TS 6.0)
-        const currentGroup = groups[categoryKey] ?? [];
-        
-        const sortedInnerProjects = [...currentGroup].sort((a, b) => {
-          // 1º Lugar: Tag 'primeiro' (isFirst)
+      .map(categoryKey => ({
+        name: categoryKey,
+        projects: [...(groups[categoryKey] ?? [])].sort((a, b) => {
           if (a.isFirst && !b.isFirst) return -1;
           if (!a.isFirst && b.isFirst) return 1;
-
-          // 2º Lugar: Tag 'destaque' (isFeatured)
           if (a.isFeatured && !b.isFeatured) return -1;
           if (!a.isFeatured && b.isFeatured) return 1;
-
           return a.name.localeCompare(b.name);
-        });
-
-        return {
-          name: categoryKey,
-          projects: sortedInnerProjects
-        };
-      });
+        })
+      }));
   }, [projects, labels]);
 
+  // Estado Vazio (Empty State)
   if (projects.length === 0) {
     return (
-      <section id="projects" className="py-24 text-center px-6">
-        <div className="inline-flex p-4 rounded-full bg-slate-100 dark:bg-slate-800 mb-6">
-          <div className="animate-pulse w-8 h-8 bg-blue-500 rounded-full" />
+      <section id="projects" className="py-24 text-center px-6 bg-slate-50 dark:bg-slate-900/20">
+        <div className="inline-flex p-6 rounded-full bg-blue-50 dark:bg-blue-900/20 mb-6">
+          <div className="animate-bounce w-8 h-8 bg-blue-600 rounded-lg shadow-lg" />
         </div>
         <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
           {dict.states.emptyProjects.title}
         </h3>
-        <p className="text-slate-500 dark:text-slate-400 font-medium">
+        <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
           {dict.states.emptyProjects.description}
         </p>
       </section>
@@ -89,27 +87,31 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
       className="py-24 bg-slate-50/50 dark:bg-[#020617]/50 transition-colors duration-300"
     >
       <div className="container mx-auto px-6 max-w-7xl">
-        <header className="mb-16">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white">
+        <header className="mb-20">
+          <h2 className="text-4xl sm:text-6xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white">
             {labels.title.split(' ')[0]}{" "}
             <span className="text-blue-600 dark:text-blue-500">
               {labels.title.split(' ').slice(1).join(' ')}
             </span>
           </h2>
-          <div className="h-2 w-24 bg-blue-600 mt-6 rounded-full shadow-lg shadow-blue-500/20" />
+          <div className="h-2 w-24 bg-blue-600 mt-6 rounded-full shadow-xl shadow-blue-500/20" />
         </header>
 
-        <div className="space-y-20">
+        <div className="space-y-24">
           {groupedProjects.map((group) => (
-            <div key={group.name} className="space-y-8">
-              <div className="flex items-center gap-4">
-                <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400 whitespace-nowrap">
+            <div key={group.name} className="group/section space-y-10">
+              <div className="flex items-center gap-6">
+                <h3 className="text-sm md:text-base font-black uppercase tracking-[0.4em] text-blue-600 dark:text-blue-400">
                   {group.name}
                 </h3>
-                <div className="h-px flex-grow bg-slate-200 dark:bg-slate-800/50" />
+                <div className="h-px flex-grow bg-slate-200 dark:bg-slate-800 transition-colors group-hover/section:bg-blue-500/30" />
+                <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">
+                  {group.projects.length} {group.projects.length === 1 ? 'Item' : 'Items'}
+                </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {/* GRID RESPONSIVO: 1 coluna mobile, 2 tablet, 3 desktop */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {group.projects.map((project) => (
                   <ProjectCard 
                     key={project.id} 
