@@ -3,24 +3,19 @@ import type { NextConfig } from "next";
 /**
  * NEXT.JS 16 CONFIGURATION - SERGIO SANTOS PORTFOLIO
  * -----------------------------------------------------------------------------
- * ✔ React Compiler: Estável no nível raiz (Next.js 16 + React 19)
- * ✔ Turbopack: Compatibilidade garantida via serverExternalPackages
- * ✔ TypeScript 6.0: Suporte a typedRoutes
+ * ✔ React Compiler: Estável na raiz (Next.js 16)
+ * ✔ OG Images: Rotas de cache corrigidas para suportar :slug dinâmico
+ * ✔ Octokit & Turbopack: Compatibilidade via serverExternalPackages
  */
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  
-  // CORREÇÃO: No Next.js 16, o compilador é estável e fica na raiz
   reactCompiler: true, 
-  
-  // Gera links tipados para o roteamento do Next.js
   typedRoutes: true, 
 
   experimental: {
-    // Otimiza o tempo de build/runtime para bibliotecas comuns
     optimizePackageImports: [
       "lucide-react",
       "framer-motion",
@@ -28,25 +23,21 @@ const nextConfig: NextConfig = {
       "tailwind-merge",
       "date-fns"
     ],
-    
-    // Proteção contra vazamento de dados do servidor (Data Tainting)
     taint: true, 
-    
-    // Controle fino de cache de navegação do cliente
     staleTimes: {
       dynamic: 30,
       static: 180,
     },
   },
 
-  // ESSENCIAL PARA OCTOKIT + TURBOPACK
-  // Evita que o Turbopack tente empacotar módulos nativos de Node.js
-  // que o Octokit e o Sharp utilizam internamente.
+  // Mantendo a compatibilidade do Octokit, Sharp (essencial para OG Images) 
+  // e Application Insights.
   serverExternalPackages: [
     "octokit", 
     "@octokit/core", 
-    "sharp",
-    "gray-matter"
+    "sharp", 
+    "gray-matter",
+    "@microsoft/applicationinsights-web"
   ],
 
   images: {
@@ -73,8 +64,21 @@ const nextConfig: NextConfig = {
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }
         ],
       },
+      // RESTAURAÇÃO: Rotas explícitas para garantir que o cache de OG Images e PDF funcione com :slug
       {
-        source: '/(cv-sergio-santos|og-image|images|icons)/:path*',
+        source: '/cv-sergio-santos-:slug.pdf',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        source: '/og-image-:slug.png',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        source: '/images/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        source: '/icons/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       }
     ];
