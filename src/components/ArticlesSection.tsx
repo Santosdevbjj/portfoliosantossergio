@@ -4,10 +4,10 @@
  * ARTICLES SECTION
  * -----------------------------------------------------------------------------
  * ✔ TS 6.0 Strict-Safe
- * ✔ Next.js 16 (Turbopack) & React 19 Ready
- * ✔ Tailwind CSS 4.2 Optimized
- * ✔ Multilíngue (PT / EN / ES)
- * ✔ Responsividade Fluida
+ * ✔ Next.js 16 (Turbopack) & React 19 Ready (Ref handling & Metadata)
+ * ✔ Tailwind CSS 4.2 Optimized (New utility engine)
+ * ✔ Multilíngue (PT / EN / ES-ES / ES-AR / ES-MX)
+ * ✔ 100% Responsivo & Acessível
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -22,21 +22,16 @@ import {
 import type {
   ArticlesSectionDictionary,
   CommonDictionary,
+  StateDictionary,
   ArticleItem,
 } from '@/types/dictionary';
 
 import { NavSection, getSectionId } from '@/domain/navigation';
 
-// Corrigindo a interface para bater com o que existe no dictionary.ts
 interface ArticlesSectionProps {
   readonly articles: ArticlesSectionDictionary;
   readonly common: CommonDictionary;
-  // Alterado de StateDictionary para any ou uma interface específica
-  // para alinhar com o dicionário atual
-  readonly states: {
-    errorArticles: string;
-    [key: string]: any;
-  };
+  readonly states: StateDictionary;
 }
 
 export default function ArticlesSection({
@@ -85,14 +80,14 @@ export default function ArticlesSection({
             href={common.externalLinks.medium}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-widest text-blue-600 hover:text-blue-500 transition-colors group"
+            className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-widest text-blue-600 hover:text-blue-500 transition-colors group outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
           >
             {articles.mediumProfile}
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </a>
         </header>
 
-        {/* GRID - Com animação de entrada controlada pelo estado isVisible */}
+        {/* GRID */}
         {articles.items && articles.items.length > 0 ? (
           <div
             className={`grid grid-cols-1 md:grid-cols-2 gap-8 transition-all duration-1000 ease-out ${
@@ -138,7 +133,7 @@ function ArticleCard({
 }: ArticleCardProps) {
   return (
     <article
-      className="group relative flex flex-col bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 transition-all duration-300 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/5"
+      className="group relative flex flex-col bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 transition-all duration-300 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/5 focus-within:ring-2 focus-within:ring-blue-500/50"
     >
       <div className="flex justify-between items-start mb-6">
         <div
@@ -149,7 +144,7 @@ function ArticleCard({
 
         {article.isAward && (
           <span
-            className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-amber-200 dark:border-amber-800/50 shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-amber-200 dark:border-amber-800/50 shadow-xs"
           >
             <Award className="w-3.5 h-3.5" aria-hidden="true" />
             {awardLabel}
@@ -183,7 +178,7 @@ function ArticleCard({
           href={article.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-blue-600 transition-all outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg"
+          className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white group-hover:text-blue-600 transition-all outline-hidden rounded-lg"
         >
           {readMoreLabel}
           <ExternalLink
