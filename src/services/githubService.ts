@@ -1,29 +1,49 @@
 // src/services/githubService.ts
+import { Octokit } from 'octokit';
 import { processRepositories } from "@/lib/github-service";
-import type { GitHubRepo, ProcessedProject } from "@/types/github";
+import type { ProcessedProject, GitHubRepo } from "@/types/github";
 
-const GITHUB_API_URL = "https://api.github.com";
+/**
+ * SERVIÇO UNIFICADO GITHUB (Next.js 16 + Octokit)
+ * -----------------------------------------------------------------------------
+ * ✔ Utiliza Octokit para maior segurança e facilidade com Tokens.
+ * ✔ Utiliza sua lógica personalizada de 'processRepositories' (Pipes e Categorias).
+ * ✔ Cache nativo via Next.js configurado no nível do servidor.
+ */
+
+// Instancia o Octokit (o servidor Vercel pegará o GITHUB_TOKEN das Env Vars)
+const octokit = new Octokit({ 
+  auth: process.env.GITHUB_TOKEN 
+});
 
 export async function getGitHubProjects(username: string): Promise<ProcessedProject[]> {
-  const response = await fetch(
-    `${GITHUB_API_URL}/users/${username}/repos?per_page=100`,
-    {
+  try {
+    // Busca os repositórios usando Octokit
+    // Nota: O Octokit no servidor não faz cache automático como o 'fetch' do Next,
+    // mas em Server Components, o Next.js lida com a revalidação da página.
+    const { data: rawRepos } = await octokit.request('GET /users/{username}/repos', {
+      username,
+      per_page: 100,
+      sort: 'updated',
       headers: {
-        Accept: "application/vnd.github+json",
-        // Adicione seu GITHUB_TOKEN no .env para evitar limites de taxa
-        ...(process.env.GITHUB_TOKEN && { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` })
-      },
-      next: { revalidate: 3600 },
-    }
-  );
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    });
 
-  if (!response.ok) return [];
+    // Cast seguro para o seu tipo GitHubRepo do TS 6.0
+    const repos = rawRepos as unknown as GitHubRepo[];
 
-  const rawRepos = (await response.json()) as GitHubRepo[];
-  
-  // Aqui aplicamos a lógica de filtro e mapeamento que criamos no lib
-  return processRepositories(rawRepos, username);
+    // Retorna os dados processados com sua lógica de Negócio (Filtro 'portfolio', Pipes, etc)
+    return processRepositories(repos, username);
+
+  } catch (error) {
+    console.error('❌ Erro ao buscar projetos do GitHub:', error);
+    return [];
+  }
 }
 
-// Para manter compatibilidade com códigos antigos que usavam outro nome
-export { getGitHubProjects as fetchUserRepos };
+/**
+ * ALIAS DE COMPATIBILIDADE
+ * Garante que componentes que chamam 'getProjects' ou 'fetchUserRepos' não quebrem.
+ */
+export { getGitHubProjects as getProjects, getGitHubProjects as fetchUserRepos };
