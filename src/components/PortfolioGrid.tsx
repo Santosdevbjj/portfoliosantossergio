@@ -4,9 +4,8 @@
  * PORTFOLIO GRID COMPONENT
  * -----------------------------------------------------------------------------
  * ✔ Stack: React 19, Next.js 16, TS 6.0, Tailwind 4.2
- * ✔ Fix: Resolvido "Object is possibly undefined" usando referência direta
- * ✔ I18n: Suporte total a PT, EN, ES (Agrupamento via Dicionário)
- * ✔ Responsivo: Mobile-first (1 col) -> Tablet (2 cols) -> Desktop (3 cols)
+ * ✔ Fix: Prerender Error (Handling undefined/null projects during build)
+ * ✔ I18n: Suporte nativo a PT, EN, ES
  */
 
 import { useMemo } from 'react';
@@ -16,7 +15,7 @@ import type { ProjectDomain } from '@/domain/projects';
 import type { Dictionary } from '@/types/dictionary';
 
 interface PortfolioGridProps {
-  readonly projects: readonly ProjectDomain[];
+  readonly projects?: readonly ProjectDomain[]; // Tornamos opcional para segurança
   readonly lang: string;
   readonly dict: Dictionary;
 }
@@ -26,21 +25,28 @@ interface ProjectGroup {
   projects: ProjectDomain[];
 }
 
-export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
+export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
   const { projects: labels } = dict;
 
   /**
-   * Agrupamento Inteligente de Projetos
-   * Otimizado para TS 6.0 Strict Mode
+   * Agrupamento Seguro de Projetos
+   * Adicionada verificação de existência para evitar erros de Prerender no Vercel
    */
   const groupedProjects = useMemo((): ProjectGroup[] => {
+    // Defesa inicial: se projects for null/undefined, retorna vazio
+    if (!projects || !Array.isArray(projects)) return [];
+
     const groups: Record<string, ProjectDomain[]> = {};
     
     projects.forEach(project => {
+      // Defesa por objeto: se o projeto estiver malformado
+      if (!project) return;
+
       let categoryDisplayName: string = labels.categories.dev; 
       
-      // 1. Mapeamento de Tópicos para Categorias
-      const matchedTopicKey = project.topics.find(t => t.toLowerCase() in TOPIC_TO_CATEGORY);
+      // FIX: Verificação segura de topics (Cannot read properties of undefined reading 'find')
+      const topics = project.topics ?? [];
+      const matchedTopicKey = topics.find(t => t && t.toLowerCase() in TOPIC_TO_CATEGORY);
       
       if (matchedTopicKey) {
         const categoryId = TOPIC_TO_CATEGORY[matchedTopicKey.toLowerCase() as keyof typeof TOPIC_TO_CATEGORY];
@@ -48,24 +54,20 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
           categoryDisplayName = labels.categories[categoryId as keyof typeof labels.categories] || categoryId;
         }
       } else {
-        // 2. Fallback para Tecnologia Principal
-        const techKey = project.technology.labelKey as keyof typeof labels.categories;
+        const techKey = project.technology?.labelKey as keyof typeof labels.categories;
         categoryDisplayName = labels.categories[techKey] || labels.categories.dev;
       }
 
-      // FIX: Garantia de existência do grupo usando referência para evitar erro de 'undefined'
       if (!groups[categoryDisplayName]) {
         groups[categoryDisplayName] = [];
       }
       
-      // Acessamos o grupo e garantimos ao TS que ele não é nulo/undefined aqui
       const currentGroup = groups[categoryDisplayName];
       if (currentGroup) {
         currentGroup.push(project);
       }
     });
 
-    // Ordenação de Seções e Projetos
     return Object.keys(groups)
       .sort((a, b) => {
         const weightA = CATEGORY_ORDER[a as keyof typeof CATEGORY_ORDER] ?? 99;
@@ -79,23 +81,26 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
           if (!a.isFirst && b.isFirst) return 1;
           if (a.isFeatured && !b.isFeatured) return -1;
           if (!a.isFeatured && b.isFeatured) return 1;
-          return a.name.localeCompare(b.name);
+          return (a.name || '').localeCompare(b.name || '');
         })
       }));
   }, [projects, labels]);
 
-  // Estado Vazio (Proteção de Interface)
-  if (projects.length === 0) {
+  /**
+   * EMPTY STATE / LOADING DURANTE PRERENDER
+   * Evita que a página quebre se a API falhar no build
+   */
+  if (!projects || projects.length === 0) {
     return (
       <section id="projects" className="py-24 text-center px-6 bg-slate-50/50 dark:bg-slate-900/10">
         <div className="inline-flex items-center justify-center p-6 rounded-3xl bg-blue-50 dark:bg-blue-900/20 mb-8">
           <div className="animate-pulse w-10 h-10 bg-blue-600 rounded-xl shadow-lg shadow-blue-500/40" />
         </div>
         <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
-          {dict.states?.emptyProjects?.title || "Projetos em atualização"}
+          {dict.states?.emptyProjects?.title || "Sincronizando Projetos..."}
         </h3>
         <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-          {dict.states?.emptyProjects?.description || "Aguardando sincronização com a API do GitHub..."}
+          {dict.states?.emptyProjects?.description || "Estamos obtendo os dados mais recentes do GitHub."}
         </p>
       </section>
     );
@@ -107,22 +112,19 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
       className="py-24 bg-slate-50/30 dark:bg-[#020617]/30 backdrop-blur-md transition-colors duration-500"
     >
       <div className="container mx-auto px-6 max-w-7xl">
-        {/* Cabeçalho da Seção - Tailwind 4.2 Modern Design */}
         <header className="mb-24">
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white leading-[0.85]">
-            {labels.title.split(' ')[0]}{" "}
+            {(labels.title || "Portfolio").split(' ')[0]}{" "}
             <span className="text-blue-600 dark:text-blue-500 block sm:inline">
-              {labels.title.split(' ').slice(1).join(' ')}
+              {(labels.title || "").split(' ').slice(1).join(' ')}
             </span>
           </h2>
           <div className="h-2.5 w-32 bg-blue-600 mt-8 rounded-full shadow-[0_10px_20px_rgba(37,99,235,0.3)]" />
         </header>
 
-        {/* Listagem de Grupos */}
         <div className="space-y-32">
           {groupedProjects.map((group) => (
             <div key={group.name} className="group/section space-y-12">
-              {/* Divider de Categoria */}
               <div className="flex items-center gap-8">
                 <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.5em] text-blue-600 dark:text-blue-400">
                   {group.name}
@@ -133,7 +135,6 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
                 </span>
               </div>
 
-              {/* Grid Responsivo Dinâmico */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
                 {group.projects.map((project) => (
                   <ProjectCard 
