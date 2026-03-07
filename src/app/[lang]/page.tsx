@@ -2,8 +2,8 @@
  * HOME PAGE - PORTFÓLIO SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
  * ✔ Stack: Next.js 16, React 19, TS 6.0, Tailwind 4.2, Node 24
- * ✔ I18n: Suporte nativo a pt-BR, en-US, es-ES (e variantes AR/MX)
- * ✔ Responsividade: Mobile-first com containers Max-7xl
+ * ✔ I18n: Suporte nativo a pt-BR, en-US, es-ES, es-AR, es-MX
+ * ✔ Responsividade: Mobile-first otimizado para Vercel
  */
 
 import type { Metadata, Viewport } from "next";
@@ -14,7 +14,7 @@ import type { Locale, Dictionary } from "@/types/dictionary";
 
 // Services & Helpers
 import { getServerDictionary } from "@/lib/getServerDictionary";
-import { getProjects } from "@/services/github"; // Serviço unificado com Octokit
+import { getGitHubProjects } from "@/services/githubService"; // Importação unificada
 import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales";
 
 // Components
@@ -31,8 +31,9 @@ interface PageProps {
   params: Promise<{ lang: string }>;
 }
 
+// Configurações de Cache e Renderização da Vercel
 export const dynamic = "force-static";
-export const revalidate = 3600; // Revalida a cada hora para atualizar projetos do GitHub
+export const revalidate = 3600; // Atualiza o cache do GitHub a cada hora
 
 export async function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }));
@@ -66,21 +67,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function HomePage({ params }: PageProps) {
   const { lang: rawLang } = await params;
 
+  // Validação de Locale para Next.js 16
   if (!isValidLocale(rawLang)) {
     notFound();
   }
 
   const lang = rawLang as Locale;
   
-  // Busca paralela de Dicionário e Projetos (Direct Server Fetching)
+  /**
+   * DATA FETCHING - SERVER SIDE
+   * ✔ getGitHubProjects utiliza o Octokit internamente.
+   * ✔ O processamento de "Pipes" (|) ocorre dentro do serviço.
+   */
   const [dictData, allProjects] = await Promise.all([
     getServerDictionary(lang),
-    getProjects() 
+    getGitHubProjects("Santosdevbjj") // Nome de usuário injetado corretamente
   ]);
 
   if (!dictData) notFound();
 
-  // Tratamento de segurança para o dicionário
+  // Tratamento de segurança para o dicionário (TS 6.0 Strict Null Checks)
   const dict: Dictionary = {
     ...dictData,
     contact: {
@@ -93,12 +99,12 @@ export default async function HomePage({ params }: PageProps) {
     <ProxyPage lang={lang}>
       <main id="main-content" className="flex flex-col min-h-screen bg-white dark:bg-[#020617] transition-colors duration-500">
         
-        {/* HERO - Header responsivo com padding para mobile */}
+        {/* SEÇÃO HERO - Otimizada para Tailwind 4.2 */}
         <div className="pt-20 lg:pt-0">
           <HeroSection dictionary={dict} />
         </div>
 
-        {/* SOBRE & HIGHLIGHTS */}
+        {/* SOBRE & HIGHLIGHTS - Responsividade 7xl */}
         <section id="about" className="relative overflow-hidden">
           <AboutSection dict={dict.about} />
           
@@ -106,7 +112,7 @@ export default async function HomePage({ params }: PageProps) {
             <CareerHighlights dict={dict} />
           </div>
 
-          {/* Botão de CV Adaptativo */}
+          {/* Chamada para Ação: Download CV Multilíngue */}
           <div className="container mx-auto px-6 py-16 flex justify-center md:justify-start max-w-7xl">
             <a 
               href={`/cv-sergio-santos-${lang}.pdf`} 
@@ -114,29 +120,29 @@ export default async function HomePage({ params }: PageProps) {
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-2xl active:scale-95"
             >
-              <span className="group-hover:mr-2 transition-all">↓</span>
+              <span className="group-hover:translate-y-1 transition-transform">↓</span>
               {dict.contact.cvLabel}
             </a>
           </div>
         </section>
 
-        {/* EXPERIÊNCIA - Server Side Rendered */}
+        {/* EXPERIÊNCIA PROFISSIONAL */}
         <ExperienceSection experience={dict.experience} />
 
-        {/* PORTFÓLIO - Injeção de dados do GitHub já filtrados */}
+        {/* GRID DE PORTFÓLIO - Projetos do GitHub Processados */}
         <PortfolioGrid 
           projects={allProjects} 
           lang={lang} 
           dict={dict} 
         />
 
-        {/* CONTEÚDO TÉCNICO */}
+        {/* ARTIGOS TÉCNICOS */}
         <FeaturedArticleSection 
           articles={dict.articles} 
           common={dict.common} 
         />
 
-        {/* FOOTER & CTA */}
+        {/* CONTATO & RODAPÉ */}
         <ContactSection 
           contact={dict.contact} 
           common={dict.common} 
