@@ -4,8 +4,8 @@
  * PORTFOLIO GRID COMPONENT
  * -----------------------------------------------------------------------------
  * ✔ Stack: React 19, Next.js 16, TS 6.0, Tailwind 4.2
- * ✔ Responsividade: Grid Adaptativo 1 -> 2 -> 3 colunas (max-7xl)
- * ✔ I18n: Agrupamento dinâmico baseado em chaves do dicionário
+ * ✔ Fix: Resolvido erro de "string | undefined" no agrupamento
+ * ✔ I18n: Fallbacks seguros para chaves de tradução
  */
 
 import { useMemo } from 'react';
@@ -30,20 +30,24 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
 
   /**
    * Agrupamento Inteligente de Projetos
-   * TS 6.0: Utiliza inferência estrita para garantir que as chaves existam no dicionário
+   * Corrigido para satisfazer o Strict Null Checks do TS 6.0
    */
   const groupedProjects = useMemo((): ProjectGroup[] => {
     const groups: Record<string, ProjectDomain[]> = {};
     
     projects.forEach(project => {
-      let categoryDisplayName: string;
+      let categoryDisplayName: string = labels.categories.dev; // Default seguro
       
       // 1. Tenta encontrar por tópicos (Data Science, Web, etc)
       const matchedTopicKey = project.topics.find(t => t.toLowerCase() in TOPIC_TO_CATEGORY);
       
       if (matchedTopicKey) {
-        const categoryId = TOPIC_TO_CATEGORY[matchedTopicKey.toLowerCase()];
-        categoryDisplayName = labels.categories[categoryId as keyof typeof labels.categories] || categoryId;
+        // Forçamos o tipo para string para garantir que categoryId não seja undefined
+        const categoryId = TOPIC_TO_CATEGORY[matchedTopicKey.toLowerCase() as keyof typeof TOPIC_TO_CATEGORY];
+        
+        if (categoryId) {
+          categoryDisplayName = labels.categories[categoryId as keyof typeof labels.categories] || categoryId;
+        }
       } else {
         // 2. Fallback para a tecnologia principal detectada pelo serviço
         const techKey = project.technology.labelKey as keyof typeof labels.categories;
@@ -66,7 +70,6 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
       .map(groupName => ({
         name: groupName,
         projects: [...(groups[groupName] ?? [])].sort((a, b) => {
-          // Prioridade: 1º 'isFirst' (Projeto Principal), 2º 'isFeatured' (Destaque)
           if (a.isFirst && !b.isFirst) return -1;
           if (!a.isFirst && b.isFirst) return 1;
           if (a.isFeatured && !b.isFeatured) return -1;
@@ -76,10 +79,7 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
       }));
   }, [projects, labels]);
 
-  /**
-   * EMPTY STATE
-   * Caso não existam projetos com a tag 'portfolio' no GitHub
-   */
+  // Seção de Empty State (Estado Vazio)
   if (projects.length === 0) {
     return (
       <section id="projects" className="py-24 text-center px-6 bg-slate-50/50 dark:bg-slate-900/10">
@@ -102,7 +102,6 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
       className="py-24 bg-slate-50/30 dark:bg-[#020617]/30 backdrop-blur-sm transition-colors duration-500"
     >
       <div className="container mx-auto px-6 max-w-7xl">
-        {/* TÍTULO DA SEÇÃO - Estilo Editorial Impactante */}
         <header className="mb-24">
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white leading-[0.9]">
             {labels.title.split(' ')[0]}{" "}
@@ -113,11 +112,9 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
           <div className="h-2.5 w-32 bg-blue-600 mt-8 rounded-full shadow-2xl shadow-blue-500/30" />
         </header>
 
-        {/* LISTAGEM AGRUPADA */}
         <div className="space-y-32">
           {groupedProjects.map((group) => (
             <div key={group.name} className="group/section space-y-12">
-              {/* HEADER DO GRUPO (ex: DATA SCIENCE, WEB DEV) */}
               <div className="flex items-center gap-8">
                 <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.5em] text-blue-600 dark:text-blue-400">
                   {group.name}
@@ -128,7 +125,6 @@ export function PortfolioGrid({ projects, dict }: PortfolioGridProps) {
                 </span>
               </div>
 
-              {/* GRID DOS CARDS - Totalmente Responsivo */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
                 {group.projects.map((project) => (
                   <ProjectCard 
