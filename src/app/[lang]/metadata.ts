@@ -15,13 +15,14 @@ interface MetadataProps {
 
 /**
  * Gerador de Metadados robusto e tipado para TS 6.0 e Next.js 16
- * Totalmente alinhado com a estrutura física de arquivos em /public
+ * ✔ Resolve erro de "possibly undefined" em dict.seo.pages
+ * ✔ Alinhado com arquivos físicos em /public
  */
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
-  // No Next.js 16, params DEVE ser aguardado (Promise)
+  // No Next.js 16, params deve ser aguardado
   const { lang: rawLang } = await params;
 
-  // Validação rigorosa do locale
+  // Validação do locale
   if (!isValidLocale(rawLang)) {
     notFound();
   }
@@ -29,13 +30,14 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
   const lang: Locale = rawLang;
   const dict = await getDictionary(lang);
 
-  // Extração segura do dicionário (conforme src/types/dictionary.ts)
-  const pageTitle = dict.seo.pages.home.title || dict.seo.siteName;
-  const pageDescription = dict.seo.pages.home.description || dict.seo.description;
+  // RESOLUÇÃO DO ERRO DE BUILD: Extração segura usando Optional Chaining
+  // O Fallback garante que se 'home' for undefined, o build não quebre e use o valor global
+  const pageTitle = dict.seo.pages?.home?.title ?? dict.seo.siteName;
+  const pageDescription = dict.seo.pages?.home?.description ?? dict.seo.description;
 
   /**
    * MAPA DE IMAGENS OG (Open Graph)
-   * Corrigido para bater EXATAMENTE com os arquivos físicos listados em /public
+   * Vinculado exatamente aos arquivos em /public
    */
   const ogImageMap: Record<Locale, string> = {
     'pt-BR': '/og-image-pt-BR.png',
@@ -47,7 +49,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
 
   /**
    * MAPA DE LOCALES ISO
-   * Necessário para correta interpretação por crawlers (ex: pt_BR)
+   * Necessário para crawlers (ex: pt-BR vira pt_BR no meta tag)
    */
   const ogLocaleMap: Record<Locale, string> = {
     'pt-BR': 'pt_BR',
@@ -57,10 +59,9 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     'es-MX': 'es_MX',
   };
 
-  // Caminho absoluto da imagem para SEO máximo
   const finalOgImage = `${SITE_URL}${ogImageMap[lang]}`;
 
-  // Geração dinâmica de tags alternadas (Hreflang) para SEO internacional
+  // Hreflang para SEO Internacional
   const languages = SUPPORTED_LOCALES.reduce((acc, loc) => {
     acc[loc] = `${SITE_URL}/${loc}`;
     return acc;
