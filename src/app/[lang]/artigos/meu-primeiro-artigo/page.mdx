@@ -2,24 +2,32 @@ import MdxLayout from '@/components/mdx-layout'
 import { getServerDictionary } from "@/lib/getServerDictionary"
 import { normalizeLocale } from "@/dictionaries/locales"
 
-export default async function Page(props: { params: Promise<{ lang: string }> }) {
-  const { lang } = await props.params;
+export const dynamic = 'force-static';
+
+export default async function Page(props) {
+  const params = await props.params;
+  const lang = params.lang;
   const dict = await getServerDictionary(lang);
   const safeLang = normalizeLocale(lang);
 
+  // Extraímos os dados do dicionário para variáveis simples
+  // Isso evita erros de parsing do Acorn dentro do JSX do MDX
+  const article = dict.articles.items[0];
+  const title = article?.title || "Artigo";
+  const description = article?.description || "";
+
   return (
     <MdxLayout lang={safeLang} dict={dict}>
-      {/* O conteúdo abaixo é processado pelo Typography Engine do Tailwind 4.2 
-          configurado no seu MdxLayout.tsx
-      */}
       
-      # {dict.articles.items[0]?.title || "Meu Primeiro Artigo Técnico"}
+      # {title}
 
-      > {dict.articles.items[0]?.description || "Este é um exemplo de artigo escrito manualmente."}
+      > {description}
 
       ## Por que usar MDX manual?
 
-      - **Controle Total**: Integre componentes React 19 diretamente no texto.
+      O uso de MDX permite unir a simplicidade do Markdown com o poder do **React 19**. No contexto do seu portfólio, isso garante:
+
+      - **Controle Total**: Integre componentes diretamente no texto.
       - **Performance Máxima**: O Next.js 16 pré-renderiza este conteúdo no servidor.
       - **SEO Nativo**: Totalmente compatível com os metadados do seu dicionário.
 
@@ -27,16 +35,16 @@ export default async function Page(props: { params: Promise<{ lang: string }> })
 
       ## Exemplo de Código
 
-      Abaixo, um exemplo de implementação consistente com o Node 24:
+      Abaixo, um exemplo de implementação consistente com o **Node 24** e o novo motor do **Tailwind 4.2**:
 
       ```javascript
-      // Exemplo de log de sistema
-      console.log("Sistema operando em Node 24");
+      // Exemplo de log de sistema em Node 24
+      console.log("Sistema operando em Node 24 com Vercel iad1");
       ```
 
       ### Conclusão
 
-      Este artigo está integrado ao seu sistema de **i18n** e utiliza o `TableOfContents` para gerar o sumário automaticamente a partir destes títulos (H2 e H3).
+      Este artigo está totalmente integrado ao seu sistema de **i18n** (Português, Inglês e Espanhol) e utiliza o `TableOfContents` para gerar o sumário automaticamente a partir destes títulos.
 
     </MdxLayout>
   );
