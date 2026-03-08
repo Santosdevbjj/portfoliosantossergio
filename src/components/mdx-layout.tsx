@@ -9,7 +9,7 @@ import type { Dictionary, Locale } from "@/types/dictionary";
  * ✔ Stack: TS 6.0, Node 24, Tailwind 4.2, Next 16
  * ✔ I18n: Suporte dinâmico para pt-BR, en, es (ES/AR/MX)
  * ✔ Responsivo: Layout adaptativo com Sidebar inteligente em LG+
- * ✔ Alinhamento: Integrado ao Dicionário e Tipagem Strict
+ * ✔ Alinhamento: Integrado ao Dicionário e Tipagem Strict (Fix: SEO Undefined)
  */
 
 interface MdxLayoutProps {
@@ -21,21 +21,29 @@ interface MdxLayoutProps {
 export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
   
   /**
+   * RESOLUÇÃO DO ERRO DE BUILD:
+   * Acessamos 'articles' via chave de string com fallback para evitar o erro 'possibly undefined'
+   * causado pela index signature no SeoDictionary.
+   */
+  const articlesSeo = dict.seo.pages["articles"];
+  const articlesTitle = articlesSeo?.title || dict.articles.title;
+
+  /**
    * Lógica de tradução para o botão de retorno baseada no dicionário.
    * Utiliza chaves existentes no pt-BR.json para manter a consistência.
    */
   const getBackLabel = () => {
     const label = dict.states.emptyProjects.cta; // "Voltar"
-    const context = dict.seo.pages.articles.title; // "Artigos"
+    const context = articlesTitle; // "Artigos"
     
-    // Gramática dinâmica por idioma
-    if (lang === 'pt-BR') return `${label} para ${context}`;
-    if (lang === 'en') return `${label} to ${context}`;
-    return `${label} a ${context}`; // Fallback para variações de espanhol (ES/AR/MX)
+    // Gramática dinâmica por idioma (Suporte PT, EN, ES)
+    if (lang.startsWith('pt')) return `${label} para ${context}`;
+    if (lang.startsWith('en')) return `${label} to ${context}`;
+    return `${label} a ${context}`; // Fallback para variações de espanhol
   };
 
   // Título do artigo para o Share (tenta pegar do primeiro item ou usa o título da página)
-  const articleTitle = dict.articles.items[0]?.title || dict.seo.pages.articles.title;
+  const articleTitle = dict.articles.items[0]?.title || articlesTitle;
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#020617] pt-24 pb-20 selection:bg-blue-500/30">
@@ -59,7 +67,7 @@ export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
             </Link>
           </div>
 
-          {/* Typography Engine - Tailwind 4.2 Optimized (usando as novas utilidades de espaçamento e cores) */}
+          {/* Typography Engine - Tailwind 4.2 Optimized */}
           <div className="prose prose-slate dark:prose-invert lg:prose-xl 
             max-w-none
             prose-headings:font-black prose-headings:tracking-tighter prose-headings:italic
@@ -72,7 +80,6 @@ export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
             {children}
           </div>
 
-          {/* COMPONENTE INTEGRADO: ShareArticle com props dict e lang atualizadas */}
           <ShareArticle 
             title={articleTitle} 
             dict={dict} 
@@ -84,7 +91,6 @@ export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
         <aside className="lg:w-80 w-full lg:block">
           <div className="lg:sticky lg:top-32 space-y-8">
             
-            {/* TableOfContents utilizando o dicionário para acessibilidade */}
             <TableOfContents dict={dict} />
             
             {/* Bloco Informativo do Autor (Card lateral) */}
@@ -104,7 +110,6 @@ export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
             </div>
           </div>
         </aside>
-
       </div>
     </main>
   );
