@@ -1,28 +1,43 @@
 import MdxLayout from '@/components/mdx-layout'
+import { getServerDictionary } from "@/lib/getServerDictionary"
+import { normalizeLocale } from "@/dictionaries/locales"
 
-# Meu Primeiro Artigo Técnico
+export default async function Page(props: { params: Promise<{ lang: string }> }) {
+  const { lang } = await props.params;
+  const dict = await getServerDictionary(lang);
+  const safeLang = normalizeLocale(lang);
 
-Este é um exemplo de artigo escrito **manualmente** dentro do projeto usando a extensão `.mdx`.
+  return (
+    <MdxLayout lang={safeLang} dict={dict}>
+      {/* O conteúdo abaixo é processado pelo Typography Engine do Tailwind 4.2 
+          configurado no seu MdxLayout.tsx
+      */}
+      
+      # {dict.articles.items[0]?.title || "Meu Primeiro Artigo Técnico"}
 
-### Por que usar MDX manual?
-- Controle total sobre os componentes.
-- Performance máxima (gerado no build).
-- Ideal para guias definitivos do seu portfólio.
+      > {dict.articles.items[0]?.description || "Este é um exemplo de artigo escrito manualmente."}
 
-export default function MDXPage({ children }) {
-  return <MdxLayout>{children}</MdxLayout>
+      ## Por que usar MDX manual?
+
+      - **Controle Total**: Integre componentes React 19 diretamente no texto.
+      - **Performance Máxima**: O Next.js 16 pré-renderiza este conteúdo no servidor.
+      - **SEO Nativo**: Totalmente compatível com os metadados do seu dicionário.
+
+      ---
+
+      ## Exemplo de Código
+
+      Abaixo, um exemplo de implementação consistente com o Node 24:
+
+      ```javascript
+      // Exemplo de log de sistema
+      console.log("Sistema operando em Node 24");
+      ```
+
+      ### Conclusão
+
+      Este artigo está integrado ao seu sistema de **i18n** e utiliza o `TableOfContents` para gerar o sumário automaticamente a partir destes títulos (H2 e H3).
+
+    </MdxLayout>
+  );
 }
-
-
-
-
-
-
-
-# Bem-vindo ao meu Artigo Técnico
-
-Este artigo foi escrito em **MDX**! 
-
-Aqui está um exemplo de código:
-```javascript
-console.log("Olá Mundo!");
