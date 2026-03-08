@@ -1,13 +1,13 @@
 {
   "meta": {
-    "version": "1.0.0",
+    "version": "1.0.1",
     "locale": "pt-BR",
     "direction": "ltr",
-    "lastUpdated": "2026-03-05T21:00:00Z",
+    "lastUpdated": "2026-03-08T21:00:00Z",
     "author": "Sérgio Santos",
     "source": "manual",
-    "contentVersion": "2026.03.05",
-    "contentHash": "i18n-ptbr-2026-03-05",
+    "contentVersion": "2026.03.08",
+    "contentHash": "i18n-ptbr-2026-03-08",
     "sourceType": "curated-manual",
     "description": "Portfólio multilíngue de Sérgio Santos, especialista em Ciência de Dados e Engenharia de Software."
   },
@@ -99,19 +99,32 @@
     },
 
     "categories": {
+
       "Data Engineering": { "labelKey": "Engenharia de Dados" },
       "Cloud & Infrastructure": { "labelKey": "Nuvem e Infraestrutura" },
       "Data Science": { "labelKey": "Ciência de Dados" },
       "Data Analytics": { "labelKey": "Análise de Dados" },
       "Outros": { "labelKey": "Outros Projetos" },
+
       "dataScience": { "labelKey": "Ciência de Dados" },
-      "cloud": { "labelKey": "Azure Databricks" },
-      "graphs": { "labelKey": "Neo4J" },
-      "analysis": { "labelKey": "Power BI & Análise" },
-      "excel": { "labelKey": "Excel" },
-      "database": { "labelKey": "Banco de Dados" },
-      "dev": { "labelKey": "Desenvolvimento" },
-      "security": { "labelKey": "Segurança" }
+      "cloud": { "labelKey": "Cloud & Databricks" },
+      "graphs": { "labelKey": "Análise de Grafos (Neo4J)" },
+      "analysis": { "labelKey": "Análise de Dados & Power BI" },
+      "excel": { "labelKey": "Excel e Modelagem de Dados" },
+      "database": { "labelKey": "Banco de Dados & SQL" },
+
+      "dev": { "labelKey": "Desenvolvimento de Software" },
+      "security": { "labelKey": "Cibersegurança" },
+
+      "html": { "labelKey": "HTML" },
+      "css": { "labelKey": "CSS" },
+      "javascript": { "labelKey": "JavaScript" },
+      "typescript": { "labelKey": "TypeScript" },
+      "next": { "labelKey": "Next.js" },
+      "node": { "labelKey": "Node.js" },
+      "react": { "labelKey": "React" },
+      "articles": { "labelKey": "Artigos Técnicos" }
+
     },
 
     "featuredProjects": []
@@ -144,35 +157,11 @@
       "system": "Sistema"
     },
 
-    "errorBoundary": {
-      "title": "Ops! Erro inesperado.",
-      "description": "Entre em contato se o problema persistir.",
-      "actions": {
-        "retry": "Tentar novamente",
-        "home": "Início"
-      }
-    },
-
-    "notFound": {
-      "title": "Página não encontrada",
-      "description": "O link pode estar quebrado.",
-      "button": "Voltar"
-    },
-
     "externalLinks": {
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
       "medium": "https://medium.com/@sergiosantosluiz",
       "email": "mailto:santossergiorealbjj@outlook.com"
-    },
-
-    "menu": {
-      "open": "Abrir",
-      "close": "Fechar",
-      "aria": {
-        "open": "Abrir menu",
-        "close": "Fechar menu"
-      }
     }
   },
 
