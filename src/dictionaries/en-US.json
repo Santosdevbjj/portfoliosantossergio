@@ -1,32 +1,32 @@
 {
   "meta": {
-    "version": "1.0.0",
+    "version": "1.0.1",
     "locale": "en-US",
     "direction": "ltr",
-    "lastUpdated": "2026-03-05T20:40:00Z",
+    "lastUpdated": "2026-03-08T21:00:00Z",
     "author": "Sérgio Santos",
     "source": "manual",
-    "contentVersion": "2026.03.05",
-    "contentHash": "i18n-enus-2026-03-05",
+    "contentVersion": "2026.03.08",
+    "contentHash": "i18n-ptbr-2026-03-08",
     "sourceType": "curated-manual",
-    "description": "Multilingual portfolio of Sérgio Santos, specialist in Data Science, Artificial Intelligence and Software Engineering."
+    "description": "Multilingual portfolio of Sérgio Santos, specialist in Data Science and Software Engineering."
   },
 
   "hero": {
-    "greeting": "Available for Mission-Critical Projects",
+    "greeting": "Available for Critical Projects",
     "title": "Data Science Analyst",
-    "subtitle": "Data & Resilience",
+    "subtitle": "Data and Resilience",
     "headline": "Specialist in transforming complex infrastructures into high-availability systems and scalable data pipelines.",
     "ctaPrimary": "View Projects"
   },
 
   "about": {
     "title": "About Me",
-    "differentialTitle": "Data Engineering with a Mission-Critical Focus",
-    "description": "Data Science Analyst with a solid background in critical banking systems, focused on transforming data into decisions, cost reduction, and operational efficiency.",
-    "differentialContent": "I worked for more than 15 years at Banco Bradesco in regulated mission-critical environments. Today I focus on Data Science and AI, applying the rigor of critical systems to the creation of predictive models.",
+    "differentialTitle": "Data Engineering Focused on Mission-Critical Systems",
+    "description": "Data Science Analyst with a strong background in critical banking systems and focused on transforming data into decisions, cost reduction, and operational efficiency.",
+    "differentialContent": "I worked for more than 15 years at Banco Bradesco in regulated mission-critical environments. I currently focus my work on Data Science and AI.",
     "highlights": [
-      "15+ Years in Banking",
+      "15+ years in Banking",
       "Cloud Specialist",
       "Data Science & AI"
     ],
@@ -41,7 +41,7 @@
 
   "contact": {
     "title": "Let's Talk?",
-    "subtitle": "Seeking opportunities in governance and modernization projects.",
+    "subtitle": "I am seeking opportunities in governance and modernization projects.",
     "cta": "Send Email",
     "emailLabel": "Copy Email",
     "cvLabel": "View CV",
@@ -55,24 +55,24 @@
     "emptyLabel": "No experience found",
     "items": [
       {
-        "company": "Freelance Consultant / Transition",
+        "company": "Independent Consultant / Transition",
         "period": "2008 - Present",
-        "role": "Mission-Critical Systems Specialist",
-        "description": "Architecture and maintenance of resilient data pipelines and infrastructure, with focus on Data Science and intelligent automation."
+        "role": "Critical Systems Specialist",
+        "description": "Architecture and maintenance of data pipelines and resilient infrastructure."
       }
     ]
   },
 
   "articles": {
     "title": "Technical Articles",
-    "mediumProfile": "View Medium profile",
+    "mediumProfile": "View profile on Medium",
     "readMore": "Read full article",
     "publishedAt": "Published on",
-    "bestOfMonth": "Featured Article of the Month",
+    "bestOfMonth": "Featured of the Month",
     "awardWinner": "Award-Winning Article",
     "items": [
       {
-        "title": "The Era of Data in Critical Systems",
+        "title": "The Data Era in Critical Systems",
         "description": "How data governance transforms legacy systems into strategic assets.",
         "date": "2025",
         "category": "Data Strategy",
@@ -85,8 +85,8 @@
   "projects": {
     "title": "Projects and Solutions",
     "featuredLabel": "Technical Highlight",
-    "firstLabel": "Challenge & Architecture",
-    "impactLabel": "Impact & Results",
+    "firstLabel": "Challenge and Architecture",
+    "impactLabel": "Impact and Outcome",
     "problem": "Problem",
     "solution": "Solution",
     "viewProject": "GitHub Repository",
@@ -99,19 +99,32 @@
     },
 
     "categories": {
+
       "Data Engineering": { "labelKey": "Data Engineering" },
-      "Cloud & Infrastructure": { "labelKey": "Cloud & Infrastructure" },
+      "Cloud & Infrastructure": { "labelKey": "Cloud and Infrastructure" },
       "Data Science": { "labelKey": "Data Science" },
       "Data Analytics": { "labelKey": "Data Analytics" },
       "Outros": { "labelKey": "Other Projects" },
+
       "dataScience": { "labelKey": "Data Science" },
-      "cloud": { "labelKey": "Azure Databricks" },
-      "graphs": { "labelKey": "Neo4J" },
-      "analysis": { "labelKey": "Power BI & Analysis" },
-      "excel": { "labelKey": "Excel" },
-      "database": { "labelKey": "Database" },
-      "dev": { "labelKey": "Development" },
-      "security": { "labelKey": "Security" }
+      "cloud": { "labelKey": "Cloud & Databricks" },
+      "graphs": { "labelKey": "Graph Analysis (Neo4J)" },
+      "analysis": { "labelKey": "Data Analysis & Power BI" },
+      "excel": { "labelKey": "Excel and Data Modeling" },
+      "database": { "labelKey": "Database & SQL" },
+
+      "dev": { "labelKey": "Software Development" },
+      "security": { "labelKey": "Cybersecurity" },
+
+      "html": { "labelKey": "HTML" },
+      "css": { "labelKey": "CSS" },
+      "javascript": { "labelKey": "JavaScript" },
+      "typescript": { "labelKey": "TypeScript" },
+      "next": { "labelKey": "Next.js" },
+      "node": { "labelKey": "Node.js" },
+      "react": { "labelKey": "React" },
+      "articles": { "labelKey": "Technical Articles" }
+
     },
 
     "featuredProjects": []
@@ -144,35 +157,11 @@
       "system": "System"
     },
 
-    "errorBoundary": {
-      "title": "Oops! Unexpected error.",
-      "description": "Please contact me if the problem persists.",
-      "actions": {
-        "retry": "Try again",
-        "home": "Home"
-      }
-    },
-
-    "notFound": {
-      "title": "Page not found",
-      "description": "The link may be broken.",
-      "button": "Go Back"
-    },
-
     "externalLinks": {
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
       "medium": "https://medium.com/@sergiosantosluiz",
       "email": "mailto:santossergiorealbjj@outlook.com"
-    },
-
-    "menu": {
-      "open": "Open",
-      "close": "Close",
-      "aria": {
-        "open": "Open menu",
-        "close": "Close menu"
-      }
     }
   },
 
@@ -193,10 +182,10 @@
     "emptyProjects": {
       "title": "No projects",
       "description": "Coming soon.",
-      "cta": "Go Back"
+      "cta": "Back"
     },
 
-    "emptyExperience": "No records found.",
+    "emptyExperience": "No records.",
     "errorArticles": "Error loading articles."
   },
 
@@ -204,9 +193,9 @@
     "title": "Cookies",
     "description": "We improve your experience.",
     "necessary": "Necessary",
-    "alwaysActive": "Always Active",
+    "alwaysActive": "Always active",
     "analytics": "Analytics",
-    "acceptAll": "Accept All",
+    "acceptAll": "Accept",
     "savePreferences": "Save"
   },
 
@@ -226,7 +215,7 @@
     "pages": {
       "home": {
         "title": "Home",
-        "description": "Portfolio of Sérgio Santos"
+        "description": "Sérgio Santos Portfolio"
       },
       "projects": {
         "title": "Projects",
