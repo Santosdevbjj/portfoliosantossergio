@@ -46,7 +46,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
   const dict = await getServerDictionary(locale);
   
-  // Caminho ABSOLUTO da imagem específica por idioma
   const ogImageUrl = `${siteUrl}/og-image-${locale}.png`; 
 
   return {
@@ -58,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: dict.seo.description,
     keywords: dict.seo.keywords,
     
-    // TAG DO GOOGLE PRESERVADA
+    // TAG DO GOOGLE PRESERVADA (CONFORME SOLICITADO)
     verification: {
       google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
     },
@@ -68,7 +67,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: dict.seo.description,
       url: `${siteUrl}/${locale}`,
       siteName: dict.seo.siteName,
-      locale: locale.replace("-", "_"), // Formato padrão OG (ex: pt_BR)
+      locale: locale.replace("-", "_"),
       type: "website",
       images: [
         {
@@ -102,7 +101,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 /* =========================================
-   VIEWPORT
+   VIEWPORT (Separado conforme Next.js 16)
 ========================================= */
 export const viewport: Viewport = {
   width: "device-width",
@@ -117,6 +116,7 @@ export default async function LangLayout(props: {
   children: ReactNode;
   params: Promise<{ lang: string }>;
 }) {
+  // No Next.js 16, params é uma Promise
   const { lang } = await props.params;
   const children = props.children;
   const locale = normalizeLocale(lang);
@@ -174,7 +174,7 @@ export default async function LangLayout(props: {
           />
         </ScrollSpyProvider>
 
-        {/* Google Analytics - Mantido conforme solicitado */}
+        {/* Google Analytics - Mantido intacto */}
         {gaId && (
           <>
             <Script
