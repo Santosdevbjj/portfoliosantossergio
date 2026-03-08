@@ -22,17 +22,20 @@ export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
   
   /**
    * Lógica de tradução para o botão de retorno baseada no dicionário.
-   * Utiliza a chave 'states.emptyProjects.cta' ou 'seo.pages.articles.title' 
-   * conforme a estrutura do seu JSON.
+   * Utiliza chaves existentes no pt-BR.json para manter a consistência.
    */
   const getBackLabel = () => {
     const label = dict.states.emptyProjects.cta; // "Voltar"
     const context = dict.seo.pages.articles.title; // "Artigos"
     
+    // Gramática dinâmica por idioma
     if (lang === 'pt-BR') return `${label} para ${context}`;
     if (lang === 'en') return `${label} to ${context}`;
-    return `${label} a ${context}`; // Fallback para variações de espanhol
+    return `${label} a ${context}`; // Fallback para variações de espanhol (ES/AR/MX)
   };
+
+  // Título do artigo para o Share (tenta pegar do primeiro item ou usa o título da página)
+  const articleTitle = dict.articles.items[0]?.title || dict.seo.pages.articles.title;
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#020617] pt-24 pb-20 selection:bg-blue-500/30">
@@ -56,7 +59,7 @@ export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
             </Link>
           </div>
 
-          {/* Typography Engine - Tailwind 4.2 Optimized */}
+          {/* Typography Engine - Tailwind 4.2 Optimized (usando as novas utilidades de espaçamento e cores) */}
           <div className="prose prose-slate dark:prose-invert lg:prose-xl 
             max-w-none
             prose-headings:font-black prose-headings:tracking-tighter prose-headings:italic
@@ -69,15 +72,19 @@ export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
             {children}
           </div>
 
-          {/* Componente de Compartilhamento Integrado */}
-          <ShareArticle title={dict.articles.items[0]?.title || dict.seo.title} />
+          {/* COMPONENTE INTEGRADO: ShareArticle com props dict e lang atualizadas */}
+          <ShareArticle 
+            title={articleTitle} 
+            dict={dict} 
+            lang={lang} 
+          />
         </article>
 
         {/* Sidebar para Sumário (Escondida em mobile, visível em LG+) */}
         <aside className="lg:w-80 w-full lg:block">
           <div className="lg:sticky lg:top-32 space-y-8">
             
-            {/* Agora passando corretamente o dict para o TableOfContents */}
+            {/* TableOfContents utilizando o dicionário para acessibilidade */}
             <TableOfContents dict={dict} />
             
             {/* Bloco Informativo do Autor (Card lateral) */}
