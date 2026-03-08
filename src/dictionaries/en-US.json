@@ -9,8 +9,9 @@
     "contentVersion": "2026.03.05",
     "contentHash": "i18n-enus-2026-03-05",
     "sourceType": "curated-manual",
-    "description": "Multilingual portfolio of Sérgio Santos, specialist in Information Technology, Artificial Intelligence and Software Engineering."
+    "description": "Multilingual portfolio of Sérgio Santos, specialist in Data Science, Artificial Intelligence and Software Engineering."
   },
+
   "hero": {
     "greeting": "Available for Mission-Critical Projects",
     "title": "Data Science Analyst",
@@ -18,11 +19,12 @@
     "headline": "Specialist in transforming complex infrastructures into high-availability systems and scalable data pipelines.",
     "ctaPrimary": "View Projects"
   },
+
   "about": {
     "title": "About Me",
     "differentialTitle": "Data Engineering with a Mission-Critical Focus",
-    "description": "Data Science Analyst with a solid background in critical banking systems, focusing on transforming data into decisions, cost reduction, and operational efficiency.",
-    "differentialContent": "I served for over 15 years at Banco Bradesco in regulated mission-critical environments. Currently, I focus my work on Data Science and AI, applying the rigor of critical systems to the creation of predictive models.",
+    "description": "Data Science Analyst with a solid background in critical banking systems, focused on transforming data into decisions, cost reduction, and operational efficiency.",
+    "differentialContent": "I worked for more than 15 years at Banco Bradesco in regulated mission-critical environments. Today I focus on Data Science and AI, applying the rigor of critical systems to the creation of predictive models.",
     "highlights": [
       "15+ Years in Banking",
       "Cloud Specialist",
@@ -36,6 +38,7 @@
       "automation": "100% Automated Systems"
     }
   },
+
   "contact": {
     "title": "Let's Talk?",
     "subtitle": "Seeking opportunities in governance and modernization projects.",
@@ -46,6 +49,7 @@
     "ctaTitle": "Let's build something together?",
     "buttonText": "Get in Touch →"
   },
+
   "experience": {
     "title": "Professional Experience",
     "emptyLabel": "No experience found",
@@ -53,17 +57,18 @@
       {
         "company": "Freelance Consultant / Transition",
         "period": "2008 - Present",
-        "role": "Critical Systems Specialist",
-        "description": "Architecture and maintenance of resilient data pipelines and infrastructure. Focus on Data Science and intelligent automation."
+        "role": "Mission-Critical Systems Specialist",
+        "description": "Architecture and maintenance of resilient data pipelines and infrastructure, with focus on Data Science and intelligent automation."
       }
     ]
   },
+
   "articles": {
     "title": "Technical Articles",
-    "mediumProfile": "View Medium Profile",
+    "mediumProfile": "View Medium profile",
     "readMore": "Read full article",
     "publishedAt": "Published on",
-    "bestOfMonth": "Highlight of the Month",
+    "bestOfMonth": "Featured Article of the Month",
     "awardWinner": "Award-Winning Article",
     "items": [
       {
@@ -76,6 +81,7 @@
       }
     ]
   },
+
   "projects": {
     "title": "Projects and Solutions",
     "featuredLabel": "Technical Highlight",
@@ -86,10 +92,12 @@
     "viewProject": "GitHub Repository",
     "viewDemo": "View Demo",
     "viewAll": "View All",
+
     "portfolio": {
       "all": "All",
       "viewProject": "View Project"
     },
+
     "categories": {
       "Data Engineering": { "labelKey": "Data Engineering" },
       "Cloud & Infrastructure": { "labelKey": "Cloud & Infrastructure" },
@@ -105,8 +113,10 @@
       "dev": { "labelKey": "Development" },
       "security": { "labelKey": "Security" }
     },
+
     "featuredProjects": []
   },
+
   "common": {
     "navigation": "Main navigation",
     "role": "Data Science Analyst | Python | SQL | Azure",
@@ -119,6 +129,7 @@
     "skipToContent": "Skip to content",
     "languageSwitcher": "Change language",
     "email": "santossergiorealbjj@outlook.com",
+
     "nav": {
       "about": "About",
       "experience": "Experience",
@@ -126,11 +137,13 @@
       "articles": "Articles",
       "contact": "Contact"
     },
+
     "theme": {
       "light": "Light",
       "dark": "Dark",
       "system": "System"
     },
+
     "errorBoundary": {
       "title": "Oops! Unexpected error.",
       "description": "Please contact me if the problem persists.",
@@ -139,17 +152,20 @@
         "home": "Home"
       }
     },
+
     "notFound": {
       "title": "Page not found",
       "description": "The link may be broken.",
       "button": "Go Back"
     },
+
     "externalLinks": {
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
       "medium": "https://medium.com/@sergiosantosluiz",
       "email": "mailto:santossergiorealbjj@outlook.com"
     },
+
     "menu": {
       "open": "Open",
       "close": "Close",
@@ -159,6 +175,7 @@
       }
     }
   },
+
   "intl": {
     "locale": "en-US",
     "fallbackLocale": "en",
@@ -167,18 +184,22 @@
     "unitDisplay": "short",
     "numberFormat": "en-US"
   },
+
   "states": {
     "loading": "Loading...",
     "empty": "No data.",
     "error": "Error loading.",
+
     "emptyProjects": {
       "title": "No projects",
       "description": "Coming soon.",
       "cta": "Go Back"
     },
+
     "emptyExperience": "No records found.",
     "errorArticles": "Error loading articles."
   },
+
   "cookie": {
     "title": "Cookies",
     "description": "We improve your experience.",
@@ -188,10 +209,12 @@
     "acceptAll": "Accept All",
     "savePreferences": "Save"
   },
+
   "seo": {
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
     "description": "Data Science & Critical Systems",
+
     "keywords": [
       "python",
       "databricks",
@@ -199,6 +222,7 @@
       "neo4j",
       "data science"
     ],
+
     "pages": {
       "home": {
         "title": "Home",
@@ -214,6 +238,7 @@
       }
     }
   },
+
   "metrics": {
     "availability": "99.5%",
     "availabilityNormalized": {
