@@ -1,9 +1,10 @@
 /**
- * HOME PAGE - PORTFÓLIO SÉRGIO SANTOS
+ * HOME PAGE - PORTFÓLIO SÉRGIO SANTOS (CORRIGIDO v2026)
  * -----------------------------------------------------------------------------
- * ✔ Stack: Next.js 16, React 19, TS 6.0, Tailwind 4.2, Node 24
- * ✔ Fix: Proteção contra erro 'labelKey' via fallback de dicionário
- * ✔ Responsividade: Mobile-first com containers dinâmicos Tailwind 4.2
+ * ✔ Stack: Next.js 16 (Promise Params), React 19 (Async Components)
+ * ✔ TS 6.0: Strict variance e inference para Dictionaries
+ * ✔ Tailwind 4.2: Dynamic Viewports e Containers
+ * ✔ Fix: Resolução de categorias de projeto via labelKey
  */
 
 import type { Metadata, Viewport } from "next";
@@ -29,12 +30,12 @@ import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { CareerHighlights } from "@/components/CareerHighlights";
 
 interface PageProps {
-  params: Promise<{ lang: string }>;
+  readonly params: Promise<{ lang: string }>;
 }
 
-// Configurações de Cache Vercel / Next.js 16
+// Configurações de Cache Next.js 16 / Vercel Edge
 export const dynamic = "force-static";
-export const revalidate = 3600;
+export const revalidate = 3600; // Revalida a cada 1 hora
 
 export async function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }));
@@ -51,8 +52,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!isValidLocale(rawLang)) return {};
 
   const dict = await getServerDictionary(rawLang as Locale);
-  if (!dict) return {};
-
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
 
   return {
@@ -68,7 +67,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function HomePage({ params }: PageProps) {
-  // 1. Resolver Params de forma assíncrona (React 19/Next 16 Pattern)
+  // 1. Resolver Params (Next 16 obriga o await)
   const { lang: rawLang } = await params;
 
   if (!isValidLocale(rawLang)) {
@@ -77,85 +76,83 @@ export default async function HomePage({ params }: PageProps) {
 
   const lang = rawLang as Locale;
   
-  // 2. Busca paralela de alta performance (Node 24)
-  const [dictData, rawProjects] = await Promise.all([
+  // 2. Data Fetching Paralelo (Node 24 Performance)
+  // Nota: getGitHubProjects já possui fallback interno para array vazio
+  const [dict, rawProjects] = await Promise.all([
     getServerDictionary(lang),
     getGitHubProjects("Santosdevbjj")
   ]);
 
-  // 3. Fallback Crítico para evitar erro de 'labelKey'
-  if (!dictData) {
-    console.error(`❌ Erro crítico: Dicionário não encontrado para o idioma: ${lang}`);
-    notFound();
-  }
-
-  // Cast seguro para o domínio de projetos
+  // 3. Tipagem e Sanitização (TS 6.0)
   const allProjects = rawProjects as unknown as ProjectDomain[];
-
-  // 4. Sanitização do Dicionário (Impede erros de tradução ausente no build)
-  const dict: Dictionary = {
-    ...dictData,
-    contact: {
-      ...dictData.contact,
-      cvLabel: dictData.contact?.cvLabel ?? (lang === 'pt-BR' ? 'Baixar CV' : 'Download CV'),
-    }
-  };
 
   return (
     <ProxyPage lang={lang}>
-      <main id="main-content" className="flex flex-col min-h-screen bg-white dark:bg-[#020617] transition-colors duration-500">
+      <main 
+        id="main-content" 
+        className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500 selection:bg-blue-500/30"
+      >
         
-        {/* HERO SECTION - Mobile-First Adjustment */}
-        <div className="pt-20 lg:pt-0">
+        {/* HERO - Adaptativo para Safe Areas de Mobile */}
+        <section className="pt-24 lg:pt-0">
           <HeroSection dictionary={dict} />
-        </div>
+        </section>
 
-        {/* ABOUT & HIGHLIGHTS */}
-        <section id="about" className="relative overflow-hidden w-full">
+        {/* SOBRE E DESTAQUES - Tailwind 4.2 Max-Width Patterns */}
+        <section id="about" className="relative w-full overflow-hidden">
           <AboutSection dict={dict.about} />
           
-          <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <CareerHighlights dict={dict} />
           </div>
 
-          {/* CV CTA - Tailwind 4.2 Utility Patterns */}
-          <div className="container mx-auto px-4 md:px-6 py-12 md:py-16 flex justify-center md:justify-start max-w-7xl">
-            <a 
-              href={`/cv-sergio-santos-${lang}.pdf`} 
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-3 bg-slate-900 dark:bg-slate-50 text-white dark:text-slate-900 px-6 py-4 md:px-8 md:py-5 rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs hover:scale-[1.03] transition-all shadow-xl active:scale-95"
-            >
-              <span className="group-hover:translate-y-1 transition-transform inline-block">↓</span>
-              {dict.contact.cvLabel}
-            </a>
+          {/* CTA DOWNLOAD CV - Design Sistêmico */}
+          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+            <div className="flex justify-center md:justify-start">
+              <a 
+                href={`/cv-sergio-santos-${lang}.pdf`} 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-4 rounded-2xl bg-slate-900 px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-white transition-all hover:scale-[1.02] hover:bg-blue-600 active:scale-95 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-blue-500 dark:hover:text-white shadow-2xl shadow-blue-500/10"
+              >
+                <span className="text-lg transition-transform group-hover:translate-y-1">↓</span>
+                {dict.contact.cvLabel}
+              </a>
+            </div>
           </div>
         </section>
 
-        {/* EXPERIENCE SECTION */}
-        <ExperienceSection experience={dict.experience} />
+        {/* EXPERIÊNCIA - Server Component Pattern */}
+        <section id="experience" className="w-full">
+          <ExperienceSection experience={dict.experience} />
+        </section>
 
-        {/* PORTFOLIO GRID - Responsividade garantida via container interno */}
-        <div className="w-full bg-slate-50/50 dark:bg-slate-900/20 py-10">
+        {/* PORTFÓLIO - Com Grid Inteligente */}
+        <section id="projects" className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10">
           <PortfolioGrid 
             projects={allProjects} 
             lang={lang} 
             dict={dict} 
           />
-        </div>
+        </section>
 
-        {/* ARTICLES & CONTENT */}
-        <FeaturedArticleSection 
-          articles={dict.articles} 
-          common={dict.common} 
-        />
+        {/* ARTIGOS E CONTEÚDO */}
+        <section id="articles" className="w-full">
+          <FeaturedArticleSection 
+            articles={dict.articles} 
+            common={dict.common} 
+          />
+        </section>
 
-        {/* CONTACT SECTION */}
-        <ContactSection 
-          contact={dict.contact} 
-          common={dict.common} 
-          locale={lang} 
-        />
+        {/* CONTATO */}
+        <section id="contact" className="w-full pb-20">
+          <ContactSection 
+            contact={dict.contact} 
+            common={dict.common} 
+            locale={lang} 
+          />
+        </section>
+
       </main>
     </ProxyPage>
   );
