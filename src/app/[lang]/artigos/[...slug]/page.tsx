@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import MdxLayout from '@/components/mdx-layout';
 import ShareArticle from '@/components/ShareArticle';
 import { getServerDictionary } from '@/lib/getServerDictionary';
+import { normalizeLocale } from '@/dictionaries/locales';
+import type { Locale } from '@/types/dictionary';
 
 interface PageProps {
   params: Promise<{ slug: string[]; lang: string }>;
@@ -36,7 +38,11 @@ async function fetchGithubContent(fullPath: string) {
 
 export default async function RemoteArticlePage(props: PageProps) {
   // Next.js 16: params e searchParams são Promises
-  const { slug, lang } = await props.params;
+  const { slug, lang: rawLang } = await props.params;
+  
+  // Correção do Erro de Build: Normalização do tipo para Locale
+  const lang = normalizeLocale(rawLang) as Locale;
+  
   const dict = await getServerDictionary(lang);
   const fullPath = slug.join('/');
 
@@ -66,12 +72,12 @@ export default async function RemoteArticlePage(props: PageProps) {
         </article>
         
         <footer className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800">
-          <ShareArticle title={articleTitle} />
+          <ShareArticle title={articleTitle} dict={dict} lang={lang} />
         </footer>
       </MdxLayout>
     );
   } catch (err) {
-    // Fallback: Se o MDX falhar (Syntax Error), renderiza como texto puro preservando a leitura
+    // Fallback: Se o MDX falhar (Syntax Error), renderiza como texto puro
     return (
       <MdxLayout lang={lang} dict={dict}>
         <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
