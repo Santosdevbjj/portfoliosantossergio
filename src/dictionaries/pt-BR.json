@@ -3,10 +3,15 @@
     "version": "1.0.0",
     "locale": "pt-BR",
     "direction": "ltr",
-    "lastUpdated": "2026-03-05T20:40:00Z",
+    "lastUpdated": "2026-03-05T21:00:00Z",
     "author": "Sérgio Santos",
+    "source": "manual",
+    "contentVersion": "2026.03.05",
+    "contentHash": "i18n-ptbr-2026-03-05",
+    "sourceType": "curated-manual",
     "description": "Portfólio multilíngue de Sérgio Santos, especialista em Ciência de Dados e Engenharia de Software."
   },
+
   "hero": {
     "greeting": "Disponível para Projetos Críticos",
     "title": "Analista de Ciência de Dados",
@@ -14,6 +19,7 @@
     "headline": "Especialista em transformar infraestruturas complexas em sistemas de alta disponibilidade e pipelines de dados escaláveis.",
     "ctaPrimary": "Ver Projetos"
   },
+
   "about": {
     "title": "Sobre Mim",
     "differentialTitle": "Engenharia de Dados com Foco em Missão Crítica",
@@ -32,6 +38,7 @@
       "automation": "Sistemas 100% Automatizados"
     }
   },
+
   "contact": {
     "title": "Vamos Conversar?",
     "subtitle": "Busco oportunidades em projetos de governança e modernização.",
@@ -42,6 +49,7 @@
     "ctaTitle": "Vamos construir algo juntos?",
     "buttonText": "Entrar em Contato →"
   },
+
   "experience": {
     "title": "Experiência Profissional",
     "emptyLabel": "Nenhuma experiência encontrada",
@@ -54,6 +62,7 @@
       }
     ]
   },
+
   "articles": {
     "title": "Artigos Técnicos",
     "mediumProfile": "Ver perfil no Medium",
@@ -72,6 +81,7 @@
       }
     ]
   },
+
   "projects": {
     "title": "Projetos e Soluções",
     "featuredLabel": "Destaque Técnico",
@@ -82,10 +92,12 @@
     "viewProject": "Repositório GitHub",
     "viewDemo": "Visualizar Demo",
     "viewAll": "Ver Todos",
+
     "portfolio": {
       "all": "Todos",
       "viewProject": "Ver Projeto"
     },
+
     "categories": {
       "Data Engineering": { "labelKey": "Engenharia de Dados" },
       "Cloud & Infrastructure": { "labelKey": "Nuvem e Infraestrutura" },
@@ -101,8 +113,10 @@
       "dev": { "labelKey": "Desenvolvimento" },
       "security": { "labelKey": "Segurança" }
     },
+
     "featuredProjects": []
   },
+
   "common": {
     "navigation": "Navegação principal",
     "role": "Analista de Ciência de Dados | Python | SQL | Azure",
@@ -115,6 +129,7 @@
     "skipToContent": "Pular para o conteúdo",
     "languageSwitcher": "Alterar idioma",
     "email": "santossergiorealbjj@outlook.com",
+
     "nav": {
       "about": "Sobre",
       "experience": "Experiência",
@@ -122,28 +137,45 @@
       "articles": "Artigos",
       "contact": "Contato"
     },
-    "theme": { "light": "Claro", "dark": "Escuro", "system": "Sistema" },
+
+    "theme": {
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    },
+
     "errorBoundary": {
       "title": "Ops! Erro inesperado.",
       "description": "Entre em contato se o problema persistir.",
-      "actions": { "retry": "Tentar novamente", "home": "Início" }
+      "actions": {
+        "retry": "Tentar novamente",
+        "home": "Início"
+      }
     },
+
     "notFound": {
       "title": "Página não encontrada",
       "description": "O link pode estar quebrado.",
       "button": "Voltar"
     },
+
     "externalLinks": {
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
       "medium": "https://medium.com/@sergiosantosluiz",
       "email": "mailto:santossergiorealbjj@outlook.com"
     },
+
     "menu": {
-      "open": "Abrir", "close": "Fechar",
-      "aria": { "open": "Abrir menu", "close": "Fechar menu" }
+      "open": "Abrir",
+      "close": "Fechar",
+      "aria": {
+        "open": "Abrir menu",
+        "close": "Fechar menu"
+      }
     }
   },
+
   "intl": {
     "locale": "pt-BR",
     "fallbackLocale": "pt",
@@ -152,14 +184,22 @@
     "unitDisplay": "short",
     "numberFormat": "pt-BR"
   },
+
   "states": {
     "loading": "Carregando...",
     "empty": "Sem dados.",
     "error": "Erro ao carregar.",
-    "emptyProjects": { "title": "Nenhum projeto", "description": "Em breve.", "cta": "Voltar" },
+
+    "emptyProjects": {
+      "title": "Nenhum projeto",
+      "description": "Em breve.",
+      "cta": "Voltar"
+    },
+
     "emptyExperience": "Sem registros.",
     "errorArticles": "Erro nos artigos."
   },
+
   "cookie": {
     "title": "Cookies",
     "description": "Melhoramos sua experiência.",
@@ -169,19 +209,41 @@
     "acceptAll": "Aceitar",
     "savePreferences": "Salvar"
   },
+
   "seo": {
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
     "description": "Ciência de Dados & Sistemas Críticos",
-    "keywords": ["python", "databricks", "sql", "neo4j", "data science"],
+
+    "keywords": [
+      "python",
+      "databricks",
+      "sql",
+      "neo4j",
+      "data science"
+    ],
+
     "pages": {
-      "home": { "title": "Início", "description": "Portfólio de Sérgio Santos" },
-      "projects": { "title": "Projetos", "description": "Soluções de dados" },
-      "articles": { "title": "Artigos", "description": "Conteúdo técnico" }
+      "home": {
+        "title": "Início",
+        "description": "Portfólio de Sérgio Santos"
+      },
+      "projects": {
+        "title": "Projetos",
+        "description": "Soluções de dados"
+      },
+      "articles": {
+        "title": "Artigos",
+        "description": "Conteúdo técnico"
+      }
     }
   },
+
   "metrics": {
     "availability": "99,5%",
-    "availabilityNormalized": { "value": 99.5, "unit": "%" }
+    "availabilityNormalized": {
+      "value": 99.5,
+      "unit": "%"
+    }
   }
 }
