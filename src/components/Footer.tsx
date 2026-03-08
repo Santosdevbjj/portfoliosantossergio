@@ -29,6 +29,13 @@ interface FooterProps {
   readonly articles: ArticlesSectionDictionary;
 }
 
+/**
+ * FOOTER COMPONENT - REVISADO & INTEGRADO
+ * -----------------------------------------------------------------------------
+ * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16, Node 24
+ * ✔ I18n: Suporte PT-BR / EN-US / ES (ES/MX/AR)
+ * ✔ Responsivo: Layout adaptativo Mobile-First
+ */
 export default function Footer({
   lang,
   common,
@@ -45,7 +52,7 @@ export default function Footer({
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 lg:py-24 space-y-20">
 
-        {/* CTA */}
+        {/* SECTION: CTA (Call to Action) */}
         <section
           className="relative overflow-hidden rounded-[2.5rem]
                      bg-gradient-to-br from-blue-600 to-indigo-700
@@ -54,7 +61,7 @@ export default function Footer({
                      items-start lg:items-center gap-10"
         >
           <div className="relative z-10 max-w-xl">
-            <h3 className="text-2xl md:text-4xl font-black tracking-tight mb-4">
+            <h3 className="text-2xl md:text-4xl font-black tracking-tight mb-4 italic">
               {articles.title}
             </h3>
             <p className="text-sm md:text-base font-medium leading-relaxed text-blue-50/90">
@@ -63,22 +70,22 @@ export default function Footer({
           </div>
 
           <a
-            href={`mailto:${email}`}
+            href={email} // Já inclui 'mailto:' no dicionário externalLinks
             className="group relative z-10 inline-flex
                        items-center gap-3 bg-white text-blue-700
                        px-8 py-4 rounded-2xl text-xs
                        font-black uppercase tracking-wider
-                       hover:bg-blue-50 transition-all"
+                       hover:bg-blue-50 transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-blue-950/20"
           >
             {contact.cta}
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </a>
         </section>
 
-        {/* GRID */}
+        {/* GRID: LINKS & INFO */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
 
-          {/* IDENTIDADE */}
+          {/* COL 1: IDENTIDADE */}
           <div className="space-y-6">
             <div className="flex flex-col gap-1">
               <span className="text-3xl font-black tracking-tighter uppercase
@@ -100,11 +107,11 @@ export default function Footer({
                          tracking-[0.2em] text-slate-500 shadow-sm"
             >
               <Globe className="w-3.5 h-3.5 text-blue-500" aria-hidden />
-              {lang}
+              {lang.toUpperCase()}
             </div>
           </div>
 
-          {/* NAVEGAÇÃO */}
+          {/* COL 2: NAVEGAÇÃO */}
           <nav aria-label={common.navigation}>
             <h4 className={STYLES.footerTitle}>
               {common.navigation}
@@ -116,14 +123,15 @@ export default function Footer({
                     href={`/${lang}${getNavHash(section)}`}
                     className={STYLES.footerLink}
                   >
-                    {section}
+                    {/* Tradução dinâmica baseada nas chaves do dicionário common.nav */}
+                    {common.nav[section as keyof typeof common.nav] || section}
                   </Link>
                 </li>
               ))}
             </ul>
           </nav>
 
-          {/* IDIOMA */}
+          {/* COL 3: IDIOMA */}
           <div>
             <h4 className={STYLES.footerTitle}>
               {common.languageSwitcher}
@@ -133,16 +141,16 @@ export default function Footer({
             </div>
           </div>
 
-          {/* CONTATO */}
+          {/* COL 4: CONTATO & SOCIAL */}
           <div className="space-y-6">
             <h4 className={STYLES.footerTitle}>
               {contact.title}
             </h4>
 
-            <a href={`mailto:${email}`} className="group block space-y-3">
+            <a href={email} className="group block space-y-3">
               <div className="flex items-center gap-3 text-sm font-bold
-                           text-slate-500 group-hover:text-blue-600
-                           transition-colors">
+                             text-slate-500 group-hover:text-blue-600
+                             transition-colors">
                 <Mail className="w-4 h-4" aria-hidden />
                 <span>{contact.emailLabel}</span>
               </div>
@@ -150,8 +158,8 @@ export default function Footer({
               <p className="break-all rounded-xl border
                            bg-slate-100/50 dark:bg-slate-800/30
                            p-4 text-[11px] font-mono font-bold
-                           text-slate-400">
-                {email}
+                           text-slate-400 group-hover:border-blue-500/30 transition-colors">
+                {common.email}
               </p>
             </a>
 
@@ -167,12 +175,12 @@ export default function Footer({
           </div>
         </div>
 
-        {/* FOOTER FINAL */}
+        {/* FINAL: COPYRIGHT & TECH */}
         <div className="pt-10 border-t border-slate-200
-                     dark:border-slate-800/80
-                     flex flex-col md:flex-row
-                     items-center justify-between gap-8">
-          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                       dark:border-slate-800/80
+                       flex flex-col md:flex-row
+                       items-center justify-between gap-8">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-center md:text-left">
             {common.footer}
           </div>
 
@@ -199,11 +207,11 @@ function SocialIcon({ href, label, children }: SocialIconProps) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="group rounded-xl border border-slate-200
+      className="group flex items-center gap-2 rounded-xl border border-slate-200
                  dark:border-slate-800
                  bg-white dark:bg-slate-900
                  p-2.5 text-slate-400
-                 hover:text-blue-600 transition-all"
+                 hover:text-blue-600 hover:border-blue-600/30 transition-all hover:scale-110"
     >
       {children}
       <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
