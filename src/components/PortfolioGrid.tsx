@@ -3,7 +3,7 @@
 /**
  * PORTFOLIO GRID COMPONENT - NEXT.JS 16 & REACT 19
  * -----------------------------------------------------------------------------
- * ✔ Fix: Erro de atribuição de CategoryDetail para string (Acesso via .labelKey)
+ * ✔ Fix: Erro de build (Object is possibly undefined) na linha 75
  * ✔ Stack: TS 6.0, Next.js 16, React 19, Node 24, Tailwind 4.2
  * ✔ I18n: Suporte nativo a PT-BR, EN e ES via dicionários
  * ✔ Responsivo: Sistema de grid adaptativo 1-2-3 colunas
@@ -39,17 +39,15 @@ export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
 
     const groups: Record<string, ProjectDomain[]> = {};
     
-    // Fallback para nome da categoria de desenvolvimento
+    // Fallback seguro para desenvolvimento
     const devCategoryLabel = labels.categories.dev?.labelKey || "Development";
 
     projects.forEach(project => {
       if (!project) return;
 
       let categoryDisplayName: string = devCategoryLabel;
-      
       const topics: readonly string[] = Array.isArray(project.topics) ? project.topics : [];
       
-      // Busca por tópico mapeado no config/categories.ts
       const matchedTopicKey = topics.find((t: string) => 
         t && t.toLowerCase() in TOPIC_TO_CATEGORY
       );
@@ -57,21 +55,19 @@ export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
       if (matchedTopicKey) {
         const categoryId = TOPIC_TO_CATEGORY[matchedTopicKey.toLowerCase()];
         const categoryObj = labels.categories[categoryId as keyof typeof labels.categories] as CategoryDetail | undefined;
-        
-        // CORREÇÃO: Acessa .labelKey em vez do objeto completo
         categoryDisplayName = categoryObj?.labelKey || categoryId || devCategoryLabel;
       } else {
-        // Fallback para a tecnologia principal do domínio
         const techKey = project.technology?.labelKey;
-        const categoryObj = labels.categories[techKey] as CategoryDetail | undefined;
-        
+        const categoryObj = labels.categories[techKey as string] as CategoryDetail | undefined;
         categoryDisplayName = categoryObj?.labelKey || devCategoryLabel;
       }
 
+      // CORREÇÃO DO ERRO VERCEL: Inicialização explícita para o TS 6.0
       if (!groups[categoryDisplayName]) {
         groups[categoryDisplayName] = [];
       }
       
+      // Agora o TS tem certeza que o array existe
       groups[categoryDisplayName].push(project);
     });
 
@@ -84,20 +80,16 @@ export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
       })
       .map(groupName => ({
         name: groupName,
-        projects: (groups[groupName] ?? []).sort((a, b) => {
-          // Prioridade 1: Projetos marcados como "Primeiro" (isFirst)
+        projects: [...(groups[groupName] ?? [])].sort((a, b) => {
           if (a.isFirst && !b.isFirst) return -1;
           if (!a.isFirst && b.isFirst) return 1;
-          // Prioridade 2: Projetos em Destaque (isFeatured)
           if (a.isFeatured && !b.isFeatured) return -1;
           if (!a.isFeatured && b.isFeatured) return 1;
-          // Ordenação alfabética residual
           return (a.name || '').localeCompare(b.name || '');
         })
       }));
   }, [projects, labels]);
 
-  // UI de Estado Vazio / Sincronização
   if (projects.length === 0) {
     return (
       <section id="projects" className="py-24 text-center px-6 bg-slate-50/50 dark:bg-slate-900/10">
@@ -115,10 +107,7 @@ export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
   }
 
   return (
-    <section 
-      id="projects" 
-      className="py-24 bg-slate-50/30 dark:bg-[#020617]/30 backdrop-blur-xl transition-colors duration-500"
-    >
+    <section id="projects" className="py-24 bg-slate-50/30 dark:bg-[#020617]/30 backdrop-blur-xl transition-colors duration-500">
       <div className="container mx-auto px-6 max-w-7xl">
         <header className="mb-24">
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic text-slate-900 dark:text-white leading-[0.85]">
@@ -143,14 +132,9 @@ export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
                 </span>
               </div>
 
-              {/* GRID RESPONSIVO: 1 coluna (mobile), 2 colunas (tablet), 3 colunas (desktop) */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
                 {group.projects.map((project) => (
-                  <ProjectCard 
-                    key={project.id} 
-                    project={project} 
-                    dict={dict} 
-                  />
+                  <ProjectCard key={project.id} project={project} dict={dict} />
                 ))}
               </div>
             </div>
