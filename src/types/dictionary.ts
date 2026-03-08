@@ -82,22 +82,17 @@ export interface ArticlesSectionDictionary {
   items: ArticleItem[];
 }
 
-/**
- * RESOLUÇÃO DO ERRO labelKey:
- * Cada categoria agora é mapeada como um objeto que contém labelKey.
- */
 export interface CategoryDetail {
   labelKey: string;
 }
 
 export interface ProjectCategories {
-  // Categorias vindas do mapeamento do GitHub
   "Data Engineering": CategoryDetail;
   "Cloud & Infrastructure": CategoryDetail;
   "Data Science": CategoryDetail;
   "Data Analytics": CategoryDetail;
   "Outros": CategoryDetail;
-  // Categorias estáticas para compatibilidade
+
   dataScience: CategoryDetail;
   cloud: CategoryDetail;
   graphs: CategoryDetail;
@@ -106,7 +101,8 @@ export interface ProjectCategories {
   database: CategoryDetail;
   dev: CategoryDetail;
   security: CategoryDetail;
-  [key: string]: CategoryDetail; // Fallback para chaves dinâmicas
+
+  [key: string]: CategoryDetail;
 }
 
 export interface ProjectItem {
@@ -130,12 +126,15 @@ export interface ProjectsSectionDictionary {
   viewProject: string;
   viewDemo: string;
   viewAll: string;
-  categories: ProjectCategories;
-  featuredProjects: ProjectItem[]; 
-  portfolio?: {
+
+  portfolio: {
     all: string;
     viewProject: string;
   };
+
+  categories: ProjectCategories;
+
+  featuredProjects: ProjectItem[];
 }
 
 export interface CommonDictionary {
@@ -150,30 +149,70 @@ export interface CommonDictionary {
   skipToContent: string;
   languageSwitcher: string;
   email: string;
-  nav: { about: string; experience: string; projects: string; articles: string; contact: string; };
-  theme: { light: string; dark: string; system: string; };
-  errorBoundary: { title: string; description: string; actions: { retry: string; home: string; }; };
-  notFound: { title: string; description: string; button: string; };
-  externalLinks: { linkedin: string; github: string; medium: string; email: string; };
-  menu: { open: string; close: string; aria: { open: string; close: string; }; };
+
+  nav: {
+    about: string;
+    experience: string;
+    projects: string;
+    articles: string;
+    contact: string;
+  };
+
+  theme: {
+    light: string;
+    dark: string;
+    system: string;
+  };
+
+  errorBoundary: {
+    title: string;
+    description: string;
+    actions: {
+      retry: string;
+      home: string;
+    };
+  };
+
+  notFound: {
+    title: string;
+    description: string;
+    button: string;
+  };
+
+  externalLinks: {
+    linkedin: string;
+    github: string;
+    medium: string;
+    email: string;
+  };
+
+  menu: {
+    open: string;
+    close: string;
+    aria: {
+      open: string;
+      close: string;
+    };
+  };
 }
 
-// Interfaces formais para substituir o 'any'
 export interface StateDictionary {
   loading: string;
   empty: string;
   error: string;
+
   emptyProjects: {
     title: string;
     description: string;
     cta: string;
   };
+
   emptyExperience: string;
   errorArticles: string;
 }
 
 export interface IntlDictionary {
-  locale: string;
+  locale: Locale;
   fallbackLocale: string;
   currency: string;
   timezone: string;
@@ -196,6 +235,7 @@ export interface SeoDictionary {
   title: string;
   description: string;
   keywords: string[];
+
   pages: {
     [key: string]: {
       title: string;
