@@ -3,10 +3,10 @@
 /**
  * PORTFOLIO GRID COMPONENT - NEXT.JS 16 & REACT 19
  * -----------------------------------------------------------------------------
- * ✔ Fix: Erro de build (Object is possibly undefined) na linha 75
+ * ✔ Fix: Erro de build Vercel (Type-safe Grouping)
  * ✔ Stack: TS 6.0, Next.js 16, React 19, Node 24, Tailwind 4.2
  * ✔ I18n: Suporte nativo a PT-BR, EN e ES via dicionários
- * ✔ Responsivo: Sistema de grid adaptativo 1-2-3 colunas
+ * ✔ Responsivo: Grid adaptativo 1-2-3 colunas
  */
 
 import { useMemo } from 'react';
@@ -22,24 +22,20 @@ interface PortfolioGridProps {
 }
 
 interface ProjectGroup {
-  name: string;
-  projects: ProjectDomain[];
+  readonly name: string;
+  readonly projects: ProjectDomain[];
 }
 
 export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
-  // Garantia de fallbacks seguros para o dicionário
   const labels = dict?.projects;
   const states = dict?.states;
 
-  /**
-   * Agrupamento de Projetos com Tipagem Rigorosa
-   */
   const groupedProjects = useMemo((): ProjectGroup[] => {
     if (!projects || !Array.isArray(projects) || !labels) return [];
 
-    const groups: Record<string, ProjectDomain[]> = {};
+    const groups = new Map<string, ProjectDomain[]>();
     
-    // Fallback seguro para desenvolvimento
+    // Fallback seguro para rótulo de desenvolvimento
     const devCategoryLabel = labels.categories.dev?.labelKey || "Development";
 
     projects.forEach(project => {
@@ -62,32 +58,31 @@ export function PortfolioGrid({ projects = [], dict }: PortfolioGridProps) {
         categoryDisplayName = categoryObj?.labelKey || devCategoryLabel;
       }
 
-      // CORREÇÃO DO ERRO VERCEL: Inicialização explícita para o TS 6.0
-      if (!groups[categoryDisplayName]) {
-        groups[categoryDisplayName] = [];
-      }
-      
-      // Agora o TS tem certeza que o array existe
-      groups[categoryDisplayName].push(project);
+      // SOLUÇÃO DO ERRO VERCEL: Uso de Map para garantir tipagem e existência
+      const currentGroup = groups.get(categoryDisplayName) || [];
+      groups.set(categoryDisplayName, [...currentGroup, project]);
     });
 
-    // Ordenação Editorial baseada no CATEGORY_ORDER
-    return Object.keys(groups)
+    // Ordenação e mapeamento para o formato final
+    return Array.from(groups.keys())
       .sort((a, b) => {
         const weightA = CATEGORY_ORDER[a] ?? 99;
         const weightB = CATEGORY_ORDER[b] ?? 99;
         return weightA - weightB;
       })
-      .map(groupName => ({
-        name: groupName,
-        projects: [...(groups[groupName] ?? [])].sort((a, b) => {
-          if (a.isFirst && !b.isFirst) return -1;
-          if (!a.isFirst && b.isFirst) return 1;
-          if (a.isFeatured && !b.isFeatured) return -1;
-          if (!a.isFeatured && b.isFeatured) return 1;
-          return (a.name || '').localeCompare(b.name || '');
-        })
-      }));
+      .map(groupName => {
+        const groupProjects = groups.get(groupName) || [];
+        return {
+          name: groupName,
+          projects: [...groupProjects].sort((a, b) => {
+            if (a.isFirst && !b.isFirst) return -1;
+            if (!a.isFirst && b.isFirst) return 1;
+            if (a.isFeatured && !b.isFeatured) return -1;
+            if (!a.isFeatured && b.isFeatured) return 1;
+            return (a.name || '').localeCompare(b.name || '');
+          })
+        };
+      });
   }, [projects, labels]);
 
   if (projects.length === 0) {
