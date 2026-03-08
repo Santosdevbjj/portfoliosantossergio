@@ -1,17 +1,17 @@
 /**
  * HOME PAGE - PORTFÓLIO SÉRGIO SANTOS (CORRIGIDO v2026)
  * -----------------------------------------------------------------------------
+ * ✔ Fix: Removido 'Dictionary' unused import (Vercel Build Fix)
  * ✔ Stack: Next.js 16 (Promise Params), React 19 (Async Components)
- * ✔ TS 6.0: Strict variance e inference para Dictionaries
- * ✔ Tailwind 4.2: Dynamic Viewports e Containers
- * ✔ Fix: Resolução de categorias de projeto via labelKey
+ * ✔ TS 6.0: Strict inference para Dictionaries
+ * ✔ Tailwind 4.2: Dynamic Viewports
  */
 
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
 // Types
-import type { Locale, Dictionary } from "@/types/dictionary";
+import type { Locale } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
 
 // Services & Helpers
@@ -67,7 +67,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function HomePage({ params }: PageProps) {
-  // 1. Resolver Params (Next 16 obriga o await)
+  // 1. Resolver Params (Next 16 exige await)
   const { lang: rawLang } = await params;
 
   if (!isValidLocale(rawLang)) {
@@ -77,13 +77,12 @@ export default async function HomePage({ params }: PageProps) {
   const lang = rawLang as Locale;
   
   // 2. Data Fetching Paralelo (Node 24 Performance)
-  // Nota: getGitHubProjects já possui fallback interno para array vazio
   const [dict, rawProjects] = await Promise.all([
     getServerDictionary(lang),
     getGitHubProjects("Santosdevbjj")
   ]);
 
-  // 3. Tipagem e Sanitização (TS 6.0)
+  // 3. Tipagem (TS 6.0)
   const allProjects = rawProjects as unknown as ProjectDomain[];
 
   return (
@@ -93,12 +92,12 @@ export default async function HomePage({ params }: PageProps) {
         className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500 selection:bg-blue-500/30"
       >
         
-        {/* HERO - Adaptativo para Safe Areas de Mobile */}
+        {/* HERO */}
         <section className="pt-24 lg:pt-0">
           <HeroSection dictionary={dict} />
         </section>
 
-        {/* SOBRE E DESTAQUES - Tailwind 4.2 Max-Width Patterns */}
+        {/* SOBRE E DESTAQUES */}
         <section id="about" className="relative w-full overflow-hidden">
           <AboutSection dict={dict.about} />
           
@@ -106,7 +105,7 @@ export default async function HomePage({ params }: PageProps) {
             <CareerHighlights dict={dict} />
           </div>
 
-          {/* CTA DOWNLOAD CV - Design Sistêmico */}
+          {/* CTA DOWNLOAD CV */}
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
             <div className="flex justify-center md:justify-start">
               <a 
@@ -122,12 +121,12 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* EXPERIÊNCIA - Server Component Pattern */}
+        {/* EXPERIÊNCIA */}
         <section id="experience" className="w-full">
           <ExperienceSection experience={dict.experience} />
         </section>
 
-        {/* PORTFÓLIO - Com Grid Inteligente */}
+        {/* PORTFÓLIO - Usando o componente Grid que gerencia os cards */}
         <section id="projects" className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10">
           <PortfolioGrid 
             projects={allProjects} 
@@ -136,7 +135,7 @@ export default async function HomePage({ params }: PageProps) {
           />
         </section>
 
-        {/* ARTIGOS E CONTEÚDO */}
+        {/* ARTIGOS */}
         <section id="articles" className="w-full">
           <FeaturedArticleSection 
             articles={dict.articles} 
