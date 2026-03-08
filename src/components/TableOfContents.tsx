@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import type { Dictionary } from "@/types/dictionary";
 
 /**
  * TABLE OF CONTENTS COMPONENT
  * -----------------------------------------------------------------------------
  * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16
- * ✔ I18n: Suporte PT/EN/ES via Dictionary (Chaves: dict.seo.pages.articles.title)
+ * ✔ I18n: Suporte PT/EN/ES via Dictionary
  * ✔ Responsivo: Sidebar em Desktop (sticky), Accordion em Mobile
- * ✔ Alinhamento: Consumindo IDs gerados no MdxLayout
  */
 
 interface Heading {
@@ -27,7 +26,7 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
 
-  // Título dinâmico vindo do dicionário (Ex: "Artigos", "Articles", "Artículos")
+  // Título dinâmico vindo do dicionário
   const tocTitle = dict.seo.pages.articles.title;
 
   useEffect(() => {
@@ -37,7 +36,6 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
 
     const elements = Array.from(article.querySelectorAll("h2, h3")).map((elem) => {
       const text = elem.textContent || "";
-      // Gera ID caso não exista (fallback de segurança)
       const id = elem.id || text.toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -55,7 +53,6 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
 
     setHeadings(elements);
 
-    // Observer para detectar qual seção está visível no viewport
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -65,7 +62,7 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
         });
       },
       { 
-        rootMargin: "-10% 0% -75% 0%", // Ativa quando o título está no topo da tela
+        rootMargin: "-10% 0% -75% 0%",
         threshold: 1.0 
       }
     );
@@ -116,7 +113,6 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
           bg-white dark:bg-transparent lg:border-l lg:border-slate-200 lg:dark:border-slate-800 lg:pl-8
         `}
       >
-        {/* Título Desktop */}
         <h4 className="hidden lg:block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8">
           {tocTitle}
         </h4>
@@ -139,7 +135,6 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
                   }
                 `}
               >
-                {/* Indicador visual de item ativo (Bolinha flutuante) */}
                 {activeId === h.id && (
                   <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-600 shadow-[0_0_12px_rgba(37,99,235,0.6)] lg:-left-12" />
                 )}
