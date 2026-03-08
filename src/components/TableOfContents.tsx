@@ -7,7 +7,7 @@ import type { Dictionary } from "@/types/dictionary";
  * TABLE OF CONTENTS COMPONENT
  * -----------------------------------------------------------------------------
  * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16
- * ✔ I18n: Suporte PT/EN/ES via Dictionary
+ * ✔ Fix: Type-safe access to dynamic SEO dictionary keys
  * ✔ Responsivo: Sidebar em Desktop (sticky), Accordion em Mobile
  */
 
@@ -26,8 +26,10 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
 
-  // Título dinâmico vindo do dicionário
-  const tocTitle = dict.seo.pages.articles.title;
+  // RESOLUÇÃO DO ERRO DE BUILD:
+  // Como 'pages' no SeoDictionary usa index signature [key: string], 
+  // acessamos com fallback seguro para evitar o erro 'possibly undefined'.
+  const tocTitle = dict.seo.pages["articles"]?.title || dict.articles.title;
 
   useEffect(() => {
     // Busca dentro do elemento 'article' definido no MdxLayout
@@ -36,6 +38,7 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
 
     const elements = Array.from(article.querySelectorAll("h2, h3")).map((elem) => {
       const text = elem.textContent || "";
+      // Gera ID caso não exista (normalização de acentos e espaços)
       const id = elem.id || text.toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -63,7 +66,7 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
       },
       { 
         rootMargin: "-10% 0% -75% 0%",
-        threshold: 1.0 
+        threshold: 0.1 // Ajustado para melhor detecção em Next 16
       }
     );
 
@@ -79,7 +82,7 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
       className="w-full lg:w-64 flex flex-col"
       aria-label={dict.common.navigation}
     >
-      {/* VERSÃO MOBILE: Botão Expansível */}
+      {/* VERSÃO MOBILE: Botão Expansível (Accordion) */}
       <div className="lg:hidden mb-6">
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -104,7 +107,7 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
         </button>
       </div>
 
-      {/* CONTEÚDO DO SUMÁRIO */}
+      {/* CONTEÚDO DO SUMÁRIO: Sticky em Desktop */}
       <div 
         id="toc-list-mobile"
         className={`
