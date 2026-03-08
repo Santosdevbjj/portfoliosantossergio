@@ -1,21 +1,41 @@
 import Link from "next/link";
 import TableOfContents from "./TableOfContents";
+import ShareArticle from "./ShareArticle";
+import type { Dictionary, Locale } from "@/types/dictionary";
 
-// TypeScript 6.0: Definindo e UTILIZANDO a interface para evitar erro de 'never used'
+/**
+ * MDX LAYOUT COMPONENT - NEXT.JS 16 & REACT 19
+ * -----------------------------------------------------------------------------
+ * ✔ Stack: TS 6.0, Node 24, Tailwind 4.2, Next 16
+ * ✔ I18n: Suporte dinâmico para pt-BR, en, es (ES/AR/MX)
+ * ✔ Responsivo: Mobile-first com Sidebar inteligente em LG+
+ */
+
 interface MdxLayoutProps {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
+  readonly lang: Locale;
+  readonly dict: Dictionary;
 }
 
-export default function MdxLayout({ children }: MdxLayoutProps) {
+export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
+  // Tradução dinâmica do link de retorno baseada no dicionário e na lógica de lang
+  const getBackLabel = () => {
+    if (lang === 'pt-BR') return 'Voltar para o Journal';
+    if (lang === 'en') return 'Back to Journal';
+    return 'Volver al Journal'; // Fallback para variações de espanhol
+  };
+
   return (
     <main className="min-h-screen bg-white dark:bg-[#020617] pt-24 pb-20 selection:bg-blue-500/30">
       <div className="container mx-auto px-6 max-w-7xl flex flex-col lg:flex-row gap-12">
         
-        <article className="flex-1 max-w-4xl">
+        {/* Coluna Principal do Artigo */}
+        <article className="flex-1 max-w-4xl w-full">
+          
           {/* Navegação SPA via Next.js 16 Link */}
           <div className="mb-12">
             <Link 
-              href="/pt-BR/artigos" 
+              href={`/${lang}/artigos`} 
               className="group inline-flex items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-blue-600 transition-all duration-300"
             >
               <span className="mr-3 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 group-hover:border-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
@@ -23,7 +43,7 @@ export default function MdxLayout({ children }: MdxLayoutProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
                 </svg>
               </span>
-              Voltar para o Journal
+              {getBackLabel()}
             </Link>
           </div>
 
@@ -39,14 +59,28 @@ export default function MdxLayout({ children }: MdxLayoutProps) {
             prose-img:rounded-[2.5rem] prose-img:shadow-2xl prose-img:border dark:prose-img:border-slate-800">
             {children}
           </div>
+
+          {/* Componente de Compartilhamento Integrado */}
+          <ShareArticle title={dict.articles.title} />
         </article>
 
-        {/* Sidebar fixa para Sumário */}
-        <aside className="lg:w-80">
-          <div className="sticky top-32">
-            <TableOfContents />
+        {/* Sidebar fixa para Sumário (Escondida em mobile, visível em LG+) */}
+        <aside className="lg:w-80 w-full lg:block">
+          <div className="lg:sticky lg:top-32 space-y-8">
+            <TableOfContents dict={dict} />
+            
+            {/* Bloco Informativo Adicional (Opcional) */}
+            <div className="hidden lg:block p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">
+                {dict.meta.author}
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                {dict.hero.headline}
+              </p>
+            </div>
           </div>
         </aside>
+
       </div>
     </main>
   );
