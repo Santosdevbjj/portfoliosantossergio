@@ -9,8 +9,9 @@
     "contentVersion": "2026.03.05",
     "contentHash": "i18n-esar-2026-03-05",
     "sourceType": "curated-manual",
-    "description": "Portafolio multilingüe de Sérgio Santos, especialista en Tecnología de la Información, Inteligencia Artificial e Ingeniería de Software."
+    "description": "Portafolio multilingüe de Sérgio Santos, especialista en Ciencia de Datos e Ingeniería de Software."
   },
+
   "hero": {
     "greeting": "Disponible para Proyectos Críticos",
     "title": "Analista de Ciencia de Datos",
@@ -18,15 +19,16 @@
     "headline": "Especialista en transformar infraestructuras complejas en sistemas de alta disponibilidad y pipelines de datos escalables.",
     "ctaPrimary": "Ver Proyectos"
   },
+
   "about": {
     "title": "Sobre Mí",
     "differentialTitle": "Ingeniería de Datos con Foco en Misión Crítica",
     "description": "Analista de Ciencia de Datos con base sólida en sistemas críticos bancarios y foco en transformar datos en decisiones, reducción de costos y eficiencia operativa.",
-    "differentialContent": "Laburé por más de 15 años en el Banco Bradesco en ambientes regulados de misión crítica. Actualmente direcciono mi actividad hacia la Ciencia de Dados e IA, aplicando el rigor de sistemas críticos a la creación de modelos predictivos.",
+    "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en ambientes regulados de misión crítica. Actualmente oriento mi trabajo hacia Ciencia de Datos e IA, aplicando el rigor de sistemas críticos en la creación de modelos predictivos.",
     "highlights": [
       "15+ años en Bancos",
       "Especialista Cloud",
-      "Data Science e IA"
+      "Ciencia de Datos e IA"
     ],
     "stats": {
       "experienceValue": "+15",
@@ -36,6 +38,7 @@
       "automation": "Sistemas 100% Automatizados"
     }
   },
+
   "contact": {
     "title": "¿Charlamos?",
     "subtitle": "Busco oportunidades en proyectos de gobernanza y modernización.",
@@ -46,6 +49,7 @@
     "ctaTitle": "¿Hacemos algo juntos?",
     "buttonText": "Ponete en contacto →"
   },
+
   "experience": {
     "title": "Experiencia Profesional",
     "emptyLabel": "No se encontró ninguna experiencia",
@@ -54,10 +58,11 @@
         "company": "Consultor Autónomo / Transición",
         "period": "2008 - Actualidad",
         "role": "Especialista en Sistemas Críticos",
-        "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructura resiliente. Foco en Ciencia de Datos y automatización inteligente."
+        "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructura resiliente."
       }
     ]
   },
+
   "articles": {
     "title": "Artículos Técnicos",
     "mediumProfile": "Ver perfil en Medium",
@@ -68,7 +73,7 @@
     "items": [
       {
         "title": "La Era de los Datos en Sistemas Críticos",
-        "description": "Cómo el gobierno de datos transforma sistemas legados en activos estratégicos.",
+        "description": "Cómo la gobernanza de datos transforma sistemas legados en activos estratégicos.",
         "date": "2025",
         "category": "Data Strategy",
         "isAward": true,
@@ -76,6 +81,7 @@
       }
     ]
   },
+
   "projects": {
     "title": "Proyectos y Soluciones",
     "featuredLabel": "Destacado Técnico",
@@ -86,6 +92,12 @@
     "viewProject": "Repositorio GitHub",
     "viewDemo": "Visualizar Demo",
     "viewAll": "Ver Todos",
+
+    "portfolio": {
+      "all": "Todos",
+      "viewProject": "Ver Proyecto"
+    },
+
     "categories": {
       "Data Engineering": { "labelKey": "Ingeniería de Datos" },
       "Cloud & Infrastructure": { "labelKey": "Nube e Infraestructura" },
@@ -101,12 +113,10 @@
       "dev": { "labelKey": "Desarrollo" },
       "security": { "labelKey": "Seguridad" }
     },
-    "portfolio": {
-      "all": "Todos",
-      "viewProject": "Ver Proyecto"
-    },
+
     "featuredProjects": []
   },
+
   "common": {
     "navigation": "Navegación principal",
     "role": "Analista de Ciencia de Datos | Python | SQL | Azure",
@@ -119,14 +129,7 @@
     "skipToContent": "Ir al contenido",
     "languageSwitcher": "Cambiar idioma",
     "email": "santossergiorealbjj@outlook.com",
-    "errorBoundary": {
-      "title": "¡Upa! Error inesperado.",
-      "description": "Ponete en contacto si el problema persiste.",
-      "actions": {
-        "retry": "Reintentar",
-        "home": "Inicio"
-      }
-    },
+
     "nav": {
       "about": "Sobre mí",
       "experience": "Experiencia",
@@ -134,22 +137,35 @@
       "articles": "Artículos",
       "contact": "Contacto"
     },
+
     "theme": {
       "light": "Claro",
       "dark": "Oscuro",
       "system": "Sistema"
     },
+
+    "errorBoundary": {
+      "title": "¡Ups! Error inesperado.",
+      "description": "Ponete en contacto si el problema persiste.",
+      "actions": {
+        "retry": "Reintentar",
+        "home": "Inicio"
+      }
+    },
+
     "notFound": {
       "title": "Página no encontrada",
-      "description": "El link puede estar roto.",
+      "description": "El enlace puede estar roto.",
       "button": "Volver"
     },
+
     "externalLinks": {
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
       "medium": "https://medium.com/@sergiosantosluiz",
       "email": "mailto:santossergiorealbjj@outlook.com"
     },
+
     "menu": {
       "open": "Abrir",
       "close": "Cerrar",
@@ -159,6 +175,7 @@
       }
     }
   },
+
   "intl": {
     "locale": "es-AR",
     "fallbackLocale": "es",
@@ -167,18 +184,22 @@
     "unitDisplay": "short",
     "numberFormat": "es-AR"
   },
+
   "states": {
     "loading": "Cargando...",
     "empty": "Sin datos.",
     "error": "Error al cargar.",
+
     "emptyProjects": {
       "title": "Ningún proyecto",
       "description": "Próximamente.",
       "cta": "Volver"
     },
+
     "emptyExperience": "Sin registros.",
     "errorArticles": "Error en los artículos."
   },
+
   "cookie": {
     "title": "Cookies",
     "description": "Mejoramos tu experiencia.",
@@ -188,10 +209,12 @@
     "acceptAll": "Aceptar",
     "savePreferences": "Guardar"
   },
+
   "seo": {
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
     "description": "Ciencia de Datos y Sistemas Críticos",
+
     "keywords": [
       "python",
       "databricks",
@@ -199,10 +222,11 @@
       "neo4j",
       "data science"
     ],
+
     "pages": {
       "home": {
         "title": "Inicio",
-        "description": "Portfolio de Sérgio Santos"
+        "description": "Portafolio de Sérgio Santos"
       },
       "projects": {
         "title": "Proyectos",
@@ -214,6 +238,7 @@
       }
     }
   },
+
   "metrics": {
     "availability": "99,5%",
     "availabilityNormalized": {
