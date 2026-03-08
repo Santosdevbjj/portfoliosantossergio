@@ -86,22 +86,43 @@ export interface CategoryDetail {
   labelKey: string;
 }
 
+/*
+Categorias precisam refletir EXATAMENTE o JSON.
+Mantemos chaves fortes + index signature.
+*/
 export interface ProjectCategories {
+
+  /* Portfolio filter categories */
   "Data Engineering": CategoryDetail;
   "Cloud & Infrastructure": CategoryDetail;
   "Data Science": CategoryDetail;
   "Data Analytics": CategoryDetail;
   "Outros": CategoryDetail;
 
+  /* Internal technical tags */
   dataScience: CategoryDetail;
   cloud: CategoryDetail;
   graphs: CategoryDetail;
   analysis: CategoryDetail;
   excel: CategoryDetail;
   database: CategoryDetail;
+
   dev: CategoryDetail;
   security: CategoryDetail;
 
+  /* Frontend stack */
+  html: CategoryDetail;
+  css: CategoryDetail;
+  javascript: CategoryDetail;
+  typescript: CategoryDetail;
+  next: CategoryDetail;
+  node: CategoryDetail;
+  react: CategoryDetail;
+
+  /* Content */
+  articles: CategoryDetail;
+
+  /* Fallback for dynamic categories */
   [key: string]: CategoryDetail;
 }
 
@@ -164,6 +185,10 @@ export interface CommonDictionary {
     system: string;
   };
 
+  /*
+  Mantido da versão antiga para compatibilidade futura
+  mesmo que não esteja no JSON ainda
+  */
   errorBoundary: {
     title: string;
     description: string;
