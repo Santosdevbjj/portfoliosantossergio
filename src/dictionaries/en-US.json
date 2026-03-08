@@ -86,6 +86,10 @@
     "viewProject": "GitHub Repository",
     "viewDemo": "View Demo",
     "viewAll": "View All",
+    "portfolio": {
+      "all": "All",
+      "viewProject": "View Project"
+    },
     "categories": {
       "Data Engineering": { "labelKey": "Data Engineering" },
       "Cloud & Infrastructure": { "labelKey": "Cloud & Infrastructure" },
