@@ -14,7 +14,7 @@ export enum ProjectCoreTag {
 
 /**
  * Tecnologias principais detectadas nos topics do GitHub
- * A ORDEM É IMPORTANTE pois define a prioridade de classificação
+ * A ORDEM DEFINE PRIORIDADE
  */
 export enum ProjectTechnology {
   DATA_SCIENCE = "data-science",
@@ -35,14 +35,14 @@ export enum ProjectTechnology {
   CSS = "css",
   JAVASCRIPT = "javascript",
   TYPESCRIPT = "typescript",
-  NEXT = "next.js",
+  NEXT = "next",
   NODE = "node",
   REACT = "react",
   ARTICLES = "articles",
 }
 
 /**
- * Ordem oficial de tecnologias para renderização
+ * Ordem oficial de tecnologias
  */
 export const PROJECT_TECHNOLOGY_ORDER: readonly ProjectTechnology[] = [
   ProjectTechnology.DATA_SCIENCE,
@@ -70,7 +70,7 @@ export const PROJECT_TECHNOLOGY_ORDER: readonly ProjectTechnology[] = [
 ];
 
 /**
- * Estrutura de domínio do projeto
+ * Estrutura de domínio
  */
 export interface ProjectDomain {
   readonly id: string;
@@ -91,38 +91,38 @@ export interface ProjectDomain {
 }
 
 /**
- * Mapeia tecnologia -> categoria do dictionary
+ * Mapeia tecnologia -> chave do dictionary
  */
 const TECHNOLOGY_CATEGORY_MAP: Record<
   ProjectTechnology,
   keyof ProjectCategories
 > = {
   [ProjectTechnology.DATA_SCIENCE]: "dataScience",
-  [ProjectTechnology.AZURE_DATABRICKS]: "cloud",
+  [ProjectTechnology.AZURE_DATABRICKS]: "azureDatabricks",
   [ProjectTechnology.NEO4J]: "graphs",
   [ProjectTechnology.POWER_BI]: "analysis",
   [ProjectTechnology.EXCEL]: "excel",
   [ProjectTechnology.DATABASE]: "database",
-  [ProjectTechnology.PYTHON]: "dev",
-  [ProjectTechnology.DOTNET]: "dev",
-  [ProjectTechnology.JAVA]: "dev",
-  [ProjectTechnology.MACHINE_LEARNING]: "dataScience",
-  [ProjectTechnology.ARTIFICIAL_INTELLIGENCE]: "dataScience",
-  [ProjectTechnology.AWS]: "cloud",
+  [ProjectTechnology.PYTHON]: "python",
+  [ProjectTechnology.DOTNET]: "dotnet",
+  [ProjectTechnology.JAVA]: "java",
+  [ProjectTechnology.MACHINE_LEARNING]: "machineLearning",
+  [ProjectTechnology.ARTIFICIAL_INTELLIGENCE]: "ai",
+  [ProjectTechnology.AWS]: "aws",
   [ProjectTechnology.CYBERSECURITY]: "security",
-  [ProjectTechnology.PROGRAMMING_LOGIC]: "dev",
-  [ProjectTechnology.HTML]: "dev",
-  [ProjectTechnology.CSS]: "dev",
-  [ProjectTechnology.JAVASCRIPT]: "dev",
-  [ProjectTechnology.TYPESCRIPT]: "dev",
-  [ProjectTechnology.NEXT]: "dev",
-  [ProjectTechnology.NODE]: "dev",
-  [ProjectTechnology.REACT]: "dev",
-  [ProjectTechnology.ARTICLES]: "analysis",
+  [ProjectTechnology.PROGRAMMING_LOGIC]: "logic",
+  [ProjectTechnology.HTML]: "html",
+  [ProjectTechnology.CSS]: "css",
+  [ProjectTechnology.JAVASCRIPT]: "javascript",
+  [ProjectTechnology.TYPESCRIPT]: "typescript",
+  [ProjectTechnology.NEXT]: "next",
+  [ProjectTechnology.NODE]: "node",
+  [ProjectTechnology.REACT]: "react",
+  [ProjectTechnology.ARTICLES]: "articles",
 };
 
 /**
- * Sinônimos usados nos topics do GitHub
+ * Aliases usados nos topics do GitHub
  */
 const TECHNOLOGY_TOPIC_ALIASES: Record<ProjectTechnology, string[]> = {
   [ProjectTechnology.DATA_SCIENCE]: [
@@ -131,8 +131,10 @@ const TECHNOLOGY_TOPIC_ALIASES: Record<ProjectTechnology, string[]> = {
   ],
 
   [ProjectTechnology.AZURE_DATABRICKS]: [
-    "azure-databricks",
     "databricks",
+    "azure-databricks",
+    "azure",
+    "azure-cloud",
   ],
 
   [ProjectTechnology.NEO4J]: [
@@ -147,9 +149,7 @@ const TECHNOLOGY_TOPIC_ALIASES: Record<ProjectTechnology, string[]> = {
     "analise-de-dados",
   ],
 
-  [ProjectTechnology.EXCEL]: [
-    "excel",
-  ],
+  [ProjectTechnology.EXCEL]: ["excel"],
 
   [ProjectTechnology.DATABASE]: [
     "database",
@@ -157,18 +157,14 @@ const TECHNOLOGY_TOPIC_ALIASES: Record<ProjectTechnology, string[]> = {
     "sql",
   ],
 
-  [ProjectTechnology.PYTHON]: [
-    "python",
-  ],
+  [ProjectTechnology.PYTHON]: ["python"],
 
   [ProjectTechnology.DOTNET]: [
     "dotnet",
     "csharp",
   ],
 
-  [ProjectTechnology.JAVA]: [
-    "java",
-  ],
+  [ProjectTechnology.JAVA]: ["java"],
 
   [ProjectTechnology.MACHINE_LEARNING]: [
     "machine-learning",
@@ -200,24 +196,35 @@ const TECHNOLOGY_TOPIC_ALIASES: Record<ProjectTechnology, string[]> = {
   [ProjectTechnology.CSS]: ["css"],
   [ProjectTechnology.JAVASCRIPT]: ["javascript"],
   [ProjectTechnology.TYPESCRIPT]: ["typescript"],
-  [ProjectTechnology.NEXT]: ["next", "nextjs", "next.js"],
-  [ProjectTechnology.NODE]: ["node"],
+
+  [ProjectTechnology.NEXT]: [
+    "next",
+    "nextjs",
+    "next.js",
+  ],
+
+  [ProjectTechnology.NODE]: [
+    "node",
+    "nodejs",
+  ],
+
   [ProjectTechnology.REACT]: ["react"],
 
   [ProjectTechnology.ARTICLES]: [
     "articles",
+    "artigos",
     "artigos-tecnicos",
   ],
 };
 
 /**
- * Normaliza topics do GitHub
+ * Normaliza topics
  */
 const normalizeTopics = (topics: readonly string[]) =>
   topics.map(t => t.toLowerCase().trim());
 
 /**
- * Resolve tecnologia principal do projeto
+ * Resolve tecnologia
  */
 export const resolveProjectTechnology = (
   topics: readonly string[],
@@ -227,31 +234,38 @@ export const resolveProjectTechnology = (
 
   const tech =
     PROJECT_TECHNOLOGY_ORDER.find(technology =>
-      TECHNOLOGY_TOPIC_ALIASES[technology].some(alias =>
+      TECHNOLOGY_TOPIC_ALIASES[technology]?.some(alias =>
         normalized.includes(alias),
       ),
     ) ?? ProjectTechnology.DATA_SCIENCE;
 
   return {
     id: tech,
-    labelKey: TECHNOLOGY_CATEGORY_MAP[tech],
+    labelKey:
+      TECHNOLOGY_CATEGORY_MAP[tech] ?? "dataScience",
   };
 };
 
 /**
- * Resolve flags principais do projeto
+ * Resolve flags
  */
-export const resolveProjectFlags = (topics: readonly string[]) => {
+export const resolveProjectFlags = (
+  topics: readonly string[],
+) => {
 
   const normalized = normalizeTopics(topics);
 
   return {
-    isPortfolio: normalized.includes(ProjectCoreTag.PORTFOLIO),
+    isPortfolio: normalized.includes(
+      ProjectCoreTag.PORTFOLIO,
+    ),
 
     isFeatured:
       normalized.includes(ProjectCoreTag.FEATURED) ||
       normalized.includes(ProjectCoreTag.DESTAQUE),
 
-    isFirst: normalized.includes(ProjectCoreTag.PRIMEIRO),
+    isFirst: normalized.includes(
+      ProjectCoreTag.PRIMEIRO,
+    ),
   };
 };
