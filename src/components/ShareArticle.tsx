@@ -7,8 +7,8 @@ import type { Dictionary, Locale } from "@/types/dictionary";
  * SHARE ARTICLE COMPONENT
  * -----------------------------------------------------------------------------
  * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16
- * ✔ I18n: Suporte Dinâmico PT-BR, EN, ES via Dictionary
- * ✔ Responsivo: Mobile-first com otimização de toque e escala
+ * ✔ I18n: Suporte Dinâmico PT-BR, EN, ES via Dictionary e Regex de prefixo
+ * ✔ Responsivo: Mobile-first com otimização de toque e escala (Tailwind 4.2 native)
  * ✔ Acessibilidade: Aria-labels traduzidos e contraste verificado
  */
 
@@ -30,14 +30,26 @@ export default function ShareArticle({ title, dict, lang }: ShareArticleProps) {
     shareUrl
   )}`;
 
-  // Mapeamento de rótulos baseado no dicionário para manter consistência
-  // Nota: Como não há uma chave específica para "Compartilhar", usamos contexto de CTA
-  const labels = {
-    question: lang === "pt-BR" ? "Gostou do conteúdo?" : 
-              lang === "en" ? "Enjoyed the content?" : "¿Te gustó el contenido?",
-    button: lang === "pt-BR" ? "Compartilhar no LinkedIn" : 
-            lang === "en" ? "Share on LinkedIn" : "Compartir en LinkedIn"
+  /**
+   * RESOLUÇÃO DO ERRO DE BUILD:
+   * O tipo Locale é estrito (ex: "en-US", "es-MX"). 
+   * Usamos startsWith para verificar o prefixo do idioma de forma segura e compatível com TS 6.0.
+   */
+  const getLabels = () => {
+    const isPt = lang.startsWith("pt");
+    const isEn = lang.startsWith("en");
+    
+    return {
+      question: isPt 
+        ? "Gostou do conteúdo?" 
+        : isEn ? "Enjoyed the content?" : "¿Te gustó el contenido?",
+      button: isPt 
+        ? "Compartilhar no LinkedIn" 
+        : isEn ? "Share on LinkedIn" : "Compartir en LinkedIn"
+    };
   };
+
+  const labels = getLabels();
 
   return (
     <div className="mt-16 pt-10 border-t border-slate-200 dark:border-slate-800/60 not-prose">
