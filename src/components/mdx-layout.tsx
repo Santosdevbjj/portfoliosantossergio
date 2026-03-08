@@ -8,7 +8,8 @@ import type { Dictionary, Locale } from "@/types/dictionary";
  * -----------------------------------------------------------------------------
  * ✔ Stack: TS 6.0, Node 24, Tailwind 4.2, Next 16
  * ✔ I18n: Suporte dinâmico para pt-BR, en, es (ES/AR/MX)
- * ✔ Responsivo: Mobile-first com Sidebar inteligente em LG+
+ * ✔ Responsivo: Layout adaptativo com Sidebar inteligente em LG+
+ * ✔ Alinhamento: Integrado ao Dicionário e Tipagem Strict
  */
 
 interface MdxLayoutProps {
@@ -18,11 +19,19 @@ interface MdxLayoutProps {
 }
 
 export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
-  // Tradução dinâmica do link de retorno baseada no dicionário e na lógica de lang
+  
+  /**
+   * Lógica de tradução para o botão de retorno baseada no dicionário.
+   * Utiliza a chave 'states.emptyProjects.cta' ou 'seo.pages.articles.title' 
+   * conforme a estrutura do seu JSON.
+   */
   const getBackLabel = () => {
-    if (lang === 'pt-BR') return 'Voltar para o Journal';
-    if (lang === 'en') return 'Back to Journal';
-    return 'Volver al Journal'; // Fallback para variações de espanhol
+    const label = dict.states.emptyProjects.cta; // "Voltar"
+    const context = dict.seo.pages.articles.title; // "Artigos"
+    
+    if (lang === 'pt-BR') return `${label} para ${context}`;
+    if (lang === 'en') return `${label} to ${context}`;
+    return `${label} a ${context}`; // Fallback para variações de espanhol
   };
 
   return (
@@ -38,7 +47,7 @@ export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
               href={`/${lang}/artigos`} 
               className="group inline-flex items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-blue-600 transition-all duration-300"
             >
-              <span className="mr-3 flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 group-hover:border-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
+              <span className="mr-3 flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 group-hover:border-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
                 </svg>
@@ -61,22 +70,30 @@ export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
           </div>
 
           {/* Componente de Compartilhamento Integrado */}
-          <ShareArticle title={dict.articles.title} />
+          <ShareArticle title={dict.articles.items[0]?.title || dict.seo.title} />
         </article>
 
-        {/* Sidebar fixa para Sumário (Escondida em mobile, visível em LG+) */}
+        {/* Sidebar para Sumário (Escondida em mobile, visível em LG+) */}
         <aside className="lg:w-80 w-full lg:block">
           <div className="lg:sticky lg:top-32 space-y-8">
+            
+            {/* Agora passando corretamente o dict para o TableOfContents */}
             <TableOfContents dict={dict} />
             
-            {/* Bloco Informativo Adicional (Opcional) */}
-            <div className="hidden lg:block p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
-              <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">
+            {/* Bloco Informativo do Autor (Card lateral) */}
+            <div className="hidden lg:block p-8 rounded-[2rem] bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 transition-all hover:border-blue-500/30">
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-4">
                 {dict.meta.author}
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                 {dict.hero.headline}
               </p>
+              
+              <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">
+                  {dict.about.stats.automation}
+                </p>
+              </div>
             </div>
           </div>
         </aside>
