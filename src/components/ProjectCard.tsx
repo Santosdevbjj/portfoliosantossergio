@@ -1,11 +1,11 @@
 'use client';
 
 /**
- * PROJECT CARD COMPONENT
+ * PROJECT CARD COMPONENT - REVISADO & INTEGRADO
  * -----------------------------------------------------------------------------
- * ✔ Stack: React 19, TS 6.0, Tailwind 4.2
- * ✔ I18n: Totalmente integrado com dicionários PT/EN/ES
- * ✔ Responsividade: Flex-grow dinâmico e padding adaptativo
+ * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16, Node 24
+ * ✔ I18n: Integrado com Dictionary (PT/EN/ES)
+ * ✔ Responsividade: Grid-ready com flex-grow e padding dinâmico
  */
 
 import {
@@ -29,9 +29,9 @@ interface ProjectCardProps {
 export function ProjectCard({ project, dict }: ProjectCardProps) {
   const { projects: labels } = dict;
 
-  // Lógica de extração segura para descrições com Pipes (|)
-  // Caso o serviço já tenha processado, 'project.description' terá a parte 1.
-  const descParts = project.description?.includes('|') 
+  // Lógica de extração segura para descrições estruturadas com Pipes (|)
+  // Divide a string em: Problema | Solução | Impacto
+  const descParts = project.description?.includes('|')
     ? project.description.split('|').map(p => p.trim())
     : [project.description];
 
@@ -40,8 +40,8 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
   const impactText = descParts[2] || '';
 
   /**
-   * Formata as tags técnicas (ex: nextjs -> Nextjs, aws -> AWS)
-   * TS 6.0: Otimizado com Set para busca O(1)
+   * Formata as tags técnicas (ex: aws -> AWS)
+   * TS 6.0: Otimizado com Set para busca constante O(1)
    */
   const formatTechTag = (topic: string): string => {
     const uppercaseTechs = new Set([
@@ -59,7 +59,7 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
   return (
     <article className="group relative flex h-full w-full flex-col rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl dark:border-slate-800/60 dark:bg-slate-950/40 md:p-8">
       
-      {/* Badge de Destaque Técnico */}
+      {/* Badge de Destaque Técnico - Posicionamento Absoluto Responsivo */}
       {project.isFeatured && (
         <div className="absolute -top-3 right-6 z-10">
           <span className="flex items-center gap-1.5 rounded-full bg-blue-600 px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-blue-500/20">
@@ -101,6 +101,7 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
         </div>
       </header>
 
+      {/* Área de Conteúdo - Flex Grow garante que o footer fique sempre na base */}
       <div className="flex flex-grow flex-col">
         <h3 className="mb-5 text-xl font-black tracking-tight text-slate-900 dark:text-white md:text-2xl">
           {project.name}
@@ -134,9 +135,9 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
       </div>
 
       <footer className="mt-8 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-5 dark:border-slate-800/50">
-        {/* Categoria Principal */}
+        {/* Categoria Principal - Integração Dicionário & Domain */}
         <span className="rounded-full bg-blue-50 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
-          {labels.categories[project.technology.labelKey] || labels.categories.dev}
+          {labels.categories[project.technology.labelKey]?.labelKey || labels.categories.dev?.labelKey}
         </span>
 
         {/* Tags Técnicas filtradas (máximo 3) */}
@@ -158,7 +159,6 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
 
 /**
  * Sub-componente CaseSection
- * Organiza as seções Problema/Solução/Impacto
  */
 interface CaseSectionProps {
   readonly icon: React.ReactNode;
