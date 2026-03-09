@@ -1,13 +1,13 @@
 {
   "meta": {
-    "version": "1.0.0",
+    "version": "1.0.1",
     "locale": "es-AR",
     "direction": "ltr",
-    "lastUpdated": "2026-03-05T21:00:00Z",
+    "lastUpdated": "2026-03-08T21:00:00Z",
     "author": "Sérgio Santos",
     "source": "manual",
-    "contentVersion": "2026.03.05",
-    "contentHash": "i18n-esar-2026-03-05",
+    "contentVersion": "2026.03.08",
+    "contentHash": "i18n-ptbr-2026-03-08",
     "sourceType": "curated-manual",
     "description": "Portafolio multilingüe de Sérgio Santos, especialista en Ciencia de Datos e Ingeniería de Software."
   },
@@ -22,19 +22,19 @@
 
   "about": {
     "title": "Sobre Mí",
-    "differentialTitle": "Ingeniería de Datos con Foco en Misión Crítica",
-    "description": "Analista de Ciencia de Datos con base sólida en sistemas críticos bancarios y foco en transformar datos en decisiones, reducción de costos y eficiencia operativa.",
-    "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en ambientes regulados de misión crítica. Actualmente oriento mi trabajo hacia Ciencia de Datos e IA, aplicando el rigor de sistemas críticos en la creación de modelos predictivos.",
+    "differentialTitle": "Ingeniería de Datos con Enfoque en Sistemas de Misión Crítica",
+    "description": "Analista de Ciencia de Datos con una base sólida en sistemas bancarios críticos y enfocado en transformar datos en decisiones, reducción de costos y eficiencia operativa.",
+    "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente enfoco mi trabajo en Ciencia de Datos e IA.",
     "highlights": [
-      "15+ años en Bancos",
-      "Especialista Cloud",
-      "Ciencia de Datos e IA"
+      "Más de 15 años en Banca",
+      "Especialista en Cloud",
+      "Data Science e IA"
     ],
     "stats": {
       "experienceValue": "+15",
       "experienceLabel": "Años",
-      "availabilityValue": "99,9%",
-      "availabilityLabel": "Uptime",
+      "availabilityValue": "99.9%",
+      "availabilityLabel": "Disponibilidad",
       "automation": "Sistemas 100% Automatizados"
     }
   },
@@ -46,16 +46,16 @@
     "emailLabel": "Copiar Email",
     "cvLabel": "Ver CV",
     "linkedinLabel": "LinkedIn",
-    "ctaTitle": "¿Hacemos algo juntos?",
-    "buttonText": "Ponete en contacto →"
+    "ctaTitle": "¿Construimos algo juntos?",
+    "buttonText": "Ponete en Contacto →"
   },
 
   "experience": {
     "title": "Experiencia Profesional",
-    "emptyLabel": "No se encontró ninguna experiencia",
+    "emptyLabel": "No se encontró experiencia",
     "items": [
       {
-        "company": "Consultor Autónomo / Transición",
+        "company": "Consultor Independiente / Transición",
         "period": "2008 - Actualidad",
         "role": "Especialista en Sistemas Críticos",
         "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructura resiliente."
@@ -67,13 +67,13 @@
     "title": "Artículos Técnicos",
     "mediumProfile": "Ver perfil en Medium",
     "readMore": "Leer artículo completo",
-    "publishedAt": "Publicado el",
+    "publishedAt": "Publicado en",
     "bestOfMonth": "Destacado del Mes",
     "awardWinner": "Artículo Premiado",
     "items": [
       {
         "title": "La Era de los Datos en Sistemas Críticos",
-        "description": "Cómo la gobernanza de datos transforma sistemas legados en activos estratégicos.",
+        "description": "Cómo la gobernanza de datos transforma sistemas heredados en activos estratégicos.",
         "date": "2025",
         "category": "Data Strategy",
         "isAward": true,
@@ -90,7 +90,7 @@
     "problem": "Problema",
     "solution": "Solución",
     "viewProject": "Repositorio GitHub",
-    "viewDemo": "Visualizar Demo",
+    "viewDemo": "Ver Demo",
     "viewAll": "Ver Todos",
 
     "portfolio": {
@@ -99,19 +99,32 @@
     },
 
     "categories": {
+
       "Data Engineering": { "labelKey": "Ingeniería de Datos" },
       "Cloud & Infrastructure": { "labelKey": "Nube e Infraestructura" },
       "Data Science": { "labelKey": "Ciencia de Datos" },
       "Data Analytics": { "labelKey": "Análisis de Datos" },
       "Outros": { "labelKey": "Otros Proyectos" },
+
       "dataScience": { "labelKey": "Ciencia de Datos" },
-      "cloud": { "labelKey": "Azure Databricks" },
-      "graphs": { "labelKey": "Neo4J" },
-      "analysis": { "labelKey": "Power BI y Análisis" },
-      "excel": { "labelKey": "Excel" },
-      "database": { "labelKey": "Base de Datos" },
-      "dev": { "labelKey": "Desarrollo" },
-      "security": { "labelKey": "Seguridad" }
+      "cloud": { "labelKey": "Cloud & Databricks" },
+      "graphs": { "labelKey": "Análisis de Grafos (Neo4J)" },
+      "analysis": { "labelKey": "Análisis de Datos & Power BI" },
+      "excel": { "labelKey": "Excel y Modelado de Datos" },
+      "database": { "labelKey": "Base de Datos & SQL" },
+
+      "dev": { "labelKey": "Desarrollo de Software" },
+      "security": { "labelKey": "Ciberseguridad" },
+
+      "html": { "labelKey": "HTML" },
+      "css": { "labelKey": "CSS" },
+      "javascript": { "labelKey": "JavaScript" },
+      "typescript": { "labelKey": "TypeScript" },
+      "next": { "labelKey": "Next.js" },
+      "node": { "labelKey": "Node.js" },
+      "react": { "labelKey": "React" },
+      "articles": { "labelKey": "Artículos Técnicos" }
+
     },
 
     "featuredProjects": []
@@ -126,7 +139,7 @@
     "loading": "Cargando...",
     "error": "Algo salió mal.",
     "socialLinks": "Abrir perfil de {platform}",
-    "skipToContent": "Ir al contenido",
+    "skipToContent": "Saltar al contenido",
     "languageSwitcher": "Cambiar idioma",
     "email": "santossergiorealbjj@outlook.com",
 
@@ -144,35 +157,11 @@
       "system": "Sistema"
     },
 
-    "errorBoundary": {
-      "title": "¡Ups! Error inesperado.",
-      "description": "Ponete en contacto si el problema persiste.",
-      "actions": {
-        "retry": "Reintentar",
-        "home": "Inicio"
-      }
-    },
-
-    "notFound": {
-      "title": "Página no encontrada",
-      "description": "El enlace puede estar roto.",
-      "button": "Volver"
-    },
-
     "externalLinks": {
       "linkedin": "https://www.linkedin.com/in/santossergioluiz",
       "github": "https://github.com/Santosdevbjj",
       "medium": "https://medium.com/@sergiosantosluiz",
       "email": "mailto:santossergiorealbjj@outlook.com"
-    },
-
-    "menu": {
-      "open": "Abrir",
-      "close": "Cerrar",
-      "aria": {
-        "open": "Abrir menú",
-        "close": "Cerrar menú"
-      }
     }
   },
 
