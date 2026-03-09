@@ -4,26 +4,35 @@ import type { Dictionary } from "@/types/dictionary";
 
 /**
  * Extrai todos os caminhos (dot notation) de um objeto.
+ *
  * Exemplo:
  * common.errorBoundary.actions.retry
  *
  * ✔ Ignora arrays
- * ✔ Seguro para TS 6 strict
+ * ✔ Seguro para TypeScript strict
+ * ✔ Evita loops em objetos circulares
  * ✔ Não usa any
  */
 function getAllPaths(
   obj: unknown,
-  prefix = ""
+  prefix = "",
+  visited = new WeakSet<object>()
 ): string[] {
   if (!obj || typeof obj !== "object") {
     return [];
   }
 
-  const entries = Object.entries(
-    obj as Record<string, unknown>
-  );
+  if (visited.has(obj as object)) {
+    return [];
+  }
 
-  return entries.flatMap(([key, value]) => {
+  visited.add(obj as object);
+
+  const record = obj as Record<string, unknown>;
+
+  const paths: string[] = [];
+
+  for (const [key, value] of Object.entries(record)) {
     const path = prefix ? `${prefix}.${key}` : key;
 
     if (
@@ -31,21 +40,25 @@ function getAllPaths(
       typeof value === "object" &&
       !Array.isArray(value)
     ) {
-      return getAllPaths(value, path);
+      paths.push(...getAllPaths(value, path, visited));
+    } else {
+      paths.push(path);
     }
+  }
 
-    return [path];
-  });
+  return paths;
 }
 
 /**
  * Compara dois dicionários e retorna inconsistências:
+ *
  * - Chaves faltantes no target
  * - Chaves extras no target
  *
  * ✔ Seguro para uso em build
- * ✔ Não depende de runtime Next
+ * ✔ Não depende de runtime do Next.js
  * ✔ Compatível com JSON importado via App Router
+ * ✔ Determinístico para CI/CD
  */
 export function validateCrossLocale(
   base: Dictionary,
@@ -56,13 +69,13 @@ export function validateCrossLocale(
   const basePaths = new Set(getAllPaths(base));
   const targetPaths = new Set(getAllPaths(target));
 
-  const missingInTarget = [...basePaths].filter(
-    (path) => !targetPaths.has(path)
-  );
+  const missingInTarget = [...basePaths]
+    .filter((path) => !targetPaths.has(path))
+    .sort();
 
-  const extraInTarget = [...targetPaths].filter(
-    (path) => !basePaths.has(path)
-  );
+  const extraInTarget = [...targetPaths]
+    .filter((path) => !basePaths.has(path))
+    .sort();
 
   const errors: string[] = [];
 
