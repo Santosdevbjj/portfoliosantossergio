@@ -7,35 +7,48 @@ import esAR from "./es-AR.json";
 import esMX from "./es-MX.json";
 
 import { validateCrossLocale } from "./validateCrossLocale";
+
 import type { Dictionary } from "@/types/dictionary";
 
 /**
+ * Estrutura mínima usada apenas para validação estrutural.
+ * Não exige campos adicionados pelo normalizeDictionary.
+ */
+type RawDictionary = Partial<Dictionary> & {
+  [key: string]: unknown;
+};
+
+/**
  * Valida a consistência estrutural entre todos os dicionários.
- * Garante que todas as chaves do locale base (pt-BR)
- * existam nos demais idiomas suportados.
  *
  * ✔ Compatível com Next.js 16
- * ✔ Compatível com TypeScript 6 strict
- * ✔ Seguro para build no Vercel
+ * ✔ Compatível com TypeScript strict
+ * ✔ Não quebra build no Vercel
+ * ✔ Valida apenas estrutura real do JSON
  */
 export function validateAllLocales(): void {
-  const base = ptBR as Dictionary;
+  const base = ptBR as unknown as RawDictionary;
 
   const targets: Array<{
-    data: Dictionary;
+    data: RawDictionary;
     code: string;
   }> = [
-    { data: enUS as Dictionary, code: "en-US" },
-    { data: esES as Dictionary, code: "es-ES" },
-    { data: esAR as Dictionary, code: "es-AR" },
-    { data: esMX as Dictionary, code: "es-MX" },
+    { data: enUS as unknown as RawDictionary, code: "en-US" },
+    { data: esES as unknown as RawDictionary, code: "es-ES" },
+    { data: esAR as unknown as RawDictionary, code: "es-AR" },
+    { data: esMX as unknown as RawDictionary, code: "es-MX" },
   ];
 
   const errors: string[] = [];
 
   for (const target of targets) {
     errors.push(
-      ...validateCrossLocale(base, target.data, "pt-BR", target.code),
+      ...validateCrossLocale(
+        base as Dictionary,
+        target.data as Dictionary,
+        "pt-BR",
+        target.code,
+      ),
     );
   }
 
@@ -46,7 +59,10 @@ export function validateAllLocales(): void {
       console.error(`  - ${err}`);
     }
 
-    // Em produção o build deve falhar
+    /**
+     * Em produção o build deve falhar
+     * para evitar deploy com dicionários inconsistentes
+     */
     if (process.env.NODE_ENV === "production") {
       throw new Error(
         "i18n validation failed: locale structure mismatch",
