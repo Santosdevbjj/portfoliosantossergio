@@ -11,15 +11,23 @@ export function validateDictionary(dictionary: Dictionary): ValidationResult {
   const errors: string[] = [];
 
   /* =========================================================
+     Helper seguro para validar strings
+  ========================================================== */
+
+  const isString = (value: unknown): value is string =>
+    typeof value === "string" && value.trim().length > 0;
+
+  /* =========================================================
      Helper: Validação de SEO
   ========================================================== */
+
   const validateSeo = (seo: Dictionary["seo"] | undefined): void => {
     if (!seo) {
       errors.push("Missing seo section");
       return;
     }
 
-    if (!seo.siteName) {
+    if (!isString(seo.siteName)) {
       errors.push("Missing seo.siteName");
     }
 
@@ -36,11 +44,16 @@ export function validateDictionary(dictionary: Dictionary): ValidationResult {
     requiredPages.forEach((page) => {
       const pageData = seo.pages?.[page];
 
-      if (!pageData?.title) {
+      if (!pageData) {
+        errors.push(`Missing seo.pages.${page}`);
+        return;
+      }
+
+      if (!isString(pageData.title)) {
         errors.push(`Missing seo.pages.${page}.title`);
       }
 
-      if (!pageData?.description) {
+      if (!isString(pageData.description)) {
         errors.push(`Missing seo.pages.${page}.description`);
       }
     });
@@ -50,12 +63,24 @@ export function validateDictionary(dictionary: Dictionary): ValidationResult {
      1. Meta & Internacionalização
   ========================================================== */
 
-  if (!dictionary.meta?.locale) {
-    errors.push("Missing meta.locale");
+  if (!dictionary.meta) {
+    errors.push("Missing meta section");
+  } else {
+    if (!isString(dictionary.meta.locale)) {
+      errors.push("Missing meta.locale");
+    }
+
+    if (!isString(dictionary.meta.version)) {
+      errors.push("Missing meta.version");
+    }
   }
 
-  if (!dictionary.intl?.currency) {
-    errors.push("Missing intl.currency");
+  if (!dictionary.intl) {
+    errors.push("Missing intl section");
+  } else {
+    if (!isString(dictionary.intl.currency)) {
+      errors.push("Missing intl.currency");
+    }
   }
 
   /* =========================================================
@@ -71,11 +96,11 @@ export function validateDictionary(dictionary: Dictionary): ValidationResult {
   if (!dictionary.hero) {
     errors.push("Missing hero section");
   } else {
-    if (!dictionary.hero.title) {
+    if (!isString(dictionary.hero.title)) {
       errors.push("Missing hero.title");
     }
 
-    if (!dictionary.hero.ctaPrimary) {
+    if (!isString(dictionary.hero.ctaPrimary)) {
       errors.push("Missing hero.ctaPrimary");
     }
   }
@@ -87,22 +112,21 @@ export function validateDictionary(dictionary: Dictionary): ValidationResult {
   if (!dictionary.experience) {
     errors.push("Missing experience section");
   } else {
-    if (!dictionary.experience.title) {
+    if (!isString(dictionary.experience.title)) {
       errors.push("Missing experience.title");
     }
 
-    if (
-      !Array.isArray(dictionary.experience.items) ||
-      dictionary.experience.items.length === 0
-    ) {
+    const items = dictionary.experience.items;
+
+    if (!Array.isArray(items) || items.length === 0) {
       errors.push("experience.items must be a non-empty array");
     } else {
-      dictionary.experience.items.forEach((item, index) => {
-        if (!item.company) {
+      items.forEach((item, index) => {
+        if (!isString(item.company)) {
           errors.push(`Missing experience.items[${index}].company`);
         }
 
-        if (!item.role) {
+        if (!isString(item.role)) {
           errors.push(`Missing experience.items[${index}].role`);
         }
       });
@@ -116,25 +140,27 @@ export function validateDictionary(dictionary: Dictionary): ValidationResult {
   if (!dictionary.articles) {
     errors.push("Missing articles section");
   } else {
-    if (!dictionary.articles.title) {
+    if (!isString(dictionary.articles.title)) {
       errors.push("Missing articles.title");
     }
 
-    if (!Array.isArray(dictionary.articles.items)) {
+    const items = dictionary.articles.items;
+
+    if (!Array.isArray(items)) {
       errors.push("articles.items must be an array");
     } else {
-      dictionary.articles.items.forEach((article, index) => {
-        if (!article.title) {
+      items.forEach((article, index) => {
+        if (!isString(article.title)) {
           errors.push(`Missing articles.items[${index}].title`);
         }
 
-        if (!article.link) {
+        if (!isString(article.link)) {
           errors.push(`Missing articles.items[${index}].link`);
         }
 
         if (typeof article.isAward !== "boolean") {
           errors.push(
-            `articles.items[${index}].isAward must be a boolean`
+            `articles.items[${index}].isAward must be a boolean`,
           );
         }
       });
@@ -145,8 +171,12 @@ export function validateDictionary(dictionary: Dictionary): ValidationResult {
      6. Projects
   ========================================================== */
 
-  if (!dictionary.projects?.categories) {
-    errors.push("Missing projects.categories section");
+  if (!dictionary.projects) {
+    errors.push("Missing projects section");
+  } else {
+    if (!dictionary.projects.categories) {
+      errors.push("Missing projects.categories section");
+    }
   }
 
   /* =========================================================
@@ -178,19 +208,23 @@ export function validateDictionary(dictionary: Dictionary): ValidationResult {
   if (normalized) {
     if (typeof normalized.value !== "number") {
       errors.push(
-        "metrics.availabilityNormalized.value must be a number"
+        "metrics.availabilityNormalized.value must be a number",
       );
     }
 
     if (normalized.unit !== "%") {
       errors.push(
-        "metrics.availabilityNormalized.unit must be '%'"
+        "metrics.availabilityNormalized.unit must be '%'",
       );
     }
   }
 
+  /* =========================================================
+     Resultado final
+  ========================================================== */
+
   return {
     valid: errors.length === 0,
-    errors,
+    errors: errors.sort(),
   };
 }
