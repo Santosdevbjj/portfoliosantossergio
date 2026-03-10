@@ -1,15 +1,3 @@
-/**
- * HOME PAGE - PORTFÓLIO SÉRGIO SANTOS
- * -----------------------------------------------------------------------------
- * ✔ Next.js 16
- * ✔ React 19 Async Server Components
- * ✔ TypeScript 6 Strict
- * ✔ Node 24 Runtime
- * ✔ Tailwind 4.2
- * ✔ Vercel Edge Compatible
- * ✔ i18n Safe Rendering
- */
-
 import type { Metadata, Viewport } from "next"
 import { notFound } from "next/navigation"
 
@@ -32,6 +20,7 @@ import AboutSection from "@/components/AboutSection"
 import ExperienceSection from "@/components/ExperienceSection"
 import FeaturedArticleSection from "@/components/FeaturedArticleSection"
 import ContactSection from "@/components/ContactSection"
+
 import { PortfolioGrid } from "@/components/PortfolioGrid"
 import { CareerHighlights } from "@/components/CareerHighlights"
 
@@ -87,35 +76,59 @@ export async function generateMetadata(
 }
 
 /**
- * Normaliza projetos GitHub → ProjectDomain
+ * Normaliza dados GitHub → ProjectDomain
  */
 function normalizeProjects(projects: any[]): ProjectDomain[] {
 
-  const filtered = projects.filter(
-    (p) => p && p.name && (p.htmlUrl || p.html_url)
-  )
+  if (!Array.isArray(projects)) return []
 
-  return filtered.map((p, index): ProjectDomain => {
+  return projects
+    .filter(
+      (p) =>
+        p &&
+        typeof p.name === "string" &&
+        (p.htmlUrl || p.html_url)
+    )
+    .map((p, index): ProjectDomain => {
 
-    const topics: string[] = p.topics ?? []
+      const topics: string[] =
+        Array.isArray(p.topics) ? p.topics : []
 
-    const flags = resolveProjectFlags(topics)
+      const flags = resolveProjectFlags(topics)
 
-    return {
-      id: String(p.id ?? p.name),
-      name: p.name,
-      description: p.description ?? "",
-      htmlUrl: p.htmlUrl ?? p.html_url,
-      homepage: p.homepage ?? null,
-      topics,
+      return {
+        id: String(p.id ?? p.name),
 
-      technology: resolveProjectTechnology(topics),
+        name: p.name,
 
-      isPortfolio: flags.isPortfolio || true,
-      isFeatured: index < 3 || flags.isFeatured,
-      isFirst: index === 0 || flags.isFirst
-    }
-  })
+        description:
+          typeof p.description === "string"
+            ? p.description
+            : "",
+
+        htmlUrl: p.htmlUrl ?? p.html_url,
+
+        homepage:
+          typeof p.homepage === "string"
+            ? p.homepage
+            : null,
+
+        topics,
+
+        technology:
+          resolveProjectTechnology(topics),
+
+        isPortfolio: flags.isPortfolio ?? false,
+
+        isFeatured:
+          flags.isFeatured ?? index < 3,
+
+        isFirst:
+          flags.isFirst ?? index === 0
+      }
+
+    })
+
 }
 
 export default async function HomePage({ params }: PageProps) {
@@ -137,19 +150,12 @@ export default async function HomePage({ params }: PageProps) {
     normalizeProjects(rawProjects ?? [])
 
   return (
+
     <ProxyPage lang={lang}>
 
       <main
         id="main-content"
-        className={`
-          flex flex-col
-          min-h-screen
-          bg-white
-          dark:bg-slate-950
-          transition-colors
-          duration-500
-          selection:bg-blue-500/30
-        `}
+        className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500 selection:bg-blue-500/30"
       >
 
         <section className="pt-24 lg:pt-0">
@@ -164,53 +170,6 @@ export default async function HomePage({ params }: PageProps) {
             <CareerHighlights dict={dict} />
           </div>
 
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-
-            <div className="flex justify-center md:justify-start">
-
-              <a
-                href={`/cv-sergio-santos-${lang}.pdf`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`
-                  group
-                  inline-flex
-                  items-center
-                  gap-4
-                  rounded-2xl
-                  bg-slate-900
-                  px-8
-                  py-5
-                  text-[11px]
-                  font-black
-                  uppercase
-                  tracking-[0.2em]
-                  text-white
-                  transition-all
-                  hover:scale-[1.02]
-                  hover:bg-blue-600
-                  active:scale-95
-                  dark:bg-slate-50
-                  dark:text-slate-900
-                  dark:hover:bg-blue-500
-                  dark:hover:text-white
-                  shadow-2xl
-                  shadow-blue-500/10
-                `}
-              >
-
-                <span className="text-lg transition-transform group-hover:translate-y-1">
-                  ↓
-                </span>
-
-                {dict?.contact?.cvLabel ?? "Download CV"}
-
-              </a>
-
-            </div>
-
-          </div>
-
         </section>
 
         <section id="experience" className="w-full">
@@ -219,12 +178,7 @@ export default async function HomePage({ params }: PageProps) {
 
         <section
           id="projects"
-          className={`
-            w-full
-            bg-slate-50/50
-            py-20
-            dark:bg-slate-900/10
-          `}
+          className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10"
         >
 
           <PortfolioGrid
@@ -236,10 +190,12 @@ export default async function HomePage({ params }: PageProps) {
         </section>
 
         <section id="articles" className="w-full">
+
           <FeaturedArticleSection
             articles={dict.articles}
             common={dict.common}
           />
+
         </section>
 
         <section id="contact" className="w-full pb-20">
@@ -255,5 +211,6 @@ export default async function HomePage({ params }: PageProps) {
       </main>
 
     </ProxyPage>
+
   )
 }
