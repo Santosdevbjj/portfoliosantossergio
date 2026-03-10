@@ -16,6 +16,11 @@ import { notFound } from "next/navigation"
 import type { Locale } from "@/types/dictionary"
 import type { ProjectDomain } from "@/domain/projects"
 
+import {
+  resolveProjectTechnology,
+  resolveProjectFlags
+} from "@/domain/projects"
+
 import { getServerDictionary } from "@/lib/getServerDictionary"
 import { getGitHubProjects } from "@/services/githubService"
 
@@ -82,7 +87,7 @@ export async function generateMetadata(
 }
 
 /**
- * Normaliza projetos do GitHub → ProjectDomain
+ * Normaliza projetos GitHub → ProjectDomain
  */
 function normalizeProjects(projects: any[]): ProjectDomain[] {
 
@@ -90,21 +95,27 @@ function normalizeProjects(projects: any[]): ProjectDomain[] {
     (p) => p && p.name && (p.htmlUrl || p.html_url)
   )
 
-  return filtered.map((p, index): ProjectDomain => ({
-    id: p.id ?? p.name,
-    name: p.name,
-    description: p.description ?? "",
-    htmlUrl: p.htmlUrl ?? p.html_url,
-    homepage: p.homepage ?? null,
-    topics: p.topics ?? [],
-    technology: p.technology ?? p.topics ?? [],
-    stars: p.stars ?? p.stargazers_count ?? 0,
-    updatedAt: p.updatedAt ?? p.updated_at ?? null,
+  return filtered.map((p, index): ProjectDomain => {
 
-    isPortfolio: true,
-    isFirst: index === 0,
-    isFeatured: index < 3
-  }))
+    const topics: string[] = p.topics ?? []
+
+    const flags = resolveProjectFlags(topics)
+
+    return {
+      id: String(p.id ?? p.name),
+      name: p.name,
+      description: p.description ?? "",
+      htmlUrl: p.htmlUrl ?? p.html_url,
+      homepage: p.homepage ?? null,
+      topics,
+
+      technology: resolveProjectTechnology(topics),
+
+      isPortfolio: flags.isPortfolio || true,
+      isFeatured: index < 3 || flags.isFeatured,
+      isFirst: index === 0 || flags.isFirst
+    }
+  })
 }
 
 export default async function HomePage({ params }: PageProps) {
