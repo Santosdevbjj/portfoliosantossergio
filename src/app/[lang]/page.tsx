@@ -4,12 +4,18 @@ import { notFound } from "next/navigation"
 import type { Locale } from "@/types/dictionary"
 import type { ProjectDomain } from "@/domain/projects"
 
-import { resolveProjectTechnology, resolveProjectFlags } from "@/domain/projects"
+import {
+  resolveProjectTechnology,
+  resolveProjectFlags,
+} from "@/domain/projects"
 
 import { getServerDictionary } from "@/lib/getServerDictionary"
 import { getGitHubProjects } from "@/services/githubService"
 
-import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales"
+import {
+  SUPPORTED_LOCALES,
+  isValidLocale,
+} from "@/dictionaries/locales"
 
 import ProxyPage from "@/components/ProxyPage"
 import HeroSection from "@/components/HeroSection"
@@ -37,21 +43,30 @@ export const viewport: Viewport = {
 }
 
 export async function generateStaticParams() {
-  return SUPPORTED_LOCALES.map((lang) => ({ lang }))
+  return SUPPORTED_LOCALES.map((lang) => ({
+    lang,
+  }))
+}
+
+function normalizeLocale(locale: string): string {
+  return locale.split("-")[0]
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const rawLang = params.lang
+  const baseLang = normalizeLocale(rawLang)
 
-  if (!isValidLocale(rawLang)) {
+  if (!isValidLocale(baseLang)) {
     return {}
   }
 
   const lang = rawLang as Locale
 
-  const dict = await getServerDictionary(lang)
+  const dict = await getServerDictionary(lang).catch(
+    () => null
+  )
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ??
@@ -69,7 +84,10 @@ export async function generateMetadata({
     alternates: {
       canonical: `${siteUrl}/${lang}`,
       languages: Object.fromEntries(
-        SUPPORTED_LOCALES.map((l) => [l, `${siteUrl}/${l}`])
+        SUPPORTED_LOCALES.map((l) => [
+          l,
+          `${siteUrl}/${l}`,
+        ])
       ),
     },
 
@@ -90,22 +108,19 @@ export async function generateMetadata({
   }
 }
 
-/*
-Normaliza dados GitHub → ProjectDomain
-*/
 function normalizeProjects(
-  projects: readonly any[] | null | undefined
+  projects: unknown
 ): ProjectDomain[] {
   if (!Array.isArray(projects)) return []
 
   return projects
     .filter(
-      (p) =>
+      (p: any) =>
         p &&
         typeof p.name === "string" &&
         (p.htmlUrl || p.html_url)
     )
-    .map((p, index): ProjectDomain => {
+    .map((p: any, index): ProjectDomain => {
       const topics: string[] = Array.isArray(p.topics)
         ? p.topics
         : []
@@ -135,9 +150,11 @@ function normalizeProjects(
 
         isPortfolio: flags.isPortfolio ?? false,
 
-        isFeatured: flags.isFeatured ?? index < 3,
+        isFeatured:
+          flags.isFeatured ?? index < 3,
 
-        isFirst: flags.isFirst ?? index === 0,
+        isFirst:
+          flags.isFirst ?? index === 0,
       }
     })
 }
@@ -146,20 +163,28 @@ export default async function HomePage({
   params,
 }: PageProps) {
   const rawLang = params.lang
+  const baseLang = normalizeLocale(rawLang)
 
-  if (!isValidLocale(rawLang)) {
+  if (!isValidLocale(baseLang)) {
     notFound()
   }
 
   const lang = rawLang as Locale
 
   const [dict, rawProjects] = await Promise.all([
-    getServerDictionary(lang),
-    getGitHubProjects("Santosdevbjj"),
+    getServerDictionary(lang).catch(() => null),
+    getGitHubProjects("Santosdevbjj").catch(
+      () => []
+    ),
   ])
 
-  const safeProjects: ProjectDomain[] =
-    normalizeProjects(rawProjects ?? [])
+  if (!dict) {
+    notFound()
+  }
+
+  const safeProjects = normalizeProjects(
+    rawProjects
+  )
 
   return (
     <ProxyPage lang={lang}>
@@ -182,7 +207,10 @@ export default async function HomePage({
           </div>
         </section>
 
-        <section id="experience" className="w-full">
+        <section
+          id="experience"
+          className="w-full"
+        >
           <ExperienceSection
             experience={dict.experience}
           />
@@ -199,14 +227,20 @@ export default async function HomePage({
           />
         </section>
 
-        <section id="articles" className="w-full">
+        <section
+          id="articles"
+          className="w-full"
+        >
           <FeaturedArticleSection
             articles={dict.articles}
             common={dict.common}
           />
         </section>
 
-        <section id="contact" className="w-full pb-20">
+        <section
+          id="contact"
+          className="w-full pb-20"
+        >
           <ContactSection
             contact={dict.contact}
             common={dict.common}
