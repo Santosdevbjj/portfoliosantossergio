@@ -13,18 +13,14 @@
 import type { Metadata, Viewport } from "next"
 import { notFound } from "next/navigation"
 
-// Types
 import type { Locale } from "@/types/dictionary"
 import type { ProjectDomain } from "@/domain/projects"
 
-// Services
 import { getServerDictionary } from "@/lib/getServerDictionary"
 import { getGitHubProjects } from "@/services/githubService"
 
-// i18n
 import { SUPPORTED_LOCALES, isValidLocale } from "@/dictionaries/locales"
 
-// Components
 import ProxyPage from "@/components/ProxyPage"
 import HeroSection from "@/components/HeroSection"
 import AboutSection from "@/components/AboutSection"
@@ -85,9 +81,6 @@ export async function generateMetadata(
   }
 }
 
-/**
- * Converte projetos GitHub → ProjectDomain
- */
 function normalizeProjects(projects: any[]): ProjectDomain[] {
   return projects
     .filter((p) => p && p.name && (p.htmlUrl || p.html_url))
@@ -126,15 +119,15 @@ export default async function HomePage({ params }: PageProps) {
 
       <main
         id="main-content"
-        className="
-        flex flex-col
-        min-h-screen
-        bg-white
-        dark:bg-slate-950
-        transition-colors
-        duration-500
-        selection:bg-blue-500/30
-      "
+        className={`
+          flex flex-col
+          min-h-screen
+          bg-white
+          dark:bg-slate-950
+          transition-colors
+          duration-500
+          selection:bg-blue-500/30
+        `}
       >
 
         {/* HERO */}
@@ -159,33 +152,35 @@ export default async function HomePage({ params }: PageProps) {
                 href={`/cv-sergio-santos-${lang}.pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="
-                group
-                inline-flex
-                items-center
-                gap-4
-                rounded-2xl
-                bg-slate-900
-                px-8
-                py-5
-                text-[11px]
-                font-black
-                uppercase
-                tracking-[0.2em]
-                text-white
-                transition-all
-                hover:scale-[1.02]
-                hover:bg-blue-600
-                active:scale-95
-                dark:bg-slate-50
-                dark:text-slate-900
-                dark:hover:bg-blue-500
-                dark:hover:text-white
-                shadow-2xl
-                shadow-blue-500/10
+                className={`
+                  group
+                  inline-flex
+                  items-center
+                  gap-4
+                  rounded-2xl
+                  bg-slate-900
+                  px-8
+                  py-5
+                  text-[11px]
+                  font-black
+                  uppercase
+                  tracking-[0.2em]
+                  text-white
+                  transition-all
+                  hover:scale-[1.02]
+                  hover:bg-blue-600
+                  active:scale-95
+                  dark:bg-slate-50
+                  dark:text-slate-900
+                  dark:hover:bg-blue-500
+                  dark:hover:text-white
+                  shadow-2xl
+                  shadow-blue-500/10
+                `}
               >
+
                 <span className="text-lg transition-transform group-hover:translate-y-1">
-                  {"↓"}
+                  ↓
                 </span>
 
                 {dict?.contact?.cvLabel ?? "Download CV"}
@@ -193,6 +188,7 @@ export default async function HomePage({ params }: PageProps) {
               </a>
 
             </div>
+
           </div>
 
         </section>
@@ -205,12 +201,12 @@ export default async function HomePage({ params }: PageProps) {
         {/* PROJECTS */}
         <section
           id="projects"
-          className="
-          w-full
-          bg-slate-50/50
-          py-20
-          dark:bg-slate-900/10
-        "
+          className={`
+            w-full
+            bg-slate-50/50
+            py-20
+            dark:bg-slate-900/10
+          `}
         >
 
           <PortfolioGrid
@@ -241,6 +237,7 @@ export default async function HomePage({ params }: PageProps) {
         </section>
 
       </main>
+
     </ProxyPage>
   )
 }
