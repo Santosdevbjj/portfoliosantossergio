@@ -29,7 +29,7 @@ import { CareerHighlights } from "@/components/CareerHighlights"
 
 interface PageProps {
   readonly params: {
-    lang: string
+    lang?: string
   }
 }
 
@@ -48,14 +48,21 @@ export async function generateStaticParams() {
   }))
 }
 
-function normalizeLocale(locale: string): string {
-  return locale.split("-")[0]
+/**
+ * Normaliza locale:
+ * pt-BR -> pt
+ * en-US -> en
+ * undefined -> en
+ */
+function normalizeLocale(locale?: string): string {
+  if (!locale) return "en"
+  return locale.split("-")[0] ?? "en"
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const rawLang = params.lang
+  const rawLang = params.lang ?? "en"
   const baseLang = normalizeLocale(rawLang)
 
   if (!isValidLocale(baseLang)) {
@@ -162,7 +169,7 @@ function normalizeProjects(
 export default async function HomePage({
   params,
 }: PageProps) {
-  const rawLang = params.lang
+  const rawLang = params.lang ?? "en"
   const baseLang = normalizeLocale(rawLang)
 
   if (!isValidLocale(baseLang)) {
