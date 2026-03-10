@@ -8,9 +8,15 @@ import type {
 } from "@/types/github";
 
 /**
+ * Normaliza tópicos do GitHub.
+ */
+function normalizeTopics(topics?: readonly string[]): string[] {
+  return (topics ?? []).map((t: string) => t.toLowerCase());
+}
+
+/**
  * Processa repositórios do GitHub em projetos de portfólio.
  */
-
 export function processRepositories(
   repos: readonly GitHubRepo[],
   username: string
@@ -24,7 +30,7 @@ export function processRepositories(
 
     .filter((repo): repo is GitHubRepo => {
 
-      const topics = (repo.topics ?? []).map(t => t.toLowerCase());
+      const topics = normalizeTopics(repo.topics);
 
       const hasTag = topics.includes("portfolio");
 
@@ -38,7 +44,7 @@ export function processRepositories(
 
     .map((repo): ProcessedProject => {
 
-      const topics = (repo.topics ?? []).map(t => t.toLowerCase());
+      const topics = normalizeTopics(repo.topics);
 
       const descriptionParts =
         repo.description?.split("|") ?? [];
