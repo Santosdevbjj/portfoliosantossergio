@@ -27,15 +27,16 @@ export function PortfolioGrid({
 
   const groupedProjects = useMemo((): ProjectGroup[] => {
 
-    if (!projects.length) return [];
+    if (!projects || projects.length === 0) return [];
 
     const groups = new Map<string, ProjectDomain[]>();
 
     projects.forEach((project) => {
 
-      const category =
-        project.technology?.labelKey ??
-        "Outros";
+      const rawCategory =
+        project?.technology?.labelKey ?? "Outros";
+
+      const category = String(rawCategory);
 
       const current = groups.get(category) ?? [];
 
@@ -44,9 +45,9 @@ export function PortfolioGrid({
     });
 
     return Array.from(groups.entries()).map(
-      ([name, projects]) => ({
+      ([name, groupProjects]) => ({
         name,
-        projects: [...projects].sort((a, b) => {
+        projects: [...groupProjects].sort((a, b) => {
 
           if (a.isFirst && !b.isFirst) return -1;
           if (!a.isFirst && b.isFirst) return 1;
@@ -54,7 +55,10 @@ export function PortfolioGrid({
           if (a.isFeatured && !b.isFeatured) return -1;
           if (!a.isFeatured && b.isFeatured) return 1;
 
-          return a.name.localeCompare(b.name);
+          const nameA = a.name ?? "";
+          const nameB = b.name ?? "";
+
+          return nameA.localeCompare(nameB);
 
         })
       })
@@ -62,7 +66,7 @@ export function PortfolioGrid({
 
   }, [projects]);
 
-  if (!projects.length) {
+  if (!projects || projects.length === 0) {
     return (
       <section
         id="projects"
