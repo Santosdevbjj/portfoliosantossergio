@@ -86,41 +86,25 @@ export async function generateMetadata(
  */
 function normalizeProjects(projects: any[]): ProjectDomain[] {
 
-  const normalized: ProjectDomain[] = projects
-    .filter((p) => p && p.name && (p.htmlUrl || p.html_url))
-    .map((p) => ({
-      id: p.id ?? p.name,
-      name: p.name,
-      description: p.description ?? "",
-      htmlUrl: p.htmlUrl ?? p.html_url,
-      homepage: p.homepage ?? null,
-      topics: p.topics ?? [],
-      technology: p.technology ?? p.topics ?? [],
-      stars: p.stars ?? p.stargazers_count ?? 0,
-      updatedAt: p.updatedAt ?? p.updated_at ?? null,
+  const filtered = projects.filter(
+    (p) => p && p.name && (p.htmlUrl || p.html_url)
+  )
 
-      isPortfolio: true,
-      isFeatured: false,
-      isFirst: false
-    }))
+  return filtered.map((p, index): ProjectDomain => ({
+    id: p.id ?? p.name,
+    name: p.name,
+    description: p.description ?? "",
+    htmlUrl: p.htmlUrl ?? p.html_url,
+    homepage: p.homepage ?? null,
+    topics: p.topics ?? [],
+    technology: p.technology ?? p.topics ?? [],
+    stars: p.stars ?? p.stargazers_count ?? 0,
+    updatedAt: p.updatedAt ?? p.updated_at ?? null,
 
-  /**
-   * Marca primeiro projeto
-   */
-  const first = normalized.at(0)
-
-  if (first) {
-    first.isFirst = true
-  }
-
-  /**
-   * Marca até 3 como featured
-   */
-  normalized.slice(0, 3).forEach((p) => {
-    p.isFeatured = true
-  })
-
-  return normalized
+    isPortfolio: true,
+    isFirst: index === 0,
+    isFeatured: index < 3
+  }))
 }
 
 export default async function HomePage({ params }: PageProps) {
@@ -138,7 +122,8 @@ export default async function HomePage({ params }: PageProps) {
     getGitHubProjects("Santosdevbjj")
   ])
 
-  const safeProjects: ProjectDomain[] = normalizeProjects(rawProjects ?? [])
+  const safeProjects: ProjectDomain[] =
+    normalizeProjects(rawProjects ?? [])
 
   return (
     <ProxyPage lang={lang}>
@@ -156,12 +141,10 @@ export default async function HomePage({ params }: PageProps) {
         `}
       >
 
-        {/* HERO */}
         <section className="pt-24 lg:pt-0">
           <HeroSection dictionary={dict} />
         </section>
 
-        {/* ABOUT */}
         <section id="about" className="relative w-full overflow-hidden">
 
           <AboutSection dict={dict.about} />
@@ -219,12 +202,10 @@ export default async function HomePage({ params }: PageProps) {
 
         </section>
 
-        {/* EXPERIENCE */}
         <section id="experience" className="w-full">
           <ExperienceSection experience={dict.experience} />
         </section>
 
-        {/* PROJECTS */}
         <section
           id="projects"
           className={`
@@ -243,7 +224,6 @@ export default async function HomePage({ params }: PageProps) {
 
         </section>
 
-        {/* ARTICLES */}
         <section id="articles" className="w-full">
           <FeaturedArticleSection
             articles={dict.articles}
@@ -251,7 +231,6 @@ export default async function HomePage({ params }: PageProps) {
           />
         </section>
 
-        {/* CONTACT */}
         <section id="contact" className="w-full pb-20">
 
           <ContactSection
