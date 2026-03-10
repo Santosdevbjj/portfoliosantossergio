@@ -34,38 +34,23 @@ import ContactSection from "@/components/ContactSection"
 import { PortfolioGrid } from "@/components/PortfolioGrid"
 import { CareerHighlights } from "@/components/CareerHighlights"
 
-/**
- * Page Props (Next 16 async params)
- */
 interface PageProps {
   readonly params: Promise<{ lang: string }>
 }
 
-/**
- * Static Generation
- */
 export const dynamic = "force-static"
 export const revalidate = 3600
 
-/**
- * Static params para i18n
- */
 export async function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }))
 }
 
-/**
- * Viewport config
- */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#020617"
 }
 
-/**
- * SEO multilíngue
- */
 export async function generateMetadata(
   { params }: PageProps
 ): Promise<Metadata> {
@@ -119,9 +104,6 @@ function normalizeProjects(projects: any[]): ProjectDomain[] {
     }))
 }
 
-/**
- * Home Page
- */
 export default async function HomePage({ params }: PageProps) {
 
   const { lang: rawLang } = await params
@@ -132,17 +114,11 @@ export default async function HomePage({ params }: PageProps) {
 
   const lang = rawLang as Locale
 
-  /**
-   * Parallel data fetching
-   */
   const [dict, rawProjects] = await Promise.all([
     getServerDictionary(lang),
     getGitHubProjects("Santosdevbjj")
   ])
 
-  /**
-   * Normaliza os projetos
-   */
   const safeProjects: ProjectDomain[] = normalizeProjects(rawProjects ?? [])
 
   return (
@@ -167,10 +143,7 @@ export default async function HomePage({ params }: PageProps) {
         </section>
 
         {/* ABOUT */}
-        <section
-          id="about"
-          className="relative w-full overflow-hidden"
-        >
+        <section id="about" className="relative w-full overflow-hidden">
 
           <AboutSection dict={dict.about} />
 
@@ -211,9 +184,8 @@ export default async function HomePage({ params }: PageProps) {
                 shadow-2xl
                 shadow-blue-500/10
               >
-
                 <span className="text-lg transition-transform group-hover:translate-y-1">
-                  ↓
+                  {"↓"}
                 </span>
 
                 {dict?.contact?.cvLabel ?? "Download CV"}
@@ -222,6 +194,7 @@ export default async function HomePage({ params }: PageProps) {
 
             </div>
           </div>
+
         </section>
 
         {/* EXPERIENCE */}
