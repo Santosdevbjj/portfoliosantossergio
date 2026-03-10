@@ -1,81 +1,99 @@
 // src/services/githubService.ts
-import { Octokit } from 'octokit';
-import { RequestError } from 'octokit';
+
+import { Octokit } from "octokit";
+import { RequestError } from "octokit";
+
 import { processRepositories } from "@/lib/github-service";
+
 import type { ProcessedProject, GitHubRepo } from "@/types/github";
 
 /**
- * SERVIÇO UNIFICADO GITHUB (Next.js 16 + Octokit 5.0.5)
+ * SERVIÇO UNIFICADO GITHUB
  * -----------------------------------------------------------------------------
- * ✔ Stack: TypeScript 6.0, Node 24, Next.js 16 (App Router)
- * ✔ Usuário Padrão: Santosdevbjj
- * ✔ Performance: Paginação automática via Octokit Iterator
- * ✔ Resiliência: Timeout de 7s e tratamento de erro 'RequestError'
+ * ✔ Next.js 16
+ * ✔ Node 24
+ * ✔ Octokit
+ * ✔ Paginação automática
+ * ✔ Resiliência a erros
  */
 
-// Configuração do cliente utilizando o fetch nativo do Node 24
-const octokit = new Octokit({ 
+const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
   request: {
-    timeout: 7000, 
-  }
+    timeout: 7000,
+  },
 });
 
-// Nome de usuário centralizado para evitar hardcoding espalhado
 const DEFAULT_USERNAME = "Santosdevbjj";
 
-/**
- * Busca e processa projetos do GitHub.
- * Se nenhum username for passado, utiliza 'Santosdevbjj' por padrão.
- */
-export async function getGitHubProjects(username: string = DEFAULT_USERNAME): Promise<ProcessedProject[]> {
+export async function getGitHubProjects(
+  username: string = DEFAULT_USERNAME
+): Promise<ProcessedProject[]> {
+
   if (!username) {
-    console.warn('⚠️ GitHub Service: Username não disponível.');
+    console.warn("⚠️ GitHub Service: Username não definido.");
     return [];
   }
 
   try {
     const reposList: GitHubRepo[] = [];
-    
-    // O Iterator é a melhor prática para garantir que todos os repositórios 
-    // sejam capturados, mesmo que ultrapassem 100 itens no futuro.
-    const iterator = octokit.paginate.iterator(octokit.rest.repos.listForUser, {
-      username,
-      per_page: 100,
-      sort: 'updated',
-      type: 'owner', // Filtra apenas repositórios próprios (evita forks)
-      headers: {
-        'X-GitHub-Api-Version': '2022-11-28'
+
+    const iterator = octokit.paginate.iterator(
+      octokit.rest.repos.listForUser,
+      {
+        username,
+        per_page: 100,
+        sort: "updated",
+        type: "owner",
+
+        headers: {
+          "X-GitHub-Api-Version": "2022-11-28",
+          Accept: "application/vnd.github+json",
+        },
       }
-    });
+    );
 
     for await (const { data: repos } of iterator) {
-      // Cast seguro conforme padrões do TS 6.0
-      reposList.push(...(repos as unknown as GitHubRepo[]));
+
+      const normalizedRepos = (repos as unknown as GitHubRepo[]).map(repo => ({
+        ...repo,
+        topics: (repo.topics ?? []).map(t => t.toLowerCase())
+      }));
+
+      reposList.push(...normalizedRepos);
     }
 
-    // Processamento com sua lógica de negócio (Filtros por tópico 'portfolio', categorias, etc)
     return processRepositories(reposList, username);
 
   } catch (error: unknown) {
-    // Tratamento de erro especializado do Octokit
+
     if (error instanceof RequestError) {
-      console.error(`❌ GitHub API Error [${error.status}]: ${error.message}`);
-      
+
+      console.error(
+        `❌ GitHub API Error [${error.status}]: ${error.message}`
+      );
+
       if (error.status === 403) {
-        console.error('🛑 Rate limit atingido. Verifique o seu GITHUB_TOKEN nas variáveis de ambiente da Vercel.');
+        console.error(
+          "🛑 Rate limit atingido. Configure GITHUB_TOKEN na Vercel."
+        );
       }
+
     } else {
-      console.error('❌ Erro inesperado ao buscar repositórios:', error);
+      console.error(
+        "❌ Erro inesperado ao buscar repositórios:",
+        error
+      );
     }
-    
-    // Retorna array vazio para manter a estabilidade do componente React (PortfolioGrid)
-    return []; 
+
+    return [];
   }
 }
 
 /**
- * ALIAS DE COMPATIBILIDADE
- * Facilitam a exportação para diferentes padrões de consumo no Next.js 16.
+ * Aliases de compatibilidade
  */
-export { getGitHubProjects as getProjects, getGitHubProjects as fetchUserRepos };
+export {
+  getGitHubProjects as getProjects,
+  getGitHubProjects as fetchUserRepos
+};
