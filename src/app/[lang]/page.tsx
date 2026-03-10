@@ -4,10 +4,7 @@ import { notFound } from "next/navigation"
 import type { Locale } from "@/types/dictionary"
 import type { ProjectDomain } from "@/domain/projects"
 
-import {
-  resolveProjectTechnology,
-  resolveProjectFlags
-} from "@/domain/projects"
+import { resolveProjectTechnology, resolveProjectFlags } from "@/domain/projects"
 
 import { getServerDictionary } from "@/lib/getServerDictionary"
 import { getGitHubProjects } from "@/services/githubService"
@@ -25,29 +22,32 @@ import { PortfolioGrid } from "@/components/PortfolioGrid"
 import { CareerHighlights } from "@/components/CareerHighlights"
 
 interface PageProps {
-  readonly params: Promise<{ lang: string }>
+  readonly params: {
+    lang: string
+  }
 }
 
 export const dynamic = "force-static"
 export const revalidate = 3600
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#020617",
+}
+
 export async function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({ lang }))
 }
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: "#020617"
-}
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const rawLang = params.lang
 
-export async function generateMetadata(
-  { params }: PageProps
-): Promise<Metadata> {
-
-  const { lang: rawLang } = await params
-
-  if (!isValidLocale(rawLang)) return {}
+  if (!isValidLocale(rawLang)) {
+    return {}
+  }
 
   const lang = rawLang as Locale
 
@@ -70,16 +70,32 @@ export async function generateMetadata(
       canonical: `${siteUrl}/${lang}`,
       languages: Object.fromEntries(
         SUPPORTED_LOCALES.map((l) => [l, `${siteUrl}/${l}`])
-      )
-    }
+      ),
+    },
+
+    openGraph: {
+      title:
+        dict?.seo?.pages?.home?.title ??
+        "Sérgio Santos | Data & Cloud Engineer",
+
+      description:
+        dict?.seo?.pages?.home?.description ??
+        "Portfolio of Sérgio Santos — Data Engineering, Cloud and AI.",
+
+      url: `${siteUrl}/${lang}`,
+      siteName: "Sérgio Santos Portfolio",
+      locale: lang,
+      type: "website",
+    },
   }
 }
 
-/**
- * Normaliza dados GitHub → ProjectDomain
- */
-function normalizeProjects(projects: any[]): ProjectDomain[] {
-
+/*
+Normaliza dados GitHub → ProjectDomain
+*/
+function normalizeProjects(
+  projects: readonly any[] | null | undefined
+): ProjectDomain[] {
   if (!Array.isArray(projects)) return []
 
   return projects
@@ -90,9 +106,9 @@ function normalizeProjects(projects: any[]): ProjectDomain[] {
         (p.htmlUrl || p.html_url)
     )
     .map((p, index): ProjectDomain => {
-
-      const topics: string[] =
-        Array.isArray(p.topics) ? p.topics : []
+      const topics: string[] = Array.isArray(p.topics)
+        ? p.topics
+        : []
 
       const flags = resolveProjectFlags(topics)
 
@@ -115,25 +131,21 @@ function normalizeProjects(projects: any[]): ProjectDomain[] {
 
         topics,
 
-        technology:
-          resolveProjectTechnology(topics),
+        technology: resolveProjectTechnology(topics),
 
         isPortfolio: flags.isPortfolio ?? false,
 
-        isFeatured:
-          flags.isFeatured ?? index < 3,
+        isFeatured: flags.isFeatured ?? index < 3,
 
-        isFirst:
-          flags.isFirst ?? index === 0
+        isFirst: flags.isFirst ?? index === 0,
       }
-
     })
-
 }
 
-export default async function HomePage({ params }: PageProps) {
-
-  const { lang: rawLang } = await params
+export default async function HomePage({
+  params,
+}: PageProps) {
+  const rawLang = params.lang
 
   if (!isValidLocale(rawLang)) {
     notFound()
@@ -143,74 +155,65 @@ export default async function HomePage({ params }: PageProps) {
 
   const [dict, rawProjects] = await Promise.all([
     getServerDictionary(lang),
-    getGitHubProjects("Santosdevbjj")
+    getGitHubProjects("Santosdevbjj"),
   ])
 
   const safeProjects: ProjectDomain[] =
     normalizeProjects(rawProjects ?? [])
 
   return (
-
     <ProxyPage lang={lang}>
-
       <main
         id="main-content"
-        className="flex flex-col min-h-screen bg-white dark:bg-slate-950 transition-colors duration-500 selection:bg-blue-500/30"
+        className="flex min-h-screen flex-col bg-white transition-colors duration-500 selection:bg-blue-500/30 dark:bg-slate-950"
       >
-
         <section className="pt-24 lg:pt-0">
           <HeroSection dictionary={dict} />
         </section>
 
-        <section id="about" className="relative w-full overflow-hidden">
-
+        <section
+          id="about"
+          className="relative w-full overflow-hidden"
+        >
           <AboutSection dict={dict.about} />
 
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <CareerHighlights dict={dict} />
           </div>
-
         </section>
 
         <section id="experience" className="w-full">
-          <ExperienceSection experience={dict.experience} />
+          <ExperienceSection
+            experience={dict.experience}
+          />
         </section>
 
         <section
           id="projects"
           className="w-full bg-slate-50/50 py-20 dark:bg-slate-900/10"
         >
-
           <PortfolioGrid
             projects={safeProjects}
             lang={lang}
             dict={dict}
           />
-
         </section>
 
         <section id="articles" className="w-full">
-
           <FeaturedArticleSection
             articles={dict.articles}
             common={dict.common}
           />
-
         </section>
 
         <section id="contact" className="w-full pb-20">
-
           <ContactSection
             contact={dict.contact}
             common={dict.common}
             locale={lang}
           />
-
         </section>
-
       </main>
-
     </ProxyPage>
-
   )
 }
