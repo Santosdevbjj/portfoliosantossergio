@@ -81,8 +81,12 @@ export async function generateMetadata(
   }
 }
 
+/**
+ * Normaliza projetos do GitHub → ProjectDomain
+ */
 function normalizeProjects(projects: any[]): ProjectDomain[] {
-  return projects
+
+  const normalized = projects
     .filter((p) => p && p.name && (p.htmlUrl || p.html_url))
     .map((p) => ({
       id: p.id ?? p.name,
@@ -93,8 +97,29 @@ function normalizeProjects(projects: any[]): ProjectDomain[] {
       topics: p.topics ?? [],
       technology: p.technology ?? p.topics ?? [],
       stars: p.stars ?? p.stargazers_count ?? 0,
-      updatedAt: p.updatedAt ?? p.updated_at ?? null
+      updatedAt: p.updatedAt ?? p.updated_at ?? null,
+
+      /** CAMPOS OBRIGATÓRIOS DO DOMAIN */
+      isPortfolio: true,
+      isFeatured: false,
+      isFirst: false
     }))
+
+  /**
+   * Marca o primeiro projeto
+   */
+  if (normalized.length > 0) {
+    normalized[0].isFirst = true
+  }
+
+  /**
+   * Marca os 3 primeiros como featured
+   */
+  normalized.slice(0, 3).forEach((p) => {
+    p.isFeatured = true
+  })
+
+  return normalized
 }
 
 export default async function HomePage({ params }: PageProps) {
