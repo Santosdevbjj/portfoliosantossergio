@@ -101,13 +101,29 @@ export async function generateMetadata(
 }
 
 /**
+ * Converte projetos GitHub → ProjectDomain
+ */
+function normalizeProjects(projects: any[]): ProjectDomain[] {
+  return projects
+    .filter((p) => p && p.name && (p.htmlUrl || p.html_url))
+    .map((p) => ({
+      id: p.id ?? p.name,
+      name: p.name,
+      description: p.description ?? "",
+      htmlUrl: p.htmlUrl ?? p.html_url,
+      homepage: p.homepage ?? null,
+      topics: p.topics ?? [],
+      technology: p.technology ?? p.topics ?? [],
+      stars: p.stars ?? p.stargazers_count ?? 0,
+      updatedAt: p.updatedAt ?? p.updated_at ?? null
+    }))
+}
+
+/**
  * Home Page
  */
 export default async function HomePage({ params }: PageProps) {
 
-  /**
-   * Resolve params
-   */
   const { lang: rawLang } = await params
 
   if (!isValidLocale(rawLang)) {
@@ -125,19 +141,9 @@ export default async function HomePage({ params }: PageProps) {
   ])
 
   /**
-   * Safe typing
+   * Normaliza os projetos
    */
-  const allProjects = (rawProjects ?? []) as ProjectDomain[]
-
-  /**
-   * Sanitize projects (fix build error)
-   */
-  const safeProjects = allProjects.filter(
-    (project) =>
-      project &&
-      project.name &&
-      project.html_url
-  )
+  const safeProjects: ProjectDomain[] = normalizeProjects(rawProjects ?? [])
 
   return (
     <ProxyPage lang={lang}>
@@ -160,7 +166,6 @@ export default async function HomePage({ params }: PageProps) {
           <HeroSection dictionary={dict} />
         </section>
 
-
         {/* ABOUT */}
         <section
           id="about"
@@ -173,7 +178,6 @@ export default async function HomePage({ params }: PageProps) {
             <CareerHighlights dict={dict} />
           </div>
 
-          {/* CV CTA */}
           <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
 
             <div className="flex justify-center md:justify-start">
@@ -206,7 +210,6 @@ export default async function HomePage({ params }: PageProps) {
                 dark:hover:text-white
                 shadow-2xl
                 shadow-blue-500/10
-              "
               >
 
                 <span className="text-lg transition-transform group-hover:translate-y-1">
@@ -221,17 +224,10 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-
         {/* EXPERIENCE */}
-        <section
-          id="experience"
-          className="w-full"
-        >
-          <ExperienceSection
-            experience={dict.experience}
-          />
+        <section id="experience" className="w-full">
+          <ExperienceSection experience={dict.experience} />
         </section>
-
 
         {/* PROJECTS */}
         <section
@@ -252,24 +248,16 @@ export default async function HomePage({ params }: PageProps) {
 
         </section>
 
-
         {/* ARTICLES */}
-        <section
-          id="articles"
-          className="w-full"
-        >
+        <section id="articles" className="w-full">
           <FeaturedArticleSection
             articles={dict.articles}
             common={dict.common}
           />
         </section>
 
-
         {/* CONTACT */}
-        <section
-          id="contact"
-          className="w-full pb-20"
-        >
+        <section id="contact" className="w-full pb-20">
 
           <ContactSection
             contact={dict.contact}
