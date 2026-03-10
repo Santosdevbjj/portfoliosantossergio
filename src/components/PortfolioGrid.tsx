@@ -3,7 +3,7 @@
 /**
  * PORTFOLIO GRID COMPONENT - NEXT.JS 16 & REACT 19
  * -----------------------------------------------------------------------------
- * ✔ Fix: Erro de build Vercel (Type-safe Grouping)
+ * ✔ Fix: Erro de build Vercel (Turbopack parser fix)
  * ✔ Stack: TS 6.0, Next.js 16, React 19, Node 24, Tailwind 4.2
  * ✔ I18n: Suporte nativo a PT-BR, EN e ES via dicionários
  * ✔ Responsivo: Grid adaptativo 1-2-3 colunas
@@ -61,9 +61,13 @@ export function PortfolioGrid({
         const categoryId =
           TOPIC_TO_CATEGORY[matchedTopic.toLowerCase()];
 
+        const rawCategory =
+          labels.categories?.[
+            categoryId as keyof typeof labels.categories
+          ];
+
         const categoryObj =
-          labels.categories?.[categoryId as keyof typeof labels.categories]
-          as CategoryDetail | undefined;
+          rawCategory as CategoryDetail | undefined;
 
         categoryDisplayName =
           categoryObj?.labelKey ||
@@ -76,9 +80,13 @@ export function PortfolioGrid({
 
         if (techKey && labels?.categories) {
 
+          const rawCategory =
+            labels.categories?.[
+              techKey as keyof typeof labels.categories
+            ];
+
           const categoryObj =
-            labels.categories?.[techKey as keyof typeof labels.categories]
-            as CategoryDetail | undefined;
+            rawCategory as CategoryDetail | undefined;
 
           categoryDisplayName =
             categoryObj?.labelKey ||
