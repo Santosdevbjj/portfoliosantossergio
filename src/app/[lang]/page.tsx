@@ -86,7 +86,7 @@ export async function generateMetadata(
  */
 function normalizeProjects(projects: any[]): ProjectDomain[] {
 
-  const normalized = projects
+  const normalized: ProjectDomain[] = projects
     .filter((p) => p && p.name && (p.htmlUrl || p.html_url))
     .map((p) => ({
       id: p.id ?? p.name,
@@ -99,21 +99,22 @@ function normalizeProjects(projects: any[]): ProjectDomain[] {
       stars: p.stars ?? p.stargazers_count ?? 0,
       updatedAt: p.updatedAt ?? p.updated_at ?? null,
 
-      /** CAMPOS OBRIGATÓRIOS DO DOMAIN */
       isPortfolio: true,
       isFeatured: false,
       isFirst: false
     }))
 
   /**
-   * Marca o primeiro projeto
+   * Marca primeiro projeto
    */
-  if (normalized.length > 0) {
-    normalized[0].isFirst = true
+  const first = normalized.at(0)
+
+  if (first) {
+    first.isFirst = true
   }
 
   /**
-   * Marca os 3 primeiros como featured
+   * Marca até 3 como featured
    */
   normalized.slice(0, 3).forEach((p) => {
     p.isFeatured = true
