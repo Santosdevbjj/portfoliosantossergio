@@ -8,8 +8,6 @@ import { normalizeLocale, locales } from "@/dictionaries/locales";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { ScrollSpyProvider } from "@/contexts/scroll-spy.client";
 import { buildMetadata } from "@/lib/seo";
-
-// CORREÇÃO: Removido o prefixo "get" para coincidir com as exportações em src/lib/schema.ts
 import { personSchema, websiteSchema } from "@/lib/schema";
 
 import Navbar from "@/components/Navbar";
@@ -37,14 +35,22 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 
   const dict = await getServerDictionary(locale);
 
-  // Utiliza a função buildMetadata do seu src/lib/seo.ts
-  return buildMetadata({
+  /** * CORREÇÃO TYPE ERROR: 
+   * Ajustado para passar apenas propriedades aceitas pela interface em src/lib/seo.ts
+   * A verificação do Google é injetada manualmente para garantir que o TS não barre o build
+   */
+  const metadata = buildMetadata({
     title: dict.seo.title,
     description: dict.seo.description,
     path: `/${locale}`,
-    locale: locale,
-    verificationGoogle: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0", // SUA TAG PRESERVADA
   });
+
+  return {
+    ...metadata,
+    verification: {
+      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0", // SUA TAG PRESERVADA E PROTEGIDA
+    },
+  };
 }
 
 export const viewport: Viewport = {
@@ -74,7 +80,7 @@ export default async function LangLayout(props: {
       suppressHydrationWarning
     >
       <head>
-        {/* Injeção dos Schemas corrigida para os nomes reais das funções */}
+        {/* Scripts de Schema.org para SEO Estruturado */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema()) }}
@@ -86,7 +92,7 @@ export default async function LangLayout(props: {
       </head>
       <body className="min-h-screen flex flex-col bg-background text-foreground font-sans antialiased selection:bg-blue-500/30">
         <ScrollSpyProvider>
-          {/* Acessibilidade: Skip Link */}
+          {/* Acessibilidade: Skip Link para Teclado/Screen Readers */}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-4 py-2 rounded-lg"
@@ -99,7 +105,7 @@ export default async function LangLayout(props: {
           <main id="main-content" className="flex-grow">
             <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
 
-            {/* Container Responsivo Tailwind 4.2 */}
+            {/* Layout Responsivo alinhado com Tailwind 4.2 */}
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4">
               <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
             </div>
@@ -115,7 +121,7 @@ export default async function LangLayout(props: {
           />
         </ScrollSpyProvider>
 
-        {/* Google Analytics - Preservado */}
+        {/* Google Analytics - Mantido Intacto */}
         {gaId && (
           <>
             <Script
