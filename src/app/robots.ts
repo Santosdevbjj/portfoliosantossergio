@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 
 export default function robots(): MetadataRoute.Robots {
+
   const baseUrl = (
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app"
@@ -8,9 +9,13 @@ export default function robots(): MetadataRoute.Robots {
 
   return {
     rules: [
+
+      /**
+       * Regras globais
+       */
       {
         userAgent: "*",
-        allow: "/",
+        allow: ["/"],
         disallow: [
           "/api/",
           "/_next/",
@@ -20,20 +25,48 @@ export default function robots(): MetadataRoute.Robots {
       },
 
       /**
-       * Proteção básica contra scraping agressivo
+       * Google
        */
       {
-        userAgent: "GPTBot",
-        disallow: ["/private/"],
+        userAgent: "Googlebot",
+        allow: "/",
       },
 
+      /**
+       * Bing
+       */
       {
-        userAgent: "CCBot",
+        userAgent: "Bingbot",
+        allow: "/",
+      },
+
+      /**
+       * Apple
+       */
+      {
+        userAgent: "Applebot",
+        allow: "/",
+      },
+
+      /**
+       * DuckDuckGo
+       */
+      {
+        userAgent: "DuckDuckBot",
+        allow: "/",
+      },
+
+      /**
+       * Proteção básica contra scraping IA
+       */
+      {
+        userAgent: ["GPTBot", "CCBot"],
         disallow: ["/private/"],
       },
     ],
 
     sitemap: `${baseUrl}/sitemap.xml`,
+
     host: baseUrl,
   }
 }
