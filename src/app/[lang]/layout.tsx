@@ -8,7 +8,9 @@ import { normalizeLocale, locales } from "@/dictionaries/locales";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { ScrollSpyProvider } from "@/contexts/scroll-spy.client";
 import { buildMetadata } from "@/lib/seo";
-import { getPersonSchema, getWebsiteSchema } from "@/lib/schema";
+
+// CORREÇÃO: Removido o prefixo "get" para coincidir com as exportações em src/lib/schema.ts
+import { personSchema, websiteSchema } from "@/lib/schema";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -72,14 +74,14 @@ export default async function LangLayout(props: {
       suppressHydrationWarning
     >
       <head>
-        {/* Injeção do Person Schema e Website Schema via lib/schema.ts */}
+        {/* Injeção dos Schemas corrigida para os nomes reais das funções */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(getPersonSchema(dict)) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema()) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(getWebsiteSchema()) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema()) }}
         />
       </head>
       <body className="min-h-screen flex flex-col bg-background text-foreground font-sans antialiased selection:bg-blue-500/30">
