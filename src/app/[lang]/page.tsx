@@ -66,38 +66,38 @@ export async function generateMetadata({
 }
 
 /**
- * NORMALIZAÇÃO CORRIGIDA
- * Removida variável 'flags' não utilizada para evitar erro de build.
- * Garante compatibilidade com os nomes de campos exatos da API v3 do GitHub.
+ * NORMALIZAÇÃO ROBUSTA
+ * Resolve o problema de 'Projetos brutos: 92 | Com tag portfolio: 0'
  */
 function normalizeProjects(projects: any[]): ProjectDomain[] {
-  if (!Array.isArray(projects)) {
-    console.error("❌ normalizeProjects: Recebido dado que não é array:", projects);
-    return [];
-  }
+  if (!Array.isArray(projects)) return [];
 
   return projects
     .map((p, index): ProjectDomain => {
-      // O GitHub entrega 'topics' ou 'repository_topics' dependendo da chamada
-      const topics: string[] = Array.isArray(p.topics) ? p.topics : [];
+      // O GitHub pode enviar tópicos em 'topics' ou 'repository_topics'
+      const rawTopics = p.topics || p.repository_topics || [];
+      const topics: string[] = Array.isArray(rawTopics) 
+        ? rawTopics.map((t: string) => String(t).toLowerCase()) 
+        : [];
       
-      // Prioriza html_url (padrão GitHub) mas aceita camelCase
       const link = p.html_url || p.htmlUrl || "";
 
       return {
         id: String(p.id || p.name || index),
-        name: p.name || "Projeto Sem Nome",
+        name: p.name ? p.name.replace(/-/g, ' ') : "Projeto",
         description: p.description || "",
         htmlUrl: link,
         homepage: p.homepage || null,
         topics: topics,
         technology: resolveProjectTechnology(topics),
-        isPortfolio: topics.includes("portfolio"), // Sua regra estrita
+        // Busca a tag 'portfolio' ignorando se o usuário escreveu Portfolio ou portfolio
+        isPortfolio: topics.includes("portfolio"), 
         isFeatured: topics.includes("featured") || index < 3,
         isFirst: index === 0,
       };
     })
-    .filter((p) => p.isPortfolio && p.htmlUrl !== ""); 
+    // Filtro rigoroso: Tem que ter a tag e ter um link válido
+    .filter((p) => p.isPortfolio === true && p.htmlUrl !== ""); 
 }
 
 export default async function HomePage(props: PageProps) {
@@ -110,11 +110,10 @@ export default async function HomePage(props: PageProps) {
 
   const lang = locale as Locale;
 
-  // Busca de dados com log de depuração para o console da Vercel
   const [dict, rawProjects] = await Promise.all([
     getServerDictionary(lang).catch(() => null),
     getGitHubProjects("Santosdevbjj").catch((err) => {
-      console.error("❌ Erro crítico ao buscar do GitHub:", err);
+      console.error("❌ Erro GitHub:", err);
       return [];
     }),
   ]);
@@ -124,7 +123,7 @@ export default async function HomePage(props: PageProps) {
   // Processa os projetos
   const safeProjects = normalizeProjects(rawProjects as any[]);
 
-  // Debug log para você ver no painel da Vercel quantos projetos passaram no filtro
+  // Esse log no deploy agora deve mostrar um número maior que 0 em 'Com tag portfolio'
   console.log(`📊 Locale: ${lang} | Projetos brutos: ${rawProjects?.length || 0} | Com tag portfolio: ${safeProjects.length}`);
 
   const typedDict = dict as any;
@@ -139,6 +138,7 @@ export default async function HomePage(props: PageProps) {
           <HeroSection dictionary={dict} />
         </section>
 
+        {/* PROJETO DE DESTAQUE */}
         <section className="w-full px-4 py-12 md:py-20 bg-gradient-to-b from-transparent to-slate-100/50 dark:to-slate-900/20">
           <div className="mx-auto max-w-7xl">
              {typedDict.constructionProject && (
@@ -158,6 +158,7 @@ export default async function HomePage(props: PageProps) {
           <ExperienceSection experience={dict.experience} />
         </section>
 
+        {/* GRID DE PROJETOS */}
         <section id="projects" className="w-full py-20">
           <PortfolioGrid
             projects={safeProjects}
