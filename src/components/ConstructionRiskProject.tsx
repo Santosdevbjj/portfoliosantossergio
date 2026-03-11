@@ -1,9 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { 
-  BarChart3, BrainCircuit, MessageSquare, ShieldAlert, 
-  TrendingUp, FileText, Settings, Code2, Database 
+  BarChart3, 
+  BrainCircuit, 
+  MessageSquare, 
+  ShieldAlert, 
+  TrendingUp, 
+  FileText, 
+  Code2, 
+  Database 
 } from 'lucide-react';
 
 // Tipagem para garantir consistência com o dicionário i18n
@@ -72,7 +78,7 @@ export default function ConstructionRiskProject({ dict }: ConstructionRiskProps)
         {/* Responsive Metrics Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-10">
           {metrics.map((m) => (
-            <div key={m.id} className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/50 backdrop-blur-sm">
+            <div key={m.id} className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/50 backdrop-blur-sm hover:bg-zinc-800/40 transition-colors">
               <div className="mb-3 p-2 w-fit rounded-lg bg-zinc-800/50">{m.icon}</div>
               <div className="text-lg md:text-xl font-bold text-white">{m.value}</div>
               <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mt-1">
@@ -84,12 +90,12 @@ export default function ConstructionRiskProject({ dict }: ConstructionRiskProps)
       </div>
 
       {/* Tabs Navigation */}
-      <nav className="flex border-b border-zinc-800 px-2 md:px-4 bg-[#0d0d0d] overflow-x-auto no-scrollbar">
+      <nav className="flex border-b border-zinc-800 px-2 md:px-4 bg-[#0d0d0d] overflow-x-auto no-scrollbar scroll-smooth">
         {(['pipeline', 'insights', 'decisões'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 md:px-6 py-4 text-xs md:text-sm font-medium transition-all relative whitespace-nowrap ${
+            className={`px-4 md:px-6 py-4 text-xs md:text-sm font-medium transition-all relative whitespace-nowrap outline-none ${
               activeTab === tab ? "text-white" : "text-zinc-500 hover:text-zinc-300"
             }`}
           >
@@ -155,7 +161,7 @@ export default function ConstructionRiskProject({ dict }: ConstructionRiskProps)
       <div className="px-6 md:px-8 py-6 bg-zinc-900/30 border-t border-zinc-800">
         <div className="flex flex-wrap gap-2">
           {stack.map((s) => (
-            <span key={s} className="px-2.5 py-1 bg-zinc-800/50 text-zinc-500 rounded-md border border-zinc-700/50 text-[10px] md:text-xs font-mono">
+            <span key={s} className="px-2.5 py-1 bg-zinc-800/50 text-zinc-500 rounded-md border border-zinc-700/50 text-[10px] md:text-xs font-mono hover:text-zinc-300 transition-colors cursor-default">
               {s}
             </span>
           ))}
@@ -167,11 +173,11 @@ export default function ConstructionRiskProject({ dict }: ConstructionRiskProps)
 
 /* --- Sub-componentes tipados para limpeza de código --- */
 
-function PipelineItem({ step, title, desc, icon }: { step: string, title: string, desc: string, icon: React.ReactNode }) {
+function PipelineItem({ step, title, desc, icon }: { step: string, title: string, desc: string, icon: ReactNode }) {
   return (
-    <div className="flex items-center gap-4 md:gap-6 p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 group hover:bg-zinc-900/40 transition-all">
-      <div className="text-xl md:text-2xl font-black text-zinc-800 group-hover:text-blue-900/30 transition-colors italic">{step}</div>
-      <div className="p-2 rounded-lg bg-zinc-800/30 text-zinc-400">{icon}</div>
+    <div className="flex items-center gap-4 md:gap-6 p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 group hover:bg-zinc-900/40 transition-all cursor-default">
+      <div className="text-xl md:text-2xl font-black text-zinc-800 group-hover:text-blue-900/30 transition-colors italic leading-none">{step}</div>
+      <div className="p-2 rounded-lg bg-zinc-800/30 text-zinc-400 group-hover:text-blue-400 transition-colors">{icon}</div>
       <div className="flex-1">
         <h3 className="text-zinc-200 text-sm md:text-base font-semibold">{title}</h3>
         <p className="text-xs md:text-sm text-zinc-500 leading-relaxed">{desc}</p>
@@ -182,13 +188,13 @@ function PipelineItem({ step, title, desc, icon }: { step: string, title: string
 
 function InsightCard({ isTrue, title, detail }: { isTrue: boolean, title: string, detail: string }) {
   return (
-    <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/30 flex items-start gap-4">
+    <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/30 flex items-start gap-4 hover:border-zinc-700 transition-all">
       <div className={`mt-1 p-1.5 rounded-full ${isTrue ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
         {isTrue ? <TrendingUp size={14}/> : <ShieldAlert size={14}/>}
       </div>
       <div>
         <h4 className="text-xs md:text-sm font-bold text-zinc-300">{title}</h4>
-        <p className="text-[11px] md:text-xs text-zinc-500 mt-1 italic">"{detail}"</p>
+        <p className="text-[11px] md:text-xs text-zinc-500 mt-1 italic leading-snug">"{detail}"</p>
       </div>
     </div>
   );
@@ -196,11 +202,11 @@ function InsightCard({ isTrue, title, detail }: { isTrue: boolean, title: string
 
 function DecisionCard({ title, choice, alt, reason }: { title: string, choice: string, alt: string, reason: string }) {
   return (
-    <div className="p-5 rounded-xl border border-zinc-800 bg-[#0d0d0d] hover:border-zinc-700 transition-colors">
+    <div className="p-5 rounded-xl border border-zinc-800 bg-[#0d0d0d] hover:border-zinc-700 transition-all group">
       <span className="text-[10px] uppercase text-zinc-600 font-bold tracking-widest">{title}</span>
       <div className="flex items-center gap-2 my-3">
-        <span className="text-[10px] md:text-xs font-bold text-blue-400 px-2 py-1 bg-blue-500/10 rounded">{choice}</span>
-        <span className="text-[10px] text-zinc-700 italic">vs</span>
+        <span className="text-[10px] md:text-xs font-bold text-blue-400 px-2 py-1 bg-blue-500/10 rounded group-hover:bg-blue-500/20 transition-colors">{choice}</span>
+        <span className="text-[10px] text-zinc-700 italic font-serif">vs</span>
         <span className="text-[10px] md:text-xs text-zinc-600 font-medium">{alt}</span>
       </div>
       <p className="text-[11px] md:text-xs text-zinc-500 leading-relaxed">{reason}</p>
