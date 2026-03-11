@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next"
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import type { Locale } from "@/types/dictionary"
@@ -45,7 +45,7 @@ export async function generateMetadata({
 
   if (!locales.includes(locale)) return {};
 
-  const dict = await getServerDictionary(locale).catch(() => null);
+  const dict = await getServerDictionary(locale as Locale).catch(() => null);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
 
   return {
@@ -66,7 +66,7 @@ export async function generateMetadata({
   }
 }
 
-// Normalização de Projetos do GitHub
+// Normalização de Projetos do GitHub com tipos TS 6.0
 function normalizeProjects(projects: unknown): ProjectDomain[] {
   if (!Array.isArray(projects)) return []
   return projects
@@ -97,8 +97,10 @@ export default async function HomePage(props: PageProps) {
     notFound();
   }
 
+  const lang = locale as Locale;
+
   const [dict, rawProjects] = await Promise.all([
-    getServerDictionary(locale).catch(() => null),
+    getServerDictionary(lang).catch(() => null),
     getGitHubProjects("Santosdevbjj").catch(() => []),
   ]);
 
@@ -107,7 +109,7 @@ export default async function HomePage(props: PageProps) {
   const safeProjects = normalizeProjects(rawProjects);
 
   return (
-    <ProxyPage lang={locale}>
+    <ProxyPage lang={lang}>
       <main
         id="main-content"
         className="flex min-h-screen flex-col bg-slate-50 transition-colors duration-500 selection:bg-blue-500/30 dark:bg-slate-950"
@@ -117,9 +119,9 @@ export default async function HomePage(props: PageProps) {
           <HeroSection dictionary={dict} />
         </section>
 
-        {/* PROJETO DE DESTAQUE: Predição de Risco de Obras */}
+        {/* PROJETO DE DESTAQUE: Predição de Risco de Obras (Integração Direta) */}
         <section className="w-full px-4 py-12 md:py-20 bg-gradient-to-b from-transparent to-slate-100/50 dark:to-slate-900/20">
-          <div className="container mx-auto">
+          <div className="mx-auto max-w-7xl">
              <ConstructionRiskProject dict={dict.constructionProject} />
           </div>
         </section>
@@ -132,7 +134,7 @@ export default async function HomePage(props: PageProps) {
           </div>
         </section>
 
-        {/* EXPERIÊNCIA (BRADESCO E OUTROS) */}
+        {/* EXPERIÊNCIA */}
         <section id="experience" className="w-full">
           <ExperienceSection experience={dict.experience} />
         </section>
@@ -141,7 +143,7 @@ export default async function HomePage(props: PageProps) {
         <section id="projects" className="w-full py-20">
           <PortfolioGrid
             projects={safeProjects}
-            lang={locale}
+            lang={lang}
             dict={dict}
           />
         </section>
@@ -159,7 +161,7 @@ export default async function HomePage(props: PageProps) {
           <ContactSection
             contact={dict.contact}
             common={dict.common}
-            locale={locale}
+            locale={lang}
           />
         </section>
       </main>
