@@ -6,6 +6,7 @@ import {
 } from "@/dictionaries/locales"
 
 export default function sitemap(): MetadataRoute.Sitemap {
+
   const baseUrl = (
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app"
@@ -14,7 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date()
 
   /**
-   * Páginas do portfólio
+   * Páginas principais do portfólio
    */
   const pages = [
     "",
@@ -26,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ] as const
 
   /**
-   * Gera alternates hreflang
+   * Alternates hreflang
    */
   function buildAlternates(path: string) {
     const languages: Record<string, string> = {}
@@ -44,36 +45,66 @@ export default function sitemap(): MetadataRoute.Sitemap {
    * Prioridade SEO
    */
   function getPriority(page: string, locale: string) {
+
     if (page === "") {
       return locale === DEFAULT_LOCALE ? 1.0 : 0.9
     }
 
-    if (page === "projects") return 0.9
-    if (page === "artigos") return 0.85
-    if (page === "about") return 0.8
-    if (page === "experience") return 0.8
-    if (page === "contact") return 0.7
+    switch (page) {
+      case "projects":
+        return 0.95
 
-    return 0.7
+      case "artigos":
+        return 0.9
+
+      case "about":
+        return 0.85
+
+      case "experience":
+        return 0.85
+
+      case "contact":
+        return 0.75
+
+      default:
+        return 0.7
+    }
   }
 
   /**
    * Frequência de atualização
    */
   function getChangeFrequency(page: string) {
-    if (page === "") return "weekly" as const
-    if (page === "projects") return "weekly" as const
-    if (page === "artigos") return "weekly" as const
 
-    return "monthly" as const
+    if (page === "") return "weekly"
+
+    if (page === "projects") return "weekly"
+
+    if (page === "artigos") return "weekly"
+
+    if (page === "experience") return "monthly"
+
+    return "monthly"
   }
 
   /**
-   * 1️⃣ Páginas localizadas
+   * 1️⃣ Root canonical
+   */
+  const rootEntry: MetadataRoute.Sitemap[number] = {
+    url: baseUrl,
+    lastModified,
+    changeFrequency: "weekly",
+    priority: 1,
+    alternates: buildAlternates(""),
+  }
+
+  /**
+   * 2️⃣ Páginas localizadas
    */
   const localizedPages: MetadataRoute.Sitemap =
     SUPPORTED_LOCALES.flatMap((locale: SupportedLocale) =>
       pages.map((page) => {
+
         const path = page ? `/${page}` : ""
 
         return {
@@ -87,20 +118,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     )
 
   /**
-   * 2️⃣ URL raiz
+   * 3️⃣ Documentos públicos (CV)
    */
-  const rootEntry: MetadataRoute.Sitemap[number] = {
-    url: baseUrl,
-    lastModified,
-    changeFrequency: "weekly",
-    priority: 1.0,
-    alternates: buildAlternates(""),
-  }
-
-  /**
-   * 3️⃣ Documentos públicos
-   */
-  const documentEntries: MetadataRoute.Sitemap =
+  const documents: MetadataRoute.Sitemap =
     SUPPORTED_LOCALES.map((locale) => ({
       url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
       lastModified,
@@ -108,5 +128,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     }))
 
-  return [rootEntry, ...localizedPages, ...documentEntries]
+  /**
+   * 4️⃣ Preparação futura para artigos dinâmicos
+   * (MDX ou CMS)
+   */
+
+  const articles: MetadataRoute.Sitemap = []
+
+  return [
+    rootEntry,
+    ...localizedPages,
+    ...documents,
+    ...articles,
+  ]
 }
