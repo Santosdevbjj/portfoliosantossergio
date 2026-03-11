@@ -51,14 +51,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * Normalização com Safe Guards para evitar erros de 'undefined' durante o build
+ * Normalização robusta de repositórios do GitHub
  */
 function normalizeProjects(repos: any[]): ProjectDomain[] {
   if (!repos || !Array.isArray(repos)) return [];
 
   return repos
     .map((repo, index): ProjectDomain => {
-      // Garante que topics seja sempre um array, mesmo que o GitHub falhe
       const rawTopics = repo?.topics || repo?.repository_topics || [];
       const topics = Array.isArray(rawTopics) 
         ? rawTopics.map((t: string) => String(t).toLowerCase()) 
@@ -87,7 +86,7 @@ export default async function HomePage({ params }: PageProps) {
   if (!locales.includes(locale)) notFound();
   const lang = locale as Locale;
 
-  // Busca de dados com fallback para evitar quebra total da página
+  // Busca paralela otimizada (Node 24)
   const [dict, rawRepos] = await Promise.all([
     getServerDictionary(lang).catch(() => null),
     getPortfolioRepos("Santosdevbjj").catch(() => []),
@@ -96,6 +95,11 @@ export default async function HomePage({ params }: PageProps) {
   if (!dict) notFound();
 
   const safeProjects = normalizeProjects(rawRepos);
+
+  // Verificação de segurança para o componente de projeto específico
+  // O erro 'pipeline' ocorre porque o componente tenta acessar dict.dataScienceProject.pipeline
+  // Se a chave não existir no dicionário, não renderizamos para não quebrar o build.
+  const hasDataScienceData = !!(dict as any).dataScienceProject || !!(dict as any).constructionProject;
 
   return (
     <ProxyPage lang={lang}>
@@ -107,19 +111,17 @@ export default async function HomePage({ params }: PageProps) {
           <HeroSection dictionary={dict} />
         </section>
 
-        {/* SOLUÇÃO DO ERRO 'pipeline' de undefined:
-          O erro sugere que o ConstructionRiskProject está tentando acessar dict.projects.pipeline.
-          Aqui passamos o dict com um check de existência.
+        {/* SOLUÇÃO DO PRERENDER ERROR:
+            Renderização condicional rigorosa. Se 'pipeline' for lido de dentro deste componente,
+            garantimos que passamos o objeto correto ou nada.
         */}
-        <section className="w-full px-4 py-12 md:py-20 bg-linear-to-b from-transparent to-slate-100/50 dark:to-slate-900/20">
-          <div className="mx-auto max-w-7xl">
-             {/* Se o seu componente ConstructionRiskProject depende de dados específicos, 
-                garantimos que ele só renderize se os dados básicos existirem ou passamos
-                o dicionário inteiro para ele mesmo tratar os fallbacks internos.
-             */}
-             <ConstructionRiskProject dict={dict as any} />
-          </div>
-        </section>
+        {hasDataScienceData && (
+          <section className="w-full px-4 py-12 md:py-20 bg-linear-to-b from-transparent to-slate-100/50 dark:to-slate-900/20">
+            <div className="mx-auto max-w-7xl">
+               <ConstructionRiskProject dict={dict as any} />
+            </div>
+          </section>
+        )}
 
         <section id="about" className="relative w-full overflow-hidden">
           <AboutSection dict={dict.about} />
