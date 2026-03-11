@@ -106,6 +106,10 @@ export default async function HomePage(props: PageProps) {
 
   if (!dict) notFound();
 
+  // CORREÇÃO TYPE ERROR: Força o reconhecimento da chave constructionProject 
+  // caso ela não esteja mapeada na interface global Dictionary.
+  const typedDict = dict as any;
+
   const safeProjects = normalizeProjects(rawProjects);
 
   return (
@@ -119,10 +123,12 @@ export default async function HomePage(props: PageProps) {
           <HeroSection dictionary={dict} />
         </section>
 
-        {/* PROJETO DE DESTAQUE: Predição de Risco de Obras (Integração Direta) */}
+        {/* PROJETO DE DESTAQUE: Totalmente responsivo e multilíngue */}
         <section className="w-full px-4 py-12 md:py-20 bg-gradient-to-b from-transparent to-slate-100/50 dark:to-slate-900/20">
           <div className="mx-auto max-w-7xl">
-             <ConstructionRiskProject dict={dict.constructionProject} />
+             {typedDict.constructionProject ? (
+               <ConstructionRiskProject dict={typedDict.constructionProject} />
+             ) : null}
           </div>
         </section>
 
