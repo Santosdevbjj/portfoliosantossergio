@@ -1,28 +1,34 @@
-import { cache } from "react";
-import type { GitHubRepo } from "@/types/github";
+import { cache } from "react"
 
-const GITHUB_API = "https://api.github.com";
+import type { GitHubRepo } from "@/types/github"
 
-export const getPortfolioRepos = cache(async (
-  username: string
-): Promise<GitHubRepo[]> => {
+const GITHUB_API =
+  "https://api.github.com"
 
-  const res = await fetch(
-    `${GITHUB_API}/users/${username}/repos?per_page=100`,
-    {
-      headers: {
-        Accept: "application/vnd.github+json"
-      },
+export const getPortfolioRepos = cache(
+  async (
+    username: string
+  ): Promise<GitHubRepo[]> => {
+    const res = await fetch(
+      `${GITHUB_API}/users/${username}/repos?per_page=100&type=owner&sort=updated`,
+      {
+        headers: {
+          Accept:
+            "application/vnd.github+json",
+        },
 
-      next: {
-        revalidate: 3600
+        next: {
+          revalidate: 3600,
+        },
       }
+    )
+
+    if (!res.ok) {
+      throw new Error(
+        `GitHub API error: ${res.status}`
+      )
     }
-  );
 
-  if (!res.ok) {
-    throw new Error("GitHub API error");
+    return res.json()
   }
-
-  return res.json();
-});
+)
