@@ -66,27 +66,39 @@ export async function generateMetadata({
   }
 }
 
-// Normalização de Projetos do GitHub com tipos TS 6.0
-function normalizeProjects(projects: unknown): ProjectDomain[] {
-  if (!Array.isArray(projects)) return []
+/**
+ * NORMALIZAÇÃO CORRIGIDA
+ * Garante compatibilidade com os nomes de campos exatos da API v3 do GitHub
+ */
+function normalizeProjects(projects: any[]): ProjectDomain[] {
+  if (!Array.isArray(projects)) {
+    console.error("❌ normalizeProjects: Recebido dado que não é array:", projects);
+    return [];
+  }
+
   return projects
-    .filter((p: any) => p && typeof p.name === "string" && (p.htmlUrl || p.html_url))
-    .map((p: any, index): ProjectDomain => {
-      const topics: string[] = Array.isArray(p.topics) ? p.topics : []
-      const flags = resolveProjectFlags(topics)
+    .map((p, index): ProjectDomain => {
+      // O GitHub entrega 'topics' ou 'repository_topics' dependendo da chamada
+      const topics: string[] = Array.isArray(p.topics) ? p.topics : [];
+      const flags = resolveProjectFlags(topics);
+      
+      // Prioriza html_url (padrão GitHub) mas aceita camelCase
+      const link = p.html_url || p.htmlUrl || "";
+
       return {
-        id: String(p.id ?? p.name),
-        name: p.name,
-        description: typeof p.description === "string" ? p.description : "",
-        htmlUrl: p.htmlUrl ?? p.html_url,
-        homepage: typeof p.homepage === "string" ? p.homepage : null,
-        topics,
+        id: String(p.id || p.name || index),
+        name: p.name || "Projeto Sem Nome",
+        description: p.description || "",
+        htmlUrl: link,
+        homepage: p.homepage || null,
+        topics: topics,
         technology: resolveProjectTechnology(topics),
-        isPortfolio: flags.isPortfolio ?? false,
-        isFeatured: flags.isFeatured ?? index < 3,
-        isFirst: flags.isFirst ?? index === 0,
-      }
+        isPortfolio: topics.includes("portfolio"), // Sua regra estrita
+        isFeatured: topics.includes("featured") || index < 3,
+        isFirst: index === 0,
+      };
     })
+    .filter((p) => p.isPortfolio && p.htmlUrl !== ""); // Filtra estritamente pela sua TAG
 }
 
 export default async function HomePage(props: PageProps) {
@@ -99,18 +111,24 @@ export default async function HomePage(props: PageProps) {
 
   const lang = locale as Locale;
 
+  // Busca de dados com log de depuração para o console da Vercel
   const [dict, rawProjects] = await Promise.all([
     getServerDictionary(lang).catch(() => null),
-    getGitHubProjects("Santosdevbjj").catch(() => []),
+    getGitHubProjects("Santosdevbjj").catch((err) => {
+      console.error("❌ Erro crítico ao buscar do GitHub:", err);
+      return [];
+    }),
   ]);
 
   if (!dict) notFound();
 
-  // CORREÇÃO TYPE ERROR: Força o reconhecimento da chave constructionProject 
-  // caso ela não esteja mapeada na interface global Dictionary.
-  const typedDict = dict as any;
+  // Processa os projetos
+  const safeProjects = normalizeProjects(rawProjects as any[]);
 
-  const safeProjects = normalizeProjects(rawProjects);
+  // Debug log para você ver no painel da Vercel quantos projetos passaram no filtro
+  console.log(`📊 Locale: ${lang} | Projetos brutos: ${rawProjects?.length || 0} | Com tag portfolio: ${safeProjects.length}`);
+
+  const typedDict = dict as any;
 
   return (
     <ProxyPage lang={lang}>
@@ -118,21 +136,18 @@ export default async function HomePage(props: PageProps) {
         id="main-content"
         className="flex min-h-screen flex-col bg-slate-50 transition-colors duration-500 selection:bg-blue-500/30 dark:bg-slate-950"
       >
-        {/* HERO SECTION */}
         <section className="pt-24 lg:pt-0">
           <HeroSection dictionary={dict} />
         </section>
 
-        {/* PROJETO DE DESTAQUE: Totalmente responsivo e multilíngue */}
         <section className="w-full px-4 py-12 md:py-20 bg-gradient-to-b from-transparent to-slate-100/50 dark:to-slate-900/20">
           <div className="mx-auto max-w-7xl">
-             {typedDict.constructionProject ? (
+             {typedDict.constructionProject && (
                <ConstructionRiskProject dict={typedDict.constructionProject} />
-             ) : null}
+             )}
           </div>
         </section>
 
-        {/* SOBRE & HIGHLIGHTS */}
         <section id="about" className="relative w-full overflow-hidden">
           <AboutSection dict={dict.about} />
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -140,12 +155,13 @@ export default async function HomePage(props: PageProps) {
           </div>
         </section>
 
-        {/* EXPERIÊNCIA */}
         <section id="experience" className="w-full">
           <ExperienceSection experience={dict.experience} />
         </section>
 
-        {/* GRID DE PROJETOS GITHUB */}
+        {/* Se safeProjects.length for 0 aqui, o componente PortfolioGrid 
+            provavelmente exibe a mensagem de "Em breve".
+        */}
         <section id="projects" className="w-full py-20">
           <PortfolioGrid
             projects={safeProjects}
@@ -154,7 +170,6 @@ export default async function HomePage(props: PageProps) {
           />
         </section>
 
-        {/* ARTIGOS */}
         <section id="articles" className="w-full">
           <FeaturedArticleSection
             articles={dict.articles}
@@ -162,7 +177,6 @@ export default async function HomePage(props: PageProps) {
           />
         </section>
 
-        {/* CONTATO */}
         <section id="contact" className="w-full pb-20">
           <ContactSection
             contact={dict.contact}
