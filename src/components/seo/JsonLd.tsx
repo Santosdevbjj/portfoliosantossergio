@@ -1,7 +1,6 @@
-import React from "react"
-
 /**
  * JSON-LD Schema Types
+ * Compatible with Next.js 16 + React 19 + TypeScript 6
  */
 
 export type JsonLdSchema =
@@ -100,18 +99,18 @@ export interface JsonLdProps {
 /**
  * JsonLd Component
  *
- * Safe JSON-LD injection for SEO.
- * Compatible with Next.js App Router.
+ * Injects structured data (JSON-LD) safely.
+ * Works with Next.js App Router and Server Components.
  */
 
 export default function JsonLd({ schema }: JsonLdProps) {
-  const json = Array.isArray(schema) ? schema : [schema]
+  const schemas = Array.isArray(schema) ? schema : [schema]
 
   return (
     <>
-      {json.map((item, index) => (
+      {schemas.map((item, index) => (
         <script
-          key={index}
+          key={`jsonld-${index}`}
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(item),
