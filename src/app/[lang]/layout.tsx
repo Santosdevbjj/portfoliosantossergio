@@ -7,6 +7,8 @@ import type { ReactNode } from "react";
 import { normalizeLocale, locales } from "@/dictionaries/locales";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { ScrollSpyProvider } from "@/contexts/scroll-spy.client";
+import { buildMetadata } from "@/lib/seo";
+import { getPersonSchema, getWebsiteSchema } from "@/lib/schema";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -21,109 +23,42 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-/* =========================================
-   STATIC PARAMS (SSG)
-========================================= */
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
-/* =========================================
-   METADATA DINÂMICA (SEO, OG, X, WHATSAPP)
-========================================= */
-type Props = {
-  params: Promise<{ lang: string }>;
-};
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
   const locale = normalizeLocale(lang);
 
-  if (!locales.includes(locale)) {
-    notFound();
-  }
+  if (!locales.includes(locale)) notFound();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
   const dict = await getServerDictionary(locale);
-  
-  const ogImageUrl = `${siteUrl}/og-image-${locale}.png`; 
 
-  return {
-    metadataBase: new URL(siteUrl),
-    title: {
-      default: dict.seo.title || "Sérgio Santos",
-      template: `%s | ${dict.seo.siteName || "Sérgio Santos"}`,
-    },
+  // Utiliza a função buildMetadata do seu src/lib/seo.ts
+  return buildMetadata({
+    title: dict.seo.title,
     description: dict.seo.description,
-    keywords: dict.seo.keywords,
-    
-    // TAG DO GOOGLE PRESERVADA (CONFORME SOLICITADO)
-    verification: {
-      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
-    },
-
-    openGraph: {
-      title: dict.seo.title,
-      description: dict.seo.description,
-      url: `${siteUrl}/${locale}`,
-      siteName: dict.seo.siteName,
-      locale: locale.replace("-", "_"),
-      type: "website",
-      images: [
-        {
-          url: ogImageUrl,
-          width: 1200,
-          height: 630,
-          alt: dict.seo.title,
-        },
-      ],
-    },
-
-    twitter: {
-      card: "summary_large_image",
-      title: dict.seo.title,
-      description: dict.seo.description,
-      images: [ogImageUrl],
-    },
-
-    alternates: {
-      canonical: `${siteUrl}/${locale}`,
-      languages: {
-        "pt-BR": `${siteUrl}/pt-BR`,
-        "en-US": `${siteUrl}/en-US`,
-        "es-ES": `${siteUrl}/es-ES`,
-        "es-MX": `${siteUrl}/es-MX`,
-        "es-AR": `${siteUrl}/es-AR`,
-        "x-default": `${siteUrl}/en-US`,
-      },
-    },
-  };
+    path: `/${locale}`,
+    locale: locale,
+    verificationGoogle: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0", // SUA TAG PRESERVADA
+  });
 }
 
-/* =========================================
-   VIEWPORT (Separado conforme Next.js 16)
-========================================= */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#020617",
 };
 
-/* =========================================
-   LAYOUT PRINCIPAL
-========================================= */
 export default async function LangLayout(props: {
   children: ReactNode;
   params: Promise<{ lang: string }>;
 }) {
-  // No Next.js 16, params é uma Promise
   const { lang } = await props.params;
-  const children = props.children;
   const locale = normalizeLocale(lang);
 
-  if (!locales.includes(locale)) {
-    notFound();
-  }
+  if (!locales.includes(locale)) notFound();
 
   const dict = await getServerDictionary(locale);
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
@@ -136,12 +71,23 @@ export default async function LangLayout(props: {
       className={`${inter.variable} scroll-smooth`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen flex flex-col bg-background text-foreground font-sans antialiased transition-colors duration-500">
+      <head>
+        {/* Injeção do Person Schema e Website Schema via lib/schema.ts */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(getPersonSchema(dict)) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(getWebsiteSchema()) }}
+        />
+      </head>
+      <body className="min-h-screen flex flex-col bg-background text-foreground font-sans antialiased selection:bg-blue-500/30">
         <ScrollSpyProvider>
           {/* Acessibilidade: Skip Link */}
           <a
             href="#main-content"
-            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-4 py-2 rounded-md"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-4 py-2 rounded-lg"
           >
             {dict.common.skipToContent}
           </a>
@@ -149,21 +95,14 @@ export default async function LangLayout(props: {
           <Navbar lang={locale} common={dict.common} />
 
           <main id="main-content" className="flex-grow">
-            <BreadcrumbsJsonLd
-              lang={locale}
-              dict={dict}
-              baseUrl={baseUrl}
-            />
+            <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
 
-            <div className="container mx-auto px-4 pt-4">
-              <Breadcrumbs
-                lang={locale}
-                dictionary={dict}
-                baseUrl={baseUrl}
-              />
+            {/* Container Responsivo Tailwind 4.2 */}
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4">
+              <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
             </div>
 
-            {children}
+            {props.children}
           </main>
 
           <Footer
@@ -174,7 +113,7 @@ export default async function LangLayout(props: {
           />
         </ScrollSpyProvider>
 
-        {/* Google Analytics - Mantido intacto */}
+        {/* Google Analytics - Preservado */}
         {gaId && (
           <>
             <Script
@@ -186,9 +125,7 @@ export default async function LangLayout(props: {
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${gaId}', {
-                  page_path: window.location.pathname,
-                });
+                gtag('config', '${gaId}');
               `}
             </Script>
           </>
