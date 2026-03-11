@@ -1,169 +1,209 @@
-import React, { useState } from 'react';
+'use client';
+
+import { useState } from 'react';
 import { 
   BarChart3, BrainCircuit, MessageSquare, ShieldAlert, 
   TrendingUp, FileText, Settings, Code2, Database 
 } from 'lucide-react';
 
+// Tipagem para garantir consistência com o dicionário i18n
+interface ProjectDictionary {
+  title: string;
+  description: string;
+  badge: string;
+  cta: string;
+  tabs: {
+    pipeline: string;
+    insights: string;
+    decisions: string;
+  };
+  mainInsight: string;
+}
+
+interface ConstructionRiskProps {
+  dict: ProjectDictionary;
+}
+
 const metrics = [
-  { label: "MAE", value: "4,97 dias", sub: "Erro médio do modelo", icon: <BrainCircuit className="w-5 h-5 text-blue-400" /> },
-  { label: "Melhoria", value: "-59%", sub: "vs baseline histórico", icon: <TrendingUp className="w-5 h-5 text-green-400" /> },
-  { label: "Economia estimada", value: "R$ 248k/ano", sub: "Em multas contratuais", icon: <BarChart3 className="w-5 h-5 text-yellow-400" /> },
-  { label: "Decisão gerada", value: "Preventiva", sub: "Foco em fornecedores", icon: <ShieldAlert className="w-5 h-5 text-red-400" /> },
+  { id: 'mae', value: "4,97 dias", icon: <BrainCircuit className="w-5 h-5 text-blue-400" /> },
+  { id: 'improvement', value: "-59%", icon: <TrendingUp className="w-5 h-5 text-green-400" /> },
+  { id: 'savings', value: "R$ 248k/ano", icon: <BarChart3 className="w-5 h-5 text-yellow-400" /> },
+  { id: 'decision', value: "Preventiva", icon: <ShieldAlert className="w-5 h-5 text-red-400" /> },
 ];
 
 const stack = [
   "Python", "Pandas", "Scikit-learn", "Supabase", "Render", "Streamlit", "Docker", "Telegram Bot API"
 ];
 
-const hypotheses = [
-  { h: "Clima é a principal causa de atraso?", result: false, detail: "Rating do fornecedor tem impacto ~3x maior em etapas de acabamento." },
-  { h: "Fornecedores com baixo rating atrasam mesmo em bom clima?", result: true, detail: "Confirmada — padrão consistente no histórico operacional." },
-  { h: "Obras de maior orçamento têm mais risco?", result: true, detail: "Obras acima de R$ 2M apresentam maior sensibilidade a atrasos." },
-];
-
-const pipeline = [
-  { step: "01", title: "Problema de Negócio", desc: "Mapeamento do custo de R$ 1.380/dia por atraso.", icon: <FileText /> },
-  { step: "02", title: "Arquitetura de Dados", desc: "Camadas raw → analytics → products no Supabase.", icon: <Database /> },
-  { step: "03", title: "EDA & Hipóteses", desc: "Validação de causas raízes vs. suposições do setor.", icon: <BarChart3 /> },
-  { step: "04", title: "ML Modeling", desc: "RandomForestRegressor focado em interpretabilidade.", icon: <Settings /> },
-  { step: "05", title: "Deploy & Entrega", desc: "Bot Telegram e Streamlit para gestores de obra.", icon: <MessageSquare /> },
-];
-
-export default function ConstructionRiskProject() {
-  const [activeTab, setActiveTab] = useState("pipeline");
+export default function ConstructionRiskProject({ dict }: ConstructionRiskProps) {
+  const [activeTab, setActiveTab] = useState<"pipeline" | "insights" | "decisões">("pipeline");
 
   return (
-    <div className="max-w-4xl mx-auto bg-[#0a0a0a] text-zinc-300 rounded-xl border border-zinc-800 overflow-hidden shadow-2xl">
+    <section className="w-full max-w-4xl mx-auto bg-[#0a0a0a] text-zinc-300 rounded-2xl border border-zinc-800 overflow-hidden shadow-2xl transition-all hover:border-zinc-700/50">
       
-      {/* Header / Hero Section */}
-      <div className="p-8 border-b border-zinc-800 bg-gradient-to-b from-[#111] to-[#0a0a0a]">
+      {/* Header Section */}
+      <div className="p-6 md:p-8 border-b border-zinc-800 bg-gradient-to-b from-[#111] to-[#0a0a0a]">
         <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-mono text-blue-500 uppercase tracking-widest">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-[10px] md:text-xs font-mono text-blue-500 uppercase tracking-widest">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
               </span>
-              Em Produção • ML Case
+              {dict.badge}
             </div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">Predição de Risco de Atraso em Obras</h1>
-            <p className="text-zinc-400 max-w-xl leading-relaxed">
-              Plataforma analítica que antecipa riscos operacionais, convertendo dados históricos em alertas preventivos antes que o custo se materialize.
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight">
+              {dict.title}
+            </h1>
+            <p className="text-zinc-400 max-w-xl leading-relaxed text-sm md:text-base">
+              {dict.description}
             </p>
           </div>
           <a 
             href="https://github.com/Santosdevbjj/analiseRiscosAtrasoObras" 
             target="_blank"
-            className="flex items-center gap-2 px-4 py-2 bg-zinc-100 text-black rounded-lg font-medium hover:bg-white transition-colors text-sm"
+            rel="noopener noreferrer"
+            className="w-full md:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-zinc-100 text-black rounded-xl font-semibold hover:bg-white transition-all active:scale-95 text-sm"
           >
-            <Code2 size={18} /> Ver Código
+            <Code2 size={18} /> {dict.cta}
           </a>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-          {metrics.map((m, i) => (
-            <div key={i} className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-all">
-              <div className="mb-2">{m.icon}</div>
-              <div className="text-xl font-bold text-white">{m.value}</div>
-              <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">{m.label}</div>
-              <div className="text-xs text-zinc-500 mt-1">{m.sub}</div>
+        {/* Responsive Metrics Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-10">
+          {metrics.map((m) => (
+            <div key={m.id} className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/50 backdrop-blur-sm">
+              <div className="mb-3 p-2 w-fit rounded-lg bg-zinc-800/50">{m.icon}</div>
+              <div className="text-lg md:text-xl font-bold text-white">{m.value}</div>
+              <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mt-1">
+                {m.id}
+              </div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex border-b border-zinc-800 px-4 bg-[#0d0d0d]">
-        {["pipeline", "insights", "decisões"].map((tab) => (
+      <nav className="flex border-b border-zinc-800 px-2 md:px-4 bg-[#0d0d0d] overflow-x-auto no-scrollbar">
+        {(['pipeline', 'insights', 'decisões'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-6 py-4 text-sm font-medium transition-all relative ${
+            className={`px-4 md:px-6 py-4 text-xs md:text-sm font-medium transition-all relative whitespace-nowrap ${
               activeTab === tab ? "text-white" : "text-zinc-500 hover:text-zinc-300"
             }`}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab === 'pipeline' ? dict.tabs.pipeline : tab === 'insights' ? dict.tabs.insights : dict.tabs.decisions}
             {activeTab === tab && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.5)]" />
             )}
           </button>
         ))}
-      </div>
+      </nav>
 
-      {/* Tab Content */}
-      <div className="p-8 min-h-[400px]">
+      {/* Tab Content Area */}
+      <div className="p-6 md:p-8 min-h-[380px]">
         {activeTab === "pipeline" && (
-          <div className="space-y-4 animate-in fade-in duration-500">
-            {pipeline.map((p, i) => (
-              <div key={i} className="flex items-center gap-6 p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 group hover:bg-zinc-900/40 transition-all">
-                <div className="text-2xl font-black text-zinc-800 group-hover:text-blue-900/30 transition-colors italic">{p.step}</div>
-                <div className="flex-1">
-                  <h3 className="text-zinc-200 font-semibold mb-1">{p.title}</h3>
-                  <p className="text-sm text-zinc-500 leading-relaxed">{p.desc}</p>
-                </div>
-              </div>
-            ))}
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <PipelineItem step="01" title="Business Problem" desc="Mapping R$ 1.380/day penalty cost." icon={<FileText />} />
+            <PipelineItem step="02" title="Data Architecture" desc="Raw → Analytics → Products layers in Supabase." icon={<Database />} />
+            <PipelineItem step="03" title="EDA" desc="Validating root causes vs. industry assumptions." icon={<BarChart3 />} />
+            <PipelineItem step="04" title="Deploy" desc="Telegram Bot & Streamlit for field managers." icon={<MessageSquare />} />
           </div>
         )}
 
         {activeTab === "insights" && (
           <div className="space-y-6 animate-in fade-in duration-500">
              <div className="grid gap-4">
-              {hypotheses.map((h, i) => (
-                <div key={i} className="p-5 rounded-xl border border-zinc-800 bg-zinc-900/30">
-                  <div className="flex items-start gap-4">
-                    <div className={`mt-1 p-1 rounded-full ${h.result ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
-                      {h.result ? <TrendingUp size={16}/> : <ShieldAlert size={16}/>}
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-zinc-300 mb-2">{h.h}</h4>
-                      <p className="text-sm text-zinc-500 italic">"{h.detail}"</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                <InsightCard 
+                  isTrue={false} 
+                  title="Clima é a causa principal?" 
+                  detail="Rating do fornecedor tem impacto 3x maior." 
+                />
+                <InsightCard 
+                  isTrue={true} 
+                  title="Fornecedores Low Rating?" 
+                  detail="Atrasam independente das condições climáticas." 
+                />
              </div>
-             <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20 text-blue-400 text-sm italic">
-                <strong>Insight Principal:</strong> O rating do fornecedor atua como o principal preditor, superando fatores climáticos que eram a crença comum da empresa.
+             <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/20 text-blue-400 text-xs md:text-sm leading-relaxed">
+                <span className="font-bold mr-2">💡 {dict.mainInsight}:</span> 
+                O rating do fornecedor é o principal preditor de risco.
              </div>
           </div>
         )}
 
         {activeTab === "decisões" && (
-          <div className="space-y-4 animate-in fade-in duration-500">
-            <div className="grid md:grid-cols-2 gap-4">
-              <DecisionCard title="Algoritmo" choice="Random Forest" alt="XGBoost" reason="Prioridade na interpretabilidade para stakeholders de engenharia civil." />
-              <DecisionCard title="Infra" choice="Supabase + Render" alt="AWS" reason="Deploy ágil com camadas de dados desacopladas e custo zero." />
-            </div>
+          <div className="grid md:grid-cols-2 gap-4 animate-in zoom-in-95 duration-300">
+            <DecisionCard 
+              title="Algoritmo" 
+              choice="Random Forest" 
+              alt="XGBoost" 
+              reason="Interpretabilidade para stakeholders não técnicos." 
+            />
+            <DecisionCard 
+              title="Database" 
+              choice="Supabase" 
+              alt="Local Postgres" 
+              reason="API REST nativa para integração com Bot Telegram." 
+            />
           </div>
         )}
       </div>
 
-      {/* Footer Stack */}
-      <div className="px-8 py-6 bg-zinc-900/30 border-t border-zinc-800">
-        <div className="flex flex-wrap gap-2 text-[11px] font-mono">
-          {stack.map((s, i) => (
-            <span key={i} className="px-3 py-1 bg-zinc-800 text-zinc-400 rounded-full border border-zinc-700">
+      {/* Responsive Tech Stack Footer */}
+      <div className="px-6 md:px-8 py-6 bg-zinc-900/30 border-t border-zinc-800">
+        <div className="flex flex-wrap gap-2">
+          {stack.map((s) => (
+            <span key={s} className="px-2.5 py-1 bg-zinc-800/50 text-zinc-500 rounded-md border border-zinc-700/50 text-[10px] md:text-xs font-mono">
               {s}
             </span>
           ))}
         </div>
       </div>
+    </section>
+  );
+}
+
+/* --- Sub-componentes tipados para limpeza de código --- */
+
+function PipelineItem({ step, title, desc, icon }: { step: string, title: string, desc: string, icon: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-4 md:gap-6 p-4 rounded-xl border border-zinc-900 bg-zinc-900/20 group hover:bg-zinc-900/40 transition-all">
+      <div className="text-xl md:text-2xl font-black text-zinc-800 group-hover:text-blue-900/30 transition-colors italic">{step}</div>
+      <div className="p-2 rounded-lg bg-zinc-800/30 text-zinc-400">{icon}</div>
+      <div className="flex-1">
+        <h3 className="text-zinc-200 text-sm md:text-base font-semibold">{title}</h3>
+        <p className="text-xs md:text-sm text-zinc-500 leading-relaxed">{desc}</p>
+      </div>
     </div>
   );
 }
 
-function DecisionCard({ title, choice, alt, reason }: any) {
+function InsightCard({ isTrue, title, detail }: { isTrue: boolean, title: string, detail: string }) {
   return (
-    <div className="p-5 rounded-xl border border-zinc-800 bg-[#0d0d0d]">
+    <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/30 flex items-start gap-4">
+      <div className={`mt-1 p-1.5 rounded-full ${isTrue ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
+        {isTrue ? <TrendingUp size={14}/> : <ShieldAlert size={14}/>}
+      </div>
+      <div>
+        <h4 className="text-xs md:text-sm font-bold text-zinc-300">{title}</h4>
+        <p className="text-[11px] md:text-xs text-zinc-500 mt-1 italic">"{detail}"</p>
+      </div>
+    </div>
+  );
+}
+
+function DecisionCard({ title, choice, alt, reason }: { title: string, choice: string, alt: string, reason: string }) {
+  return (
+    <div className="p-5 rounded-xl border border-zinc-800 bg-[#0d0d0d] hover:border-zinc-700 transition-colors">
       <span className="text-[10px] uppercase text-zinc-600 font-bold tracking-widest">{title}</span>
       <div className="flex items-center gap-2 my-3">
-        <span className="text-xs font-bold text-blue-400 px-2 py-1 bg-blue-500/10 rounded">{choice}</span>
-        <span className="text-[10px] text-zinc-700">vs</span>
-        <span className="text-xs text-zinc-600 font-medium">{alt}</span>
+        <span className="text-[10px] md:text-xs font-bold text-blue-400 px-2 py-1 bg-blue-500/10 rounded">{choice}</span>
+        <span className="text-[10px] text-zinc-700 italic">vs</span>
+        <span className="text-[10px] md:text-xs text-zinc-600 font-medium">{alt}</span>
       </div>
-      <p className="text-xs text-zinc-500 leading-relaxed">{reason}</p>
+      <p className="text-[11px] md:text-xs text-zinc-500 leading-relaxed">{reason}</p>
     </div>
   );
 }
