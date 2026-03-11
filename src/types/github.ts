@@ -5,68 +5,75 @@
  * usada pelo serviço de portfólio.
  */
 export interface GitHubRepo {
-  id: number;
-  name: string;
-  description: string | null;
-  html_url: string;
-  homepage: string | null;
+  id: number
+
+  name: string
+
+  description: string | null
+
+  html_url: string
+
+  homepage: string | null
 
   /**
    * Topics podem vir undefined dependendo da API.
    */
-  topics?: string[];
+  topics?: readonly string[]
 
   /**
    * Necessário para filtrar forks.
    */
-  fork: boolean;
+  fork: boolean
 
   owner: {
-    login: string;
-  };
+    login: string
+  }
 }
 
 /**
  * Estrutura final consumida pelos componentes React.
  */
 export interface ProcessedProject {
-  id: number;
+  id: number
 
   /**
    * Nome formatado para UI
    */
-  name: string;
+  name: string
 
   /**
    * URL do repositório
    */
-  url: string;
+  url: string
 
   /**
-   * URL da aplicação online (homepage)
+   * URL da aplicação online
    */
-  liveUrl: string | null;
+  liveUrl: string | null
 
   /**
    * Estrutura narrativa usada no portfólio
    */
-  problem: string;
-  solution: string;
-  impact: string;
+  problem: string
+
+  solution: string
+
+  impact: string
 
   /**
-   * Tags de destaque
+   * Flags de destaque
    */
-  isFeatured: boolean;
-  isHead: boolean;
+  isFeatured: boolean
+
+  isHead: boolean
 
   /**
-   * Categoria de domínio
+   * Categoria principal
    */
-  category: string;
+  category: string
 
   /**
    * Tecnologias detectadas via topics
    */
-  technologies: string[];
+  technologies: string[]
 }
