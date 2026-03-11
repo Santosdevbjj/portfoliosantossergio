@@ -1,84 +1,112 @@
-import type { MetadataRoute } from "next";
+import type { MetadataRoute } from "next"
 import {
   SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
   type SupportedLocale,
-} from "@/dictionaries/locales";
+} from "@/dictionaries/locales"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = (
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app"
-  ).replace(/\/$/, "");
+  ).replace(/\/$/, "")
 
-  const lastModified = new Date();
+  const lastModified = new Date()
 
-  // Páginas estáticas do seu portfólio
+  /**
+   * Páginas do portfólio
+   */
   const pages = [
-    "", 
+    "",
     "about",
     "experience",
     "projects",
-    "artigos", // Atualizado de 'articles' para 'artigos' conforme sua estrutura de pastas
+    "artigos",
     "contact",
-  ] as const;
+  ] as const
 
   /**
-   * Gera objeto hreflang consistente para SEO Internacional
+   * Gera alternates hreflang
    */
   function buildAlternates(path: string) {
-    const languages: Record<string, string> = {};
+    const languages: Record<string, string> = {}
 
     for (const locale of SUPPORTED_LOCALES) {
-      languages[locale] = `${baseUrl}/${locale}${path}`;
+      languages[locale] = `${baseUrl}/${locale}${path}`
     }
 
-    // Define o fallback para usuários de outras regiões
-    languages["x-default"] = `${baseUrl}/${DEFAULT_LOCALE}${path}`;
+    languages["x-default"] = `${baseUrl}/${DEFAULT_LOCALE}${path}`
 
-    return { languages };
+    return { languages }
   }
 
   /**
-   * 1️⃣ Mapeamento de páginas por idioma
+   * Prioridade SEO
    */
-  const pageEntries: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap(
-    (locale: SupportedLocale) =>
+  function getPriority(page: string, locale: string) {
+    if (page === "") {
+      return locale === DEFAULT_LOCALE ? 1.0 : 0.9
+    }
+
+    if (page === "projects") return 0.9
+    if (page === "artigos") return 0.85
+    if (page === "about") return 0.8
+    if (page === "experience") return 0.8
+    if (page === "contact") return 0.7
+
+    return 0.7
+  }
+
+  /**
+   * Frequência de atualização
+   */
+  function getChangeFrequency(page: string) {
+    if (page === "") return "weekly" as const
+    if (page === "projects") return "weekly" as const
+    if (page === "artigos") return "weekly" as const
+
+    return "monthly" as const
+  }
+
+  /**
+   * 1️⃣ Páginas localizadas
+   */
+  const localizedPages: MetadataRoute.Sitemap =
+    SUPPORTED_LOCALES.flatMap((locale: SupportedLocale) =>
       pages.map((page) => {
-        const path = page ? `/${page}` : "";
-        const isHome = page === "";
+        const path = page ? `/${page}` : ""
 
         return {
           url: `${baseUrl}/${locale}${path}`,
           lastModified,
-          changeFrequency: isHome ? "weekly" : "monthly" as const,
-          priority: isHome ? (locale === DEFAULT_LOCALE ? 1.0 : 0.9) : 0.8,
+          changeFrequency: getChangeFrequency(page),
+          priority: getPriority(page, locale),
           alternates: buildAlternates(path),
-        };
+        }
       })
-  );
+    )
 
   /**
-   * 2️⃣ Entrada da Raiz (/) redirecionando para o locale padrão
+   * 2️⃣ URL raiz
    */
   const rootEntry: MetadataRoute.Sitemap[number] = {
     url: baseUrl,
     lastModified,
-    changeFrequency: "weekly" as const,
+    changeFrequency: "weekly",
     priority: 1.0,
     alternates: buildAlternates(""),
-  };
+  }
 
   /**
-   * 3️⃣ Documentos Estáticos (CVs)
+   * 3️⃣ Documentos públicos
    */
-  const documentEntries: MetadataRoute.Sitemap = SUPPORTED_LOCALES.map(
-    (locale) => ({
+  const documentEntries: MetadataRoute.Sitemap =
+    SUPPORTED_LOCALES.map((locale) => ({
       url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
       lastModified,
+      changeFrequency: "yearly",
       priority: 0.5,
-    })
-  );
+    }))
 
-  return [rootEntry, ...pageEntries, ...documentEntries];
+  return [rootEntry, ...localizedPages, ...documentEntries]
 }
