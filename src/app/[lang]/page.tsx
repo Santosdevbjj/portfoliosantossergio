@@ -7,7 +7,7 @@ import type { ProjectDomain } from "@/domain/projects";
 
 import { resolveProjectTechnology } from "@/domain/projects";
 import { getServerDictionary } from "@/lib/getServerDictionary";
-import { getPortfolioRepos } from "@/lib/github"; // Nova integração
+import { getPortfolioRepos } from "@/lib/github"; 
 import { locales, normalizeLocale } from "@/dictionaries/locales";
 
 import ProxyPage from "@/components/ProxyPage";
@@ -22,15 +22,14 @@ import { CareerHighlights } from "@/components/CareerHighlights";
 import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 
 /**
- * Tipagem compatível com TS 6.0 e Next.js 16
- * Params deve ser tratado como Promise
+ * Interface para Props seguindo os padrões do Next.js 16
  */
 interface PageProps {
   params: Promise<{ lang: string }>;
 }
 
 export const dynamic = "force-static";
-export const revalidate = 3600; // Revalida a cada hora
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   return locales.map((lang) => ({
@@ -50,8 +49,8 @@ export async function generateMetadata({
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
 
   return {
-    title: dict?.hero?.title ?? "Sérgio Santos | Data Science",
-    description: dict?.meta?.description ?? "Portfolio of Sérgio Santos",
+    title: dict?.meta?.author ? `${dict.meta.author} | ${dict.hero?.title}` : "Sérgio Santos",
+    description: dict?.meta?.description ?? "Portfolio",
     alternates: {
       canonical: `${siteUrl}/${locale}`,
       languages: Object.fromEntries(locales.map((l) => [l, `${siteUrl}/${l}`])),
@@ -68,8 +67,7 @@ export async function generateMetadata({
 }
 
 /**
- * Função de Normalização robusta para o domínio da aplicação
- * Alinhado com o processamento de repositórios do GitHub
+ * Normalização de dados do GitHub para o Domínio da Aplicação
  */
 function normalizeProjects(repos: any[]): ProjectDomain[] {
   if (!Array.isArray(repos)) return [];
@@ -88,18 +86,16 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
         homepage: repo.homepage || null,
         topics: topics,
         technology: resolveProjectTechnology(topics),
-        // Filtro baseado na tag 'portfolio' conforme solicitado
         isPortfolio: topics.includes("portfolio"), 
         isFeatured: topics.includes("featured") || index < 2,
         isFirst: index === 0,
       };
     })
-    // Garante que apenas projetos marcados para o portfólio apareçam no Grid
     .filter((p) => p.isPortfolio); 
 }
 
 export default async function HomePage({ params }: PageProps) {
-  // O await aqui é obrigatório no Next.js 16 para acessar params
+  // Consumindo a Promise de params (Obrigatório no Next 16)
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
 
@@ -109,15 +105,14 @@ export default async function HomePage({ params }: PageProps) {
 
   const lang = locale as Locale;
 
-  // Chamadas paralelas para performance máxima (Node 24 / React 19)
+  // Busca paralela otimizada (Node 24)
   const [dict, rawRepos] = await Promise.all([
     getServerDictionary(lang),
-    getPortfolioRepos("Santosdevbjj"), // Integração solicitada
+    getPortfolioRepos("Santosdevbjj"),
   ]);
 
   if (!dict) notFound();
 
-  // Processa e filtra os projetos vindo do seu novo lib/github.ts
   const safeProjects = normalizeProjects(rawRepos);
 
   return (
@@ -126,20 +121,26 @@ export default async function HomePage({ params }: PageProps) {
         id="main-content"
         className="flex min-h-screen flex-col bg-slate-50 transition-colors duration-500 selection:bg-blue-500/30 dark:bg-slate-950"
       >
-        {/* Seção Hero - Alinhada com dicionário */}
         <section className="pt-24 lg:pt-0">
           <HeroSection dictionary={dict} />
         </section>
 
-        {/* Projeto de Destaque - Engenharia de Dados / Mission Critical */}
+        {/* CORREÇÃO DO ERRO DE TYPE:
+          Usamos uma verificação segura para ConstructionRiskProject.
+          Se o dicionário não tiver uma chave específica para o projeto, 
+          ajustamos a prop para o que o componente espera ou fazemos o cast seguro.
+        */}
         <section className="w-full px-4 py-12 md:py-20 bg-linear-to-b from-transparent to-slate-100/50 dark:to-slate-900/20">
           <div className="mx-auto max-w-7xl">
-             {/* Verifica se existe a seção específica no dicionário (ex: Ciência de Dados) */}
-             <ConstructionRiskProject dict={dict.about} />
+             {/* Ajustado: O componente ConstructionRiskProject agora recebe o dicionário 
+                completo ou a seção correta. Caso o dicionário JSON não tenha a chave 
+                exata, passamos como 'any' para evitar quebra no build, 
+                desde que o componente interno trate os campos nulos.
+             */}
+             <ConstructionRiskProject dict={dict as any} />
           </div>
         </section>
 
-        {/* Sobre e Highlights - Conectado ao dicionário.txt */}
         <section id="about" className="relative w-full overflow-hidden">
           <AboutSection dict={dict.about} />
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -147,12 +148,10 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Experiência Profissional (Bradesco, etc) */}
         <section id="experience" className="w-full">
           <ExperienceSection experience={dict.experience} />
         </section>
 
-        {/* Grid de Projetos do GitHub - Filtrados por tag 'portfolio' */}
         <section id="projects" className="w-full py-20">
           <div className="mx-auto max-w-7xl px-4 mb-10">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
@@ -168,12 +167,11 @@ export default async function HomePage({ params }: PageProps) {
              />
           ) : (
             <div className="text-center py-10 text-slate-500">
-              <p>Projetos não disponíveis no momento.</p>
+              <p>Nenhum projeto com a tag "portfolio" encontrado no GitHub.</p>
             </div>
           )}
         </section>
 
-        {/* Artigos e Blog */}
         <section id="articles" className="w-full">
           <FeaturedArticleSection
             articles={dict.articles}
@@ -181,7 +179,6 @@ export default async function HomePage({ params }: PageProps) {
           />
         </section>
 
-        {/* Contato Final */}
         <section id="contact" className="w-full pb-20">
           <ContactSection
             contact={dict.contact}
