@@ -6,7 +6,6 @@ import type { ProjectDomain } from "@/domain/projects"
 
 import {
   resolveProjectTechnology,
-  resolveProjectFlags,
 } from "@/domain/projects"
 
 import { getServerDictionary } from "@/lib/getServerDictionary"
@@ -68,7 +67,8 @@ export async function generateMetadata({
 
 /**
  * NORMALIZAÇÃO CORRIGIDA
- * Garante compatibilidade com os nomes de campos exatos da API v3 do GitHub
+ * Removida variável 'flags' não utilizada para evitar erro de build.
+ * Garante compatibilidade com os nomes de campos exatos da API v3 do GitHub.
  */
 function normalizeProjects(projects: any[]): ProjectDomain[] {
   if (!Array.isArray(projects)) {
@@ -80,7 +80,6 @@ function normalizeProjects(projects: any[]): ProjectDomain[] {
     .map((p, index): ProjectDomain => {
       // O GitHub entrega 'topics' ou 'repository_topics' dependendo da chamada
       const topics: string[] = Array.isArray(p.topics) ? p.topics : [];
-      const flags = resolveProjectFlags(topics);
       
       // Prioriza html_url (padrão GitHub) mas aceita camelCase
       const link = p.html_url || p.htmlUrl || "";
@@ -98,7 +97,7 @@ function normalizeProjects(projects: any[]): ProjectDomain[] {
         isFirst: index === 0,
       };
     })
-    .filter((p) => p.isPortfolio && p.htmlUrl !== ""); // Filtra estritamente pela sua TAG
+    .filter((p) => p.isPortfolio && p.htmlUrl !== ""); 
 }
 
 export default async function HomePage(props: PageProps) {
@@ -159,9 +158,6 @@ export default async function HomePage(props: PageProps) {
           <ExperienceSection experience={dict.experience} />
         </section>
 
-        {/* Se safeProjects.length for 0 aqui, o componente PortfolioGrid 
-            provavelmente exibe a mensagem de "Em breve".
-        */}
         <section id="projects" className="w-full py-20">
           <PortfolioGrid
             projects={safeProjects}
