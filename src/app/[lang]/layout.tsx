@@ -59,13 +59,6 @@ export const viewport: Viewport = {
   themeColor: "#020617",
 };
 
-// COLOQUEI ABAIXO
-
-export const metadata = {
-  metadataBase: new URL('https://portfoliosantossergio.vercel.app'),
-};
-
-
 
 export default async function LangLayout(props: {
   children: ReactNode;
