@@ -23,7 +23,7 @@
   "about": {
     "title": "Sobre Mí",
     "differentialTitle": "Ingeniería de Datos con Enfoque en Sistemas de Misión Crítica",
-    "description": "Ciencia de Datos con una sólida base en sistemas bancarios críticos y enfocado en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
+    "description": "Científico de Datos con una sólida base en sistemas bancarios críticos y enfocado en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
     "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente enfoco mi trabajo en Ciencia de Datos e IA.",
     "highlights": [
       "Más de 15 años en Banca",
@@ -132,7 +132,7 @@
 
   "common": {
     "navigation": "Navegación principal",
-    "role": "Ciencia de Datos | Python | SQL | Azure",
+    "role": "Científico de Datos | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
     "rights": "Todos los derechos reservados",
     "builtWith": "Desarrollado con Next.js 16 y TypeScript",
