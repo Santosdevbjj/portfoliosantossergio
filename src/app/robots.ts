@@ -10,9 +10,13 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/"],
+        allow: [
+          "/",
+          "/api/og/*",      // Permite explicitamente o acesso às imagens dinâmicas
+          "/api/post-og/*"  // Garante acesso à sua rota específica de posts
+        ],
         disallow: [
-          "/api/",
+          "/api/",          // Bloqueia outras rotas de API (proteção de dados)
           "/_next/",
           "/admin/",
           "/private/",
@@ -21,7 +25,11 @@ export default function robots(): MetadataRoute.Robots {
 
       {
         userAgent: "Googlebot",
-        allow: "/",
+        allow: [
+          "/",
+          "/api/og/*",
+          "/api/post-og/*"
+        ],
       },
 
       {
@@ -41,6 +49,7 @@ export default function robots(): MetadataRoute.Robots {
 
       /**
        * AI Crawlers
+       * Configuração para robôs de IA
        */
       {
         userAgent: [
@@ -49,7 +58,7 @@ export default function robots(): MetadataRoute.Robots {
           "ClaudeBot",
           "PerplexityBot",
         ],
-        disallow: ["/private/"],
+        disallow: ["/private/", "/api/"],
       },
     ],
 
