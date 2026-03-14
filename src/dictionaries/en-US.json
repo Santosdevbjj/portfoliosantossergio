@@ -132,7 +132,7 @@
 
   "common": {
     "navigation": "Main navigation",
-    "role": "Data Science Analyst | Python | SQL | Azure",
+    "role": "Data Scientist | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. All rights reserved.",
     "rights": "All rights reserved",
     "builtWith": "Built with Next.js 16 & TypeScript",
