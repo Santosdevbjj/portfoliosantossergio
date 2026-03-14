@@ -12,44 +12,33 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: [
           "/",
-          "/api/og/*",      // Permite explicitamente o acesso às imagens dinâmicas
-          "/api/post-og/*"  // Garante acesso à sua rota específica de posts
+          "/og/*",          // Permite acesso total às imagens de Open Graph
+          "/icons/*",       // Permite acesso aos ícones (favicon, apple-touch)
+          "/images/*",      // Permite acesso às fotos de perfil e troféus
+          "/cv-*.pdf",      // Permite que o Google indexe seus currículos
         ],
         disallow: [
-          "/api/",          // Bloqueia outras rotas de API (proteção de dados)
-          "/_next/",
+          "/api/",          // Bloqueia rotas de API sensíveis
+          "/_next/",        // Bloqueia arquivos internos do Next.js
           "/admin/",
           "/private/",
         ],
       },
-
+      /**
+       * Meta/Facebook Crawler
+       * Requisito da documentação: Garantir que o FacebookExternalHit
+       * consiga baixar as imagens para gerar o thumbnail.
+       */
       {
-        userAgent: "Googlebot",
+        userAgent: ["FacebookExternalHit", "LinkedInBot"],
         allow: [
-          "/",
-          "/api/og/*",
-          "/api/post-og/*"
+          "/og/",
+          "/images/",
         ],
       },
-
-      {
-        userAgent: "Bingbot",
-        allow: "/",
-      },
-
-      {
-        userAgent: "Applebot",
-        allow: "/",
-      },
-
-      {
-        userAgent: "DuckDuckBot",
-        allow: "/",
-      },
-
       /**
        * AI Crawlers
-       * Configuração para robôs de IA
+       * Permite que leiam o conteúdo público, mas protege dados privados
        */
       {
         userAgent: [
@@ -57,13 +46,11 @@ export default function robots(): MetadataRoute.Robots {
           "CCBot",
           "ClaudeBot",
           "PerplexityBot",
+          "Meta-WebIndexer", // Adicionado conforme documentação da Meta
         ],
-        disallow: ["/private/", "/api/"],
+        disallow: ["/private/", "/api/", "/_next/"],
       },
     ],
-
     sitemap: `${baseUrl}/sitemap.xml`,
-
-    host: baseUrl,
   }
 }
