@@ -5,7 +5,6 @@ import { getDictionary } from '@/dictionaries';
 import { isValidLocale, SUPPORTED_LOCALES } from '@/dictionaries/locales';
 import type { Locale } from '@/types/dictionary';
 
-// URL Base limpa para evitar barras duplas
 const SITE_URL = 'https://portfoliosantossergio.vercel.app';
 
 interface MetadataProps {
@@ -14,12 +13,6 @@ interface MetadataProps {
   }>;
 }
 
-/**
- * Gerador de Metadados - Sérgio Santos Portfolio
- * ✔ Suporte a Next.js 16 (params as Promise)
- * ✔ Estrutura de pastas /og/ para evitar conflitos de cache
- * ✔ URLs absolutas para validação em LinkedIn e Facebook
- */
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
 
@@ -30,14 +23,10 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
   const lang: Locale = rawLang;
   const dict = await getDictionary(lang);
 
-  // Extração segura de Título e Descrição do Dicionário
   const pageTitle = dict.seo.pages?.home?.title ?? dict.seo.siteName;
   const pageDescription = dict.seo.pages?.home?.description ?? dict.seo.description;
 
-  /**
-   * MAPA DE IMAGENS OG (Open Graph)
-   * Apontando para a nova pasta /public/og/
-   */
+  // Mapa de imagens na nova pasta /og/
   const ogImageMap: Record<Locale, string> = {
     'pt-BR': 'og/og-image-pt-BR.png',
     'en-US': 'og/og-image-en-US.png',
@@ -54,10 +43,8 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     'es-MX': 'es_MX',
   };
 
-  // URL Absoluta da Imagem (Ex: https://.../og/og-image-pt-BR.png)
   const finalOgImage = `${SITE_URL}/${ogImageMap[lang]}`;
   
-  // Hreflang para SEO Internacional
   const languages = SUPPORTED_LOCALES.reduce((acc, loc) => {
     acc[loc] = `${SITE_URL}/${loc}`;
     return acc;
@@ -70,7 +57,10 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       template: `%s | ${dict.seo.siteName}`,
     },
     description: pageDescription,
-    keywords: dict.seo.keywords,
+    // fb:app_id ajuda na validação da Meta
+    other: {
+      'fb:app_id': 'SEU_ID_DO_FACEBOOK_AQUI', // Se não tiver, pode remover esta linha
+    },
     alternates: {
       canonical: `${SITE_URL}/${lang}`,
       languages: {
@@ -88,8 +78,8 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       images: [
         {
           url: finalOgImage,
-          width: 1200,
-          height: 630,
+          width: 1200, // Especificado conforme Documentação Meta
+          height: 630, // Especificado conforme Documentação Meta
           alt: pageTitle,
           type: 'image/png',
         },
@@ -99,8 +89,9 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       card: 'summary_large_image',
       title: pageTitle,
       description: pageDescription,
-      images: [finalOgImage], // Twitter agora usa a mesma imagem absoluta da pasta /og/
+      images: [finalOgImage],
     },
+    // Demais metadados de ícones e robôs seguem sua estrutura
     icons: {
       icon: [
         { url: '/icons/favicon.ico', sizes: 'any' },
