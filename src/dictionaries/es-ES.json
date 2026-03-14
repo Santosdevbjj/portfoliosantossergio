@@ -14,7 +14,7 @@
 
   "hero": {
     "greeting": "Disponible para Proyectos Críticos",
-    "title": "Analista de Ciencia de Datos",
+    "title": "Ciencia de Datos",
     "subtitle": "Datos y Resiliencia",
     "headline": "Especialista en transformar infraestructuras complejas en sistemas de alta disponibilidad y pipelines de datos escalables.",
     "ctaPrimary": "Ver Proyectos"
@@ -23,7 +23,7 @@
   "about": {
     "title": "Sobre Mí",
     "differentialTitle": "Ingeniería de Datos con Enfoque en Sistemas de Misión Crítica",
-    "description": "Analista de Ciencia de Datos con una sólida base en sistemas bancarios críticos y enfocado en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
+    "description": "Ciencia de Datos con una sólida base en sistemas bancarios críticos y enfocado en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
     "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente enfoco mi trabajo en Ciencia de Datos e IA.",
     "highlights": [
       "Más de 15 años en Banca",
@@ -132,7 +132,7 @@
 
   "common": {
     "navigation": "Navegación principal",
-    "role": "Analista de Ciencia de Datos | Python | SQL | Azure",
+    "role": "Ciencia de Datos | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
     "rights": "Todos los derechos reservados",
     "builtWith": "Desarrollado con Next.js 16 y TypeScript",
@@ -199,23 +199,29 @@
     "savePreferences": "Guardar"
   },
 
-  "seo": {
-    "siteName": "Sérgio Santos | Portafolio",
-    "title": "Sérgio Santos",
-    "description": "Ciencia de Datos y Sistemas Críticos",
-
-    "keywords": [
-      "python",
-      "databricks",
-      "sql",
-      "neo4j",
-      "data science"
-    ],
-
+   
+"seo": {
+  "siteName": "Sergio Santos | Portfolio",
+  "title": "Sergio Santos",
+  "description": "Científico de Datos especializado en Sistemas Críticos y de Misión Crítica. Explora proyectos de ingeniería de datos, alta disponibilidad y análisis predictivo.",
+  "keywords": [
+    "Ciencia de Datos",
+    "Data Science",
+    "Sistemas Críticos",
+    "Misión Crítica",
+    "Machine Learning",
+    "ETL",
+    "Data Pipelines",
+    "Cloud Computing",
+    "Azure",
+    "Python",
+    "Alta Disponibilidad"
+  ],
+  
     "pages": {
       "home": {
         "title": "Inicio",
-        "description": "Portafolio de Sérgio Santos"
+        "description":  "Especialista en Ciencia de Datos, Machine Learning y Data Pipelines para Sistemas Críticos."
       },
       "projects": {
         "title": "Proyectos",
