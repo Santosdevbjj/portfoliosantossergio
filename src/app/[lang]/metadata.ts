@@ -5,7 +5,7 @@ import { getDictionary } from '@/dictionaries';
 import { isValidLocale, SUPPORTED_LOCALES } from '@/dictionaries/locales';
 import type { Locale } from '@/types/dictionary';
 
-// Definimos a URL base sem a barra final para evitar duplicação
+// URL Base limpa para evitar barras duplas
 const SITE_URL = 'https://portfoliosantossergio.vercel.app';
 
 interface MetadataProps {
@@ -15,9 +15,10 @@ interface MetadataProps {
 }
 
 /**
- * Gerador de Metadados robusto e tipado para Next.js 16
- * ✔ Correção de URL malformada (barra dupla)
- * ✔ URLs absolutas para Scrapers de Redes Sociais
+ * Gerador de Metadados - Sérgio Santos Portfolio
+ * ✔ Suporte a Next.js 16 (params as Promise)
+ * ✔ Estrutura de pastas /og/ para evitar conflitos de cache
+ * ✔ URLs absolutas para validação em LinkedIn e Facebook
  */
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -29,20 +30,20 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
   const lang: Locale = rawLang;
   const dict = await getDictionary(lang);
 
-  // Título e Descrição (Priorizando o conteúdo SEO do dicionário)
+  // Extração segura de Título e Descrição do Dicionário
   const pageTitle = dict.seo.pages?.home?.title ?? dict.seo.siteName;
   const pageDescription = dict.seo.pages?.home?.description ?? dict.seo.description;
 
   /**
    * MAPA DE IMAGENS OG (Open Graph)
-   * Nota: Removi a barra inicial dos valores para garantir a concatenação limpa
+   * Apontando para a nova pasta /public/og/
    */
   const ogImageMap: Record<Locale, string> = {
-    'pt-BR': 'og-image-pt-BR.png',
-    'en-US': 'og-image-en-US.png',
-    'es-ES': 'og-image-es-ES.png',
-    'es-AR': 'og-image-es-AR.png',
-    'es-MX': 'og-image-es-MX.png',
+    'pt-BR': 'og/og-image-pt-BR.png',
+    'en-US': 'og/og-image-en-US.png',
+    'es-ES': 'og/og-image-es-ES.png',
+    'es-AR': 'og/og-image-es-AR.png',
+    'es-MX': 'og/og-image-es-MX.png',
   };
 
   const ogLocaleMap: Record<Locale, string> = {
@@ -53,7 +54,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     'es-MX': 'es_MX',
   };
 
-  // Montagem da URL Absoluta Garantida (sem barra dupla)
+  // URL Absoluta da Imagem (Ex: https://.../og/og-image-pt-BR.png)
   const finalOgImage = `${SITE_URL}/${ogImageMap[lang]}`;
   
   // Hreflang para SEO Internacional
@@ -86,7 +87,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       description: pageDescription,
       images: [
         {
-          url: finalOgImage, // URL Limpa: https://portfoliosantossergio.vercel.app/og-image-pt-BR.png
+          url: finalOgImage,
           width: 1200,
           height: 630,
           alt: pageTitle,
@@ -98,7 +99,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       card: 'summary_large_image',
       title: pageTitle,
       description: pageDescription,
-      images: [finalOgImage],
+      images: [finalOgImage], // Twitter agora usa a mesma imagem absoluta da pasta /og/
     },
     icons: {
       icon: [
@@ -108,6 +109,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       ],
       apple: [
         { url: '/icons/apple-touch-icon.png', sizes: '180x180' },
+        { url: '/icons/apple-icon.png', sizes: '180x180' },
       ],
     },
     robots: {
