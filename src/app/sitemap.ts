@@ -1,8 +1,8 @@
+// src/app/sitemap.ts
 import type { MetadataRoute } from "next"
 import {
   SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
-  type SupportedLocale,
 } from "@/dictionaries/locales"
 
 const baseUrl = "https://portfoliosantossergio.vercel.app"
@@ -21,8 +21,8 @@ const pages = [
 ] as const
 
 /**
- * LISTA DE ARTIGOS (Sincronizado com seu repositório GitHub)
- * Como os artigos são buscados via API, listamos os slugs aqui para o SEO
+ * LISTA DE ARTIGOS (Sincronizado com seu repositório GitHub Santosdevbjj/myArticles)
+ * Estrutura: categoria/nome-do-arquivo
  */
 const articleRoutes = [
   "autoconhecimento/aprend-continuo",
@@ -48,19 +48,23 @@ const articleRoutes = [
 
 /**
  * CONSTRUTOR DE ALTERNATES (SEO Internacional)
+ * Gera os links hreflang para que o Google entenda as versões traduzidas
  */
 function buildAlternates(pathname: string) {
   const languages: Record<string, string> = {}
-  for (const locale of SUPPORTED_LOCALES) {
+  
+  SUPPORTED_LOCALES.forEach((locale) => {
     languages[locale] = `${baseUrl}/${locale}${pathname}`
-  }
+  })
+
   languages["x-default"] = `${baseUrl}/${DEFAULT_LOCALE}${pathname}`
+  
   return { languages }
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
   
-  // 1. Entrada da Raiz (/)
+  // 1. Entrada da Raiz (https://portfoliosantossergio.vercel.app)
   const rootEntry: MetadataRoute.Sitemap[number] = {
     url: baseUrl,
     lastModified,
@@ -69,21 +73,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     alternates: buildAlternates(""),
   }
 
-  // 2. Páginas Localizadas (/pt-BR/about, etc.)
+  // 2. Páginas Localizadas (/pt-BR/about, /en-US/about, etc.)
   const localizedPages: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap((locale) =>
     pages.map((page) => {
       const pathname = page ? `/${page}` : ""
       return {
         url: `${baseUrl}/${locale}${pathname}`,
         lastModified,
-        changeFrequency: page === "" || page === "artigos" ? "weekly" : "monthly",
+        changeFrequency: (page === "" || page === "artigos") ? "weekly" : "monthly",
         priority: page === "" ? 0.9 : 0.8,
         alternates: buildAlternates(pathname),
       }
     })
   )
 
-  // 3. Artigos Dinâmicos (Vindo do GitHub mapeado acima)
+  // 3. Artigos Dinâmicos (Mapeados das subpastas do GitHub)
   const articles: MetadataRoute.Sitemap = articleRoutes.flatMap((slug) =>
     SUPPORTED_LOCALES.map((locale) => ({
       url: `${baseUrl}/${locale}/artigos/${slug}`,
@@ -94,12 +98,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   )
 
-  // 4. Documentos Públicos (PDFs de currículo)
+  // 4. Documentos Públicos (Currículos PDF na pasta public/)
   const documents: MetadataRoute.Sitemap = SUPPORTED_LOCALES.map((locale) => ({
     url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
     lastModified,
     changeFrequency: "monthly",
-    priority: 0.6,
+    priority: 0.5,
   }))
 
   return [rootEntry, ...localizedPages, ...articles, ...documents]
