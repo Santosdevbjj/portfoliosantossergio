@@ -1,5 +1,5 @@
 // src/app/[lang]/page.tsx
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 
 import type { Locale } from "@/types/dictionary";
@@ -30,7 +30,16 @@ export const revalidate = 3600;
 
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
-}
+} 
+
+// coloquei o abaixo
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#020617",
+};
+
+
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
