@@ -5,6 +5,7 @@ import { getDictionary } from '@/dictionaries';
 import { isValidLocale, SUPPORTED_LOCALES } from '@/dictionaries/locales';
 import type { Locale } from '@/types/dictionary';
 
+// Definimos a URL base sem a barra final para evitar duplicação
 const SITE_URL = 'https://portfoliosantossergio.vercel.app';
 
 interface MetadataProps {
@@ -14,15 +15,13 @@ interface MetadataProps {
 }
 
 /**
- * Gerador de Metadados robusto e tipado para TS 6.0 e Next.js 16
- * ✔ Resolve erro de "possibly undefined" em dict.seo.pages
- * ✔ Alinhado com arquivos físicos em /public
+ * Gerador de Metadados robusto e tipado para Next.js 16
+ * ✔ Correção de URL malformada (barra dupla)
+ * ✔ URLs absolutas para Scrapers de Redes Sociais
  */
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
-  // No Next.js 16, params deve ser aguardado
   const { lang: rawLang } = await params;
 
-  // Validação do locale
   if (!isValidLocale(rawLang)) {
     notFound();
   }
@@ -30,27 +29,22 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
   const lang: Locale = rawLang;
   const dict = await getDictionary(lang);
 
-  // RESOLUÇÃO DO ERRO DE BUILD: Extração segura usando Optional Chaining
-  // O Fallback garante que se 'home' for undefined, o build não quebre e use o valor global
+  // Título e Descrição (Priorizando o conteúdo SEO do dicionário)
   const pageTitle = dict.seo.pages?.home?.title ?? dict.seo.siteName;
   const pageDescription = dict.seo.pages?.home?.description ?? dict.seo.description;
 
   /**
    * MAPA DE IMAGENS OG (Open Graph)
-   * Vinculado exatamente aos arquivos em /public
+   * Nota: Removi a barra inicial dos valores para garantir a concatenação limpa
    */
   const ogImageMap: Record<Locale, string> = {
-    'pt-BR': '/og-image-pt-BR.png',
-    'en-US': '/og-image-en-US.png',
-    'es-ES': '/og-image-es-ES.png',
-    'es-AR': '/og-image-es-AR.png',
-    'es-MX': '/og-image-es-MX.png',
+    'pt-BR': 'og-image-pt-BR.png',
+    'en-US': 'og-image-en-US.png',
+    'es-ES': 'og-image-es-ES.png',
+    'es-AR': 'og-image-es-AR.png',
+    'es-MX': 'og-image-es-MX.png',
   };
 
-  /**
-   * MAPA DE LOCALES ISO
-   * Necessário para crawlers (ex: pt-BR vira pt_BR no meta tag)
-   */
   const ogLocaleMap: Record<Locale, string> = {
     'pt-BR': 'pt_BR',
     'en-US': 'en_US',
@@ -59,9 +53,8 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     'es-MX': 'es_MX',
   };
 
- // const finalOgImage = `${SITE_URL}${ogImageMap[lang]}`;
-
-  const finalOgImage = `https://portfoliosantossergio.vercel.app${ogImageMap[lang]}`;
+  // Montagem da URL Absoluta Garantida (sem barra dupla)
+  const finalOgImage = `${SITE_URL}/${ogImageMap[lang]}`;
   
   // Hreflang para SEO Internacional
   const languages = SUPPORTED_LOCALES.reduce((acc, loc) => {
@@ -93,10 +86,11 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       description: pageDescription,
       images: [
         {
-          url: finalOgImage,
+          url: finalOgImage, // URL Limpa: https://portfoliosantossergio.vercel.app/og-image-pt-BR.png
           width: 1200,
           height: 630,
           alt: pageTitle,
+          type: 'image/png',
         },
       ],
     },
