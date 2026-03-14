@@ -14,7 +14,7 @@
 
   "hero": {
     "greeting": "Disponível para Projetos Críticos",
-    "title": "Analista de Ciência de Dados",
+    "title": "Cientista de Dados",
     "subtitle": "Dados e Resiliência",
     "headline": "Especialista em transformar infraestruturas complexas em sistemas de alta disponibilidade e pipelines de dados escaláveis.",
     "ctaPrimary": "Ver Projetos"
@@ -199,25 +199,28 @@
     "savePreferences": "Salvar"
   },
 
- "seo": {
+  "seo": {
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
     "description": "Cientista de Dados especialista em Sistemas Críticos e Missão Crítica. Explore projetos de engenharia de dados, alta disponibilidade e análise preditiva.",
-     "keywords": [
+    "keywords": [
       "Ciência de Dados",
       "Data Science",
       "Sistemas Críticos",
       "Missão Crítica",
+      "Machine Learning",
+      "ETL",
+      "Data Pipelines",
+      "Cloud Computing",
+      "Azure",
       "Python",
-      "Java",
-      "Alta Disponibilidade",
-      "Engenharia de Dados"
+      "Alta Disponibilidade"
     ],
-   
+    
     "pages": {
       "home": {
         "title": "Início",
-        "description": "Portfólio de Sérgio Santos"
+        "description": "Especialista em Ciência de Dados, Machine Learning e Data Pipelines para Sistemas Críticos."
       },
       "projects": {
         "title": "Projetos",
