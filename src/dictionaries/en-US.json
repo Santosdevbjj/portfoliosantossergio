@@ -14,7 +14,7 @@
 
   "hero": {
     "greeting": "Available for Critical Projects",
-    "title": "Data Science Analyst",
+    "title": "Data Scientist",
     "subtitle": "Data and Resilience",
     "headline": "Specialist in transforming complex infrastructures into high-availability systems and scalable data pipelines.",
     "ctaPrimary": "View Projects"
@@ -23,7 +23,7 @@
   "about": {
     "title": "About Me",
     "differentialTitle": "Data Engineering Focused on Mission-Critical Systems",
-    "description": "Data Science Analyst with a strong background in critical banking systems and focused on transforming data into decisions, cost reduction, and operational efficiency.",
+    "description": "Data Scientist with a strong background in critical banking systems and focused on transforming data into decisions, cost reduction, and operational efficiency.",
     "differentialContent": "I worked for more than 15 years at Banco Bradesco in regulated mission-critical environments. I currently focus my work on Data Science and AI.",
     "highlights": [
       "15+ years in Banking",
@@ -199,23 +199,27 @@
     "savePreferences": "Save"
   },
 
-  "seo": {
+   "seo": {
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
-    "description": "Data Science & Critical Systems",
-
+    "description": "Data Scientist specializing in Critical Systems and Mission-Critical solutions. Explore projects in data engineering, high availability, and predictive analysis.",
     "keywords": [
-      "python",
-      "databricks",
-      "sql",
-      "neo4j",
-      "data science"
+      "Data Science",
+      "Critical Systems",
+      "Mission-Critical",
+      "Machine Learning",
+      "ETL",
+      "Data Pipelines",
+      "Cloud Computing",
+      "Azure",
+      "Python",
+      "High Availability"
     ],
-
+    
     "pages": {
       "home": {
         "title": "Home",
-        "description": "Sérgio Santos Portfolio"
+        "description": "Specialist in Data Science, Machine Learning, and Data Pipelines for Critical Systems."
       },
       "projects": {
         "title": "Projects",
