@@ -199,19 +199,21 @@
     "savePreferences": "Salvar"
   },
 
-  "seo": {
+ "seo": {
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
-    "description": "Ciência de Dados & Sistemas Críticos",
-
-    "keywords": [
-      "python",
-      "databricks",
-      "sql",
-      "neo4j",
-      "data science"
+    "description": "Cientista de Dados especialista em Sistemas Críticos e Missão Crítica. Explore projetos de engenharia de dados, alta disponibilidade e análise preditiva.",
+     "keywords": [
+      "Ciência de Dados",
+      "Data Science",
+      "Sistemas Críticos",
+      "Missão Crítica",
+      "Python",
+      "Java",
+      "Alta Disponibilidade",
+      "Engenharia de Dados"
     ],
-
+   
     "pages": {
       "home": {
         "title": "Início",
