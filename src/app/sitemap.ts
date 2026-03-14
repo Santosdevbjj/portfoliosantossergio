@@ -1,22 +1,15 @@
 import type { MetadataRoute } from "next"
-import fs from "fs"
-import path from "path"
-
 import {
   SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
   type SupportedLocale,
 } from "@/dictionaries/locales"
 
-const baseUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  "https://portfoliosantossergio.vercel.app"
-).replace(/\/$/, "")
-
+const baseUrl = "https://portfoliosantossergio.vercel.app"
 const lastModified = new Date()
 
 /**
- * páginas principais
+ * PÁGINAS ESTÁTICAS DO SISTEMA
  */
 const pages = [
   "",
@@ -28,73 +21,46 @@ const pages = [
 ] as const
 
 /**
- * prioridade SEO
+ * LISTA DE ARTIGOS (Sincronizado com seu repositório GitHub)
+ * Como os artigos são buscados via API, listamos os slugs aqui para o SEO
  */
-function getPriority(page: string, locale: string) {
-  if (page === "") {
-    return locale === DEFAULT_LOCALE ? 1 : 0.9
-  }
-
-  switch (page) {
-    case "projects":
-      return 0.95
-    case "artigos":
-      return 0.9
-    case "about":
-      return 0.85
-    case "experience":
-      return 0.85
-    case "contact":
-      return 0.75
-    default:
-      return 0.7
-  }
-}
+const articleRoutes = [
+  "autoconhecimento/aprend-continuo",
+  "autoconhecimento/home-office",
+  "autoconhecimento/inteligencia-emocional",
+  "aws-artigos/microsservicos-aws-step-functions",
+  "azure-cloud-native/azure-cloud-native-article",
+  "data-artigos/dados-para-reduzir-custos",
+  "data-artigos/privacidade-de-dados",
+  "dio_Campus_Expert_14/analise-grafos-carreira",
+  "dio_Campus_Expert_14/conclusao-dio-Campus-Expert14",
+  "dio_Campus_Expert_14/contrato-compromisso",
+  "dio_Campus_Expert_14/neo4J-dados-conectados",
+  "dio_Campus_Expert_14/resultados-concretos-jornada",
+  "dotnet-artigos/visual-studio-vscode-guia-das-ides",
+  "ia-artigos/ia-generativa-com-sete-guardrails",
+  "ia-artigos/implementar-ia-generativa-com-eficiencia",
+  "java-artigos/java-pensar-como-engenheiro-software",
+  "low_code/low-code-saude",
+  "python-artigos/pycharm-spyder-vscode-ides",
+  "typescript-artigos/typescript-strict-padrao",
+]
 
 /**
- * frequência
- */
-function getChangeFrequency(page: string) {
-  if (page === "") return "weekly"
-  if (page === "projects") return "weekly"
-  if (page === "artigos") return "weekly"
-  if (page === "experience") return "monthly"
-  return "monthly"
-}
-
-/**
- * hreflang alternates
+ * CONSTRUTOR DE ALTERNATES (SEO Internacional)
  */
 function buildAlternates(pathname: string) {
   const languages: Record<string, string> = {}
-
   for (const locale of SUPPORTED_LOCALES) {
     languages[locale] = `${baseUrl}/${locale}${pathname}`
   }
-
   languages["x-default"] = `${baseUrl}/${DEFAULT_LOCALE}${pathname}`
-
   return { languages }
 }
 
-/**
- * descobrir artigos MDX automaticamente
- */
-function getArticles(): string[] {
-  const articlesDir = path.join(process.cwd(), "content/artigos")
-
-  if (!fs.existsSync(articlesDir)) return []
-
-  return fs
-    .readdirSync(articlesDir)
-    .filter((file) => file.endsWith(".mdx"))
-    .map((file) => file.replace(".mdx", ""))
-}
-
 export default function sitemap(): MetadataRoute.Sitemap {
-  /**
-   * ROOT
-   */
+  
+  // 1. Entrada da Raiz (/)
   const rootEntry: MetadataRoute.Sitemap[number] = {
     url: baseUrl,
     lastModified,
@@ -103,55 +69,38 @@ export default function sitemap(): MetadataRoute.Sitemap {
     alternates: buildAlternates(""),
   }
 
-  /**
-   * páginas localizadas
-   */
-  const localizedPages: MetadataRoute.Sitemap =
-    SUPPORTED_LOCALES.flatMap((locale: SupportedLocale) =>
-      pages.map((page) => {
-        const pathname = page ? `/${page}` : ""
-
-        return {
-          url: `${baseUrl}/${locale}${pathname}`,
-          lastModified,
-          changeFrequency: getChangeFrequency(page),
-          priority: getPriority(page, locale),
-          alternates: buildAlternates(pathname),
-        }
-      })
-    )
-
-  /**
-   * artigos dinâmicos
-   */
-  const articleSlugs = getArticles()
-
-  const articles: MetadataRoute.Sitemap =
-    articleSlugs.flatMap((slug) =>
-      SUPPORTED_LOCALES.map((locale) => ({
-        url: `${baseUrl}/${locale}/artigos/${slug}`,
+  // 2. Páginas Localizadas (/pt-BR/about, etc.)
+  const localizedPages: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap((locale) =>
+    pages.map((page) => {
+      const pathname = page ? `/${page}` : ""
+      return {
+        url: `${baseUrl}/${locale}${pathname}`,
         lastModified,
-        changeFrequency: "monthly",
-        priority: 0.8,
-        alternates: buildAlternates(`/artigos/${slug}`),
-      }))
-    )
+        changeFrequency: page === "" || page === "artigos" ? "weekly" : "monthly",
+        priority: page === "" ? 0.9 : 0.8,
+        alternates: buildAlternates(pathname),
+      }
+    })
+  )
 
-  /**
-   * documentos públicos
-   */
-  const documents: MetadataRoute.Sitemap =
+  // 3. Artigos Dinâmicos (Vindo do GitHub mapeado acima)
+  const articles: MetadataRoute.Sitemap = articleRoutes.flatMap((slug) =>
     SUPPORTED_LOCALES.map((locale) => ({
-      url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
+      url: `${baseUrl}/${locale}/artigos/${slug}`,
       lastModified,
-      changeFrequency: "yearly",
-      priority: 0.5,
+      changeFrequency: "monthly",
+      priority: 0.7,
+      alternates: buildAlternates(`/artigos/${slug}`),
     }))
+  )
 
-  return [
-    rootEntry,
-    ...localizedPages,
-    ...articles,
-    ...documents,
-  ]
+  // 4. Documentos Públicos (PDFs de currículo)
+  const documents: MetadataRoute.Sitemap = SUPPORTED_LOCALES.map((locale) => ({
+    url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
+    lastModified,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }))
+
+  return [rootEntry, ...localizedPages, ...articles, ...documents]
 }
