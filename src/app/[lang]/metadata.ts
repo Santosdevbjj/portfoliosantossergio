@@ -59,8 +59,10 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     'es-MX': 'es_MX',
   };
 
-  const finalOgImage = `${SITE_URL}${ogImageMap[lang]}`;
+ // const finalOgImage = `${SITE_URL}${ogImageMap[lang]}`;
 
+  const finalOgImage = `https://portfoliosantossergio.vercel.app${ogImageMap[lang]}`;
+  
   // Hreflang para SEO Internacional
   const languages = SUPPORTED_LOCALES.reduce((acc, loc) => {
     acc[loc] = `${SITE_URL}/${loc}`;
