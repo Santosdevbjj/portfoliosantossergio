@@ -72,7 +72,11 @@ export default async function ArticlesListPage({
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {articles.map((art) => {
                   const fullSlug = art.slug.join("/");
-                  const displayTitle = art.slug[art.slug.length - 1].replace(/-/g, ' ');
+                  
+                  // CORREÇÃO DO ERRO DE DEPLOY:
+                  // Garantimos que o título existe antes de aplicar o .replace()
+                  const lastSegment = art.slug[art.slug.length - 1] || "artigo";
+                  const displayTitle = lastSegment.replace(/-/g, ' ');
 
                   return (
                     <Link 
