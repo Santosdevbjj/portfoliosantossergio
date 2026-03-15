@@ -40,7 +40,8 @@ export const viewport: Viewport = {
 
 /**
  * SEO & METADATA INTEGRATION
- * Corrigindo og:url, og:type e garantindo descrições > 100 caracteres
+ * Integrando correções para LinkedIn (descrição > 100 caracteres)
+ * e Meta/Facebook (og:type, og:url e fb:app_id com 'property')
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -51,13 +52,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
   const fullUrl = `${siteUrl}/${locale}`;
 
-  // Fallback para descrição > 100 caracteres conforme exigência do LinkedIn
+  // Garante descrição > 100 caracteres para o LinkedIn Post Inspector
   const baseDescription = dict?.meta?.description ?? "Portfolio de Sérgio Santos";
   const longDescription = baseDescription.length < 100 
     ? `${baseDescription}. Especialista em Ciência de Dados, IA Generativa e Engenharia de Software de alto desempenho.` 
     : baseDescription;
 
-  // Mapa de locales para o formato da Meta (Facebook/WhatsApp)
+  // Mapeamento preciso para Open Graph Locales (Meta Standard)
   const ogLocaleMap: Record<string, string> = {
     'pt-BR': 'pt_BR',
     'en-US': 'en_US',
@@ -79,19 +80,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: pageTitle,
       description: longDescription,
-      url: fullUrl, // CORRIGE og:url
+      url: fullUrl,
       siteName: "Sérgio Santos Portfolio",
-      locale: ogLocaleMap[locale] || 'pt_BR', // CORRIGE locale para formato Meta (ex: pt_BR)
-      type: "website", // CORRIGE og:type
+      locale: ogLocaleMap[locale] || 'pt_BR',
+      type: "website", // Essencial para Meta/LinkedIn
       images: [
         {
-          url: `/og/og-image-${locale}.png`, // Nova estrutura da pasta /og/
+          url: `/og/og-image-${locale}.png`,
           width: 1200,
           height: 630,
           alt: `Portfolio Sérgio Santos - ${locale}`,
           type: 'image/png',
         },
       ],
+    },
+    // SOLUÇÃO PARA fb:app_id: Usando a chave nativa 'facebook' o Next.js 
+    // renderiza <meta property="fb:app_id" /> em vez de 'name'
+    facebook: {
+      appId: '672839201123456', 
     },
     twitter: {
       card: "summary_large_image",
@@ -110,10 +116,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         { url: '/icons/apple-icon.png', sizes: '180x180' },
       ],
     },
-    other: {
-      // fb:app_id opcional - se tiver um ID real da Meta, coloque aqui
-      'fb:app_id': '672839201123456', 
-    }
   };
 }
 
@@ -202,7 +204,6 @@ export default async function HomePage({ params }: PageProps) {
           )}
         </section>
 
-        {/* --- SEÇÃO "PONTE" PARA ARTIGOS --- */}
         <section id="articles" className="py-20 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-4xl md:text-5xl font-black uppercase italic mb-6 text-slate-900 dark:text-white">
