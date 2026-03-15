@@ -1,4 +1,7 @@
-import { Metadata } from "next";
+// src/app/[lang]/artigos/[...slug]/page.tsx
+
+// Correção do erro de build: Uso obrigatório de 'import type' para tipos no TS 6.0
+import type { Metadata } from "next";
 import { getArticleContent } from "@/lib/github";
 import { getAllArticlesRecursively } from "@/lib/github-scanner";
 import ReactMarkdown from "react-markdown";
@@ -12,6 +15,7 @@ import type { Locale } from "@/types/dictionary";
 
 /**
  * TIPAGEM COMPATÍVEL COM NEXT.JS 16 E REACT 19
+ * Params e SearchParams agora são Promises.
  */
 interface PageProps {
   params: Promise<{ slug: string[]; lang: string }>;
@@ -19,22 +23,21 @@ interface PageProps {
 
 /**
  * 1. METADADOS DINÂMICOS (SEO & REDES SOCIAIS)
- * Integrado com a API de OG dinâmica para evitar erros de Catch-all no build.
+ * Totalmente multilíngue e compatível com o Route Handler de imagem OG.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, slug } = await params;
   const fullSlug = slug.join("/");
   
-  // URL Base para produção
   const siteUrl = "https://portfoliosantossergio.vercel.app";
   const fullUrl = `${siteUrl}/${lang}/artigos/${fullSlug}`;
   
-  // Endpoint da API de Imagem OG dinâmica que criamos
+  // URL da API de imagem dinâmica (Route Handler) com suporte a todos os idiomas
   const ogImageUrl = `${siteUrl}/api/og/article?lang=${lang}&slug=${encodeURIComponent(fullSlug)}`;
 
-  // Extração de título amigável para SEO a partir do slug
+  // Formatação de título para SEO
   const cleanTitle = slug[slug.length - 1].replace(/-/g, " ").toUpperCase();
-  const description = `Artigo técnico sobre ${cleanTitle.toLowerCase()}. Explore conteúdos de Ciência de Dados e Engenharia de Software no portfólio de Sérgio Santos.`;
+  const description = `Artigo técnico sobre ${cleanTitle.toLowerCase()}. Leia no portfólio de Sérgio Santos (Next.js 16/React 19).`;
 
   return {
     title: `${cleanTitle} | Sérgio Santos`,
@@ -49,7 +52,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: "Sérgio Santos | Portfolio",
       type: "article",
       authors: ["Sérgio Santos"],
-      locale: lang.replace("-", "_"),
+      publishedTime: new Date().toISOString(),
+      locale: lang.replace("-", "_"), // Ex: pt_BR, es_ES, es_AR, es_MX
       images: [
         {
           url: ogImageUrl,
@@ -70,12 +74,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 /**
  * 2. GERAÇÃO ESTÁTICA DINÂMICA (SSG)
- * Percorre o GitHub via scanner e informa ao Next.js quais rotas devem ser pré-renderizadas.
+ * Percorre o GitHub via scanner para todos os idiomas suportados.
  */
 export async function generateStaticParams() {
   const articles = await getAllArticlesRecursively();
   
-  // Criamos as rotas combinando cada idioma suportado com cada artigo do GitHub
+  // Combina idiomas (PT, EN, ES-ES, ES-AR, ES-MX) com os slugs do GitHub
   const paths = articles.flatMap((art) => 
     SUPPORTED_LOCALES.map((locale) => ({
       lang: locale,
@@ -88,49 +92,46 @@ export async function generateStaticParams() {
 
 /**
  * 3. COMPONENTE DE PÁGINA (SERVER COMPONENT)
- * ✔ Estilização com Tailwind CSS v4.2 (Prose/Typography)
- * ✔ Renderização de Markdown GFM
- * ✔ Suporte total a I18n
+ * Otimizado para Node 24 e Tailwind CSS 4.2.
  */
 export default async function ArtigoDetalhePage(props: PageProps) {
-  // Params como Promise (Padrão React 19 / Next.js 16)
+  // Padrão React 19: await nos params
   const { slug, lang: rawLang } = await props.params;
   
   const lang = normalizeLocale(rawLang) as Locale;
   const dict = await getServerDictionary(lang);
 
-  // Busca o conteúdo bruto do Markdown diretamente do repositório
+  // Fetch do conteúdo Markdown do repositório
   const content = await getArticleContent(slug);
 
   if (!content) {
     return notFound();
   }
 
-  // Extração do título para o componente de compartilhamento
+  // Lógica de título para o ShareArticle
   const titleMatch = content.match(/^#\s+(.*)$/m);
   const articleTitle = titleMatch?.[1]?.trim() ?? slug[slug.length - 1].replace(/-/g, " ");
 
   return (
     <MdxLayout lang={lang} dict={dict}>
-      <article className="container mx-auto py-12 max-w-4xl px-4 animate-in fade-in duration-700">
+      <article className="container mx-auto py-12 max-w-4xl px-4 overflow-hidden">
         
-        {/* CONTEÚDO DO ARTIGO - OTIMIZADO PARA TAILWIND v4.2 */}
+        {/* CONTEÚDO DO ARTIGO - TAILWIND 4.2 + TYPOGRAPHY */}
         <div className="prose prose-slate dark:prose-invert max-w-none 
           prose-blue prose-headings:scroll-mt-32 
-          prose-img:rounded-3xl prose-img:shadow-2xl
+          prose-img:rounded-2xl prose-img:shadow-lg
           prose-a:text-blue-600 dark:prose-a:text-blue-400
-          selection:bg-blue-500/30 text-slate-900 dark:text-slate-100">
+          selection:bg-blue-500/20 text-slate-900 dark:text-slate-100
+          transition-colors duration-300">
           
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {content}
           </ReactMarkdown>
         </div>
         
-        {/* RODAPÉ: COMPARTILHAMENTO SOCIAIS */}
+        {/* RODAPÉ INTEGRADO */}
         <footer className="mt-20 pt-10 border-t border-slate-200 dark:border-slate-800">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <ShareArticle title={articleTitle} dict={dict} lang={lang} />
-          </div>
+          <ShareArticle title={articleTitle} dict={dict} lang={lang} />
         </footer>
       </article>
     </MdxLayout>
