@@ -4,6 +4,7 @@ import {
   SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
 } from "@/dictionaries/locales"
+import { getAllArticlesRecursively } from "@/lib/github-scanner"
 
 const baseUrl = "https://portfoliosantossergio.vercel.app"
 const lastModified = new Date()
@@ -21,32 +22,6 @@ const pages = [
 ] as const
 
 /**
- * LISTA DE ARTIGOS (Sincronizado com seu repositório GitHub Santosdevbjj/myArticles)
- * Estrutura: categoria/nome-do-arquivo
- */
-const articleRoutes = [
-  "autoconhecimento/aprend-continuo",
-  "autoconhecimento/home-office",
-  "autoconhecimento/inteligencia-emocional",
-  "aws-artigos/microsservicos-aws-step-functions",
-  "azure-cloud-native/azure-cloud-native-article",
-  "data-artigos/dados-para-reduzir-custos",
-  "data-artigos/privacidade-de-dados",
-  "dio_Campus_Expert_14/analise-grafos-carreira",
-  "dio_Campus_Expert_14/conclusao-dio-Campus-Expert14",
-  "dio_Campus_Expert_14/contrato-compromisso",
-  "dio_Campus_Expert_14/neo4J-dados-conectados",
-  "dio_Campus_Expert_14/resultados-concretos-jornada",
-  "dotnet-artigos/visual-studio-vscode-guia-das-ides",
-  "ia-artigos/ia-generativa-com-sete-guardrails",
-  "ia-artigos/implementar-ia-generativa-com-eficiencia",
-  "java-artigos/java-pensar-como-engenheiro-software",
-  "low_code/low-code-saude",
-  "python-artigos/pycharm-spyder-vscode-ides",
-  "typescript-artigos/typescript-strict-padrao",
-]
-
-/**
  * CONSTRUTOR DE ALTERNATES (SEO Internacional)
  * Gera os links hreflang para que o Google entenda as versões traduzidas
  */
@@ -62,7 +37,7 @@ function buildAlternates(pathname: string) {
   return { languages }
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   
   // 1. Entrada da Raiz (https://portfoliosantossergio.vercel.app)
   const rootEntry: MetadataRoute.Sitemap[number] = {
@@ -87,16 +62,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })
   )
 
-  // 3. Artigos Dinâmicos (Mapeados das subpastas do GitHub)
-  const articles: MetadataRoute.Sitemap = articleRoutes.flatMap((slug) =>
-    SUPPORTED_LOCALES.map((locale) => ({
-      url: `${baseUrl}/${locale}/artigos/${slug}`,
+  // 3. Artigos Dinâmicos (Buscados automaticamente do GitHub via Scanner)
+  // Agora o scanner varre pastas e subpastas recursivamente
+  const dynamicArticlesData = await getAllArticlesRecursively();
+
+  const articles: MetadataRoute.Sitemap = dynamicArticlesData.flatMap((art) => {
+    const slugPath = art.slug.join("/");
+    return SUPPORTED_LOCALES.map((locale) => ({
+      url: `${baseUrl}/${locale}/artigos/${slugPath}`,
       lastModified,
       changeFrequency: "monthly",
       priority: 0.7,
-      alternates: buildAlternates(`/artigos/${slug}`),
+      alternates: buildAlternates(`/artigos/${slugPath}`),
     }))
-  )
+  })
 
   // 4. Documentos Públicos (Currículos PDF na pasta public/)
   const documents: MetadataRoute.Sitemap = SUPPORTED_LOCALES.map((locale) => ({
