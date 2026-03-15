@@ -58,8 +58,12 @@ export default async function ArticlesListPage({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {articleRoutes.map((fullSlug) => {
-            // Extrai a categoria e o título para exibição
-            const [category, slug] = fullSlug.split("/");
+            // Correção do Erro de Tipagem:
+            // Dividimos o path e garantimos valores padrão caso o split falhe
+            const parts = fullSlug.split("/");
+            const category = parts[0] || "Geral";
+            const slug = parts[1] || parts[0]; // Usa a categoria como slug se não houver segunda parte
+            
             const displayTitle = slug.replace(/-/g, ' ');
 
             return (
