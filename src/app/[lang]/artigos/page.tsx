@@ -9,7 +9,6 @@ import type { Locale } from "@/types/dictionary";
  * Integração baseada na estrutura do repositório Santosdevbjj/myArticles
  */
 
-// Lista sincronizada com o seu sitemap.ts
 const articleRoutes = [
   "autoconhecimento/aprend-continuo",
   "autoconhecimento/home-office",
@@ -40,7 +39,6 @@ export default async function ArticlesListPage({
   const { lang } = await params;
   const locale = lang as Locale;
   
-  // Busca o dicionário para traduções de UI
   const dict = await getServerDictionary(locale);
 
   return (
@@ -58,13 +56,14 @@ export default async function ArticlesListPage({
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {articleRoutes.map((fullSlug) => {
-            // Correção do Erro de Tipagem:
-            // Dividimos o path e garantimos valores padrão caso o split falhe
+            // SOLUÇÃO DEFINITIVA PARA O ERRO DE TIPAGEM:
+            // Usamos desestruturação com valores padrão para garantir que sejam strings
             const parts = fullSlug.split("/");
-            const category = parts[0] || "Geral";
-            const slug = parts[1] || parts[0]; // Usa a categoria como slug se não houver segunda parte
+            const category = parts[0] ?? "Geral";
+            const slugPart = parts[1] ?? parts[0] ?? "artigo";
             
-            const displayTitle = slug.replace(/-/g, ' ');
+            // Forçamos o TypeScript a entender que displayTitle é uma string
+            const displayTitle = String(slugPart).replace(/-/g, ' ');
 
             return (
               <Link 
@@ -74,7 +73,7 @@ export default async function ArticlesListPage({
               >
                 <div className="flex flex-col h-full">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-4 block">
-                    {category.replace(/-/g, ' ')}
+                    {String(category).replace(/-/g, ' ')}
                   </span>
                   
                   <h2 className="text-2xl font-bold capitalize text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
