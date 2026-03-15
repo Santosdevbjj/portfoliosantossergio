@@ -1,7 +1,7 @@
 // src/app/[lang]/page.tsx
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link"; // Importado para a nova seção
+import Link from "next/link"; 
 
 import type { Locale } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
@@ -15,7 +15,6 @@ import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import ExperienceSection from "@/components/ExperienceSection";
-import FeaturedArticleSection from "@/components/FeaturedArticleSection";
 import ContactSection from "@/components/ContactSection";
 
 import { PortfolioGrid } from "@/components/PortfolioGrid";
@@ -55,7 +54,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       canonical: `${siteUrl}/${locale}`,
       languages: Object.fromEntries(locales.map((l) => [l, `${siteUrl}/${l}`])),
     },
-    // INTEGRAÇÃO DAS OG IMAGES
     openGraph: {
       images: [
         {
@@ -164,7 +162,7 @@ export default async function HomePage({ params }: PageProps) {
         </section>
 
         {/* --- SEÇÃO "PONTE" PARA ARTIGOS --- */}
-        <section className="py-20 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
+        <section id="articles" className="py-20 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-4xl md:text-5xl font-black uppercase italic mb-6 text-slate-900 dark:text-white">
               Conhecimento <span className="text-blue-600">Compartilhado</span>
