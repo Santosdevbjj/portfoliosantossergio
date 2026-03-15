@@ -1,0 +1,2977 @@
+
+
+
+
+Não é melhor usarmos a versão mais recente da API?
+
+
+
+Vamos estudar a documentação oficial:
+
+https://docs.github.com/pt/rest/repos/contents?apiVersion=2026-03-10
+
+
+Skip to main content
+Documentos do GitHub
+API REST/
+Repositórios/
+Conteúdo
+A API REST agora é versionada. Para obter mais informações, confira "Sobre o controle de versão da API".
+Endpoints da API REST para conteúdo de repositório
+Use a API REST para criar, modificar e excluir conteúdo codificado em Base64 em um repositório.
+
+Get repository content
+Gets the contents of a file or directory in a repository. Specify the file path or directory with the path parameter. If you omit the path parameter, you will receive the contents of the repository's root directory.
+
+This endpoint supports the following custom media types. For more information, see "Media types."
+
+application/vnd.github.raw+json: Returns the raw file contents for files and symlinks.
+application/vnd.github.html+json: Returns the file contents in HTML. Markup languages are rendered to HTML using GitHub's open-source Markup library.
+application/vnd.github.object+json: Returns the contents in a consistent object format regardless of the content type. For example, instead of an array of objects for a directory, the response will be an object with an entries attribute containing the array of objects.
+If the content is a directory: The response will be an array of objects, one object for each item in the directory.
+
+If the content is a symlink and the symlink's target is a normal file in the repository, then the API responds with the content of the file. Otherwise, the API responds with an object describing the symlink itself.
+
+If the content is a submodule, the submodule_git_url field identifies the location of the submodule repository, and the sha identifies a specific commit within the submodule repository. Git uses the given URL when cloning the submodule repository, and checks out the submodule at that specific commit. If the submodule repository is not hosted on github.com, the Git URLs (git_url and _links["git"]) and the github.com URLs (html_url and _links["html"]) will have null values.
+
+Notes:
+
+To get a repository's contents recursively, you can recursively get the tree.
+This API has an upper limit of 1,000 files for a directory. If you need to retrieve more files, use the Git Trees API.
+Download URLs expire and are meant to be used just once. To ensure the download URL does not expire, please use the contents API to obtain a fresh download URL for each download.
+If the requested file's size is:
+1 MB or smaller: All features of this endpoint are supported.
+Between 1-100 MB: Only the raw or object custom media types are supported. Both will work as normal, except that when using the object media type, the content field will be an empty string and the encoding field will be "none". To get the contents of these larger files, use the raw media type.
+Greater than 100 MB: This endpoint is not supported.
+Tokens de acesso granular para "Get repository content"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (read)
+Esse endpoint pode ser usado sem autenticação ou permissões mencionadas acima, se apenas recursos públicos forem solicitados.
+
+Parâmetros para "Get repository content"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+path string Obrigatório
+path parameter
+
+Parâmetros de consulta
+Nome, Tipo, Descrição
+ref string
+The name of the commit/branch/tag. Default: the repository’s default branch.
+
+Códigos de status de resposta HTTP para "Get repository content"
+Código de status	Descrição
+200	
+OK
+
+302	
+Found
+
+304	
+Not modified
+
+403	
+Forbidden
+
+404	
+Resource not found
+
+Exemplos de código para "Get repository content"
+Exemplos de solicitação
+Select the example type
+get/repos/{owner}/{repo}/contents/{path}
+curl -L \ -H "Accept: application/vnd.github.object" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/contents/PATH
+Response if content is a file
+
+Status: 200
+{ "type": "file", "encoding": "base64", "size": 5362, "name": "README.md", "path": "README.md", "content": "IyBZb2dhIEJvmsgaW4gcHJvZ3Jlc3MhIEZlZWwgdAoKOndhcm5pbmc6IFdvc\\nZnJlZSBmUgdG8gY0byBjaGVjayBvdXQgdGhlIGFwcCwgYnV0IGJlIHN1c29t\\nZSBiYWNrIG9uY2UgaXQgaXMgY29tcGxldGUuCgpBIHdlYiBhcHAgdGhhdCBs\\nZWFkcyB5b3UgdGhyb3VnaCBhIHlvZ2Egc2Vzc2lvbi4KCltXb3Jrb3V0IG5v\\ndyFdKGh0dHBzOi8vc2tlZHdhcmRzODguZ2l0aHViLmlvL3lvZ2EvKQoKPGlt\\nZyBzcmM9InNyYy9pbWFnZXMvbWFza2FibGVfaWNvbl81MTIucG5nIiBhbHQ9\\nImJvdCBsaWZ0aW5nIHdlaWdodHMiIHdpZHRoPSIxMDAiLz4KCkRvIHlvdSBo\\nYXZlIGZlZWRiYWNrIG9yIGlkZWFzIGZvciBpbXByb3ZlbWVudD8gW09wZW4g\\nYW4gaXNzdWVdKGh0dHBzOi8vZ2l0aHViLmNvbS9za2Vkd2FyZHM4OC95b2dh\\nL2lzc3Vlcy9uZXcpLgoKV2FudCBtb3JlIGdhbWVzPyBWaXNpdCBbQ25TIEdh\\nbWVzXShodHRwczovL3NrZWR3YXJkczg4LmdpdGh1Yi5pby9wb3J0Zm9saW8v\\nKS4KCiMjIERldmVsb3BtZW50CgpUbyBhZGQgYSBuZXcgcG9zZSwgYWRkIGFu\\nIGVudHJ5IHRvIHRoZSByZWxldmFudCBmaWxlIGluIGBzcmMvYXNhbmFzYC4K\\nClRvIGJ1aWxkLCBydW4gYG5wbSBydW4gYnVpbGRgLgoKVG8gcnVuIGxvY2Fs\\nbHkgd2l0aCBsaXZlIHJlbG9hZGluZyBhbmQgbm8gc2VydmljZSB3b3JrZXIs\\nIHJ1biBgbnBtIHJ1biBkZXZgLiAoSWYgYSBzZXJ2aWNlIHdvcmtlciB3YXMg\\ncHJldmlvdXNseSByZWdpc3RlcmVkLCB5b3UgY2FuIHVucmVnaXN0ZXIgaXQg\\naW4gY2hyb21lIGRldmVsb3BlciB0b29sczogYEFwcGxpY2F0aW9uYCA+IGBT\\nZXJ2aWNlIHdvcmtlcnNgID4gYFVucmVnaXN0ZXJgLikKClRvIHJ1biBsb2Nh\\nbGx5IGFuZCByZWdpc3RlciB0aGUgc2VydmljZSB3b3JrZXIsIHJ1biBgbnBt\\nIHN0YXJ0YC4KClRvIGRlcGxveSwgcHVzaCB0byBgbWFpbmAgb3IgbWFudWFs\\nbHkgdHJpZ2dlciB0aGUgYC5naXRodWIvd29ya2Zsb3dzL2RlcGxveS55bWxg\\nIHdvcmtmbG93Lgo=\\n", "sha": "3d21ec53a331a6f037a91c368710b99387d012c1", "url": "https://api.github.com/repos/octokit/octokit.rb/contents/README.md", "git_url": "https://api.github.com/repos/octokit/octokit.rb/git/blobs/3d21ec53a331a6f037a91c368710b99387d012c1", "html_url": "https://github.com/octokit/octokit.rb/blob/master/README.md", "download_url": "https://raw.githubusercontent.com/octokit/octokit.rb/master/README.md", "_links": { "git": "https://api.github.com/repos/octokit/octokit.rb/git/blobs/3d21ec53a331a6f037a91c368710b99387d012c1", "self": "https://api.github.com/repos/octokit/octokit.rb/contents/README.md", "html": "https://github.com/octokit/octokit.rb/blob/master/README.md" } }
+Create or update file contents
+Creates a new file or replaces an existing file in a repository.
+
+Note
+
+If you use this endpoint and the "Delete a file" endpoint in parallel, the concurrent requests will conflict and you will receive errors. You must use these endpoints serially instead.
+
+OAuth app tokens and personal access tokens (classic) need the repo scope to use this endpoint. The workflow scope is also required in order to modify files in the .github/workflows directory.
+
+Tokens de acesso granular para "Create or update file contents"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter pelo menos um dos seguintes conjuntos de permissões:
+
+"Contents" repository permissions (write)
+"Contents" repository permissions (write) and "Workflows" repository permissions (write)
+Parâmetros para "Create or update file contents"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+path string Obrigatório
+path parameter
+
+Parâmetros do corpo
+Nome, Tipo, Descrição
+message string Obrigatório
+The commit message.
+
+content string Obrigatório
+The new file content, using Base64 encoding.
+
+sha string
+Required if you are updating a file. The blob SHA of the file being replaced.
+
+branch string
+The branch name. Default: the repository’s default branch.
+
+committer object
+The person that committed the file. Default: the authenticated user.
+
+Properties of committer
+author object
+The author of the file. Default: The committer or the authenticated user if you omit committer.
+
+Properties of author
+Códigos de status de resposta HTTP para "Create or update file contents"
+Código de status	Descrição
+200	
+OK
+
+201	
+Created
+
+404	
+Resource not found
+
+409	
+Conflict
+
+422	
+Validation failed, or the endpoint has been spammed.
+
+Exemplos de código para "Create or update file contents"
+Exemplos de solicitação
+Select the example type
+put/repos/{owner}/{repo}/contents/{path}
+curl -L \ -X PUT \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/contents/PATH \ -d '{"message":"my commit message","committer":{"name":"Monalisa Octocat","email":"octocat@github.com"},"content":"bXkgbmV3IGZpbGUgY29udGVudHM="}'
+Response
+
+Status: 201
+{ "content": { "name": "hello.txt", "path": "notes/hello.txt", "sha": "95b966ae1c166bd92f8ae7d1c313e738c731dfc3", "size": 9, "url": "https://api.github.com/repos/octocat/Hello-World/contents/notes/hello.txt", "html_url": "https://github.com/octocat/Hello-World/blob/master/notes/hello.txt", "git_url": "https://api.github.com/repos/octocat/Hello-World/git/blobs/95b966ae1c166bd92f8ae7d1c313e738c731dfc3", "download_url": "https://raw.githubusercontent.com/octocat/HelloWorld/master/notes/hello.txt", "type": "file", "_links": { "self": "https://api.github.com/repos/octocat/Hello-World/contents/notes/hello.txt", "git": "https://api.github.com/repos/octocat/Hello-World/git/blobs/95b966ae1c166bd92f8ae7d1c313e738c731dfc3", "html": "https://github.com/octocat/Hello-World/blob/master/notes/hello.txt" } }, "commit": { "sha": "7638417db6d59f3c431d3e1f261cc637155684cd", "node_id": "MDY6Q29tbWl0NzYzODQxN2RiNmQ1OWYzYzQzMWQzZTFmMjYxY2M2MzcxNTU2ODRjZA==", "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/7638417db6d59f3c431d3e1f261cc637155684cd", "html_url": "https://github.com/octocat/Hello-World/git/commit/7638417db6d59f3c431d3e1f261cc637155684cd", "author": { "date": "2014-11-07T22:01:45Z", "name": "Monalisa Octocat", "email": "octocat@github.com" }, "committer": { "date": "2014-11-07T22:01:45Z", "name": "Monalisa Octocat", "email": "octocat@github.com" }, "message": "my commit message", "tree": { "url": "https://api.github.com/repos/octocat/Hello-World/git/trees/691272480426f78a0138979dd3ce63b77f706feb", "sha": "691272480426f78a0138979dd3ce63b77f706feb" }, "parents": [ { "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/1acc419d4d6a9ce985db7be48c6349a0475975b5", "html_url": "https://github.com/octocat/Hello-World/git/commit/1acc419d4d6a9ce985db7be48c6349a0475975b5", "sha": "1acc419d4d6a9ce985db7be48c6349a0475975b5" } ], "verification": { "verified": false, "reason": "unsigned", "signature": null, "payload": null, "verified_at": null } } }
+Delete a file
+Deletes a file in a repository.
+
+You can provide an additional committer parameter, which is an object containing information about the committer. Or, you can provide an author parameter, which is an object containing information about the author.
+
+The author section is optional and is filled in with the committer information if omitted. If the committer information is omitted, the authenticated user's information is used.
+
+You must provide values for both name and email, whether you choose to use author or committer. Otherwise, you'll receive a 422 status code.
+
+Note
+
+If you use this endpoint and the "Create or update file contents" endpoint in parallel, the concurrent requests will conflict and you will receive errors. You must use these endpoints serially instead.
+
+Tokens de acesso granular para "Delete a file"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter pelo menos um dos seguintes conjuntos de permissões:
+
+"Contents" repository permissions (write)
+"Contents" repository permissions (write) and "Workflows" repository permissions (write)
+Parâmetros para "Delete a file"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+path string Obrigatório
+path parameter
+
+Parâmetros do corpo
+Nome, Tipo, Descrição
+message string Obrigatório
+The commit message.
+
+sha string Obrigatório
+The blob SHA of the file being deleted.
+
+branch string
+The branch name. Default: the repository’s default branch
+
+committer object
+object containing information about the committer.
+
+Properties of committer
+author object
+object containing information about the author.
+
+Properties of author
+Códigos de status de resposta HTTP para "Delete a file"
+Código de status	Descrição
+200	
+OK
+
+404	
+Resource not found
+
+409	
+Conflict
+
+422	
+Validation failed, or the endpoint has been spammed.
+
+503	
+Service unavailable
+
+Exemplos de código para "Delete a file"
+Exemplo de solicitação
+delete/repos/{owner}/{repo}/contents/{path}
+curl -L \ -X DELETE \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/contents/PATH \ -d '{"message":"my commit message","committer":{"name":"Monalisa Octocat","email":"octocat@github.com"},"sha":"329688480d39049927147c162b9d2deaf885005f"}'
+Response
+
+Status: 200
+{ "content": null, "commit": { "sha": "7638417db6d59f3c431d3e1f261cc637155684cd", "node_id": "MDY6Q29tbWl0NzYzODQxN2RiNmQ1OWYzYzQzMWQzZTFmMjYxY2M2MzcxNTU2ODRjZA==", "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/7638417db6d59f3c431d3e1f261cc637155684cd", "html_url": "https://github.com/octocat/Hello-World/git/commit/7638417db6d59f3c431d3e1f261cc637155684cd", "author": { "date": "2014-11-07T22:01:45Z", "name": "Monalisa Octocat", "email": "octocat@github.com" }, "committer": { "date": "2014-11-07T22:01:45Z", "name": "Monalisa Octocat", "email": "octocat@github.com" }, "message": "my commit message", "tree": { "url": "https://api.github.com/repos/octocat/Hello-World/git/trees/691272480426f78a0138979dd3ce63b77f706feb", "sha": "691272480426f78a0138979dd3ce63b77f706feb" }, "parents": [ { "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/1acc419d4d6a9ce985db7be48c6349a0475975b5", "html_url": "https://github.com/octocat/Hello-World/git/commit/1acc419d4d6a9ce985db7be48c6349a0475975b5", "sha": "1acc419d4d6a9ce985db7be48c6349a0475975b5" } ], "verification": { "verified": false, "reason": "unsigned", "signature": null, "payload": null, "verified_at": null } } }
+Get a repository README
+Gets the preferred README for a repository.
+
+This endpoint supports the following custom media types. For more information, see "Media types."
+
+application/vnd.github.raw+json: Returns the raw file contents. This is the default if you do not specify a media type.
+application/vnd.github.html+json: Returns the README in HTML. Markup languages are rendered to HTML using GitHub's open-source Markup library.
+Tokens de acesso granular para "Get a repository README"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (read)
+Esse endpoint pode ser usado sem autenticação ou permissões mencionadas acima, se apenas recursos públicos forem solicitados.
+
+Parâmetros para "Get a repository README"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+Parâmetros de consulta
+Nome, Tipo, Descrição
+ref string
+The name of the commit/branch/tag. Default: the repository’s default branch.
+
+Códigos de status de resposta HTTP para "Get a repository README"
+Código de status	Descrição
+200	
+OK
+
+304	
+Not modified
+
+404	
+Resource not found
+
+422	
+Validation failed, or the endpoint has been spammed.
+
+Exemplos de código para "Get a repository README"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/readme
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/readme
+Response
+
+Status: 200
+{ "type": "file", "encoding": "base64", "size": 5362, "name": "README.md", "path": "README.md", "content": "encoded content ...", "sha": "3d21ec53a331a6f037a91c368710b99387d012c1", "url": "https://api.github.com/repos/octokit/octokit.rb/contents/README.md", "git_url": "https://api.github.com/repos/octokit/octokit.rb/git/blobs/3d21ec53a331a6f037a91c368710b99387d012c1", "html_url": "https://github.com/octokit/octokit.rb/blob/master/README.md", "download_url": "https://raw.githubusercontent.com/octokit/octokit.rb/master/README.md", "_links": { "git": "https://api.github.com/repos/octokit/octokit.rb/git/blobs/3d21ec53a331a6f037a91c368710b99387d012c1", "self": "https://api.github.com/repos/octokit/octokit.rb/contents/README.md", "html": "https://github.com/octokit/octokit.rb/blob/master/README.md" } }
+Get a repository README for a directory
+Gets the README from a repository directory.
+
+This endpoint supports the following custom media types. For more information, see "Media types."
+
+application/vnd.github.raw+json: Returns the raw file contents. This is the default if you do not specify a media type.
+application/vnd.github.html+json: Returns the README in HTML. Markup languages are rendered to HTML using GitHub's open-source Markup library.
+Tokens de acesso granular para "Get a repository README for a directory"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (read)
+Esse endpoint pode ser usado sem autenticação ou permissões mencionadas acima, se apenas recursos públicos forem solicitados.
+
+Parâmetros para "Get a repository README for a directory"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+dir string Obrigatório
+The alternate path to look for a README file
+
+Parâmetros de consulta
+Nome, Tipo, Descrição
+ref string
+The name of the commit/branch/tag. Default: the repository’s default branch.
+
+Códigos de status de resposta HTTP para "Get a repository README for a directory"
+Código de status	Descrição
+200	
+OK
+
+404	
+Resource not found
+
+422	
+Validation failed, or the endpoint has been spammed.
+
+Exemplos de código para "Get a repository README for a directory"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/readme/{dir}
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/readme/DIR
+Response
+
+Status: 200
+{ "type": "file", "encoding": "base64", "size": 5362, "name": "README.md", "path": "README.md", "content": "encoded content ...", "sha": "3d21ec53a331a6f037a91c368710b99387d012c1", "url": "https://api.github.com/repos/octokit/octokit.rb/contents/README.md", "git_url": "https://api.github.com/repos/octokit/octokit.rb/git/blobs/3d21ec53a331a6f037a91c368710b99387d012c1", "html_url": "https://github.com/octokit/octokit.rb/blob/master/README.md", "download_url": "https://raw.githubusercontent.com/octokit/octokit.rb/master/README.md", "_links": { "git": "https://api.github.com/repos/octokit/octokit.rb/git/blobs/3d21ec53a331a6f037a91c368710b99387d012c1", "self": "https://api.github.com/repos/octokit/octokit.rb/contents/README.md", "html": "https://github.com/octokit/octokit.rb/blob/master/README.md" } }
+Download a repository archive (tar)
+Gets a redirect URL to download a tar archive for a repository. If you omit :ref, the repository’s default branch (usually main) will be used. Please make sure your HTTP framework is configured to follow redirects or you will need to use the Location header to make a second GET request.
+
+Note
+
+For private repositories, these links are temporary and expire after five minutes.
+
+Tokens de acesso granular para "Download a repository archive (tar)"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (read)
+Esse endpoint pode ser usado sem autenticação ou permissões mencionadas acima, se apenas recursos públicos forem solicitados.
+
+Parâmetros para "Download a repository archive (tar)"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+ref string Obrigatório
+Códigos de status de resposta HTTP para "Download a repository archive (tar)"
+Código de status	Descrição
+302	
+Found
+
+Exemplos de código para "Download a repository archive (tar)"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/tarball/{ref}
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/tarball/REF
+Response
+
+Status: 302
+Download a repository archive (zip)
+Gets a redirect URL to download a zip archive for a repository. If you omit :ref, the repository’s default branch (usually main) will be used. Please make sure your HTTP framework is configured to follow redirects or you will need to use the Location header to make a second GET request.
+
+Note
+
+For private repositories, these links are temporary and expire after five minutes. If the repository is empty, you will receive a 404 when you follow the redirect.
+
+Tokens de acesso granular para "Download a repository archive (zip)"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (read)
+Esse endpoint pode ser usado sem autenticação ou permissões mencionadas acima, se apenas recursos públicos forem solicitados.
+
+Parâmetros para "Download a repository archive (zip)"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+ref string Obrigatório
+Códigos de status de resposta HTTP para "Download a repository archive (zip)"
+Código de status	Descrição
+302	
+Found
+
+Exemplos de código para "Download a repository archive (zip)"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/zipball/{ref}
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/zipball/REF
+Response
+
+Status: 302
+Ajuda e suporte
+Você encontrou o que precisava?
+
+Política de privacidade
+Ainda precisa de ajuda?
+Pergunte à comunidade do GitHub
+Contate o suporte
+Legal
+Parte desse conteúdo pode ser traduzida por computador ou IA.
+
+© 2026 GitHub, Inc.
+Termos
+Privacidade
+Status
+Preços
+Serviços especializados
+Blog
+Endpoints da API REST para conteúdo de repositório - Documentos do GitHub
+
+
+
+
+
+
+
+
+
+
+
+https://docs.github.com/pt/rest/about-the-rest-api/api-versions?apiVersion=2026-03-10
+
+
+
+Skip to main content
+Documentos do GitHub
+API REST/
+Sobre a API REST/
+Versões da API
+Versões da API
+Saiba como especificar qual versão da API REST usar sempre que fizer uma solicitação à API REST.
+
+Neste artigo
+Sobre o controle de versão da API
+A API REST do GitHub tem controle de versão. O nome da versão da API é baseado na data em que a versão da API foi lançada. Por exemplo, a versão 2026-03-10 da API foi lançada em Tue, 10 Mar 2026.
+
+Alterações interruptivas são alterações que podem potencialmente interromper uma integração. Forneceremos aviso prévio antes de liberar alterações significativas. As alterações interruptivas incluem:
+
+Removendo uma operação inteira
+Removendo ou renomeando um parâmetro
+Removendo ou renomeando um campo de resposta
+Adicionando um novo parâmetro obrigatório
+Tornando necessário um parâmetro que era opcional
+Alterando o tipo de um parâmetro ou campo de resposta
+Removendo valores de enumeração
+Adicionando uma nova regra de validação a um parâmetro existente
+Alterando os requisitos de autenticação ou autorização
+Quaisquer alterações aditivas (não interruptivas) estarão disponíveis em todas as versões da API com suporte. Alterações aditivas são alterações que não devem interromper uma integração. As alterações aditivas incluem:
+
+Adicionando uma operação
+Adicionando um parâmetro opcional
+Adicionando um cabeçalho de solicitação opcional
+Adicionando um campo de resposta
+Adicionando um cabeçalho de resposta
+Adicionando valores de enumeração
+Quando uma nova versão da API REST for lançada, a versão anterior da API terá suporte por pelo menos mais 24 meses após o lançamento da nova versão da API.
+
+Especificando uma versão da API
+Você deve usar o cabeçalho X-GitHub-Api-Version para especificar uma versão da API. Por exemplo:
+
+curl --header "X-GitHub-Api-Version:2026-03-10" https://api.github.com/zen
+As solicitações sem o cabeçalho X-GitHub-Api-Version usarão a versão 2022-11-28 padrão.
+
+Se você especificar uma versão da API que não tem mais suporte, receberá um erro 400.
+
+Atualizando para o nova versão da API
+Antes de atualizar para uma nova versão da API REST, leia o log de alterações significativas da nova versão da API para entender quais mudanças significativas estão incluídas e como atualizar para essa versão específica da API. Para saber mais, confira Alterações de quebra.
+
+Ao atualizar sua integração para especificar a nova versão da API no cabeçalho X-GitHub-Api-Version, você também precisará fazer as alterações necessárias para que sua integração funcione com a nova versão da API.
+
+Após a atualização da integração, teste sua integração para verificar se ela funciona com a nova versão da API.
+
+Versões de API com suporte
+No momento, há suporte para as seguintes versões da API REST:
+
+2026-03-10 2022-11-28
+
+Você também pode fazer uma solicitação de API para obter todas as versões de API com suporte. Para saber mais, confira Pontos de extremidade da API REST para metadados.
+
+Ajuda e suporte
+Você encontrou o que precisava?
+
+Política de privacidade
+Ainda precisa de ajuda?
+Pergunte à comunidade do GitHub
+Contate o suporte
+Legal
+Parte desse conteúdo pode ser traduzida por computador ou IA.
+
+© 2026 GitHub, Inc.
+Termos
+Privacidade
+Status
+Preços
+Serviços especializados
+Blog
+Versões da API - Documentos do GitHub
+
+
+
+
+
+
+
+
+
+https://docs.github.com/pt/rest/about-the-rest-api/breaking-changes?apiVersion=2026-03-10
+
+
+
+Skip to main content
+Documentos do GitHub
+API REST/
+Sobre a API REST/
+Alterações de quebra
+Alterações de quebra
+Saiba mais sobre as mudanças de ruptura introduzidas em cada versão da API REST.
+
+Neste artigo
+About breaking changes in the REST API
+The GitHub REST API is versioned. The API version name is based on the date when the API version was released. For example, the API version 2026-03-10 was released on Tue, 10 Mar 2026.
+
+Breaking changes are changes that can potentially break an integration. We will provide advance notice before releasing breaking changes. Breaking changes include:
+
+Removing an entire operation
+Removing or renaming a parameter
+Removing or renaming a response field
+Adding a new required parameter
+Making a previously optional parameter required
+Changing the type of a parameter or response field
+Removing enum values
+Adding a new validation rule to an existing parameter
+Changing authentication or authorization requirements
+Any additive (non-breaking) changes will be available in all supported API versions. Additive changes are changes that should not break an integration. Additive changes include:
+
+Adding an operation
+Adding an optional parameter
+Adding an optional request header
+Adding a response field
+Adding a response header
+Adding enum values
+When a new REST API version is released, the previous API version will be supported for at least 24 more months following the release of the new API version.
+
+For more information about API versions, see API Versions.
+
+Upgrading to a new API version
+Before upgrading to a new REST API version, you should read the section on this page that corresponds to the new API version to understand what breaking changes are included and to learn more about how to upgrade to that API version.
+
+When you update your integration to specify the new API version in the X-GitHub-Api-Version header, you'll also need to make any changes required for your integration to work with the new API version.
+
+Once your integration is updated, test your integration to verify that it works with the new API version.
+
+Version 2026-03-10
+Remove deprecated rate property from rate limit endpoint The rate property has been deprecated since 2021 and duplicates information available in the resources.core property. To migrate, update your integration to read rate limit information from resources.core instead of rate.
+
+See https://docs.github.com/rest/rate-limit for updated documentation.
+
+Affected endpoints
+Remove deprecated permission property from request when a team is created
+
+Affected endpoints
+Updates the "Get repository content" API, so that, when listing the contents of a directory, submodules have the type "submodule" instead of the type "file"
+
+Affected endpoints
+Change Content-Type of SARIF response When trying to receive the SARIF upload by setting the Accept header to application/sarif+json the response Content-Type would incorrectly be set to application/json+sarif. This change corrects this so the response Content-Type in this case becomes application/sarif+json.
+
+For more information, see "Get a code scanning analysis for a repository" in the REST API documentation.
+
+Remove deprecated use_squash_pr_title_as_default property from repo settings endpoints This property has been replaced by squash_merge_commit_title.
+
+Affected endpoints
+Remove authorizations_url from the API root (GET /) The OAuth Authorization API has been deprecated since 2020.
+
+Affected endpoints
+Deprecate support for the beta media type This media type was officially deprecated in 2014. However, there are still remnants of its use that modify response payloads. The following response properties are deprecated as a result:
+
+emails response as a flat array of strings instead of email objects
+pull_request response property with null default values
+user response property, replaced by owner
+master_branch response property, replaced by default_branch
+Affected endpoints
+This changeset removes the underspecified fields history and forks from the base-gist object These properties were unintentionally added when we converted JSON schemas to OpenAPI. The properties appear in resources such as "gist revisions" and "update gist" but should not be implemented in the base gist object.
+
+Affected endpoints
+Change success status code from 204 to 202 for deleting an installation The installation deletion is being moved to the background
+
+Affected endpoints
+Remove secret_scanning_push_protection_custom_link_enabled from the organization request and response
+
+Affected endpoints
+Remove javascript and typescript values from the languages enum in code scanning default setup responses, in favor of javascript-typescript JavaScript and TypeScript are analyzed together by CodeQL, so having separate enum values was misleading and inconsistent with how the analysis actually works. This breaking change removes the individual "javascript" and "typescript" values in favor of the combined "javascript-typescript" value that accurately represents the unified analysis.
+
+For more information, see "Get a code scanning default setup configuration" in the REST API documentation and the related codeql-action CHANGELOG.
+
+Affected endpoints
+Remove deprecated has_downloads property from Repository response has_downloads has been deprecated for 10+ years
+
+Affected endpoints
+Change create repository response from 422 to 451 when blocked by trade controls Repository creation requests where the creator or owner is subject to trade control regulations now return 451 Unavailable For Legal Reasons instead of 422 Unprocessable Entity.
+
+Affected endpoints
+Change delete organization response from 403 to 451 when blocked by trade controls Organization deletion requests blocked by trade controls now return 451 Unavailable For Legal Reasons instead of 403 Forbidden.
+
+Affected endpoints
+Change remove organization member response from 403 to 451 when blocked by trade controls Requests to remove a member from a trade-controlled organization now return 451 Unavailable For Legal Reasons instead of 403 Forbidden.
+
+Affected endpoints
+Change update organization membership response from 403 to 451 when blocked by trade controls Membership update requests for trade-controlled organizations now return 451 Unavailable For Legal Reasons instead of 403 Forbidden.
+
+Affected endpoints
+Change accept repository invitation response from 403 to 451 when blocked by trade controls Repository invitation acceptance blocked by trade controls now returns 451 Unavailable For Legal Reasons instead of 403 Forbidden.
+
+Affected endpoints
+Remove deprecated hub_url property from API root response
+
+Affected endpoints
+Deprecate cvss property in favor of cvss_severities for advisory APIs The cvss_severities property will supplant the existing cvss property and contain cvss_v3 and cvss_v4 properties if they exist on the advisory.
+
+Affected endpoints
+Remove repository detail fields from migration resource responses
+
+Affected endpoints
+Remove deprecated /hub endpoint
+
+Remove merge_commit_sha field from pull request responses The merge_commit_sha property is removed from pull request payloads across all endpoints that return pull request objects.
+
+Affected endpoints
+Change workflow dispatch response from 204 to 200 with workflow run details Removes the return_run_details parameter. The endpoint now always returns 200 with the workflow run details in the response body.
+
+Affected endpoints
+Remove deprecated singular "assignee" field from Issue and Pull Request endpoints The singular assignee field has been marked as "closing down" for years and duplicates information available in the assignees array. To migrate, update your integration to:
+
+Use the assignees array parameter instead of the singular assignee parameter when creating or updating Issues.
+Read assignee information from the assignees array instead of the singular assignee property in Issue and Pull Request responses.
+See https://docs.github.com/rest/issues/issues for updated documentation.
+
+Affected endpoints
+Change selected_repository_ids parameter to only accept integers for Dependabot org secrets
+
+Affected endpoints
+Remove the bundle property from attestation list responses The bundle field is removed from repo, org, and user attestation list and bulk-list responses. Use bundle_url to retrieve the attestation bundle.
+
+Affected endpoints
+Version 2022-11-28
+Version 2022-11-28 is the first version of the GitHub Free, Pro & Team REST API after date-based versioning was introduced. This version does not include any breaking changes.
+
+Ajuda e suporte
+Você encontrou o que precisava?
+
+Política de privacidade
+Ainda precisa de ajuda?
+Pergunte à comunidade do GitHub
+Contate o suporte
+Legal
+Parte desse conteúdo pode ser traduzida por computador ou IA.
+
+© 2026 GitHub, Inc.
+Termos
+Privacidade
+Status
+Preços
+Serviços especializados
+Blog
+Alterações de quebra - Documentos do GitHub
+
+
+
+
+
+
+
+https://docs.github.com/pt/rest/rate-limit?apiVersion=2026-03-10
+
+
+
+Skip to main content
+Documentos do GitHub
+API REST/
+Limite de taxa
+A API REST agora é versionada. Para obter mais informações, confira "Sobre o controle de versão da API".
+Pontos de extremidade da API REST para limites de taxa
+Use a API REST para verificar seu status de limite de taxa atual.
+
+Pontos de extremidade da API REST para limites de taxa
+Get rate limit status for the authenticated user
+Ajuda e suporte
+Você encontrou o que precisava?
+
+Política de privacidade
+Ainda precisa de ajuda?
+Pergunte à comunidade do GitHub
+Contate o suporte
+Legal
+Parte desse conteúdo pode ser traduzida por computador ou IA.
+
+© 2026 GitHub, Inc.
+Termos
+Privacidade
+Status
+Preços
+Serviços especializados
+Blog
+Pontos de extremidade da API REST para limites de taxa - Documentos do GitHub
+
+
+
+
+
+
+
+
+
+
+
+https://docs.github.com/pt/rest/code-scanning/code-scanning?apiVersion=2026-03-10#get-a-code-scanning-analysis-for-a-repository
+
+
+
+
+
+
+
+
+Skip to main content
+Documentos do GitHub
+API REST/
+Varredura de código/
+Varredura de código
+A API REST agora é versionada. Para obter mais informações, confira "Sobre o controle de versão da API".
+Pontos de extremidade da API REST para varredura de código
+Use a API REST para recuperar e atualizar os alertas da code scanning de um repositório.
+
+Sobre o escaneamento de código
+É possível recuperar e atualizar alertas de code scanning a partir de um repositório. Você pode usar os pontos de extremidade para criar relatórios automatizados para os alertas de code scanning em uma organização ou fazer upload dos resultados de análise gerados usando as ferramentas off-line de code scanning. Para saber mais, confira Verificar o código em busca de vulnerabilidades.
+
+List code scanning alerts for an organization
+Lists code scanning alerts for the default branch for all eligible repositories in an organization. Eligible repositories are repositories that are owned by organizations that you own or for which you are a security manager. For more information, see "Managing security managers in your organization."
+
+The authenticated user must be an owner or security manager for the organization to use this endpoint.
+
+OAuth app tokens and personal access tokens (classic) need the security_events or repos cope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "List code scanning alerts for an organization"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (read)
+Parâmetros para "List code scanning alerts for an organization"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+org string Obrigatório
+The organization name. The name is not case sensitive.
+
+Parâmetros de consulta
+Nome, Tipo, Descrição
+tool_name string
+The name of a code scanning tool. Only results by this tool will be listed. You can specify the tool by using either tool_name or tool_guid, but not both.
+
+tool_guid string or null
+The GUID of a code scanning tool. Only results by this tool will be listed. Note that some code scanning tools may not include a GUID in their analysis data. You can specify the tool by using either tool_guid or tool_name, but not both.
+
+before string
+A cursor, as given in the Link header. If specified, the query only searches for results before this cursor. For more information, see "Using pagination in the REST API."
+
+after string
+A cursor, as given in the Link header. If specified, the query only searches for results after this cursor. For more information, see "Using pagination in the REST API."
+
+page integer
+The page number of the results to fetch. For more information, see "Using pagination in the REST API."
+
+Padrão: 1
+
+per_page integer
+The number of results per page (max 100). For more information, see "Using pagination in the REST API."
+
+Padrão: 30
+
+direction string
+The direction to sort the results by.
+
+Padrão: desc
+
+Pode ser um dos: asc, desc
+
+state string
+If specified, only code scanning alerts with this state will be returned.
+
+Pode ser um dos: open, closed, dismissed, fixed
+
+sort string
+The property by which to sort the results.
+
+Padrão: created
+
+Pode ser um dos: created, updated
+
+severity string
+If specified, only code scanning alerts with this severity will be returned.
+
+Pode ser um dos: critical, high, medium, low, warning, note, error
+
+assignees string
+Filter alerts by assignees. Provide a comma-separated list of user handles (e.g., octocat or octocat,hubot). Use * to list alerts with at least one assignee or none to list alerts with no assignees.
+
+Códigos de status de resposta HTTP para "List code scanning alerts for an organization"
+Código de status	Descrição
+200	
+OK
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "List code scanning alerts for an organization"
+Exemplo de solicitação
+get/orgs/{org}/code-scanning/alerts
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/orgs/ORG/code-scanning/alerts
+Response
+
+Status: 200
+[ { "number": 4, "created_at": "2020-02-13T12:29:18Z", "url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/4", "html_url": "https://github.com/octocat/hello-world/code-scanning/4", "state": "open", "dismissed_by": null, "dismissed_at": null, "dismissed_reason": null, "dismissed_comment": null, "rule": { "id": "js/zipslip", "severity": "error", "tags": [ "security", "external/cwe/cwe-022" ], "description": "Arbitrary file write during zip extraction", "name": "js/zipslip" }, "tool": { "name": "CodeQL", "guid": null, "version": "2.4.0" }, "most_recent_instance": { "ref": "refs/heads/main", "analysis_key": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "category": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "environment": "{}", "state": "open", "commit_sha": "39406e42cb832f683daa691dd652a8dc36ee8930", "message": { "text": "This path depends on a user-provided value." }, "location": { "path": "spec-main/api-session-spec.ts", "start_line": 917, "end_line": 917, "start_column": 7, "end_column": 18 }, "classifications": [ "test" ] }, "instances_url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/4/instances", "repository": { "id": 1296269, "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5", "name": "Hello-World", "full_name": "octocat/Hello-World", "owner": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "private": false, "html_url": "https://github.com/octocat/Hello-World", "description": "This your first repo!", "fork": false, "url": "https://api.github.com/repos/octocat/Hello-World", "archive_url": "https://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}", "assignees_url": "https://api.github.com/repos/octocat/Hello-World/assignees{/user}", "blobs_url": "https://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}", "branches_url": "https://api.github.com/repos/octocat/Hello-World/branches{/branch}", "collaborators_url": "https://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}", "comments_url": "https://api.github.com/repos/octocat/Hello-World/comments{/number}", "commits_url": "https://api.github.com/repos/octocat/Hello-World/commits{/sha}", "compare_url": "https://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}", "contents_url": "https://api.github.com/repos/octocat/Hello-World/contents/{+path}", "contributors_url": "https://api.github.com/repos/octocat/Hello-World/contributors", "deployments_url": "https://api.github.com/repos/octocat/Hello-World/deployments", "downloads_url": "https://api.github.com/repos/octocat/Hello-World/downloads", "events_url": "https://api.github.com/repos/octocat/Hello-World/events", "forks_url": "https://api.github.com/repos/octocat/Hello-World/forks", "git_commits_url": "https://api.github.com/repos/octocat/Hello-World/git/commits{/sha}", "git_refs_url": "https://api.github.com/repos/octocat/Hello-World/git/refs{/sha}", "git_tags_url": "https://api.github.com/repos/octocat/Hello-World/git/tags{/sha}", "issue_comment_url": "https://api.github.com/repos/octocat/Hello-World/issues/comments{/number}", "issue_events_url": "https://api.github.com/repos/octocat/Hello-World/issues/events{/number}", "issues_url": "https://api.github.com/repos/octocat/Hello-World/issues{/number}", "keys_url": "https://api.github.com/repos/octocat/Hello-World/keys{/key_id}", "labels_url": "https://api.github.com/repos/octocat/Hello-World/labels{/name}", "languages_url": "https://api.github.com/repos/octocat/Hello-World/languages", "merges_url": "https://api.github.com/repos/octocat/Hello-World/merges", "milestones_url": "https://api.github.com/repos/octocat/Hello-World/milestones{/number}", "notifications_url": "https://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}", "pulls_url": "https://api.github.com/repos/octocat/Hello-World/pulls{/number}", "releases_url": "https://api.github.com/repos/octocat/Hello-World/releases{/id}", "stargazers_url": "https://api.github.com/repos/octocat/Hello-World/stargazers", "statuses_url": "https://api.github.com/repos/octocat/Hello-World/statuses/{sha}", "subscribers_url": "https://api.github.com/repos/octocat/Hello-World/subscribers", "subscription_url": "https://api.github.com/repos/octocat/Hello-World/subscription", "tags_url": "https://api.github.com/repos/octocat/Hello-World/tags", "teams_url": "https://api.github.com/repos/octocat/Hello-World/teams", "trees_url": "https://api.github.com/repos/octocat/Hello-World/git/trees{/sha}", "hooks_url": "https://api.github.com/repos/octocat/Hello-World/hooks" } }, { "number": 3, "created_at": "2020-02-13T12:29:18Z", "url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/3", "html_url": "https://github.com/octocat/hello-world/code-scanning/3", "state": "dismissed", "dismissed_by": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "dismissed_at": "2020-02-14T12:29:18Z", "dismissed_reason": "false positive", "dismissed_comment": "This alert is not actually correct, because there's a sanitizer included in the library.", "rule": { "id": "js/zipslip", "severity": "error", "tags": [ "security", "external/cwe/cwe-022" ], "description": "Arbitrary file write during zip extraction", "name": "js/zipslip" }, "tool": { "name": "CodeQL", "guid": null, "version": "2.4.0" }, "most_recent_instance": { "ref": "refs/heads/main", "analysis_key": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "category": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "environment": "{}", "state": "open", "commit_sha": "39406e42cb832f683daa691dd652a8dc36ee8930", "message": { "text": "This path depends on a user-provided value." }, "location": { "path": "lib/ab12-gen.js", "start_line": 917, "end_line": 917, "start_column": 7, "end_column": 18 }, "classifications": [] }, "instances_url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/3/instances", "repository": { "id": 1296269, "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5", "name": "Hello-World", "full_name": "octocat/Hello-World", "owner": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "private": false, "html_url": "https://github.com/octocat/Hello-World", "description": "This your first repo!", "fork": false, "url": "https://api.github.com/repos/octocat/Hello-World", "archive_url": "https://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}", "assignees_url": "https://api.github.com/repos/octocat/Hello-World/assignees{/user}", "blobs_url": "https://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}", "branches_url": "https://api.github.com/repos/octocat/Hello-World/branches{/branch}", "collaborators_url": "https://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}", "comments_url": "https://api.github.com/repos/octocat/Hello-World/comments{/number}", "commits_url": "https://api.github.com/repos/octocat/Hello-World/commits{/sha}", "compare_url": "https://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}", "contents_url": "https://api.github.com/repos/octocat/Hello-World/contents/{+path}", "contributors_url": "https://api.github.com/repos/octocat/Hello-World/contributors", "deployments_url": "https://api.github.com/repos/octocat/Hello-World/deployments", "downloads_url": "https://api.github.com/repos/octocat/Hello-World/downloads", "events_url": "https://api.github.com/repos/octocat/Hello-World/events", "forks_url": "https://api.github.com/repos/octocat/Hello-World/forks", "git_commits_url": "https://api.github.com/repos/octocat/Hello-World/git/commits{/sha}", "git_refs_url": "https://api.github.com/repos/octocat/Hello-World/git/refs{/sha}", "git_tags_url": "https://api.github.com/repos/octocat/Hello-World/git/tags{/sha}", "issue_comment_url": "https://api.github.com/repos/octocat/Hello-World/issues/comments{/number}", "issue_events_url": "https://api.github.com/repos/octocat/Hello-World/issues/events{/number}", "issues_url": "https://api.github.com/repos/octocat/Hello-World/issues{/number}", "keys_url": "https://api.github.com/repos/octocat/Hello-World/keys{/key_id}", "labels_url": "https://api.github.com/repos/octocat/Hello-World/labels{/name}", "languages_url": "https://api.github.com/repos/octocat/Hello-World/languages", "merges_url": "https://api.github.com/repos/octocat/Hello-World/merges", "milestones_url": "https://api.github.com/repos/octocat/Hello-World/milestones{/number}", "notifications_url": "https://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}", "pulls_url": "https://api.github.com/repos/octocat/Hello-World/pulls{/number}", "releases_url": "https://api.github.com/repos/octocat/Hello-World/releases{/id}", "stargazers_url": "https://api.github.com/repos/octocat/Hello-World/stargazers", "statuses_url": "https://api.github.com/repos/octocat/Hello-World/statuses/{sha}", "subscribers_url": "https://api.github.com/repos/octocat/Hello-World/subscribers", "subscription_url": "https://api.github.com/repos/octocat/Hello-World/subscription", "tags_url": "https://api.github.com/repos/octocat/Hello-World/tags", "teams_url": "https://api.github.com/repos/octocat/Hello-World/teams", "trees_url": "https://api.github.com/repos/octocat/Hello-World/git/trees{/sha}", "hooks_url": "https://api.github.com/repos/octocat/Hello-World/hooks" } } ]
+List code scanning alerts for a repository
+Lists code scanning alerts.
+
+The response includes a most_recent_instance object. This provides details of the most recent instance of this alert for the default branch (or for the specified Git reference if you used ref in the request).
+
+OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "List code scanning alerts for a repository"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (read)
+Parâmetros para "List code scanning alerts for a repository"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+Parâmetros de consulta
+Nome, Tipo, Descrição
+tool_name string
+The name of a code scanning tool. Only results by this tool will be listed. You can specify the tool by using either tool_name or tool_guid, but not both.
+
+tool_guid string or null
+The GUID of a code scanning tool. Only results by this tool will be listed. Note that some code scanning tools may not include a GUID in their analysis data. You can specify the tool by using either tool_guid or tool_name, but not both.
+
+page integer
+The page number of the results to fetch. For more information, see "Using pagination in the REST API."
+
+Padrão: 1
+
+per_page integer
+The number of results per page (max 100). For more information, see "Using pagination in the REST API."
+
+Padrão: 30
+
+ref string
+The Git reference for the results you want to list. The ref for a branch can be formatted either as refs/heads/<branch name> or simply <branch name>. To reference a pull request use refs/pull/<number>/merge.
+
+pr integer
+The number of the pull request for the results you want to list.
+
+direction string
+The direction to sort the results by.
+
+Padrão: desc
+
+Pode ser um dos: asc, desc
+
+before string
+A cursor, as given in the Link header. If specified, the query only searches for results before this cursor. For more information, see "Using pagination in the REST API."
+
+after string
+A cursor, as given in the Link header. If specified, the query only searches for results after this cursor. For more information, see "Using pagination in the REST API."
+
+sort string
+The property by which to sort the results.
+
+Padrão: created
+
+Pode ser um dos: created, updated
+
+state string
+If specified, only code scanning alerts with this state will be returned.
+
+Pode ser um dos: open, closed, dismissed, fixed
+
+severity string
+If specified, only code scanning alerts with this severity will be returned.
+
+Pode ser um dos: critical, high, medium, low, warning, note, error
+
+assignees string
+Filter alerts by assignees. Provide a comma-separated list of user handles (e.g., octocat or octocat,hubot). Use * to list alerts with at least one assignee or none to list alerts with no assignees.
+
+Códigos de status de resposta HTTP para "List code scanning alerts for a repository"
+Código de status	Descrição
+200	
+OK
+
+304	
+Not modified
+
+403	
+Response if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "List code scanning alerts for a repository"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/alerts
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/alerts
+Response
+
+Status: 200
+[ { "number": 4, "created_at": "2020-02-13T12:29:18Z", "url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/4", "html_url": "https://github.com/octocat/hello-world/code-scanning/4", "state": "open", "fixed_at": null, "dismissed_by": null, "dismissed_at": null, "dismissed_reason": null, "dismissed_comment": null, "rule": { "id": "js/zipslip", "severity": "error", "tags": [ "security", "external/cwe/cwe-022" ], "description": "Arbitrary file write during zip extraction", "name": "js/zipslip" }, "tool": { "name": "CodeQL", "guid": null, "version": "2.4.0" }, "most_recent_instance": { "ref": "refs/heads/main", "analysis_key": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "category": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "environment": "{}", "state": "open", "commit_sha": "39406e42cb832f683daa691dd652a8dc36ee8930", "message": { "text": "This path depends on a user-provided value." }, "location": { "path": "spec-main/api-session-spec.ts", "start_line": 917, "end_line": 917, "start_column": 7, "end_column": 18 }, "classifications": [ "test" ] }, "instances_url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/4/instances" }, { "number": 3, "created_at": "2020-02-13T12:29:18Z", "url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/3", "html_url": "https://github.com/octocat/hello-world/code-scanning/3", "state": "dismissed", "fixed_at": null, "dismissed_by": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "dismissed_at": "2020-02-14T12:29:18Z", "dismissed_reason": "false positive", "dismissed_comment": "This alert is not actually correct, because there's a sanitizer included in the library.", "rule": { "id": "js/zipslip", "severity": "error", "tags": [ "security", "external/cwe/cwe-022" ], "description": "Arbitrary file write during zip extraction", "name": "js/zipslip" }, "tool": { "name": "CodeQL", "guid": null, "version": "2.4.0" }, "most_recent_instance": { "ref": "refs/heads/main", "analysis_key": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "category": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "environment": "{}", "state": "open", "commit_sha": "39406e42cb832f683daa691dd652a8dc36ee8930", "message": { "text": "This path depends on a user-provided value." }, "location": { "path": "lib/ab12-gen.js", "start_line": 917, "end_line": 917, "start_column": 7, "end_column": 18 }, "classifications": [] }, "instances_url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/3/instances" } ]
+Get a code scanning alert
+Gets a single code scanning alert.
+
+OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Get a code scanning alert"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (read)
+Parâmetros para "Get a code scanning alert"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+alert_number integer Obrigatório
+The number that identifies an alert. You can find this at the end of the URL for a code scanning alert within GitHub, and in the number field in the response from the GET /repos/{owner}/{repo}/code-scanning/alerts operation.
+
+Códigos de status de resposta HTTP para "Get a code scanning alert"
+Código de status	Descrição
+200	
+OK
+
+304	
+Not modified
+
+403	
+Response if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "Get a code scanning alert"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/alerts/ALERT_NUMBER
+Response
+
+Status: 200
+{ "number": 42, "created_at": "2020-06-19T11:21:34Z", "url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/42", "html_url": "https://github.com/octocat/hello-world/code-scanning/42", "state": "dismissed", "fixed_at": null, "dismissed_by": { "login": "octocat", "id": 54933897, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "dismissed_at": "2020-02-14T12:29:18Z", "dismissed_reason": "false positive", "dismissed_comment": "This alert is not actually correct, because there's a sanitizer included in the library.", "rule": { "id": "js/zipslip", "severity": "error", "security_severity_level": "high", "description": "Arbitrary file write during zip extraction (\"Zip Slip\")", "name": "js/zipslip", "full_description": "Extracting files from a malicious zip archive without validating that the destination file path is within the destination directory can cause files outside the destination directory to be overwritten.", "tags": [ "security", "external/cwe/cwe-022" ], "help": "# Arbitrary file write during zip extraction (\"Zip Slip\")\\nExtracting files from a malicious zip archive without validating that the destination file path is within the destination directory can cause files outside the destination directory to be overwritten ...", "help_uri": "https://codeql.github.com/" }, "tool": { "name": "CodeQL", "guid": null, "version": "2.4.0" }, "most_recent_instance": { "ref": "refs/heads/main", "analysis_key": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "category": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "environment": "{}", "state": "dismissed", "commit_sha": "39406e42cb832f683daa691dd652a8dc36ee8930", "message": { "text": "This path depends on a user-provided value." }, "location": { "path": "spec-main/api-session-spec.ts", "start_line": 917, "end_line": 917, "start_column": 7, "end_column": 18 }, "classifications": [ "test" ] }, "instances_url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/42/instances" }
+Update a code scanning alert
+Updates the status of a single code scanning alert. OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Update a code scanning alert"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (write)
+Parâmetros para "Update a code scanning alert"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+alert_number integer Obrigatório
+The number that identifies an alert. You can find this at the end of the URL for a code scanning alert within GitHub, and in the number field in the response from the GET /repos/{owner}/{repo}/code-scanning/alerts operation.
+
+Parâmetros do corpo
+Nome, Tipo, Descrição
+state string
+Sets the state of the code scanning alert. You must provide dismissed_reason when you set the state to dismissed.
+
+Pode ser um dos: open, dismissed
+
+dismissed_reason string or null
+Required when the state is dismissed. The reason for dismissing or closing the alert.
+
+Pode ser um dos: false positive, won't fix, used in tests, null
+
+dismissed_comment string or null
+The dismissal comment associated with the dismissal of the alert.
+
+create_request boolean
+If true, attempt to create an alert dismissal request.
+
+assignees array of strings
+The list of users to assign to the code scanning alert. An empty array unassigns all previous assignees from the alert.
+
+Códigos de status de resposta HTTP para "Update a code scanning alert"
+Código de status	Descrição
+200	
+OK
+
+400	
+Bad Request
+
+403	
+Response if the repository is archived or if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "Update a code scanning alert"
+Exemplo de solicitação
+patch/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}
+curl -L \ -X PATCH \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/alerts/ALERT_NUMBER \ -d '{"state":"dismissed","dismissed_reason":"false positive","dismissed_comment":"This alert is not actually correct, because there'\''s a sanitizer included in the library.","create_request":true}'
+Response
+
+Status: 200
+{ "number": 42, "created_at": "2020-08-25T21:28:36Z", "url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/42", "html_url": "https://github.com/octocat/hello-world/code-scanning/42", "state": "dismissed", "fixed_at": null, "dismissed_by": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "dismissed_at": "2020-09-02T22:34:56Z", "dismissed_reason": "false positive", "dismissed_comment": "This alert is not actually correct, because there's a sanitizer included in the library.", "rule": { "id": "js/zipslip", "severity": "error", "security_severity_level": "high", "description": "Arbitrary file write during zip extraction (\"Zip Slip\")", "name": "js/zipslip", "full_description": "Extracting files from a malicious zip archive without validating that the destination file path is within the destination directory can cause files outside the destination directory to be overwritten.", "tags": [ "security", "external/cwe/cwe-022" ], "help": "# Arbitrary file write during zip extraction (\"Zip Slip\")\\nExtracting files from a malicious zip archive without validating that the destination file path is within the destination directory can cause files outside the destination directory to be overwritten ...", "help_uri": "https://codeql.github.com/" }, "tool": { "name": "CodeQL", "guid": null, "version": "2.4.0" }, "most_recent_instance": { "ref": "refs/heads/main", "analysis_key": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "category": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "environment": "{}", "state": "dismissed", "commit_sha": "39406e42cb832f683daa691dd652a8dc36ee8930", "message": { "text": "This path depends on a user-provided value." }, "location": { "path": "spec-main/api-session-spec.ts", "start_line": 917, "end_line": 917, "start_column": 7, "end_column": 18 }, "classifications": [ "test" ] }, "instances_url": "https://api.github.com/repos/octocat/hello-world/code-scanning/alerts/42/instances" }
+Get the status of an autofix for a code scanning alert
+Gets the status and description of an autofix for a code scanning alert.
+
+OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Get the status of an autofix for a code scanning alert"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (read)
+Parâmetros para "Get the status of an autofix for a code scanning alert"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+alert_number integer Obrigatório
+The number that identifies an alert. You can find this at the end of the URL for a code scanning alert within GitHub, and in the number field in the response from the GET /repos/{owner}/{repo}/code-scanning/alerts operation.
+
+Códigos de status de resposta HTTP para "Get the status of an autofix for a code scanning alert"
+Código de status	Descrição
+200	
+OK
+
+400	
+Bad Request
+
+403	
+Response if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "Get the status of an autofix for a code scanning alert"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/autofix
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/alerts/ALERT_NUMBER/autofix
+Response
+
+Status: 200
+{ "status": "success", "description": "This fixes an XSS vulnerability by escaping the user input.", "started_at": "2024-02-14T12:29:18Z" }
+Create an autofix for a code scanning alert
+Creates an autofix for a code scanning alert.
+
+If a new autofix is to be created as a result of this request or is currently being generated, then this endpoint will return a 202 Accepted response.
+
+If an autofix already exists for a given alert, then this endpoint will return a 200 OK response.
+
+OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Create an autofix for a code scanning alert"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (write)
+Parâmetros para "Create an autofix for a code scanning alert"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+alert_number integer Obrigatório
+The number that identifies an alert. You can find this at the end of the URL for a code scanning alert within GitHub, and in the number field in the response from the GET /repos/{owner}/{repo}/code-scanning/alerts operation.
+
+Códigos de status de resposta HTTP para "Create an autofix for a code scanning alert"
+Código de status	Descrição
+200	
+OK
+
+202	
+Accepted
+
+400	
+Bad Request
+
+403	
+Response if the repository is archived, if GitHub Advanced Security is not enabled for this repository or if rate limit is exceeded
+
+404	
+Resource not found
+
+422	
+Unprocessable Entity
+
+503	
+Service unavailable
+
+Exemplos de código para "Create an autofix for a code scanning alert"
+Exemplos de solicitação
+Select the example type
+post/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/autofix
+curl -L \ -X POST \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/alerts/ALERT_NUMBER/autofix
+OK
+
+Status: 200
+{ "status": "success", "description": "This fixes an XSS vulnerability by escaping the user input.", "started_at": "2024-02-14T12:29:18Z" }
+Commit an autofix for a code scanning alert
+Commits an autofix for a code scanning alert.
+
+If an autofix is committed as a result of this request, then this endpoint will return a 201 Created response.
+
+OAuth app tokens and personal access tokens (classic) need the repo scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Commit an autofix for a code scanning alert"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (write)
+Parâmetros para "Commit an autofix for a code scanning alert"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+alert_number integer Obrigatório
+The number that identifies an alert. You can find this at the end of the URL for a code scanning alert within GitHub, and in the number field in the response from the GET /repos/{owner}/{repo}/code-scanning/alerts operation.
+
+Parâmetros do corpo
+Nome, Tipo, Descrição
+target_ref string
+The Git reference of target branch for the commit. Branch needs to already exist. For more information, see "Git References" in the Git documentation.
+
+message string
+Commit message to be used.
+
+Códigos de status de resposta HTTP para "Commit an autofix for a code scanning alert"
+Código de status	Descrição
+201	
+Created
+
+400	
+Bad Request
+
+403	
+Response if the repository is archived or if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+422	
+Unprocessable Entity
+
+503	
+Service unavailable
+
+Exemplos de código para "Commit an autofix for a code scanning alert"
+Exemplo de solicitação
+post/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/autofix/commits
+curl -L \ -X POST \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/alerts/ALERT_NUMBER/autofix/commits \ -d '{"target_ref":"refs/heads/fix-bug","message":"Let'\''s fix this 🪲!"}'
+Created
+
+Status: 201
+{ "target_ref": "refs/heads/main", "sha": "178f4f6090b3fccad4a65b3e83d076a622d59652" }
+List instances of a code scanning alert
+Lists all instances of the specified code scanning alert.
+
+OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "List instances of a code scanning alert"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (read)
+Parâmetros para "List instances of a code scanning alert"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+alert_number integer Obrigatório
+The number that identifies an alert. You can find this at the end of the URL for a code scanning alert within GitHub, and in the number field in the response from the GET /repos/{owner}/{repo}/code-scanning/alerts operation.
+
+Parâmetros de consulta
+Nome, Tipo, Descrição
+page integer
+The page number of the results to fetch. For more information, see "Using pagination in the REST API."
+
+Padrão: 1
+
+per_page integer
+The number of results per page (max 100). For more information, see "Using pagination in the REST API."
+
+Padrão: 30
+
+ref string
+The Git reference for the results you want to list. The ref for a branch can be formatted either as refs/heads/<branch name> or simply <branch name>. To reference a pull request use refs/pull/<number>/merge.
+
+pr integer
+The number of the pull request for the results you want to list.
+
+Códigos de status de resposta HTTP para "List instances of a code scanning alert"
+Código de status	Descrição
+200	
+OK
+
+403	
+Response if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "List instances of a code scanning alert"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/alerts/ALERT_NUMBER/instances
+Response
+
+Status: 200
+[ { "ref": "refs/heads/main", "analysis_key": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "environment": "", "category": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "state": "open", "commit_sha": "39406e42cb832f683daa691dd652a8dc36ee8930", "message": { "text": "This path depends on a user-provided value." }, "location": { "path": "lib/ab12-gen.js", "start_line": 917, "end_line": 917, "start_column": 7, "end_column": 18 }, "classifications": [ "library" ] }, { "ref": "refs/pull/3740/merge", "analysis_key": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "environment": "", "category": ".github/workflows/codeql-analysis.yml:CodeQL-Build", "state": "fixed", "commit_sha": "b09da05606e27f463a2b49287684b4ae777092f2", "message": { "text": "This suffix check is missing a length comparison to correctly handle lastIndexOf returning -1." }, "location": { "path": "app/script.js", "start_line": 2, "end_line": 2, "start_column": 10, "end_column": 50 }, "classifications": [ "source" ] } ]
+List code scanning analyses for a repository
+Lists the details of all code scanning analyses for a repository, starting with the most recent. The response is paginated and you can use the page and per_page parameters to list the analyses you're interested in. By default 30 analyses are listed per page.
+
+The rules_count field in the response give the number of rules that were run in the analysis. For very old analyses this data is not available, and 0 is returned in this field.
+
+Warning
+
+Closing down notice: The tool_name field is closing down and will, in future, not be included in the response for this endpoint. The example response reflects this change. The tool name can now be found inside the tool field.
+
+OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "List code scanning analyses for a repository"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (read)
+Parâmetros para "List code scanning analyses for a repository"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+Parâmetros de consulta
+Nome, Tipo, Descrição
+tool_name string
+The name of a code scanning tool. Only results by this tool will be listed. You can specify the tool by using either tool_name or tool_guid, but not both.
+
+tool_guid string or null
+The GUID of a code scanning tool. Only results by this tool will be listed. Note that some code scanning tools may not include a GUID in their analysis data. You can specify the tool by using either tool_guid or tool_name, but not both.
+
+page integer
+The page number of the results to fetch. For more information, see "Using pagination in the REST API."
+
+Padrão: 1
+
+per_page integer
+The number of results per page (max 100). For more information, see "Using pagination in the REST API."
+
+Padrão: 30
+
+pr integer
+The number of the pull request for the results you want to list.
+
+ref string
+The Git reference for the analyses you want to list. The ref for a branch can be formatted either as refs/heads/<branch name> or simply <branch name>. To reference a pull request use refs/pull/<number>/merge.
+
+sarif_id string
+Filter analyses belonging to the same SARIF upload.
+
+direction string
+The direction to sort the results by.
+
+Padrão: desc
+
+Pode ser um dos: asc, desc
+
+sort string
+The property by which to sort the results.
+
+Padrão: created
+
+Valor: created
+
+Códigos de status de resposta HTTP para "List code scanning analyses for a repository"
+Código de status	Descrição
+200	
+OK
+
+403	
+Response if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "List code scanning analyses for a repository"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/analyses
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/analyses
+Response
+
+Status: 200
+[ { "ref": "refs/heads/main", "commit_sha": "d99612c3e1f2970085cfbaeadf8f010ef69bad83", "analysis_key": ".github/workflows/codeql-analysis.yml:analyze", "environment": "{\"language\":\"python\"}", "error": "", "category": ".github/workflows/codeql-analysis.yml:analyze/language:python", "created_at": "2020-08-27T15:05:21Z", "results_count": 17, "rules_count": 49, "id": 201, "url": "https://api.github.com/repos/octocat/hello-world/code-scanning/analyses/201", "sarif_id": "6c81cd8e-b078-4ac3-a3be-1dad7dbd0b53", "tool": { "name": "CodeQL", "guid": null, "version": "2.4.0" }, "deletable": true, "warning": "" }, { "ref": "refs/heads/my-branch", "commit_sha": "c8cff6510d4d084fb1b4aa13b64b97ca12b07321", "analysis_key": ".github/workflows/shiftleft.yml:build", "environment": "{}", "error": "", "category": ".github/workflows/shiftleft.yml:build/", "created_at": "2020-08-31T22:46:44Z", "results_count": 17, "rules_count": 32, "id": 200, "url": "https://api.github.com/repos/octocat/hello-world/code-scanning/analyses/200", "sarif_id": "8981cd8e-b078-4ac3-a3be-1dad7dbd0b582", "tool": { "name": "Python Security Analysis", "guid": null, "version": "1.2.0" }, "deletable": true, "warning": "" } ]
+Get a code scanning analysis for a repository
+Gets a specified code scanning analysis for a repository.
+
+The default JSON response contains fields that describe the analysis. This includes the Git reference and commit SHA to which the analysis relates, the datetime of the analysis, the name of the code scanning tool, and the number of alerts.
+
+The rules_count field in the default response give the number of rules that were run in the analysis. For very old analyses this data is not available, and 0 is returned in this field.
+
+This endpoint supports the following custom media types. For more information, see "Media types."
+
+application/sarif+json: Instead of returning a summary of the analysis, this endpoint returns a subset of the analysis data that was uploaded. The data is formatted as SARIF version 2.1.0. It also returns additional data such as the github/alertNumber and github/alertUrl properties.
+OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Get a code scanning analysis for a repository"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (read)
+Parâmetros para "Get a code scanning analysis for a repository"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+analysis_id integer Obrigatório
+The ID of the analysis, as returned from the GET /repos/{owner}/{repo}/code-scanning/analyses operation.
+
+Códigos de status de resposta HTTP para "Get a code scanning analysis for a repository"
+Código de status	Descrição
+200	
+OK
+
+403	
+Response if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+422	
+Response if analysis could not be processed
+
+503	
+Service unavailable
+
+Exemplos de código para "Get a code scanning analysis for a repository"
+Exemplos de solicitação
+Select the example type
+get/repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/analyses/ANALYSIS_ID
+application/json response
+
+Status: 200
+{ "ref": "refs/heads/main", "commit_sha": "c18c69115654ff0166991962832dc2bd7756e655", "analysis_key": ".github/workflows/codeql-analysis.yml:analyze", "environment": "{\"language\":\"javascript\"}", "error": "", "category": ".github/workflows/codeql-analysis.yml:analyze/language:javascript", "created_at": "2021-01-13T11:55:49Z", "results_count": 3, "rules_count": 67, "id": 3602840, "url": "https://api.github.com/repos/octocat/hello-world/code-scanning/analyses/201", "sarif_id": "47177e22-5596-11eb-80a1-c1e54ef945c6", "tool": { "name": "CodeQL", "guid": null, "version": "2.4.0" }, "deletable": true, "warning": "" }
+Delete a code scanning analysis from a repository
+Deletes a specified code scanning analysis from a repository.
+
+You can delete one analysis at a time. To delete a series of analyses, start with the most recent analysis and work backwards. Conceptually, the process is similar to the undo function in a text editor.
+
+When you list the analyses for a repository, one or more will be identified as deletable in the response:
+
+"deletable": true
+An analysis is deletable when it's the most recent in a set of analyses. Typically, a repository will have multiple sets of analyses for each enabled code scanning tool, where a set is determined by a unique combination of analysis values:
+
+ref
+tool
+category
+If you attempt to delete an analysis that is not the most recent in a set, you'll get a 400 response with the message:
+
+Analysis specified is not deletable.
+The response from a successful DELETE operation provides you with two alternative URLs for deleting the next analysis in the set: next_analysis_url and confirm_delete_url. Use the next_analysis_url URL if you want to avoid accidentally deleting the final analysis in a set. This is a useful option if you want to preserve at least one analysis for the specified tool in your repository. Use the confirm_delete_url URL if you are content to remove all analyses for a tool. When you delete the last analysis in a set, the value of next_analysis_url and confirm_delete_url in the 200 response is null.
+
+As an example of the deletion process, let's imagine that you added a workflow that configured a particular code scanning tool to analyze the code in a repository. This tool has added 15 analyses: 10 on the default branch, and another 5 on a topic branch. You therefore have two separate sets of analyses for this tool. You've now decided that you want to remove all of the analyses for the tool. To do this you must make 15 separate deletion requests. To start, you must find an analysis that's identified as deletable. Each set of analyses always has one that's identified as deletable. Having found the deletable analysis for one of the two sets, delete this analysis and then continue deleting the next analysis in the set until they're all deleted. Then repeat the process for the second set. The procedure therefore consists of a nested loop:
+
+Outer loop:
+
+List the analyses for the repository, filtered by tool.
+
+Parse this list to find a deletable analysis. If found:
+
+Inner loop:
+
+Delete the identified analysis.
+Parse the response for the value of confirm_delete_url and, if found, use this in the next iteration.
+The above process assumes that you want to remove all trace of the tool's analyses from the GitHub user interface, for the specified repository, and it therefore uses the confirm_delete_url value. Alternatively, you could use the next_analysis_url value, which would leave the last analysis in each set undeleted to avoid removing a tool's analysis entirely.
+
+OAuth app tokens and personal access tokens (classic) need the repo scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Delete a code scanning analysis from a repository"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (write)
+Parâmetros para "Delete a code scanning analysis from a repository"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+analysis_id integer Obrigatório
+The ID of the analysis, as returned from the GET /repos/{owner}/{repo}/code-scanning/analyses operation.
+
+Parâmetros de consulta
+Nome, Tipo, Descrição
+confirm_delete string or null
+Allow deletion if the specified analysis is the last in a set. If you attempt to delete the final analysis in a set without setting this parameter to true, you'll get a 400 response with the message: Analysis is last of its type and deletion may result in the loss of historical alert data. Please specify confirm_delete.
+
+Códigos de status de resposta HTTP para "Delete a code scanning analysis from a repository"
+Código de status	Descrição
+200	
+OK
+
+400	
+Bad Request
+
+403	
+Response if the repository is archived or if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "Delete a code scanning analysis from a repository"
+Exemplo de solicitação
+delete/repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}
+curl -L \ -X DELETE \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/analyses/ANALYSIS_ID
+Default response
+
+Status: 200
+{ "next_analysis_url": "https://api.github.com/repos/octocat/hello-world/code-scanning/analyses/41", "confirm_delete_url": "https://api.github.com/repos/octocat/hello-world/code-scanning/analyses/41?confirm_delete" }
+List CodeQL databases for a repository
+Lists the CodeQL databases that are available in a repository.
+
+OAuth app tokens and personal access tokens (classic) need the repo scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "List CodeQL databases for a repository"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (read)
+Esse endpoint pode ser usado sem autenticação ou permissões mencionadas acima, se apenas recursos públicos forem solicitados.
+
+Parâmetros para "List CodeQL databases for a repository"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+Códigos de status de resposta HTTP para "List CodeQL databases for a repository"
+Código de status	Descrição
+200	
+OK
+
+403	
+Response if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "List CodeQL databases for a repository"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/codeql/databases
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/codeql/databases
+Response
+
+Status: 200
+[ { "id": 1, "name": "database.zip", "language": "java", "uploader": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "content_type": "application/zip", "size": 1024, "created_at": "2022-09-12T12:14:32Z", "updated_at": "2022-09-12T12:14:32Z", "url": "https://api.github.com/repos/octocat/Hello-World/code-scanning/codeql/databases/java", "commit_oid": "1927de39fefa25a9d0e64e3f540ff824a72f538c" }, { "id": 2, "name": "database.zip", "language": "ruby", "uploader": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "content_type": "application/zip", "size": 1024, "created_at": "2022-09-12T12:14:32Z", "updated_at": "2022-09-12T12:14:32Z", "url": "https://api.github.com/repos/octocat/Hello-World/code-scanning/codeql/databases/ruby", "commit_oid": "1927de39fefa25a9d0e64e3f540ff824a72f538c" } ]
+Get a CodeQL database for a repository
+Gets a CodeQL database for a language in a repository.
+
+By default this endpoint returns JSON metadata about the CodeQL database. To download the CodeQL database binary content, set the Accept header of the request to application/zip, and make sure your HTTP client is configured to follow redirects or use the Location header to make a second request to get the redirect URL.
+
+OAuth app tokens and personal access tokens (classic) need the repo scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Get a CodeQL database for a repository"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (read)
+Esse endpoint pode ser usado sem autenticação ou permissões mencionadas acima, se apenas recursos públicos forem solicitados.
+
+Parâmetros para "Get a CodeQL database for a repository"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+language string Obrigatório
+The language of the CodeQL database.
+
+Códigos de status de resposta HTTP para "Get a CodeQL database for a repository"
+Código de status	Descrição
+200	
+OK
+
+302	
+Found
+
+403	
+Response if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "Get a CodeQL database for a repository"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/codeql/databases/{language}
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/codeql/databases/LANGUAGE
+Response
+
+Status: 200
+{ "id": 1, "name": "database.zip", "language": "java", "uploader": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "content_type": "application/zip", "size": 1024, "created_at": "2022-09-12T12:14:32Z", "updated_at": "2022-09-12T12:14:32Z", "url": "https://api.github.com/repos/octocat/Hello-World/code-scanning/codeql/databases/java", "commit_oid": "1927de39fefa25a9d0e64e3f540ff824a72f538c" }
+Delete a CodeQL database
+Deletes a CodeQL database for a language in a repository.
+
+OAuth app tokens and personal access tokens (classic) need the repo scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Delete a CodeQL database"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (write)
+Parâmetros para "Delete a CodeQL database"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+language string Obrigatório
+The language of the CodeQL database.
+
+Códigos de status de resposta HTTP para "Delete a CodeQL database"
+Código de status	Descrição
+204	
+No Content
+
+403	
+Response if the repository is archived or if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "Delete a CodeQL database"
+Exemplo de solicitação
+delete/repos/{owner}/{repo}/code-scanning/codeql/databases/{language}
+curl -L \ -X DELETE \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/codeql/databases/LANGUAGE
+Response
+
+Status: 204
+Create a CodeQL variant analysis
+Creates a new CodeQL variant analysis, which will run a CodeQL query against one or more repositories.
+
+Get started by learning more about running CodeQL queries at scale with Multi-Repository Variant Analysis.
+
+Use the owner and repo parameters in the URL to specify the controller repository that will be used for running GitHub Actions workflows and storing the results of the CodeQL variant analysis.
+
+OAuth app tokens and personal access tokens (classic) need the repo scope to use this endpoint.
+
+Tokens de acesso granular para "Create a CodeQL variant analysis"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (write)
+Parâmetros para "Create a CodeQL variant analysis"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+Códigos de status de resposta HTTP para "Create a CodeQL variant analysis"
+Código de status	Descrição
+201	
+Variant analysis submitted for processing
+
+404	
+Resource not found
+
+422	
+Unable to process variant analysis submission
+
+503	
+Service unavailable
+
+Exemplos de código para "Create a CodeQL variant analysis"
+Exemplos de solicitação
+Select the example type
+post/repos/{owner}/{repo}/code-scanning/codeql/variant-analyses
+curl -L \ -X POST \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/codeql/variant-analyses \ -d '{"language":"csharp","query_pack":"aGVsbG8=","repositories":["octocat/Hello-World","octocat/example"]}'
+Response for a successful variant analysis submission
+
+Status: 201
+{ "summary": "Default response", "value": { "id": 1, "controller_repo": { "id": 1296269, "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5", "name": "Hello-World", "full_name": "octocat/Hello-World", "owner": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "private": false, "html_url": "https://github.com/octocat/Hello-World", "description": "This your first repo!", "fork": false, "url": "https://api.github.com/repos/octocat/Hello-World", "archive_url": "https://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}", "assignees_url": "https://api.github.com/repos/octocat/Hello-World/assignees{/user}", "blobs_url": "https://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}", "branches_url": "https://api.github.com/repos/octocat/Hello-World/branches{/branch}", "collaborators_url": "https://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}", "comments_url": "https://api.github.com/repos/octocat/Hello-World/comments{/number}", "commits_url": "https://api.github.com/repos/octocat/Hello-World/commits{/sha}", "compare_url": "https://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}", "contents_url": "https://api.github.com/repos/octocat/Hello-World/contents/{+path}", "contributors_url": "https://api.github.com/repos/octocat/Hello-World/contributors", "deployments_url": "https://api.github.com/repos/octocat/Hello-World/deployments", "downloads_url": "https://api.github.com/repos/octocat/Hello-World/downloads", "events_url": "https://api.github.com/repos/octocat/Hello-World/events", "forks_url": "https://api.github.com/repos/octocat/Hello-World/forks", "git_commits_url": "https://api.github.com/repos/octocat/Hello-World/git/commits{/sha}", "git_refs_url": "https://api.github.com/repos/octocat/Hello-World/git/refs{/sha}", "git_tags_url": "https://api.github.com/repos/octocat/Hello-World/git/tags{/sha}", "issue_comment_url": "https://api.github.com/repos/octocat/Hello-World/issues/comments{/number}", "issue_events_url": "https://api.github.com/repos/octocat/Hello-World/issues/events{/number}", "issues_url": "https://api.github.com/repos/octocat/Hello-World/issues{/number}", "keys_url": "https://api.github.com/repos/octocat/Hello-World/keys{/key_id}", "labels_url": "https://api.github.com/repos/octocat/Hello-World/labels{/name}", "languages_url": "https://api.github.com/repos/octocat/Hello-World/languages", "merges_url": "https://api.github.com/repos/octocat/Hello-World/merges", "milestones_url": "https://api.github.com/repos/octocat/Hello-World/milestones{/number}", "notifications_url": "https://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}", "pulls_url": "https://api.github.com/repos/octocat/Hello-World/pulls{/number}", "releases_url": "https://api.github.com/repos/octocat/Hello-World/releases{/id}", "stargazers_url": "https://api.github.com/repos/octocat/Hello-World/stargazers", "statuses_url": "https://api.github.com/repos/octocat/Hello-World/statuses/{sha}", "subscribers_url": "https://api.github.com/repos/octocat/Hello-World/subscribers", "subscription_url": "https://api.github.com/repos/octocat/Hello-World/subscription", "tags_url": "https://api.github.com/repos/octocat/Hello-World/tags", "teams_url": "https://api.github.com/repos/octocat/Hello-World/teams", "trees_url": "https://api.github.com/repos/octocat/Hello-World/git/trees{/sha}", "hooks_url": "https://api.github.com/repos/octocat/Hello-World/hooks" }, "actor": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "query_language": "python", "query_pack_url": "https://www.example.com", "created_at": "2022-09-12T12:14:32Z", "updated_at": "2022-09-12T12:14:32Z", "completed_at": "2022-09-12T13:15:33Z", "status": "succeeded", "actions_workflow_run_id": 3453588, "scanned_repositories": [ { "repository": { "id": 1296269, "name": "Hello-World", "full_name": "octocat/Hello-World", "private": false }, "analysis_status": "succeeded", "result_count": 532, "artifact_size_in_bytes": 12345 } ], "skipped_repositories": { "access_mismatch_repos": { "repository_count": 2, "repositories": [ { "id": 1, "name": "octo-repo1", "full_name": "octo-org/octo-repo1", "private": false }, { "id": 2, "name": "octo-repo2", "full_name": "octo-org/octo-repo2", "private": false } ] }, "not_found_repos": { "repository_count": 3, "repository_full_names": [ "octo-org/octo-repo4", "octo-org/octo-repo5", "octo-org/octo-repo6" ] }, "no_codeql_db_repos": { "repository_count": 2, "repositories": [ { "id": 7, "name": "octo-repo7", "full_name": "octo-org/octo-repo7", "private": false }, { "id": 8, "name": "octo-repo8", "full_name": "octo-org/octo-repo8", "private": false } ] }, "over_limit_repos": { "repository_count": 2, "repositories": [ { "id": 9, "name": "octo-repo9", "full_name": "octo-org/octo-repo9", "private": false }, { "id": 10, "name": "octo-repo10", "full_name": "octo-org/octo-repo10", "private": false } ] } } } }
+Get the summary of a CodeQL variant analysis
+Gets the summary of a CodeQL variant analysis.
+
+OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Get the summary of a CodeQL variant analysis"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (read)
+Esse endpoint pode ser usado sem autenticação ou permissões mencionadas acima, se apenas recursos públicos forem solicitados.
+
+Parâmetros para "Get the summary of a CodeQL variant analysis"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+codeql_variant_analysis_id integer Obrigatório
+The unique identifier of the variant analysis.
+
+Códigos de status de resposta HTTP para "Get the summary of a CodeQL variant analysis"
+Código de status	Descrição
+200	
+OK
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "Get the summary of a CodeQL variant analysis"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/codeql/variant-analyses/{codeql_variant_analysis_id}
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/codeql/variant-analyses/CODEQL_VARIANT_ANALYSIS_ID
+Default response
+
+Status: 200
+{ "id": 1, "controller_repo": { "id": 1296269, "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5", "name": "Hello-World", "full_name": "octocat/Hello-World", "owner": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "private": false, "html_url": "https://github.com/octocat/Hello-World", "description": "This your first repo!", "fork": false, "url": "https://api.github.com/repos/octocat/Hello-World", "archive_url": "https://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}", "assignees_url": "https://api.github.com/repos/octocat/Hello-World/assignees{/user}", "blobs_url": "https://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}", "branches_url": "https://api.github.com/repos/octocat/Hello-World/branches{/branch}", "collaborators_url": "https://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}", "comments_url": "https://api.github.com/repos/octocat/Hello-World/comments{/number}", "commits_url": "https://api.github.com/repos/octocat/Hello-World/commits{/sha}", "compare_url": "https://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}", "contents_url": "https://api.github.com/repos/octocat/Hello-World/contents/{+path}", "contributors_url": "https://api.github.com/repos/octocat/Hello-World/contributors", "deployments_url": "https://api.github.com/repos/octocat/Hello-World/deployments", "downloads_url": "https://api.github.com/repos/octocat/Hello-World/downloads", "events_url": "https://api.github.com/repos/octocat/Hello-World/events", "forks_url": "https://api.github.com/repos/octocat/Hello-World/forks", "git_commits_url": "https://api.github.com/repos/octocat/Hello-World/git/commits{/sha}", "git_refs_url": "https://api.github.com/repos/octocat/Hello-World/git/refs{/sha}", "git_tags_url": "https://api.github.com/repos/octocat/Hello-World/git/tags{/sha}", "issue_comment_url": "https://api.github.com/repos/octocat/Hello-World/issues/comments{/number}", "issue_events_url": "https://api.github.com/repos/octocat/Hello-World/issues/events{/number}", "issues_url": "https://api.github.com/repos/octocat/Hello-World/issues{/number}", "keys_url": "https://api.github.com/repos/octocat/Hello-World/keys{/key_id}", "labels_url": "https://api.github.com/repos/octocat/Hello-World/labels{/name}", "languages_url": "https://api.github.com/repos/octocat/Hello-World/languages", "merges_url": "https://api.github.com/repos/octocat/Hello-World/merges", "milestones_url": "https://api.github.com/repos/octocat/Hello-World/milestones{/number}", "notifications_url": "https://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}", "pulls_url": "https://api.github.com/repos/octocat/Hello-World/pulls{/number}", "releases_url": "https://api.github.com/repos/octocat/Hello-World/releases{/id}", "stargazers_url": "https://api.github.com/repos/octocat/Hello-World/stargazers", "statuses_url": "https://api.github.com/repos/octocat/Hello-World/statuses/{sha}", "subscribers_url": "https://api.github.com/repos/octocat/Hello-World/subscribers", "subscription_url": "https://api.github.com/repos/octocat/Hello-World/subscription", "tags_url": "https://api.github.com/repos/octocat/Hello-World/tags", "teams_url": "https://api.github.com/repos/octocat/Hello-World/teams", "trees_url": "https://api.github.com/repos/octocat/Hello-World/git/trees{/sha}", "hooks_url": "https://api.github.com/repos/octocat/Hello-World/hooks" }, "actor": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "query_language": "python", "query_pack_url": "https://www.example.com", "created_at": "2022-09-12T12:14:32Z", "updated_at": "2022-09-12T12:14:32Z", "completed_at": "2022-09-12T13:15:33Z", "status": "succeeded", "actions_workflow_run_id": 3453588, "scanned_repositories": [ { "repository": { "id": 1296269, "name": "Hello-World", "full_name": "octocat/Hello-World", "private": false }, "analysis_status": "succeeded", "result_count": 532, "artifact_size_in_bytes": 12345 } ], "skipped_repositories": { "access_mismatch_repos": { "repository_count": 2, "repositories": [ { "id": 1, "name": "octo-repo1", "full_name": "octo-org/octo-repo1", "private": false }, { "id": 2, "name": "octo-repo2", "full_name": "octo-org/octo-repo2", "private": false } ] }, "not_found_repos": { "repository_count": 3, "repository_full_names": [ "octo-org/octo-repo4", "octo-org/octo-repo5", "octo-org/octo-repo6" ] }, "no_codeql_db_repos": { "repository_count": 2, "repositories": [ { "id": 7, "name": "octo-repo7", "full_name": "octo-org/octo-repo7", "private": false }, { "id": 8, "name": "octo-repo8", "full_name": "octo-org/octo-repo8", "private": false } ] }, "over_limit_repos": { "repository_count": 2, "repositories": [ { "id": 9, "name": "octo-repo9", "full_name": "octo-org/octo-repo9", "private": false }, { "id": 10, "name": "octo-repo10", "full_name": "octo-org/octo-repo10", "private": false } ] } } }
+Get the analysis status of a repository in a CodeQL variant analysis
+Gets the analysis status of a repository in a CodeQL variant analysis.
+
+OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Get the analysis status of a repository in a CodeQL variant analysis"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Contents" repository permissions (read)
+Parâmetros para "Get the analysis status of a repository in a CodeQL variant analysis"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the controller repository.
+
+codeql_variant_analysis_id integer Obrigatório
+The ID of the variant analysis.
+
+repo_owner string Obrigatório
+The account owner of the variant analysis repository. The name is not case sensitive.
+
+repo_name string Obrigatório
+The name of the variant analysis repository.
+
+Códigos de status de resposta HTTP para "Get the analysis status of a repository in a CodeQL variant analysis"
+Código de status	Descrição
+200	
+OK
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "Get the analysis status of a repository in a CodeQL variant analysis"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/codeql/variant-analyses/{codeql_variant_analysis_id}/repos/{repo_owner}/{repo_name}
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/codeql/variant-analyses/CODEQL_VARIANT_ANALYSIS_ID/repos/REPO_OWNER/REPO_NAME
+Default response
+
+Status: 200
+{ "repository": { "id": 1296269, "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5", "name": "Hello-World", "full_name": "octocat/Hello-World", "owner": { "login": "octocat", "id": 1, "node_id": "MDQ6VXNlcjE=", "avatar_url": "https://github.com/images/error/octocat_happy.gif", "gravatar_id": "", "url": "https://api.github.com/users/octocat", "html_url": "https://github.com/octocat", "followers_url": "https://api.github.com/users/octocat/followers", "following_url": "https://api.github.com/users/octocat/following{/other_user}", "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}", "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}", "subscriptions_url": "https://api.github.com/users/octocat/subscriptions", "organizations_url": "https://api.github.com/users/octocat/orgs", "repos_url": "https://api.github.com/users/octocat/repos", "events_url": "https://api.github.com/users/octocat/events{/privacy}", "received_events_url": "https://api.github.com/users/octocat/received_events", "type": "User", "site_admin": false }, "private": false, "html_url": "https://github.com/octocat/Hello-World", "description": "This your first repo!", "fork": false, "url": "https://api.github.com/repos/octocat/Hello-World", "archive_url": "https://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}", "assignees_url": "https://api.github.com/repos/octocat/Hello-World/assignees{/user}", "blobs_url": "https://api.github.com/repos/octocat/Hello-World/git/blobs{/sha}", "branches_url": "https://api.github.com/repos/octocat/Hello-World/branches{/branch}", "collaborators_url": "https://api.github.com/repos/octocat/Hello-World/collaborators{/collaborator}", "comments_url": "https://api.github.com/repos/octocat/Hello-World/comments{/number}", "commits_url": "https://api.github.com/repos/octocat/Hello-World/commits{/sha}", "compare_url": "https://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}", "contents_url": "https://api.github.com/repos/octocat/Hello-World/contents/{+path}", "contributors_url": "https://api.github.com/repos/octocat/Hello-World/contributors", "deployments_url": "https://api.github.com/repos/octocat/Hello-World/deployments", "downloads_url": "https://api.github.com/repos/octocat/Hello-World/downloads", "events_url": "https://api.github.com/repos/octocat/Hello-World/events", "forks_url": "https://api.github.com/repos/octocat/Hello-World/forks", "git_commits_url": "https://api.github.com/repos/octocat/Hello-World/git/commits{/sha}", "git_refs_url": "https://api.github.com/repos/octocat/Hello-World/git/refs{/sha}", "git_tags_url": "https://api.github.com/repos/octocat/Hello-World/git/tags{/sha}", "issue_comment_url": "https://api.github.com/repos/octocat/Hello-World/issues/comments{/number}", "issue_events_url": "https://api.github.com/repos/octocat/Hello-World/issues/events{/number}", "issues_url": "https://api.github.com/repos/octocat/Hello-World/issues{/number}", "keys_url": "https://api.github.com/repos/octocat/Hello-World/keys{/key_id}", "labels_url": "https://api.github.com/repos/octocat/Hello-World/labels{/name}", "languages_url": "https://api.github.com/repos/octocat/Hello-World/languages", "merges_url": "https://api.github.com/repos/octocat/Hello-World/merges", "milestones_url": "https://api.github.com/repos/octocat/Hello-World/milestones{/number}", "notifications_url": "https://api.github.com/repos/octocat/Hello-World/notifications{?since,all,participating}", "pulls_url": "https://api.github.com/repos/octocat/Hello-World/pulls{/number}", "releases_url": "https://api.github.com/repos/octocat/Hello-World/releases{/id}", "stargazers_url": "https://api.github.com/repos/octocat/Hello-World/stargazers", "statuses_url": "https://api.github.com/repos/octocat/Hello-World/statuses/{sha}", "subscribers_url": "https://api.github.com/repos/octocat/Hello-World/subscribers", "subscription_url": "https://api.github.com/repos/octocat/Hello-World/subscription", "tags_url": "https://api.github.com/repos/octocat/Hello-World/tags", "teams_url": "https://api.github.com/repos/octocat/Hello-World/teams", "trees_url": "https://api.github.com/repos/octocat/Hello-World/git/trees{/sha}", "hooks_url": "https://api.github.com/repos/octocat/Hello-World/hooks" }, "analysis_status": "succeeded", "artifact_size_in_bytes": 12345, "result_count": 532, "database_commit_sha": "2d870c2a717a524627af38fa2da382188a096f90", "source_location_prefix": "/", "artifact_url": "https://example.com" }
+Get a code scanning default setup configuration
+Gets a code scanning default setup configuration.
+
+OAuth app tokens and personal access tokens (classic) need the repo scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Get a code scanning default setup configuration"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Administration" repository permissions (read)
+Parâmetros para "Get a code scanning default setup configuration"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+Códigos de status de resposta HTTP para "Get a code scanning default setup configuration"
+Código de status	Descrição
+200	
+OK
+
+403	
+Response if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+503	
+Service unavailable
+
+Exemplos de código para "Get a code scanning default setup configuration"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/default-setup
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/default-setup
+Response
+
+Status: 200
+{ "state": "configured", "languages": [ "ruby", "python" ], "query_suite": "default", "threat_model": "remote", "updated_at": "2023-01-19T11:21:34Z", "schedule": "weekly" }
+Update a code scanning default setup configuration
+Updates a code scanning default setup configuration.
+
+OAuth app tokens and personal access tokens (classic) need the repo scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Update a code scanning default setup configuration"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Administration" repository permissions (write)
+Parâmetros para "Update a code scanning default setup configuration"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+Parâmetros do corpo
+Nome, Tipo, Descrição
+state string
+The desired state of code scanning default setup.
+
+Pode ser um dos: configured, not-configured
+
+runner_type string
+Runner type to be used.
+
+Pode ser um dos: standard, labeled
+
+runner_label string or null
+Runner label to be used if the runner type is labeled.
+
+query_suite string
+CodeQL query suite to be used.
+
+Pode ser um dos: default, extended
+
+threat_model string
+Threat model to be used for code scanning analysis. Use remote to analyze only network sources and remote_and_local to include local sources like filesystem access, command-line arguments, database reads, environment variable and standard input.
+
+Pode ser um dos: remote, remote_and_local
+
+languages array of strings
+CodeQL languages to be analyzed. Supported values are: actions, c-cpp, csharp, go, java-kotlin, javascript-typescript, python, ruby, swift
+
+Códigos de status de resposta HTTP para "Update a code scanning default setup configuration"
+Código de status	Descrição
+200	
+OK
+
+202	
+Accepted
+
+403	
+Response if the repository is archived or if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+409	
+Response if there is already a validation run in progress with a different default setup configuration
+
+422	
+Response if the configuration change cannot be made because the repository is not in the required state
+
+503	
+Service unavailable
+
+Exemplos de código para "Update a code scanning default setup configuration"
+Exemplo de solicitação
+patch/repos/{owner}/{repo}/code-scanning/default-setup
+curl -L \ -X PATCH \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/default-setup \ -d '{"state":"configured","threat_model":"remote_and_local"}'
+Response
+
+Status: 202
+{ "run_id": 42, "run_url": "https://api.github.com/repos/octoorg/octocat/actions/runs/42" }
+Upload an analysis as SARIF data
+Uploads SARIF data containing the results of a code scanning analysis to make the results available in a repository. For troubleshooting information, see "Troubleshooting SARIF uploads."
+
+There are two places where you can upload code scanning results.
+
+If you upload to a pull request, for example --ref refs/pull/42/merge or --ref refs/pull/42/head, then the results appear as alerts in a pull request check. For more information, see "Triaging code scanning alerts in pull requests."
+If you upload to a branch, for example --ref refs/heads/my-branch, then the results appear in the Security tab for your repository. For more information, see "Managing code scanning alerts for your repository."
+You must compress the SARIF-formatted analysis data that you want to upload, using gzip, and then encode it as a Base64 format string. For example:
+
+gzip -c analysis-data.sarif | base64 -w0
+SARIF upload supports a maximum number of entries per the following data objects, and an analysis will be rejected if any of these objects is above its maximum value. For some objects, there are additional values over which the entries will be ignored while keeping the most important entries whenever applicable. To get the most out of your analysis when it includes data above the supported limits, try to optimize the analysis configuration. For example, for the CodeQL tool, identify and remove the most noisy queries. For more information, see "SARIF results exceed one or more limits."
+
+SARIF data	Maximum values	Additional limits
+Runs per file	20	
+Results per run	25,000	Only the top 5,000 results will be included, prioritized by severity.
+Rules per run	25,000	
+Tool extensions per run	100	
+Thread Flow Locations per result	10,000	Only the top 1,000 Thread Flow Locations will be included, using prioritization.
+Location per result	1,000	Only 100 locations will be included.
+Tags per rule	20	Only 10 tags will be included.
+The 202 Accepted response includes an id value. You can use this ID to check the status of the upload by using it in the /sarifs/{sarif_id} endpoint. For more information, see "Get information about a SARIF upload."
+
+OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+This endpoint is limited to 1,000 requests per hour for each user or app installation calling it.
+
+Tokens de acesso granular para "Upload an analysis as SARIF data"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (write)
+Parâmetros para "Upload an analysis as SARIF data"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+Parâmetros do corpo
+Nome, Tipo, Descrição
+commit_sha string Obrigatório
+The SHA of the commit to which the analysis you are uploading relates.
+
+ref string Obrigatório
+The full Git reference, formatted as refs/heads/<branch name>, refs/tags/<tag>, refs/pull/<number>/merge, or refs/pull/<number>/head.
+
+sarif string Obrigatório
+A Base64 string representing the SARIF file to upload. You must first compress your SARIF file using gzip and then translate the contents of the file into a Base64 encoding string. For more information, see "SARIF support for code scanning."
+
+checkout_uri string
+The base directory used in the analysis, as it appears in the SARIF file. This property is used to convert file paths from absolute to relative, so that alerts can be mapped to their correct location in the repository.
+
+started_at string
+The time that the analysis run began. This is a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+
+tool_name string
+The name of the tool used to generate the code scanning analysis. If this parameter is not used, the tool name defaults to "API". If the uploaded SARIF contains a tool GUID, this will be available for filtering using the tool_guid parameter of operations such as GET /repos/{owner}/{repo}/code-scanning/alerts.
+
+validate boolean
+Whether the SARIF file will be validated according to the code scanning specifications. This parameter is intended to help integrators ensure that the uploaded SARIF files are correctly rendered by code scanning.
+
+Códigos de status de resposta HTTP para "Upload an analysis as SARIF data"
+Código de status	Descrição
+202	
+Accepted
+
+400	
+Bad Request if the sarif field is invalid
+
+403	
+Response if the repository is archived or if GitHub Advanced Security is not enabled for this repository
+
+404	
+Resource not found
+
+413	
+Payload Too Large if the sarif field is too large
+
+503	
+Service unavailable
+
+Exemplos de código para "Upload an analysis as SARIF data"
+Exemplo de solicitação
+post/repos/{owner}/{repo}/code-scanning/sarifs
+curl -L \ -X POST \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/sarifs \ -d '{"commit_sha":"4b6472266afd7b471e86085a6659e8c7f2b119da","ref":"refs/heads/master","sarif":"H4sICMLGdF4AA2V4YW1wbGUuc2FyaWYAvVjdbts2FL7PUxDCijaA/CM7iRNfLkPXYgHSNstumlzQ0pHFVCI1korjFgH2ONtr7Ul2KFmy/mOn6QIkjsjDw0/nfN85NL8dEGL9pNwAImqRObECrWM1H40kXQ2XTAfJIlEgXcE1cD10RTQSVDE10K4aKSqZP1AxuKOIKg1ydJU60jSfSh8Hk6EzHA/vlOCWbfa7B6kYPpj90rlsWCZcmbHP5Bs+4oAWIjQD2SMOeJLh2vIQDnIaQerqXHjw8YIgxohybxAyDsS4cAPKsp03K4RcUs6+Up2D+JXpd8mibKIQN9fM/aMCdbyBujGSSQgVxJtx5qX2d2qUcIweQhEuDQf3GBO6CKHkogx/N3MVCKl/AeVKFuf4y5ubsMGDTj1ep+5I7sgmLIpxtU38hLtmMRGSuCFVyip5eKzs5ydh+LztVL6f2m6oih1BkYiuyQIIJWodxVpERPj4sEiWBNNH8EWT0DMG8EAjzKVHXCrB4FkPu/F64NMk1OeC+2yZSNoBOoR7CC0EzYWGbm+xFDFIzbI011+cLjfZtyJkmMZfumAh02uL3NpV2y+MZ6RAjxibyKrNxxJcVjANSb4eBGwZ1M0KsuyR2poLr5rMl8vaDSeVn6eTWEO2j2xIEcmhwlTKNOi4GMOI8gfuZYkvJ7b4v5Tiumyz7RnHeodFzpS8ASIZCH/AYdWi2z3sG8JtFxJ6fF9yR9CdifBr9Pd6d5V2+zbJKjjCFGGmsHuYFy2ytJq9tUxcLSRSQecppOGKrpUxYfxefMEFK+wOGa4hudQByBVT0L+EKtyACxnRsABhEx1QjVDs1KNI9MbpnhqfE45B6FJvu3hRu5VRU9MhZLmK7fqkKyQSTHNoyMqUFMqXCV3CwAeqEwmVokraK8IuBaGvHjQ0gMYrKjnjyw7uk9uD8tgmsBbFMPnU1bV2ZhkJNkuolUiWys3UPWzs5aaIUz9TBe8zMb+6+nT+6fLy91dlE3xzeDDT4zYszb0bW6NjJd0Rvn2EnLvWLFSdKPpBzInzfRgu8ETyMcH8nIfMnJCeC2PyfTA+UKngcnGH7Hw2hGkVQs5YlIRCtdWZYQ4/73es2JlxkfViOEIhoWJq5Oo6UBBfiKIqFBWhiE3jJGbFwVoxBHTRSuIS67sMeplei24X20shLjG+8gqbKC/bESiNMC+wd5q5id0yeS7CJEqXzmrTWNq3k05l84P6f4/bEmXFJjI0fIt1BGQssUnUDkBYeVhE5TqPnMH3jqogDcP0zKcTgLPTMSzOjhbjuVOmW23l1fYNStulfo6sXlFsGLhbDy5RECPRYGCTgOj2bd4nUQEivEd0H7KKYxqnEhFohuur3a3UPskbH/+Yg0+M5P2MHRJu3ziHh3Z2NCrWt3XF1rWTw8Ne/pfbWYXnDSE0SNZQQt1i18q7te2vOhu7ehWuvVyeu0wbLZi24mhoo6aOOTltzG/lgdVvVoXQq5V+pewkFIzL8fjEcadT55jOjpzFzHuOTtDNrMkJPMVQDd7F09RID72O/UPZ0tmctqZ7kWX6EmSZnDpP8GU67SXM8XE3YSrxbKsx6UReZ4y6n/FVZfJjs9Z7stma75W5yQtkzjk5eSJxk1lv4o7+j8TlhaJ2lsKWZO6lruDPBLib3x5ZN/KGWzZ+pn///evv7OOf4iIBv3oY9L/l1wiJ9p0Tc+F1zZnOE9NxXWEus6IQhr5pMfoqxi8WPsuu0azsns4UC6WzNzHIzbeEx4P/AJ3SefgcFAAA"}'
+Default response
+
+Status: 202
+{ "id": "47177e22-5596-11eb-80a1-c1e54ef945c6", "url": "https://api.github.com/repos/octocat/hello-world/code-scanning/sarifs/47177e22-5596-11eb-80a1-c1e54ef945c6" }
+Get information about a SARIF upload
+Gets information about a SARIF upload, including the status and the URL of the analysis that was uploaded so that you can retrieve details of the analysis. For more information, see "Get a code scanning analysis for a repository." OAuth app tokens and personal access tokens (classic) need the security_events scope to use this endpoint with private or public repositories, or the public_repo scope to use this endpoint with only public repositories.
+
+Tokens de acesso granular para "Get information about a SARIF upload"
+Este endpoint funciona com os seguintes tipos de token granulares:
+
+Tokens de acesso de usuário do aplicativo GitHub
+Tokens de acesso à instalação do aplicativo GitHub
+Tokens de acesso pessoal refinados
+O token refinado deve ter os seguintes conjuntos de permissões:
+
+"Code scanning alerts" repository permissions (read)
+Parâmetros para "Get information about a SARIF upload"
+Cabeçalhos
+Nome, Tipo, Descrição
+accept string
+Setting to application/vnd.github+json is recommended.
+
+Parâmetros de caminho
+Nome, Tipo, Descrição
+owner string Obrigatório
+The account owner of the repository. The name is not case sensitive.
+
+repo string Obrigatório
+The name of the repository without the .git extension. The name is not case sensitive.
+
+sarif_id string Obrigatório
+The SARIF ID obtained after uploading.
+
+Códigos de status de resposta HTTP para "Get information about a SARIF upload"
+Código de status	Descrição
+200	
+OK
+
+403	
+Response if GitHub Advanced Security is not enabled for this repository
+
+404	
+Not Found if the sarif id does not match any upload
+
+503	
+Service unavailable
+
+Exemplos de código para "Get information about a SARIF upload"
+Exemplo de solicitação
+get/repos/{owner}/{repo}/code-scanning/sarifs/{sarif_id}
+curl -L \ -H "Accept: application/vnd.github+json" \ -H "Authorization: Bearer <YOUR-TOKEN>" \ -H "X-GitHub-Api-Version: 2026-03-10" \ https://api.github.com/repos/OWNER/REPO/code-scanning/sarifs/SARIF_ID
+Default response
+
+Status: 200
+{ "processing_status": "complete", "analyses_url": "https://api.github.com/repos/octocat/hello-world/code-scanning/analyses?sarif_id=47177e22-5596-11eb-80a1-c1e54ef945c6" }
+Ajuda e suporte
+Você encontrou o que precisava?
+
+Política de privacidade
+Ainda precisa de ajuda?
+Pergunte à comunidade do GitHub
+Contate o suporte
+Legal
+Parte desse conteúdo pode ser traduzida por computador ou IA.
+
+© 2026 GitHub, Inc.
+Termos
+Privacidade
+Status
+Preços
+Serviços especializados
+Blog
+Pontos de extremidade da API REST para varredura de código - Documentos do GitHub
+
+
+
+
+
+
+
+
+
+
+
+https://docs.github.com/pt/rest/about-the-rest-api/api-versions?apiVersion=2026-03-10
+
+
+
+
+
+
+Skip to main content
+Documentos do GitHub
+API REST/
+Sobre a API REST/
+Versões da API
+Versões da API
+Saiba como especificar qual versão da API REST usar sempre que fizer uma solicitação à API REST.
+
+Neste artigo
+Sobre o controle de versão da API
+A API REST do GitHub tem controle de versão. O nome da versão da API é baseado na data em que a versão da API foi lançada. Por exemplo, a versão 2026-03-10 da API foi lançada em Tue, 10 Mar 2026.
+
+Alterações interruptivas são alterações que podem potencialmente interromper uma integração. Forneceremos aviso prévio antes de liberar alterações significativas. As alterações interruptivas incluem:
+
+Removendo uma operação inteira
+Removendo ou renomeando um parâmetro
+Removendo ou renomeando um campo de resposta
+Adicionando um novo parâmetro obrigatório
+Tornando necessário um parâmetro que era opcional
+Alterando o tipo de um parâmetro ou campo de resposta
+Removendo valores de enumeração
+Adicionando uma nova regra de validação a um parâmetro existente
+Alterando os requisitos de autenticação ou autorização
+Quaisquer alterações aditivas (não interruptivas) estarão disponíveis em todas as versões da API com suporte. Alterações aditivas são alterações que não devem interromper uma integração. As alterações aditivas incluem:
+
+Adicionando uma operação
+Adicionando um parâmetro opcional
+Adicionando um cabeçalho de solicitação opcional
+Adicionando um campo de resposta
+Adicionando um cabeçalho de resposta
+Adicionando valores de enumeração
+Quando uma nova versão da API REST for lançada, a versão anterior da API terá suporte por pelo menos mais 24 meses após o lançamento da nova versão da API.
+
+Especificando uma versão da API
+Você deve usar o cabeçalho X-GitHub-Api-Version para especificar uma versão da API. Por exemplo:
+
+curl --header "X-GitHub-Api-Version:2026-03-10" https://api.github.com/zen
+As solicitações sem o cabeçalho X-GitHub-Api-Version usarão a versão 2022-11-28 padrão.
+
+Se você especificar uma versão da API que não tem mais suporte, receberá um erro 400.
+
+Atualizando para o nova versão da API
+Antes de atualizar para uma nova versão da API REST, leia o log de alterações significativas da nova versão da API para entender quais mudanças significativas estão incluídas e como atualizar para essa versão específica da API. Para saber mais, confira Alterações de quebra.
+
+Ao atualizar sua integração para especificar a nova versão da API no cabeçalho X-GitHub-Api-Version, você também precisará fazer as alterações necessárias para que sua integração funcione com a nova versão da API.
+
+Após a atualização da integração, teste sua integração para verificar se ela funciona com a nova versão da API.
+
+Versões de API com suporte
+No momento, há suporte para as seguintes versões da API REST:
+
+2026-03-10 2022-11-28
+
+Você também pode fazer uma solicitação de API para obter todas as versões de API com suporte. Para saber mais, confira Pontos de extremidade da API REST para metadados.
+
+Ajuda e suporte
+Você encontrou o que precisava?
+
+Política de privacidade
+Ainda precisa de ajuda?
+Pergunte à comunidade do GitHub
+Contate o suporte
+Legal
+Parte desse conteúdo pode ser traduzida por computador ou IA.
+
+© 2026 GitHub, Inc.
+Termos
+Privacidade
+Status
+Preços
+Serviços especializados
+Blog
+Versões da API - Documentos do GitHub
+
+
+
+
+
+https://docs.github.com/pt/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2026-03-10#media-types
+
+
+
+
+Skip to main content
+Documentos do GitHub
+API REST/
+Usando a API REST/
+Introdução
+Introdução à API REST
+Aprenda a usar a API REST do GitHub.
+
+Tool navigation
+GitHub CLI
+curl
+JavaScript
+Neste artigo
+Introdução
+Este artigo descreve como usar a API REST do GitHub com GitHub CLI, curl ou JavaScript. Para ver um guia de início rápido, confira Início Rápido da API REST GitHub.
+
+Sobre solicitações para a API REST
+Esta seção descreve os elementos que compõem uma solicitação de API:
+
+        [Método HTTP](#http-method)
+        [Caminho](#path)
+        [Cabeçalhos](#headers)
+        [Tipos de mídia](#media-types)
+        [Autenticação](#authentication)
+        [Parâmetros](#parameters)
+Cada solicitação para a API REST inclui um método HTTP e um caminho. Dependendo do ponto de extremidade da API REST, talvez você também precise especificar cabeçalhos de solicitação, informações de autenticação, parâmetros de consulta ou parâmetros de corpo.
+
+A documentação de referência da API REST descreve o método HTTP, o caminho e os parâmetros para cada ponto de extremidade. Ela também exibe exemplos de solicitações e respostas para cada ponto de extremidade. Para mais informações, confira a documentação de referência de REST.
+
+método HTTP
+O método HTTP de um ponto de extremidade define o tipo de ação que ele executa em um determinado recurso. Alguns métodos HTTP comuns são GET, POST, DELETE e PATCH. A documentação de referência da API REST fornece o método HTTP para cada ponto de extremidade.
+
+Por exemplo, o método HTTP para o ponto de extremidade "Listar problemas do repositório" é GET.
+
+Sempre que possível, a API REST do GitHub tenta usar um método HTTP apropriado para cada ação.
+
+        `GET`: usado para recuperar recursos.
+        `POST`: usado para criar recursos.
+        `PATCH`: usado para atualizar propriedades de recursos.
+        `PUT`: usado para substituir recursos ou coleções de recursos.
+        `DELETE`: usado para excluir recursos.
+Caminho
+Cada ponto de extremidade tem um caminho. A documentação de referência da API REST fornece o caminho para cada ponto de extremidade. Por exemplo, o caminho para o ponto de extremidade "Listar problemas do repositório" é /repos/{owner}/{repo}/issues.
+
+As chaves {} em um caminho denotam os parâmetros de caminho que precisam ser especificados por você. Os parâmetros de caminho modificam o caminho do ponto de extremidade e são necessários em sua solicitação. Por exemplo, os parâmetros de caminho para o ponto de extremidade "Listar problemas do repositório" são {owner} e {repo}. Para usar esse caminho em sua solicitação de API, substitua {repo} pelo nome do repositório no qual você deseja solicitar uma lista de problemas e substitua {owner} pelo nome da conta proprietária do repositório.
+
+Cabeçalhos
+Os cabeçalhos fornecem informações adicionais sobre a solicitação e a resposta desejada. Veja a seguir alguns exemplos de cabeçalhos que você pode usar em suas solicitações para a API REST do GitHub. Para obter um exemplo de uma solicitação que usa cabeçalhos, consulte Fazer uma solicitação.
+
+Accept
+A maioria dos pontos de extremidade da API REST do GitHub especifica que você deve transmitir um cabeçalho Accept com um valor de application/vnd.github+json. O valor do cabeçalho Accept é um tipo de mídia. Para obter mais informações sobre os tipos de mídia, confira Tipos de mídia.
+
+X-GitHub-Api-Version
+Você deve usar esse cabeçalho para especificar uma versão da API REST a ser usada para sua solicitação. Para saber mais, confira Versões da API.
+
+User-Agent
+Todas as solicitações de API precisam incluir um cabeçalho User-Agent válido. O cabeçalho User-Agent identifica o usuário ou aplicativo que está fazendo a solicitação.
+
+Por padrão, a GitHub CLI envia um cabeçalho User-Agent válido. No entanto, o GitHub recomenda usar o nome de usuário do GitHub ou o nome do aplicativo para o valor do cabeçalho User-Agent. Isso permite que GitHub entre em contato com você se houver problemas.
+
+Veja a seguir um exemplo de User-Agent para um aplicativo chamado Awesome-Octocat-App:
+
+User-Agent: Awesome-Octocat-App
+Solicitações sem cabeçalho User-Agent serão rejeitadas. Se você fornecer um cabeçalho User-Agent inválido, receberá uma resposta 403 Forbidden.
+
+
+Tipos de mídia
+Você pode especificar um ou mais tipos de mídia adicionando-os ao cabeçalho Accept de sua solicitação. Para obter mais informações sobre o cabeçalho Accept, confira Accept.
+
+Os tipos de mídia especificam o formato dos dados que você deseja consumir da API. Os tipos de mídia são específicos aos recursos, permitindo que eles mudem de forma independente e ofereçam suporte a formatos que outros recursos não. A documentação de cada endpoint da API REST do GitHub descreverá os tipos de mídia que suporta. Para obter mais informações, confira Documentação da API REST do GitHub.
+
+Os tipos de mídia mais comuns compatíveis com a API REST do GitHub são application/vnd.github+json e application/json.
+
+Existem tipos de mídia personalizados que você pode usar com alguns endpoints. A API REST, por exemplo, para gerenciar commits e pull requests, oferece suporte aos tipos de mídia diff, patch e sha. Os tipos de mídia full, raw, text ou html são usados por outros endpoints.
+
+Todos os tipos de mídias personalizadas no GitHub são semelhantes ao seguinte: application/vnd.github.PARAM+json, em que PARAM é o nome do tipo de mídia. Por exemplo, para especificar o tipo de mídia raw, você poderia usar application/vnd.github.raw+json.
+
+Para obter um exemplo de uma solicitação que usa tipos de mídia, confira Fazer uma solicitação.
+
+Autenticação
+Muitos endpoints exigem autenticação ou retornam informações adicionais se você estiver autenticado. Além disso, você pode fazer mais solicitações por hora quando estiver autenticado.
+
+Embora alguns pontos de extremidade da API REST sejam acessíveis sem autenticação, a GitHub CLI requer que você se autentique antes de usar o subcomando api para fazer uma solicitação de API. Utilize o subcomando auth login para se autenticar no GitHub. Para saber mais, confira Fazer uma solicitação.
+
+Parâmetros
+Muitos métodos de API exigem ou permitem que você envie informações adicionais em parâmetros em sua solicitação. Existem alguns tipos diferentes de parâmetros: parâmetros de caminho, parâmetros de corpo e parâmetros de consulta.
+
+Parâmetros de caminho
+Os parâmetros de caminho modificam o caminho do endpoint. Esses parâmetros são obrigatórios em sua solicitação. Para obter mais informações, consulte Caminho.
+
+Parâmetros do corpo
+Os parâmetros do corpo permitem que você passe dados adicionais para a API. Esses parâmetros podem ser opcionais ou obrigatórios, dependendo do ponto de extremidade. Por exemplo, um parâmetro de corpo pode permitir que você especifique um título de problema ao criar um novo problema ou especificar determinadas configurações ao habilitar ou desabilitar um recurso. A documentação de cada ponto de extremidade da API REST do GitHub descreverá os tipos de corpo compatíveis. Para obter mais informações, confira Documentação da API REST do GitHub.
+
+Por exemplo, o endpoint "Criar uma questão" exige que você especifique um título para a nova questão em sua solicitação. Ele também permite que você especifique outras informações opcionalmente, como texto para colocar no corpo do problema, usuários para atribuir ao novo problema ou rótulos para aplicar ao novo problema. Para obter um exemplo de uma solicitação que usa parâmetros de corpo, confira Fazer uma solicitação.
+
+Para transmitir parâmetros de corpo, você deverá autenticar sua solicitação. Para obter mais informações, confira Autenticação.
+
+Parâmetros de consulta
+Os parâmetros de consulta permitem controlar quais dados são retornados para uma solicitação. Geralmente, esses parâmetros são opcionais. A documentação de cada ponto de extremidade da API REST do GitHub descreverá quaisquer parâmetros de consulta compatíveis. Para obter mais informações, confira Documentação da API REST do GitHub.
+
+Por exemplo, o endpoint "List public events" retorna trinta itens por padrão. Você pode usar o parâmetro de consulta per_page para retornar dois problemas em vez de 30. Você pode usar o parâmetro de consulta page para buscar apenas a primeira página de resultados. Para obter um exemplo de uma solicitação que usa parâmetros de consulta, consulte Fazer uma solicitação.
+
+Como fazer uma solicitação
+Esta seção demonstra como fazer uma solicitação autenticada para a API REST do GitHub usando a GitHub CLI.
+
+1. Instalação
+Instale GitHub CLI no macOS, Windows ou Linux. Para obter instruções de instalação, confira Instalação no repositório do GitHub CLI.
+
+2. Autenticar
+Para se autenticar no GitHub, execute o comando a seguir no terminal.
+
+gh auth login
+Você pode usar a opção --scopes para especificar os escopos desejados. Se você quiser autenticar com um token criado, poderá usar a opção --with-token. Para obter mais informações, confira a documentaçãoauth login da GitHub CLI.
+
+Selecione o local em que deseja se autenticar:
+
+Se você acessar o GitHub no GitHub.com, selecione GitHub.com.
+Se você acessar o GitHub em um domínio diferente, selecione Outro e depois insira o nome do host (por exemplo, octocorp.ghe.com).
+Siga o restante das solicitações na tela.
+
+O GitHub CLI armazena automaticamente suas credenciais do Git quando você escolhe HTTPS como protocolo preferencial para operações Git e responde "sim" ao prompt que pergunta se deseja efetuar a autenticação no Git com suas credenciais do GitHub. Isso pode ser útil porque permite que você use comandos Git como git push e git pull sem a necessidade de configurar um gerenciador de credenciais distinto ou usar SSH.
+
+3. Escolha um endpoint para sua solicitação
+Escolha um ponto de extremidade para o qual fazer uma solicitação. Você pode consultar a documentação da API REST do GitHub para descobrir endpoints que você pode usar para interagir com o GitHub.
+
+Identifique o método HTTP e o caminho do ponto de extremidade. Você enviará tais informações com sua solicitação. Para obter mais informações, consulte Método HTTP e Caminho.
+
+Por exemplo, o ponto de extremidade "Criar um problema" usa o método HTTP POST e o caminho /repos/{owner}/{repo}/issues.
+
+Identifique os parâmetros de caminho necessários. Os parâmetros de caminho necessários aparecem entre colchetes {} no caminho do ponto de extremidade. Substitua cada marcador de posição do parâmetro pelo valor desejado. Para obter mais informações, consulte Caminho.
+
+Por exemplo, o ponto de extremidade "Criar um problema" usa o caminho /repos/{owner}/{repo}/issues e os parâmetros de caminho são {owner} e {repo}. Para usar esse caminho em sua solicitação de API, substitua {repo} pelo nome do repositório no qual deseja criar um novo problema e substitua {owner} pelo nome da conta proprietária do repositório.
+
+4. Fazer uma solicitação com GitHub CLI
+Use o subcomando api da GitHub CLI para fazer uma solicitação de API. Para obter mais informações, confira a documentaçãoapi da GitHub CLI.
+
+Em sua solicitação, especifique as seguintes opções e valores: * --method seguido pelo método HTTP e o caminho do endpoint. Para obter mais informações, consulte Método HTTP e Caminho. * --header: * ** Accept:** passe o tipo de mídia em um cabeçalho Accept. Para transmitir vários tipos de mídia em um cabeçalho Accept, separe os tipos de mídia com uma vírgula: Accept: application/vnd.github+json,application/vnd.github.diff. Para obter mais informações, confira Accept e Tipos de mídia. * ** X-GitHub-Api-Version:** passe a versão da API em um cabeçalho X-GitHub-Api-Version. Para obter mais informações, consulte X-GitHub-Api-Version. * ** -f ** ou -F seguido por quaisquer parâmetros de corpo ou parâmetros de consulta no formato key=value. Use a opção -F para transmitir um parâmetro que seja um número, booliano ou nulo. Use a opção -f para transmitir parâmetros de sequência.
+
+Alguns pontos de extremidade usam parâmetros de consulta que são matrizes. Para enviar uma matriz na cadeia de caracteres de consulta, use o parâmetro de consulta uma vez por item de matriz e acrescente [] após o nome do parâmetro de consulta. Por exemplo, para fornecer uma matriz de dois IDs de repositório, use -f repository_ids[]=REPOSITORY_A_ID -f repository_ids[]=REPOSITORY_B_ID.
+
+Se você não precisar especificar nenhum parâmetro de corpo ou parâmetro de consulta em sua solicitação, omita essa opção. Para obter mais informações, consulte Parâmetros de corpo e Parâmetros de consulta. Para obter exemplos, confira Solicitação de exemplo usando parâmetros de corpo e Solicitação de exemplo usando parâmetros de consulta.
+
+Solicitação de exemplo
+A solicitação de exemplo a seguir usa o ponto de extremidade "Obter Octocat" para retornar o octocat como arte ASCII.
+
+Shell
+gh api --method GET /octocat \
+--header 'Accept: application/vnd.github+json' \
+--header "X-GitHub-Api-Version: 2022-11-28"
+Exemplo de solicitação usando parâmetros de consulta
+O endpoint "Listar eventos públicos" retorna trinta questões por padrão. O exemplo a seguir usa o parâmetro de consulta per_page para retornar dois problemas em vez de 30 e o parâmetro de consulta page para efetuar fetch apenas na primeira página de resultados.
+
+Shell
+gh api --method GET /events -F per_page=2 -F page=1
+--header 'Accept: application/vnd.github+json' \
+Exemplo de solicitação usando parâmetros do corpo
+O exemplo a seguir usa o endpoint "Criar um problema" para criar um novo problema em um repositório the octocat/Spoon-Knife. Na resposta, localize o html_url do seu problema e acesse o problema no navegador.
+
+Shell
+gh api --method POST /repos/octocat/Spoon-Knife/issues \
+--header "Accept: application/vnd.github+json" \
+--header "X-GitHub-Api-Version: 2022-11-28" \
+-f title='Created with the REST API' \
+-f body='This is a test issue created by the REST API' \
+Como usar a resposta
+Depois que você fizer uma solicitação, a API retornará o código de status de resposta, os cabeçalhos de resposta e, possivelmente, um corpo da resposta.
+
+Sobre o código de resposta e os cabeçalhos
+Toda solicitação retornará um código de status HTTP que indica o sucesso da resposta. Para obter mais informações sobre códigos de resposta, confira a documentação do código de status de resposta HTTP do MDN.
+
+Além disso, a resposta incluirá cabeçalhos que fornecem mais detalhes sobre a resposta. Cabeçalhos que começam com X- ou x- são personalizados para GitHub. Por exemplo, os cabeçalhos x-ratelimit-remaining e x-ratelimit-reset informam quantas solicitações você pode fazer em um período.
+
+Para exibir o código de status e os cabeçalhos, use a opção --include ou --i ao enviar sua solicitação.
+
+Por exemplo, esta solicitação obtém uma lista de issues no repositório the octocat/Spoon-Knife:
+
+gh api \
+--header 'Accept: application/vnd.github+json' \
+--method GET /repos/octocat/Spoon-Knife/issues \
+-F per_page=2 --include
+E retorna um código de resposta e cabeçalhos semelhantes ao seguinte:
+
+HTTP/2.0 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Expose-Headers: ETag, Link, Location, Retry-After, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset
+Cache-Control: private, max-age=60, s-maxage=60
+Content-Security-Policy: default-src 'none'
+Content-Type: application/json; charset=utf-8
+Date: Thu, 04 Aug 2022 19:56:41 GMT
+Etag: W/"a63dfbcfdb73621e9d2e89551edcf9856731ced534bd7f1e114a5da1f5f73418"
+Link: <https://api.github.com/repositories/1300192/issues?per_page=1&page=2>; rel="next", <https://api.github.com/repositories/1300192/issues?per_page=1&page=14817>; rel="last"
+Referrer-Policy: origin-when-cross-origin, strict-origin-when-cross-origin
+Server: GitHub.com
+Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
+Vary: Accept, Authorization, Cookie, Accept-Encoding, Accept, X-Requested-With
+X-Accepted-Oauth-Scopes: repo
+X-Content-Type-Options: nosniff
+X-Frame-Options: deny
+X-Github-Api-Version-Selected: 2022-08-09
+X-Github-Media-Type: github.v3; format=json
+X-Github-Request-Id: 1C73:26D4:E2E500:1EF78F4:62EC2479
+X-Oauth-Client-Id: 178c6fc778ccc68e1d6a
+X-Oauth-Scopes: gist, read:org, repo, workflow
+X-Ratelimit-Limit: 15000
+X-Ratelimit-Remaining: 14996
+X-Ratelimit-Reset: 1659645499
+X-Ratelimit-Resource: core
+X-Ratelimit-Used: 4
+X-Xss-Protection: 0
+Neste exemplo, o código de resposta é 200, o que indica uma solicitação bem-sucedida.
+
+Sobre o corpo da resposta
+Muitos pontos de extremidade devolverão um corpo da resposta. A menos que especificado de outra forma, o corpo da resposta está no formato JSON. Os campos em branco são incluídos como null em vez de serem omitidos. Todos os carimbo de data/hora são devolvidos no formato UTC, ISO 8601: YYYY-MM-DDTHH:MM:SSZ.
+
+Ao contrário da API do GraphQL, onde você especifica quais informações quer, a API REST normalmente retorna mais informações do que você precisa. Se desejar, você pode analisar a resposta a fim de extrair informações específicas.
+
+Por exemplo, você pode usar > a fim de redirecionar a resposta para um arquivo. No exemplo a seguir, substitua REPO-OWNER pelo nome da conta proprietária do repositório e REPO-NAME pelo nome do repositório.
+
+Shell
+gh api \
+--header 'Accept: application/vnd.github+json' \
+--method GET /repos/REPO-OWNER/REPO-NAME/issues \
+-F per_page=2 > data.json
+Em seguida, você pode usar o jq para obter o título e o ID do autor de cada issue:
+
+Shell
+jq '.[] | {title: .title, authorID: .user.id}' data.json
+Os dois comandos anteriores retornam algo como:
+
+{
+  "title": "Update index.html",
+  "authorID": 10701255
+}
+{
+  "title": "Edit index file",
+  "authorID": 53709285
+}
+Para obter mais informações sobre o jq, confira a documentação do jq.
+
+Declarações detalhadas vs. resumidas
+Uma resposta pode incluir todos os atributos de um recurso ou apenas um subconjunto de atributos, dependendo de você efetuar fetch de um recurso individual ou de uma lista de recursos.
+
+Quando você efetuar fetch de um recurso individual, como um repositório específico, a resposta normalmente incluirá todos os atributos desse recurso. Esta é a representação "detalhada" do recurso.
+Quando você efetuar fetch de uma lista de recursos, como uma lista de vários repositórios, a resposta incluirá apenas um subconjunto dos atributos para cada recurso. Esta é a representação resumida do recurso.
+Observe que às vezes a autorização influencia a quantidade de detalhes incluídos em uma declaração.
+
+A razão para isso é que alguns atributos são computacionalmente caros para a API fornecer, portanto, o GitHub exclui esses atributos da declaração resumida. Para obter esses atributos, você pode buscar a representação detalhada.
+
+A documentação fornece um exemplo de resposta para cada método da API. A resposta de exemplo ilustra todos os atributos que são retornados por esse método.
+
+Hipermídia
+Todos os recursos podem ter uma ou mais propriedades *_url vinculando outros recursos. Estes tem o objetivo de fornecer URLs explícitas para que os clientes API apropriados não precisem construir URLs por conta própria. É altamente recomendável que os clientes da API os utilizem. Fazer isso tornará as futuras atualizações da API mais fáceis para os desenvolvedores. Espera-se que todas as URLs sejam modelos de URI RFC 6570 adequados.
+
+Em seguida, você pode expandir esses modelos usando algo como o gem uri_template:
+
+>> tmpl = URITemplate.new('/notifications{?since,all,participating}')
+>> tmpl.expand
+=> "/notifications"
+
+>> tmpl.expand all: 1
+=> "/notifications?all=1"
+
+>> tmpl.expand all: 1, participating: 1
+=> "/notifications?all=1&participating=1"
+Próximas etapas
+Este artigo demonstrou como listar e criar problemas em um repositório. Para obter mais prática, tente comentar numa questão, editar o título de uma questão ou fechar uma questão. Para obter mais informações, consulte o ponto de extremidade "Criar um comentário sobre o problema" e o ponto de extremidade "Atualizar um problema".
+
+Para obter mais informações sobre outros pontos de extremidade que você pode usar, confira a documentação de referência de REST.
+
+Ajuda e suporte
+Você encontrou o que precisava?
+
+Política de privacidade
+Ainda precisa de ajuda?
+Pergunte à comunidade do GitHub
+Contate o suporte
+Legal
+Parte desse conteúdo pode ser traduzida por computador ou IA.
+
+© 2026 GitHub, Inc.
+Termos
+Privacidade
+Status
+Preços
+Serviços especializados
+Blog
+
+
+
+
+
+
+
+
+
+
+O ARQUIVO src/lib/github.ts
+
+ESTÁ ATUALMENTE COM ESSE 
+
+CONTEÚDO 
+
+
+
+// src/lib/github.ts
+import { cache } from "react";
+import type { GitHubRepo } from "@/types/github";
+
+const GITHUB_API = "https://api.github.com";
+const GITHUB_USER = "Santosdevbjj";
+const REPO = "myArticles";
+const BRANCH = "main";
+
+// URL para buscar o conteúdo bruto (RAW) dos arquivos Markdown
+const RAW_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO}/${BRANCH}/artigos`;
+
+/**
+ * 1. SERVIÇO DE BUSCA DE CONTEÚDO (Para os Artigos)
+ * Busca o texto bruto (.md) de um artigo específico dentro do repositório.
+ */
+export async function getArticleContent(slugArray: string[]) {
+  // Converte o array ["ia-artigos", "meu-artigo"] em "ia-artigos/meu-artigo"
+  const fullPath = slugArray.join("/");
+  
+  try {
+    const res = await fetch(`${RAW_BASE_URL}/${fullPath}.md`, {
+      // Cache do Next.js: mantém os dados por 1 hora (3600 segundos)
+      next: { 
+        revalidate: 3600,
+        tags: [`article-${fullPath}`]
+      },
+    });
+
+    if (!res.ok) {
+      console.warn(`⚠️ Artigo não encontrado no GitHub: ${fullPath}`);
+      return null;
+    }
+
+    return await res.text();
+  } catch (error) {
+    console.error("❌ Erro ao buscar conteúdo do artigo no GitHub:", error);
+    return null;
+  }
+}
+
+/**
+ * 2. SERVIÇO DE BUSCA DE REPOSITÓRIOS (Para o Portfólio)
+ * Busca repositórios do usuário de forma otimizada para Next.js 15/16.
+ */
+export const getPortfolioRepos = cache(
+  async (username: string): Promise<GitHubRepo[]> => {
+    const token = process.env.GITHUB_TOKEN;
+
+    try {
+      const res = await fetch(
+        `${GITHUB_API}/users/${username}/repos?per_page=100&type=owner&sort=updated`,
+        {
+          headers: {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          next: {
+            revalidate: 3600,
+            tags: ["github-repos"],
+          },
+        }
+      );
+
+      if (res.status === 403) {
+        console.warn("⚠️ GitHub API: Rate limit atingido ou token inválido.");
+      }
+
+      if (!res.ok) {
+        throw new Error(`GitHub API Error: ${res.status} ${res.statusText}`);
+      }
+
+      const data: GitHubRepo[] = await res.json();
+
+      // Filtra apenas repositórios originais (não forks)
+      return data.filter(repo => !repo.fork);
+      
+    } catch (error) {
+      console.error("❌ Falha ao buscar repositórios do GitHub:", error);
+      return [];
+    }
+  }
+); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+O ARQUIVO src/app/sitemap.ts
+
+ESTA ATUALMENTE COM ESSE CONTEÚDO 
+
+
+
+// src/app/sitemap.ts
+import type { MetadataRoute } from "next"
+import {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+} from "@/dictionaries/locales"
+
+const baseUrl = "https://portfoliosantossergio.vercel.app"
+const lastModified = new Date()
+
+/**
+ * PÁGINAS ESTÁTICAS DO SISTEMA
+ */
+const pages = [
+  "",
+  "about",
+  "experience",
+  "projects",
+  "artigos",
+  "contact",
+] as const
+
+/**
+ * LISTA DE ARTIGOS (Sincronizado com seu repositório GitHub Santosdevbjj/myArticles)
+ * Estrutura: categoria/nome-do-arquivo
+ */
+const articleRoutes = [
+  "autoconhecimento/aprend-continuo",
+  "autoconhecimento/home-office",
+  "autoconhecimento/inteligencia-emocional",
+  "aws-artigos/microsservicos-aws-step-functions",
+  "azure-cloud-native/azure-cloud-native-article",
+  "data-artigos/dados-para-reduzir-custos",
+  "data-artigos/privacidade-de-dados",
+  "dio_Campus_Expert_14/analise-grafos-carreira",
+  "dio_Campus_Expert_14/conclusao-dio-Campus-Expert14",
+  "dio_Campus_Expert_14/contrato-compromisso",
+  "dio_Campus_Expert_14/neo4J-dados-conectados",
+  "dio_Campus_Expert_14/resultados-concretos-jornada",
+  "dotnet-artigos/visual-studio-vscode-guia-das-ides",
+  "ia-artigos/ia-generativa-com-sete-guardrails",
+  "ia-artigos/implementar-ia-generativa-com-eficiencia",
+  "java-artigos/java-pensar-como-engenheiro-software",
+  "low_code/low-code-saude",
+  "python-artigos/pycharm-spyder-vscode-ides",
+  "typescript-artigos/typescript-strict-padrao",
+]
+
+/**
+ * CONSTRUTOR DE ALTERNATES (SEO Internacional)
+ * Gera os links hreflang para que o Google entenda as versões traduzidas
+ */
+function buildAlternates(pathname: string) {
+  const languages: Record<string, string> = {}
+  
+  SUPPORTED_LOCALES.forEach((locale) => {
+    languages[locale] = `${baseUrl}/${locale}${pathname}`
+  })
+
+  languages["x-default"] = `${baseUrl}/${DEFAULT_LOCALE}${pathname}`
+  
+  return { languages }
+}
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  
+  // 1. Entrada da Raiz (https://portfoliosantossergio.vercel.app)
+  const rootEntry: MetadataRoute.Sitemap[number] = {
+    url: baseUrl,
+    lastModified,
+    changeFrequency: "weekly",
+    priority: 1,
+    alternates: buildAlternates(""),
+  }
+
+  // 2. Páginas Localizadas (/pt-BR/about, /en-US/about, etc.)
+  const localizedPages: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap((locale) =>
+    pages.map((page) => {
+      const pathname = page ? `/${page}` : ""
+      return {
+        url: `${baseUrl}/${locale}${pathname}`,
+        lastModified,
+        changeFrequency: (page === "" || page === "artigos") ? "weekly" : "monthly",
+        priority: page === "" ? 0.9 : 0.8,
+        alternates: buildAlternates(pathname),
+      }
+    })
+  )
+
+  // 3. Artigos Dinâmicos (Mapeados das subpastas do GitHub)
+  const articles: MetadataRoute.Sitemap = articleRoutes.flatMap((slug) =>
+    SUPPORTED_LOCALES.map((locale) => ({
+      url: `${baseUrl}/${locale}/artigos/${slug}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+      alternates: buildAlternates(`/artigos/${slug}`),
+    }))
+  )
+
+  // 4. Documentos Públicos (Currículos PDF na pasta public/)
+  const documents: MetadataRoute.Sitemap = SUPPORTED_LOCALES.map((locale) => ({
+    url: `${baseUrl}/cv-sergio-santos-${locale}.pdf`,
+    lastModified,
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }))
+
+  return [rootEntry, ...localizedPages, ...articles, ...documents]
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+│   ├── dio_Campus_Expert_14/                      (5 artigos)
+│   │   ├── analise-grafos-carreira.md             # Como Análise de Grafos em Streaming Transformou Minha Carreira em Data
+│   │   ├── conclusao-dio-Campus-Expert14.md       # Conclusão do DIO Campus Expert – Turma 14
+│   │   ├── contrato-compromisso.md                # Qual é o Meu Contrato de Compromisso?
+│   │   ├── neo4J-dados-conectados.md              # Neo4j: Estrutura e Análise de Dados Altamente Conectados
+│   │   └── resultados-concretos-jornada.md        # Minha Jornada no DIO Campus Expert 14
+│   │
+│   ├── dotnet-artigos/                            (1 artigo)
+│   │   └── visual-studio-vscode-guia-das-ides.md  # Visual Studio vs VS Code: Guia Para Multiplicar Produtividade em .NET
+│   │
+│   ├── ia-artigos/                                (2 artigos)
+│   │   ├── ia-generativa-com-sete-guardrails.md   # IA Generativa com 7 Guardrails de Segurança
+│   │   └── implementar-ia-generativa-com-eficiencia.md  # Da Teoria ao ROI: 5 Fases para Implementar IA com 30% de Eficiência
+│   │
+│   ├── java-artigos/                              (1 artigo)
+│   │   └── java-pensar-como-engenheiro-software.md  # Java na Prática: OOP para Pensar como Engenheiro de Software
+│   │
+│   ├── low_code/                                  (1 artigo)
+│   │   └── low-code-saude.md                      # Low-Code na Saúde: Como Criar Apps Médicos em Semanas
+│   │
+│   ├── python-artigos/                            (1 artigo)
+│   │   └── pycharm-spyder-vscode-ides.md          # VS Code, PyCharm, Spyder ou Jupyter? Qual IDE Python Escolher
+│   │
+│   └── typescript-artigos/                        (1 artigo)
+│       └── typescript-strict-padrao.md            # Strict por Padrão: TypeScript 6.0 Removeu o Sloppy Mode
+│
+└── README.md
+
+
+
+
+
+
+
