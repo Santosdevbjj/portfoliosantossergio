@@ -13,11 +13,10 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { useScrollSpy } from '@/contexts/scroll-spy.client'
 
 /**
- * NAVBAR COMPONENT - VERSÃO INTEGRADA 2026
+ * NAVBAR COMPONENT - CORRIGIDO
  * -----------------------------------------------------------------------------
- * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16, Node 24
- * ✔ I18n: PT-BR, EN-US, ES-ES, ES-MX, ES-AR
- * ✔ Navigation: Híbrida (Hash Scroll + Page Links)
+ * ✔ Fix: TypeScript Index Signature Error resolvido
+ * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16
  */
 
 interface NavbarProps {
@@ -58,13 +57,17 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
       isExternal: false
     }));
 
-    // Injeção manual do link de Artigos (Nova Página)
+    // Acesso seguro à tradução de artigos
+    // Cast para Record para evitar erro de indexação do TS
+    const navTranslations = nav as Record<string, string>;
+    const articlesLabel = navTranslations['articles'] || navTranslations['artigos'] || 'Artigos';
+
     return [
       ...baseLinks,
       { 
         id: 'articles', 
         href: `/${lang}/artigos`, 
-        label: nav['articles' as any] || 'Artigos',
+        label: articlesLabel,
         isExternal: true 
       }
     ];
