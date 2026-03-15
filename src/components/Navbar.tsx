@@ -13,12 +13,11 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { useScrollSpy } from '@/contexts/scroll-spy.client'
 
 /**
- * NAVBAR COMPONENT - REVISADO & INTEGRADO
+ * NAVBAR COMPONENT - VERSÃO INTEGRADA 2026
  * -----------------------------------------------------------------------------
  * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16, Node 24
- * ✔ I18n: Suporte PT-BR / EN-US / ES-ES / ES-MX / ES-AR (Via Dictionary)
- * ✔ Responsividade: Mobile-First com Overlay Inteligente
- * ✔ Acessibilidade: Aria-labels dinâmicos e Trava de Scroll
+ * ✔ I18n: PT-BR, EN-US, ES-ES, ES-MX, ES-AR
+ * ✔ Navigation: Híbrida (Hash Scroll + Page Links)
  */
 
 interface NavbarProps {
@@ -27,21 +26,20 @@ interface NavbarProps {
 }
 
 export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
-  // Extração segura do dicionário alinhada com src/types/dictionary.ts
   const { nav, menu, theme, languageSwitcher } = common
   const { activeSection } = useScrollSpy()
   
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
-  // Controle de scroll otimizado (Passive Listeners para Node 24/V8)
+  // Controle de scroll otimizado
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock body scroll (React 19 pattern)
+  // Lock body scroll para React 19
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -50,14 +48,27 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
     }
   }, [isOpen])
 
-  // Mapeamento dinâmico baseado no domínio de navegação e dicionário
-  const navLinks = useMemo(() => 
-    NAV_SECTIONS.map((section) => ({
+  // Mapeamento dinâmico integrado com a nova página de Artigos
+  const navLinks = useMemo(() => {
+    // Links baseados nas seções de scroll da Home
+    const baseLinks = NAV_SECTIONS.map((section) => ({
       id: section,
       href: `/${lang}${getNavHash(section)}`,
-      // Acesso via chave dinâmica no dicionário comum.nav
       label: nav[section as keyof typeof nav] || section,
-    })), [lang, nav])
+      isExternal: false
+    }));
+
+    // Injeção manual do link de Artigos (Nova Página)
+    return [
+      ...baseLinks,
+      { 
+        id: 'articles', 
+        href: `/${lang}/artigos`, 
+        label: nav['articles' as any] || 'Artigos',
+        isExternal: true 
+      }
+    ];
+  }, [lang, nav]);
 
   return (
     <nav
@@ -71,7 +82,7 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
-        {/* Logo / Nome do Profissional */}
+        {/* Logo */}
         <Link 
           href={`/${lang}`} 
           className="group relative z-[110] outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg"
@@ -82,7 +93,7 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
           </span>
         </Link>
 
-        {/* Desktop Menu - Tailwind 4.2 Flex Layout */}
+        {/* Desktop Menu */}
         <div className="hidden lg:flex items-center gap-10">
           <div className="flex gap-8">
             {navLinks.map(link => {
@@ -131,7 +142,7 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay - Full Screen Glassmorphism */}
+      {/* Mobile Menu Overlay */}
       <div 
         className={`lg:hidden fixed inset-0 z-[100] bg-white dark:bg-[#020617] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
           isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
