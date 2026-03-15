@@ -1,6 +1,7 @@
 // src/app/[lang]/page.tsx
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
+import Link from "next/link"; // Importado para a nova seção
 
 import type { Locale } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
@@ -32,14 +33,11 @@ export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 } 
 
-// coloquei o abaixo
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#020617",
 };
-
-
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -52,19 +50,36 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: dict?.meta?.author ? `${dict.meta.author} | ${dict.hero?.title}` : "Sérgio Santos",
     description: dict?.meta?.description ?? "Portfolio",
+    metadataBase: new URL(siteUrl),
     alternates: {
       canonical: `${siteUrl}/${locale}`,
       languages: Object.fromEntries(locales.map((l) => [l, `${siteUrl}/${l}`])),
     },
+    // INTEGRAÇÃO DAS OG IMAGES
+    openGraph: {
+      images: [
+        {
+          url: `/og/og-image-${locale}.png`,
+          width: 1200,
+          height: 630,
+          alt: `Portfolio Sérgio Santos - ${locale}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [`/og/og-image-${locale}.png`],
+    },
+    icons: {
+      icon: "/icons/icon.png",
+      shortcut: "/icons/favicon.ico",
+      apple: "/icons/apple-touch-icon.png",
+    }
   };
 }
 
-/**
- * Normalização robusta de repositórios do GitHub
- */
 function normalizeProjects(repos: any[]): ProjectDomain[] {
   if (!repos || !Array.isArray(repos)) return [];
-
   return repos
     .map((repo, index): ProjectDomain => {
       const rawTopics = repo?.topics || repo?.repository_topics || [];
@@ -91,23 +106,16 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
 export default async function HomePage({ params }: PageProps) {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
-
   if (!locales.includes(locale)) notFound();
   const lang = locale as Locale;
 
-  // Busca paralela otimizada (Node 24)
   const [dict, rawRepos] = await Promise.all([
     getServerDictionary(lang).catch(() => null),
     getPortfolioRepos("Santosdevbjj").catch(() => []),
   ]);
 
   if (!dict) notFound();
-
   const safeProjects = normalizeProjects(rawRepos);
-
-  // Verificação de segurança para o componente de projeto específico
-  // O erro 'pipeline' ocorre porque o componente tenta acessar dict.dataScienceProject.pipeline
-  // Se a chave não existir no dicionário, não renderizamos para não quebrar o build.
   const hasDataScienceData = !!(dict as any).dataScienceProject || !!(dict as any).constructionProject;
 
   return (
@@ -120,10 +128,6 @@ export default async function HomePage({ params }: PageProps) {
           <HeroSection dictionary={dict} />
         </section>
 
-        {/* SOLUÇÃO DO PRERENDER ERROR:
-            Renderização condicional rigorosa. Se 'pipeline' for lido de dentro deste componente,
-            garantimos que passamos o objeto correto ou nada.
-        */}
         {hasDataScienceData && (
           <section className="w-full px-4 py-12 md:py-20 bg-linear-to-b from-transparent to-slate-100/50 dark:to-slate-900/20">
             <div className="mx-auto max-w-7xl">
@@ -151,11 +155,7 @@ export default async function HomePage({ params }: PageProps) {
           </div>
           
           {safeProjects.length > 0 ? (
-             <PortfolioGrid
-               projects={safeProjects}
-               lang={lang}
-               dict={dict}
-             />
+             <PortfolioGrid projects={safeProjects} lang={lang} dict={dict} />
           ) : (
             <div className="text-center py-10 text-slate-500">
               <p>Projetos em fase de sincronização...</p>
@@ -163,11 +163,27 @@ export default async function HomePage({ params }: PageProps) {
           )}
         </section>
 
-        <section id="articles" className="w-full">
-          <FeaturedArticleSection
-            articles={dict.articles}
-            common={dict.common}
-          />
+        {/* --- SEÇÃO "PONTE" PARA ARTIGOS --- */}
+        <section className="py-20 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-4xl md:text-5xl font-black uppercase italic mb-6 text-slate-900 dark:text-white">
+              Conhecimento <span className="text-blue-600">Compartilhado</span>
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-10 font-medium">
+              Explore minha biblioteca de artigos técnicos sobre IA, Engenharia de Software e Cloud, 
+              sincronizados em tempo real com meu repositório oficial no GitHub.
+            </p>
+            
+            <Link 
+              href={`/${lang}/artigos`}
+              className="inline-flex items-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest rounded-full transition-all hover:scale-105 shadow-2xl shadow-blue-500/20 group"
+            >
+              ACESSAR PORTAL DE ARTIGOS
+              <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
         </section>
 
         <section id="contact" className="w-full pb-20">
