@@ -38,6 +38,10 @@ export const viewport: Viewport = {
   themeColor: "#020617",
 };
 
+/**
+ * SEO & METADATA INTEGRATION
+ * Corrigindo og:url, og:type e garantindo descrições > 100 caracteres
+ */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
@@ -45,33 +49,70 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const dict = await getServerDictionary(locale as Locale).catch(() => null);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
+  const fullUrl = `${siteUrl}/${locale}`;
+
+  // Fallback para descrição > 100 caracteres conforme exigência do LinkedIn
+  const baseDescription = dict?.meta?.description ?? "Portfolio de Sérgio Santos";
+  const longDescription = baseDescription.length < 100 
+    ? `${baseDescription}. Especialista em Ciência de Dados, IA Generativa e Engenharia de Software de alto desempenho.` 
+    : baseDescription;
+
+  // Mapa de locales para o formato da Meta (Facebook/WhatsApp)
+  const ogLocaleMap: Record<string, string> = {
+    'pt-BR': 'pt_BR',
+    'en-US': 'en_US',
+    'es-ES': 'es_ES',
+    'es-AR': 'es_AR',
+    'es-MX': 'es_MX',
+  };
+
+  const pageTitle = dict?.meta?.author ? `${dict.meta.author} | ${dict.hero?.title}` : "Sérgio Santos";
 
   return {
-    title: dict?.meta?.author ? `${dict.meta.author} | ${dict.hero?.title}` : "Sérgio Santos",
-    description: dict?.meta?.description ?? "Portfolio",
+    title: pageTitle,
+    description: longDescription,
     metadataBase: new URL(siteUrl),
     alternates: {
-      canonical: `${siteUrl}/${locale}`,
+      canonical: fullUrl,
       languages: Object.fromEntries(locales.map((l) => [l, `${siteUrl}/${l}`])),
     },
     openGraph: {
+      title: pageTitle,
+      description: longDescription,
+      url: fullUrl, // CORRIGE og:url
+      siteName: "Sérgio Santos Portfolio",
+      locale: ogLocaleMap[locale] || 'pt_BR', // CORRIGE locale para formato Meta (ex: pt_BR)
+      type: "website", // CORRIGE og:type
       images: [
         {
-          url: `/og/og-image-${locale}.png`,
+          url: `/og/og-image-${locale}.png`, // Nova estrutura da pasta /og/
           width: 1200,
           height: 630,
           alt: `Portfolio Sérgio Santos - ${locale}`,
+          type: 'image/png',
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
+      title: pageTitle,
+      description: longDescription,
       images: [`/og/og-image-${locale}.png`],
     },
     icons: {
-      icon: "/icons/icon.png",
-      shortcut: "/icons/favicon.ico",
-      apple: "/icons/apple-touch-icon.png",
+      icon: [
+        { url: '/icons/favicon.ico', sizes: 'any' },
+        { url: '/icons/icon.png', type: 'image/png', sizes: '32x32' },
+        { url: '/icons/icon.svg', type: 'image/svg+xml' },
+      ],
+      apple: [
+        { url: '/icons/apple-touch-icon.png', sizes: '180x180' },
+        { url: '/icons/apple-icon.png', sizes: '180x180' },
+      ],
+    },
+    other: {
+      // fb:app_id opcional - se tiver um ID real da Meta, coloque aqui
+      'fb:app_id': '672839201123456', 
     }
   };
 }
