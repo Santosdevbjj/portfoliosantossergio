@@ -3,6 +3,8 @@ import MdxLayout from "@/components/mdx-layout";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import type { Locale } from "@/types/dictionary";
 
+export const dynamic = 'force-dynamic';
+
 /**
  * ARTICLES LIST PAGE - NEXT.JS 16 & REACT 19
  * -----------------------------------------------------------------------------
