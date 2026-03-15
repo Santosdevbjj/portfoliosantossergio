@@ -14,8 +14,8 @@ import { normalizeLocale, SUPPORTED_LOCALES } from "@/dictionaries/locales";
 import type { Locale } from "@/types/dictionary";
 
 /**
- * TIPAGEM NEXT.JS 16
- * Atende à mudança onde 'params' deve ser tratado como Promise.
+ * TIPAGEM NEXT.JS 16 E REACT 19
+ * Params deve ser tratado como uma Promise.
  */
 interface PageProps {
   params: Promise<{ slug: string[]; lang: string }>;
@@ -23,7 +23,7 @@ interface PageProps {
 
 /**
  * 2. METADADOS DINÂMICOS (SEO & OPEN GRAPH)
- * Totalmente integrado à API de imagem dinâmica e suporte multilingue.
+ * Integrado com descrição longa (>100 caracteres) para evitar avisos no LinkedIn.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, slug } = await params;
@@ -39,8 +39,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // URL para o Route Handler de imagem OG (api/og/article)
   const ogImageUrl = `${siteUrl}/api/og/article?lang=${lang}&slug=${encodeURIComponent(fullSlugPath)}`;
 
+  // Título em UpperCase para consistência visual
   const cleanTitle = lastPart.replace(/-/g, " ").toUpperCase();
-  const description = `Artigo técnico sobre ${cleanTitle.toLowerCase()}. Leia no portfólio de Sérgio Santos (Next.js 16/React 19).`;
+  
+  // DESCRIÇÃO AMPLIADA (Solução para o Warning do LinkedIn Inspector)
+  // Ultrapassa os 100 caracteres exigidos para melhor SEO e engajamento.
+  const description = `Artigo técnico detalhado sobre ${cleanTitle.toLowerCase()}. Explore este e outros conteúdos sobre Ciência de Dados e Inteligência Artificial no portfólio profissional de Sérgio Santos.`;
 
   return {
     title: `${cleanTitle} | Sérgio Santos`,
@@ -75,7 +79,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 /**
  * 3. GERAÇÃO ESTÁTICA (SSG)
- * Gera as 110 combinações de rotas (Idiomas x Conteúdo GitHub).
+ * Suporte multilingue: pt-BR, en-US, es-ES, es-AR, es-MX.
  */
 export async function generateStaticParams() {
   const articles = await getAllArticlesRecursively();
@@ -98,21 +102,21 @@ export default async function ArtigoDetalhePage(props: PageProps) {
   const lang = normalizeLocale(rawLang) as Locale;
   const dict = await getServerDictionary(lang);
 
-  // Busca o conteúdo Markdown direto do GitHub
+  // Busca o conteúdo Markdown direto do GitHub via Service
   const content = await getArticleContent(slug);
 
   if (!content) {
     return notFound();
   }
 
-  // Título dinâmico para os botões de compartilhamento
+  // Lógica de extração de título para o componente ShareArticle
   const titleMatch = content.match(/^#\s+(.*)$/m);
   const fallbackTitle = (slug?.[slug.length - 1] ?? "").replace(/-/g, " ");
   const articleTitle = titleMatch?.[1]?.trim() ?? fallbackTitle;
 
   return (
     <MdxLayout lang={lang} dict={dict}>
-      <article className="container mx-auto py-12 max-w-4xl px-4 overflow-hidden">
+      <article className="container mx-auto py-12 max-w-4xl px-4 overflow-hidden animate-in fade-in duration-500">
         
         {/* CONTEÚDO MDX - TAILWIND 4.2 PROSE (TYPOGRAPHY) */}
         <div className="prose prose-slate dark:prose-invert max-w-none 
@@ -126,7 +130,7 @@ export default async function ArtigoDetalhePage(props: PageProps) {
           </ReactMarkdown>
         </div>
         
-        {/* RODAPÉ COM SHARE BUTTONS */}
+        {/* RODAPÉ INTEGRADO COM SHARE ARTICLE */}
         <footer className="mt-20 pt-10 border-t border-slate-200 dark:border-slate-800">
           <ShareArticle title={articleTitle} dict={dict} lang={lang} />
         </footer>
