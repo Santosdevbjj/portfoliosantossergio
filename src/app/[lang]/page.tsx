@@ -16,7 +16,10 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import ExperienceSection from "@/components/ExperienceSection";
 import ContactSection from "@/components/ContactSection";
-import PdfSafeLoader from "@/components/pdf/PdfSafeLoader"; // Importado
+
+// Importação segura para evitar erros de Prerender/Pipeline
+import PdfSafeLoader from "@/components/pdf/PdfSafeLoader";
+import ResumeLangSelector from "@/components/pdf/ResumeLangSelector";
 
 import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { CareerHighlights } from "@/components/CareerHighlights";
@@ -50,7 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const baseDescription = dict?.meta?.description ?? "Portfolio de Sérgio Santos";
   const longDescription = baseDescription.length < 100 
-    ? `${baseDescription}. Especialista em Ciência de Dados, IA Generativa e Engenharia de Software de alto desempenho.` 
+    ? `${baseDescription}. Especialista em Ciência de Dados e IA Generativa.` 
     : baseDescription;
 
   const ogLocaleMap: Record<string, string> = {
@@ -125,7 +128,7 @@ export default async function HomePage({ params }: PageProps) {
 
   return (
     <ProxyPage lang={lang}>
-      <main id="main-content" className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
+      <main id="main-content" className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
         <HeroSection dictionary={dict} />
 
         {/* DATA SCIENCE HIGHLIGHT */}
@@ -135,16 +138,19 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        <AboutSection dict={dict.about} />
-        
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-          <CareerHighlights dict={dict} />
-        </div>
+        <section id="about">
+          <AboutSection dict={dict.about} />
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+            <CareerHighlights dict={dict} />
+          </div>
+        </section>
 
-        <ExperienceSection experience={dict.experience} />
+        <section id="experience">
+          <ExperienceSection experience={dict.experience} />
+        </section>
 
         <section id="projects" className="w-full py-20">
-          <div className="mx-auto max-w-7xl px-4 mb-10 text-center lg:text-left">
+          <div className="mx-auto max-w-7xl px-4 mb-10">
             <h2 className="text-4xl font-black text-slate-900 dark:text-white uppercase italic">
               Projetos <span className="text-blue-600">Full-Stack</span>
             </h2>
@@ -152,18 +158,22 @@ export default async function HomePage({ params }: PageProps) {
           <PortfolioGrid projects={safeProjects} lang={lang} dict={dict} />
         </section>
 
-        {/* NOVA SEÇÃO: RESUME PREVIEW INTEGRADO NA HOME */}
-        <section id="resume-preview" className="py-20 bg-white dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
+        {/* SEÇÃO DE CURRÍCULO INTEGRADA NA HOME */}
+        <section id="resume-preview" className="py-20 bg-white dark:bg-slate-900/40 border-y border-slate-200 dark:border-slate-800">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-black text-slate-900 dark:text-white uppercase mb-4">
-                Currículo <span className="text-blue-600">Oficial</span>
+            <div className="text-center mb-10">
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white uppercase mb-4 tracking-tighter">
+                Curriculum <span className="text-blue-600">Vitae</span>
               </h2>
-              <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-                Visualize ou baixe a versão PDF atualizada para {lang}.
+              <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">
+                Selecione o idioma e visualize minha trajetória profissional.
               </p>
+              
+              {/* Seletor de Idioma dentro da Home */}
+              <ResumeLangSelector />
             </div>
-            <div className="max-w-5xl mx-auto shadow-2xl rounded-3xl overflow-hidden bg-slate-100 dark:bg-slate-800 p-2 md:p-8">
+
+            <div className="max-w-5xl mx-auto shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] rounded-3xl overflow-hidden bg-white dark:bg-slate-800">
                <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
             </div>
           </div>
