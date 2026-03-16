@@ -16,6 +16,7 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import ExperienceSection from "@/components/ExperienceSection";
 import ContactSection from "@/components/ContactSection";
+import PdfSafeLoader from "@/components/pdf/PdfSafeLoader"; // Importado
 
 import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { CareerHighlights } from "@/components/CareerHighlights";
@@ -38,11 +39,6 @@ export const viewport: Viewport = {
   themeColor: "#020617",
 };
 
-/**
- * SEO & METADATA INTEGRATION
- * Integrando correções para LinkedIn (descrição > 100 caracteres)
- * e Meta/Facebook (og:type, og:url e fb:app_id com 'property')
- */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
@@ -52,19 +48,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
   const fullUrl = `${siteUrl}/${locale}`;
 
-  // Garante descrição > 100 caracteres para o LinkedIn Post Inspector
   const baseDescription = dict?.meta?.description ?? "Portfolio de Sérgio Santos";
   const longDescription = baseDescription.length < 100 
     ? `${baseDescription}. Especialista em Ciência de Dados, IA Generativa e Engenharia de Software de alto desempenho.` 
     : baseDescription;
 
-  // Mapeamento preciso para Open Graph Locales (Meta Standard)
   const ogLocaleMap: Record<string, string> = {
-    'pt-BR': 'pt_BR',
-    'en-US': 'en_US',
-    'es-ES': 'es_ES',
-    'es-AR': 'es_AR',
-    'es-MX': 'es_MX',
+    'pt-BR': 'pt_BR', 'en-US': 'en_US', 'es-ES': 'es_ES', 'es-AR': 'es_AR', 'es-MX': 'es_MX',
   };
 
   const pageTitle = dict?.meta?.author ? `${dict.meta.author} | ${dict.hero?.title}` : "Sérgio Santos";
@@ -83,38 +73,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: fullUrl,
       siteName: "Sérgio Santos Portfolio",
       locale: ogLocaleMap[locale] || 'pt_BR',
-      type: "website", // Essencial para Meta/LinkedIn
-      images: [
-        {
-          url: `/og/og-image-${locale}.png`,
-          width: 1200,
-          height: 630,
-          alt: `Portfolio Sérgio Santos - ${locale}`,
-          type: 'image/png',
-        },
-      ],
+      type: "website",
+      images: [{ url: `/og/og-image-${locale}.png`, width: 1200, height: 630 }],
     },
-    // SOLUÇÃO PARA fb:app_id: Usando a chave nativa 'facebook' o Next.js 
-    // renderiza <meta property="fb:app_id" /> em vez de 'name'
-    facebook: {
-      appId: '672839201123456', 
-    },
+    facebook: { appId: '672839201123456' },
     twitter: {
       card: "summary_large_image",
       title: pageTitle,
       description: longDescription,
       images: [`/og/og-image-${locale}.png`],
-    },
-    icons: {
-      icon: [
-        { url: '/icons/favicon.ico', sizes: 'any' },
-        { url: '/icons/icon.png', type: 'image/png', sizes: '32x32' },
-        { url: '/icons/icon.svg', type: 'image/svg+xml' },
-      ],
-      apple: [
-        { url: '/icons/apple-touch-icon.png', sizes: '180x180' },
-        { url: '/icons/apple-icon.png', sizes: '180x180' },
-      ],
     },
   };
 }
@@ -124,17 +91,14 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
   return repos
     .map((repo, index): ProjectDomain => {
       const rawTopics = repo?.topics || repo?.repository_topics || [];
-      const topics = Array.isArray(rawTopics) 
-        ? rawTopics.map((t: string) => String(t).toLowerCase()) 
-        : [];
-      
+      const topics = Array.isArray(rawTopics) ? rawTopics.map((t: string) => String(t).toLowerCase()) : [];
       return {
         id: String(repo?.id || index),
         name: (repo?.name || "Projeto").replace(/-/g, ' '),
         description: repo?.description || "",
         htmlUrl: repo?.html_url || "",
         homepage: repo?.homepage || null,
-        topics: topics,
+        topics,
         technology: resolveProjectTechnology(topics),
         isPortfolio: topics.includes("portfolio"), 
         isFeatured: topics.includes("featured") || index < 2,
@@ -157,66 +121,63 @@ export default async function HomePage({ params }: PageProps) {
 
   if (!dict) notFound();
   const safeProjects = normalizeProjects(rawRepos);
-  const hasDataScienceData = !!(dict as any).dataScienceProject || !!(dict as any).constructionProject;
+  const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
 
   return (
     <ProxyPage lang={lang}>
-      <main
-        id="main-content"
-        className="flex min-h-screen flex-col bg-slate-50 transition-colors duration-500 selection:bg-blue-500/30 dark:bg-slate-950"
-      >
-        <section className="pt-24 lg:pt-0">
-          <HeroSection dictionary={dict} />
-        </section>
+      <main id="main-content" className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
+        <HeroSection dictionary={dict} />
 
-        {hasDataScienceData && (
-          <section className="w-full px-4 py-12 md:py-20 bg-linear-to-b from-transparent to-slate-100/50 dark:to-slate-900/20">
-            <div className="mx-auto max-w-7xl">
-               <ConstructionRiskProject dict={dict as any} />
-            </div>
-          </section>
-        )}
-
-        <section id="about" className="relative w-full overflow-hidden">
-          <AboutSection dict={dict.about} />
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <CareerHighlights dict={dict} />
+        {/* DATA SCIENCE HIGHLIGHT */}
+        <section className="w-full px-4 py-12 bg-linear-to-b from-transparent to-slate-100/50 dark:to-slate-900/20">
+          <div className="mx-auto max-w-7xl">
+             <ConstructionRiskProject dict={dict as any} />
           </div>
         </section>
 
-        <section id="experience" className="w-full">
-          <ExperienceSection experience={dict.experience} />
-        </section>
+        <AboutSection dict={dict.about} />
+        
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+          <CareerHighlights dict={dict} />
+        </div>
+
+        <ExperienceSection experience={dict.experience} />
 
         <section id="projects" className="w-full py-20">
-          <div className="mx-auto max-w-7xl px-4 mb-10">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
-              {dict.hero.ctaPrimary}
+          <div className="mx-auto max-w-7xl px-4 mb-10 text-center lg:text-left">
+            <h2 className="text-4xl font-black text-slate-900 dark:text-white uppercase italic">
+              Projetos <span className="text-blue-600">Full-Stack</span>
             </h2>
           </div>
-          
-          {safeProjects.length > 0 ? (
-             <PortfolioGrid projects={safeProjects} lang={lang} dict={dict} />
-          ) : (
-            <div className="text-center py-10 text-slate-500">
-              <p>Projetos em fase de sincronização...</p>
-            </div>
-          )}
+          <PortfolioGrid projects={safeProjects} lang={lang} dict={dict} />
         </section>
 
-        <section id="articles" className="py-20 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/10">
+        {/* NOVA SEÇÃO: RESUME PREVIEW INTEGRADO NA HOME */}
+        <section id="resume-preview" className="py-20 bg-white dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white uppercase mb-4">
+                Currículo <span className="text-blue-600">Oficial</span>
+              </h2>
+              <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+                Visualize ou baixe a versão PDF atualizada para {lang}.
+              </p>
+            </div>
+            <div className="max-w-5xl mx-auto shadow-2xl rounded-3xl overflow-hidden bg-slate-100 dark:bg-slate-800 p-2 md:p-8">
+               <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
+            </div>
+          </div>
+        </section>
+
+        {/* ARTICLES CTA */}
+        <section id="articles" className="py-20 bg-slate-50/50 dark:bg-slate-950">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-4xl md:text-5xl font-black uppercase italic mb-6 text-slate-900 dark:text-white">
               Conhecimento <span className="text-blue-600">Compartilhado</span>
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-10 font-medium">
-              Explore minha biblioteca de artigos técnicos sobre IA, Engenharia de Software e Cloud, 
-              sincronizados em tempo real com meu repositório oficial no GitHub.
-            </p>
-            
             <Link 
               href={`/${lang}/artigos`}
-              className="inline-flex items-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest rounded-full transition-all hover:scale-105 shadow-2xl shadow-blue-500/20 group"
+              className="inline-flex items-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest rounded-full transition-all hover:scale-105 shadow-xl shadow-blue-500/20 group"
             >
               ACESSAR PORTAL DE ARTIGOS
               <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -226,13 +187,7 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        <section id="contact" className="w-full pb-20">
-          <ContactSection
-            contact={dict.contact}
-            common={dict.common}
-            locale={lang}
-          />
-        </section>
+        <ContactSection contact={dict.contact} common={dict.common} locale={lang} />
       </main>
     </ProxyPage>
   );
