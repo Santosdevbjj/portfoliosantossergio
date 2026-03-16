@@ -23,7 +23,7 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
   const origin = searchParams?.get('utm_source') ?? 'portfolio_direct';
 
   const copyToClipboard = useCallback((): void => {
-    if (!navigator?.clipboard) return;
+    if (typeof window === 'undefined' || !navigator?.clipboard) return;
     navigator.clipboard.writeText(email).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -45,7 +45,7 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
           
           <div className="relative z-10 flex flex-col items-center gap-12 lg:flex-row lg:justify-between">
             <div className="flex-1 text-center lg:text-left">
-              <h2 className="mb-6 text-3xl font-black leading-tight tracking-tighter text-white md:text-5xl lg:text-7xl">
+              <h2 className="mb-6 text-3xl font-black leading-tight tracking-tighter text-white md:text-5xl lg:text-7xl uppercase italic">
                 {contact.title}
               </h2>
               <p className="mx-auto mb-10 max-w-xl text-base font-medium leading-relaxed text-blue-50 opacity-90 md:text-xl lg:mx-0">
@@ -53,7 +53,7 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
               </p>
 
               <div className="flex flex-col flex-wrap items-center justify-center gap-4 sm:flex-row lg:justify-start">
-                {/* CTA PRINCIPAL */}
+                {/* CTA: EMAIL DIRETO */}
                 <a
                   href={`mailto:${email}?subject=Contact from ${origin}`}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-8 py-4 text-lg font-black text-blue-600 shadow-lg transition-all hover:scale-105 active:scale-95 sm:w-auto"
@@ -62,7 +62,20 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
                   {contact.cta}
                 </a>
 
-                {/* BOTÃO PARA PÁGINA DE RESUME (NOVO) */}
+                {/* CTA: COPIAR EMAIL (Utiliza Copy e Check) */}
+                <button
+                  onClick={copyToClipboard}
+                  className={`flex w-full items-center justify-center gap-3 rounded-2xl border px-6 py-4 text-base font-bold transition-all active:scale-95 sm:w-auto cursor-pointer ${
+                    copied 
+                    ? 'bg-emerald-500 border-emerald-400 text-white' 
+                    : 'bg-blue-800/40 border-white/20 text-white hover:bg-blue-800/60'
+                  }`}
+                >
+                  {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5 opacity-70" />}
+                  {copied ? copiedLabel : contact.emailLabel}
+                </button>
+
+                {/* CTA: PÁGINA DE RESUME (Utiliza FileText) */}
                 <Link
                   href={`/${locale}/resume`}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl border border-white/30 bg-white/10 px-6 py-4 text-base font-bold text-white backdrop-blur-sm transition-all hover:bg-white/20 sm:w-auto"
@@ -70,28 +83,40 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
                   <FileText className="h-5 w-5" />
                   {contact.cvLabel}
                 </Link>
+              </div>
 
-                {/* DOWNLOAD DIRETO (PATH CORRIGIDO) */}
-                <a
+              {/* DOWNLOAD DIRETO PEQUENO */}
+              <div className="mt-6 flex justify-center lg:justify-start">
+                 <a
                   href={`/pdf/cv-sergio-santos-${locale}.pdf`}
                   download
-                  className="hidden sm:flex items-center gap-2 text-white/70 hover:text-white text-sm font-bold transition-colors"
+                  className="text-white/60 hover:text-white text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  PDF
+                  Download PDF Direct
                 </a>
               </div>
             </div>
 
-            {/* SOCIAL */}
+            {/* REDES SOCIAIS (Utiliza Linkedin e Github) */}
             <div className="flex flex-row gap-4 lg:flex-col">
-              <a href={linkedinUrl} target="_blank" className="rounded-2xl bg-white p-5 text-blue-600 shadow-xl hover:-translate-y-2 transition-transform">
-                <Linkedin className="h-8 w-8" />
+              <a 
+                href={linkedinUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="rounded-2xl bg-white p-5 text-blue-600 shadow-xl hover:-translate-y-2 transition-transform duration-300"
+              >
+                <Linkedin className="h-8 w-8 md:h-10 md:w-10" />
               </a>
-              <a href={githubUrl} target="_blank" className="rounded-2xl bg-slate-900 p-5 text-white shadow-xl hover:-translate-y-2 transition-transform">
-                <Github className="h-8 w-8" />
+              <a 
+                href={githubUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="rounded-2xl bg-slate-900 p-5 text-white shadow-xl hover:-translate-y-2 transition-transform duration-300"
+              >
+                <Github className="h-8 w-8 md:h-10 md:w-10" />
               </a>
             </div>
           </div>
