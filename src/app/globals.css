@@ -68,5 +68,18 @@
     background-color: color-mix(in oklch, var(--card) 75%, transparent);
     border-color: color-mix(in oklch, var(--border) 50%, transparent);
   }
+} 
+
+@layer base {
+  /* Estilização suave para a barra de rolagem do visualizador de PDF */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-100 dark:bg-slate-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-blue-500 rounded-full border-2 border-transparent bg-clip-content;
+  }
 }
 
