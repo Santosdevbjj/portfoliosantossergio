@@ -3,9 +3,10 @@ import type { NextConfig } from "next";
 /**
  * NEXT.JS 16 CONFIGURATION - SERGIO SANTOS PORTFOLIO
  * -----------------------------------------------------------------------------
- * ✔ React Compiler: Estável na raiz (Next.js 16)
- * ✔ OG Images: Rotas de cache corrigidas para suportar :slug dinâmico
- * ✔ Octokit & Turbopack: Compatibilidade via serverExternalPackages
+ * ✔ React Compiler: Estável (Next.js 16)
+ * ✔ PDF Support: Otimizado para visualização e download via public/pdf/
+ * ✔ OG Images: Cache imutável para as versões multilingue em public/og/
+ * ✔ Performance: Node 24 + Turbopack compatibilidade
  */
 
 const nextConfig: NextConfig = {
@@ -16,6 +17,15 @@ const nextConfig: NextConfig = {
   typedRoutes: true, 
 
   experimental: {
+    // Adicionado react-pdf para garantir compatibilidade com Server Components no Next 16
+    serverComponentsExternalPackages: [
+      "octokit", 
+      "@octokit/core", 
+      "sharp", 
+      "gray-matter",
+      "@microsoft/applicationinsights-web",
+      "react-pdf" 
+    ],
     optimizePackageImports: [
       "lucide-react",
       "framer-motion",
@@ -30,16 +40,6 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // Mantendo a compatibilidade do Octokit, Sharp (essencial para OG Images) 
-  // e Application Insights.
-  serverExternalPackages: [
-    "octokit", 
-    "@octokit/core", 
-    "sharp", 
-    "gray-matter",
-    "@microsoft/applicationinsights-web"
-  ],
-
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
@@ -53,6 +53,18 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // Configuração de Webpack para suporte nativo a arquivos PDF se importados via TS
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.pdf$/,
+      type: 'asset/resource',
+      generator: {
+        filename: 'static/pdf/[name][ext]',
+      },
+    });
+    return config;
+  },
+
   async headers() {
     return [
       {
@@ -64,13 +76,18 @@ const nextConfig: NextConfig = {
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }
         ],
       },
-      // RESTAURAÇÃO: Rotas explícitas para garantir que o cache de OG Images e PDF funcione com :slug
+      // CORREÇÃO: Cache imutável para os currículos na pasta /pdf/
       {
-        source: '/cv-sergio-santos-:slug.pdf',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+        source: '/pdf/cv-sergio-santos-:lang.pdf',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Content-Type', value: 'application/pdf' },
+          { key: 'Content-Disposition', value: 'inline' } // Permite abrir no navegador em vez de forçar download
+        ],
       },
+      // CORREÇÃO: Cache imutável para as OG Images na pasta /og/
       {
-        source: '/og-image-:slug.png',
+        source: '/og/og-image-:lang.png',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
