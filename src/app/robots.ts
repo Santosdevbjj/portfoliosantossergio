@@ -1,10 +1,10 @@
-import type { MetadataRoute } from "next"
+import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = (
     process.env.NEXT_PUBLIC_SITE_URL ??
     "https://portfoliosantossergio.vercel.app"
-  ).replace(/\/$/, "")
+  ).replace(/\/$/, "");
 
   return {
     rules: [
@@ -12,45 +12,37 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: [
           "/",
-          "/og/*",          // Permite acesso total às imagens de Open Graph
-          "/icons/*",       // Permite acesso aos ícones (favicon, apple-touch)
-          "/images/*",      // Permite acesso às fotos de perfil e troféus
-          "/cv-*.pdf",      // Permite que o Google indexe seus currículos
+          "/og/*.png",       // Permite todas as OG Images por idioma
+          "/icons/*",        // Permite favicons e apple icons
+          "/images/*.png",   // Permite sua foto de perfil e troféus DIO
+          "/images/*.svg",
+          "/pdf/cv-*.pdf",   // Permite indexação direta dos currículos
         ],
         disallow: [
-          "/api/",          // Bloqueia rotas de API sensíveis
-          "/_next/",        // Bloqueia arquivos internos do Next.js
-          "/admin/",
+          "/api/",
+          "/_next/",
           "/private/",
+          "/admin/",
         ],
       },
-      /**
-       * Meta/Facebook Crawler
-       * Requisito da documentação: Garantir que o FacebookExternalHit
-       * consiga baixar as imagens para gerar o thumbnail.
-       */
       {
+        /**
+         * LinkedIn e Facebook precisam acessar /og/ para gerar o card
+         * quando você compartilha seu portfólio.
+         */
         userAgent: ["FacebookExternalHit", "LinkedInBot"],
-        allow: [
-          "/og/",
-          "/images/",
-        ],
+        allow: ["/og/", "/images/"],
       },
-      /**
-       * AI Crawlers
-       * Permite que leiam o conteúdo público, mas protege dados privados
-       */
       {
-        userAgent: [
-          "GPTBot",
-          "CCBot",
-          "ClaudeBot",
-          "PerplexityBot",
-          "Meta-WebIndexer", // Adicionado conforme documentação da Meta
-        ],
-        disallow: ["/private/", "/api/", "/_next/"],
+        /**
+         * Permite que modelos de IA indexem seu conteúdo público
+         * (Artigos e Projetos) para que você apareça em buscas de IA.
+         */
+        userAgent: ["GPTBot", "ClaudeBot", "PerplexityBot", "CCBot"],
+        allow: ["/", "/[lang]/artigos/*", "/[lang]/projects/*"],
+        disallow: ["/api/", "/_next/"],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
-  }
+  };
 }
