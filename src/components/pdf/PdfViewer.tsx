@@ -1,10 +1,12 @@
 'use client'
 import { useState, useEffect } from "react"
 import { Document, Page, pdfjs } from "react-pdf"
-import "react-pdf/dist/esm/Page/TextLayer.css"
-import "react-pdf/dist/esm/Page/AnnotationLayer.css"
 
-// Worker do PDF.js compatível com Next 16
+// Caminhos corrigidos para evitar erro de build no Vercel/Turbopack
+import "react-pdf/dist/Page/TextLayer.css"
+import "react-pdf/dist/Page/AnnotationLayer.css"
+
+// Worker do PDF.js otimizado
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
 interface PdfViewerProps {
@@ -16,9 +18,10 @@ export default function PdfViewer({ fileUrl, lang }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number>();
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [containerWidth, setContainerWidth] = useState<number>(800);
+  const [mounted, setMounted] = useState(false);
 
-  // Ajusta a largura do PDF dinamicamente para ser responsivo
   useEffect(() => {
+    setMounted(true);
     const updateWidth = () => {
       const width = window.innerWidth > 900 ? 850 : window.innerWidth - 40;
       setContainerWidth(width);
@@ -28,8 +31,10 @@ export default function PdfViewer({ fileUrl, lang }: PdfViewerProps) {
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
+  if (!mounted) return <div className="min-h-[600px] flex items-center justify-center">Iniciando...</div>;
+
   return (
-    <div className="flex flex-col items-center gap-8 w-full animate-in fade-in duration-700">
+    <div className="flex flex-col items-center gap-8 w-full transition-opacity duration-700 ease-in">
       <div className="bg-white dark:bg-slate-950 shadow-2xl rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
         <Document 
           file={fileUrl} 
@@ -39,8 +44,8 @@ export default function PdfViewer({ fileUrl, lang }: PdfViewerProps) {
           <Page 
             pageNumber={pageNumber} 
             width={containerWidth} 
-            renderTextLayer 
-            renderAnnotationLayer 
+            renderTextLayer={true} 
+            renderAnnotationLayer={true} 
             className="shadow-inner"
           />
         </Document>
@@ -52,26 +57,26 @@ export default function PdfViewer({ fileUrl, lang }: PdfViewerProps) {
           <button 
             disabled={pageNumber <= 1}
             onClick={() => setPageNumber(p => p - 1)}
-            className="p-2 hover:bg-blue-600 hover:text-white rounded disabled:opacity-30 transition-all"
+            className="p-2 hover:bg-blue-600 hover:text-white rounded-md disabled:opacity-30 transition-all cursor-pointer"
           >
-            Anterior
+            {lang.startsWith('en') ? 'Previous' : lang.startsWith('es') ? 'Anterior' : 'Anterior'}
           </button>
           <span className="px-4 font-mono text-sm"> {pageNumber} / {numPages} </span>
           <button 
             disabled={pageNumber >= (numPages || 1)}
             onClick={() => setPageNumber(p => p + 1)}
-            className="p-2 hover:bg-blue-600 hover:text-white rounded disabled:opacity-30 transition-all"
+            className="p-2 hover:bg-blue-600 hover:text-white rounded-md disabled:opacity-30 transition-all cursor-pointer"
           >
-            Próximo
+            {lang.startsWith('en') ? 'Next' : lang.startsWith('es') ? 'Siguiente' : 'Próximo'}
           </button>
         </div>
 
         <a 
           href={fileUrl} 
           download={`CV_Sergio_Santos_${lang}.pdf`}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-all shadow-lg hover:shadow-blue-500/20"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-all shadow-lg hover:shadow-blue-500/40"
         >
-          Download PDF
+          {lang.startsWith('en') ? 'Download PDF' : lang.startsWith('es') ? 'Descargar PDF' : 'Baixar PDF'}
         </a>
       </div>
     </div>
