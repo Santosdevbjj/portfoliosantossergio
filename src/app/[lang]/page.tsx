@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 
 import type { Locale } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
@@ -21,25 +20,17 @@ import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { CareerHighlights } from "@/components/CareerHighlights";
 import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 
-/**
- * SOLUÇÃO DO ERRO 'pipeline': 
- * O PdfSafeLoader utiliza bibliotecas de renderização que tocam em APIs de Node/Browser.
- * Forçamos o carregamento apenas no lado do cliente (SSR: FALSE).
- */
-const PdfSafeLoader = dynamic(() => import("@/components/pdf/PdfSafeLoader"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-[600px] w-full animate-pulse items-center justify-center bg-slate-200 dark:bg-slate-800 rounded-xl">
-      <span className="text-slate-500">Carregando Currículo...</span>
-    </div>
-  ),
-});
+// IMPORTANTE: Removi o dynamic import com ssr:false daqui, 
+// pois o Next.js 16 não permite isso diretamente em Server Components de rota.
+// O componente PdfSafeLoader deve ser chamado dentro de um Client Component.
+import PdfSafeLoader from "@/components/pdf/PdfSafeLoader";
 
 interface PageProps {
   params: Promise<{ lang: string }>;
 }
 
-export const dynamic = "force-static";
+// Configurações de Cache e Build
+export const dynamic = "force-static"; 
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
@@ -53,7 +44,7 @@ export const viewport: Viewport = {
 };
 
 /**
- * METADATA: Otimizado para Meta (Facebook) e SEO Multilingue
+ * SEO MULTILINGUE (PT, EN, ES-ES, ES-AR, ES-MX)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -94,7 +85,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         },
       ],
     },
-    // Correção Meta: fb:app_id via 'other' para garantir o atributo 'property'
     other: {
       "fb:app_id": "672839201123456",
     },
@@ -128,6 +118,9 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
     .filter((p) => p.isPortfolio && p.htmlUrl);
 }
 
+/**
+ * COMPONENTE PRINCIPAL - NODE 24 & REACT 19 READY
+ */
 export default async function HomePage({ params }: PageProps) {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
@@ -150,15 +143,17 @@ export default async function HomePage({ params }: PageProps) {
     <ProxyPage lang={lang}>
       <main className="flex min-h-screen flex-col bg-slate-50 selection:bg-blue-200 dark:bg-slate-950 dark:selection:bg-blue-900">
         
+        {/* HERO E DESTAQUES */}
         <HeroSection dictionary={dict} />
 
-        {/* TROFÉUS DIO 2025 - Responsividade Tailwind 4.2 */}
+        {/* VITRINE DIO 2025 - VENCEDOR COMPETIÇÃO ARTIGOS */}
         <section className="py-12 bg-white/50 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <ConstructionRiskProject dict={dict as any} />
           </div>
         </section>
 
+        {/* SOBRE E CARREIRA */}
         <section className="relative">
           <AboutSection dict={dict.about} />
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
@@ -166,8 +161,10 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
+        {/* EXPERIÊNCIA PROFISSIONAL */}
         <ExperienceSection experience={dict.experience} />
 
+        {/* PROJETOS COM GRID RESPONSIVO (Tailwind 4.2) */}
         <section className="py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
@@ -177,7 +174,7 @@ export default async function HomePage({ params }: PageProps) {
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* CURRICULUM VITAE - PDF SAFE LOADER (SSR DISABLED) */}
+        {/* CURRICULUM VITAE - SUPORTE PT, EN, ES (AR, ES, MX) */}
         <section className="py-24 border-t border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/20">
           <div className="text-center mb-12 px-4">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white mb-6">
@@ -190,11 +187,13 @@ export default async function HomePage({ params }: PageProps) {
 
           <div className="max-w-5xl mx-auto px-4">
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl overflow-hidden min-h-[600px]">
+              {/* O PdfSafeLoader deve conter internamente o logic de "use client" */}
               <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
             </div>
           </div>
         </section>
 
+        {/* BOTÃO DE ARTIGOS */}
         <section className="py-24 text-center">
           <Link
             href={`/${lang}/artigos`}
