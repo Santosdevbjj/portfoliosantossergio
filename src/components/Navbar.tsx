@@ -2,54 +2,56 @@
 
 import { useEffect, useMemo, useState, type JSX } from 'react'
 import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { Menu, X, FileText } from 'lucide-react'
 
 import type { SupportedLocale } from "@/dictionaries/locales"
-import type { CommonDictionary } from '@/types/dictionary'
+import type { CommonDictionary, ContactDictionary } from '@/types/dictionary'
 import { NAV_SECTIONS, getNavHash } from '@/domain/navigation'
+import { getResumePath } from '@/lib/resume/resumePdfMap'
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useScrollSpy } from '@/contexts/scroll-spy.client'
 
 /**
- * NAVBAR COMPONENT - CORRIGIDO
+ * NAVBAR COMPONENT - VERSÃO 2026 (INTEGRADA)
  * -----------------------------------------------------------------------------
- * ✔ Fix: TypeScript Index Signature Error resolvido
+ * ✔ Unificação: Tudo baseia-se na rota /[lang]
+ * ✔ Fix: Integração direta com resumePdfMap para evitar conflito de estado
  * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16
  */
 
 interface NavbarProps {
   readonly lang: SupportedLocale;
   readonly common: CommonDictionary;
+  readonly contact: ContactDictionary; // Adicionado para pegar a label do CV
 }
 
-export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
+export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Element {
   const { nav, menu, theme, languageSwitcher } = common
   const { activeSection } = useScrollSpy()
+  const pathname = usePathname()
   
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
-  // Controle de scroll otimizado
+  // Controle de scroll otimizado para performance
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock body scroll para React 19
+  // Lock body scroll para React 19 quando o menu mobile está aberto
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
-  // Mapeamento dinâmico integrado com a nova página de Artigos
+  // Mapeamento de links unificado
   const navLinks = useMemo(() => {
-    // Links baseados nas seções de scroll da Home
+    // 1. Seções da Home (Scroll)
     const baseLinks = NAV_SECTIONS.map((section) => ({
       id: section,
       href: `/${lang}${getNavHash(section)}`,
@@ -57,21 +59,17 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
       isExternal: false
     }));
 
-    // Acesso seguro à tradução de artigos
-    // Cast para Record para evitar erro de indexação do TS
-    const navTranslations = nav as Record<string, string>;
-    const articlesLabel = navTranslations['articles'] || navTranslations['artigos'] || 'Artigos';
+    // 2. Link do Currículo (PDF Dinâmico baseado no idioma da URL)
+    const resumeLink = {
+      id: 'resume',
+      href: getResumePath(lang),
+      label: contact.cvLabel || 'CV',
+      isExternal: true,
+      icon: <FileText size={14} className="mr-1 inline" />
+    };
 
-    return [
-      ...baseLinks,
-      { 
-        id: 'articles', 
-        href: `/${lang}/artigos`, 
-        label: articlesLabel,
-        isExternal: true 
-      }
-    ];
-  }, [lang, nav]);
+    return [...baseLinks, resumeLink];
+  }, [lang, nav, contact.cvLabel]);
 
   return (
     <nav
@@ -85,7 +83,7 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
-        {/* Logo */}
+        {/* Logo - Sempre redireciona para a home no idioma atual */}
         <Link 
           href={`/${lang}`} 
           className="group relative z-[110] outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg"
@@ -105,11 +103,14 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
                 <Link
                   key={link.id}
                   href={link.href}
+                  target={link.isExternal ? "_blank" : undefined}
+                  rel={link.isExternal ? "noopener noreferrer" : undefined}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`relative text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 hover:text-blue-600 ${
+                  className={`relative text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 hover:text-blue-600 flex items-center ${
                     isActive ? 'text-blue-600' : 'text-slate-500 dark:text-slate-400'
                   }`}
                 >
+                  {'icon' in link && link.icon}
                   {link.label}
                   {isActive && (
                     <span className="absolute -bottom-1 left-0 h-0.5 w-full bg-blue-600 rounded-full animate-in fade-in zoom-in duration-500" />
@@ -122,6 +123,7 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
 
           <div className="flex items-center gap-6">
+            {/* O LanguageSwitcher agora é o ÚNICO responsável por trocar o idioma via router.push(`/${newLang}`) */}
             <LanguageSwitcher currentLang={lang} />
             <ThemeToggle labels={theme} />
           </div>
@@ -157,6 +159,7 @@ export default function Navbar({ lang, common }: NavbarProps): JSX.Element {
               <Link 
                 key={link.id} 
                 href={link.href} 
+                target={link.isExternal ? "_blank" : undefined}
                 onClick={() => setIsOpen(false)}
                 className="block text-4xl font-black text-slate-900 dark:text-white hover:text-blue-600 transition-colors"
                 style={{ transitionDelay: `${idx * 50}ms` }}
