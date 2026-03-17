@@ -25,7 +25,7 @@ import { CareerHighlights } from "@/components/CareerHighlights"
 import ConstructionRiskProject from "@/components/ConstructionRiskProject"
 
 interface PageProps {
-  params: { lang: string } // ✅ CORRETO
+  params: { lang: string }
 }
 
 export const dynamic = "force-static"
@@ -42,7 +42,7 @@ export const viewport: Viewport = {
 }
 
 /**
- * ✅ METADATA CORRIGIDO (SEM BUG DO FACEBOOK)
+ * ✅ METADATA CORRIGIDO (TS6 + SEO + VERCEL)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const locale = normalizeLocale(params.lang)
@@ -61,55 +61,47 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     dict?.meta?.description ??
     "Portfólio de Sérgio Santos - Especialista em IA e Data Science"
 
-  return {
-    title:
-      dict?.meta?.author && dict?.hero?.title
-        ? `${dict.meta.author} | ${dict.hero.title}`
-        : "Sérgio Santos",
+  const title =
+    dict?.meta?.author && dict?.hero?.title
+      ? `${dict.meta.author} | ${dict.hero.title}`
+      : "Sérgio Santos"
 
+  return {
+    title,
     description,
 
     metadataBase: new URL(siteUrl),
 
     alternates: {
-      canonical: `/${locale}`,
+      canonical: fullUrl, // ✅ agora usado corretamente
       languages: Object.fromEntries(
-        locales.map((l) => [l, `/${l}`])
+        locales.map((l) => [l, `${siteUrl}/${l}`])
       ),
     },
 
     openGraph: {
-      title:
-        dict?.meta?.author && dict?.hero?.title
-          ? `${dict.meta.author} | ${dict.hero.title}`
-          : "Sérgio Santos",
-
+      title,
       description,
-      url: `/${locale}`,
+      url: fullUrl, // ✅ usado aqui
       type: "website",
-
       images: [
         {
-          url: `/og/og-image-${locale}.png`,
+          url: `${siteUrl}/og/og-image-${locale}.png`,
           width: 1200,
           height: 630,
         },
       ],
     },
 
-    // ✅ CORREÇÃO DO ERRO DO FACEBOOK
     other: {
-      "fb:app_id": "672839201123456", // <-- agora usa "property"
+      "fb:app_id": "672839201123456",
     },
 
     twitter: {
       card: "summary_large_image",
-      title:
-        dict?.meta?.author && dict?.hero?.title
-          ? `${dict.meta.author} | ${dict.hero.title}`
-          : "Sérgio Santos",
+      title,
       description,
-      images: [`/og/og-image-${locale}.png`],
+      images: [`${siteUrl}/og/og-image-${locale}.png`],
     },
   }
 }
@@ -160,6 +152,7 @@ export default async function HomePage({ params }: PageProps) {
   if (!dict) notFound()
 
   const projects = normalizeProjects(repos)
+
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`
 
   return (
@@ -193,7 +186,7 @@ export default async function HomePage({ params }: PageProps) {
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* ✅ PDF SEGURO */}
+        {/* PDF */}
         <section className="py-20">
           <div className="text-center mb-10">
             <h2 className="text-4xl font-black">
