@@ -20,16 +20,16 @@ import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { CareerHighlights } from "@/components/CareerHighlights";
 import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 
-// IMPORTANTE: Removi o dynamic import com ssr:false daqui, 
-// pois o Next.js 16 não permite isso diretamente em Server Components de rota.
-// O componente PdfSafeLoader deve ser chamado dentro de um Client Component.
+// Componente blindado que isola o erro de 'pipeline'
 import PdfSafeLoader from "@/components/pdf/PdfSafeLoader";
 
 interface PageProps {
   params: Promise<{ lang: string }>;
 }
 
-// Configurações de Cache e Build
+/**
+ * CONFIGURAÇÃO DE BUILD E PERFORMANCE (Next.js 16 & Node 24)
+ */
 export const dynamic = "force-static"; 
 export const revalidate = 3600;
 
@@ -44,7 +44,7 @@ export const viewport: Viewport = {
 };
 
 /**
- * SEO MULTILINGUE (PT, EN, ES-ES, ES-AR, ES-MX)
+ * SEO MULTILINGUE INTEGRADO (PT, EN, ES-ES, ES-AR, ES-MX)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -78,21 +78,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: "Portfolio Sérgio Santos",
       images: [
         {
-          url: `/og/og-image-${locale}.png`,
+          url: `/og/og-image-${locale}.png`, // Mapeado para sua estrutura em public/og/
           width: 1200,
           height: 630,
           alt: `Portfolio Sérgio Santos - ${locale}`,
         },
       ],
     },
-    other: {
-      "fb:app_id": "672839201123456",
-    },
     twitter: {
       card: "summary_large_image",
       title,
       description,
       images: [`/og/og-image-${locale}.png`],
+    },
+    icons: {
+      icon: "/icons/icon.png",
+      shortcut: "/icons/favicon.ico",
+      apple: "/icons/apple-touch-icon.png",
+      other: [
+        { rel: "icon", url: "/icons/icon.svg", type: "image/svg+xml" },
+      ],
     },
   };
 }
@@ -118,9 +123,6 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
     .filter((p) => p.isPortfolio && p.htmlUrl);
 }
 
-/**
- * COMPONENTE PRINCIPAL - NODE 24 & REACT 19 READY
- */
 export default async function HomePage({ params }: PageProps) {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
@@ -137,23 +139,28 @@ export default async function HomePage({ params }: PageProps) {
   if (!dict) notFound();
 
   const projects = normalizeProjects(repos);
+  
+  /**
+   * MAPEAR CV CORRETO (PT-BR, EN-US, ES-ES, ES-AR, ES-MX)
+   * Baseado na estrutura: public/pdf/cv-sergio-santos-${lang}.pdf
+   */
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
 
   return (
     <ProxyPage lang={lang}>
       <main className="flex min-h-screen flex-col bg-slate-50 selection:bg-blue-200 dark:bg-slate-950 dark:selection:bg-blue-900">
         
-        {/* HERO E DESTAQUES */}
+        {/* HERO SECTION - REAÇÃO AO IDIOMA */}
         <HeroSection dictionary={dict} />
 
-        {/* VITRINE DIO 2025 - VENCEDOR COMPETIÇÃO ARTIGOS */}
+        {/* VITRINE DIO - VENCEDOR COMPETIÇÃO ARTIGOS */}
         <section className="py-12 bg-white/50 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <ConstructionRiskProject dict={dict as any} />
           </div>
         </section>
 
-        {/* SOBRE E CARREIRA */}
+        {/* ABOUT E DESTAQUES DE CARREIRA */}
         <section className="relative">
           <AboutSection dict={dict.about} />
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
@@ -161,10 +168,10 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* EXPERIÊNCIA PROFISSIONAL */}
+        {/* EXPERIÊNCIA E SKILLS */}
         <ExperienceSection experience={dict.experience} />
 
-        {/* PROJETOS COM GRID RESPONSIVO (Tailwind 4.2) */}
+        {/* PROJETOS (GRID RESPONSIVO TAILWIND 4.2) */}
         <section className="py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
@@ -174,7 +181,7 @@ export default async function HomePage({ params }: PageProps) {
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* CURRICULUM VITAE - SUPORTE PT, EN, ES (AR, ES, MX) */}
+        {/* SEÇÃO CURRICULUM VITAE - BLINDADA CONTRA ERROS DE BUILD */}
         <section className="py-24 border-t border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/20">
           <div className="text-center mb-12 px-4">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white mb-6">
@@ -186,14 +193,15 @@ export default async function HomePage({ params }: PageProps) {
           </div>
 
           <div className="max-w-5xl mx-auto px-4">
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl overflow-hidden min-h-[600px]">
-              {/* O PdfSafeLoader deve conter internamente o logic de "use client" */}
+            {/* Sombras e Bordas Tailwind 4.2 */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden min-h-[600px] border border-slate-200 dark:border-slate-800">
+              {/* PdfSafeLoader gerencia internamente o ciclo de vida Client-Only */}
               <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
             </div>
           </div>
         </section>
 
-        {/* BOTÃO DE ARTIGOS */}
+        {/* CTAs FINAIS */}
         <section className="py-24 text-center">
           <Link
             href={`/${lang}/artigos`}
