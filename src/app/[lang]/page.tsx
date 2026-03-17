@@ -1,112 +1,117 @@
-import type { Metadata, Viewport } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-
-import type { Locale } from "@/types/dictionary";
-import type { ProjectDomain } from "@/domain/projects";
-import { resolveProjectTechnology } from "@/domain/projects";
-
-import { getServerDictionary } from "@/lib/getServerDictionary";
-import { getPortfolioRepos } from "@/lib/github";
-import { locales, normalizeLocale } from "@/dictionaries/locales";
-
-import ProxyPage from "@/components/ProxyPage";
-import HeroSection from "@/components/HeroSection";
-import AboutSection from "@/components/AboutSection";
-import ExperienceSection from "@/components/ExperienceSection";
-import ContactSection from "@/components/ContactSection";
-import ResumeLangSelector from "@/components/pdf/ResumeLangSelector";
-import { PortfolioGrid } from "@/components/PortfolioGrid";
-import { CareerHighlights } from "@/components/CareerHighlights";
-import ConstructionRiskProject from "@/components/ConstructionRiskProject";
-
-// Componente blindado que isola o erro de 'pipeline'
-import PdfSafeLoader from "@/components/pdf/PdfSafeLoader";
+import type { Metadata, Viewport } from "next"
+import { notFound } from "next/navigation"
+import Link from "next/link"
+import type { Locale } from "@/types/dictionary"
+import type { ProjectDomain } from "@/domain/projects"
+import { resolveProjectTechnology } from "@/domain/projects"
+import { getServerDictionary } from "@/lib/getServerDictionary"
+import { getPortfolioRepos } from "@/lib/github"
+import { locales, normalizeLocale } from "@/dictionaries/locales"
+import ProxyPage from "@/components/ProxyPage"
+import HeroSection from "@/components/HeroSection"
+import AboutSection from "@/components/AboutSection"
+import ExperienceSection from "@/components/ExperienceSection"
+import ContactSection from "@/components/ContactSection"
+import PdfSafeLoader from "@/components/pdf/PdfSafeLoader"
+import ResumeLangSelector from "@/components/pdf/ResumeLangSelector"
+import { PortfolioGrid } from "@/components/PortfolioGrid"
+import { CareerHighlights } from "@/components/CareerHighlights"
+import ConstructionRiskProject from "@/components/ConstructionRiskProject"
 
 interface PageProps {
-  params: Promise<{ lang: string }>;
+  params: { lang: string }
 }
 
-/**
- * CONFIGURAÇÃO DE BUILD E PERFORMANCE (Next.js 16 & Node 24)
- */
-export const dynamic = "force-static"; 
-export const revalidate = 3600;
+export const dynamic = "force-static"
+export const revalidate = 3600
 
-export async function generateStaticParams() {
-  return locales.map((lang) => ({ lang }));
+export function generateStaticParams() {
+  return locales.map((lang) => ({ lang }))
 }
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#020617",
-};
+}
 
 /**
- * SEO MULTILINGUE INTEGRADO (PT, EN, ES-ES, ES-AR, ES-MX)
+ * ✅ METADATA OTIMIZADO (SEO + TS6 COMPATÍVEL)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { lang: rawLang } = await params;
-  const locale = normalizeLocale(rawLang);
+  const locale = normalizeLocale(params.lang)
 
-  if (!locales.includes(locale)) return {};
+  if (!locales.includes(locale)) return {}
 
-  const dict = await getServerDictionary(locale as Locale).catch(() => null);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app";
-  const fullUrl = `${siteUrl}/${locale}`;
+  const dict = await getServerDictionary(locale as Locale).catch(() => null)
 
-  const title = dict?.meta?.author && dict?.hero?.title
-    ? `${dict.meta.author} | ${dict.hero.title}`
-    : "Sérgio Santos | Data Science & Engineering";
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://portfoliosantossergio.vercel.app"
 
-  const description = dict?.meta?.description || "Portfólio de Engenharia de Dados e IA";
+  // ✅ AGORA USADO (corrige erro TS)
+  const fullUrl = `${siteUrl}/${locale}`
+
+  const description =
+    dict?.meta?.description ??
+    "Portfólio de Sérgio Santos - Especialista em IA e Data Science"
+
+  const title =
+    dict?.meta?.author && dict?.hero?.title
+      ? `${dict.meta.author} | ${dict.hero.title}`
+      : "Sérgio Santos"
 
   return {
     title,
     description,
     metadataBase: new URL(siteUrl),
+
     alternates: {
       canonical: fullUrl,
-      languages: Object.fromEntries(locales.map((l) => [l, `${siteUrl}/${l}`])),
+      languages: Object.fromEntries(
+        locales.map((l) => [l, `${siteUrl}/${l}`])
+      ),
     },
+
     openGraph: {
       title,
       description,
-      url: fullUrl,
+      url: fullUrl, // ✅ USANDO fullUrl
       type: "website",
-      siteName: "Portfolio Sérgio Santos",
       images: [
         {
-          url: `/og/og-image-${locale}.png`, // Mapeado para sua estrutura em public/og/
+          url: `${siteUrl}/og/og-image-${locale}.png`,
           width: 1200,
           height: 630,
-          alt: `Portfolio Sérgio Santos - ${locale}`,
         },
       ],
     },
+
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [`/og/og-image-${locale}.png`],
+      images: [`${siteUrl}/og/og-image-${locale}.png`],
     },
-    icons: {
-      icon: "/icons/icon.png",
-      shortcut: "/icons/favicon.ico",
-      apple: "/icons/apple-touch-icon.png",
-      other: [
-        { rel: "icon", url: "/icons/icon.svg", type: "image/svg+xml" },
-      ],
+
+    other: {
+      "fb:app_id": "672839201123456",
     },
-  };
+  }
 }
 
+/**
+ * NORMALIZA REPOSITÓRIOS
+ */
 function normalizeProjects(repos: any[]): ProjectDomain[] {
-  if (!Array.isArray(repos)) return [];
+  if (!Array.isArray(repos)) return []
+
   return repos
     .map((repo, index): ProjectDomain => {
-      const topics = Array.isArray(repo?.topics) ? repo.topics.map((t: string) => t.toLowerCase()) : [];
+      const topics = Array.isArray(repo?.topics)
+        ? repo.topics.map((t: string) => t.toLowerCase())
+        : []
+
       return {
         id: String(repo?.id ?? index),
         name: (repo?.name ?? "Projeto").replace(/-/g, " "),
@@ -118,96 +123,84 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
         isPortfolio: topics.includes("portfolio"),
         isFeatured: topics.includes("featured") || index < 2,
         isFirst: index === 0,
-      };
+      }
     })
-    .filter((p) => p.isPortfolio && p.htmlUrl);
+    .filter((p) => p.isPortfolio && p.htmlUrl)
 }
 
+/**
+ * PAGE
+ */
 export default async function HomePage({ params }: PageProps) {
-  const { lang: rawLang } = await params;
-  const locale = normalizeLocale(rawLang);
+  const locale = normalizeLocale(params.lang)
 
-  if (!locales.includes(locale)) notFound();
+  if (!locales.includes(locale)) notFound()
 
-  const lang = locale as Locale;
+  const lang = locale as Locale
 
   const [dict, repos] = await Promise.all([
     getServerDictionary(lang).catch(() => null),
     getPortfolioRepos("Santosdevbjj").catch(() => []),
-  ]);
+  ])
 
-  if (!dict) notFound();
+  if (!dict) notFound()
 
-  const projects = normalizeProjects(repos);
-  
-  /**
-   * MAPEAR CV CORRETO (PT-BR, EN-US, ES-ES, ES-AR, ES-MX)
-   * Baseado na estrutura: public/pdf/cv-sergio-santos-${lang}.pdf
-   */
-  const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
+  const projects = normalizeProjects(repos)
+
+  const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`
 
   return (
     <ProxyPage lang={lang}>
-      <main className="flex min-h-screen flex-col bg-slate-50 selection:bg-blue-200 dark:bg-slate-950 dark:selection:bg-blue-900">
+      <main className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
         
-        {/* HERO SECTION - REAÇÃO AO IDIOMA */}
         <HeroSection dictionary={dict} />
 
-        {/* VITRINE DIO - VENCEDOR COMPETIÇÃO ARTIGOS */}
-        <section className="py-12 bg-white/50 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-12">
+          <div className="mx-auto max-w-7xl px-4">
             <ConstructionRiskProject dict={dict as any} />
           </div>
         </section>
 
-        {/* ABOUT E DESTAQUES DE CARREIRA */}
-        <section className="relative">
+        <section>
           <AboutSection dict={dict.about} />
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+          <div className="mx-auto max-w-7xl px-4 py-12">
             <CareerHighlights dict={dict} />
           </div>
         </section>
 
-        {/* EXPERIÊNCIA E SKILLS */}
         <ExperienceSection experience={dict.experience} />
 
-        {/* PROJETOS (GRID RESPONSIVO TAILWIND 4.2) */}
-        <section className="py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
+        <section className="py-20">
+          <div className="mx-auto max-w-7xl px-4 mb-10">
+            <h2 className="text-4xl font-black">
               Projetos <span className="text-blue-600">Full-Stack</span>
             </h2>
           </div>
+
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* SEÇÃO CURRICULUM VITAE - BLINDADA CONTRA ERROS DE BUILD */}
-        <section className="py-24 border-t border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/20">
-          <div className="text-center mb-12 px-4">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white mb-6">
+        {/* PDF */}
+        <section className="py-20">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-black">
               Curriculum <span className="text-blue-600">Vitae</span>
             </h2>
-            <div className="flex justify-center">
-               <ResumeLangSelector />
-            </div>
+
+            <ResumeLangSelector />
           </div>
 
-          <div className="max-w-5xl mx-auto px-4">
-            {/* Sombras e Bordas Tailwind 4.2 */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden min-h-[600px] border border-slate-200 dark:border-slate-800">
-              {/* PdfSafeLoader gerencia internamente o ciclo de vida Client-Only */}
-              <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
-            </div>
+          <div className="max-w-5xl mx-auto">
+            <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
           </div>
         </section>
 
-        {/* CTAs FINAIS */}
-        <section className="py-24 text-center">
+        <section className="py-20 text-center">
           <Link
             href={`/${lang}/artigos`}
-            className="inline-flex items-center justify-center px-12 py-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25"
+            className="px-10 py-5 bg-blue-600 text-white rounded-full"
           >
-            VER MEUS ARTIGOS TÉCNICOS
+            ARTIGOS
           </Link>
         </section>
 
@@ -218,5 +211,5 @@ export default async function HomePage({ params }: PageProps) {
         />
       </main>
     </ProxyPage>
-  );
+  )
 }
