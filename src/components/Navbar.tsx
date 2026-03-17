@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, type JSX } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+// Removido o 'usePathname' que causava o erro de build
 import { Menu, X, FileText } from 'lucide-react'
 import type { SupportedLocale } from "@/dictionaries/locales"
 import type { CommonDictionary, ContactDictionary } from '@/types/dictionary'
@@ -13,17 +13,16 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { useScrollSpy } from '@/contexts/scroll-spy.client'
 
 /**
- * NAVBAR COMPONENT - VERSÃO 2026 (INTEGRADA)
+ * NAVBAR COMPONENT - VERSÃO 2026 (CORRIGIDA)
  * -----------------------------------------------------------------------------
- * ✔ Unificação: Tudo baseia-se na rota /[lang]
- * ✔ Fix: Integração direta com resumePdfMap para evitar conflito de estado
+ * ✔ Fix: Removida importação não utilizada de usePathname (Erro de Build Vercel)
  * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16
  */
 
 interface NavbarProps {
   readonly lang: SupportedLocale;
   readonly common: CommonDictionary;
-  readonly contact: ContactDictionary; // Necessário para o label do CV
+  readonly contact: ContactDictionary;
 }
 
 export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Element {
@@ -32,7 +31,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
-  // Controle de scroll otimizado
+  // Controle de scroll otimizado (Passive listeners para performance)
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -51,7 +50,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
 
   // Mapeamento de links unificado
   const navLinks = useMemo(() => {
-    // 1. Seções da Home (Scroll)
+    // 1. Seções da Home (Scroll dinâmico baseado no lang)
     const baseLinks = NAV_SECTIONS.map((section) => ({
       id: section,
       href: `/${lang}${getNavHash(section)}`,
@@ -59,13 +58,13 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
       isExternal: false
     }));
 
-    // 2. Link do Currículo (PDF Dinâmico baseado no idioma da URL)
+    // 2. Link do Currículo (PDF Dinâmico)
     const resumeLink = {
       id: 'resume',
       href: getResumePath(lang),
       label: contact.cvLabel || 'CV',
       isExternal: true,
-      icon: <FileText size={14} className="mr-1 inline" />
+      icon: <FileText size={14} className="mr-1 inline-block" />
     };
 
     return [...baseLinks, resumeLink];
@@ -133,7 +132,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
             type="button"
             aria-label={isOpen ? menu.aria.close : menu.aria.open}
             onClick={() => setIsOpen(!isOpen)}
-            className="p-2 text-slate-900 dark:text-white focus:outline-none"
+            className="p-2 text-slate-900 dark:text-white focus:outline-none cursor-pointer"
           >
             {isOpen ? (
               <X size={32} className="text-blue-600 animate-in spin-in-90 duration-300" />
@@ -146,7 +145,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
 
       {/* Mobile Menu Overlay */}
       <div className={`lg:hidden fixed inset-0 z-[100] bg-white dark:bg-[#020617] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-        isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+        isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'
       }`}>
         <div className="flex flex-col h-full justify-center gap-12 p-12">
           <div className="space-y-8">
@@ -155,6 +154,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
                 key={link.id}
                 href={link.href}
                 target={link.isExternal ? "_blank" : undefined}
+                rel={link.isExternal ? "noopener noreferrer" : undefined}
                 onClick={() => setIsOpen(false)}
                 className="block text-4xl font-black text-slate-900 dark:text-white hover:text-blue-600 transition-colors"
                 style={{ transitionDelay: `${idx * 50}ms` }}
