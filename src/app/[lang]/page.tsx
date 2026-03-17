@@ -25,7 +25,7 @@ import { CareerHighlights } from "@/components/CareerHighlights";
 import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 
 /**
- * TS 6.0 + Next.js 16 exigem que params seja uma Promise em páginas dinâmicas
+ * TS 6.0 + Next.js 16: params deve ser uma Promise
  */
 interface PageProps {
   params: Promise<{ lang: string }>;
@@ -45,7 +45,7 @@ export const viewport: Viewport = {
 };
 
 /**
- * SEO MULTILINGUE (PT-BR, EN-US, ES-ES, ES-AR, ES-MX)
+ * SEO MULTILINGUE INTEGRADO (PT, EN, ES-ES, ES-AR, ES-MX)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -60,11 +60,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = dict?.meta?.author && dict?.hero?.title
     ? `${dict.meta.author} | ${dict.hero.title}`
-    : "Sérgio Santos | Data Science & AI";
+    : "Sérgio Santos | Data Science & Engineering";
+
+  const description = dict?.meta?.description || "Portfólio de Engenharia de Dados e IA";
 
   return {
     title,
-    description: dict?.meta?.description,
+    description,
     metadataBase: new URL(siteUrl),
     alternates: {
       canonical: fullUrl,
@@ -72,28 +74,35 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     openGraph: {
       title,
-      description: dict?.meta?.description,
+      description,
       url: fullUrl,
       type: "website",
+      siteName: "Portfolio Sérgio Santos",
       images: [
         {
-          url: `/og/og-image-${locale}.png`, // Caminho corrigido conforme sua lista
+          url: `/og/og-image-${locale}.png`,
           width: 1200,
           height: 630,
+          alt: `Portfolio Sérgio Santos - ${locale}`,
         },
       ],
-      other: {
+    },
+    // Correção do erro da Meta: fb:app_id deve estar fora de openGraph se for 'property'
+    // No Next.js Metadata, usamos a chave 'facebook' ou 'other'
+    other: {
       "fb:app_id": "672839201123456",
     },
     twitter: {
       card: "summary_large_image",
+      title,
+      description,
       images: [`/og/og-image-${locale}.png`],
     },
   };
 }
 
 /**
- * NORMALIZAÇÃO DE REPOSITÓRIOS GITHUB
+ * NORMALIZAÇÃO DE REPOSITÓRIOS GITHUB (DOMÍNIO)
  */
 function normalizeProjects(repos: any[]): ProjectDomain[] {
   if (!Array.isArray(repos)) return [];
@@ -121,7 +130,7 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
 }
 
 /**
- * COMPONENTE PRINCIPAL - RESPONSIVO E OTIMIZADO (TAILWIND 4.2)
+ * PAGE COMPONENT - TOTALMENTE RESPONSIVO (TAILWIND 4.2)
  */
 export default async function HomePage({ params }: PageProps) {
   const { lang: rawLang } = await params;
@@ -131,7 +140,7 @@ export default async function HomePage({ params }: PageProps) {
 
   const lang = locale as Locale;
 
-  // Carregamento paralelo para performance de build
+  // Busca de dados em paralelo para build ultra-rápido no Node 24
   const [dict, repos] = await Promise.all([
     getServerDictionary(lang).catch(() => null),
     getPortfolioRepos("Santosdevbjj").catch(() => []),
@@ -140,23 +149,23 @@ export default async function HomePage({ params }: PageProps) {
   if (!dict) notFound();
 
   const projects = normalizeProjects(repos);
-  const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`; // Caminho absoluto corrigido
+  const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
 
   return (
     <ProxyPage lang={lang}>
       <main className="flex min-h-screen flex-col bg-slate-50 selection:bg-blue-200 dark:bg-slate-950 dark:selection:bg-blue-900">
         
-        {/* HERO E PROJETOS EM DESTAQUE */}
+        {/* HERO SECTION - ADAPTATIVO */}
         <HeroSection dictionary={dict} />
 
-        {/* SEÇÃO DIO - TROFÉUS 2025 */}
+        {/* VITRINE DIO - TROFÉUS E CONQUISTAS 2025 */}
         <section className="py-12 bg-white/50 dark:bg-slate-900/50">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <ConstructionRiskProject dict={dict as any} />
           </div>
         </section>
 
-        {/* SOBRE E CARREIRA */}
+        {/* BIO E DESTAQUES DE CARREIRA */}
         <section className="relative">
           <AboutSection dict={dict.about} />
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
@@ -167,7 +176,7 @@ export default async function HomePage({ params }: PageProps) {
         {/* EXPERIÊNCIA PROFISSIONAL */}
         <ExperienceSection experience={dict.experience} />
 
-        {/* GRID DE PROJETOS FULL-STACK */}
+        {/* PORTFÓLIO GRID - RESPONSIVIDADE DE GRID MÓVEL/DESKTOP */}
         <section className="py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
@@ -177,7 +186,7 @@ export default async function HomePage({ params }: PageProps) {
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* VISUALIZADOR DE CURRÍCULO (PDF SAFE LOADER) */}
+        {/* CURRICULUM VITAE - PDF MULTILINGUE (PT, EN, ES-AR, ES-ES, ES-MX) */}
         <section className="py-24 border-t border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/20">
           <div className="text-center mb-12 px-4">
             <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white mb-6">
@@ -188,12 +197,14 @@ export default async function HomePage({ params }: PageProps) {
             </div>
           </div>
 
-          <div className="max-w-5xl mx-auto px-4 shadow-2xl">
-            <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl overflow-hidden">
+              <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
+            </div>
           </div>
         </section>
 
-        {/* CTA ARTIGOS */}
+        {/* CTA ARTIGOS TÉCNICOS */}
         <section className="py-24 text-center">
           <Link
             href={`/${lang}/artigos`}
@@ -203,6 +214,7 @@ export default async function HomePage({ params }: PageProps) {
           </Link>
         </section>
 
+        {/* RODAPÉ E CONTATO */}
         <ContactSection
           contact={dict.contact}
           common={dict.common}
