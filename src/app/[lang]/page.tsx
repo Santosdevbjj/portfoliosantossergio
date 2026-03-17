@@ -41,7 +41,7 @@ export const viewport: Viewport = {
 }
 
 /**
- * METADATA (SEO + FACEBOOK FIX)
+ * METADATA (FIX COMPLETO)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const locale = normalizeLocale(params.lang)
@@ -82,7 +82,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       url: fullUrl,
       type: "website",
-      appId: "672839201123456", // ✅ CORRETO
       images: [
         {
           url: `${siteUrl}/og/og-image-${locale}.png`,
@@ -90,6 +89,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           height: 630,
         },
       ],
+    },
+
+    // ✅ FACEBOOK FIX REAL
+    other: {
+      "fb:app_id": "672839201123456",
     },
 
     twitter: {
@@ -156,7 +160,6 @@ export default async function HomePage({ params }: PageProps) {
 
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`
 
-  // ✅ SAFE ACCESS (SEM QUEBRAR TS)
   const construction = (dict as any)?.construction
 
   return (
@@ -165,7 +168,6 @@ export default async function HomePage({ params }: PageProps) {
 
         <HeroSection dictionary={dict} />
 
-        {/* SAFE RENDER */}
         {construction ? (
           <section className="py-12">
             <div className="mx-auto max-w-7xl px-4">
@@ -176,7 +178,6 @@ export default async function HomePage({ params }: PageProps) {
 
         <section>
           {dict?.about && <AboutSection dict={dict.about} />}
-
           <div className="mx-auto max-w-7xl px-4 py-12">
             <CareerHighlights dict={dict} />
           </div>
