@@ -1,13 +1,12 @@
 /**
  * i18n Locales Configuration - Versão 2026
  * -----------------------------------------------------------------------------
- * ✔ Suporte: Next.js 16, React 19, TS 6.0, Node 24
- * ✔ Este arquivo é a única "Fonte da Verdade" para idiomas no sistema.
+ * ✔ Suporte: Next.js 16.1.7, React 19, TS 6.0, Node 24
+ * ✔ Correção de Build: Tipagem estrita para o split de locale
  */
 
 /**
  * Lista oficial de locales suportados no sistema.
- * Baseado nos seus dicionários e arquivos PDF existentes.
  */
 export const SUPPORTED_LOCALES = [
   "pt-BR",
@@ -17,61 +16,45 @@ export const SUPPORTED_LOCALES = [
   "es-MX",
 ] as const;
 
-/**
- * Alias para exportação simplificada, mantendo compatibilidade 
- * com os tipos de dicionário.
- */
 export const locales = SUPPORTED_LOCALES;
 
 /**
- * Tipo derivado da lista de locales. 
- * Garante que o TypeScript aponte erro se tentarmos usar um idioma não mapeado.
+ * Tipagens baseadas na lista imutável acima.
  */
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
-
-/**
- * Atalho de tipo para uso em rotas e parâmetros.
- */
 export type Locale = SupportedLocale;
 
 /**
- * Idioma padrão utilizado em caso de falha de detecção ou rota raiz.
+ * Idioma padrão.
  */
 export const DEFAULT_LOCALE: SupportedLocale = "pt-BR";
 
 /**
- * Verifica se uma string qualquer é um locale válido dentro do sistema.
- * Utiliza o Type Guard 'locale is SupportedLocale' para segurança de tipo no TS 6.0.
+ * Type Guard para validação de locale.
  */
 export function isValidLocale(locale: string): locale is SupportedLocale {
   return (SUPPORTED_LOCALES as readonly string[]).includes(locale);
 }
 
 /**
- * Normaliza qualquer entrada (URL, Header, State) para um locale suportado.
- * * ✔ Case insensitive (PT-BR -> pt-BR)
- * ✔ Corrige separadores (en_US -> en-US)
- * ✔ Fallback inteligente para a base da língua (es -> es-ES)
- * ✔ Garante retorno de um SupportedLocale válido
+ * Normaliza qualquer entrada para um locale suportado.
  */
 export function normalizeLocale(input?: string | null): SupportedLocale {
   if (!input) return DEFAULT_LOCALE;
 
-  // Limpa espaços, troca underscores e normaliza para o formato xx-yy
   const cleaned = input.trim().replace(/_/g, "-");
   
-  // Busca exata (Case Insensitive)
   const exactMatch = SUPPORTED_LOCALES.find(
     (l) => l.toLowerCase() === cleaned.toLowerCase()
   );
   if (exactMatch) return exactMatch;
 
-  // Normalização de abreviações comuns
-  const base = cleaned.toLowerCase().split("-")[0];
+  const base = cleaned.toLowerCase().split("-")[0] || "";
+  
   switch (base) {
     case "pt": return "pt-BR";
     case "en": return "en-US";
-    case "es": return "es-ES"; // Padrão Espanha para entrada genérica 'es'
+    case "es": return "es-ES";
     default: return DEFAULT_LOCALE;
   }
 }
@@ -79,7 +62,11 @@ export function normalizeLocale(input?: string | null): SupportedLocale {
 /**
  * Helper para metadados SEO e acessibilidade (HTML lang attribute).
  * Retorna apenas a parte da língua (ex: "pt", "en", "es").
+ * * FIX: Adicionado fallback e verificação para satisfazer o TS 6.0 Strict Mode.
  */
 export function getLanguageCode(locale: SupportedLocale): string {
-  return locale.split("-")[0];
+  // Garantimos que se o split falhar por algum motivo bizarro, 
+  // ele retorna o primeiro segmento ou a string inteira.
+  const code = locale.split("-")[0];
+  return code ?? locale;
 }
