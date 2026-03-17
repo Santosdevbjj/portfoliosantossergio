@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Script from "next/script"
 import PdfSafeLoader from "@/components/pdf/PdfSafeLoader"
 import ResumeLangSelector from "@/components/pdf/ResumeLangSelector"
 import {
@@ -12,7 +13,7 @@ interface Props {
 }
 
 /**
- * 🔥 GERAÇÃO ESTÁTICA (CRÍTICO PARA VERCEL)
+ * ✅ GERAÇÃO ESTÁTICA (OBRIGATÓRIO)
  */
 export function generateStaticParams() {
   return SUPPORTED_LANGS.map((lang) => ({
@@ -21,7 +22,7 @@ export function generateStaticParams() {
 }
 
 /**
- * 🔥 Metadata SEO
+ * ✅ SEO Metadata
  */
 export function generateMetadata({ params }: Props): Metadata {
   const lang: Lang = SUPPORTED_LANGS.includes(params.lang as Lang)
@@ -88,22 +89,11 @@ export default function ResumePage({ params }: Props) {
   return (
     <main className="container mx-auto px-4 py-12 min-h-screen selection:bg-blue-600/10">
       
-      {/* HEADER */}
-      <header className="text-center mb-10">
-        <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tighter">
-          {currentContent.h1}
-        </h1>
-
-        <div className="w-20 h-2 bg-blue-600 mx-auto mb-6 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)]" />
-
-        <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-          {currentContent.p}
-        </p>
-      </header>
-
-      {/* ✅ JSON-LD CORRIGIDO */}
-      <script
+      {/* ✅ JSON-LD SEGURO (SEM QUEBRAR BUILD) */}
+      <Script
+        id="resume-jsonld"
         type="application/ld+json"
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
@@ -118,6 +108,19 @@ export default function ResumePage({ params }: Props) {
           }),
         }}
       />
+
+      {/* HEADER */}
+      <header className="text-center mb-10">
+        <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tighter">
+          {currentContent.h1}
+        </h1>
+
+        <div className="w-20 h-2 bg-blue-600 mx-auto mb-6 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)]" />
+
+        <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
+          {currentContent.p}
+        </p>
+      </header>
 
       {/* SELETOR */}
       <ResumeLangSelector />
