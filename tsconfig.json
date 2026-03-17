@@ -4,15 +4,15 @@
     "target": "ES2025",
     "lib": ["dom", "dom.iterable", "esnext"],
     "module": "ESNext",
-    /* 'Bundler' é o padrão para Next.js 16 (Turbopack/Webpack) */
+    /* 'Bundler' é o padrão ouro para Next.js 16 e Turbopack */
     "moduleResolution": "Bundler",
     "moduleDetection": "force",
 
-    /* --- AJUSTE DE ESTRUTURA PARA DEPLOY (SOLUÇÃO DO ERRO) --- */
-    /* Removido "rootDir": "./src" para permitir arquivos de configuração na raiz */
-    "baseUrl": ".",
+    /* --- COMPLIANCE TS 6.0 (SOLUÇÃO DO ERRO) --- */
+    /* Removido 'baseUrl' e 'rootDir' para total compatibilidade com o deploy da Vercel */
     "noEmit": true,
     "verbatimModuleSyntax": true,
+    "isolatedModules": true,
 
     /* --- RIGOR DE MISSÃO CRÍTICA (NÍVEL SENIOR) --- */
     "strict": true,
@@ -39,6 +39,7 @@
     "types": ["node"],
 
     /* --- INFRASTRUCTURE PATHS (TS 6.0 COMPLIANCE) --- */
+    /* Sem baseUrl, os caminhos devem começar com './' para serem relativos à raiz */
     "paths": {
       "@/*": ["./src/*"],
       "#/*": ["./src/*"]
