@@ -1,19 +1,24 @@
 import type { Metadata, Viewport } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
+
 import type { Locale } from "@/types/dictionary"
 import type { ProjectDomain } from "@/domain/projects"
+
 import { resolveProjectTechnology } from "@/domain/projects"
 import { getServerDictionary } from "@/lib/getServerDictionary"
 import { getPortfolioRepos } from "@/lib/github"
 import { locales, normalizeLocale } from "@/dictionaries/locales"
+
 import ProxyPage from "@/components/ProxyPage"
 import HeroSection from "@/components/HeroSection"
 import AboutSection from "@/components/AboutSection"
 import ExperienceSection from "@/components/ExperienceSection"
 import ContactSection from "@/components/ContactSection"
+
 import PdfSafeLoader from "@/components/pdf/PdfSafeLoader"
 import ResumeLangSelector from "@/components/pdf/ResumeLangSelector"
+
 import { PortfolioGrid } from "@/components/PortfolioGrid"
 import { CareerHighlights } from "@/components/CareerHighlights"
 import ConstructionRiskProject from "@/components/ConstructionRiskProject"
@@ -36,7 +41,7 @@ export const viewport: Viewport = {
 }
 
 /**
- * ✅ METADATA OTIMIZADO (SEO + TS6 COMPATÍVEL)
+ * METADATA (100% SEGURO)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const locale = normalizeLocale(params.lang)
@@ -49,7 +54,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     process.env.NEXT_PUBLIC_SITE_URL ||
     "https://portfoliosantossergio.vercel.app"
 
-  // ✅ AGORA USADO (corrige erro TS)
   const fullUrl = `${siteUrl}/${locale}`
 
   const description =
@@ -76,7 +80,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title,
       description,
-      url: fullUrl, // ✅ USANDO fullUrl
+      url: fullUrl,
       type: "website",
       images: [
         {
@@ -93,21 +97,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: [`${siteUrl}/og/og-image-${locale}.png`],
     },
-
-    other: {
-      "fb:app_id": "672839201123456",
-    },
   }
 }
 
 /**
- * NORMALIZA REPOSITÓRIOS
+ * NORMALIZA REPOSITÓRIOS (SAFE)
  */
-function normalizeProjects(repos: any[]): ProjectDomain[] {
+function normalizeProjects(repos: unknown): ProjectDomain[] {
   if (!Array.isArray(repos)) return []
 
   return repos
-    .map((repo, index): ProjectDomain => {
+    .map((repo: any, index): ProjectDomain => {
       const topics = Array.isArray(repo?.topics)
         ? repo.topics.map((t: string) => t.toLowerCase())
         : []
@@ -129,7 +129,7 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
 }
 
 /**
- * PAGE
+ * PAGE (ANTI-CRASH)
  */
 export default async function HomePage({ params }: PageProps) {
   const locale = normalizeLocale(params.lang)
@@ -138,10 +138,16 @@ export default async function HomePage({ params }: PageProps) {
 
   const lang = locale as Locale
 
-  const [dict, repos] = await Promise.all([
-    getServerDictionary(lang).catch(() => null),
-    getPortfolioRepos("Santosdevbjj").catch(() => []),
+  const [dictResult, reposResult] = await Promise.allSettled([
+    getServerDictionary(lang),
+    getPortfolioRepos("Santosdevbjj"),
   ])
+
+  const dict =
+    dictResult.status === "fulfilled" ? dictResult.value : null
+
+  const repos =
+    reposResult.status === "fulfilled" ? reposResult.value : []
 
   if (!dict) notFound()
 
@@ -152,24 +158,34 @@ export default async function HomePage({ params }: PageProps) {
   return (
     <ProxyPage lang={lang}>
       <main className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
-        
+
+        {/* HERO */}
         <HeroSection dictionary={dict} />
 
-        <section className="py-12">
-          <div className="mx-auto max-w-7xl px-4">
-            <ConstructionRiskProject dict={dict as any} />
-          </div>
-        </section>
+        {/* PROJETO RISCO - SAFE */}
+        {dict?.construction ? (
+          <section className="py-12">
+            <div className="mx-auto max-w-7xl px-4">
+              <ConstructionRiskProject dict={dict.construction} />
+            </div>
+          </section>
+        ) : null}
 
+        {/* ABOUT */}
         <section>
-          <AboutSection dict={dict.about} />
+          {dict?.about && <AboutSection dict={dict.about} />}
+
           <div className="mx-auto max-w-7xl px-4 py-12">
             <CareerHighlights dict={dict} />
           </div>
         </section>
 
-        <ExperienceSection experience={dict.experience} />
+        {/* EXPERIENCE */}
+        {dict?.experience && (
+          <ExperienceSection experience={dict.experience} />
+        )}
 
+        {/* PROJECTS */}
         <section className="py-20">
           <div className="mx-auto max-w-7xl px-4 mb-10">
             <h2 className="text-4xl font-black">
@@ -195,6 +211,7 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
+        {/* CTA */}
         <section className="py-20 text-center">
           <Link
             href={`/${lang}/artigos`}
@@ -204,6 +221,7 @@ export default async function HomePage({ params }: PageProps) {
           </Link>
         </section>
 
+        {/* CONTACT */}
         <ContactSection
           contact={dict.contact}
           common={dict.common}
