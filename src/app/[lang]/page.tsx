@@ -82,6 +82,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           height: 630,
         },
       ],
+      other: {
+      "fb:app_id": "672839201123456",
     },
     twitter: {
       card: "summary_large_image",
