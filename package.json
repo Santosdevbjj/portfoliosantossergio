@@ -13,8 +13,8 @@
     "build": "next build",
     "build:fast": "next build --no-lint",
     "start": "next start",
-    "lint": "eslint .",
-    "type-check": "tsc --noEmit",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit --project tsconfig.json",
     "i18n:validate": "tsx src/dictionaries/validate-i18n.ts",
     "clean": "rm -rf .next node_modules package-lock.json && npm install"
   },
