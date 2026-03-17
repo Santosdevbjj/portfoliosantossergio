@@ -28,7 +28,7 @@ export default function HeroSection({
   const { hero, contact, about, metrics, meta } = dictionary
 
   const projectsHash = `#${getSectionId(NavSection.PROJECTS)}`
-  const cvPath = `/cv-sergio-santos-${meta.locale}.pdf`
+  const cvPath = `/pdf/cv-sergio-santos-${meta.locale}.pdf`
 
   return (
     <section
