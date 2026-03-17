@@ -1,4 +1,3 @@
-export default withMDX(nextConfig)
 // @ts-check
 import createMDX from '@next/mdx'
 
@@ -8,7 +7,7 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
 
   // 2. Configuração do Turbopack (Next.js 16)
-  // Mantemos simples para evitar conflitos com o motor de inferência do TS 6.0
+  // Otimizado para o motor nativo do TS 6.0
   turbopack: {
     rules: {
       '*.svg': {
@@ -32,18 +31,17 @@ const nextConfig = {
         pathname: '/**' 
       },
     ],
-    dangerouslyAllowSVG: true, // Necessário para badges e ícones técnicos
+    dangerouslyAllowSVG: true,
     minimumCacheTTL: 60,
   },
 
-  // 4. Isolamento de pacotes problemáticos no Node 24 / React 19
-  // Isso resolve o erro de 'pipeline' retirando essas libs do bundle do servidor
+  // 4. Isolamento de pacotes para Node 24 / React 19
+  // Impede falhas de Prerendering (Pipeline Error)
   serverExternalPackages: ['pdfjs-dist', 'canvas'],
 
-  // 5. Configurações Experimentais para Estabilidade (Opcional)
+  // 5. Configurações Experimentais
   experimental: {
-    // Garante que o MDX use o novo motor do React 19
-    mdxRs: true,
+    mdxRs: true, // Usa o compilador Rust para MDX (Mais rápido)
   }
 }
 
@@ -54,4 +52,5 @@ const withMDX = createMDX({
   },
 })
 
+// APENAS UM EXPORT DEFAULT NO FINAL DO ARQUIVO
 export default withMDX(nextConfig)
