@@ -1,18 +1,31 @@
 import type { Metadata } from "next"
 import PdfSafeLoader from "@/components/pdf/PdfSafeLoader"
 import ResumeLangSelector from "@/components/pdf/ResumeLangSelector"
-import { getResumeContent, SUPPORTED_LANGS } from "@/lib/resume/resumeContent"
+import {
+  getResumeContent,
+  SUPPORTED_LANGS,
+  type Lang,
+} from "@/lib/resume/resumeContent"
 
 interface Props {
   params: { lang: string }
 }
 
 /**
- * SEO Metadata dinâmico (Next 16)
+ * 🔥 GERAÇÃO ESTÁTICA (CRÍTICO PARA VERCEL)
  */
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const lang = SUPPORTED_LANGS.includes(params.lang as any)
-    ? params.lang
+export function generateStaticParams() {
+  return SUPPORTED_LANGS.map((lang) => ({
+    lang,
+  }))
+}
+
+/**
+ * 🔥 Metadata SEO
+ */
+export function generateMetadata({ params }: Props): Metadata {
+  const lang: Lang = SUPPORTED_LANGS.includes(params.lang as Lang)
+    ? (params.lang as Lang)
     : "en-US"
 
   const seo = getResumeContent(lang)
@@ -40,14 +53,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * Página principal
  */
 export default function ResumePage({ params }: Props) {
-  const lang = SUPPORTED_LANGS.includes(params.lang as any)
-    ? params.lang
+  const lang: Lang = SUPPORTED_LANGS.includes(params.lang as Lang)
+    ? (params.lang as Lang)
     : "en-US"
 
   const seo = getResumeContent(lang)
   const pdfFile = seo.pdfUrl
 
-  const content = {
+  const content: Record<Lang, { h1: string; p: string }> = {
     "pt-BR": {
       h1: "Currículo Vitae",
       p: "Versão oficial para Ciência de Dados e Engenharia.",
@@ -70,8 +83,7 @@ export default function ResumePage({ params }: Props) {
     },
   }
 
-  const currentContent =
-    content[lang as keyof typeof content] || content["en-US"]
+  const currentContent = content[lang]
 
   return (
     <main className="container mx-auto px-4 py-12 min-h-screen selection:bg-blue-600/10">
@@ -89,7 +101,7 @@ export default function ResumePage({ params }: Props) {
         </p>
       </header>
 
-      {/* SEO JSON-LD (CRÍTICO PARA GOOGLE) */}
+      {/* ✅ JSON-LD CORRIGIDO */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -100,16 +112,17 @@ export default function ResumePage({ params }: Props) {
             jobTitle: seo.title,
             description: seo.description,
             url: seo.resumeUrl,
-            image: `${seo.resumeUrl}/../../images/sergio-santos-profile.png`,
+            image:
+              "https://portfoliosantossergio.vercel.app/images/sergio-santos-profile.png",
             knowsAbout: seo.skills,
           }),
         }}
       />
 
-      {/* SELETOR DE IDIOMA */}
+      {/* SELETOR */}
       <ResumeLangSelector />
 
-      {/* PDF VIEWER */}
+      {/* PDF */}
       <section className="w-full max-w-5xl mx-auto flex justify-center">
         <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
       </section>
