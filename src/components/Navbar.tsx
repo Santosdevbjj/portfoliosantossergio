@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useState, type JSX } from 'react'
 import Link from 'next/link'
-// Removido o 'usePathname' que causava o erro de build
 import { Menu, X, FileText } from 'lucide-react'
+
+// Importações atualizadas conforme sua nova estrutura de arquivos
 import type { SupportedLocale } from "@/dictionaries/locales"
 import type { CommonDictionary, ContactDictionary } from '@/types/dictionary'
-import { NAV_SECTIONS, getNavHash } from '@/domain/navigation'
+import { NAV_SECTIONS, getNavHash, NavSection } from '@/domain/navigation'
 import { getResumePath } from '@/lib/resume/resumePdfMap'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -15,9 +16,17 @@ import { useScrollSpy } from '@/contexts/scroll-spy.client'
 /**
  * NAVBAR COMPONENT - VERSÃO 2026 (CORRIGIDA)
  * -----------------------------------------------------------------------------
- * ✔ Fix: Removida importação não utilizada de usePathname (Erro de Build Vercel)
- * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16
+ * ✔ Fix: Tipagem da união de links para evitar erro de build (Property 'icon' missing)
+ * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16.1.7, Node 24
  */
+
+interface NavLinkItem {
+  id: string;
+  href: string;
+  label: string;
+  isExternal: boolean;
+  icon?: JSX.Element; // Propriedade opcional para resolver o erro de build
+}
 
 interface NavbarProps {
   readonly lang: SupportedLocale;
@@ -31,14 +40,14 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
-  // Controle de scroll otimizado (Passive listeners para performance)
+  // Controle de scroll otimizado
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock body scroll para React 19 quando o menu mobile está aberto
+  // Lock body scroll para React 19
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.body.style.overflow = isOpen ? 'hidden' : ''
@@ -48,18 +57,18 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
     }
   }, [isOpen])
 
-  // Mapeamento de links unificado
-  const navLinks = useMemo(() => {
-    // 1. Seções da Home (Scroll dinâmico baseado no lang)
-    const baseLinks = NAV_SECTIONS.map((section) => ({
+  // Mapeamento de links unificado com tipagem explícita
+  const navLinks = useMemo((): NavLinkItem[] => {
+    // 1. Seções da Home
+    const baseLinks: NavLinkItem[] = NAV_SECTIONS.map((section) => ({
       id: section,
       href: `/${lang}${getNavHash(section)}`,
       label: nav[section as keyof typeof nav] || section,
       isExternal: false
     }));
 
-    // 2. Link do Currículo (PDF Dinâmico)
-    const resumeLink = {
+    // 2. Link do Currículo (PDF Dinâmico baseado no seu novo resumePdfMap)
+    const resumeLink: NavLinkItem = {
       id: 'resume',
       href: getResumePath(lang),
       label: contact.cvLabel || 'CV',
@@ -96,11 +105,11 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center gap-10">
           <div className="flex gap-8">
-            {navLinks.map(link => {
+            {navLinks.map((link) => {
               const isActive = activeSection === link.id
               return (
-                <Link
-                  key={link.id}
+                <Link 
+                  key={link.id} 
                   href={link.href}
                   target={link.isExternal ? "_blank" : undefined}
                   rel={link.isExternal ? "noopener noreferrer" : undefined}
@@ -109,7 +118,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
                     isActive ? 'text-blue-600' : 'text-slate-500 dark:text-slate-400'
                   }`}
                 >
-                  {link.icon && link.icon}
+                  {link.icon}
                   {link.label}
                   {isActive && (
                     <span className="absolute -bottom-1 left-0 h-0.5 w-full bg-blue-600 rounded-full animate-in fade-in zoom-in duration-500" />
@@ -118,7 +127,9 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
               )
             })}
           </div>
+
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
+
           <div className="flex items-center gap-6">
             <LanguageSwitcher currentLang={lang} />
             <ThemeToggle labels={theme} />
@@ -128,8 +139,8 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
         {/* Mobile Controls */}
         <div className="flex items-center gap-4 lg:hidden relative z-[110]">
           <ThemeToggle labels={theme} />
-          <button
-            type="button"
+          <button 
+            type="button" 
             aria-label={isOpen ? menu.aria.close : menu.aria.open}
             onClick={() => setIsOpen(!isOpen)}
             className="p-2 text-slate-900 dark:text-white focus:outline-none cursor-pointer"
@@ -150,8 +161,8 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
         <div className="flex flex-col h-full justify-center gap-12 p-12">
           <div className="space-y-8">
             {navLinks.map((link, idx) => (
-              <Link
-                key={link.id}
+              <Link 
+                key={link.id} 
                 href={link.href}
                 target={link.isExternal ? "_blank" : undefined}
                 rel={link.isExternal ? "noopener noreferrer" : undefined}
@@ -164,6 +175,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
               </Link>
             ))}
           </div>
+
           <div className="pt-12 border-t border-slate-100 dark:border-slate-800/50">
             <p className="mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
               {languageSwitcher}
