@@ -41,7 +41,7 @@ export const viewport: Viewport = {
 }
 
 /**
- * METADATA (100% SEGURO)
+ * METADATA (SEO + FACEBOOK FIX)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const locale = normalizeLocale(params.lang)
@@ -82,6 +82,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       url: fullUrl,
       type: "website",
+      appId: "672839201123456", // ✅ CORRETO
       images: [
         {
           url: `${siteUrl}/og/og-image-${locale}.png`,
@@ -101,7 +102,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * NORMALIZA REPOSITÓRIOS (SAFE)
+ * NORMALIZA REPOSITÓRIOS
  */
 function normalizeProjects(repos: unknown): ProjectDomain[] {
   if (!Array.isArray(repos)) return []
@@ -129,7 +130,7 @@ function normalizeProjects(repos: unknown): ProjectDomain[] {
 }
 
 /**
- * PAGE (ANTI-CRASH)
+ * PAGE
  */
 export default async function HomePage({ params }: PageProps) {
   const locale = normalizeLocale(params.lang)
@@ -155,23 +156,24 @@ export default async function HomePage({ params }: PageProps) {
 
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`
 
+  // ✅ SAFE ACCESS (SEM QUEBRAR TS)
+  const construction = (dict as any)?.construction
+
   return (
     <ProxyPage lang={lang}>
       <main className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
 
-        {/* HERO */}
         <HeroSection dictionary={dict} />
 
-        {/* PROJETO RISCO - SAFE */}
-        {dict?.construction ? (
+        {/* SAFE RENDER */}
+        {construction ? (
           <section className="py-12">
             <div className="mx-auto max-w-7xl px-4">
-              <ConstructionRiskProject dict={dict.construction} />
+              <ConstructionRiskProject dict={construction} />
             </div>
           </section>
         ) : null}
 
-        {/* ABOUT */}
         <section>
           {dict?.about && <AboutSection dict={dict.about} />}
 
@@ -180,12 +182,10 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* EXPERIENCE */}
         {dict?.experience && (
           <ExperienceSection experience={dict.experience} />
         )}
 
-        {/* PROJECTS */}
         <section className="py-20">
           <div className="mx-auto max-w-7xl px-4 mb-10">
             <h2 className="text-4xl font-black">
@@ -196,7 +196,6 @@ export default async function HomePage({ params }: PageProps) {
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* PDF */}
         <section className="py-20">
           <div className="text-center mb-10">
             <h2 className="text-4xl font-black">
@@ -211,7 +210,6 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* CTA */}
         <section className="py-20 text-center">
           <Link
             href={`/${lang}/artigos`}
@@ -221,7 +219,6 @@ export default async function HomePage({ params }: PageProps) {
           </Link>
         </section>
 
-        {/* CONTACT */}
         <ContactSection
           contact={dict.contact}
           common={dict.common}
