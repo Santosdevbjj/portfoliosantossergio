@@ -1,4 +1,6 @@
-export const BASE_URL = "https://portfoliosantossergio.vercel.app"
+export const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL ||
+  "https://portfoliosantossergio.vercel.app"
 
 export const SUPPORTED_LANGS = [
   "pt-BR",
@@ -27,16 +29,25 @@ export interface ResumeContent {
   keywords: string[]
 }
 
+/**
+ * PDFs estão em /public/pdf
+ */
 function getPdfUrl(lang: Lang) {
-  return `${BASE_URL}/pdf/cv-sergio-santos-${lang}.pdf`
+  return `/pdf/cv-sergio-santos-${lang}.pdf`
 }
 
+/**
+ * Página de currículo (App Router)
+ */
 function getResumeUrl(lang: Lang) {
   return `${BASE_URL}/${lang}/resume`
 }
 
+/**
+ * OG Images estão em /public/og
+ */
 function getOgImage(lang: Lang) {
-  return `${BASE_URL}/og-image-${lang}.png`
+  return `${BASE_URL}/og/og-image-${lang}.png`
 }
 
 export const resumeContent: Record<Lang, ResumeContent> = {
@@ -180,6 +191,9 @@ export const resumeContent: Record<Lang, ResumeContent> = {
   }
 }
 
+/**
+ * Segurança de idioma
+ */
 export function getResumeContent(lang: string): ResumeContent {
   if (SUPPORTED_LANGS.includes(lang as Lang)) {
     return resumeContent[lang as Lang]
@@ -188,6 +202,9 @@ export function getResumeContent(lang: string): ResumeContent {
   return resumeContent["en-US"]
 }
 
+/**
+ * Usado para sitemap, feeds e SEO programático
+ */
 export function getAllResumes(): ResumeContent[] {
   return Object.values(resumeContent)
 }
