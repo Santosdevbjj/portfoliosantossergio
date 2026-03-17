@@ -1,16 +1,20 @@
 {
   "compilerOptions": {
-    /* --- MOTOR NATIVO TS 6.0 & NEXT.JS 16 --- */
-    "target": "ESNext",
+    /* --- MOTOR NATIVO TS 6.0 (BRIDGE TO TS 7.0) --- */
+    "target": "ES2025", 
     "lib": ["dom", "dom.iterable", "esnext"],
-    "noEmit": true,
     "module": "ESNext",
-    /* 'Bundler' é o padrão ouro para Next.js 16 e resolve o Octokit corretamente */
+    /* 'Bundler' é o padrão ouro para Next.js 16 e Turbopack */
     "moduleResolution": "Bundler", 
-    "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     
-    /* --- RIGOR DE MISSÃO CRÍTICA (Padrão Bancário) --- */
+    /* --- COMPLIANCE TS 6.0 & ESTRUTURA --- */
+    "rootDir": "./src",
+    /* Removido baseUrl para evitar depreciação; usamos paths relativos ao rootDir */
+    "noEmit": true,
+    "verbatimModuleSyntax": true,
+    
+    /* --- RIGOR DE MISSÃO CRÍTICA (NÍVEL SENIOR) --- */
     "strict": true,
     "noUncheckedIndexedAccess": true, 
     "exactOptionalPropertyTypes": true, 
@@ -25,17 +29,18 @@
     "tsBuildInfoFile": "node_modules/.cache/tsconfig.tsbuildinfo",
     
     /* --- INTEROP & SECURITY --- */
-    /* Importante para que o Octokit (CJS/ESM) seja importado sem erros */
     "esModuleInterop": true,         
     "resolveJsonModule": true,
     "allowJs": true, 
-    "skipLibCheck": true, /* Essencial para evitar erros em tipos de terceiros no deploy */
+    "skipLibCheck": true, /* Evita que erros em libs de terceiros parem o deploy */
     "forceConsistentCasingInFileNames": true,
 
-    /* --- PERFORMANCE & TYPES --- */
+    /* --- PERFORMANCE & TYPES (TS 6.0 Default fix) --- */
+    /* Explicitamos 'node' para evitar o erro 'Cannot find name process' */
     "types": ["node"],
 
-    /* --- INFRASTRUCTURE PATHS (TS 6.0 Compliance) --- */
+    /* --- INFRASTRUCTURE PATHS (Future-Proofing) --- */
+    /* Alinhado com a nova regra de remover o baseUrl */
     "paths": {
       "@/*": ["./src/*"],
       "#/*": ["./src/*"]
@@ -53,10 +58,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
     "src/**/*",
-    "next.config.ts",
-    "tests/**/*.ts"
+    "next.config.mjs"
   ],
 
   "exclude": [
