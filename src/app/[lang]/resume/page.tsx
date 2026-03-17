@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import PdfSafeLoader from "@/components/pdf/PdfSafeLoader";
 import ResumeLangSelector from "@/components/pdf/ResumeLangSelector";
-import { RESUME_PDF_MAP, getResumePath } from "@/lib/resume/resumePdfMap";
+import { getResumePath } from "@/lib/resume/resumePdfMap";
 import { SUPPORTED_LOCALES, type SupportedLocale, isValidLocale } from "@/dictionaries/locales";
 
 /**
  * REQUISITOS TÉCNICOS ATENDIDOS:
  * ✔ Next.js 16 (App Router) - Params as Promise (Async)
  * ✔ React 19 - Server Components nativos
- * ✔ TypeScript 6.0 - VerbatimModuleSyntax & Type Safety
+ * ✔ TypeScript 6.0 - VerbatimModuleSyntax & Zero Unused Locals
  * ✔ Tailwind CSS 4.2 - Estilização moderna
  */
 
@@ -86,7 +86,7 @@ function JsonLd({ lang, title }: { lang: string; title: string }) {
 }
 
 /**
- * ✅ Página do Currículo - Integração Total com RESUME_PDF_MAP
+ * ✅ Página do Currículo - Integração Total com o mapeamento de PDFs
  */
 export default async function ResumePage(props: Props) {
   // No Next.js 16, params deve ser aguardado (await)
@@ -95,17 +95,19 @@ export default async function ResumePage(props: Props) {
   // Validação do locale
   const lang = isValidLocale(langParam) ? langParam : "pt-BR";
   
-  // Obtém o caminho do PDF do mapeamento centralizado
+  // Obtém o caminho do PDF usando a função auxiliar (mais limpo e seguro)
   const pdfUrl = getResumePath(lang);
 
   // Textos de interface por idioma
-  const ui = {
+  const uiMap: Record<SupportedLocale, { h1: string; p: string }> = {
     "pt-BR": { h1: "Currículo Vitae", p: "Versão oficial para Ciência de Dados e Engenharia." },
     "en-US": { h1: "Resume / CV", p: "Official version for Data Science and Engineering." },
     "es-ES": { h1: "Currículum Vitae", p: "Versión oficial para España." },
     "es-AR": { h1: "Currículum Vitae", p: "Versión oficial para Argentina." },
     "es-MX": { h1: "Currículum Vitae", p: "Versión oficial para México." },
-  }[lang];
+  };
+
+  const ui = uiMap[lang];
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-12 min-h-screen animate-in fade-in duration-700">
