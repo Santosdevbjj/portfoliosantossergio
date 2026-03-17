@@ -14,15 +14,16 @@ const nextConfig = {
         as: '*.js',
       },
     },
-    // Fix para PDF.js: Evita que o Turbopack tente analisar o worker do PDF.js como um módulo JS padrão
+    // Correção FATAL: Turbopack não aceita 'false'. 
+    // Mapeamos para strings vazias para neutralizar módulos de Node.js no navegador.
     resolveAlias: {
-      canvas: false,
-      'utf-8-validate': false,
-      'bufferutil': false,
+      canvas: 'empty-module',
+      'utf-8-validate': 'empty-module',
+      bufferutil: 'empty-module',
     },
   },
 
-  // 3. Permissões de Imagens (GitHub e Avatares)
+  // 3. Permissões de Imagens
   images: {
     remotePatterns: [
       {
@@ -37,15 +38,14 @@ const nextConfig = {
       },
     ],
     minimumCacheTTL: 60,
-    dangerouslyAllowSVG: true, // Útil para ícones e badges de projetos
-    contentDispositionType: 'attachment',
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    dangerouslyAllowSVG: true,
   },
 
-  // 4. Configurações de Compilação (Otimização para Node 24/React 19)
-  serverExternalPackages: ['canvas'], // Importante para bibliotecas de PDF
+  // 4. Otimização para Node 24 / React 19
+  // Impede que o Next tente processar o 'canvas' no lado do servidor
+  serverExternalPackages: ['canvas', 'pdfjs-dist'],
   
-  // 5. Redirecionamentos de Segurança para os PDFs (Opcional, mas recomendado)
+  // 5. Headers para PDFs
   async headers() {
     return [
       {
@@ -57,7 +57,7 @@ const nextConfig = {
           },
           {
             key: 'Cache-Control',
-            value: 'public, max-age=3600, must-revalidate',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
