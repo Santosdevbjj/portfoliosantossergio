@@ -4,12 +4,10 @@ import { useEffect, useMemo, useState, type JSX } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X, FileText } from 'lucide-react'
-
 import type { SupportedLocale } from "@/dictionaries/locales"
 import type { CommonDictionary, ContactDictionary } from '@/types/dictionary'
 import { NAV_SECTIONS, getNavHash } from '@/domain/navigation'
 import { getResumePath } from '@/lib/resume/resumePdfMap'
-
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useScrollSpy } from '@/contexts/scroll-spy.client'
@@ -25,18 +23,16 @@ import { useScrollSpy } from '@/contexts/scroll-spy.client'
 interface NavbarProps {
   readonly lang: SupportedLocale;
   readonly common: CommonDictionary;
-  readonly contact: ContactDictionary; // Adicionado para pegar a label do CV
+  readonly contact: ContactDictionary; // Necessário para o label do CV
 }
 
 export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Element {
   const { nav, menu, theme, languageSwitcher } = common
   const { activeSection } = useScrollSpy()
-  const pathname = usePathname()
-  
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
-  // Controle de scroll otimizado para performance
+  // Controle de scroll otimizado
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -45,8 +41,12 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
 
   // Lock body scroll para React 19 quando o menu mobile está aberto
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = isOpen ? 'hidden' : ''
+    }
+    return () => {
+      if (typeof document !== 'undefined') document.body.style.overflow = ''
+    }
   }, [isOpen])
 
   // Mapeamento de links unificado
@@ -72,18 +72,18 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
   }, [lang, nav, contact.cvLabel]);
 
   return (
-    <nav
-      role="navigation"
+    <nav 
+      role="navigation" 
       aria-label={common.navigation}
       data-scrolled={isScrolled}
       className={`fixed top-0 z-[100] w-full transition-all duration-500 ease-in-out ${
-        isScrolled
-          ? 'bg-white/90 dark:bg-[#020617]/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-slate-800/60 py-3 shadow-xl'
+        isScrolled 
+          ? 'bg-white/90 dark:bg-[#020617]/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-slate-800/60 py-3 shadow-xl' 
           : 'bg-transparent py-6'
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
-        {/* Logo - Sempre redireciona para a home no idioma atual */}
+        {/* Logo */}
         <Link 
           href={`/${lang}`} 
           className="group relative z-[110] outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg"
@@ -110,7 +110,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
                     isActive ? 'text-blue-600' : 'text-slate-500 dark:text-slate-400'
                   }`}
                 >
-                  {'icon' in link && link.icon}
+                  {link.icon && link.icon}
                   {link.label}
                   {isActive && (
                     <span className="absolute -bottom-1 left-0 h-0.5 w-full bg-blue-600 rounded-full animate-in fade-in zoom-in duration-500" />
@@ -119,11 +119,8 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
               )
             })}
           </div>
-
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
-
           <div className="flex items-center gap-6">
-            {/* O LanguageSwitcher agora é o ÚNICO responsável por trocar o idioma via router.push(`/${newLang}`) */}
             <LanguageSwitcher currentLang={lang} />
             <ThemeToggle labels={theme} />
           </div>
@@ -148,17 +145,15 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
       </div>
 
       {/* Mobile Menu Overlay */}
-      <div 
-        className={`lg:hidden fixed inset-0 z-[100] bg-white dark:bg-[#020617] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
-        }`}
-      >
+      <div className={`lg:hidden fixed inset-0 z-[100] bg-white dark:bg-[#020617] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+      }`}>
         <div className="flex flex-col h-full justify-center gap-12 p-12">
           <div className="space-y-8">
             {navLinks.map((link, idx) => (
-              <Link 
-                key={link.id} 
-                href={link.href} 
+              <Link
+                key={link.id}
+                href={link.href}
                 target={link.isExternal ? "_blank" : undefined}
                 onClick={() => setIsOpen(false)}
                 className="block text-4xl font-black text-slate-900 dark:text-white hover:text-blue-600 transition-colors"
@@ -169,7 +164,6 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
               </Link>
             ))}
           </div>
-
           <div className="pt-12 border-t border-slate-100 dark:border-slate-800/50">
             <p className="mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
               {languageSwitcher}
