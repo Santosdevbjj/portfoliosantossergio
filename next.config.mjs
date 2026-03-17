@@ -6,8 +6,7 @@ const nextConfig = {
   // 1. Definição de extensões (Suporte a MDX)
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
 
-  // 2. Configuração correta para o Turbopack (conforme a nova doc)
-  // Mudou de experimental.turbo para o nível superior 'turbopack'
+  // 2. Configuração do Turbopack
   turbopack: {
     rules: {
       '*.svg': {
@@ -15,9 +14,15 @@ const nextConfig = {
         as: '*.js',
       },
     },
+    // Fix para PDF.js: Evita que o Turbopack tente analisar o worker do PDF.js como um módulo JS padrão
+    resolveAlias: {
+      canvas: false,
+      'utf-8-validate': false,
+      'bufferutil': false,
+    },
   },
 
-  // 3. Permissões de Imagens do GitHub
+  // 3. Permissões de Imagens (GitHub e Avatares)
   images: {
     remotePatterns: [
       {
@@ -32,13 +37,37 @@ const nextConfig = {
       },
     ],
     minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true, // Útil para ícones e badges de projetos
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+
+  // 4. Configurações de Compilação (Otimização para Node 24/React 19)
+  serverExternalPackages: ['canvas'], // Importante para bibliotecas de PDF
+  
+  // 5. Redirecionamentos de Segurança para os PDFs (Opcional, mas recomendado)
+  async headers() {
+    return [
+      {
+        source: '/pdf/:path*',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/pdf',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, must-revalidate',
+          },
+        ],
+      },
+    ]
   },
 }
 
 const withMDX = createMDX({
   options: {
-    // Plugins de Markdown
-    remarkPlugins: [], 
+    remarkPlugins: [],
     rehypePlugins: [],
   },
 })
