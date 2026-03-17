@@ -50,10 +50,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const dict = await getServerDictionary(locale as Locale).catch(() => null)
 
-  const siteUrl =
+ // const siteUrl =
+  //  process.env.NEXT_PUBLIC_SITE_URL ||
+   // "https://portfoliosantossergio.vercel.app"
+
+  const siteUrl = (
     process.env.NEXT_PUBLIC_SITE_URL ||
     "https://portfoliosantossergio.vercel.app"
+  ).replace(/\/$/, "");
 
+  
+  
   const fullUrl = `${siteUrl}/${locale}`
 
   const description =
