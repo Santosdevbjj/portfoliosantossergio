@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import PdfSafeLoader from "@/components/pdf/PdfSafeLoader";
 import ResumeLangSelector from "@/components/pdf/ResumeLangSelector"; // Importação nova
+import { resumeContent } from "@/lib/resume/resumeContent";
+
 
 interface Props {
   params: Promise<{ lang: string }>;
@@ -52,7 +54,27 @@ export default async function ResumePage({ params }: Props) {
         <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed mb-8">
           {currentContent.p}
         </p>
-      </header>
+      </header> 
+
+     const seo = resumeContent[lang] || resumeContent["en-US"],
+      
+      
+      <script
+           type="application/ld+json"
+          dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+         "@context": "https://schema.org",
+        "@type": "Person",
+        name: seo.name,
+       jobTitle: seo.title,
+      description: seo.description,
+      url: `https://portfoliosantossergio.vercel.app/${lang}/resume`,
+      knowsAbout: seo.skills
+      })
+    }}
+     /> 
+
+      
 
       {/* NOVO: Seletor Visual de Idiomas */}
       <ResumeLangSelector />
