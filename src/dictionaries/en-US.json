@@ -239,4 +239,14 @@
       "unit": "%"
     }
   }
+},
+
+"resume": {
+  "selectLanguage": "Select Language",
+  "languages": {
+    "pt-BR": "Portuguese",
+    "en-US": "English",
+    "es-ES": "Spanish"
+  }
 }
+
