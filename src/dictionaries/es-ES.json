@@ -240,4 +240,8 @@
       "es-ES": "Español"
     }
   }
+},
+"menu": {
+  "open": "Abrir menú",
+  "close": "Cerrar"
 }
