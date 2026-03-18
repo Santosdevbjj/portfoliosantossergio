@@ -4,20 +4,21 @@ import { useEffect, useMemo, useState, type JSX } from 'react'
 import Link from 'next/link'
 import { Menu, X, FileText } from 'lucide-react'
 
-// Importações atualizadas conforme sua nova estrutura de arquivos
+// Importações de tipos e domínio
 import type { SupportedLocale } from "@/dictionaries/locales"
 import type { CommonDictionary, ContactDictionary } from '@/types/dictionary'
-import { NAV_SECTIONS, getNavHash, NavSection } from '@/domain/navigation'
+import { NAV_SECTIONS, getNavHash } from '@/domain/navigation'
 import { getResumePath } from '@/lib/resume/resumePdfMap'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useScrollSpy } from '@/contexts/scroll-spy.client'
 
 /**
- * NAVBAR COMPONENT - VERSÃO 2026 (CORRIGIDA)
+ * NAVBAR COMPONENT - VERSÃO 2026
  * -----------------------------------------------------------------------------
- * ✔ Fix: Tipagem da união de links para evitar erro de build (Property 'icon' missing)
+ * ✔ Fix: Removida importação não utilizada 'NavSection' para sanar erro de build.
  * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16.1.7, Node 24
+ * -----------------------------------------------------------------------------
  */
 
 interface NavLinkItem {
@@ -25,7 +26,7 @@ interface NavLinkItem {
   href: string;
   label: string;
   isExternal: boolean;
-  icon?: JSX.Element; // Propriedade opcional para resolver o erro de build
+  icon?: JSX.Element;
 }
 
 interface NavbarProps {
@@ -40,14 +41,14 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
-  // Controle de scroll otimizado
+  // Controle de scroll otimizado (Passive Listeners para performance)
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock body scroll para React 19
+  // Lock body scroll para React 19 quando o menu mobile está aberto
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.body.style.overflow = isOpen ? 'hidden' : ''
@@ -57,9 +58,9 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
     }
   }, [isOpen])
 
-  // Mapeamento de links unificado com tipagem explícita
+  // Mapeamento de links unificado
   const navLinks = useMemo((): NavLinkItem[] => {
-    // 1. Seções da Home
+    // 1. Seções da Home (Baseadas no Enum do domínio)
     const baseLinks: NavLinkItem[] = NAV_SECTIONS.map((section) => ({
       id: section,
       href: `/${lang}${getNavHash(section)}`,
@@ -67,7 +68,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
       isExternal: false
     }));
 
-    // 2. Link do Currículo (PDF Dinâmico baseado no seu novo resumePdfMap)
+    // 2. Link do Currículo (PDF Dinâmico mapeado por locale)
     const resumeLink: NavLinkItem = {
       id: 'resume',
       href: getResumePath(lang),
