@@ -20,6 +20,18 @@
     "ctaPrimary": "Ver Projetos"
   },
 
+  "construction": {
+    "badge": "Análise de Risco & IA",
+    "title": "Previsão de Riscos em Construção Civil",
+    "description": "Desenvolvimento de modelos preditivos para identificar gargalos operacionais e riscos estruturais em grandes obras, utilizando redes neurais e análise de séries temporais.",
+    "techStack": ["Python", "TensorFlow", "Azure Data Factory", "Power BI"],
+    "viewProject": "Explorar Solução",
+    "metrics": {
+      "accuracy": "94%",
+      "label": "Precisão do Modelo"
+    }
+  },
+
   "about": {
     "title": "Sobre Mim",
     "differentialTitle": "Engenharia de Dados com Foco em Missão Crítica",
@@ -223,7 +235,9 @@
     "languages": {
       "pt-BR": "Português",
       "en-US": "Inglês",
-      "es-ES": "Espanhol"
+      "es-ES": "Espanhol",
+      "es-AR": "Espanhol (AR)",
+      "es-MX": "Espanhol (MX)"
     }
   },
 
