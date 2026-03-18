@@ -225,10 +225,10 @@
       "en-US": "Inglês",
       "es-ES": "Espanhol"
     }
-  }
-},
+  },
 
-"menu": {
-  "open": "Abrir menu",
-  "close": "Fechar"
+  "menu": {
+    "open": "Abrir menu",
+    "close": "Fechar"
+  }
 }
