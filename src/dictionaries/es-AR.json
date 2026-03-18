@@ -239,10 +239,10 @@
       "en-US": "Inglés",
       "es-ES": "Español"
     }
-  }
-},
-"menu": {
-  "open": "Abrir menú",
-  "close": "Cerrar"
-}
+  },
 
+  "menu": {
+    "open": "Abrir menú",
+    "close": "Cerrar"
+  }
+}
