@@ -20,17 +20,26 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
 
-  const { cookie } = dict;
+  const { cookie, common } = dict;
+
+  /**
+   * 🔥 FALLBACK SEGURO (resolve erro de build)
+   */
+  const closeLabel =
+    common?.menu?.close ??
+    common?.nav?.contact ??
+    'Close';
 
   useEffect(() => {
     try {
       const hasConsent = localStorage.getItem(CONSENT_KEY);
+
       if (!hasConsent) {
         const timer = setTimeout(() => setIsOpen(true), 1500);
         return () => clearTimeout(timer);
       }
     } catch {
-      // Silencioso por segurança (modo restrito / SSR edge)
+      // silencioso (edge / SSR)
     }
   }, []);
 
@@ -85,6 +94,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
         <div className="p-2 bg-blue-600 rounded-xl text-white">
           <Cookie size={18} aria-hidden="true" />
         </div>
+
         <h2
           id="cookie-heading"
           className="font-bold text-xs uppercase tracking-widest
@@ -103,14 +113,16 @@ export function CookieBanner({ dict }: CookieBannerProps) {
       </p>
 
       <div className="space-y-2 mb-6">
-        <div className="flex items-center justify-between p-3 rounded-xl
-                        bg-slate-50 dark:bg-slate-800/50
-                        border border-slate-100 dark:border-slate-800"
+        <div
+          className="flex items-center justify-between p-3 rounded-xl
+                     bg-slate-50 dark:bg-slate-800/50
+                     border border-slate-100 dark:border-slate-800"
         >
           <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
             <ShieldCheck size={14} className="text-green-500" />
             {cookie.necessary}
           </span>
+
           <span className="text-[10px] font-bold uppercase text-slate-400">
             {cookie.alwaysActive}
           </span>
@@ -125,6 +137,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
           <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
             {cookie.analytics}
           </span>
+
           <input
             id="analytics-consent"
             type="checkbox"
@@ -163,7 +176,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
 
       <button
         onClick={() => setIsOpen(false)}
-        aria-label={dict.common.menu.close}
+        aria-label={closeLabel}
         className="absolute top-4 right-4
                    text-slate-400 hover:text-slate-600
                    dark:hover:text-white transition-colors"
