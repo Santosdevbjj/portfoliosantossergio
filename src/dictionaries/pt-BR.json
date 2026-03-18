@@ -240,4 +240,13 @@
       "unit": "%"
     }
   }
+},
+  "resume": {
+    "selectLanguage": "Selecionar Idioma",
+    "languages": {
+      "pt-BR": "Português",
+      "en-US": "Inglês",
+      "es-ES": "Espanhol"
+    }
+  }
 }
