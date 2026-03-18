@@ -99,7 +99,6 @@
     },
 
     "categories": {
-
       "Data Engineering": { "labelKey": "Data Engineering" },
       "Cloud & Infrastructure": { "labelKey": "Cloud and Infrastructure" },
       "Data Science": { "labelKey": "Data Science" },
@@ -124,7 +123,6 @@
       "node": { "labelKey": "Node.js" },
       "react": { "labelKey": "React" },
       "articles": { "labelKey": "Technical Articles" }
-
     },
 
     "featuredProjects": []
@@ -178,13 +176,11 @@
     "loading": "Loading...",
     "empty": "No data.",
     "error": "Error loading.",
-
     "emptyProjects": {
       "title": "No projects",
       "description": "Coming soon.",
       "cta": "Back"
     },
-
     "emptyExperience": "No records.",
     "errorArticles": "Error loading articles."
   },
@@ -199,27 +195,22 @@
     "savePreferences": "Save"
   },
 
-   "seo": {
+  "seo": {
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
-    "description": "Data Scientist specializing in Critical Systems and Mission-Critical solutions. Explore projects in data engineering, high availability, and predictive analysis.",
+    "description": "Data Scientist specializing in Critical Systems and Mission-Critical solutions.",
     "keywords": [
       "Data Science",
-      "Critical Systems",
-      "Mission-Critical",
       "Machine Learning",
       "ETL",
-      "Data Pipelines",
       "Cloud Computing",
       "Azure",
-      "Python",
-      "High Availability"
+      "Python"
     ],
-    
     "pages": {
       "home": {
         "title": "Home",
-        "description": "Specialist in Data Science, Machine Learning, and Data Pipelines for Critical Systems."
+        "description": "Specialist in Data Science and Data Pipelines."
       },
       "projects": {
         "title": "Projects",
@@ -238,15 +229,14 @@
       "value": 99.5,
       "unit": "%"
     }
-  }
-},
+  },
 
-"resume": {
-  "selectLanguage": "Select Language",
-  "languages": {
-    "pt-BR": "Portuguese",
-    "en-US": "English",
-    "es-ES": "Spanish"
+  "resume": {
+    "selectLanguage": "Select Language",
+    "languages": {
+      "pt-BR": "Portuguese",
+      "en-US": "English",
+      "es-ES": "Spanish"
+    }
   }
 }
-
