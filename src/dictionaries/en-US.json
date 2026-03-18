@@ -239,4 +239,9 @@
       "es-ES": "Spanish"
     }
   }
+},
+"menu": {
+  "open": "Open menu",
+  "close": "Close"
 }
+
