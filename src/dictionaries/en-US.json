@@ -7,9 +7,9 @@
     "author": "Sérgio Santos",
     "source": "manual",
     "contentVersion": "2026.03.08",
-    "contentHash": "i18n-ptbr-2026-03-08",
+    "contentHash": "i18n-enus-2026-03-08",
     "sourceType": "curated-manual",
-    "description": "Sérgio Santos Portfolio: Data Scientist and Software Engineer specialized in AI, Machine Learning, and High Availability Critical Systems. Explore my technical projects and articles."
+    "description": "Sérgio Santos Portfolio: Data Scientist, AI, and Software Engineer specialist focusing on Critical Systems and Mission Critical. View projects and technical articles."
   },
 
   "hero": {
@@ -20,11 +20,23 @@
     "ctaPrimary": "View Projects"
   },
 
+  "construction": {
+    "badge": "Risk Analysis & AI",
+    "title": "Risk Forecasting in Civil Construction",
+    "description": "Development of predictive models to identify operational bottlenecks and structural risks in large-scale projects, using neural networks and time-series analysis.",
+    "techStack": ["Python", "TensorFlow", "Azure Data Factory", "Power BI"],
+    "viewProject": "Explore Solution",
+    "metrics": {
+      "accuracy": "94%",
+      "label": "Model Accuracy"
+    }
+  },
+
   "about": {
     "title": "About Me",
-    "differentialTitle": "Data Engineering Focused on Mission-Critical Systems",
-    "description": "Data Scientist with a strong background in critical banking systems and focused on transforming data into decisions, cost reduction, and operational efficiency.",
-    "differentialContent": "I worked for more than 15 years at Banco Bradesco in regulated mission-critical environments. I currently focus my work on Data Science and AI.",
+    "differentialTitle": "Data Engineering with Mission Critical Focus",
+    "description": "Data Scientist with a solid background in banking critical systems, focused on transforming data into decisions, cost reduction, and operational efficiency.",
+    "differentialContent": "I worked for over 15 years at Banco Bradesco in regulated mission-critical environments. Currently, I direct my career towards Data Science and AI.",
     "highlights": [
       "15+ years in Banking",
       "Cloud Specialist",
@@ -41,7 +53,7 @@
 
   "contact": {
     "title": "Let's Talk?",
-    "subtitle": "I am seeking opportunities in governance and modernization projects.",
+    "subtitle": "Seeking opportunities in governance and modernization projects.",
     "cta": "Send Email",
     "emailLabel": "Copy Email",
     "cvLabel": "View CV",
@@ -55,7 +67,7 @@
     "emptyLabel": "No experience found",
     "items": [
       {
-        "company": "Independent Consultant / Transition",
+        "company": "Freelance Consultant / Transition",
         "period": "2008 - Present",
         "role": "Critical Systems Specialist",
         "description": "Architecture and maintenance of data pipelines and resilient infrastructure."
@@ -65,19 +77,19 @@
 
   "articles": {
     "title": "Technical Articles",
-    "mediumProfile": "View profile on Medium",
+    "mediumProfile": "View Medium profile",
     "readMore": "Read full article",
     "publishedAt": "Published on",
-    "bestOfMonth": "Featured of the Month",
+    "bestOfMonth": "Highlight of the Month",
     "awardWinner": "Award-Winning Article",
     "items": [
       {
-        "title": "The Data Era in Critical Systems",
+        "title": "The Era of Data in Critical Systems",
         "description": "How data governance transforms legacy systems into strategic assets.",
         "date": "2025",
         "category": "Data Strategy",
         "isAward": true,
-        "link": "https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77"
+        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
       }
     ]
   },
@@ -86,7 +98,7 @@
     "title": "Projects and Solutions",
     "featuredLabel": "Technical Highlight",
     "firstLabel": "Challenge and Architecture",
-    "impactLabel": "Impact and Outcome",
+    "impactLabel": "Impact and Result",
     "problem": "Problem",
     "solution": "Solution",
     "viewProject": "GitHub Repository",
@@ -100,7 +112,7 @@
 
     "categories": {
       "Data Engineering": { "labelKey": "Data Engineering" },
-      "Cloud & Infrastructure": { "labelKey": "Cloud and Infrastructure" },
+      "Cloud & Infrastructure": { "labelKey": "Cloud & Infrastructure" },
       "Data Science": { "labelKey": "Data Science" },
       "Data Analytics": { "labelKey": "Data Analytics" },
       "Outros": { "labelKey": "Other Projects" },
@@ -167,7 +179,7 @@
     "locale": "en-US",
     "fallbackLocale": "en",
     "currency": "USD",
-    "timezone": "America/New_York",
+    "timezone": "UTC",
     "unitDisplay": "short",
     "numberFormat": "en-US"
   },
@@ -182,23 +194,23 @@
       "cta": "Back"
     },
     "emptyExperience": "No records.",
-    "errorArticles": "Error loading articles."
+    "errorArticles": "Error in articles."
   },
 
   "cookie": {
     "title": "Cookies",
     "description": "We improve your experience.",
     "necessary": "Necessary",
-    "alwaysActive": "Always active",
+    "alwaysActive": "Active",
     "analytics": "Analytics",
-    "acceptAll": "Accept",
+    "acceptAll": "Accept All",
     "savePreferences": "Save"
   },
 
   "seo": {
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
-    "description": "Data Scientist specializing in Critical Systems and Mission-Critical solutions.",
+    "description": "Data Scientist specialist in Critical Systems and Mission Critical.",
     "keywords": [
       "Data Science",
       "Machine Learning",
@@ -206,21 +218,7 @@
       "Cloud Computing",
       "Azure",
       "Python"
-    ],
-    "pages": {
-      "home": {
-        "title": "Home",
-        "description": "Specialist in Data Science and Data Pipelines."
-      },
-      "projects": {
-        "title": "Projects",
-        "description": "Data solutions"
-      },
-      "articles": {
-        "title": "Articles",
-        "description": "Technical content"
-      }
-    }
+    ]
   },
 
   "metrics": {
@@ -236,7 +234,9 @@
     "languages": {
       "pt-BR": "Portuguese",
       "en-US": "English",
-      "es-ES": "Spanish"
+      "es-ES": "Spanish",
+      "es-AR": "Spanish (AR)",
+      "es-MX": "Spanish (MX)"
     }
   },
 
