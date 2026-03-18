@@ -1,7 +1,10 @@
 // src/types/dictionary.ts
+
 import type { SupportedLocale } from "@/dictionaries/locales";
 
 export type Locale = SupportedLocale;
+
+/* ================= META ================= */
 
 export interface DictionaryMeta {
   version: string;
@@ -16,6 +19,8 @@ export interface DictionaryMeta {
   description: string;
 }
 
+/* ================= HERO ================= */
+
 export interface HeroDictionary {
   greeting: string;
   title: string;
@@ -23,6 +28,8 @@ export interface HeroDictionary {
   headline: string;
   ctaPrimary: string;
 }
+
+/* ================= ABOUT ================= */
 
 export interface AboutDictionary {
   title: string;
@@ -39,6 +46,8 @@ export interface AboutDictionary {
   };
 }
 
+/* ================= CONTACT ================= */
+
 export interface ContactDictionary {
   title: string;
   subtitle: string;
@@ -49,6 +58,8 @@ export interface ContactDictionary {
   ctaTitle?: string;
   buttonText?: string;
 }
+
+/* ================= EXPERIENCE ================= */
 
 export interface ExperienceItem {
   company: string;
@@ -62,6 +73,8 @@ export interface ExperienceDictionary {
   items: ExperienceItem[];
   emptyLabel: string;
 }
+
+/* ================= ARTICLES ================= */
 
 export interface ArticleItem {
   title: string;
@@ -82,49 +95,16 @@ export interface ArticlesSectionDictionary {
   items: ArticleItem[];
 }
 
+/* ================= PROJECTS ================= */
+
 export interface CategoryDetail {
   labelKey: string;
 }
 
-/*
-Categorias precisam refletir EXATAMENTE o JSON.
-Mantemos chaves fortes + index signature.
-*/
-export interface ProjectCategories {
-
-  /* Portfolio filter categories */
-  "Data Engineering": CategoryDetail;
-  "Cloud & Infrastructure": CategoryDetail;
-  "Data Science": CategoryDetail;
-  "Data Analytics": CategoryDetail;
-  "Outros": CategoryDetail;
-
-  /* Internal technical tags */
-  dataScience: CategoryDetail;
-  cloud: CategoryDetail;
-  graphs: CategoryDetail;
-  analysis: CategoryDetail;
-  excel: CategoryDetail;
-  database: CategoryDetail;
-
-  dev: CategoryDetail;
-  security: CategoryDetail;
-
-  /* Frontend stack */
-  html: CategoryDetail;
-  css: CategoryDetail;
-  javascript: CategoryDetail;
-  typescript: CategoryDetail;
-  next: CategoryDetail;
-  node: CategoryDetail;
-  react: CategoryDetail;
-
-  /* Content */
-  articles: CategoryDetail;
-
-  /* Fallback for dynamic categories */
-  [key: string]: CategoryDetail;
-}
+/**
+ * 🔥 FLEXÍVEL (corrige ES-ES e futuros idiomas)
+ */
+export type ProjectCategories = Record<string, CategoryDetail>;
 
 export interface ProjectItem {
   id: string | number;
@@ -147,16 +127,15 @@ export interface ProjectsSectionDictionary {
   viewProject: string;
   viewDemo: string;
   viewAll: string;
-
   portfolio: {
     all: string;
     viewProject: string;
   };
-
   categories: ProjectCategories;
-
   featuredProjects: ProjectItem[];
 }
+
+/* ================= COMMON ================= */
 
 export interface CommonDictionary {
   navigation: string;
@@ -185,11 +164,23 @@ export interface CommonDictionary {
     system: string;
   };
 
-  /*
-  Mantido da versão antiga para compatibilidade futura
-  mesmo que não esteja no JSON ainda
-  */
-  errorBoundary: {
+  externalLinks: {
+    linkedin: string;
+    github: string;
+    medium: string;
+    email: string;
+  };
+
+  menu?: {
+    open: string;
+    close: string;
+    aria: {
+      open: string;
+      close: string;
+    };
+  };
+
+  errorBoundary?: {
     title: string;
     description: string;
     actions: {
@@ -198,43 +189,29 @@ export interface CommonDictionary {
     };
   };
 
-  notFound: {
+  notFound?: {
     title: string;
     description: string;
     button: string;
   };
-
-  externalLinks: {
-    linkedin: string;
-    github: string;
-    medium: string;
-    email: string;
-  };
-
-  menu: {
-    open: string;
-    close: string;
-    aria: {
-      open: string;
-      close: string;
-    };
-  };
 }
+
+/* ================= STATES ================= */
 
 export interface StateDictionary {
   loading: string;
   empty: string;
   error: string;
-
   emptyProjects: {
     title: string;
     description: string;
     cta: string;
   };
-
   emptyExperience: string;
   errorArticles: string;
 }
+
+/* ================= INTL ================= */
 
 export interface IntlDictionary {
   locale: Locale;
@@ -244,6 +221,8 @@ export interface IntlDictionary {
   unitDisplay: string;
   numberFormat: string;
 }
+
+/* ================= COOKIE ================= */
 
 export interface CookieDictionary {
   title: string;
@@ -255,19 +234,26 @@ export interface CookieDictionary {
   savePreferences: string;
 }
 
+/* ================= SEO ================= */
+
 export interface SeoDictionary {
   siteName: string;
   title: string;
   description: string;
   keywords: string[];
 
-  pages: {
+  /**
+   * 🔥 Agora opcional (resolve pt-BR)
+   */
+  pages?: {
     [key: string]: {
       title: string;
       description: string;
     };
   };
 }
+
+/* ================= METRICS ================= */
 
 export interface MetricsDictionary {
   availability: string;
@@ -276,6 +262,15 @@ export interface MetricsDictionary {
     unit: string;
   };
 }
+
+/* ================= RESUME ================= */
+
+export interface ResumeDictionary {
+  selectLanguage: string;
+  languages: Record<string, string>;
+}
+
+/* ================= ROOT ================= */
 
 export interface Dictionary {
   meta: DictionaryMeta;
@@ -291,4 +286,9 @@ export interface Dictionary {
   cookie: CookieDictionary;
   seo: SeoDictionary;
   metrics: MetricsDictionary;
+
+  /**
+   * 🔥 NOVO — ESSENCIAL PARA INTEGRAÇÃO COM PDF
+   */
+  resume: ResumeDictionary;
 }
