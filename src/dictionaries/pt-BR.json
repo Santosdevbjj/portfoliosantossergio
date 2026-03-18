@@ -226,4 +226,9 @@
       "es-ES": "Espanhol"
     }
   }
+},
+
+"menu": {
+  "open": "Abrir menu",
+  "close": "Fechar"
 }
