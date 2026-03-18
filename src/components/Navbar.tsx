@@ -19,7 +19,8 @@ interface NavbarProps {
 }
 
 export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Element {
-  const { nav, menu, theme } = common
+  // Removido 'menu' da desestruturação para evitar erro de variável não utilizada
+  const { nav, theme } = common
   const { activeSection } = useScrollSpy()
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -39,7 +40,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
     }
   }, [isOpen])
 
-  // Apenas as seções de ancoragem interna
+  // Memoização otimizada para React 19
   const internalLinks = useMemo(() => 
     NAV_SECTIONS.map((section) => ({
       id: section,
@@ -48,12 +49,11 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
     })), [lang, nav]
   );
 
-  // Dados do currículo para reutilização
-  const resumeData = {
+  const resumeData = useMemo(() => ({
     href: getResumePath(lang),
     label: contact.cvLabel || 'CV',
     downloadName: getResumeDownloadName(lang)
-  };
+  }), [lang, contact.cvLabel]);
 
   return (
     <nav 
@@ -68,9 +68,9 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
         
         {/* Logo */}
-        <Link href={`/${lang}`} className="relative z-[110] outline-none">
-          <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
-            SÉRGIO<span className="text-blue-600"> SANTOS</span>
+        <Link href={`/${lang}`} className="relative z-[110] outline-none group">
+          <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white transition-colors">
+            SÉRGIO<span className="text-blue-600 group-hover:text-blue-500 transition-colors"> SANTOS</span>
           </span>
         </Link>
 
@@ -92,7 +92,7 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
 
           <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
 
-          {/* Botão de CV com Destaque */}
+          {/* Botão de CV - Destaque Principal */}
           <a 
             href={resumeData.href}
             target="_blank"
@@ -114,7 +114,9 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
         <div className="flex items-center gap-3 lg:hidden relative z-[110]">
           <a 
             href={resumeData.href}
-            className="p-2 bg-blue-600 text-white rounded-full shadow-lg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2.5 bg-blue-600 text-white rounded-full shadow-lg active:scale-90 transition-transform"
             aria-label={resumeData.label}
           >
             <FileText size={20} />
@@ -122,31 +124,35 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
           <button 
             onClick={() => setIsOpen(!isOpen)}
             className="p-2 text-slate-900 dark:text-white"
+            aria-expanded={isOpen}
           >
             {isOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <div className={`lg:hidden fixed inset-0 z-[100] bg-white dark:bg-[#020617] transition-transform duration-500 ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
+      {/* Mobile Menu Overlay */}
+      <div 
+        className={`lg:hidden fixed inset-0 z-[100] bg-white dark:bg-[#020617] transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
         <div className="flex flex-col h-full justify-center p-10 gap-8">
           {internalLinks.map((link, idx) => (
             <Link 
               key={link.id} 
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="text-4xl font-black text-slate-900 dark:text-white flex items-baseline gap-4"
+              className="text-4xl font-black text-slate-900 dark:text-white flex items-baseline gap-4 group"
             >
-              <span className="text-blue-600 text-sm font-mono">0{idx + 1}</span>
+              <span className="text-blue-600 text-sm font-mono opacity-70 group-hover:opacity-100 transition-opacity">0{idx + 1}</span>
               {link.label}
             </Link>
           ))}
           
-          <div className="mt-10 pt-10 border-t border-slate-100 dark:border-slate-800">
+          <div className="mt-10 pt-10 border-t border-slate-100 dark:border-slate-800 flex items-center gap-6">
              <LanguageSwitcher currentLang={lang} />
+             <ThemeToggle labels={theme} />
           </div>
         </div>
       </div>
