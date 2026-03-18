@@ -175,13 +175,11 @@
     "loading": "Cargando...",
     "empty": "Sin datos.",
     "error": "Error al cargar.",
-
     "emptyProjects": {
       "title": "Ningún proyecto",
       "description": "Próximamente.",
       "cta": "Volver"
     },
-
     "emptyExperience": "Sin registros.",
     "errorArticles": "Error al cargar los artículos."
   },
@@ -239,9 +237,10 @@
       "en-US": "Inglés",
       "es-ES": "Español"
     }
+  },
+
+  "menu": {
+    "open": "Abrir menú",
+    "close": "Cerrar"
   }
-},
-"menu": {
-  "open": "Abrir menú",
-  "close": "Cerrar"
 }
