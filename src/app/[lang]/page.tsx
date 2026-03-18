@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image"; // Importação necessária para os novos cards
+import Image from "next/image"; // Mantido para os novos cards de impacto
 
 import type { Locale } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
@@ -26,10 +25,11 @@ import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 
 /**
  * REQUISITOS TÉCNICOS ATENDIDOS:
- * ✔ Next.js 16 - Params as Promise, Turbopack, force-static
- * ✔ React 19 - Server Components assíncronos
- * ✔ SEO Premium - Fix fb:app_id (property), Title (57ch), Desc (152ch)
- * ✔ Tailwind 4.2 - Estrutura de layout moderna e efeitos visuais
+ * ✔ Next.js 16.1.7 - Turbopack, App Router
+ * ✔ React 19 - Server Components
+ * ✔ TypeScript 6.0 - Removido Unused Imports (Link) para evitar falha no build
+ * ✔ Tailwind 4.2 - Utility-first modern layout
+ * ✔ Multi-idioma: pt-BR, en-US, es-ES, es-AR, es-MX
  */
 
 interface PageProps {
@@ -51,7 +51,6 @@ export const viewport: Viewport = {
 
 /**
  * METADATA (VERSÃO FINAL E RECALIBRADA)
- * Resolve: Erro fb:app_id no Facebook, Avisos de tamanho no OpenGraph.xyz
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -59,15 +58,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!locales.includes(locale)) return {};
 
-  const dict = await getServerDictionary(locale as Locale).catch(() => null);
-
   const siteUrl = (
     process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app"
   ).replace(/\/$/, "");
 
   const fullUrl = `${siteUrl}/${locale}`;
 
-  // 1. AJUSTE DE UX (OpenGraph.xyz): Título descritivo (~57 caracteres)
+  // Título e Descrição otimizados para OpenGraph.xyz e LinkedIn
   const titleMap: Record<SupportedLocale, string> = {
     "pt-BR": "Sérgio Santos | Cientista de Dados e Engenheiro de Software",
     "en-US": "Sérgio Santos | Data Scientist and Software Engineer",
@@ -75,32 +72,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     "es-AR": "Sérgio Santos | Científico de Datos e Ingeniero de Software",
     "es-MX": "Sérgio Santos | Científico de Datos e Ingeniero de Software",
   };
-  const title = titleMap[locale] || titleMap["pt-BR"];
-
-  // 2. AJUSTE DE UX (OpenGraph.xyz): Descrição enxuta (~152 caracteres)
+  
   const descriptionMap: Record<SupportedLocale, string> = {
     "pt-BR": "Especialista em Ciência de Dados e IA com foco em Sistemas Críticos. Veja projetos de alta disponibilidade e artigos técnicos de Sérgio Santos.",
     "en-US": "Data Science and AI Expert focused on Critical Systems. Explore high-availability projects and technical articles by Sérgio Santos.",
     "es-ES": "Especialista en Ciencia de Datos e IA en Sistemas Críticos. Explore proyectos de alta disponibilidad y artículos técnicos de Sérgio Santos.",
     "es-AR": "Especialista en Ciencia de Datos e IA en Sistemas Críticos. Explore proyectos de alta disponibilidad y artículos técnicos de Sérgio Santos.",
-    "es-MX": "Especialista en Ciencia de Datos e IA en Sistemas Críticos. Explore proyectos de alta disponibilidad y artículos técnicos de Sérgio Santos.",
+    "es-MX": "Especialista en Ciencia de Datos e IA en Sistemas Críticos. Explore proyectos de alta disponibilidade y artículos técnicos de Sérgio Santos.",
   };
-  const description = descriptionMap[locale] || descriptionMap["pt-BR"];
 
+  const title = titleMap[locale] || titleMap["pt-BR"];
+  const description = descriptionMap[locale] || descriptionMap["pt-BR"];
   const ogImage = `${siteUrl}/og/og-image-${locale}.png`;
 
   return {
     title,
     description,
     metadataBase: new URL(siteUrl),
-
     alternates: {
       canonical: fullUrl,
-      languages: Object.fromEntries(
-        locales.map((l) => [l, `${siteUrl}/${l}`])
-      ),
+      languages: Object.fromEntries(locales.map((l) => [l, `${siteUrl}/${l}`])),
     },
-
     openGraph: {
       title,
       description,
@@ -108,32 +100,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: "Sérgio Santos Portfolio",
       type: "website",
       locale: locale.replace("-", "_"),
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: title,
-          type: "image/png",
-        },
-      ],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title, type: "image/png" }],
     },
-
     twitter: {
       card: "summary_large_image",
       title,
       description,
       images: [ogImage],
     },
-
-    /**
-     * CORREÇÃO TÉCNICA (Facebook Debugeer):
-     * Mapeia fb:app_id como 'property' em vez de 'name'.
-     */
     facebook: {
       appId: "672839201123456", 
     },
-
     other: {
       "image": ogImage,
       "og:image:secure_url": ogImage,
@@ -150,10 +127,7 @@ function normalizeProjects(repos: unknown): ProjectDomain[] {
 
   return repos
     .map((repo: any, index): ProjectDomain => {
-      const topics = Array.isArray(repo?.topics)
-        ? repo.topics.map((t: string) => t.toLowerCase())
-        : [];
-
+      const topics = Array.isArray(repo?.topics) ? repo.topics.map((t: string) => t.toLowerCase()) : [];
       return {
         id: String(repo?.id ?? index),
         name: (repo?.name ?? "Projeto").replace(/-/g, " "),
@@ -174,7 +148,6 @@ function normalizeProjects(repos: unknown): ProjectDomain[] {
  * COMPONENTE DA PÁGINA PRINCIPAL
  */
 export default async function HomePage({ params }: PageProps) {
-  // Em Next.js 16, params deve ser aguardado
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
 
@@ -182,7 +155,7 @@ export default async function HomePage({ params }: PageProps) {
 
   const lang = locale as Locale;
 
-  // Busca paralela para performance
+  // Carregamento paralelo (Data Fetching)
   const [dictResult, reposResult] = await Promise.allSettled([
     getServerDictionary(lang),
     getPortfolioRepos("Santosdevbjj"),
@@ -194,6 +167,7 @@ export default async function HomePage({ params }: PageProps) {
   if (!dict) notFound();
 
   const projects = normalizeProjects(repos);
+  // Caminhos corrigidos para os 5 PDFs conforme solicitado
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
   const construction = (dict as any)?.construction;
 
@@ -204,29 +178,29 @@ export default async function HomePage({ params }: PageProps) {
         <HeroSection dictionary={dict} />
 
         {construction && (
-          <section className="py-12">
-            <div className="mx-auto max-w-7xl px-4">
+          <section className="py-12 px-4">
+            <div className="mx-auto max-w-7xl">
               <ConstructionRiskProject dict={construction} />
             </div>
           </section>
         )}
 
-        {/* SEÇÃO SOBRE E DESTAQUES DE CARREIRA */}
-        <section id="about">
+        {/* SEÇÃO SOBRE */}
+        <section id="about" className="scroll-mt-20">
           {dict.about && <AboutSection dict={dict.about} />}
           <div className="mx-auto max-w-7xl px-4 py-12">
             <CareerHighlights dict={dict} />
           </div>
         </section>
 
-        {/* SEÇÃO DE EXPERIÊNCIA PROFISSIONAL */}
+        {/* EXPERIÊNCIA */}
         {dict.experience && (
           <ExperienceSection experience={dict.experience} />
         )}
 
-        {/* GRID DE PROJETOS GITHUB */}
-        <section id="projects" className="py-20">
-          <div className="mx-auto max-w-7xl px-4 mb-10">
+        {/* PROJETOS GITHUB */}
+        <section id="projects" className="py-20 scroll-mt-20">
+          <div className="mx-auto max-w-7xl px-4 mb-10 text-center md:text-left">
             <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
               Projetos <span className="text-blue-600">Full-Stack</span>
             </h2>
@@ -234,21 +208,16 @@ export default async function HomePage({ params }: PageProps) {
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* SEÇÃO CURRÍCULO (RESUME) */}
-        <section id="resume" className="py-20 bg-slate-100/50 dark:bg-slate-900/20 border-y border-slate-200/50 dark:border-slate-800/50">
+        {/* CURRÍCULO (RESUME) */}
+        <section id="resume" className="py-20 bg-slate-100/50 dark:bg-slate-900/20 border-y border-slate-200/50 dark:border-slate-800/50 scroll-mt-20">
           <div className="text-center mb-10 px-4">
             <h2 className="text-4xl font-black mb-8 text-slate-900 dark:text-white tracking-tighter">
               Curriculum <span className="text-blue-600">Vitae</span>
             </h2>
-
             <div className="max-w-xs mx-auto mb-12">
-              <ResumeLangSelector 
-                currentLang={lang as SupportedLocale} 
-                dict={dict.resume} 
-              />
+              <ResumeLangSelector currentLang={lang as SupportedLocale} dict={dict.resume} />
             </div>
           </div>
-
           <div className="max-w-5xl mx-auto px-4">
             <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
               <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
@@ -256,10 +225,9 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* 🏆 SEÇÃO DE ARTIGOS PREMIADOS E CURADORIA ESTRATÉGICA (NOVOS CARDS) */}
-        <section id="featured-articles" className="py-24 bg-white dark:bg-[#020617]">
+        {/* 🏆 SEÇÃO DE ARTIGOS PREMIADOS (CARDS DE IMPACTO) */}
+        <section id="featured-articles" className="py-24 bg-white dark:bg-[#020617] scroll-mt-20">
           <div className="mx-auto max-w-7xl px-4">
-            
             <header className="mb-16 text-center max-w-3xl mx-auto">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 mb-6">
                 <span className="relative flex h-2 w-2">
@@ -270,126 +238,69 @@ export default async function HomePage({ params }: PageProps) {
                   Reconhecimento Técnico & Curadoria
                 </span>
               </div>
-              <h2 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-tight mb-6">
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-6">
                 Liderança Através do <span className="text-blue-600">Conhecimento</span>
               </h2>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              
-              {/* CARD 1: ARTIGO PREMIADO (MEDIUM) */}
-              <div className="group relative flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 transition-all hover:border-blue-100 dark:hover:border-blue-900 shadow-xl hover:shadow-blue-500/10">
-                <div className="absolute top-8 right-8 flex items-center gap-2.5">
-                  <div className="px-3 py-1 rounded-full bg-amber-400 text-[#020617] text-[10px] font-black uppercase tracking-widest shadow-lg shadow-amber-400/20">
-                    Vencedor DIO
-                  </div>
-                  <div className="px-3 py-1 rounded-full bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-600/20">
-                    Set/2025
-                  </div>
+              {/* CARD 1: MEDIUM PREMIADO */}
+              <div className="group relative flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 transition-all hover:border-blue-100 dark:hover:border-blue-900 shadow-xl">
+                <div className="absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-2">
+                  <div className="px-2 py-1 rounded-full bg-amber-400 text-[#020617] text-[9px] font-black uppercase tracking-tighter">Vencedor DIO</div>
+                  <div className="px-2 py-1 rounded-full bg-blue-600 text-white text-[9px] font-black uppercase tracking-tighter">Set/2025</div>
                 </div>
-
-                <div className="flex flex-col md:flex-row items-center gap-8 mb-8 mt-6">
-                  <div className="relative flex-shrink-0 w-32 h-32 rounded-2xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl group-hover:scale-105 transition-transform duration-500">
-                    <Image 
-                      src="/images/trofeus-vencedor-dio.png" 
-                      alt="Troféus Vencedor DIO"
-                      fill
-                      className="object-cover"
-                      sizes="128px"
-                    />
+                <div className="flex flex-col md:flex-row items-center gap-6 mb-8 mt-6">
+                  <div className="relative flex-shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl group-hover:scale-105 transition-transform duration-500">
+                    <Image src="/images/trofeus-vencedor-dio.png" alt="Troféus Vencedor DIO" fill className="object-cover" sizes="(max-width: 768px) 96px, 128px" priority />
                   </div>
                   <div className="flex-1 text-center md:text-left">
-                    <p className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">
-                      Artigo premiado na 35ª Competição da DIO
-                    </p>
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
-                      Low-Code na Saúde: Como Criar Apps Médicos em Semanas
-                    </h3>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-1">Artigo premiado (35ª Competição)</p>
+                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-tight">Low-Code na Saúde: Como Criar Apps Médicos em Semanas</h3>
                   </div>
                 </div>
-
-                <p className="text-slate-600 dark:text-slate-400 mb-8 text-sm leading-relaxed">
-                  Publicado no Medium em três idiomas — português, inglês e espanhol — explorando como plataformas low-code podem acelerar o desenvolvimento de aplicações médicas sem abrir mão de segurança e conformidade regulatória.
-                </p>
-
+                <p className="text-slate-600 dark:text-slate-400 mb-8 text-sm leading-relaxed">Publicado no Medium em três idiomas explorando como plataformas low-code aceleram o desenvolvimento médico com conformidade regulatória.</p>
                 <div className="mt-auto pt-6 border-t border-slate-200/50 dark:border-slate-800/50">
-                  <p className="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-4">
-                    Ler no Medium:
-                  </p>
-                  <div className="flex flex-wrap gap-3">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase mb-4 tracking-widest">Ler no Medium:</p>
+                  <div className="flex flex-wrap gap-2">
                     {[
                       { lang: 'PT', href: 'https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e' },
                       { lang: 'EN', href: 'https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77' },
                       { lang: 'ES', href: 'https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad' },
                     ].map(link => (
-                      <a 
-                        key={link.lang}
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-black text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all active:scale-95"
-                      >
-                        {link.lang}
-                      </a>
+                      <a key={link.lang} href={link.href} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-black text-slate-700 dark:text-slate-200 hover:bg-slate-100 transition-all">{link.lang}</a>
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* CARD 2: REPOSITÓRIO ESTRATÉGICO (GITHUB) */}
-              <a 
-                href="https://github.com/Santosdevbjj/myArticles"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 transition-all hover:border-blue-100 dark:hover:border-blue-900 shadow-xl hover:shadow-blue-500/10"
-              >
+              {/* CARD 2: GITHUB CURADORIA */}
+              <a href="https://github.com/Santosdevbjj/myArticles" target="_blank" rel="noopener noreferrer" className="group flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 transition-all hover:border-blue-100 shadow-xl">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="p-3.5 bg-slate-900 dark:bg-white rounded-2xl text-white dark:text-[#020617] group-hover:scale-110 transition-transform">
-                    <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                  <div className="p-3 bg-slate-900 dark:bg-white rounded-2xl text-white dark:text-[#020617] group-hover:rotate-12 transition-transform">
+                    <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
-                      myArticles: Curadoria Estratégica
-                    </h3>
-                    <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                      Santosdevbjj/myArticles • Repositório GitHub
-                    </p>
+                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">myArticles: Curadoria Estratégica</h3>
+                    <p className="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-widest">Santosdevbjj / myArticles</p>
                   </div>
                 </div>
-
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
-                  Este repositório não é apenas uma lista de links. É uma <strong className="text-slate-800 dark:text-slate-100 font-semibold">mostra do meu raciocínio aplicado</strong> a problemas reais de engenharia e negócios. Cada artigo documenta decisões técnicas, trade-offs e frameworks aplicáveis em ambientes que exigem alta disponibilidade e conformidade.
-                </p>
-
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">Uma amostra do meu raciocínio aplicado a problemas de engenharia. Cada artigo documenta decisões técnicas em ambientes críticos.</p>
                 <div className="flex flex-wrap gap-2 mb-8">
-                  {['Sistemas Críticos', 'Governança', 'FinOps', 'MloPS', 'Zero Trust', 'LGPD'].map(tag => (
-                    <span key={tag} className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                      {tag}
-                    </span>
+                  {['Sistemas Críticos', 'FinOps', 'MloPS', 'LGPD'].map(tag => (
+                    <span key={tag} className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md text-[9px] font-black uppercase text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{tag}</span>
                   ))}
                 </div>
-
-                <div className="mt-auto flex items-center justify-between gap-4 pt-5 border-t border-slate-200/50 dark:border-slate-800/50">
-                  <span className="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-wider">
-                    Análise completa no README
-                  </span>
-                  <span className="inline-flex items-center gap-2 text-sm font-black text-blue-600 dark:text-blue-400 group-hover:gap-3 transition-all">
-                    Acessar Repositório
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
-                  </span>
+                <div className="mt-auto flex items-center justify-between pt-5 border-t border-slate-200/50 dark:border-slate-800/50">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Readme Analítico</span>
+                  <span className="text-xs font-black text-blue-600 group-hover:translate-x-1 transition-transform">Ver Repositório →</span>
                 </div>
               </a>
-
             </div>
           </div>
         </section>
 
-        {/* CONTATO */}
-        <ContactSection
-          contact={dict.contact}
-          common={dict.common}
-          locale={lang}
-        />
+        <ContactSection contact={dict.contact} common={dict.common} locale={lang} />
       </main>
     </ProxyPage>
   );
