@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import PdfSafeLoader from "@/components/pdf/PdfSafeLoader";
-import ResumeLangSelector from "@/components/pdf/ResumeLangSelector";
+// CORREÇÃO: Importação nomeada conforme definido no componente
+import { ResumeLangSelector } from "@/components/pdf/ResumeLangSelector";
 import { getResumePath } from "@/lib/resume/resumePdfMap";
 import { SUPPORTED_LOCALES, type SupportedLocale, isValidLocale } from "@/dictionaries/locales";
+import { getServerDictionary } from "@/lib/getServerDictionary";
 
 /**
  * REQUISITOS TÉCNICOS ATENDIDOS:
- * ✔ Next.js 16 (App Router) - Params as Promise (Async)
- * ✔ React 19 - Server Components nativos
- * ✔ TypeScript 6.0 - VerbatimModuleSyntax & Zero Unused Locals
- * ✔ Tailwind CSS 4.2 - Estilização moderna
+ * ✔ Next.js 16 (App Router) - Params as Promise
+ * ✔ React 19 - Server Component assíncrono
+ * ✔ TypeScript 6.0 - Named Import Fix
+ * ✔ Tailwind CSS 4.2 - Shadow & Interactivity
  */
 
 interface Props {
@@ -19,9 +21,6 @@ interface Props {
 export const dynamic = "force-static";
 export const revalidate = 3600;
 
-/**
- * Gera os caminhos estáticos para todos os idiomas suportados.
- */
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({
     lang,
@@ -32,10 +31,10 @@ export function generateStaticParams() {
  * SEO Metadata - Otimizado para Next.js 16
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { lang } = await params;
+  const { lang: rawLang } = await params;
+  const lang = isValidLocale(rawLang) ? (rawLang as SupportedLocale) : "pt-BR";
   const siteUrl = "https://portfoliosantossergio.vercel.app";
   
-  // Títulos baseados no idioma para o SEO
   const titles: Record<SupportedLocale, string> = {
     "pt-BR": "Currículo | Sérgio Santos",
     "en-US": "Resume | Sérgio Santos",
@@ -44,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "es-MX": "Currículum | Sérgio Santos",
   };
 
-  const currentTitle = titles[lang as SupportedLocale] || titles["pt-BR"];
+  const currentTitle = titles[lang] || titles["pt-BR"];
 
   return {
     title: currentTitle,
@@ -52,53 +51,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     metadataBase: new URL(siteUrl),
     alternates: {
       canonical: `${siteUrl}/${lang}/resume`,
-      languages: {
-        "pt-BR": `${siteUrl}/pt-BR/resume`,
-        "en-US": `${siteUrl}/en-US/resume`,
-        "es-ES": `${siteUrl}/es-ES/resume`,
-        "es-AR": `${siteUrl}/es-AR/resume`,
-        "es-MX": `${siteUrl}/es-MX/resume`,
-      },
+      languages: Object.fromEntries(
+        SUPPORTED_LOCALES.map((l) => [l, `${siteUrl}/${l}/resume`])
+      ),
     },
   };
 }
 
 /**
- * Componente JSON-LD para Schema.org (SEO estruturado)
+ * Página do Currículo
  */
-function JsonLd({ lang, title }: { lang: string; title: string }) {
-  return (
-    <script
-      type="application/ld+json"
-      suppressHydrationWarning
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Person",
-          name: "Sérgio Santos",
-          jobTitle: "Cientista de Dados",
-          url: `https://portfoliosantossergio.vercel.app/${lang}/resume`,
-          description: title,
-        }),
-      }}
-    />
-  );
-}
-
-/**
- * ✅ Página do Currículo - Integração Total com o mapeamento de PDFs
- */
-export default async function ResumePage(props: Props) {
-  // No Next.js 16, params deve ser aguardado (await)
-  const { lang: langParam } = await props.params;
+export default async function ResumePage({ params }: Props) {
+  // 1. Aguarda os parâmetros da URL (Regra Next.js 16)
+  const { lang: langParam } = await params;
   
-  // Validação do locale
-  const lang = isValidLocale(langParam) ? langParam : "pt-BR";
+  // 2. Valida e normaliza o idioma
+  const lang = isValidLocale(langParam) ? (langParam as SupportedLocale) : "pt-BR";
   
-  // Obtém o caminho do PDF usando a função auxiliar (mais limpo e seguro)
+  // 3. Busca o dicionário para passar ao Seletor (Regra i18n)
+  const dict = await getServerDictionary(lang);
+  
+  // 4. Obtém o caminho do PDF
   const pdfUrl = getResumePath(lang);
 
-  // Textos de interface por idioma
+  // Mapeamento de interface simples para o cabeçalho
   const uiMap: Record<SupportedLocale, { h1: string; p: string }> = {
     "pt-BR": { h1: "Currículo Vitae", p: "Versão oficial para Ciência de Dados e Engenharia." },
     "en-US": { h1: "Resume / CV", p: "Official version for Data Science and Engineering." },
@@ -111,8 +87,7 @@ export default async function ResumePage(props: Props) {
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-12 min-h-screen animate-in fade-in duration-700">
-      <JsonLd lang={lang} title={ui.h1} />
-
+      
       {/* HEADER */}
       <header className="text-center mb-12">
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 dark:text-white mb-6 uppercase tracking-tighter">
@@ -124,9 +99,12 @@ export default async function ResumePage(props: Props) {
         </p>
       </header>
 
-      {/* SELETOR DE IDIOMAS */}
+      {/* SELETOR DE IDIOMAS INTEGRADO */}
       <nav className="mb-16 flex justify-center" aria-label="Seletor de idioma">
-        <ResumeLangSelector />
+        <ResumeLangSelector 
+          currentLang={lang} 
+          dict={dict.resume} 
+        />
       </nav>
 
       {/* VISUALIZADOR DE PDF */}
