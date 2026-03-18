@@ -245,4 +245,8 @@
       "es-MX": "México"
     }
   }
+},
+"menu": {
+  "open": "Abrir menú",
+  "close": "Cerrar"
 }
