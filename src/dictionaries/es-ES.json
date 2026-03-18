@@ -7,7 +7,7 @@
     "author": "Sérgio Santos",
     "source": "manual",
     "contentVersion": "2026.03.08",
-    "contentHash": "i18n-ptbr-2026-03-08",
+    "contentHash": "i18n-es-ES-2026-03-08",
     "sourceType": "curated-manual",
     "description": "Portafolio multilingüe de Sérgio Santos, especialista en Ciencia de Datos e Ingeniería de Software."
   },
@@ -21,13 +21,13 @@
   },
 
   "about": {
-    "title": "Sobre Mí",
+    "title": "Sobre mí",
     "differentialTitle": "Ingeniería de Datos con Enfoque en Sistemas de Misión Crítica",
     "description": "Científico de Datos con una sólida base en sistemas bancarios críticos y enfocado en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
     "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente enfoco mi trabajo en Ciencia de Datos e IA.",
     "highlights": [
-      "Más de 15 años en Banca",
-      "Especialista en Cloud",
+      "Más de 15 años en banca",
+      "Especialista en cloud",
       "Data Science e IA"
     ],
     "stats": {
@@ -35,15 +35,15 @@
       "experienceLabel": "Años",
       "availabilityValue": "99.9%",
       "availabilityLabel": "Disponibilidad",
-      "automation": "Sistemas 100% Automatizados"
+      "automation": "Sistemas 100% automatizados"
     }
   },
 
   "contact": {
     "title": "¿Hablamos?",
     "subtitle": "Busco oportunidades en proyectos de gobernanza y modernización.",
-    "cta": "Enviar Email",
-    "emailLabel": "Copiar Email",
+    "cta": "Enviar email",
+    "emailLabel": "Copiar email",
     "cvLabel": "Ver CV",
     "linkedinLabel": "LinkedIn",
     "ctaTitle": "¿Construimos algo juntos?",
@@ -51,28 +51,28 @@
   },
 
   "experience": {
-    "title": "Experiencia Profesional",
+    "title": "Experiencia profesional",
     "emptyLabel": "No se encontró experiencia",
     "items": [
       {
-        "company": "Consultor Independiente / Transición",
+        "company": "Consultor independiente / transición",
         "period": "2008 - Actualidad",
-        "role": "Especialista en Sistemas Críticos",
+        "role": "Especialista en sistemas críticos",
         "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructuras resilientes."
       }
     ]
   },
 
   "articles": {
-    "title": "Artículos Técnicos",
+    "title": "Artículos técnicos",
     "mediumProfile": "Ver perfil en Medium",
     "readMore": "Leer artículo completo",
     "publishedAt": "Publicado en",
-    "bestOfMonth": "Destacado del Mes",
-    "awardWinner": "Artículo Premiado",
+    "bestOfMonth": "Destacado del mes",
+    "awardWinner": "Artículo premiado",
     "items": [
       {
-        "title": "La Era de los Datos en Sistemas Críticos",
+        "title": "La era de los datos en sistemas críticos",
         "description": "Cómo la gobernanza de datos transforma los sistemas heredados en activos estratégicos.",
         "date": "2025",
         "category": "Data Strategy",
@@ -83,37 +83,35 @@
   },
 
   "projects": {
-    "title": "Proyectos y Soluciones",
-    "featuredLabel": "Destacado Técnico",
-    "firstLabel": "Desafío y Arquitectura",
-    "impactLabel": "Impacto y Resultado",
+    "title": "Proyectos y soluciones",
+    "featuredLabel": "Destacado técnico",
+    "firstLabel": "Desafío y arquitectura",
+    "impactLabel": "Impacto y resultado",
     "problem": "Problema",
     "solution": "Solución",
     "viewProject": "Repositorio GitHub",
-    "viewDemo": "Ver Demo",
-    "viewAll": "Ver Todos",
+    "viewDemo": "Ver demo",
+    "viewAll": "Ver todos",
 
     "portfolio": {
       "all": "Todos",
-      "viewProject": "Ver Proyecto"
+      "viewProject": "Ver proyecto"
     },
 
     "categories": {
+      "dataEngineering": { "labelKey": "Ingeniería de datos" },
+      "cloudInfra": { "labelKey": "Nube e infraestructura" },
+      "dataScience": { "labelKey": "Ciencia de datos" },
+      "dataAnalytics": { "labelKey": "Análisis de datos" },
+      "other": { "labelKey": "Otros proyectos" },
 
-      "Data Engineering": { "labelKey": "Ingeniería de Datos" },
-      "Cloud & Infrastructure": { "labelKey": "Nube e Infraestructura" },
-      "Data Science": { "labelKey": "Ciencia de Datos" },
-      "Data Analytics": { "labelKey": "Análisis de Datos" },
-      "Outros": { "labelKey": "Otros Proyectos" },
-
-      "dataScience": { "labelKey": "Ciencia de Datos" },
       "cloud": { "labelKey": "Cloud & Databricks" },
-      "graphs": { "labelKey": "Análisis de Grafos (Neo4J)" },
-      "analysis": { "labelKey": "Análisis de Datos & Power BI" },
-      "excel": { "labelKey": "Excel y Modelado de Datos" },
-      "database": { "labelKey": "Bases de Datos & SQL" },
+      "graphs": { "labelKey": "Análisis de grafos (Neo4J)" },
+      "analysis": { "labelKey": "Power BI y analítica" },
+      "excel": { "labelKey": "Excel y modelado de datos" },
+      "database": { "labelKey": "Bases de datos y SQL" },
 
-      "dev": { "labelKey": "Desarrollo de Software" },
+      "dev": { "labelKey": "Desarrollo de software" },
       "security": { "labelKey": "Ciberseguridad" },
 
       "html": { "labelKey": "HTML" },
@@ -123,8 +121,7 @@
       "next": { "labelKey": "Next.js" },
       "node": { "labelKey": "Node.js" },
       "react": { "labelKey": "React" },
-      "articles": { "labelKey": "Artículos Técnicos" }
-
+      "articles": { "labelKey": "Artículos técnicos" }
     },
 
     "featuredProjects": []
@@ -132,7 +129,7 @@
 
   "common": {
     "navigation": "Navegación principal",
-    "role": "Científico de Datos | Python | SQL | Azure",
+    "role": "Científico de datos | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
     "rights": "Todos los derechos reservados",
     "builtWith": "Desarrollado con Next.js 16 y TypeScript",
@@ -199,29 +196,22 @@
     "savePreferences": "Guardar"
   },
 
-   
-"seo": {
-  "siteName": "Sergio Santos | Portfolio",
-  "title": "Sergio Santos",
-  "description": "Científico de Datos especializado en Sistemas Críticos y de Misión Crítica. Explora proyectos de ingeniería de datos, alta disponibilidad y análisis predictivo.",
-  "keywords": [
-    "Ciencia de Datos",
-    "Data Science",
-    "Sistemas Críticos",
-    "Misión Crítica",
-    "Machine Learning",
-    "ETL",
-    "Data Pipelines",
-    "Cloud Computing",
-    "Azure",
-    "Python",
-    "Alta Disponibilidad"
-  ],
-  
+  "seo": {
+    "siteName": "Sergio Santos | Portfolio",
+    "title": "Sergio Santos",
+    "description": "Científico de datos especializado en sistemas críticos y de misión crítica.",
+    "keywords": [
+      "Ciencia de datos",
+      "Machine Learning",
+      "ETL",
+      "Cloud Computing",
+      "Azure",
+      "Python"
+    ],
     "pages": {
       "home": {
         "title": "Inicio",
-        "description":  "Especialista en Ciencia de Datos, Machine Learning y Data Pipelines para Sistemas Críticos."
+        "description": "Especialista en data pipelines y sistemas críticos."
       },
       "projects": {
         "title": "Proyectos",
@@ -240,15 +230,14 @@
       "value": 99.5,
       "unit": "%"
     }
-  }
-},
+  },
 
-"resume": {
-  "selectLanguage": "Seleccionar Idioma",
-  "languages": {
-    "pt-BR": "Portugués",
-    "en-US": "Inglés",
-    "es-ES": "Español"
+  "resume": {
+    "selectLanguage": "Seleccionar idioma",
+    "languages": {
+      "pt-BR": "Portugués",
+      "en-US": "Inglés",
+      "es-ES": "Español"
+    }
   }
 }
-
