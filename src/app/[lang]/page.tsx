@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
 
     other: {
-      "fb:app_id": "672839201123456",
+      "fb:app_id": "672839201123456", // NAO TIRAR - RESOLVE ERRO LINKY INSPECTOR 
     },
 
     twitter: {
