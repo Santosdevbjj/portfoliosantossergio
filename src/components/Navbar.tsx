@@ -2,32 +2,15 @@
 
 import { useEffect, useMemo, useState, type JSX } from 'react'
 import Link from 'next/link'
-import { Menu, X, FileText } from 'lucide-react'
+import { Menu, X, FileText, Download } from 'lucide-react'
 
-// Importações de tipos e domínio
 import type { SupportedLocale } from "@/dictionaries/locales"
 import type { CommonDictionary, ContactDictionary } from '@/types/dictionary'
 import { NAV_SECTIONS, getNavHash } from '@/domain/navigation'
-import { getResumePath } from '@/lib/resume/resumePdfMap'
+import { getResumePath, getResumeDownloadName } from '@/lib/resume/resumePdfMap'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useScrollSpy } from '@/contexts/scroll-spy.client'
-
-/**
- * NAVBAR COMPONENT - VERSÃO 2026
- * -----------------------------------------------------------------------------
- * ✔ Fix: Removida importação não utilizada 'NavSection' para sanar erro de build.
- * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16.1.7, Node 24
- * -----------------------------------------------------------------------------
- */
-
-interface NavLinkItem {
-  id: string;
-  href: string;
-  label: string;
-  isExternal: boolean;
-  icon?: JSX.Element;
-}
 
 interface NavbarProps {
   readonly lang: SupportedLocale;
@@ -36,19 +19,17 @@ interface NavbarProps {
 }
 
 export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Element {
-  const { nav, menu, theme, languageSwitcher } = common
+  const { nav, menu, theme } = common
   const { activeSection } = useScrollSpy()
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
-  // Controle de scroll otimizado (Passive Listeners para performance)
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock body scroll para React 19 quando o menu mobile está aberto
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.body.style.overflow = isOpen ? 'hidden' : ''
@@ -58,132 +39,114 @@ export default function Navbar({ lang, common, contact }: NavbarProps): JSX.Elem
     }
   }, [isOpen])
 
-  // Mapeamento de links unificado
-  const navLinks = useMemo((): NavLinkItem[] => {
-    // 1. Seções da Home (Baseadas no Enum do domínio)
-    const baseLinks: NavLinkItem[] = NAV_SECTIONS.map((section) => ({
+  // Apenas as seções de ancoragem interna
+  const internalLinks = useMemo(() => 
+    NAV_SECTIONS.map((section) => ({
       id: section,
       href: `/${lang}${getNavHash(section)}`,
       label: nav[section as keyof typeof nav] || section,
-      isExternal: false
-    }));
+    })), [lang, nav]
+  );
 
-    // 2. Link do Currículo (PDF Dinâmico mapeado por locale)
-    const resumeLink: NavLinkItem = {
-      id: 'resume',
-      href: getResumePath(lang),
-      label: contact.cvLabel || 'CV',
-      isExternal: true,
-      icon: <FileText size={14} className="mr-1 inline-block" />
-    };
-
-    return [...baseLinks, resumeLink];
-  }, [lang, nav, contact.cvLabel]);
+  // Dados do currículo para reutilização
+  const resumeData = {
+    href: getResumePath(lang),
+    label: contact.cvLabel || 'CV',
+    downloadName: getResumeDownloadName(lang)
+  };
 
   return (
     <nav 
       role="navigation" 
       aria-label={common.navigation}
-      data-scrolled={isScrolled}
-      className={`fixed top-0 z-[100] w-full transition-all duration-500 ease-in-out ${
+      className={`fixed top-0 z-[100] w-full transition-all duration-500 ${
         isScrolled 
-          ? 'bg-white/90 dark:bg-[#020617]/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-slate-800/60 py-3 shadow-xl' 
+          ? 'bg-white/80 dark:bg-[#020617]/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 py-3' 
           : 'bg-transparent py-6'
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
+        
         {/* Logo */}
-        <Link 
-          href={`/${lang}`} 
-          className="group relative z-[110] outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg"
-          onClick={() => setIsOpen(false)}
-        >
-          <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white transition-colors group-hover:text-blue-600">
-            SÉRGIO<span className="text-blue-600 group-hover:text-slate-900 dark:group-hover:text-white transition-colors"> SANTOS</span>
+        <Link href={`/${lang}`} className="relative z-[110] outline-none">
+          <span className="text-xl md:text-2xl font-black tracking-tighter uppercase text-slate-900 dark:text-white">
+            SÉRGIO<span className="text-blue-600"> SANTOS</span>
           </span>
         </Link>
 
-        {/* Desktop Menu */}
-        <div className="hidden lg:flex items-center gap-10">
-          <div className="flex gap-8">
-            {navLinks.map((link) => {
-              const isActive = activeSection === link.id
-              return (
-                <Link 
-                  key={link.id} 
-                  href={link.href}
-                  target={link.isExternal ? "_blank" : undefined}
-                  rel={link.isExternal ? "noopener noreferrer" : undefined}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`relative text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 hover:text-blue-600 flex items-center ${
-                    isActive ? 'text-blue-600' : 'text-slate-500 dark:text-slate-400'
-                  }`}
-                >
-                  {link.icon}
-                  {link.label}
-                  {isActive && (
-                    <span className="absolute -bottom-1 left-0 h-0.5 w-full bg-blue-600 rounded-full animate-in fade-in zoom-in duration-500" />
-                  )}
-                </Link>
-              )
-            })}
-          </div>
-
-          <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
-
-          <div className="flex items-center gap-6">
-            <LanguageSwitcher currentLang={lang} />
-            <ThemeToggle labels={theme} />
-          </div>
-        </div>
-
-        {/* Mobile Controls */}
-        <div className="flex items-center gap-4 lg:hidden relative z-[110]">
-          <ThemeToggle labels={theme} />
-          <button 
-            type="button" 
-            aria-label={isOpen ? menu.aria.close : menu.aria.open}
-            onClick={() => setIsOpen(!isOpen)}
-            className="p-2 text-slate-900 dark:text-white focus:outline-none cursor-pointer"
-          >
-            {isOpen ? (
-              <X size={32} className="text-blue-600 animate-in spin-in-90 duration-300" />
-            ) : (
-              <Menu size={32} className="animate-in fade-in duration-300" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu Overlay */}
-      <div className={`lg:hidden fixed inset-0 z-[100] bg-white dark:bg-[#020617] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-        isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'
-      }`}>
-        <div className="flex flex-col h-full justify-center gap-12 p-12">
-          <div className="space-y-8">
-            {navLinks.map((link, idx) => (
+        {/* Desktop Navigation */}
+        <div className="hidden lg:flex items-center gap-8">
+          <div className="flex gap-7">
+            {internalLinks.map((link) => (
               <Link 
                 key={link.id} 
                 href={link.href}
-                target={link.isExternal ? "_blank" : undefined}
-                rel={link.isExternal ? "noopener noreferrer" : undefined}
-                onClick={() => setIsOpen(false)}
-                className="block text-4xl font-black text-slate-900 dark:text-white hover:text-blue-600 transition-colors"
-                style={{ transitionDelay: `${idx * 50}ms` }}
+                className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors hover:text-blue-600 ${
+                  activeSection === link.id ? 'text-blue-600' : 'text-slate-500 dark:text-slate-400'
+                }`}
               >
-                <span className="text-blue-600 mr-4 font-mono text-sm">0{idx + 1}.</span>
                 {link.label}
               </Link>
             ))}
           </div>
 
-          <div className="pt-12 border-t border-slate-100 dark:border-slate-800/50">
-            <p className="mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-              {languageSwitcher}
-            </p>
-            <div className="flex justify-start scale-125 origin-left">
-              <LanguageSwitcher currentLang={lang} />
-            </div>
+          <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
+
+          {/* Botão de CV com Destaque */}
+          <a 
+            href={resumeData.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            download={resumeData.downloadName}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20"
+          >
+            <Download size={14} />
+            {resumeData.label}
+          </a>
+
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher currentLang={lang} />
+            <ThemeToggle labels={theme} />
+          </div>
+        </div>
+
+        {/* Mobile UI */}
+        <div className="flex items-center gap-3 lg:hidden relative z-[110]">
+          <a 
+            href={resumeData.href}
+            className="p-2 bg-blue-600 text-white rounded-full shadow-lg"
+            aria-label={resumeData.label}
+          >
+            <FileText size={20} />
+          </a>
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 text-slate-900 dark:text-white"
+          >
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div className={`lg:hidden fixed inset-0 z-[100] bg-white dark:bg-[#020617] transition-transform duration-500 ${
+        isOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        <div className="flex flex-col h-full justify-center p-10 gap-8">
+          {internalLinks.map((link, idx) => (
+            <Link 
+              key={link.id} 
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className="text-4xl font-black text-slate-900 dark:text-white flex items-baseline gap-4"
+            >
+              <span className="text-blue-600 text-sm font-mono">0{idx + 1}</span>
+              {link.label}
+            </Link>
+          ))}
+          
+          <div className="mt-10 pt-10 border-t border-slate-100 dark:border-slate-800">
+             <LanguageSwitcher currentLang={lang} />
           </div>
         </div>
       </div>
