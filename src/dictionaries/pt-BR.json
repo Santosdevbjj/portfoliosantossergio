@@ -99,7 +99,6 @@
     },
 
     "categories": {
-
       "Data Engineering": { "labelKey": "Engenharia de Dados" },
       "Cloud & Infrastructure": { "labelKey": "Nuvem e Infraestrutura" },
       "Data Science": { "labelKey": "Ciência de Dados" },
@@ -124,7 +123,6 @@
       "node": { "labelKey": "Node.js" },
       "react": { "labelKey": "React" },
       "articles": { "labelKey": "Artigos Técnicos" }
-
     },
 
     "featuredProjects": []
@@ -178,13 +176,11 @@
     "loading": "Carregando...",
     "empty": "Sem dados.",
     "error": "Erro ao carregar.",
-
     "emptyProjects": {
       "title": "Nenhum projeto",
       "description": "Em breve.",
       "cta": "Voltar"
     },
-
     "emptyExperience": "Sem registros.",
     "errorArticles": "Erro nos artigos."
   },
@@ -202,35 +198,16 @@
   "seo": {
     "siteName": "Sérgio Santos | Portfolio",
     "title": "Sérgio Santos",
-    "description": "Cientista de Dados especialista em Sistemas Críticos e Missão Crítica. Explore projetos de engenharia de dados, alta disponibilidade e análise preditiva.",
+    "description": "Cientista de Dados especialista em Sistemas Críticos e Missão Crítica.",
     "keywords": [
       "Ciência de Dados",
       "Data Science",
-      "Sistemas Críticos",
-      "Missão Crítica",
       "Machine Learning",
       "ETL",
-      "Data Pipelines",
       "Cloud Computing",
       "Azure",
-      "Python",
-      "Alta Disponibilidade"
-    ],
-    
-    "pages": {
-      "home": {
-        "title": "Início",
-        "description": "Especialista em Ciência de Dados, Machine Learning e Data Pipelines para Sistemas Críticos."
-      },
-      "projects": {
-        "title": "Projetos",
-        "description": "Soluções de dados"
-      },
-      "articles": {
-        "title": "Artigos",
-        "description": "Conteúdo técnico"
-      }
-    }
+      "Python"
+    ]
   },
 
   "metrics": {
@@ -239,15 +216,14 @@
       "value": 99.5,
       "unit": "%"
     }
-  }
-},
+  },
 
-"resume": {
+  "resume": {
     "selectLanguage": "Selecionar Idioma",
     "languages": {
       "pt-BR": "Português",
       "en-US": "Inglês",
       "es-ES": "Espanhol"
-      }
-        }
+    }
+  }
 }
