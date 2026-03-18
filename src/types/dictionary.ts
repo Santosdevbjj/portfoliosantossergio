@@ -5,7 +5,6 @@ import type { SupportedLocale } from "@/dictionaries/locales";
 export type Locale = SupportedLocale;
 
 /* ================= META ================= */
-
 export interface DictionaryMeta {
   version: string;
   locale: Locale;
@@ -20,7 +19,6 @@ export interface DictionaryMeta {
 }
 
 /* ================= HERO ================= */
-
 export interface HeroDictionary {
   greeting: string;
   title: string;
@@ -30,7 +28,6 @@ export interface HeroDictionary {
 }
 
 /* ================= ABOUT ================= */
-
 export interface AboutDictionary {
   title: string;
   differentialTitle: string;
@@ -47,7 +44,6 @@ export interface AboutDictionary {
 }
 
 /* ================= CONTACT ================= */
-
 export interface ContactDictionary {
   title: string;
   subtitle: string;
@@ -60,7 +56,6 @@ export interface ContactDictionary {
 }
 
 /* ================= EXPERIENCE ================= */
-
 export interface ExperienceItem {
   company: string;
   period: string;
@@ -75,7 +70,6 @@ export interface ExperienceDictionary {
 }
 
 /* ================= ARTICLES ================= */
-
 export interface ArticleItem {
   title: string;
   description: string;
@@ -96,15 +90,44 @@ export interface ArticlesSectionDictionary {
 }
 
 /* ================= PROJECTS ================= */
-
 export interface CategoryDetail {
   labelKey: string;
 }
 
 /**
- * 🔥 FLEXÍVEL (corrige ES-ES e futuros idiomas)
+ * 🔥 MANTIDO + FLEXÍVEL (SEM QUEBRAR O ANTIGO)
  */
-export type ProjectCategories = Record<string, CategoryDetail>;
+export interface ProjectCategories {
+  "Data Engineering": CategoryDetail;
+  "Cloud & Infrastructure": CategoryDetail;
+  "Data Science": CategoryDetail;
+  "Data Analytics": CategoryDetail;
+  "Outros": CategoryDetail;
+
+  dataScience: CategoryDetail;
+  cloud: CategoryDetail;
+  graphs: CategoryDetail;
+  analysis: CategoryDetail;
+  excel: CategoryDetail;
+  database: CategoryDetail;
+  dev: CategoryDetail;
+  security: CategoryDetail;
+
+  html: CategoryDetail;
+  css: CategoryDetail;
+  javascript: CategoryDetail;
+  typescript: CategoryDetail;
+  next: CategoryDetail;
+  node: CategoryDetail;
+  react: CategoryDetail;
+
+  articles: CategoryDetail;
+
+  /**
+   * 🔥 mantém compatibilidade com ES-ES
+   */
+  [key: string]: CategoryDetail;
+}
 
 export interface ProjectItem {
   id: string | number;
@@ -136,7 +159,6 @@ export interface ProjectsSectionDictionary {
 }
 
 /* ================= COMMON ================= */
-
 export interface CommonDictionary {
   navigation: string;
   role: string;
@@ -164,23 +186,10 @@ export interface CommonDictionary {
     system: string;
   };
 
-  externalLinks: {
-    linkedin: string;
-    github: string;
-    medium: string;
-    email: string;
-  };
-
-  menu?: {
-    open: string;
-    close: string;
-    aria: {
-      open: string;
-      close: string;
-    };
-  };
-
-  errorBoundary?: {
+  /**
+   * 🔥 VOLTOU A SER OBRIGATÓRIO (como era antes)
+   */
+  errorBoundary: {
     title: string;
     description: string;
     actions: {
@@ -189,15 +198,33 @@ export interface CommonDictionary {
     };
   };
 
-  notFound?: {
+  notFound: {
     title: string;
     description: string;
     button: string;
   };
+
+  externalLinks: {
+    linkedin: string;
+    github: string;
+    medium: string;
+    email: string;
+  };
+
+  /**
+   * 🔥 CRÍTICO — obrigatório
+   */
+  menu: {
+    open: string;
+    close: string;
+    aria: {
+      open: string;
+      close: string;
+    };
+  };
 }
 
 /* ================= STATES ================= */
-
 export interface StateDictionary {
   loading: string;
   empty: string;
@@ -212,7 +239,6 @@ export interface StateDictionary {
 }
 
 /* ================= INTL ================= */
-
 export interface IntlDictionary {
   locale: Locale;
   fallbackLocale: string;
@@ -223,7 +249,6 @@ export interface IntlDictionary {
 }
 
 /* ================= COOKIE ================= */
-
 export interface CookieDictionary {
   title: string;
   description: string;
@@ -235,7 +260,6 @@ export interface CookieDictionary {
 }
 
 /* ================= SEO ================= */
-
 export interface SeoDictionary {
   siteName: string;
   title: string;
@@ -243,9 +267,9 @@ export interface SeoDictionary {
   keywords: string[];
 
   /**
-   * 🔥 Agora opcional (resolve pt-BR)
+   * 🔥 voltou a ser obrigatório
    */
-  pages?: {
+  pages: {
     [key: string]: {
       title: string;
       description: string;
@@ -254,7 +278,6 @@ export interface SeoDictionary {
 }
 
 /* ================= METRICS ================= */
-
 export interface MetricsDictionary {
   availability: string;
   availabilityNormalized: {
@@ -264,14 +287,12 @@ export interface MetricsDictionary {
 }
 
 /* ================= RESUME ================= */
-
 export interface ResumeDictionary {
   selectLanguage: string;
   languages: Record<string, string>;
 }
 
 /* ================= ROOT ================= */
-
 export interface Dictionary {
   meta: DictionaryMeta;
   hero: HeroDictionary;
@@ -288,7 +309,7 @@ export interface Dictionary {
   metrics: MetricsDictionary;
 
   /**
-   * 🔥 NOVO — ESSENCIAL PARA INTEGRAÇÃO COM PDF
+   * 🔥 NOVO (não quebra nada)
    */
   resume: ResumeDictionary;
 }
