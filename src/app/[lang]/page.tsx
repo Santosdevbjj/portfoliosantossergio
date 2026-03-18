@@ -1,6 +1,9 @@
+// src/app/[lang]/page.tsx
+
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image"; // Mantido para os novos cards de impacto
+import Image from "next/image";
+import Link from "next/link"; // Importado para navegação interna nos artigos
 
 import type { Locale } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
@@ -24,18 +27,8 @@ import { CareerHighlights } from "@/components/CareerHighlights";
 import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 
 /**
- * REQUISITOS TÉCNICOS ATENDIDOS:
- * ✔ Next.js 16.1.7 - Turbopack, App Router
- * ✔ React 19 - Server Components
- * ✔ TypeScript 6.0 - Removido Unused Imports (Link) para evitar falha no build
- * ✔ Tailwind 4.2 - Utility-first modern layout
- * ✔ Multi-idioma: pt-BR, en-US, es-ES, es-AR, es-MX
+ * CONFIGURAÇÕES DE RENDERIZAÇÃO
  */
-
-interface PageProps {
-  params: Promise<{ lang: string }>;
-}
-
 export const dynamic = "force-static";
 export const revalidate = 3600;
 
@@ -50,7 +43,8 @@ export const viewport: Viewport = {
 };
 
 /**
- * METADATA (VERSÃO FINAL E RECALIBRADA)
+ * 1. METADADOS DINÂMICOS (SEO & OPEN GRAPH)
+ * Removido fb:app_id para eliminar erro de ID inválido.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -58,32 +52,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!locales.includes(locale)) return {};
 
-  const siteUrl = (
-    process.env.NEXT_PUBLIC_SITE_URL || "https://portfoliosantossergio.vercel.app"
-  ).replace(/\/$/, "");
-
+  const siteUrl = "https://portfoliosantossergio.vercel.app";
   const fullUrl = `${siteUrl}/${locale}`;
-
-  // Título e Descrição otimizados para OpenGraph.xyz e LinkedIn
-  const titleMap: Record<SupportedLocale, string> = {
-    "pt-BR": "Sérgio Santos | Cientista de Dados e Engenheiro de Software",
-    "en-US": "Sérgio Santos | Data Scientist and Software Engineer",
-    "es-ES": "Sérgio Santos | Científico de Datos e Ingeniero de Software",
-    "es-AR": "Sérgio Santos | Científico de Datos e Ingeniero de Software",
-    "es-MX": "Sérgio Santos | Científico de Datos e Ingeniero de Software",
-  };
-  
-  const descriptionMap: Record<SupportedLocale, string> = {
-    "pt-BR": "Especialista em Ciência de Dados e IA com foco em Sistemas Críticos. Veja projetos de alta disponibilidade e artigos técnicos de Sérgio Santos.",
-    "en-US": "Data Science and AI Expert focused on Critical Systems. Explore high-availability projects and technical articles by Sérgio Santos.",
-    "es-ES": "Especialista en Ciencia de Datos e IA en Sistemas Críticos. Explore proyectos de alta disponibilidad y artículos técnicos de Sérgio Santos.",
-    "es-AR": "Especialista en Ciencia de Datos e IA en Sistemas Críticos. Explore proyectos de alta disponibilidad y artículos técnicos de Sérgio Santos.",
-    "es-MX": "Especialista en Ciencia de Datos e IA en Sistemas Críticos. Explore proyectos de alta disponibilidade y artículos técnicos de Sérgio Santos.",
-  };
-
-  const title = titleMap[locale] || titleMap["pt-BR"];
-  const description = descriptionMap[locale] || descriptionMap["pt-BR"];
   const ogImage = `${siteUrl}/og/og-image-${locale}.png`;
+
+  const title = "Sérgio Santos | Cientista de Dados e Engenheiro de Software";
+  const description = "Especialista em Ciência de Dados e IA com foco em Sistemas Críticos. Veja projetos de alta disponibilidade e artigos técnicos de Sérgio Santos.";
 
   return {
     title,
@@ -94,13 +68,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: Object.fromEntries(locales.map((l) => [l, `${siteUrl}/${l}`])),
     },
     openGraph: {
+      url: fullUrl,
+      type: "website",
       title,
       description,
-      url: fullUrl,
       siteName: "Sérgio Santos Portfolio",
-      type: "website",
       locale: locale.replace("-", "_"),
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title, type: "image/png" }],
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
@@ -108,23 +89,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: [ogImage],
     },
-    facebook: {
-      appId: "672839201123456", 
-    },
     other: {
-      "image": ogImage,
-      "og:image:secure_url": ogImage,
-      "og:image:type": "image/png",
+      "twitter:domain": "portfoliosantossergio.vercel.app",
+      "twitter:url": fullUrl,
     },
   };
 }
 
+interface PageProps {
+  params: Promise<{ lang: string }>;
+}
+
 /**
- * NORMALIZA REPOSITÓRIOS DO GITHUB
+ * NORMALIZAÇÃO DE PROJETOS GITHUB
  */
 function normalizeProjects(repos: unknown): ProjectDomain[] {
   if (!Array.isArray(repos)) return [];
-
   return repos
     .map((repo: any, index): ProjectDomain => {
       const topics = Array.isArray(repo?.topics) ? repo.topics.map((t: string) => t.toLowerCase()) : [];
@@ -145,17 +125,14 @@ function normalizeProjects(repos: unknown): ProjectDomain[] {
 }
 
 /**
- * COMPONENTE DA PÁGINA PRINCIPAL
+ * COMPONENTE PRINCIPAL
  */
 export default async function HomePage({ params }: PageProps) {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
-
   if (!locales.includes(locale)) notFound();
-
   const lang = locale as Locale;
 
-  // Carregamento paralelo (Data Fetching)
   const [dictResult, reposResult] = await Promise.allSettled([
     getServerDictionary(lang),
     getPortfolioRepos("Santosdevbjj"),
@@ -163,13 +140,10 @@ export default async function HomePage({ params }: PageProps) {
 
   const dict = dictResult.status === "fulfilled" ? dictResult.value : null;
   const repos = reposResult.status === "fulfilled" ? reposResult.value : [];
-
   if (!dict) notFound();
 
   const projects = normalizeProjects(repos);
-  // Caminhos corrigidos para os 5 PDFs conforme solicitado
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
-  const construction = (dict as any)?.construction;
 
   return (
     <ProxyPage lang={lang}>
@@ -177,28 +151,25 @@ export default async function HomePage({ params }: PageProps) {
         
         <HeroSection dictionary={dict} />
 
-        {construction && (
-          <section className="py-12 px-4">
-            <div className="mx-auto max-w-7xl">
-              <ConstructionRiskProject dict={construction} />
-            </div>
-          </section>
-        )}
+        {/* PROJETO DE RISCO (DESTAQUE) */}
+        <section className="py-12 px-4">
+          <div className="mx-auto max-w-7xl">
+            <ConstructionRiskProject dict={(dict as any).construction} />
+          </div>
+        </section>
 
-        {/* SEÇÃO SOBRE */}
+        {/* SOBRE & HIGHLIGHTS */}
         <section id="about" className="scroll-mt-20">
-          {dict.about && <AboutSection dict={dict.about} />}
+          <AboutSection dict={dict.about} />
           <div className="mx-auto max-w-7xl px-4 py-12">
             <CareerHighlights dict={dict} />
           </div>
         </section>
 
-        {/* EXPERIÊNCIA */}
-        {dict.experience && (
-          <ExperienceSection experience={dict.experience} />
-        )}
+        {/* EXPERIÊNCIA PROFISSIONAL */}
+        <ExperienceSection experience={dict.experience} />
 
-        {/* PROJETOS GITHUB */}
+        {/* GRID DE PROJETOS FULL-STACK */}
         <section id="projects" className="py-20 scroll-mt-20">
           <div className="mx-auto max-w-7xl px-4 mb-10 text-center md:text-left">
             <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
@@ -208,8 +179,8 @@ export default async function HomePage({ params }: PageProps) {
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* CURRÍCULO (RESUME) */}
-        <section id="resume" className="py-20 bg-slate-100/50 dark:bg-slate-900/20 border-y border-slate-200/50 dark:border-slate-800/50 scroll-mt-20">
+        {/* CURRÍCULO (PDF LOADER) */}
+        <section id="resume" className="py-20 bg-slate-100/50 dark:bg-slate-900/20 border-y border-slate-200 dark:border-slate-800 scroll-mt-20">
           <div className="text-center mb-10 px-4">
             <h2 className="text-4xl font-black mb-8 text-slate-900 dark:text-white tracking-tighter">
               Curriculum <span className="text-blue-600">Vitae</span>
@@ -225,15 +196,11 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* 🏆 SEÇÃO DE ARTIGOS PREMIADOS (CARDS DE IMPACTO) */}
+        {/* 🏆 SEÇÃO DE ARTIGOS (INTEGRADA COM MEDIUM E REPOSITÓRIO INTERNO) */}
         <section id="featured-articles" className="py-24 bg-white dark:bg-[#020617] scroll-mt-20">
           <div className="mx-auto max-w-7xl px-4">
             <header className="mb-16 text-center max-w-3xl mx-auto">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 mb-6">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                </span>
                 <span className="text-xs font-bold uppercase tracking-widest text-blue-700 dark:text-blue-400">
                   Reconhecimento Técnico & Curadoria
                 </span>
@@ -244,58 +211,58 @@ export default async function HomePage({ params }: PageProps) {
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* CARD 1: MEDIUM PREMIADO */}
-              <div className="group relative flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 transition-all hover:border-blue-100 dark:hover:border-blue-900 shadow-xl">
-                <div className="absolute top-4 right-4 md:top-8 md:right-8 flex items-center gap-2">
-                  <div className="px-2 py-1 rounded-full bg-amber-400 text-[#020617] text-[9px] font-black uppercase tracking-tighter">Vencedor DIO</div>
-                  <div className="px-2 py-1 rounded-full bg-blue-600 text-white text-[9px] font-black uppercase tracking-tighter">Set/2025</div>
+              
+              {/* CARD 1: MEDIUM PREMIADO (Com 4 Botões) */}
+              <div className="group relative flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-xl">
+                <div className="absolute top-8 right-8 flex items-center gap-2">
+                  <div className="px-2 py-1 rounded-full bg-amber-400 text-black text-[9px] font-black uppercase">Vencedor DIO</div>
                 </div>
                 <div className="flex flex-col md:flex-row items-center gap-6 mb-8 mt-6">
-                  <div className="relative flex-shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl group-hover:scale-105 transition-transform duration-500">
-                    <Image src="/images/trofeus-vencedor-dio.png" alt="Troféus Vencedor DIO" fill className="object-cover" sizes="(max-width: 768px) 96px, 128px" priority />
+                  <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl transition-transform group-hover:scale-105">
+                    <Image src="/images/trofeus-vencedor-dio.png" alt="Troféus DIO" fill className="object-cover" />
                   </div>
                   <div className="flex-1 text-center md:text-left">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-1">Artigo premiado (35ª Competição)</p>
+                    <p className="text-[10px] font-bold uppercase text-blue-600 mb-1">Artigo Premiado (35ª Competição)</p>
                     <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white leading-tight">Low-Code na Saúde: Como Criar Apps Médicos em Semanas</h3>
                   </div>
                 </div>
-                <p className="text-slate-600 dark:text-slate-400 mb-8 text-sm leading-relaxed">Publicado no Medium em três idiomas explorando como plataformas low-code aceleram o desenvolvimento médico com conformidade regulatória.</p>
-                <div className="mt-auto pt-6 border-t border-slate-200/50 dark:border-slate-800/50">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase mb-4 tracking-widest">Ler no Medium:</p>
+                <p className="text-slate-600 dark:text-slate-400 mb-8 text-sm leading-relaxed">Explorando como plataformas low-code aceleram o desenvolvimento médico com conformidade regulatória.</p>
+                <div className="mt-auto pt-6 border-t border-slate-200 dark:border-slate-800">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase mb-4 tracking-widest">Ler Artigos:</p>
                   <div className="flex flex-wrap gap-2">
-                    {[
-                      { lang: 'PT', href: 'https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e' },
-                      { lang: 'EN', href: 'https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77' },
-                      { lang: 'ES', href: 'https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad' },
-                    ].map(link => (
-                      <a key={link.lang} href={link.href} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-black text-slate-700 dark:text-slate-200 hover:bg-slate-100 transition-all">{link.lang}</a>
-                    ))}
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-black hover:bg-slate-100 transition-all">PT</a>
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-black hover:bg-slate-100 transition-all">EN</a>
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-black hover:bg-slate-100 transition-all">ES</a>
+                    <a href="https://medium.com/@sergiosantosluiz/" target="_blank" className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-black hover:bg-blue-700 transition-all">Perfil Medium</a>
                   </div>
                 </div>
               </div>
 
-              {/* CARD 2: GITHUB CURADORIA */}
-              <a href="https://github.com/Santosdevbjj/myArticles" target="_blank" rel="noopener noreferrer" className="group flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 transition-all hover:border-blue-100 shadow-xl">
+              {/* CARD 2: REPOSITÓRIO DE ARTIGOS (Leva para a página interna /artigos) */}
+              <Link href={`/${lang}/artigos`} className="group flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-xl hover:border-blue-500 transition-all">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="p-3 bg-slate-900 dark:bg-white rounded-2xl text-white dark:text-[#020617] group-hover:rotate-12 transition-transform">
+                  <div className="p-3 bg-slate-900 dark:bg-white rounded-2xl text-white dark:text-black group-hover:rotate-12 transition-transform">
                     <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                   </div>
                   <div>
-                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">myArticles: Curadoria Estratégica</h3>
-                    <p className="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-widest">Santosdevbjj / myArticles</p>
+                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">Artigos Técnicos Integrados</h3>
+                    <p className="text-xs text-blue-600 font-bold uppercase">Governança, IA e Infraestrutura</p>
                   </div>
                 </div>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">Uma amostra do meu raciocínio aplicado a problemas de engenharia. Cada artigo documenta decisões técnicas em ambientes críticos.</p>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                  Navegue pela coleção de artigos organizada por áreas: Cloud, IA Generativa, Dados e Desenvolvimento. Cada artigo analisa problemas concretos sob a ótica de sistemas críticos bancários.
+                </p>
                 <div className="flex flex-wrap gap-2 mb-8">
-                  {['Sistemas Críticos', 'FinOps', 'MloPS', 'LGPD'].map(tag => (
+                  {['Cloud', 'IA Generativa', 'Sistemas Críticos', 'Governança'].map(tag => (
                     <span key={tag} className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-md text-[9px] font-black uppercase text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{tag}</span>
                   ))}
                 </div>
-                <div className="mt-auto flex items-center justify-between pt-5 border-t border-slate-200/50 dark:border-slate-800/50">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Readme Analítico</span>
-                  <span className="text-xs font-black text-blue-600 group-hover:translate-x-1 transition-transform">Ver Repositório →</span>
+                <div className="mt-auto flex items-center justify-between pt-5 border-t border-slate-200 dark:border-slate-800">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Explorar Base de Conhecimento</span>
+                  <span className="text-xs font-black text-blue-600 group-hover:translate-x-1 transition-transform">Ler Artigos Internos →</span>
                 </div>
-              </a>
+              </Link>
+
             </div>
           </div>
         </section>
