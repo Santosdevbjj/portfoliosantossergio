@@ -241,7 +241,8 @@
     }
   }
 },
-  "resume": {
+
+"resume": {
     "selectLanguage": "Selecionar Idioma",
     "languages": {
       "pt-BR": "Português",
