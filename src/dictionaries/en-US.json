@@ -238,10 +238,10 @@
       "en-US": "English",
       "es-ES": "Spanish"
     }
-  }
-},
-"menu": {
-  "open": "Open menu",
-  "close": "Close"
-}
+  },
 
+  "menu": {
+    "open": "Open menu",
+    "close": "Close"
+  }
+}
