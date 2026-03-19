@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-import type { Locale } from "@/types/dictionary";
+// Importação rigorosa de tipos
+import type { Dictionary, Locale } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
 
 import { resolveProjectTechnology } from "@/domain/projects";
@@ -12,6 +13,7 @@ import { getServerDictionary } from "@/lib/getServerDictionary";
 import { getPortfolioRepos } from "@/lib/github";
 import { locales, normalizeLocale, type SupportedLocale } from "@/dictionaries/locales";
 
+// Componentes de Interface
 import ProxyPage from "@/components/ProxyPage";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
@@ -26,12 +28,12 @@ import { CareerHighlights } from "@/components/CareerHighlights";
 import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 
 /**
- * CONFIGURAÇÕES DE RENDERIZAÇÃO - Next.js 16+
+ * CONFIGURAÇÕES DE RENDERIZAÇÃO - Next.js 16+ (Turbopack Ready)
  */
 export const dynamic = "force-static";
 export const revalidate = 3600;
 
-// Gera os caminhos estáticos para todos os idiomas suportados
+// Gera os caminhos estáticos para todos os idiomas suportados (pt-BR, en-US, es-ES, es-AR, es-MX)
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
@@ -47,7 +49,7 @@ interface PageProps {
 }
 
 /**
- * METADADOS DINÂMICOS (SEO)
+ * METADADOS DINÂMICOS (SEO) - Suporte Total Multilingue
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -59,7 +61,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const fullUrl = `${siteUrl}/${locale}`;
   const ogImage = `${siteUrl}/og/og-image-${locale}.png`;
 
-  const title = "Sérgio Santos | Cientista de Dados e Engenheiro de Software";
+  // Títulos e descrições baseados no idioma para o SEO
+  const titles: Record<SupportedLocale, string> = {
+    "pt-BR": "Sérgio Santos | Cientista de Dados e Engenheiro de Software",
+    "en-US": "Sérgio Santos | Data Scientist & Software Engineer",
+    "es-ES": "Sérgio Santos | Científico de Datos e Ingeniero de Software",
+    "es-AR": "Sérgio Santos | Científico de Datos e Ingeniero de Software",
+    "es-MX": "Sérgio Santos | Científico de Datos e Ingeniero de Software",
+  };
+
+  const title = titles[locale] || titles["en-US"];
   const description = "Especialista em Ciência de Dados e IA com foco em Sistemas Críticos.";
 
   return {
@@ -113,7 +124,7 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
 }
 
 /**
- * COMPONENTE PRINCIPAL (SERVER COMPONENT - React 19)
+ * COMPONENTE PRINCIPAL (SERVER COMPONENT - React 19 / Node 24)
  */
 export default async function HomePage({ params }: PageProps) {
   const { lang: rawLang } = await params;
@@ -122,10 +133,10 @@ export default async function HomePage({ params }: PageProps) {
   if (!locales.includes(locale)) notFound();
   const lang = locale as Locale;
 
-  // Busca paralela de dados
+  // Busca paralela de dados (Dicionário + Repositórios)
   const [dict, repos] = await Promise.all([
-    getServerDictionary(lang),
-    getPortfolioRepos("Santosdevbjj").catch(() => []), // Fallback para array vazio se falhar
+    getServerDictionary(lang) as Promise<Dictionary>,
+    getPortfolioRepos("Santosdevbjj").catch(() => []),
   ]);
 
   if (!dict) notFound();
@@ -137,18 +148,15 @@ export default async function HomePage({ params }: PageProps) {
     <ProxyPage lang={lang}>
       <main className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
         
+        {/* HERO SECTION */}
         <HeroSection dictionary={dict} />
 
-        {/* PROJETO DE RISCO (DESTAQUE) - Proteção contra undefined no dict */}
+        {/* PROJETO DE RISCO (DESTAQUE) - Verificação de Tipo Segura */}
         <section className="py-12 px-4">
           <div className="mx-auto max-w-7xl">
             {dict.construction ? (
               <ConstructionRiskProject dict={dict.construction} />
-            ) : (
-              <div className="p-4 border border-dashed border-slate-300 rounded-xl text-center text-slate-500">
-                Project details loading...
-              </div>
-            )}
+            ) : null}
           </div>
         </section>
 
@@ -167,13 +175,14 @@ export default async function HomePage({ params }: PageProps) {
         <section id="projects" className="py-20 scroll-mt-20">
           <div className="mx-auto max-w-7xl px-4 mb-10 text-center md:text-left">
             <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
-              Projetos <span className="text-blue-600">Full-Stack</span>
+              {lang === "pt-BR" ? "Projetos" : lang.startsWith("es") ? "Proyectos" : "Projects"}{" "}
+              <span className="text-blue-600">Full-Stack</span>
             </h2>
           </div>
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* CURRÍCULO */}
+        {/* CURRÍCULO (DINÂMICO PARA 5 IDIOMAS) */}
         <section id="resume" className="py-20 bg-slate-100/50 dark:bg-slate-900/20 border-y border-slate-200 dark:border-slate-800 scroll-mt-20">
           <div className="text-center mb-10 px-4">
             <h2 className="text-4xl font-black mb-8 text-slate-900 dark:text-white tracking-tighter">
@@ -190,39 +199,46 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* ARTIGOS */}
+        {/* ARTIGOS E RECONHECIMENTO */}
         <section id="featured-articles" className="py-24 bg-white dark:bg-[#020617] scroll-mt-20">
           <div className="mx-auto max-w-7xl px-4">
             <header className="mb-16 text-center max-w-3xl mx-auto">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 mb-6">
                 <span className="text-xs font-bold uppercase tracking-widest text-blue-700 dark:text-blue-400">
-                  Reconhecimento Técnico
+                  {dict.articles.awardWinner}
                 </span>
               </div>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-6">
-                Liderança Através do <span className="text-blue-600">Conhecimento</span>
+                {dict.articles.title}
               </h2>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* CARD MEDIUM */}
+              {/* CARD MEDIUM - PREMIADO */}
               <div className="group relative flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-xl">
                 <div className="absolute top-8 right-8">
-                  <span className="px-2 py-1 rounded-full bg-amber-400 text-black text-[9px] font-black uppercase">Vencedor DIO</span>
+                  <span className="px-2 py-1 rounded-full bg-amber-400 text-black text-[9px] font-black uppercase">
+                    {dict.articles.awardWinner}
+                  </span>
                 </div>
                 <div className="flex flex-col md:flex-row items-center gap-6 mb-8 mt-6">
                   <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl">
-                    <Image src="/images/trofeus-vencedor-dio.png" alt="Troféus DIO" fill className="object-cover" />
+                    <Image 
+                      src="/images/trofeus-vencedor-dio.png" 
+                      alt="Troféus DIO" 
+                      fill 
+                      className="object-cover" 
+                    />
                   </div>
                   <div className="flex-1 text-center md:text-left">
-                    <p className="text-[10px] font-bold uppercase text-blue-600 mb-1">Artigo Premiado</p>
-                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">Low-Code na Saúde</h3>
+                    <p className="text-[10px] font-bold uppercase text-blue-600 mb-1">{dict.articles.items[0]?.category}</p>
+                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">{dict.articles.items[0]?.title}</h3>
                   </div>
                 </div>
                 <div className="mt-auto pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-2">
-                  <a href="https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border rounded-xl text-xs font-black">PT</a>
-                  <a href="https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border rounded-xl text-xs font-black">EN</a>
-                  <a href="https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border rounded-xl text-xs font-black">ES</a>
+                  <a href="https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border rounded-xl text-xs font-black hover:bg-blue-600 hover:text-white transition-colors">PT</a>
+                  <a href="https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border rounded-xl text-xs font-black hover:bg-blue-600 hover:text-white transition-colors">EN</a>
+                  <a href="https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border rounded-xl text-xs font-black hover:bg-blue-600 hover:text-white transition-colors">ES</a>
                 </div>
               </div>
 
@@ -233,18 +249,21 @@ export default async function HomePage({ params }: PageProps) {
                     <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                   </div>
                   <div>
-                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">Artigos Internos</h3>
+                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">
+                      {lang === "pt-BR" ? "Artigos Internos" : lang.startsWith("es") ? "Artículos Internos" : "Internal Articles"}
+                    </h3>
                   </div>
                 </div>
                 <div className="mt-auto flex items-center justify-between pt-5 border-t border-slate-200 dark:border-slate-800 text-xs font-black text-blue-600">
-                  <span>Explorar Base de Conhecimento</span>
-                  <span>Ler →</span>
+                  <span>{dict.articles.mediumProfile}</span>
+                  <span>{dict.articles.readMore} →</span>
                 </div>
               </Link>
             </div>
           </div>
         </section>
 
+        {/* RODAPÉ E CONTATO */}
         <ContactSection contact={dict.contact} common={dict.common} locale={lang} />
       </main>
     </ProxyPage>
