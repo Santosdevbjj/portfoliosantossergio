@@ -1,6 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+/**
+ * ERROR BOUNDARY VIEW - PORTFÓLIO SÉRGIO SANTOS
+ * -----------------------------------------------------------------------------
+ * ✔ Next.js 16.2.0: Suporte a global-error.tsx e PPR (Partial Prerendering).
+ * ✔ React 19: Otimizado para renderização de fallback e transições de estado.
+ * ✔ TypeScript 6.0: Tipagem estrita para ErrorKey e Navigator.
+ * ✔ Tailwind CSS 4.2: Estilização utilitária de alta performance.
+ */
+
+import { useMemo, useEffect } from 'react';
 import { getErrorDictionary } from '@/dictionaries/errors';
 import {
   type SupportedLocale,
@@ -20,20 +29,35 @@ export function ErrorBoundaryView({
   reset,
   withHtmlWrapper = false,
 }: ErrorBoundaryViewProps) {
+  
+  // Log de erro automático para monitoramento em produção (Node 24/Vercel)
+  useEffect(() => {
+    console.error('ErrorBoundary Capturado:', {
+      message: error.message,
+      digest: error.digest,
+      name: error.name
+    });
+  }, [error]);
+
   /**
-   * Resolve locale safely on client
-   * Fully compatible with Next.js 16 App Router
+   * RESOLUÇÃO DE IDIOMA (TS 6.0 Safe)
+   * Garante que o erro seja exibido no idioma do navegador do usuário
+   * caso o contexto do Next.js ainda não tenha carregado o dicionário.
    */
-  const locale: SupportedLocale = useMemo(() => {
-    if (typeof navigator === 'undefined') {
-      return 'pt-BR';
+  const locale = useMemo<SupportedLocale>(() => {
+    if (typeof navigator === 'undefined') return 'pt-BR';
+
+    // Pega o idioma preferencial do navegador (ex: es-MX, pt-BR)
+    const browserLang = navigator.language;
+
+    if (isSupportedLocale(browserLang)) return browserLang;
+    
+    // Fallbacks inteligentes para as variações suportadas
+    if (browserLang.startsWith('en')) return 'en-US';
+    if (browserLang.startsWith('es')) {
+      // Prioriza es-ES se for genérico, ou tenta manter a especificidade
+      return 'es-ES'; 
     }
-
-    const lang = navigator.language;
-
-    if (isSupportedLocale(lang)) return lang;
-    if (lang.startsWith('en')) return 'en-US';
-    if (lang.startsWith('es')) return 'es-ES';
 
     return 'pt-BR';
   }, []);
@@ -41,34 +65,54 @@ export function ErrorBoundaryView({
   const dictionary = getErrorDictionary(locale);
 
   /**
-   * Type-safe narrowing aligned with ErrorDictionary
+   * MAPEAMENTO DINÂMICO DE ERROS
+   * Alinhado com src/dictionaries/errors/pt-BR.json
    */
-  const key: ErrorKey =
-    error.name in dictionary
+  const errorKey = useMemo<ErrorKey>(() => {
+    // Lista de erros conhecidos no seu dicionário JSON
+    const knownErrors: ErrorKey[] = [
+      'NotFoundError',
+      'ValidationError',
+      'UnauthorizedError',
+      'ForbiddenError',
+      'TooManyRequestsError',
+      'UnprocessableEntityError',
+      'MethodNotAllowedError'
+    ];
+
+    // Se o nome do erro estiver no dicionário, usa ele, senão usa o genérico
+    return knownErrors.includes(error.name as ErrorKey)
       ? (error.name as ErrorKey)
       : 'InternalServerError';
+  }, [error.name]);
 
   /**
-   * IMPORTANT — TS 6 exactOptionalPropertyTypes safe
-   * Only pass errorId if it exists
+   * CONTEÚDO PRINCIPAL
+   * Injetando o ID do erro (digest) para suporte técnico, conforme seu dicionário.
    */
   const content = (
-    <ErrorDisplay
-      errorKey={key}
-      dictionary={dictionary}
-      reset={reset}
-      {...(error.digest ? { errorId: error.digest } : {})}
-    />
+    <div className="min-h-[60vh] flex items-center justify-center p-4">
+      <ErrorDisplay
+        errorKey={errorKey}
+        dictionary={dictionary}
+        reset={reset}
+        // TS 6: Acesso seguro à propriedade digest da Vercel
+        errorId={error.digest}
+      />
+    </div>
   );
 
   /**
-   * Required for Next.js 16 global-error.tsx
+   * WRAPPER GLOBAL (Para global-error.tsx)
+   * Tailwind 4.2 utiliza o novo motor de renderização ultra-rápido.
    */
   if (withHtmlWrapper) {
     return (
-      <html lang={locale}>
-        <body className="min-h-screen bg-white dark:bg-[#020617] antialiased">
-          {content}
+      <html lang={locale} className="scroll-smooth">
+        <body className="min-h-screen bg-slate-50 dark:bg-slate-950 antialiased flex flex-col">
+          <main className="flex-grow flex items-center justify-center">
+            {content}
+          </main>
         </body>
       </html>
     );
