@@ -18,8 +18,6 @@ interface Props {
   params: Promise<{ lang: string }>;
 }
 
-export const dynamic = "force-static";
-export const revalidate = 3600;
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((lang) => ({
