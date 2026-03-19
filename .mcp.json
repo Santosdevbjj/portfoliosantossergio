@@ -1,15 +1,20 @@
 {
   "mcpServers": {
-    "next-devtools": {
-      "description": "Next.js 16 DevTools MCP",
-      "command": "node",
-      "args": ["mcp-env.js"],
+    "next-agent-devtools": {
+      "description": "Next.js 16.2 Official Agent Inspector (next-browser)",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@vercel/next-browser",
+        "serve"
+      ],
       "env": {
-        "NODE_ENV": "development"
+        "NODE_ENV": "development",
+        "NEXT_DEBUG_PPR": "true"
       }
     },
     "typescript-analyzer": {
-      "description": "TypeScript 6.0 Analyzer",
+      "description": "TypeScript 6.0 Strict Analyzer",
       "command": "npx",
       "args": [
         "-y",
@@ -18,14 +23,27 @@
         "tsconfig.json"
       ]
     },
-    "i18n-dictionary-helper": {
-      "description": "Auxiliar de dicionários e traduções",
+    "portfolio-assets-helper": {
+      "description": "Validador de Assets (PDFs, OGs e Dicionários)",
       "command": "npx",
       "args": [
         "-y",
-        "mcp-server-filesystem",
-        "./src/dictionaries"
+        "@modelcontextprotocol/server-filesystem",
+        "./src/dictionaries",
+        "./public/pdf",
+        "./public/og"
       ]
+    },
+    "github-portfolio-sync": {
+      "description": "Sincronização de metadados do GitHub",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE"
+      }
     }
   }
 }
