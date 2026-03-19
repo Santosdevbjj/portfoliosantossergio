@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 // Importação rigorosa de tipos conforme src/types/dictionary.ts
-import type { Dictionary, Locale, ConstructionDictionary } from "@/types/dictionary";
+// Removido 'Dictionary' que não estava sendo usado explicitamente como tipo de variável
+import type { Locale, ConstructionDictionary } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
 
 import { resolveProjectTechnology } from "@/domain/projects";
@@ -139,7 +140,7 @@ export default async function HomePage({ params }: PageProps) {
   if (!locales.includes(locale)) notFound();
   const lang = locale as Locale;
 
-  // Busca de dados
+  // Busca de dados (Dicionário tipado implicitamente pelo retorno da função)
   const [dict, repos] = await Promise.all([
     getServerDictionary(lang),
     getPortfolioRepos("Santosdevbjj").catch(() => []),
@@ -150,12 +151,11 @@ export default async function HomePage({ params }: PageProps) {
   const projects = normalizeProjects(repos);
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
 
-  // Prevenção de erro de build: extração segura do primeiro artigo
   const featuredArticle = dict.articles.items?.[0];
 
   return (
     <ProxyPage lang={lang}>
-      <main className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <main className="flex min-h-screen flex-col bg-white dark:bg-[#020617] transition-colors duration-300">
         
         {/* HERO SECTION */}
         <HeroSection dictionary={dict} />
@@ -223,7 +223,7 @@ export default async function HomePage({ params }: PageProps) {
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* CARD MEDIUM - PREMIADO (Verificação de segurança no featuredArticle) */}
+              {/* CARD MEDIUM - PREMIADO */}
               <div className="group relative flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-xl">
                 <div className="absolute top-8 right-8">
                   <span className="px-2 py-1 rounded-full bg-amber-400 text-black text-[9px] font-black uppercase">
