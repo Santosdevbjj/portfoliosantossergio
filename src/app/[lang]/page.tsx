@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 // Importação rigorosa de tipos conforme src/types/dictionary.ts
-import type { Dictionary, Locale } from "@/types/dictionary";
+import type { Dictionary, Locale, ConstructionDictionary } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
 
 import { resolveProjectTechnology } from "@/domain/projects";
@@ -33,7 +33,6 @@ import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 export const dynamic = "force-static";
 export const revalidate = 3600;
 
-// Gera os caminhos estáticos para todos os idiomas suportados
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
@@ -49,7 +48,7 @@ interface PageProps {
 }
 
 /**
- * METADADOS DINÂMICOS (SEO) - Suporte Total Multilingue (PT, EN, ES-ES, ES-AR, ES-MX)
+ * METADADOS DINÂMICOS (SEO) - Suporte Total Multilingue
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -61,7 +60,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const fullUrl = `${siteUrl}/${locale}`;
   const ogImage = `${siteUrl}/og/og-image-${locale}.png`;
 
-  // Mapeamento de títulos para SEO por localidade específica
   const titles: Record<SupportedLocale, string> = {
     "pt-BR": "Sérgio Santos | Cientista de Dados e Engenheiro de Software",
     "en-US": "Sérgio Santos | Data Scientist & Software Engineer",
@@ -71,11 +69,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 
   const title = titles[locale] || titles["en-US"];
-  const description = "Especialista em Ciência de Dados e IA com foco em Sistemas Críticos e Missão Crítica.";
-
+  
   return {
     title,
-    description,
+    description: "Especialista em Ciência de Dados e IA com foco em Sistemas Críticos e Missão Crítica.",
     metadataBase: new URL(siteUrl),
     alternates: {
       canonical: fullUrl,
@@ -85,7 +82,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: fullUrl,
       type: "website",
       title,
-      description,
+      description: "Data Scientist specialist in Critical Systems.",
       siteName: "Sérgio Santos Portfolio",
       locale: locale.replace("-", "_"),
       images: [{ 
@@ -98,7 +95,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: "summary_large_image",
       title,
-      description,
       images: [ogImage],
     },
     icons: {
@@ -134,7 +130,7 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
 }
 
 /**
- * COMPONENTE PRINCIPAL (SERVER COMPONENT - React 19 / Node 24)
+ * COMPONENTE PRINCIPAL
  */
 export default async function HomePage({ params }: PageProps) {
   const { lang: rawLang } = await params;
@@ -143,9 +139,9 @@ export default async function HomePage({ params }: PageProps) {
   if (!locales.includes(locale)) notFound();
   const lang = locale as Locale;
 
-  // Busca paralela de dados (Dicionário + Repositórios)
+  // Busca de dados
   const [dict, repos] = await Promise.all([
-    getServerDictionary(lang) as Promise<Dictionary>,
+    getServerDictionary(lang),
     getPortfolioRepos("Santosdevbjj").catch(() => []),
   ]);
 
@@ -154,6 +150,9 @@ export default async function HomePage({ params }: PageProps) {
   const projects = normalizeProjects(repos);
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
 
+  // Prevenção de erro de build: extração segura do primeiro artigo
+  const featuredArticle = dict.articles.items?.[0];
+
   return (
     <ProxyPage lang={lang}>
       <main className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
@@ -161,13 +160,12 @@ export default async function HomePage({ params }: PageProps) {
         {/* HERO SECTION */}
         <HeroSection dictionary={dict} />
 
-        {/* PROJETO DE RISCO (DESTAQUE) - Correção de Tipagem TypeScript */}
+        {/* PROJETO DE RISCO (DESTAQUE) */}
         <section className="py-12 px-4">
           <div className="mx-auto max-w-7xl">
-            {dict.construction ? (
-              /* Cast para 'any' ou adequação à interface esperada pelo componente para evitar erro de build */
-              <ConstructionRiskProject dict={dict.construction as any} />
-            ) : null}
+            {dict.construction && (
+              <ConstructionRiskProject dict={dict.construction as ConstructionDictionary} />
+            )}
           </div>
         </section>
 
@@ -186,7 +184,7 @@ export default async function HomePage({ params }: PageProps) {
         <section id="projects" className="py-20 scroll-mt-20">
           <div className="mx-auto max-w-7xl px-4 mb-10 text-center md:text-left">
             <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
-              {lang === "pt-BR" ? "Projetos" : lang.startsWith("es") ? "Proyectos" : "Projects"}{" "}
+              {dict.projects.title}{" "}
               <span className="text-blue-600">Full-Stack</span>
             </h2>
           </div>
@@ -225,11 +223,11 @@ export default async function HomePage({ params }: PageProps) {
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* CARD MEDIUM - PREMIADO */}
+              {/* CARD MEDIUM - PREMIADO (Verificação de segurança no featuredArticle) */}
               <div className="group relative flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-xl">
                 <div className="absolute top-8 right-8">
                   <span className="px-2 py-1 rounded-full bg-amber-400 text-black text-[9px] font-black uppercase">
-                    {dict.articles.awardWinner}
+                    {dict.articles.bestOfMonth}
                   </span>
                 </div>
                 <div className="flex flex-col md:flex-row items-center gap-6 mb-8 mt-6">
@@ -240,17 +238,22 @@ export default async function HomePage({ params }: PageProps) {
                       fill 
                       className="object-cover" 
                       sizes="128px"
+                      priority
                     />
                   </div>
                   <div className="flex-1 text-center md:text-left">
-                    <p className="text-[10px] font-bold uppercase text-blue-600 mb-1">{dict.articles.items[0]?.category}</p>
-                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">{dict.articles.items[0]?.title}</h3>
+                    <p className="text-[10px] font-bold uppercase text-blue-600 mb-1">
+                      {featuredArticle?.category || "Data Strategy"}
+                    </p>
+                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">
+                      {featuredArticle?.title || dict.articles.title}
+                    </h3>
                   </div>
                 </div>
                 <div className="mt-auto pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-2">
-                  <a href="https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border rounded-xl text-xs font-black hover:bg-blue-600 hover:text-white transition-colors">PT</a>
-                  <a href="https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border rounded-xl text-xs font-black hover:bg-blue-600 hover:text-white transition-colors">EN</a>
-                  <a href="https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad" target="_blank" className="px-4 py-2 bg-white dark:bg-slate-800 border rounded-xl text-xs font-black hover:bg-blue-600 hover:text-white transition-colors">ES</a>
+                  <a href={featuredArticle?.link} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white dark:bg-slate-800 border rounded-xl text-xs font-black hover:bg-blue-600 hover:text-white transition-colors">
+                    {dict.articles.readMore}
+                  </a>
                 </div>
               </div>
 
@@ -262,7 +265,7 @@ export default async function HomePage({ params }: PageProps) {
                   </div>
                   <div>
                     <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">
-                      {lang === "pt-BR" ? "Artigos Internos" : lang.startsWith("es") ? "Artículos Internos" : "Internal Articles"}
+                      {dict.common.nav.articles}
                     </h3>
                   </div>
                 </div>
