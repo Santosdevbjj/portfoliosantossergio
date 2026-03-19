@@ -5,7 +5,8 @@ import { getDictionary } from '@/dictionaries';
 import { isValidLocale, SUPPORTED_LOCALES } from '@/dictionaries/locales';
 import type { Locale } from '@/types/dictionary';
 
-const SITE_URL = 'https://portfoliosantossergio.vercel.app';
+// SITE_URL dinâmico via variável de ambiente ou fallback seguro
+const SITE_URL = process.env['NEXT_PUBLIC_SITE_URL'] ?? 'https://portfoliosantossergio.vercel.app';
 
 interface MetadataProps {
   params: Promise<{
@@ -13,6 +14,13 @@ interface MetadataProps {
   }>;
 }
 
+/**
+ * Geração de Metadados Dinâmicos - Next.js 16.2.0 (Turbopack Ready)
+ * -----------------------------------------------------------------------------
+ * ✔ TypeScript 6.0 Safe: Acesso via Index Signature ['home']
+ * ✔ React 19: Params como Promise
+ * ✔ Multilingue: Suporte a 5 locales e imagens OG localizadas na pasta /og/
+ */
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
 
@@ -20,13 +28,18 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     notFound();
   }
 
-  const lang: Locale = rawLang;
+  const lang = rawLang as Locale;
   const dict = await getDictionary(lang);
 
-  const pageTitle = dict.seo.pages?.home?.title ?? dict.seo.siteName;
-  const pageDescription = dict.seo.pages?.home?.description ?? dict.seo.description;
+  /**
+   * FIX TYPE ERROR: 
+   * Como dict.seo.pages é um objeto dinâmico, o TS 6.0 exige o acesso via ['home'].
+   */
+  const homePage = dict.seo.pages?.['home'];
+  const pageTitle = homePage?.title ?? dict.seo.siteName;
+  const pageDescription = homePage?.description ?? dict.seo.description;
 
-  // Mapa de imagens na nova pasta /og/
+  // Mapa de imagens na pasta /og/ conforme sua estrutura física
   const ogImageMap: Record<Locale, string> = {
     'pt-BR': 'og/og-image-pt-BR.png',
     'en-US': 'og/og-image-en-US.png',
@@ -45,6 +58,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
 
   const finalOgImage = `${SITE_URL}/${ogImageMap[lang]}`;
   
+  // Mapeamento de links alternativos para SEO multilingue
   const languages = SUPPORTED_LOCALES.reduce((acc, loc) => {
     acc[loc] = `${SITE_URL}/${loc}`;
     return acc;
@@ -57,10 +71,6 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       template: `%s | ${dict.seo.siteName}`,
     },
     description: pageDescription,
-    // fb:app_id ajuda na validação da Meta
-    other: {
-      'fb:app_id': 'SEU_ID_DO_FACEBOOK_AQUI', // Se não tiver, pode remover esta linha
-    },
     alternates: {
       canonical: `${SITE_URL}/${lang}`,
       languages: {
@@ -78,8 +88,8 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       images: [
         {
           url: finalOgImage,
-          width: 1200, // Especificado conforme Documentação Meta
-          height: 630, // Especificado conforme Documentação Meta
+          width: 1200,
+          height: 630,
           alt: pageTitle,
           type: 'image/png',
         },
@@ -91,7 +101,6 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       description: pageDescription,
       images: [finalOgImage],
     },
-    // Demais metadados de ícones e robôs seguem sua estrutura
     icons: {
       icon: [
         { url: '/icons/favicon.ico', sizes: 'any' },
