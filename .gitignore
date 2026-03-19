@@ -5,16 +5,20 @@ node_modules/
 .pnp
 .pnp.js
 .yarn/
-# Lockfiles são essenciais (MANTENHA package-lock.json ou pnpm-lock.yaml)
 
 # =====================================================
-# BUILD E SAÍDA — Next.js 16 + Turbopack
+# NEXT.JS 16.2 + TURBOPACK (NOVIDADES)
 # =====================================================
 .next/
 # IMPORTANTE: Mantemos o cache para acelerar builds na Vercel/CI
 !.next/cache/
-.next/trace
+
+# NOVO NA 16.2: Arquivos de controle de agentes e logs de dev
+.next/dev/lock
+.next/dev/logs/
 .next/types
+.next/trace
+
 out/
 build/
 dist/
@@ -23,7 +27,6 @@ dist/
 # TypeScript 6.0 Incremental & Metadata
 *.tsbuildinfo
 next-env.d.ts
-# O TS 6.0 gera definições automáticas para Server Actions e Metadata
 .next/server-reference-manifest.json
 
 # =====================================================
@@ -35,18 +38,17 @@ next-env.d.ts
 .env.test.local
 .env.production.local
 .env*.local
-# Arquivos de credenciais de Cloud/Databricks
+!.env.example
+
+# Credenciais e Chaves
 .azure/
 .aws/
 *.pem
 *.key
 *.pub
 
-# Permitir apenas o modelo de exemplo
-!.env.example
-
 # =====================================================
-# LOGS, CACHE E PERFORMANCE (Turborepo / Nx)
+# LOGS E CACHE DE FERRAMENTAS
 # =====================================================
 npm-debug.log*
 yarn-debug.log*
@@ -61,7 +63,17 @@ coverage/
 .nyc_output/
 
 # =====================================================
-# SISTEMA OPERACIONAL
+# ASSETS DO PORTFÓLIO (PROTEÇÃO)
+# =====================================================
+# Garantimos que os binários oficiais sejam enviados, 
+# mas ignoramos arquivos temporários de edição.
+public/pdf/*.tmp
+public/pdf/*.bak
+public/og/*.tmp
+*.crdownload
+
+# =====================================================
+# SISTEMA OPERACIONAL E IDEs
 # =====================================================
 .DS_Store
 .DS_Store?
@@ -69,9 +81,6 @@ coverage/
 Thumbs.db
 desktop.ini
 
-# =====================================================
-# IDEs E EDITORES
-# =====================================================
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
@@ -81,9 +90,9 @@ desktop.ini
 *.swo
 
 # =====================================================
-# CIÊNCIA DE DADOS E BACKEND (Python/SQL/Neo4J)
+# ENGENHARIA DE DADOS (Python/SQL/Parquet)
 # =====================================================
-# Ignora arquivos de dados pesados e temporários
+# Ignora datasets pesados que devem estar no DVC ou Cloud Storage
 *.csv
 *.xlsx
 *.parquet
@@ -102,7 +111,7 @@ __pycache__/
 .python-version
 
 # =====================================================
-# ARQUIVOS TEMPORÁRIOS E BACKUPS
+# TEMPORÁRIOS E BACKUPS
 # =====================================================
 *.tmp
 *.temp
