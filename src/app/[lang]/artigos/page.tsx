@@ -6,9 +6,6 @@ import { getServerDictionary } from "@/lib/getServerDictionary";
 import { getAllArticlesRecursively } from "@/lib/github-scanner";
 import type { Locale } from "@/types/dictionary";
 
-// Forçamos a página a ser dinâmica para refletir mudanças no GitHub sem novo deploy
-export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // Revalida a cada 1 hora
 
 /**
  * PÁGINA DE LISTAGEM DE ARTIGOS - DINÂMICA
