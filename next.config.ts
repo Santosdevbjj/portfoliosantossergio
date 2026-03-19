@@ -1,12 +1,11 @@
 import type { NextConfig } from "next";
 
 /**
- * NEXT.JS 16 CONFIGURATION - SERGIO SANTOS PORTFOLIO
+ * NEXT.JS 16.2 CONFIGURATION - SERGIO SANTOS PORTFOLIO
  * -----------------------------------------------------------------------------
- * ✔ React Compiler: Estável (Next.js 16)
- * ✔ PDF Support: Otimizado para visualização e download via public/pdf/
- * ✔ OG Images: Cache imutável para as versões multilingue em public/og/
- * ✔ Performance: Node 24 + Turbopack compatibilidade
+ * ✔ AI Ready: AGENTS.md + Browser Log Forwarding
+ * ✔ PPR: Estabilizado como cacheComponents
+ * ✔ Turbopack: Configuração de nível superior (Out of Experimental)
  */
 
 const nextConfig: NextConfig = {
@@ -14,10 +13,18 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   reactCompiler: true, 
-  typedRoutes: true, 
+  typedRoutes: true,
+  
+  // NOVA REGRA 16.2: PPR agora é ativado aqui
+  cacheComponents: true,
+
+  // NOVA REGRA 16.2: Encaminha erros do navegador para o seu terminal de IA
+  logging: {
+    fetches: { fullUrl: true },
+    browserToTerminal: true, 
+  },
 
   experimental: {
-    // Adicionado react-pdf para garantir compatibilidade com Server Components no Next 16
     serverComponentsExternalPackages: [
       "octokit", 
       "@octokit/core", 
@@ -34,17 +41,15 @@ const nextConfig: NextConfig = {
       "date-fns"
     ],
     taint: true, 
-    staleTimes: {
-      dynamic: 30,
-      static: 180,
-    },
+    // Melhoria de scroll baseada no comportamento nativo do browser (16.2)
+    appNewScrollHandler: true,
   },
 
   images: {
     formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    // 16.2 removeu o valor 16 do padrão, mantendo compatibilidade aqui
     imageSizes: [16, 32, 48, 64, 96, 128],
-    minimumCacheTTL: 3600,
+    minimumCacheTTL: 14400, // Aumentado para 4h conforme padrão da v16
     dangerouslyAllowSVG: true,
     remotePatterns: [
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
@@ -53,16 +58,12 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Configuração de Webpack para suporte nativo a arquivos PDF se importados via TS
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.pdf$/,
-      type: 'asset/resource',
-      generator: {
-        filename: 'static/pdf/[name][ext]',
-      },
-    });
-    return config;
+  // Turbopack agora no nível superior
+  turbopack: {
+    resolveAlias: {
+      // Garante que o PDF.js funcione corretamente no Turbopack
+      'canvas': './empty.ts',
+    },
   },
 
   async headers() {
@@ -76,26 +77,22 @@ const nextConfig: NextConfig = {
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }
         ],
       },
-      // CORREÇÃO: Cache imutável para os currículos na pasta /pdf/
+      // Suporte Multilingue para CVs (pt-BR, en-US, es-ES, es-AR, es-MX)
       {
-        source: '/pdf/cv-sergio-santos-:lang.pdf',
+        source: '/pdf/cv-sergio-santos-:lang(pt-BR|en-US|es-ES|es-AR|es-MX).pdf',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
           { key: 'Content-Type', value: 'application/pdf' },
-          { key: 'Content-Disposition', value: 'inline' } // Permite abrir no navegador em vez de forçar download
+          { key: 'Content-Disposition', value: 'inline' }
         ],
       },
-      // CORREÇÃO: Cache imutável para as OG Images na pasta /og/
+      // Suporte Multilingue para OG Images
       {
-        source: '/og/og-image-:lang.png',
+        source: '/og/og-image-:lang(pt-BR|en-US|es-ES|es-AR|es-MX).png',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
-        source: '/images/:path*',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
-      },
-      {
-        source: '/icons/:path*',
+        source: '/(images|icons)/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       }
     ];
