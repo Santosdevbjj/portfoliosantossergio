@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
-export const runtime = 'edge';
 
 // Tipagem rigorosa para TypeScript 6.0
 export async function GET(req: NextRequest) {
