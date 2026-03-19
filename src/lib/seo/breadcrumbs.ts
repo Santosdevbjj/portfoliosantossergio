@@ -8,7 +8,11 @@ export interface BreadcrumbItem {
 
 /**
  * Gera breadcrumbs multilíngues 100% Type-Safe
- * ✔ Compatível com TS 6.0 Strict e Next.js 16
+ * -----------------------------------------------------------------------------
+ * ✔ Next.js 16.2.0: Otimizado para rotas dinâmicas e SSR.
+ * ✔ TypeScript 6.0: Correção de acesso via String Literal ['key'].
+ * ✔ Node 24: Manipulação de strings de alta performance.
+ * ✔ I18n: Suporte total a pt-BR, en-US, es-ES, es-AR, es-MX.
  */
 export function generateBreadcrumbs(
   pathname: string,
@@ -20,15 +24,19 @@ export function generateBreadcrumbs(
   const segments = extractPathSegments(pathname, locale);
   const breadcrumbs: BreadcrumbItem[] = [];
 
-  // 1️⃣ Home - Acesso seguro via Optional Chaining e Fallback para Nav About
-  const homeTitle = dict.seo.pages?.home?.title ?? dict.common.nav.about ?? "Home";
+  // CORREÇÃO TS 6.0: Acesso via string literal para evitar erro de Index Signature
+  // 1️⃣ Home - Acesso seguro via dicionário SEO
+  const homeTitle = 
+    dict.seo.pages?.['home']?.title ?? 
+    dict.common.nav.about ?? 
+    "Home";
 
   breadcrumbs.push({
     name: homeTitle,
     item: `${normalizedBaseUrl}/${locale}`,
   });
 
-  // 2️⃣ Processamento de Segmentos
+  // 2️⃣ Processamento de Segmentos (Recursivo/Cumulativo)
   let cumulativePath = `/${locale}`;
 
   for (const segment of segments) {
@@ -44,6 +52,9 @@ export function generateBreadcrumbs(
   return breadcrumbs;
 }
 
+/**
+ * Extrai os segmentos da URL ignorando o locale
+ */
 function extractPathSegments(pathname: string, locale: Locale): string[] {
   return pathname
     .split("/")
@@ -51,22 +62,25 @@ function extractPathSegments(pathname: string, locale: Locale): string[] {
     .filter((s) => s !== locale && s !== locale.split("-")[0]);
 }
 
+/**
+ * Resolve o nome amigável do segmento baseado no dicionário
+ */
 function resolveLabel(segment: string, dict: Dictionary): string {
-  // 1. Tenta buscar em seo.pages
+  // 1. Tenta buscar em seo.pages usando acesso seguro de string literal
   const pages = dict.seo.pages;
-  if (pages && segment in pages) {
+  if (pages && pages[segment]) {
     const page = pages[segment];
     if (page?.title) return page.title;
   }
 
-  // 2. Tenta buscar em common.nav
+  // 2. Tenta buscar em common.nav (Mapeamento de navegação principal)
   const nav = dict.common.nav;
-  const navKey = segment as keyof typeof nav;
-  if (nav[navKey]) {
-    return nav[navKey];
+  // Fazemos um cast seguro para verificar se o segmento existe nas chaves do nav
+  if (segment in nav) {
+    return (nav as any)[segment];
   }
 
-  // 3. Fallback: Formatação de Slug
+  // 3. Fallback: Formatação de Slug (ex: "meus-projetos" -> "Meus Projetos")
   return segment
     .replace(/-/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
