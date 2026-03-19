@@ -20,17 +20,15 @@
     "prettier-plugin-tailwindcss"
   ],
 
-  "// Import Sorting Config": "Alinhado com a estrutura de pastas src/ do projeto",
+  "// Import Sorting": "Prioriza React 19, Next 16.2 e Dicionários Multilíngues",
   "importOrder": [
     "^(react/(.*)$)|^(react$)",
     "^(next/(.*)$)|^(next$)",
     "<THIRD_PARTY_MODULES>",
     "",
-    "^@/types/(.*)$",
     "^@/dictionaries/(.*)$",
-     "^@/config/(.*)$",
-    "^@/domain/(.*)$",
-    "^@/services/(.*)$", 
+    "^@/types/(.*)$",
+    "^@/config/(.*)$",
     "^@/lib/(.*)$",
     "^@/hooks/(.*)$",
     "^@/components/(.*)$",
@@ -40,17 +38,14 @@
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
 
-  "// Tailwind Config": "Detecta classes em cn(), clsx e atributos personalizados",
+  "// Tailwind Config": "Otimizado para Tailwind v4.2 e funções de junção de classes",
   "tailwindAttributes": ["className", "class", "tw"],
   "tailwindFunctions": ["clsx", "twMerge", "twJoin", "cn", "cva"],
   "tailwindConfig": "./tailwind.config.ts",
 
   "overrides": [
     {
-      "files": [
-        "src/app/api/**/*",
-        "src/app/**/og.*"
-      ],
+      "files": ["src/app/api/**/*", "src/app/**/og.*"],
       "options": {
         "printWidth": 120,
         "bracketSameLine": true,
@@ -62,6 +57,13 @@
       "options": {
         "parser": "json",
         "singleQuote": false
+      }
+    },
+    {
+      "// Proteção de Assets": "Garante que o linter não toque em referências binárias",
+      "files": ["public/**/*", "**/*.pdf", "**/*.png"],
+      "options": {
+        "requirePragma": true
       }
     }
   ]
