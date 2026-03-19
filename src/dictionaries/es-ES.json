@@ -7,43 +7,55 @@
     "author": "Sérgio Santos",
     "source": "manual",
     "contentVersion": "2026.03.08",
-    "contentHash": "i18n-es-ES-2026-03-08",
+    "contentHash": "i18n-eses-2026-03-08",
     "sourceType": "curated-manual",
-    "description": "Portafolio de Sérgio Santos: Especialista en Ciencia de Datos, IA e Ingeniería de Software con enfoque en Sistemas Críticos y Misión Crítica. Explore mis proyectos y artículos técnicos."
+    "description": "Portafolio de Sérgio Santos: Especialista en Ciencia de Datos, IA e Ingeniería de Software con enfoque en Sistemas Críticos y Misión Crítica. Vea proyectos y artículos técnicos."
   },
 
   "hero": {
     "greeting": "Disponible para Proyectos Críticos",
-    "title": "Ciencia de Datos",
+    "title": "Científico de Datos",
     "subtitle": "Datos y Resiliencia",
     "headline": "Especialista en transformar infraestructuras complejas en sistemas de alta disponibilidad y pipelines de datos escalables.",
     "ctaPrimary": "Ver Proyectos"
   },
 
+  "construction": {
+    "badge": "Análisis de Riesgo e IA",
+    "title": "Predicción de Riesgos en Construcción Civil",
+    "description": "Desarrollo de modelos predictivos para identificar cuellos de botella operativos y riesgos estructurales en grandes obras, utilizando redes neuronales y análisis de series temporales.",
+    "techStack": ["Python", "TensorFlow", "Azure Data Factory", "Power BI"],
+    "viewProject": "Explorar Solución",
+    "metrics": {
+      "accuracy": "94%",
+      "label": "Precisión del Modelo"
+    }
+  },
+
   "about": {
-    "title": "Sobre mí",
-    "differentialTitle": "Ingeniería de Datos con Enfoque en Sistemas de Misión Crítica",
-    "description": "Científico de Datos con una sólida base en sistemas bancarios críticos y enfocado en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
-    "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente enfoco mi trabajo en Ciencia de Datos e IA.",
+    "title": "Sobre Mí",
+    "differentialTitle": "Ingeniería de Datos con Enfoque en Misión Crítica",
+    "description": "Científico de Datos con una sólida base en sistemas críticos bancarios y enfoque en transformar datos en decisiones, reducción de costes y eficiencia operativa.",
+    "differentialContent": "Trabajé durante más de 15 años en Banco Bradesco en entornos regulados de misión crítica. Actualmente dirijo mi carrera hacia la Ciencia de Datos e IA.",
     "highlights": [
-      "Más de 15 años en banca",
-      "Especialista en cloud",
-      "Data Science e IA"
+      "15+ años en Banca",
+      "Especialista Cloud",
+      "Data Science & IA"
     ],
     "stats": {
       "experienceValue": "+15",
       "experienceLabel": "Años",
       "availabilityValue": "99.9%",
-      "availabilityLabel": "Disponibilidad",
-      "automation": "Sistemas 100% automatizados"
+      "availabilityLabel": "Uptime",
+      "automation": "Sistemas 100% Automatizados"
     }
   },
 
   "contact": {
     "title": "¿Hablamos?",
     "subtitle": "Busco oportunidades en proyectos de gobernanza y modernización.",
-    "cta": "Enviar email",
-    "emailLabel": "Copiar email",
+    "cta": "Enviar Correo",
+    "emailLabel": "Copiar Correo",
     "cvLabel": "Ver CV",
     "linkedinLabel": "LinkedIn",
     "ctaTitle": "¿Construimos algo juntos?",
@@ -51,67 +63,68 @@
   },
 
   "experience": {
-    "title": "Experiencia profesional",
-    "emptyLabel": "No se encontró experiencia",
+    "title": "Experiencia Profesional",
+    "emptyLabel": "No se ha encontrado experiencia",
     "items": [
       {
-        "company": "Consultor independiente / transición",
+        "company": "Consultor Autónomo / Transición",
         "period": "2008 - Actualidad",
-        "role": "Especialista en sistemas críticos",
-        "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructuras resilientes."
+        "role": "Especialista en Sistemas Críticos",
+        "description": "Arquitectura y mantenimiento de pipelines de datos e infraestructura resiliente."
       }
     ]
   },
 
   "articles": {
-    "title": "Artículos técnicos",
+    "title": "Artículos Técnicos",
     "mediumProfile": "Ver perfil en Medium",
     "readMore": "Leer artículo completo",
-    "publishedAt": "Publicado en",
-    "bestOfMonth": "Destacado del mes",
-    "awardWinner": "Artículo premiado",
+    "publishedAt": "Publicado el",
+    "bestOfMonth": "Destacado del Mes",
+    "awardWinner": "Artículo Premiado",
     "items": [
       {
-        "title": "La era de los datos en sistemas críticos",
-        "description": "Cómo la gobernanza de datos transforma los sistemas heredados en activos estratégicos.",
+        "title": "La Era de los Datos en Sistemas Críticos",
+        "description": "Cómo la gobernanza de datos transforma sistemas heredados en activos estratégicos.",
         "date": "2025",
         "category": "Data Strategy",
         "isAward": true,
-        "link": "https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-en-semanas-5474e7dddfad"
+        "link": "https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e"
       }
     ]
   },
 
   "projects": {
-    "title": "Proyectos y soluciones",
-    "featuredLabel": "Destacado técnico",
-    "firstLabel": "Desafío y arquitectura",
-    "impactLabel": "Impacto y resultado",
+    "title": "Proyectos y Soluciones",
+    "featuredLabel": "Destacado Técnico",
+    "firstLabel": "Desafío y Arquitectura",
+    "impactLabel": "Impacto y Resultado",
     "problem": "Problema",
     "solution": "Solución",
     "viewProject": "Repositorio GitHub",
-    "viewDemo": "Ver demo",
-    "viewAll": "Ver todos",
+    "viewDemo": "Visualizar Demo",
+    "viewAll": "Ver Todos",
 
     "portfolio": {
       "all": "Todos",
-      "viewProject": "Ver proyecto"
+      "viewProject": "Ver Proyecto"
     },
 
     "categories": {
-      "dataEngineering": { "labelKey": "Ingeniería de datos" },
-      "cloudInfra": { "labelKey": "Nube e infraestructura" },
-      "dataScience": { "labelKey": "Ciencia de datos" },
-      "dataAnalytics": { "labelKey": "Análisis de datos" },
-      "other": { "labelKey": "Otros proyectos" },
+      "Data Engineering": { "labelKey": "Ingeniería de Datos" },
+      "Cloud & Infrastructure": { "labelKey": "Nube e Infraestructura" },
+      "Data Science": { "labelKey": "Ciencia de Datos" },
+      "Data Analytics": { "labelKey": "Análisis de Datos" },
+      "Outros": { "labelKey": "Otros Proyectos" },
 
+      "dataScience": { "labelKey": "Ciencia de Datos" },
       "cloud": { "labelKey": "Cloud & Databricks" },
-      "graphs": { "labelKey": "Análisis de grafos (Neo4J)" },
-      "analysis": { "labelKey": "Power BI y analítica" },
-      "excel": { "labelKey": "Excel y modelado de datos" },
-      "database": { "labelKey": "Bases de datos y SQL" },
+      "graphs": { "labelKey": "Análisis de Grafos (Neo4J)" },
+      "analysis": { "labelKey": "Análisis de Datos y Power BI" },
+      "excel": { "labelKey": "Excel y Modelado de Datos" },
+      "database": { "labelKey": "Base de Datos y SQL" },
 
-      "dev": { "labelKey": "Desarrollo de software" },
+      "dev": { "labelKey": "Desarrollo de Software" },
       "security": { "labelKey": "Ciberseguridad" },
 
       "html": { "labelKey": "HTML" },
@@ -121,7 +134,7 @@
       "next": { "labelKey": "Next.js" },
       "node": { "labelKey": "Node.js" },
       "react": { "labelKey": "React" },
-      "articles": { "labelKey": "Artículos técnicos" }
+      "articles": { "labelKey": "Artículos Técnicos" }
     },
 
     "featuredProjects": []
@@ -129,12 +142,12 @@
 
   "common": {
     "navigation": "Navegación principal",
-    "role": "Científico de datos | Python | SQL | Azure",
+    "role": "Científico de Datos | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
     "rights": "Todos los derechos reservados",
-    "builtWith": "Desarrollado con Next.js 16 y TypeScript",
+    "builtWith": "Desarrollado con Next.js 16 & TypeScript",
     "loading": "Cargando...",
-    "error": "Algo salió mal.",
+    "error": "Algo ha salido mal.",
     "socialLinks": "Abrir perfil de {platform}",
     "skipToContent": "Saltar al contenido",
     "languageSwitcher": "Cambiar idioma",
@@ -176,12 +189,12 @@
     "empty": "Sin datos.",
     "error": "Error al cargar.",
     "emptyProjects": {
-      "title": "Ningún proyecto",
+      "title": "Sin proyectos",
       "description": "Próximamente.",
       "cta": "Volver"
     },
     "emptyExperience": "Sin registros.",
-    "errorArticles": "Error al cargar los artículos."
+    "errorArticles": "Error en los artículos."
   },
 
   "cookie": {
@@ -195,31 +208,18 @@
   },
 
   "seo": {
-    "siteName": "Sergio Santos | Portfolio",
-    "title": "Sergio Santos",
-    "description": "Científico de datos especializado en sistemas críticos y de misión crítica.",
+    "siteName": "Sérgio Santos | Portafolio",
+    "title": "Sérgio Santos",
+    "description": "Científico de Datos especialista en Sistemas Críticos y Misión Crítica.",
     "keywords": [
-      "Ciencia de datos",
+      "Ciencia de Datos",
+      "Data Science",
       "Machine Learning",
       "ETL",
       "Cloud Computing",
       "Azure",
       "Python"
-    ],
-    "pages": {
-      "home": {
-        "title": "Inicio",
-        "description": "Especialista en data pipelines y sistemas críticos."
-      },
-      "projects": {
-        "title": "Proyectos",
-        "description": "Soluciones de datos"
-      },
-      "articles": {
-        "title": "Artículos",
-        "description": "Contenido técnico"
-      }
-    }
+    ]
   },
 
   "metrics": {
@@ -231,11 +231,13 @@
   },
 
   "resume": {
-    "selectLanguage": "Seleccionar idioma",
+    "selectLanguage": "Seleccionar Idioma",
     "languages": {
       "pt-BR": "Portugués",
       "en-US": "Inglés",
-      "es-ES": "Español"
+      "es-ES": "Español",
+      "es-AR": "Español (AR)",
+      "es-MX": "Español (MX)"
     }
   },
 
