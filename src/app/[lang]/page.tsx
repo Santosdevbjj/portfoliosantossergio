@@ -3,9 +3,10 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react"; // Adicionado para conformidade com PPR
 
-// Importações de tipos rigorosas
-import type { Locale, ConstructionDictionary, ProjectDictionary } from "@/types/dictionary";
+// Importações de tipos rigorosas (TS 6.0)
+import type { Locale, ProjectDictionary } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
 
 import { resolveProjectTechnology } from "@/domain/projects";
@@ -26,10 +27,10 @@ import { CareerHighlights } from "@/components/CareerHighlights";
 import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 
 /**
- * CONFIGURAÇÕES DE RENDERIZAÇÃO - Next.js 16.2+ (Turbopack Ready)
+ * CONFIGURAÇÕES DE RENDERIZAÇÃO - Next.js 16.2+
+ * Removidas as constantes 'dynamic' e 'revalidate' pois são incompatíveis 
+ * com cacheComponents/PPR ativo no Turbopack.
  */
-export const dynamic = "force-static";
-export const revalidate = 3600;
 
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
@@ -46,7 +47,7 @@ interface PageProps {
 }
 
 /**
- * METADADOS DINÂMICOS (SEO) - Suporte Total Multilingue
+ * METADADOS DINÂMICOS (SEO) - React 19 / TS 6.0
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -98,9 +99,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-/**
- * NORMALIZAÇÃO DE PROJETOS GITHUB
- */
 function normalizeProjects(repos: any[]): ProjectDomain[] {
   if (!Array.isArray(repos)) return [];
   return repos
@@ -123,15 +121,17 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
 }
 
 /**
- * COMPONENTE PRINCIPAL
+ * COMPONENTE PRINCIPAL - Next.js 16.2 SSR/PPR
  */
 export default async function HomePage({ params }: PageProps) {
+  // Consumo da Promise de params (Obrigatório Next 16+)
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
   
   if (!locales.includes(locale)) notFound();
   const lang = locale as Locale;
 
+  // Busca paralela otimizada
   const [dict, repos] = await Promise.all([
     getServerDictionary(lang),
     getPortfolioRepos("Santosdevbjj").catch(() => []),
@@ -148,14 +148,16 @@ export default async function HomePage({ params }: PageProps) {
       <main className="flex min-h-screen flex-col bg-white dark:bg-[#020617] transition-colors duration-300">
         <HeroSection dictionary={dict} />
 
-        {/* PROJETO DE RISCO - CORREÇÃO DE TIPO APLICADA */}
+        {/* PROJETO DE RISCO - Envolvido em Suspense para PPR */}
         <section className="py-12 px-4">
           <div className="mx-auto max-w-7xl">
-            {dict.construction && (
-              <ConstructionRiskProject 
-                dict={dict.construction as unknown as ProjectDictionary} 
-              />
-            )}
+            <Suspense fallback={<div className="h-96 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-3xl" />}>
+              {dict.construction && (
+                <ConstructionRiskProject 
+                  dict={dict.construction as unknown as ProjectDictionary} 
+                />
+              )}
+            </Suspense>
           </div>
         </section>
 
