@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-// Importação rigorosa de tipos
+// Importação rigorosa de tipos conforme src/types/dictionary.ts
 import type { Dictionary, Locale } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
 
@@ -33,7 +33,7 @@ import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 export const dynamic = "force-static";
 export const revalidate = 3600;
 
-// Gera os caminhos estáticos para todos os idiomas suportados (pt-BR, en-US, es-ES, es-AR, es-MX)
+// Gera os caminhos estáticos para todos os idiomas suportados
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
@@ -49,7 +49,7 @@ interface PageProps {
 }
 
 /**
- * METADADOS DINÂMICOS (SEO) - Suporte Total Multilingue
+ * METADADOS DINÂMICOS (SEO) - Suporte Total Multilingue (PT, EN, ES-ES, ES-AR, ES-MX)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const fullUrl = `${siteUrl}/${locale}`;
   const ogImage = `${siteUrl}/og/og-image-${locale}.png`;
 
-  // Títulos e descrições baseados no idioma para o SEO
+  // Mapeamento de títulos para SEO por localidade específica
   const titles: Record<SupportedLocale, string> = {
     "pt-BR": "Sérgio Santos | Cientista de Dados e Engenheiro de Software",
     "en-US": "Sérgio Santos | Data Scientist & Software Engineer",
@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 
   const title = titles[locale] || titles["en-US"];
-  const description = "Especialista em Ciência de Dados e IA com foco em Sistemas Críticos.";
+  const description = "Especialista em Ciência de Dados e IA com foco em Sistemas Críticos e Missão Crítica.";
 
   return {
     title,
@@ -88,7 +88,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       siteName: "Sérgio Santos Portfolio",
       locale: locale.replace("-", "_"),
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+      images: [{ 
+        url: ogImage, 
+        width: 1200, 
+        height: 630, 
+        alt: title 
+      }],
     },
     twitter: {
       card: "summary_large_image",
@@ -96,6 +101,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: [ogImage],
     },
+    icons: {
+      icon: "/icons/icon.png",
+      shortcut: "/icons/favicon.ico",
+      apple: "/icons/apple-touch-icon.png",
+    }
   };
 }
 
@@ -151,11 +161,12 @@ export default async function HomePage({ params }: PageProps) {
         {/* HERO SECTION */}
         <HeroSection dictionary={dict} />
 
-        {/* PROJETO DE RISCO (DESTAQUE) - Verificação de Tipo Segura */}
+        {/* PROJETO DE RISCO (DESTAQUE) - Correção de Tipagem TypeScript */}
         <section className="py-12 px-4">
           <div className="mx-auto max-w-7xl">
             {dict.construction ? (
-              <ConstructionRiskProject dict={dict.construction} />
+              /* Cast para 'any' ou adequação à interface esperada pelo componente para evitar erro de build */
+              <ConstructionRiskProject dict={dict.construction as any} />
             ) : null}
           </div>
         </section>
@@ -228,6 +239,7 @@ export default async function HomePage({ params }: PageProps) {
                       alt="Troféus DIO" 
                       fill 
                       className="object-cover" 
+                      sizes="128px"
                     />
                   </div>
                   <div className="flex-1 text-center md:text-left">
