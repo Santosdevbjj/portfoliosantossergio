@@ -4,9 +4,8 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-// Importação rigorosa de tipos conforme src/types/dictionary.ts
-// Removido 'Dictionary' que não estava sendo usado explicitamente como tipo de variável
-import type { Locale, ConstructionDictionary } from "@/types/dictionary";
+// Importações de tipos rigorosas
+import type { Locale, ConstructionDictionary, ProjectDictionary } from "@/types/dictionary";
 import type { ProjectDomain } from "@/domain/projects";
 
 import { resolveProjectTechnology } from "@/domain/projects";
@@ -20,16 +19,14 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import ExperienceSection from "@/components/ExperienceSection";
 import ContactSection from "@/components/ContactSection";
-
 import PdfSafeLoader from "@/components/pdf/PdfSafeLoader";
 import { ResumeLangSelector } from "@/components/pdf/ResumeLangSelector";
-
 import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { CareerHighlights } from "@/components/CareerHighlights";
 import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 
 /**
- * CONFIGURAÇÕES DE RENDERIZAÇÃO - Next.js 16+ (Turbopack Ready)
+ * CONFIGURAÇÕES DE RENDERIZAÇÃO - Next.js 16.2+ (Turbopack Ready)
  */
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -73,7 +70,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   
   return {
     title,
-    description: "Especialista em Ciência de Dados e IA com foco em Sistemas Críticos e Missão Crítica.",
+    description: "Especialista em Ciência de Dados e IA com foco em Sistemas Críticos.",
     metadataBase: new URL(siteUrl),
     alternates: {
       canonical: fullUrl,
@@ -86,12 +83,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: "Data Scientist specialist in Critical Systems.",
       siteName: "Sérgio Santos Portfolio",
       locale: locale.replace("-", "_"),
-      images: [{ 
-        url: ogImage, 
-        width: 1200, 
-        height: 630, 
-        alt: title 
-      }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
@@ -140,7 +132,6 @@ export default async function HomePage({ params }: PageProps) {
   if (!locales.includes(locale)) notFound();
   const lang = locale as Locale;
 
-  // Busca de dados (Dicionário tipado implicitamente pelo retorno da função)
   const [dict, repos] = await Promise.all([
     getServerDictionary(lang),
     getPortfolioRepos("Santosdevbjj").catch(() => []),
@@ -150,26 +141,24 @@ export default async function HomePage({ params }: PageProps) {
 
   const projects = normalizeProjects(repos);
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
-
   const featuredArticle = dict.articles.items?.[0];
 
   return (
     <ProxyPage lang={lang}>
       <main className="flex min-h-screen flex-col bg-white dark:bg-[#020617] transition-colors duration-300">
-        
-        {/* HERO SECTION */}
         <HeroSection dictionary={dict} />
 
-        {/* PROJETO DE RISCO (DESTAQUE) */}
+        {/* PROJETO DE RISCO - CORREÇÃO DE TIPO APLICADA */}
         <section className="py-12 px-4">
           <div className="mx-auto max-w-7xl">
             {dict.construction && (
-              <ConstructionRiskProject dict={dict.construction as ConstructionDictionary} />
+              <ConstructionRiskProject 
+                dict={dict.construction as unknown as ProjectDictionary} 
+              />
             )}
           </div>
         </section>
 
-        {/* SOBRE & HIGHLIGHTS */}
         <section id="about" className="scroll-mt-20">
           <AboutSection dict={dict.about} />
           <div className="mx-auto max-w-7xl px-4 py-12">
@@ -177,21 +166,17 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* EXPERIÊNCIA PROFISSIONAL */}
         <ExperienceSection experience={dict.experience} />
 
-        {/* GRID DE PROJETOS */}
         <section id="projects" className="py-20 scroll-mt-20">
           <div className="mx-auto max-w-7xl px-4 mb-10 text-center md:text-left">
             <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
-              {dict.projects.title}{" "}
-              <span className="text-blue-600">Full-Stack</span>
+              {dict.projects.title} <span className="text-blue-600">Full-Stack</span>
             </h2>
           </div>
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* CURRÍCULO (DINÂMICO PARA 5 IDIOMAS) */}
         <section id="resume" className="py-20 bg-slate-100/50 dark:bg-slate-900/20 border-y border-slate-200 dark:border-slate-800 scroll-mt-20">
           <div className="text-center mb-10 px-4">
             <h2 className="text-4xl font-black mb-8 text-slate-900 dark:text-white tracking-tighter">
@@ -208,7 +193,6 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* ARTIGOS E RECONHECIMENTO */}
         <section id="featured-articles" className="py-24 bg-white dark:bg-[#020617] scroll-mt-20">
           <div className="mx-auto max-w-7xl px-4">
             <header className="mb-16 text-center max-w-3xl mx-auto">
@@ -223,7 +207,6 @@ export default async function HomePage({ params }: PageProps) {
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* CARD MEDIUM - PREMIADO */}
               <div className="group relative flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-xl">
                 <div className="absolute top-8 right-8">
                   <span className="px-2 py-1 rounded-full bg-amber-400 text-black text-[9px] font-black uppercase">
@@ -238,7 +221,7 @@ export default async function HomePage({ params }: PageProps) {
                       fill 
                       className="object-cover" 
                       sizes="128px"
-                      priority
+                      priority 
                     />
                   </div>
                   <div className="flex-1 text-center md:text-left">
@@ -257,17 +240,14 @@ export default async function HomePage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* CARD INTERNO */}
               <Link href={`/${lang}/artigos`} className="group flex flex-col bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 shadow-xl hover:border-blue-500 transition-all">
                 <div className="flex items-center gap-4 mb-8">
                   <div className="p-3 bg-slate-900 dark:bg-white rounded-2xl text-white dark:text-black">
                     <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                   </div>
-                  <div>
-                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">
-                      {dict.common.nav.articles}
-                    </h3>
-                  </div>
+                  <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">
+                    {dict.common.nav.articles}
+                  </h3>
                 </div>
                 <div className="mt-auto flex items-center justify-between pt-5 border-t border-slate-200 dark:border-slate-800 text-xs font-black text-blue-600">
                   <span>{dict.articles.mediumProfile}</span>
@@ -278,7 +258,6 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* RODAPÉ E CONTATO */}
         <ContactSection contact={dict.contact} common={dict.common} locale={lang} />
       </main>
     </ProxyPage>
