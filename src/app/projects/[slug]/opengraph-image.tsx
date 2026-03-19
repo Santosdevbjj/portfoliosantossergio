@@ -2,10 +2,10 @@ import { ImageResponse } from 'next/og';
 import { Octokit } from 'octokit';
 
 /**
- * CONFIGURAÇÃO DE RUNTIME E CACHE (Next.js 16 + Node 24)
+ * CONFIGURAÇÃO DE RUNTIME E CACHE (Next.js 16.2 + Node 24)
  * -----------------------------------------------------------------------------
- * runtime: 'nodejs' é necessário para usar o cache em memória (Map) persistente na instância.
- * revalidate: 86400 (24 horas) - Instrução ISR para o Vercel Edge Cache.
+ * runtime: 'nodejs' para suporte completo a bibliotecas nativas no Node 24.
+ * revalidate: 86400 (24 horas) para persistência no Vercel Edge Cache.
  */
 export const runtime = 'nodejs';
 export const revalidate = 86400;
@@ -15,36 +15,39 @@ export const alt = 'GitHub Project Detail - Sérgio Santos';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-// Instância do Octokit
+/**
+ * ACESSO SEGURO (TS 6.0)
+ * Em conformidade com o erro do log: acesso via ['CHAVE'] para index signatures.
+ */
+const GITHUB_TOKEN = process.env['GITHUB_TOKEN'];
+
+// Instância do Octokit protegida
 const octokit = new Octokit({ 
-  auth: process.env.GITHUB_TOKEN,
+  auth: GITHUB_TOKEN,
   request: { timeout: 5000 } 
 });
 
-/**
- * IMPLEMENTAÇÃO DE SIMPLE MEMORY CACHE (Node 24)
- * Evita chamadas redundantes à API do GitHub se múltiplos usuários acessarem 
- * o link antes da CDN propagar a imagem.
- */
 interface RepoData {
   name: string;
   description: string;
   timestamp: number;
 }
 
+/**
+ * SIMPLE MEMORY CACHE (Node 24 Optimized)
+ */
 const repoCache = new Map<string, RepoData>();
-const CACHE_TTL = 1000 * 60 * 60; // 1 hora de cache interno
+const CACHE_TTL = 1000 * 60 * 60; // 1 hora
 
 async function getCachedRepoData(username: string, slug: string): Promise<{ name: string; description: string }> {
   const now = Date.now();
   const cached = repoCache.get(slug);
 
-  // Se estiver no cache e não expirou, retorna imediatamente
   if (cached && (now - cached.timestamp < CACHE_TTL)) {
     return { name: cached.name, description: cached.description };
   }
 
-  // Busca do GitHub com cabeçalhos de controle de cache
+  // Chamada à API com suporte a Stale-While-Revalidate (Next 16 pattern)
   const { data } = await octokit.rest.repos.get({
     owner: username,
     repo: slug,
@@ -55,7 +58,7 @@ async function getCachedRepoData(username: string, slug: string): Promise<{ name
 
   const result = {
     name: data.name,
-    description: data.description || "Engenharia de Dados & Automação",
+    description: data.description || "Data Engineering & AI Solutions",
     timestamp: now
   };
 
@@ -66,10 +69,10 @@ async function getCachedRepoData(username: string, slug: string): Promise<{ name
 /**
  * COMPONENTE PRINCIPAL (React 19 Server Component)
  */
-export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
-  // No Next.js 16, params deve ser aguardado (Promise)
+export default async function OgImage({ params }: { params: Promise<{ slug: string }> }) {
+  // Next.js 16.2 exige await para params
   const { slug } = await params;
-  const username = "Santosdevbjj";  // Importante: Substitua pelo seu login real
+  const username = "Santosdevbjj";
 
   let repoData = { 
     name: slug, 
@@ -80,8 +83,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     const data = await getCachedRepoData(username, slug);
     repoData = data;
   } catch (error) {
-    console.error(`❌ [OG-IMAGE] Erro ao buscar dados para ${slug}:`, error);
-    // Mantém o fallback definido acima
+    console.error(`❌ [OG-IMAGE] Erro:`, error);
   }
 
   return new ImageResponse(
@@ -94,64 +96,91 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'center',
-          backgroundColor: '#0f172a', // Slate 950 (Tailwind 4.2 style)
-          backgroundImage: 'radial-gradient(circle at 25% 25%, #1e293b 0%, #0f172a 100%)',
+          backgroundColor: '#020617', // Slate 950 (Tailwind 4.2 Core)
+          backgroundImage: 'radial-gradient(circle at 0% 0%, #1e1b4b 0%, #020617 100%)',
           padding: '80px',
         }}
       >
-        {/* Badge de Categoria */}
+        {/* Linha Decorativa Lateral - Estilo Moderno */}
+        <div style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '12px',
+          backgroundColor: '#3b82f6', // Blue 500
+        }} />
+
+        {/* Badge Dinâmico */}
         <div style={{
           display: 'flex',
-          backgroundColor: '#38bdf8', // Sky 400
-          color: '#0f172a',
-          padding: '8px 16px',
-          borderRadius: '4px',
-          fontSize: '24px',
-          fontWeight: 'bold',
-          marginBottom: '20px',
-          textTransform: 'uppercase'
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          border: '1px solid rgba(59, 130, 246, 0.3)',
+          color: '#60a5fa', // Blue 400
+          padding: '10px 20px',
+          borderRadius: '12px',
+          fontSize: '22px',
+          fontWeight: '900',
+          marginBottom: '32px',
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em'
         }}>
-          Data Project
+          GitHub Repository
         </div>
 
-        {/* Nome do Repositório (Dinâmico) */}
+        {/* Nome do Projeto - Tipografia de Impacto */}
         <h1 style={{
-          fontSize: '84px',
-          fontWeight: 'bold',
+          fontSize: '92px',
+          fontWeight: '900',
           color: 'white',
           margin: 0,
-          lineHeight: 1.1,
-          letterSpacing: '-0.02em',
+          lineHeight: 1,
+          letterSpacing: '-0.04em',
+          display: 'flex',
         }}>
-          {repoData.name}
+          {repoData.name.replace(/-/g, ' ')}
         </h1>
 
-        {/* Descrição curta */}
+        {/* Descrição - Layout Multiline */}
         <p style={{
-          fontSize: '32px',
-          color: '#94a3b8', // Slate 400
-          marginTop: '20px',
-          maxWidth: '900px',
+          fontSize: '34px',
+          color: '#94a3b8',
+          marginTop: '24px',
+          maxWidth: '850px',
           lineHeight: 1.4,
+          fontWeight: '400',
         }}>
           {repoData.description}
         </p>
 
-        {/* Footer com Identidade Visual */}
+        {/* Footer Consistente com a Identidade */}
         <div style={{
           display: 'flex',
           marginTop: 'auto',
           width: '100%',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          borderTop: '1px solid #1e293b',
-          paddingTop: '40px'
+          alignItems: 'flex-end',
         }}>
-          <div style={{ display: 'flex', color: 'white', fontSize: '28px', fontWeight: '600' }}>
-            Sérgio Santos
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ color: '#3b82f6', fontSize: '20px', fontWeight: '800', textTransform: 'uppercase', marginBottom: '4px' }}>
+              Lead Engineer
+            </span>
+            <span style={{ color: 'white', fontSize: '38px', fontWeight: '900' }}>
+              Sérgio Santos
+            </span>
           </div>
-          <div style={{ display: 'flex', color: '#38bdf8', fontSize: '24px' }}>
-            github.com/{username}
+          
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '12px',
+            backgroundColor: 'white',
+            padding: '12px 24px',
+            borderRadius: '16px'
+          }}>
+            <span style={{ color: '#020617', fontSize: '24px', fontWeight: '800' }}>
+              portfolio/santos
+            </span>
           </div>
         </div>
       </div>
