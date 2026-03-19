@@ -27,6 +27,19 @@ export interface HeroDictionary {
   ctaPrimary: string;
 }
 
+/* ================= CONSTRUCTION ================= */
+export interface ConstructionDictionary {
+  badge: string;
+  title: string;
+  description: string;
+  techStack: string[];
+  viewProject: string;
+  metrics: {
+    accuracy: string;
+    label: string;
+  };
+}
+
 /* ================= ABOUT ================= */
 export interface AboutDictionary {
   title: string;
@@ -296,6 +309,12 @@ export interface ResumeDictionary {
 export interface Dictionary {
   meta: DictionaryMeta;
   hero: HeroDictionary;
+
+  /**
+   * 🔥 NOVO - Seção de Projetos de Construção Civil / IA
+   */
+  construction: ConstructionDictionary;
+
   about: AboutDictionary;
   contact: ContactDictionary;
   experience: ExperienceDictionary;
