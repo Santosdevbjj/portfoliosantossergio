@@ -9,30 +9,37 @@ interface ManifestProps {
 }
 
 /**
- * Gera o Manifesto do PWA dinâmico e localizado.
- * ✔ Compatível com Next.js 16 (params como Promise)
- * ✔ TypeScript 6.0 Safe (Resolução de tipos opcionais)
- * ✔ Suporte a 5 Locales (PT-BR, EN-US, ES-ES, ES-AR, ES-MX)
+ * Geração de Manifesto PWA - Next.js 16.2.0 (Turbopack)
+ * -----------------------------------------------------------------------------
+ * ✔ TypeScript 6.0 Safe: Acesso via Index Signature ['home']
+ * ✔ React 19: Params como Promise (await params)
+ * ✔ Multilingue: PT-BR, EN-US, ES-ES, ES-AR, ES-MX
+ * ✔ Responsividade: Screenshots configurados para Mobile e Desktop
  */
 export default async function manifest(
   { params }: ManifestProps
 ): Promise<MetadataRoute.Manifest> {
   
+  // No Next.js 16.2, params deve ser aguardado
   const { lang: rawLang } = await params;
   
-  // Normalização para garantir o uso de um dos locales suportados
+  // Normalização rigorosa do locale
   const lang = normalizeLocale(rawLang) as Locale;
   const dict = await getDictionary(lang);
 
-  // Solução para o erro de Type: 'dict.seo.pages.home' is possibly 'undefined'
-  // Forçamos o reconhecimento da página home ou usamos o título geral como fallback
-  const homeTitle = dict.seo.pages?.home?.title || dict.seo.siteName;
+  /**
+   * FIX TYPE ERROR: 
+   * Como dict.seo.pages vem de um JSON dinâmico (Index Signature), 
+   * o TS 6.0 exige o acesso via ['home'].
+   */
+  const homePage = dict.seo.pages?.['home'];
+  const homeTitle = homePage?.title || dict.seo.siteName;
 
-  // Background e Theme alinhados com o design Slate-950 do portfólio
+  // Cor do tema Slate-950 (Tailwind 4.2 default dark)
   const themeColor = '#020617';
 
   return {
-    id: `portfolio-sergio-${lang}`,
+    id: `sergio-santos-pwa-${lang}`,
     lang: lang,
     dir: 'ltr',
     name: dict.seo.siteName,
@@ -49,6 +56,7 @@ export default async function manifest(
       'education',
       'portfolio',
       'software',
+      'data-science'
     ],
     icons: [
       {
@@ -71,13 +79,24 @@ export default async function manifest(
     ],
     screenshots: [
       {
-        // Aponta para os arquivos físicos confirmados (ex: og-image-pt-BR.png)
-        src: `/og-image-${lang}.png`,
+        /**
+         * CORREÇÃO DE CAMINHO: 
+         * Aponta para public/og/og-image-[lang].png conforme sua estrutura
+         */
+        src: `/og/og-image-${lang}.png`,
         sizes: '1200x630',
         type: 'image/png',
         form_factor: 'wide',
-        label: homeTitle,
+        label: `${homeTitle} - Desktop`,
       },
+      {
+        // Screenshot mobile para PWA responsivo
+        src: `/og/og-image-${lang}.png`,
+        sizes: '1200x630',
+        type: 'image/png',
+        form_factor: 'narrow',
+        label: `${homeTitle} - Mobile`,
+      }
     ],
   };
 }
