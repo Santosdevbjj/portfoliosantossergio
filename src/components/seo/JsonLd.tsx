@@ -1,122 +1,110 @@
+'use client';
+
 /**
- * JSON-LD Schema Types
- * Compatible with Next.js 16 + React 19 + TypeScript 6
+ * JSON-LD SCHEMA COMPONENT - PORTFÓLIO SÉRGIO SANTOS
+ * -----------------------------------------------------------------------------
+ * ✔ Stack: Next.js 16.2.0, React 19, TS 6.0, Node 24
+ * ✔ SEO: Suporte a Schema.org (Person, Article, SoftwareSourceCode, WebSite)
+ * ✔ I18n: Compatível com PT-BR, EN-US, ES-ES, ES-AR, ES-MX
  */
+
+import { useMemo } from 'react';
+
+/**
+ * Tipagens Estritas para Schema.org (TS 6.0)
+ */
+interface BaseSchema {
+  readonly '@context': 'https://schema.org';
+  readonly '@type': string;
+}
+
+export interface PersonSchema extends BaseSchema {
+  readonly '@type': 'Person';
+  name: string;
+  url: string;
+  image?: string;
+  jobTitle?: string;
+  description?: string;
+  sameAs?: string[];
+}
+
+export interface WebsiteSchema extends BaseSchema {
+  readonly '@type': 'WebSite';
+  name: string;
+  url: string;
+  description?: string;
+  inLanguage?: string;
+}
+
+export interface ArticleSchema extends BaseSchema {
+  readonly '@type': 'Article' | 'BlogPosting';
+  headline: string;
+  description: string;
+  datePublished: string;
+  dateModified?: string;
+  author: {
+    '@type': 'Person';
+    name: string;
+    url?: string;
+  };
+  image?: string;
+  url: string;
+}
+
+export interface ProjectSchema extends BaseSchema {
+  readonly '@type': 'SoftwareSourceCode';
+  name: string;
+  description: string;
+  codeRepository: string;
+  programmingLanguage?: string | string[];
+  runtimePlatform?: string;
+  author: {
+    '@type': 'Person';
+    name: string;
+  };
+}
 
 export type JsonLdSchema =
   | PersonSchema
   | ArticleSchema
   | ProjectSchema
   | WebsiteSchema
-  | OrganizationSchema
-  | Record<string, unknown>
-
-/**
- * Base Schema
- */
-
-interface BaseSchema {
-  "@context": "https://schema.org"
-  "@type": string
-}
-
-/**
- * Person Schema
- */
-
-export interface PersonSchema extends BaseSchema {
-  "@type": "Person"
-  name: string
-  url: string
-  image?: string
-  jobTitle?: string
-  sameAs?: string[]
-}
-
-/**
- * Website Schema
- */
-
-export interface WebsiteSchema extends BaseSchema {
-  "@type": "WebSite"
-  name: string
-  url: string
-}
-
-/**
- * Organization Schema
- */
-
-export interface OrganizationSchema extends BaseSchema {
-  "@type": "Organization"
-  name: string
-  url: string
-  logo?: string
-}
-
-/**
- * Article Schema
- */
-
-export interface ArticleSchema extends BaseSchema {
-  "@type": "Article" | "BlogPosting"
-  headline: string
-  description: string
-  datePublished: string
-  dateModified?: string
-  author: {
-    "@type": "Person"
-    name: string
-  }
-  url: string
-  image?: string
-}
-
-/**
- * Project Schema
- */
-
-export interface ProjectSchema extends BaseSchema {
-  "@type": "SoftwareSourceCode"
-  name: string
-  description: string
-  codeRepository: string
-  programmingLanguage?: string
-  author?: {
-    "@type": "Person"
-    name: string
-  }
-}
-
-/**
- * Component Props
- */
+  | Record<string, unknown>;
 
 export interface JsonLdProps {
-  schema: JsonLdSchema | JsonLdSchema[]
+  readonly schema: JsonLdSchema | JsonLdSchema[];
 }
 
 /**
- * JsonLd Component
- *
- * Injects structured data (JSON-LD) safely.
- * Works with Next.js App Router and Server Components.
+ * Componente JsonLd
+ * Injeta dados estruturados de forma segura para SEO de Missão Crítica.
  */
-
 export default function JsonLd({ schema }: JsonLdProps) {
-  const schemas = Array.isArray(schema) ? schema : [schema]
+  // Memoização para evitar re-stringify em cada render do React 19
+  const serializedSchemas = useMemo(() => {
+    const schemas = Array.isArray(schema) ? schema : [schema];
+    return schemas.map((item) => {
+      try {
+        return JSON.stringify(item);
+      } catch (e) {
+        console.error('[JSON-LD Serialization Error]:', e);
+        return null;
+      }
+    }).filter(Boolean) as string[];
+  }, [schema]);
+
+  if (serializedSchemas.length === 0) return null;
 
   return (
     <>
-      {schemas.map((item, index) => (
+      {serializedSchemas.map((jsonString, index) => (
         <script
-          key={`jsonld-${index}`}
+          key={`jsonld-${index}-${jsonString.length}`}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(item),
-          }}
+          // React 19 lida com dangerouslySetInnerHTML de forma ultra-eficiente
+          dangerouslySetInnerHTML={{ __html: jsonString }}
         />
       ))}
     </>
-  )
+  );
 }
