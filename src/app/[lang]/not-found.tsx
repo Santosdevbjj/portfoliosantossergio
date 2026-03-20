@@ -5,65 +5,67 @@ import { useMemo } from 'react';
 import { getErrorDictionary } from '@/dictionaries/errors';
 import { isSupportedLocale, type SupportedLocale } from '@/lib/i18n/locale';
 import { ErrorDisplay } from '@/components/error-display';
+import type { Locale } from '@/types/dictionary';
 
 /**
  * NEXT.JS 16.2.0 & TYPESCRIPT 6.0 - PÁGINA 404 PERSONALIZADA
  * -----------------------------------------------------------------------------
- * ✔ FIX: Acesso ao params['lang'] para conformidade com TS 6.0
- * ✔ REACT 19: Hooks otimizados para renderização concorrente
- * ✔ MULTILINGUE: Suporte total (PT-BR, EN-US, ES-ES, ES-AR, ES-MX)
- * ✔ DESIGN: Tailwind 4.2 Engine (Slate-950 Dark Mode)
+ * ✔ FIX: Inclusão da prop 'lang' no ErrorDisplay para evitar erro de build
+ * ✔ REACT 19: Memoização de dicionário para performance em Node 24
+ * ✔ MULTILINGUE: Suporte regional (PT-BR, EN-US, ES-ES, ES-AR, ES-MX)
+ * ✔ DESIGN: Tailwind 4.2 Engine com transição Dark Mode
  */
 export default function NotFound() {
-  // useParams() no Next 16 retorna um objeto que pode conter múltiplas chaves
   const params = useParams();
   const router = useRouter();
 
   /**
-   * RESOLUÇÃO DO LOCALE:
-   * O TypeScript 6.0 exige o acesso via ['lang'] em objetos de assinatura de índice.
+   * RESOLUÇÃO DO LOCALE (TS 6.0 Safe):
+   * Captura o idioma da URL de forma segura para Next 16.2.
    */
-  const locale = useMemo((): SupportedLocale => {
-    // Correção do erro: Property 'lang' comes from an index signature...
-    const lang = params?.['lang']; 
+  const resolvedLocale = useMemo((): SupportedLocale => {
+    const langParam = params?.['lang']; 
+    const currentLang = typeof langParam === 'string' ? langParam : 'pt-BR';
     
-    const currentLang = typeof lang === 'string' ? lang : 'pt-BR';
-    
-    // Fallback de segurança para garantir que sempre tenhamos um idioma válido
     return isSupportedLocale(currentLang) ? currentLang : 'pt-BR';
   }, [params]);
 
   /**
-   * INTEGRAÇÃO COM DICIONÁRIO DE ERROS:
-   * Alinhado com a chave "NotFoundError" do seu JSON.
+   * CARREGAMENTO DO DICIONÁRIO:
+   * Obtém as mensagens específicas de erro (NotFoundError, etc).
    */
-  const dictionary = useMemo(() => getErrorDictionary(locale), [locale]);
+  const dictionary = useMemo(() => 
+    getErrorDictionary(resolvedLocale), 
+  [resolvedLocale]);
 
   const handleReset = () => {
     /**
-     * REDIRECIONAMENTO INTELIGENTE:
-     * Retorna o usuário para a Home específica do idioma em que ele estava.
+     * NAVEGAÇÃO SEGURA:
+     * Redireciona para a home do idioma atual (ex: /es-AR/ ou /pt-BR/).
      */
-    router.push(`/${locale}`);
+    router.push(`/${resolvedLocale}`);
   };
 
   return (
     <main 
-      className="flex min-h-[85vh] w-full items-center justify-center px-4 py-20 sm:px-6 lg:px-8 bg-white dark:bg-[#020617] transition-colors duration-500"
-      aria-labelledby="error-title"
+      className="flex min-h-[90vh] w-full items-center justify-center px-6 py-24 bg-white dark:bg-slate-950 transition-colors duration-700"
+      aria-live="polite"
     >
-      <div className="w-full max-w-lg animate-in fade-in zoom-in slide-in-from-bottom-4 duration-700 ease-out">
-        {/* Componente centralizado de exibição de erro */}
+      <div className="w-full max-w-2xl flex flex-col items-center">
+        {/* FIX DO DEPLOY: 
+          Agora passamos a prop 'lang' exigida pelo ErrorDisplayProps revisado.
+        */}
         <ErrorDisplay
           errorKey="NotFoundError"
           dictionary={dictionary}
+          lang={resolvedLocale as Locale}
           reset={handleReset}
         />
         
-        {/* Auxílio Visual de Navegação (Opcional - Estilo Tailwind 4.2) */}
-        <div className="mt-12 text-center">
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-            Sérgio Santos | Portfolio 2025
+        {/* RODAPÉ DE BRANDING (Tailwind 4.2 utility classes) */}
+        <div className="mt-16 animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 dark:text-slate-700">
+            Sérgio Santos | Portfolio 2026
           </p>
         </div>
       </div>
