@@ -3,10 +3,10 @@
 /**
  * ERROR BOUNDARY VIEW - PORTFÓLIO SÉRGIO SANTOS
  * -----------------------------------------------------------------------------
- * ✔ Next.js 16.2.0: Suporte a global-error.tsx e PPR (Partial Prerendering).
- * ✔ React 19: Otimizado para renderização de fallback e transições de estado.
- * ✔ TypeScript 6.0: Tipagem estrita para ErrorKey e Navigator.
- * ✔ Tailwind CSS 4.2: Estilização utilitária de alta performance.
+ * ✔ Next.js 16.2.0: Suporte a global-error.tsx e PPR.
+ * ✔ React 19: Otimizado para transições de estado.
+ * ✔ TypeScript 6.0: Correção para exactOptionalPropertyTypes.
+ * ✔ Tailwind CSS 4.2: Estilização moderna e responsiva.
  */
 
 import { useMemo, useEffect } from 'react';
@@ -30,8 +30,8 @@ export function ErrorBoundaryView({
   withHtmlWrapper = false,
 }: ErrorBoundaryViewProps) {
   
-  // Log de erro automático para monitoramento em produção (Node 24/Vercel)
   useEffect(() => {
+    // Log para monitoramento (Node 24 / Vercel Logs)
     console.error('ErrorBoundary Capturado:', {
       message: error.message,
       digest: error.digest,
@@ -39,37 +39,20 @@ export function ErrorBoundaryView({
     });
   }, [error]);
 
-  /**
-   * RESOLUÇÃO DE IDIOMA (TS 6.0 Safe)
-   * Garante que o erro seja exibido no idioma do navegador do usuário
-   * caso o contexto do Next.js ainda não tenha carregado o dicionário.
-   */
   const locale = useMemo<SupportedLocale>(() => {
     if (typeof navigator === 'undefined') return 'pt-BR';
-
-    // Pega o idioma preferencial do navegador (ex: es-MX, pt-BR)
     const browserLang = navigator.language;
 
     if (isSupportedLocale(browserLang)) return browserLang;
-    
-    // Fallbacks inteligentes para as variações suportadas
     if (browserLang.startsWith('en')) return 'en-US';
-    if (browserLang.startsWith('es')) {
-      // Prioriza es-ES se for genérico, ou tenta manter a especificidade
-      return 'es-ES'; 
-    }
+    if (browserLang.startsWith('es')) return 'es-ES';
 
     return 'pt-BR';
   }, []);
 
   const dictionary = getErrorDictionary(locale);
 
-  /**
-   * MAPEAMENTO DINÂMICO DE ERROS
-   * Alinhado com src/dictionaries/errors/pt-BR.json
-   */
   const errorKey = useMemo<ErrorKey>(() => {
-    // Lista de erros conhecidos no seu dicionário JSON
     const knownErrors: ErrorKey[] = [
       'NotFoundError',
       'ValidationError',
@@ -80,32 +63,27 @@ export function ErrorBoundaryView({
       'MethodNotAllowedError'
     ];
 
-    // Se o nome do erro estiver no dicionário, usa ele, senão usa o genérico
     return knownErrors.includes(error.name as ErrorKey)
       ? (error.name as ErrorKey)
       : 'InternalServerError';
   }, [error.name]);
 
   /**
-   * CONTEÚDO PRINCIPAL
-   * Injetando o ID do erro (digest) para suporte técnico, conforme seu dicionário.
+   * CORREÇÃO TS 6.0: 
+   * Usamos espalhamento condicional para garantir que 'errorId' 
+   * só seja passado se realmente existir uma string, evitando o erro de build.
    */
   const content = (
-    <div className="min-h-[60vh] flex items-center justify-center p-4">
+    <div className="min-h-[60vh] flex items-center justify-center p-4 animate-in fade-in duration-500">
       <ErrorDisplay
         errorKey={errorKey}
         dictionary={dictionary}
         reset={reset}
-        // TS 6: Acesso seguro à propriedade digest da Vercel
-        errorId={error.digest}
+        {...(error.digest ? { errorId: error.digest } : {})}
       />
     </div>
   );
 
-  /**
-   * WRAPPER GLOBAL (Para global-error.tsx)
-   * Tailwind 4.2 utiliza o novo motor de renderização ultra-rápido.
-   */
   if (withHtmlWrapper) {
     return (
       <html lang={locale} className="scroll-smooth">
