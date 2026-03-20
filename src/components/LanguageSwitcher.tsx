@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense, useMemo } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
@@ -113,7 +113,7 @@ function LanguageSwitcherContent({
 
 /**
  * COMPONENTE PRINCIPAL COM BOUNDARY DE SUSPENSE
- * Essencial para Next.js 16 ao usar useSearchParams
+ * Essencial para Next.js 16 ao usar useSearchParams para evitar erro de build
  */
 export function LanguageSwitcher(props: LanguageSwitcherProps) {
   return (
