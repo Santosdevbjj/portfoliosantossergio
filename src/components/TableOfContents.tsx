@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import type { Dictionary } from "@/types/dictionary";
 
 /**
- * TABLE OF CONTENTS COMPONENT
+ * TABLE OF CONTENTS COMPONENT - SÉRGIO SANTOS PORTFOLIO
  * -----------------------------------------------------------------------------
- * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16
- * ✔ Fix: Type-safe access to dynamic SEO dictionary keys
- * ✔ Responsivo: Sidebar em Desktop (sticky), Accordion em Mobile
+ * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16.2
+ * ✔ Performance: Intersection Observer com otimização de CPU
+ * ✔ Responsividade: Accordion Móvel e Sidebar Desktop Sticky
  */
 
 interface Heading {
@@ -26,19 +26,24 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
 
-  // RESOLUÇÃO DO ERRO DE BUILD:
-  // Como 'pages' no SeoDictionary usa index signature [key: string], 
-  // acessamos com fallback seguro para evitar o erro 'possibly undefined'.
-  const tocTitle = dict.seo.pages["articles"]?.title || dict.articles.title;
+  /**
+   * RESOLUÇÃO DE TIPAGEM TS 6.0:
+   * Acesso seguro ao SeoDictionary para evitar erros de build 'possibly undefined'.
+   */
+  const tocTitle = useMemo(() => {
+    return dict.seo.pages?.["articles"]?.title ?? dict.articles.title;
+  }, [dict]);
 
   useEffect(() => {
-    // Busca dentro do elemento 'article' definido no MdxLayout
+    // Busca dentro do elemento 'article' injetado pelo MDX
     const article = document.querySelector("article");
     if (!article) return;
 
+    // Mapeamento de H2 e H3 para o sumário
     const elements = Array.from(article.querySelectorAll("h2, h3")).map((elem) => {
       const text = elem.textContent || "";
-      // Gera ID caso não exista (normalização de acentos e espaços)
+      
+      // Slugify: Normalização robusta de IDs para compatibilidade com links
       const id = elem.id || text.toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -56,6 +61,7 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
 
     setHeadings(elements);
 
+    // Observador de interseção para destacar a seção atual no scroll
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -65,8 +71,8 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
         });
       },
       { 
-        rootMargin: "-10% 0% -75% 0%",
-        threshold: 0.1 // Ajustado para melhor detecção em Next 16
+        rootMargin: "-80px 0% -70% 0%", // Ajustado para compensar o Header fixo
+        threshold: 1.0 
       }
     );
 
@@ -75,71 +81,70 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
     return () => observer.disconnect();
   }, []);
 
+  // Não renderiza nada se o artigo não tiver subtítulos
   if (headings.length === 0) return null;
 
   return (
     <nav 
-      className="w-full lg:w-64 flex flex-col"
+      className="w-full lg:w-72 flex flex-col"
       aria-label={dict.common.navigation}
     >
-      {/* VERSÃO MOBILE: Botão Expansível (Accordion) */}
+      {/* VERSÃO MOBILE: Accordion Premium */}
       <div className="lg:hidden mb-6">
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-expanded={isOpen}
-          aria-controls="toc-list-mobile"
-          className="flex items-center justify-between w-full p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 transition-all active:scale-[0.98]"
+          className="flex items-center justify-between w-full p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all active:scale-[0.98]"
         >
-          <div className="flex flex-col items-start">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
+          <div className="flex flex-col items-start text-left">
+            <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">
               {tocTitle}
             </span>
-            <span className="text-xs font-bold text-slate-400">
+            <span className="text-xs font-bold text-slate-500 truncate max-w-[200px]">
               {headings.find(h => h.id === activeId)?.text || dict.states.loading}
             </span>
           </div>
-          <svg 
-            className={`w-5 h-5 text-slate-400 transition-transform duration-500 ${isOpen ? 'rotate-180 text-blue-500' : ''}`} 
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
-          </svg>
+          <div className={`p-2 rounded-full bg-slate-50 dark:bg-slate-800 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+            <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </button>
       </div>
 
-      {/* CONTEÚDO DO SUMÁRIO: Sticky em Desktop */}
+      {/* LISTAGEM DE TÓPICOS: Sticky em LG+ */}
       <div 
-        id="toc-list-mobile"
         className={`
           ${isOpen ? 'max-h-[1000px] opacity-100 mb-8' : 'max-h-0 opacity-0 lg:max-h-none lg:opacity-100'} 
-          overflow-hidden lg:block sticky lg:top-32 transition-all duration-500 ease-in-out
-          bg-white dark:bg-transparent lg:border-l lg:border-slate-200 lg:dark:border-slate-800 lg:pl-8
+          overflow-hidden lg:block transition-all duration-500 ease-in-out
+          lg:border-l lg:border-slate-200 lg:dark:border-slate-800 lg:pl-6
         `}
       >
-        <h4 className="hidden lg:block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8">
+        <h4 className="hidden lg:block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 mb-6">
           {tocTitle}
         </h4>
         
-        <ul className="space-y-5">
+        <ul className="space-y-4">
           {headings.map((h) => (
             <li 
               key={h.id} 
-              style={{ paddingLeft: h.level > 2 ? `${(h.level - 2) * 16}px` : '0px' }}
-              className="relative"
+              style={{ paddingLeft: h.level > 2 ? `${(h.level - 2) * 12}px` : '0px' }}
+              className="group relative"
             >
               <a 
                 href={`#${h.id}`}
                 onClick={() => setIsOpen(false)}
                 className={`
-                  text-sm font-bold transition-all duration-300 block leading-tight
+                  text-sm font-bold transition-all duration-300 block leading-snug
                   ${activeId === h.id 
-                    ? "text-blue-600 dark:text-blue-400 translate-x-2" 
-                    : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:translate-x-1"
+                    ? "text-blue-600 dark:text-blue-400 translate-x-1" 
+                    : "text-slate-400 hover:text-slate-900 dark:text-slate-500 dark:hover:text-slate-300"
                   }
                 `}
               >
+                {/* Indicador de Seção Ativa */}
                 {activeId === h.id && (
-                  <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-600 shadow-[0_0_12px_rgba(37,99,235,0.6)] lg:-left-12" />
+                  <span className="absolute -left-6 top-1/2 -translate-y-1/2 w-1 h-4 rounded-full bg-blue-600 animate-in fade-in zoom-in lg:-left-6.5" />
                 )}
                 {h.text}
               </a>
