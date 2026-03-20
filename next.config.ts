@@ -41,6 +41,7 @@ const nextConfig: NextConfig = {
       "date-fns"
     ],
     taint: true, 
+    prefetchInlining: true,
     // Melhoria de scroll baseada no comportamento nativo do browser (16.2)
     appNewScrollHandler: true,
   },
