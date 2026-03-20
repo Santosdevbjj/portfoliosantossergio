@@ -14,7 +14,7 @@ import type { Locale } from "@/types/dictionary";
 
 /**
  * TIPAGEM NEXT.JS 16.2 E REACT 19
- * Params deve ser tratado obrigatoriamente como Promise.
+ * Params tratado como Promise para conformidade com o novo router.
  */
 interface PageProps {
   params: Promise<{ slug: string[]; lang: string }>;
@@ -22,24 +22,27 @@ interface PageProps {
 
 /**
  * 2. METADADOS DINÂMICOS (SEO & OPEN GRAPH)
- * Totalmente alinhado com suas novas imagens em /public/og/
+ * Ajuste Fino: LinkedIn Publish Date e URLs Absolutas para OG Images.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, slug } = await params;
   
   const safeSlugArray = slug ?? [];
-  const lastPart = safeSlugArray[safeSlugArray.length - 1] ?? "artigo";
   const fullSlugPath = safeSlugArray.join("/");
-  
   const siteUrl = "https://portfoliosantossergio.vercel.app";
   const fullUrl = `${siteUrl}/${lang}/artigos/${fullSlugPath}`;
   
-  // Título formatado
+  // Título e Descrição Otimizados
+  const lastPart = safeSlugArray[safeSlugArray.length - 1] ?? "artigo";
   const cleanTitle = lastPart.replace(/-/g, " ").toUpperCase();
-  const description = `Artigo técnico: ${cleanTitle}. Explore conteúdos de Ciência de Dados, IA e Engenharia de Software no portfólio de Sérgio Santos.`;
+  const description = `Artigo técnico sobre ${cleanTitle.toLowerCase()}. Especialista em Ciência de Dados e IA com foco em Sistemas Críticos.`;
 
-  // CAMINHO DAS SUAS NOVAS OG IMAGES (public/og/og-image-[locale].png)
+  // CAMINHO DA IMAGEM (URL absoluta e limpa para evitar cache antigo do LinkedIn)
   const ogImageUrl = `${siteUrl}/og/og-image-${lang}.png`;
+
+  // DATA DE PUBLICAÇÃO (ISO 8601 estrito para LinkedIn/SEO)
+  // Usamos uma constante estável para evitar erros de hidratação no build (Next.js 16.2)
+  const articleDate = "2026-03-19T22:00:00.000Z"; 
 
   return {
     title: `${cleanTitle} | Sérgio Santos`,
@@ -60,6 +63,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: fullUrl,
       siteName: "Sérgio Santos | Portfolio",
       type: "article",
+      publishedTime: articleDate, // LinkedIn reconhecerá a data agora
       authors: ["Sérgio Santos"],
       locale: lang.replace("-", "_"),
       images: [
@@ -81,8 +85,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * 3. GERAÇÃO ESTÁTICA (SSG) - SUPORTE MULTILINGUE TOTAL
- * Garante que todas as versões (ES-ES, ES-AR, ES-MX, etc) sejam geradas no build.
+ * 3. GERAÇÃO ESTÁTICA (SSG) 
+ * Mapeamento de todas as slugs para os 5 idiomas suportados.
  */
 export async function generateStaticParams() {
   const articles = await getAllArticlesRecursively();
@@ -96,8 +100,8 @@ export async function generateStaticParams() {
 }
 
 /**
- * 4. RENDERIZAÇÃO (SERVER COMPONENT)
- * Otimizado para Node 24 e Tailwind 4.2
+ * 4. RENDERIZAÇÃO DA PÁGINA
+ * Otimizado para Node 24 e Tailwind 4.2 (Container responsivo e Tipografia).
  */
 export default async function ArtigoDetalhePage(props: PageProps) {
   const { slug, lang: rawLang } = await props.params;
@@ -105,23 +109,22 @@ export default async function ArtigoDetalhePage(props: PageProps) {
   const lang = normalizeLocale(rawLang) as Locale;
   const dict = await getServerDictionary(lang);
 
-  // Busca o conteúdo Markdown via GitHub Service
   const content = await getArticleContent(slug);
 
   if (!content) {
     return notFound();
   }
 
-  // Lógica de extração de título para componentes internos
   const titleMatch = content.match(/^#\s+(.*)$/m);
   const fallbackTitle = (slug?.[slug.length - 1] ?? "").replace(/-/g, " ");
   const articleTitle = titleMatch?.[1]?.trim() ?? fallbackTitle;
 
   return (
     <MdxLayout lang={lang} dict={dict}>
+      {/* Container Responsivo com Animações React 19 */}
       <article className="container mx-auto py-12 max-w-4xl px-4 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-1000">
         
-        {/* TAILWIND 4.2 PROSE - Typography System Responsivo */}
+        {/* TAILWIND 4.2 PROSE - Typography System para leitura técnica */}
         <div className="prose prose-slate dark:prose-invert max-w-none 
           prose-blue prose-headings:scroll-mt-32 
           prose-img:rounded-2xl prose-img:shadow-xl
@@ -134,18 +137,18 @@ export default async function ArtigoDetalhePage(props: PageProps) {
           </ReactMarkdown>
         </div>
         
-        {/* RODAPÉ E COMPARTILHAMENTO */}
+        {/* RODAPÉ INTEGRADO */}
         <footer className="mt-20 pt-10 border-t border-slate-200 dark:border-slate-800">
           <ShareArticle title={articleTitle} dict={dict} lang={lang} />
           
-          {/* Link dinâmico para o CV conforme o idioma atual */}
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex flex-col items-center gap-4">
             <a 
               href={`/pdf/cv-sergio-santos-${lang}.pdf`}
               target="_blank"
-              className="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors duration-300"
             >
-              {dict.contact.cvLabel} ({lang})
+              {dict.contact.cvLabel} — {lang}
             </a>
           </div>
         </footer>
