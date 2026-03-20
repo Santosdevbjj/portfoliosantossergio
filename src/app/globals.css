@@ -3,12 +3,12 @@
 @import "../styles/animations.css";
 
 /* ========================================================================== */
-/* DARK MODE CONFIG — Tailwind v4.2 */
+/* DARK MODE CONFIG — Tailwind v4.2 Native Variant */
 /* ========================================================================== */
 @variant dark (&:where(.dark, .dark *));
 
 /* ========================================================================== */
-/* GLOBAL DESIGN SYSTEM — OKLCH + Next 16 */
+/* GLOBAL DESIGN SYSTEM — OKLCH + Next 16.2 */
 /* ========================================================================== */
 @theme {
   --color-brand-50: oklch(0.97 0.01 256.4);
@@ -44,6 +44,27 @@
     color-scheme: dark;
   }
 
+  /* -------------------------------------------------------------------------- */
+  /* AJUSTE FINO DE TIPOGRAFIA (TAILWIND 4.2 PROSE) */
+  /* Força legibilidade máxima em artigos técnicos no Dark Mode */
+  /* -------------------------------------------------------------------------- */
+  .prose-invert {
+    --tw-prose-body: var(--color-slate-300);
+    --tw-prose-headings: var(--color-white);
+    --tw-prose-links: var(--color-blue-400);
+    --tw-prose-bold: var(--color-white);
+    --tw-prose-counters: var(--color-slate-400);
+    --tw-prose-bullets: var(--color-slate-600);
+    --tw-prose-hr: var(--color-slate-800);
+    --tw-prose-quotes: var(--color-slate-100);
+    --tw-prose-quote-borders: var(--color-blue-500);
+    --tw-prose-code: var(--color-white);
+    --tw-prose-pre-code: var(--color-slate-200);
+    --tw-prose-pre-bg: var(--color-slate-900);
+    --tw-prose-th-borders: var(--color-slate-700);
+    --tw-prose-td-borders: var(--color-slate-800);
+  }
+
   html {
     @apply scroll-smooth antialiased;
     background-color: var(--background);
@@ -54,10 +75,14 @@
     color: var(--foreground);
     background-color: var(--background);
     font-family: var(--font-sans);
+    /* Suporte total para entalhes de dispositivos móveis (iOS/Android) */
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 }
 
+/* ========================================================================== */
+/* COMPONENTS LAYER — Design System Otimizado */
+/* ========================================================================== */
 @layer components {
   .main-container {
     @apply w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12;
@@ -70,16 +95,18 @@
   }
 } 
 
+/* ========================================================================== */
+/* UTILITIES & CUSTOM OVERRIDES */
+/* ========================================================================== */
 @layer base {
-  /* Estilização suave para a barra de rolagem do visualizador de PDF */
+  /* Scrollbar Premium Responsiva */
   ::-webkit-scrollbar {
     width: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-slate-100 dark:bg-slate-900;
+    @apply bg-slate-100 dark:bg-slate-950;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-blue-500 rounded-full border-2 border-transparent bg-clip-content;
+    @apply bg-blue-500/50 rounded-full border-2 border-transparent bg-clip-content hover:bg-blue-500 transition-colors;
   }
 }
-
