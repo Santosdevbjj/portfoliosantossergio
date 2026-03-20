@@ -16,7 +16,7 @@ import Footer from "@/components/Footer";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 import OpenGraph from "@/components/seo/OpenGraph";
-import StructuredData from "@/components/StructuredData"; // Importação do novo componente
+import StructuredData from "@/components/StructuredData";
 
 // Tailwind CSS 4.2 Engine
 import "@/app/globals.css";
@@ -28,14 +28,14 @@ const inter = Inter({
 });
 
 /**
- * Next.js 16.2.0: Geração Estática de Parâmetros para os 5 idiomas
+ * Next.js 16.2.0: Geração Estática de Parâmetros
  */
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
 /**
- * Geração de Metadados Dinâmicos (SEO Regionalizado)
+ * Geração de Metadados Dinâmicos
  */
 export async function generateMetadata({ 
   params 
@@ -60,7 +60,6 @@ export async function generateMetadata({
     ...metadata,
     metadataBase: new URL(baseUrl),
     verification: {
-      // MANTIDO: Sua Tag de Verificação do Google
       google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
     },
     alternates: {
@@ -91,10 +90,6 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-/**
- * ROOT LAYOUT MULTILINGUE - SÉRGIO SANTOS
- * Integrado com React 19 (Async Components) e Node 24
- */
 export default async function LangLayout(props: {
   children: ReactNode;
   params: Promise<{ lang: string }>;
@@ -105,7 +100,6 @@ export default async function LangLayout(props: {
   if (!locales.includes(locale)) notFound();
 
   const dict = await getServerDictionary(locale);
-  
   const gaId = process.env['NEXT_PUBLIC_GA_ID'];
   const baseUrl = process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app";
   const baseLanguage = locale.split("-")[0];
@@ -117,18 +111,14 @@ export default async function LangLayout(props: {
       suppressHydrationWarning
     >
       <head>
-        {/* SEO: OpenGraph Dinâmico (Suporte para og-image regionalizada) */}
         <OpenGraph 
           title={dict.seo.title}
           description={dict.seo.description}
           url={`${baseUrl}/${locale}`}
           locale={locale}
         />
-        
-        {/* INTEGRAÇÃO: Dados Estruturados Person + WebSite (Google Oficial) */}
         <StructuredData lang={locale} />
         
-        {/* Google Analytics - Estratégia afterInteractive */}
         {gaId && (
           <>
             <Script
@@ -147,13 +137,12 @@ export default async function LangLayout(props: {
         )}
       </head>
 
-      <body className="antialiased min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-50 transition-colors duration-300 ease-in-out">
+      <body className="antialiased min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-50 transition-colors duration-300">
         
-        {/* Transição de Fade-in utilizando Tailwind 4.2 capabilities */}
-        <div className="flex flex-col min-h-screen opacity-0 animate-[fadeIn_0.7s_ease-in_forwards]">
+        {/* CORREÇÃO: Removido 'opacity-0' que causava a tela branca */}
+        <div className="flex flex-col min-h-screen">
           
           <ScrollSpyProvider>
-            {/* Link de Acessibilidade */}
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-2xl"
@@ -161,24 +150,20 @@ export default async function LangLayout(props: {
               {dict.common.skipToContent}
             </a>
 
-            {/* Navbar Multilingue (PT, EN, ES-ES, ES-AR, ES-MX) */}
             <Navbar lang={locale} common={dict.common} contact={dict.contact} />
 
             <main id="main-content" className="flex-grow flex flex-col">
-              {/* Metadados: Breadcrumbs JSON-LD para Google Search */}
               <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
               
               <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-6">
                 <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
               </div>
 
-              {/* Área de Conteúdo Principal */}
               <section className="flex-grow w-full">
                 {props.children}
               </section>
             </main>
 
-            {/* Rodapé Dinâmico */}
             <Footer 
               lang={locale} 
               common={dict.common} 
