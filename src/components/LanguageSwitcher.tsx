@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
@@ -10,20 +10,20 @@ import { LOCALE_COOKIE, LOCALE_COOKIE_OPTIONS } from '@/lib/locale-cookie';
 
 interface LanguageSwitcherProps {
   readonly currentLang: Locale;
-  readonly ariaLabel?: string; // opcional para integração com dictionary.common
+  readonly ariaLabel?: string;
 }
 
 /**
- * Labels curtos para exibição.
- * ✔ Tipado por Locale
- * ✔ TS 6 safe
+ * MAPEAMENTO REGIONAL (Bandeiras e Labels)
+ * ✔ TS 6 Strict Mapping
+ * ✔ Suporte regional para ES, AR e MX
  */
-const LANGUAGE_LABELS: Record<Locale, string> = {
-  'pt-BR': 'PT',
-  'en-US': 'EN',
-  'es-ES': 'ES',
-  'es-AR': 'AR',
-  'es-MX': 'MX',
+const REGIONAL_DATA: Record<Locale, { label: string; flag: string; title: string }> = {
+  'pt-BR': { label: 'PT', flag: '🇧🇷', title: 'Português (Brasil)' },
+  'en-US': { label: 'EN', flag: '🇺🇸', title: 'English (US)' },
+  'es-ES': { label: 'ES', flag: '🇪🇸', title: 'Español (España)' },
+  'es-AR': { label: 'AR', flag: '🇦🇷', title: 'Español (Argentina)' },
+  'es-MX': { label: 'MX', flag: '🇲🇽', title: 'Español (México)' },
 };
 
 function LanguageSwitcherContent({
@@ -38,22 +38,25 @@ function LanguageSwitcherContent({
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return (
-      <div className="h-9 w-40 sm:w-48 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
-    );
-  }
-
-  function writeLocaleCookie(locale: Locale) {
+  // Persistência de preferência via Cookie (Node 24 / Client Side)
+  const writeLocaleCookie = (locale: Locale) => {
+    if (typeof document === 'undefined') return;
     document.cookie =
       `${LOCALE_COOKIE}=${locale}; ` +
       `path=${LOCALE_COOKIE_OPTIONS.path}; ` +
       `max-age=${LOCALE_COOKIE_OPTIONS.maxAge}; ` +
       `SameSite=${LOCALE_COOKIE_OPTIONS.sameSite}` +
-      (location.protocol === 'https:' ? '; Secure' : '');
-  }
+      (window.location.protocol === 'https:' ? '; Secure' : '');
+  };
 
+  // Cálculo de rotas otimizado para Next.js 16.2.0
   const availableLocales = i18n.locales as readonly Locale[];
+
+  if (!mounted) {
+    return (
+      <div className="h-9 w-44 sm:w-52 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
+    );
+  }
 
   return (
     <nav
@@ -64,10 +67,11 @@ function LanguageSwitcherContent({
     >
       {availableLocales.map((locale) => {
         const isActive = currentLang === locale;
+        const region = REGIONAL_DATA[locale];
 
+        // Lógica de Reescrita de URL amigável ao SEO
         const segments = pathname?.split('/').filter(Boolean) ?? [];
-
-        if (segments[0] && availableLocales.includes(segments[0] as Locale)) {
+        if (segments[0] && (availableLocales as readonly string[]).includes(segments[0])) {
           segments[0] = locale;
         } else {
           segments.unshift(locale);
@@ -77,27 +81,29 @@ function LanguageSwitcherContent({
         const query = searchParams?.toString();
         const href = query ? `${path}?${query}` : path;
 
-        const inactiveClasses =
-          'text-slate-600 hover:bg-white/60 hover:text-blue-600 ' +
-          'dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-blue-400';
-
         return (
           <Link
             key={locale}
             href={href}
             hrefLang={locale}
+            title={region.title}
             onClick={() => writeLocaleCookie(locale)}
-            className={`rounded-lg px-2.5 py-1.5 text-[10px] font-bold uppercase
+            className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[10px] font-black uppercase
                         transition-all duration-300 focus:outline-none
-                        focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                        focus:ring-2 focus:ring-blue-500/50
                         ${
                           isActive
-                            ? 'bg-blue-600 text-white shadow-md scale-105'
-                            : inactiveClasses
+                            ? 'bg-blue-600 text-white shadow-lg scale-105 z-10'
+                            : 'text-slate-500 hover:bg-white/60 dark:text-slate-400 dark:hover:bg-slate-800/60 hover:text-blue-600'
                         }`}
             aria-current={isActive ? 'true' : undefined}
           >
-            {LANGUAGE_LABELS[locale]}
+            <span className="text-xs filter saturate-[0.8] group-hover:saturate-100">
+              {region.flag}
+            </span>
+            <span className={isActive ? 'opacity-100' : 'opacity-70'}>
+              {region.label}
+            </span>
           </Link>
         );
       })}
@@ -105,11 +111,15 @@ function LanguageSwitcherContent({
   );
 }
 
+/**
+ * COMPONENTE PRINCIPAL COM BOUNDARY DE SUSPENSE
+ * Essencial para Next.js 16 ao usar useSearchParams
+ */
 export function LanguageSwitcher(props: LanguageSwitcherProps) {
   return (
     <Suspense
       fallback={
-        <div className="h-9 w-40 sm:w-48 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
+        <div className="h-9 w-44 sm:w-52 rounded-xl bg-slate-200/20 dark:bg-slate-800/20 animate-pulse" />
       }
     >
       <LanguageSwitcherContent {...props} />
