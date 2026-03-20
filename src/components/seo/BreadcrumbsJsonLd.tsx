@@ -1,17 +1,17 @@
 'use client';
 
-/**
- * BREADCRUMBS JSON-LD COMPONENT
- * -----------------------------------------------------------------------------
- * ✔ Stack: React 19, TS 6.0, Next.js 16, Node 24
- * ✔ SEO: Schema.org BreadcrumbList (JSON-LD)
- * ✔ I18n: Integrado com dicionários PT/EN/ES
- */
-
 import { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { generateBreadcrumbs } from '@/lib/seo/breadcrumbs';
 import type { Locale, Dictionary } from '@/types/dictionary';
+
+/**
+ * BREADCRUMBS JSON-LD COMPONENT - PORTFÓLIO SÉRGIO SANTOS
+ * -----------------------------------------------------------------------------
+ * ✔ Stack: React 19, TS 6.0, Next.js 16.2, Node 24
+ * ✔ SEO: Schema.org BreadcrumbList estruturado para Google Search
+ * ✔ I18n: Suporte total a pt-BR, en-US, es-ES, es-AR, es-MX
+ */
 
 interface BreadcrumbsJsonLdProps {
   readonly lang: Locale;
@@ -20,39 +20,54 @@ interface BreadcrumbsJsonLdProps {
 }
 
 /**
- * Injeta metadados estruturados para motores de busca (Google, Bing).
- * Este componente não renderiza nada visualmente, apenas injeta o script no DOM.
+ * Injeta metadados estruturados para motores de busca.
+ * Este componente é invisível e não afeta a responsividade do layout.
  */
 export function BreadcrumbsJsonLd({ lang, baseUrl, dict }: BreadcrumbsJsonLdProps) {
   const pathname = usePathname();
 
-  const jsonLd = useMemo(() => {
+  /**
+   * MEMOIZAÇÃO DO SCHEMA:
+   * Evita cálculos de stringify e processamento de array em re-renders.
+   */
+  const jsonLdString = useMemo(() => {
     if (!pathname) return null;
 
-    // Gera a lista de migalhas de pão baseada na rota atual e dicionário
-    const breadcrumbs = generateBreadcrumbs(pathname, lang, dict, baseUrl);
+    // Normalização da URL base
+    const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
 
-    // Estrutura oficial Schema.org
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      'itemListElement': breadcrumbs.map((crumb, index) => ({
-        '@type': 'ListItem',
-        'position': index + 1,
-        'name': crumb.name,
-        'item': crumb.item.startsWith('http') ? crumb.item : `${baseUrl}${crumb.item}`,
-      })),
-    };
+    try {
+      // Gera a lista de migalhas usando a lógica centralizada (já revisada para TS 6.0)
+      const breadcrumbs = generateBreadcrumbs(pathname, lang, dict, cleanBaseUrl);
+
+      // Estrutura oficial Schema.org BreadcrumbList
+      const schema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': breadcrumbs.map((crumb, index) => ({
+          '@type': 'ListItem',
+          'position': index + 1,
+          'name': crumb.name,
+          'item': crumb.item.startsWith('http') ? crumb.item : `${cleanBaseUrl}${crumb.item}`,
+        })),
+      };
+
+      return JSON.stringify(schema);
+    } catch (error) {
+      console.error('[SEO Error]: Falha ao gerar JSON-LD Breadcrumbs', error);
+      return null;
+    }
   }, [pathname, lang, dict, baseUrl]);
 
-  if (!jsonLd) return null;
+  if (!jsonLdString) return null;
 
   return (
     <script
       type="application/ld+json"
       id={`json-ld-breadcrumbs-${lang}`}
-      // React 19: Otimizado para hidratação segura
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      key={`json-ld-breadcrumbs-${pathname}-${lang}`}
+      // React 19: dangerouslySetInnerHTML é tratado com prioridade em metadados
+      dangerouslySetInnerHTML={{ __html: jsonLdString }}
     />
   );
 }
