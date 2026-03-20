@@ -48,7 +48,9 @@ export async function generateMetadata({
   if (!locales.includes(locale)) notFound();
 
   const dict = await getServerDictionary(locale);
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
+  
+  // CORREÇÃO TS 6: Acesso via Index Signature para evitar erro de Type Check
+  const baseUrl = process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app";
 
   const metadata = buildMetadata({
     title: dict.seo.title,
@@ -83,7 +85,7 @@ export const viewport: Viewport = {
 };
 
 /**
- * ROOT LAYOUT MULTILINGUE
+ * ROOT LAYOUT MULTILINGUE - SÉRGIO SANTOS
  */
 export default async function LangLayout(props: {
   children: ReactNode;
@@ -95,8 +97,10 @@ export default async function LangLayout(props: {
   if (!locales.includes(locale)) notFound();
 
   const dict = await getServerDictionary(locale);
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
+  
+  // CORREÇÃO TS 6: Acesso seguro aos processos de ambiente
+  const gaId = process.env['NEXT_PUBLIC_GA_ID'];
+  const baseUrl = process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app";
   const baseLanguage = locale.split("-")[0];
 
   return (
@@ -106,7 +110,7 @@ export default async function LangLayout(props: {
       suppressHydrationWarning
     >
       <head>
-        {/* SEO: OpenGraph Dinâmico por Idioma */}
+        {/* SEO: OpenGraph Dinâmico (Suporte regional AR, MX, ES, BR, US) */}
         <OpenGraph 
           title={dict.seo.title}
           description={dict.seo.description}
@@ -114,7 +118,7 @@ export default async function LangLayout(props: {
           locale={locale}
         />
         
-        {/* SEO: Dados Estruturados Principais (JSON-LD) */}
+        {/* SEO: Dados Estruturados (JSON-LD) */}
         <JsonLd 
           schema={[
             {
@@ -139,7 +143,7 @@ export default async function LangLayout(props: {
           ]}
         />
         
-        {/* Google Analytics */}
+        {/* Google Analytics - Estratégia Otimizada */}
         {gaId && (
           <>
             <Script
@@ -160,7 +164,7 @@ export default async function LangLayout(props: {
 
       <body className="antialiased min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-50 transition-colors duration-300 ease-in-out">
         
-        {/* INTEGRAÇÃO: Transição Suave de Idioma (Fade-in) */}
+        {/* INTEGRAÇÃO: Transição Suave (Fade-in Global) */}
         <div className="animate-in fade-in duration-700 flex flex-col min-h-screen">
           
           <ScrollSpyProvider>
@@ -171,21 +175,24 @@ export default async function LangLayout(props: {
               {dict.common.skipToContent}
             </a>
 
+            {/* Navbar Multilingue Responsiva */}
             <Navbar lang={locale} common={dict.common} contact={dict.contact} />
 
             <main id="main-content" className="flex-grow flex flex-col">
-              {/* SEO: Breadcrumbs JSON-LD e UI */}
+              {/* Metadados: Breadcrumbs Dinâmicos */}
               <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
               
               <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-6">
                 <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
               </div>
 
+              {/* Área de Conteúdo */}
               <section className="flex-grow w-full">
                 {props.children}
               </section>
             </main>
 
+            {/* Rodapé Integrado aos Dicionários */}
             <Footer 
               lang={locale} 
               common={dict.common} 
