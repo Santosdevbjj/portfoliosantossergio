@@ -11,12 +11,13 @@ import type { Locale } from '@/types/dictionary';
 import { ErrorDisplay } from '@/components/error-display';
 
 /**
- * ERROR BOUNDARY VIEW - PORTFÓLIO SÉRGIO SANTOS
+ * ERROR BOUNDARY VIEW - SÉRGIO SANTOS PORTFOLIO
  * -----------------------------------------------------------------------------
- * ✔ Next.js 16.2.0: Suporte a global-error.tsx e tratamento de erros críticos.
- * ✔ React 19: Melhor tratamento de hidratação e hooks estáveis.
- * ✔ TS 6.0: Resolução estrita de tipos para ErrorDisplayProps.
- * ✔ Multilíngue: Detecção inteligente de localidade do navegador (PT, EN, ES).
+ * ✔ Next.js 16.2.0: Suporte a global-error.tsx (PPR Ready)
+ * ✔ React 19: Otimização de renderização e hidratação concorrente
+ * ✔ TS 6.0 FIX: Proteção contra undefined em acessos de array (browserLangs)
+ * ✔ Multilíngue: Detecção automática PT, EN, ES (ES-ES, ES-AR, ES-MX)
+ * ✔ Responsivo: Layout fluido com Tailwind 4.2
  */
 
 interface ErrorBoundaryViewProps {
@@ -32,9 +33,9 @@ export function ErrorBoundaryView({
 }: ErrorBoundaryViewProps) {
   
   useEffect(() => {
-    // Log para monitoramento em produção (Node 24 / Vercel Runtime)
+    // Monitoramento de erros críticos em ambiente Node 24 (Vercel)
     if (process.env.NODE_ENV === 'production') {
-      console.error('[Critical Error Boundary]:', {
+      console.error('[Critical Error Boundary Event]:', {
         digest: error.digest,
         message: error.message,
         name: error.name
@@ -44,21 +45,23 @@ export function ErrorBoundaryView({
 
   /**
    * RESOLUÇÃO DINÂMICA DE IDIOMA:
-   * Como o ErrorBoundary muitas vezes roda fora do contexto do [lang],
-   * detectamos a preferência do navegador para exibir o erro no idioma do usuário.
+   * Implementação robusta para TS 6.0 evitando erros de 'possibly undefined'.
    */
   const locale = useMemo<SupportedLocale>(() => {
+    // SSR Fallback
     if (typeof navigator === 'undefined') return 'pt-BR';
     
     const browserLangs = navigator.languages || [navigator.language];
+    
+    // 1. Tenta encontrar um locale suportado exato
     const preferred = browserLangs.find(lang => isSupportedLocale(lang));
-
     if (preferred) return preferred as SupportedLocale;
 
-    // Fallbacks inteligentes por prefixo
-    const primary = browserLangs[0];
-    if (primary.startsWith('en')) return 'en-US';
-    if (primary.startsWith('es')) return 'es-ES';
+    // 2. Fallbacks seguros usando Optional Chaining para TS 6.0
+    const primary = browserLangs[0]; // Pode ser undefined
+    
+    if (primary?.startsWith('en')) return 'en-US';
+    if (primary?.startsWith('es')) return 'es-ES';
 
     return 'pt-BR';
   }, []);
@@ -82,28 +85,26 @@ export function ErrorBoundaryView({
   }, [error.name]);
 
   /**
-   * CONTEÚDO PRINCIPAL:
-   * ✔ FIX DEPLOY: Adicionada a prop 'lang' obrigatória.
-   * ✔ TS 6.0: Spread seguro para 'errorId'.
+   * INTERFACE DE ERRO (Totalmente Responsiva)
    */
   const content = (
-    <div className="min-h-[70vh] w-full flex items-center justify-center p-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="min-h-[75vh] w-full flex items-center justify-center p-6 sm:p-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
       <ErrorDisplay
         errorKey={errorKey}
         dictionary={dictionary}
-        lang={locale as Locale} // Fix: Necessário para as labels regionais (ES-AR, ES-MX, etc)
+        lang={locale as Locale}
         reset={reset}
         {...(error.digest ? { errorId: error.digest } : {})}
       />
     </div>
   );
 
-  // Utilizado no global-error.tsx onde o layout root não está disponível
+  // Renderização para global-error.tsx (Erro de raiz)
   if (withHtmlWrapper) {
     return (
       <html lang={locale}>
-        <body className="min-h-screen bg-white dark:bg-slate-950 antialiased selection:bg-blue-100 dark:selection:bg-blue-900/30">
-          <main className="w-full flex items-center justify-center">
+        <body className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-blue-100 dark:selection:bg-blue-500/30">
+          <main className="w-full h-full">
             {content}
           </main>
         </body>
