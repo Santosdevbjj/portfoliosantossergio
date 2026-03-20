@@ -1,42 +1,106 @@
 /* ==========================================================================
-   ANIMATION SYSTEM — NEXT 16 + TAILWIND v4.1
+   ANIMATION SYSTEM — NEXT 16.2 + TAILWIND v4.2
+   Otimizado para Performance (GPU Acceleration) e Acessibilidade (WCAG)
    ========================================================================== */
 
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 15px, 0);
+@layer utilities {
+  /* Animação Principal: Entrada Suave de Baixo para Cima */
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 20px, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
   }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+
+  /* Animação Shimmer: Efeito de Esqueleto/Carregamento */
+  @keyframes shimmer {
+    0% {
+      transform: translate3d(-100%, 0, 0);
+    }
+    100% {
+      transform: translate3d(100%, 0, 0);
+    }
   }
-}
 
-@keyframes shimmer {
-  0% { transform: translate3d(-100%, 0, 0); }
-  100% { transform: translate3d(100%, 0, 0); }
-}
+  /* Animação de Pulsação de Brilho (Glow) */
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.5; filter: blur(8px); }
+    50% { opacity: 0.8; filter: blur(12px); }
+  }
 
-/* Sistema de carregamento em cascata (Stagger) */
-.stagger-load > * {
-  opacity: 0;
-  will-change: transform, opacity;
-  animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/* Delays progressivos usando lógica moderna */
-.stagger-load > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-load > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-load > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-load > *:nth-child(4) { animation-delay: 0.4s; }
-
-/* Acessibilidade: Respeita a preferência do usuário por menos movimento */
-@media (prefers-reduced-motion: reduce) {
+  /* ==========================================================================
+     SISTEMA DE CASCATA (STAGGER LOAD)
+     ========================================================================== */
   .stagger-load > * {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
+    opacity: 0;
+    will-change: transform, opacity;
+    /* Cubic-bezier personalizado para uma sensação Premium/Apple-like */
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Delays progressivos otimizados para Next.js App Router */
+  .stagger-load > *:nth-child(1) { animation-delay: 100ms; }
+  .stagger-load > *:nth-child(2) { animation-delay: 200ms; }
+  .stagger-load > *:nth-child(3) { animation-delay: 300ms; }
+  .stagger-load > *:nth-child(4) { animation-delay: 400ms; }
+  .stagger-load > *:nth-child(5) { animation-delay: 500ms; }
+  .stagger-load > *:nth-child(6) { animation-delay: 600ms; }
+
+  /* Utilitário para o efeito Shimmer (Skeleton Screens) */
+  .animate-shimmer {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-slate-100);
+  }
+  .dark .animate-shimmer {
+    background-color: var(--color-slate-800);
+  }
+  .animate-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent
+    );
+    animation: shimmer 2s infinite linear;
+  }
+
+  /* ==========================================================================
+     RESPONSIVIDADE E ACESSIBILIDADE
+     ========================================================================== */
+  
+  /* Desativa animações se o usuário preferir redução de movimento (SEO/UX) */
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    .stagger-load > * {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+
+  /* Ajuste de escala para dispositivos móveis muito pequenos */
+  @media (max-width: 380px) {
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 10px, 0); /* Menos deslocamento em telas mini */
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+    }
   }
 }
