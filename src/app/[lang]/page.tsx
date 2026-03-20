@@ -2,9 +2,15 @@
 
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
+import Link from "next/link"; // Link é utilizado na seção de artigos ou navegação
 import { Suspense } from "react";
+
+/**
+ * REVISÃO TÉCNICA:
+ * 1. Removido 'Image' de "next/image" pois não estava sendo usado neste arquivo (causava erro no deploy).
+ * 2. Mantido suporte total ao React 19 (useActionState no ProfileForm).
+ * 3. Next.js 16.2.0: Params tratados como Promise.
+ */
 
 // Integração com as Libs (SEO & Schema)
 import { buildMetadata } from "@/lib/seo";
@@ -33,7 +39,7 @@ import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 import ProfileForm from "@/components/profile/ProfileForm";
 
 /**
- * Geração de Parâmetros Estáticos
+ * Geração de Parâmetros Estáticos (Build-time optimization)
  */
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
@@ -95,9 +101,10 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
 }
 
 /**
- * COMPONENTE PRINCIPAL (Next.js 16.2 / React 19)
+ * COMPONENTE PRINCIPAL (Next.js 16.2 / React 19 / Node 24)
  */
 export default async function HomePage({ params }: PageProps) {
+  // Desembrulhar params conforme Next 16.2
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
   
@@ -105,8 +112,7 @@ export default async function HomePage({ params }: PageProps) {
   const lang = locale as Locale;
 
   /**
-   * 2. BUSCA DE DADOS EM PARALELO (Node 24 Performance)
-   * Importante: Carregamos o dicionário principal e o de erros.
+   * BUSCA DE DADOS EM PARALELO (Node 24 Performance)
    */
   const [dict, repos] = await Promise.all([
     getServerDictionary(lang),
@@ -115,15 +121,11 @@ export default async function HomePage({ params }: PageProps) {
 
   if (!dict) notFound();
 
-  // Mock de carregamento do dicionário de erros (deve ser ajustado conforme sua lib de fetch)
-  // Normalmente: const errorDict = await getErrorDictionary(lang);
-  // Para este exemplo, assumimos que o getServerDictionary já compõe ou carregamos manualmente:
+  // Carregamento dinâmico do dicionário de erros baseado no idioma da URL
   const errorDict = (await import(`@/dictionaries/errors/${lang}.json`)).default as ErrorDictionary;
 
   const projects = normalizeProjects(repos);
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
-  const featuredArticle = dict.articles?.items?.[0];
-
   const jsonLd = [personSchema(), websiteSchema()];
 
   return (
@@ -133,7 +135,7 @@ export default async function HomePage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <main className="flex min-h-screen flex-col bg-white dark:bg-[#020617] transition-colors duration-300">
+      <main className="flex min-h-screen flex-col bg-white dark:bg-[#020617] transition-colors duration-300 selection:bg-blue-500/30">
         
         {/* HERO SECTION */}
         <HeroSection dictionary={dict} />
@@ -152,13 +154,14 @@ export default async function HomePage({ params }: PageProps) {
         </section>
 
         {/* INTEGRANDO O PROFILE FORM (SERVER ACTION + ERROR DICT) */}
-        <section id="settings" className="py-16 bg-zinc-50 dark:bg-zinc-950/50">
+        <section id="settings" className="py-16 bg-zinc-50 dark:bg-zinc-950/20 border-y border-zinc-200 dark:border-zinc-800/50">
           <div className="mx-auto max-w-7xl px-4 text-center mb-10">
-            <h2 className="text-3xl font-black tracking-tighter dark:text-white">
-              {lang.startsWith('pt') ? 'Configurações de Perfil' : 'Profile Settings'}
+            <h2 className="text-4xl font-black tracking-tighter dark:text-white mb-2">
+              {lang.startsWith('pt') ? 'Configurações de Perfil' : 
+               lang.startsWith('es') ? 'Configuración de Perfil' : 'Profile Settings'}
             </h2>
+            <p className="text-zinc-500 text-sm">React 19 Server Action Demo</p>
           </div>
-          {/* Aqui passamos o dict unido ao errorDict para o formulário cliente */}
           <ProfileForm 
             lang={lang} 
             dict={{ ...dict, errors: errorDict }} 
@@ -176,7 +179,7 @@ export default async function HomePage({ params }: PageProps) {
         {/* EXPERIÊNCIA PROFISSIONAL */}
         <ExperienceSection experience={dict.experience} />
 
-        {/* PORTFÓLIO GRID */}
+        {/* PORTFÓLIO GRID (GITHUB INTEGRATION) */}
         <section id="projects" className="py-24 scroll-mt-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-12">
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">
@@ -186,7 +189,7 @@ export default async function HomePage({ params }: PageProps) {
           <PortfolioGrid projects={projects} lang={lang} dict={dict} />
         </section>
 
-        {/* CURRICULUM VITAE */}
+        {/* CURRICULUM VITAE (PDF LOADER) */}
         <section id="resume" className="py-24 bg-slate-50/50 dark:bg-slate-900/10 border-y border-slate-200 dark:border-slate-800/50 scroll-mt-24">
           <div className="text-center mb-12 px-4">
             <h2 className="text-4xl md:text-5xl font-black mb-8 text-slate-900 dark:text-white tracking-tighter">
@@ -210,8 +213,13 @@ export default async function HomePage({ params }: PageProps) {
               <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tightest">
                 {dict.articles.title}
               </h2>
+              <div className="mt-8">
+                <Link href={`/${lang}/artigos`} className="text-blue-600 font-bold hover:underline">
+                   {lang.startsWith('pt') ? 'Ver todos os artigos' : 
+                    lang.startsWith('es') ? 'Ver todos los artículos' : 'View all articles'} →
+                </Link>
+              </div>
             </header>
-            {/* ... restante do código de artigos ... */}
           </div>
         </section>
 
