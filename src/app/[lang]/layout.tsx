@@ -16,7 +16,7 @@ import Footer from "@/components/Footer";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 import OpenGraph from "@/components/seo/OpenGraph";
-import JsonLd from "@/components/seo/JsonLd";
+import StructuredData from "@/components/StructuredData"; // Importação do novo componente
 
 // Tailwind CSS 4.2 Engine
 import "@/app/globals.css";
@@ -28,14 +28,14 @@ const inter = Inter({
 });
 
 /**
- * Next.js 16.2.0: Geração Estática de Parâmetros
+ * Next.js 16.2.0: Geração Estática de Parâmetros para os 5 idiomas
  */
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
 /**
- * Geração de Metadados Dinâmicos
+ * Geração de Metadados Dinâmicos (SEO Regionalizado)
  */
 export async function generateMetadata({ 
   params 
@@ -48,8 +48,6 @@ export async function generateMetadata({
   if (!locales.includes(locale)) notFound();
 
   const dict = await getServerDictionary(locale);
-  
-  // CORREÇÃO TS 6: Acesso via Index Signature para evitar erro de Type Check
   const baseUrl = process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app";
 
   const metadata = buildMetadata({
@@ -60,6 +58,7 @@ export async function generateMetadata({
 
   return {
     ...metadata,
+    metadataBase: new URL(baseUrl),
     verification: {
       // MANTIDO: Sua Tag de Verificação do Google
       google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
@@ -74,6 +73,14 @@ export async function generateMetadata({
         "es-MX": `${baseUrl}/es-MX`,
       },
     },
+    icons: {
+      icon: [
+        { url: "/icons/icon.svg", type: "image/svg+xml" },
+        { url: "/icons/icon.png", type: "image/png" },
+      ],
+      shortcut: "/icons/favicon.ico",
+      apple: "/icons/apple-touch-icon.png",
+    }
   };
 }
 
@@ -86,6 +93,7 @@ export const viewport: Viewport = {
 
 /**
  * ROOT LAYOUT MULTILINGUE - SÉRGIO SANTOS
+ * Integrado com React 19 (Async Components) e Node 24
  */
 export default async function LangLayout(props: {
   children: ReactNode;
@@ -98,7 +106,6 @@ export default async function LangLayout(props: {
 
   const dict = await getServerDictionary(locale);
   
-  // CORREÇÃO TS 6: Acesso seguro aos processos de ambiente
   const gaId = process.env['NEXT_PUBLIC_GA_ID'];
   const baseUrl = process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app";
   const baseLanguage = locale.split("-")[0];
@@ -110,7 +117,7 @@ export default async function LangLayout(props: {
       suppressHydrationWarning
     >
       <head>
-        {/* SEO: OpenGraph Dinâmico (Suporte regional AR, MX, ES, BR, US) */}
+        {/* SEO: OpenGraph Dinâmico (Suporte para og-image regionalizada) */}
         <OpenGraph 
           title={dict.seo.title}
           description={dict.seo.description}
@@ -118,32 +125,10 @@ export default async function LangLayout(props: {
           locale={locale}
         />
         
-        {/* SEO: Dados Estruturados (JSON-LD) */}
-        <JsonLd 
-          schema={[
-            {
-              "@context": "https://schema.org",
-              "@type": "Person",
-              "name": "Sérgio Santos",
-              "url": baseUrl,
-              "jobTitle": "Cientista de Dados",
-              "image": `${baseUrl}/images/sergio-santos-profile.png`,
-              "sameAs": [
-                "https://www.linkedin.com/in/santossergioluiz",
-                "https://github.com/Santosdevbjj"
-              ]
-            },
-            {
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              "name": dict.seo.siteName,
-              "url": `${baseUrl}/${locale}`,
-              "inLanguage": locale
-            }
-          ]}
-        />
+        {/* INTEGRAÇÃO: Dados Estruturados Person + WebSite (Google Oficial) */}
+        <StructuredData lang={locale} />
         
-        {/* Google Analytics - Estratégia Otimizada */}
+        {/* Google Analytics - Estratégia afterInteractive */}
         {gaId && (
           <>
             <Script
@@ -164,10 +149,11 @@ export default async function LangLayout(props: {
 
       <body className="antialiased min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-50 transition-colors duration-300 ease-in-out">
         
-        {/* INTEGRAÇÃO: Transição Suave (Fade-in Global) */}
-        <div className="animate-in fade-in duration-700 flex flex-col min-h-screen">
+        {/* Transição de Fade-in utilizando Tailwind 4.2 capabilities */}
+        <div className="flex flex-col min-h-screen opacity-0 animate-[fadeIn_0.7s_ease-in_forwards]">
           
           <ScrollSpyProvider>
+            {/* Link de Acessibilidade */}
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-2xl"
@@ -175,24 +161,24 @@ export default async function LangLayout(props: {
               {dict.common.skipToContent}
             </a>
 
-            {/* Navbar Multilingue Responsiva */}
+            {/* Navbar Multilingue (PT, EN, ES-ES, ES-AR, ES-MX) */}
             <Navbar lang={locale} common={dict.common} contact={dict.contact} />
 
             <main id="main-content" className="flex-grow flex flex-col">
-              {/* Metadados: Breadcrumbs Dinâmicos */}
+              {/* Metadados: Breadcrumbs JSON-LD para Google Search */}
               <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
               
               <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-6">
                 <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
               </div>
 
-              {/* Área de Conteúdo */}
+              {/* Área de Conteúdo Principal */}
               <section className="flex-grow w-full">
                 {props.children}
               </section>
             </main>
 
-            {/* Rodapé Integrado aos Dicionários */}
+            {/* Rodapé Dinâmico */}
             <Footer 
               lang={locale} 
               common={dict.common} 
