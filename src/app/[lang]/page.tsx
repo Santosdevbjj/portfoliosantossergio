@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 
-// SEO & Schema (Recuperando a inteligência de compartilhamento)
+// SEO & Schema
 import { buildMetadata } from "@/lib/seo";
 import { personSchema, websiteSchema } from "@/lib/schema";
 
@@ -43,16 +43,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-interface PageProps {
-  params: Promise<{ lang: string }>;
-}
-
-/**
- * SEO DINÂMICO RECUPERADO:
- * Garante que o compartilhamento no LinkedIn mostre os dados do artigo
- * se houver um slug ou contexto, caso contrário usa o padrão do portfólio.
- */
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang) as SupportedLocale;
   if (!locales.includes(locale)) return {};
@@ -64,8 +55,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: dict?.seo?.description,
     lang: locale,
     path: `/${locale}`,
-    // A imagem aqui volta a ser dinâmica baseada no dicionário de SEO
-    image: `/api/og?lang=${locale}&title=${encodeURIComponent(dict?.seo?.title ?? "")}`
+    // Apontando para as OGs estáticas que você possui
+    image: `/og/og-image-${locale}.png`
   });
 }
 
@@ -90,7 +81,7 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
     .filter((p) => p.isPortfolio && p.htmlUrl);
 }
 
-export default async function HomePage({ params }: PageProps) {
+export default async function HomePage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
   if (!locales.includes(locale)) notFound();
@@ -103,12 +94,9 @@ export default async function HomePage({ params }: PageProps) {
 
   if (!dict) notFound();
 
-  // Carregamento do dicionário de erros
   const errorDict = (await import(`@/dictionaries/errors/${lang}.json`)).default as ErrorDictionary;
-
   const projects = normalizeProjects(repos);
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
-  const featuredArticle = dict.articles?.items?.[0];
 
   return (
     <ProxyPage lang={lang}>
@@ -130,8 +118,8 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* PROFILE FORM (Integrado discretamente) */}
-        <section className="py-10 bg-zinc-50 dark:bg-zinc-900/30">
+        {/* PROFILE FORM */}
+        <section className="py-10 bg-slate-50 dark:bg-slate-900/20 border-y border-slate-100 dark:border-slate-800/50">
           <ProfileForm lang={lang} dict={{ ...dict, errors: errorDict }} />
         </section>
 
@@ -148,88 +136,99 @@ export default async function HomePage({ params }: PageProps) {
         </section>
 
         {/* -----------------------------------------------------------
-            OS TRÊS CARDS FINAIS (RESTAURADOS E CORRIGIDOS)
+            OS TRÊS CARDS FINAIS (PADRÃO AZUL INTEGRADO)
         -------------------------------------------------------------- */}
         
-        <section className="py-24 space-y-12">
+        <section className="py-24 space-y-12 bg-slate-50/30 dark:bg-transparent">
           
-          {/* 1) CARD DO CURRÍCULO (PDF) */}
+          {/* 1) CARD DO CURRÍCULO (AZUL) */}
           <div id="resume" className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-10">
-              <h2 className="text-4xl font-black dark:text-white tracking-tighter">
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
                 Curriculum <span className="text-blue-600">Vitae</span>
               </h2>
               <div className="mt-6 max-w-xs mx-auto">
                 <ResumeLangSelector currentLang={lang as SupportedLocale} dict={dict.resume} />
               </div>
             </div>
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+            <div className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl overflow-hidden border border-blue-100 dark:border-blue-900/30">
               <PdfSafeLoader fileUrl={pdfFile} lang={lang} />
             </div>
           </div>
 
-          {/* GRID PARA OS OUTROS DOIS CARDS (ARTIGO PREMIADO E GITHUB) */}
+          {/* GRID PARA OS OUTROS DOIS CARDS */}
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8">
             
-            {/* 2) CARD DO ARTIGO PREMIADO */}
-            <div className="group relative flex flex-col bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-[3rem] p-10 shadow-xl transition-all hover:scale-[1.01]">
-              <div className="absolute top-10 right-10">
-                <span className="px-3 py-1 rounded-full bg-amber-400 text-black text-[10px] font-black uppercase tracking-wider">
-                  {dict.articles.bestOfMonth}
-                </span>
-              </div>
-              
-              <div className="flex flex-col md:flex-row items-center gap-8 mb-10 mt-6">
-                <div className="relative w-36 h-36 rounded-3xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-2xl rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                  <Image 
-                    src="/images/trofeus-vencedor-dio.png" 
-                    alt="Troféu DIO" 
-                    fill 
-                    className="object-cover" 
-                  />
+            {/* 2) CARD DO ARTIGO PREMIADO (AZUL) */}
+            <div className="group relative flex flex-col bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-900/30 rounded-[3rem] p-8 md:p-12 shadow-xl hover:shadow-blue-500/10 transition-all">
+              <div className="flex flex-col h-full">
+                <div className="flex items-start justify-between mb-8">
+                  <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-lg border-2 border-blue-50 rotate-[-3deg] group-hover:rotate-0 transition-transform">
+                    <Image src="/images/trofeus-vencedor-dio.png" alt="Troféu DIO" fill className="object-cover" />
+                  </div>
+                  <span className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/30">
+                    🏆 Artigo Premiado
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-xs font-bold uppercase text-blue-600 mb-2">{featuredArticle?.category}</p>
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                    {featuredArticle?.title}
-                  </h3>
-                </div>
-              </div>
 
-              <div className="mt-auto pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                <a 
-                  href={featuredArticle?.link} 
-                  target="_blank" 
-                  className="px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-black rounded-2xl text-sm font-black hover:bg-blue-600 hover:text-white transition-all shadow-lg"
-                >
-                  {dict.articles.readMore}
-                </a>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
+                  Low-Code na Saúde: Como Criar Apps Médicos em Semanas
+                </h3>
+                
+                <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed mb-8">
+                  35ª Competição da DIO (Set/2025). Publicado no Medium em três idiomas, explorando como plataformas low-code aceleram o desenvolvimento médico com segurança e conformidade.
+                </p>
+
+                <div className="mt-auto space-y-6">
+                  <div className="flex flex-wrap gap-4 items-center py-4 border-y border-slate-100 dark:border-slate-800">
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e" target="_blank" className="flex items-center gap-2 hover:scale-110 transition-transform">
+                      <span className="text-2xl">🇧🇷</span> <span className="text-xs font-bold dark:text-slate-300">PT</span>
+                    </a>
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77" target="_blank" className="flex items-center gap-2 hover:scale-110 transition-transform">
+                      <span className="text-2xl">🇺🇸</span> <span className="text-xs font-bold dark:text-slate-300">EN</span>
+                    </a>
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad" target="_blank" className="flex items-center gap-2 hover:scale-110 transition-transform">
+                      <span className="text-2xl">🇪🇸</span> <span className="text-xs font-bold dark:text-slate-300">ES</span>
+                    </a>
+                  </div>
+
+                  <a href="https://medium.com/@sergiosantosluiz/" target="_blank" className="inline-flex items-center text-blue-600 dark:text-blue-400 font-black text-sm hover:underline">
+                    📚 Ver outros artigos no Medium <span className="ml-2">→</span>
+                  </a>
+                </div>
               </div>
             </div>
 
-            {/* 3) CARD REPOSITÓRIO GITHUB (Artigos Técnicos) */}
+            {/* 3) CARD REPOSITÓRIO GITHUB (AZUL) */}
             <Link 
               href={`/${lang}/artigos`} 
-              className="group flex flex-col bg-slate-900 dark:bg-slate-800/20 border border-slate-800 dark:border-slate-700/50 rounded-[3rem] p-10 shadow-2xl transition-all hover:border-blue-500 overflow-hidden relative"
+              className="group relative flex flex-col bg-slate-900 dark:bg-blue-950/20 border border-blue-900/30 rounded-[3rem] p-8 md:p-12 shadow-2xl overflow-hidden hover:border-blue-500 transition-all"
             >
-              <div className="flex items-center gap-5 mb-10 relative z-10">
-                <div className="p-4 bg-white rounded-2xl">
-                  <Image src="/icons/icon.svg" width={32} height={32} alt="GitHub" />
+              <div className="relative z-10 h-full flex flex-col">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="p-3 bg-white rounded-xl shadow-inner">
+                    <Image src="/icons/icon.svg" width={28} height={28} alt="GitHub" />
+                  </div>
+                  <h3 className="text-2xl font-black text-white leading-none">Artigos Técnicos</h3>
                 </div>
-                <h3 className="text-3xl font-black text-white">
-                  {dict.common.nav.articles}
-                </h3>
+
+                <div className="space-y-4 mb-10">
+                  <h4 className="text-blue-400 font-bold text-lg tracking-tight">Governança, IA e Sistemas Críticos</h4>
+                  <p className="text-slate-300 text-sm md:text-base leading-relaxed">
+                    Cloud, IA Generativa e Engenharia de Software aplicadas a problemas reais. Cada conteúdo nasce de um desafio concreto.
+                  </p>
+                  <p className="text-slate-400 text-xs italic border-l-2 border-blue-600 pl-4">
+                    Baseado em experiência com sistemas bancários: governança e conformidade como princípios.
+                  </p>
+                </div>
+
+                <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between text-blue-400 font-black text-sm">
+                  <span>{dict.articles.mediumProfile}</span>
+                  <span className="group-hover:translate-x-2 transition-transform">Acessar Repositório →</span>
+                </div>
               </div>
-              <p className="text-slate-400 mb-10 text-lg leading-relaxed relative z-10">
-                {dict.seo.description}
-              </p>
-              <div className="mt-auto flex items-center justify-between pt-8 border-t border-slate-800 text-sm font-black text-blue-400 relative z-10">
-                <span>{dict.articles.mediumProfile}</span>
-                <span className="group-hover:translate-x-2 transition-transform">
-                  {dict.articles.readMore} →
-                </span>
-              </div>
-              <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full" />
+              {/* Efeito visual de fundo azul */}
+              <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-blue-600/10 blur-[100px] rounded-full group-hover:bg-blue-600/20 transition-colors" />
             </Link>
 
           </div>
