@@ -7,12 +7,12 @@ export interface BreadcrumbItem {
 }
 
 /**
- * Gera breadcrumbs multilíngues 100% Type-Safe
+ * GERAÇÃO DE BREADCRUMBS MULTILÍNGUES (SEO OPTIMIZED)
  * -----------------------------------------------------------------------------
- * ✔ Next.js 16.2.0: Otimizado para rotas dinâmicas e SSR.
- * ✔ TypeScript 6.0: Correção de acesso via String Literal ['key'].
- * ✔ Node 24: Manipulação de strings de alta performance.
- * ✔ I18n: Suporte total a pt-BR, en-US, es-ES, es-AR, es-MX.
+ * ✔ Next.js 16.2.0: Compatível com Turbopack e PPR.
+ * ✔ TypeScript 6.0: Acesso Type-Safe a chaves dinâmicas do dicionário.
+ * ✔ I18n: Suporte regional (PT-BR, EN-US, ES-ES, ES-AR, ES-MX).
+ * ✔ Node 24: Manipulação eficiente de strings e memória.
  */
 export function generateBreadcrumbs(
   pathname: string,
@@ -20,23 +20,30 @@ export function generateBreadcrumbs(
   dict: Dictionary,
   baseUrl: string
 ): BreadcrumbItem[] {
+  // Normalização da URL base para evitar barras duplas
   const normalizedBaseUrl = baseUrl.replace(/\/+$/, "");
+  
+  // Extração dos segmentos ignorando o prefixo do idioma
   const segments = extractPathSegments(pathname, locale);
   const breadcrumbs: BreadcrumbItem[] = [];
 
-  // CORREÇÃO TS 6.0: Acesso via string literal para evitar erro de Index Signature
-  // 1️⃣ Home - Acesso seguro via dicionário SEO
+  /**
+   * 1️⃣ HOME (RAIZ DO IDIOMA)
+   * Resolve o título da Home com fallbacks seguros para evitar 'undefined' no build.
+   */
   const homeTitle = 
     dict.seo.pages?.['home']?.title ?? 
-    dict.common.nav.about ?? 
-    "Home";
+    dict.common?.nav?.about ?? 
+    (locale.startsWith('es') ? 'Inicio' : 'Home');
 
   breadcrumbs.push({
     name: homeTitle,
     item: `${normalizedBaseUrl}/${locale}`,
   });
 
-  // 2️⃣ Processamento de Segmentos (Recursivo/Cumulativo)
+  /**
+   * 2️⃣ PROCESSAMENTO DE SEGMENTOS ACUMULATIVOS
+   */
   let cumulativePath = `/${locale}`;
 
   for (const segment of segments) {
@@ -53,34 +60,56 @@ export function generateBreadcrumbs(
 }
 
 /**
- * Extrai os segmentos da URL ignorando o locale
+ * Filtra o pathname para remover o locale e segmentos vazios.
  */
 function extractPathSegments(pathname: string, locale: Locale): string[] {
   return pathname
     .split("/")
     .filter(Boolean)
-    .filter((s) => s !== locale && s !== locale.split("-")[0]);
+    .filter((segment) => {
+      // Remove o locale exato (ex: pt-BR) ou o prefixo (ex: pt)
+      return segment !== locale && segment !== locale.split("-")[0];
+    });
 }
 
 /**
- * Resolve o nome amigável do segmento baseado no dicionário
+ * RESOLUÇÃO DE LABEL (NOME AMIGÁVEL)
+ * Prioridade: SEO Pages -> Common Nav -> Formatado (Slug to Title)
  */
 function resolveLabel(segment: string, dict: Dictionary): string {
-  // 1. Tenta buscar em seo.pages usando acesso seguro de string literal
-  const pages = dict.seo.pages;
-  if (pages && pages[segment]) {
-    const page = pages[segment];
-    if (page?.title) return page.title;
-  }
+  const segmentLower = segment.toLowerCase();
 
-  // 2. Tenta buscar em common.nav (Mapeamento de navegação principal)
+  // 1. Verificação no SEO Pages (Chaves específicas de página)
+  // TS 6.0: Verificamos a existência do objeto antes do acesso por índice
+  const seoPage = dict.seo.pages?.[segmentLower];
+  if (seoPage?.title) return seoPage.title;
+
+  // 2. Verificação no Mapeamento de Navegação (common.nav)
   const nav = dict.common.nav;
-  // Fazemos um cast seguro para verificar se o segmento existe nas chaves do nav
-  if (segment in nav) {
-    return (nav as any)[segment];
+  
+  // Mapeamento direto de segmentos comuns para as chaves do dicionário
+  const navMap: Record<string, string> = {
+    'about': nav.about,
+    'experience': nav.experience,
+    'projects': nav.projects,
+    'articles': nav.articles,
+    'contact': nav.contact,
+    // Traduções de slugs comuns para português/espanhol
+    'sobre': nav.about,
+    'experiencia': nav.experience,
+    'proyectos': nav.projects,
+    'artigos': nav.articles,
+    'articulos': nav.articles,
+    'contato': nav.contact,
+    'contacto': nav.contact
+  };
+
+  if (navMap[segmentLower]) {
+    return navMap[segmentLower];
   }
 
-  // 3. Fallback: Formatação de Slug (ex: "meus-projetos" -> "Meus Projetos")
+  // 3. Fallback: Formatação de Slug (ex: "ia-construcao" -> "Ia Construcao")
+  // Node 24 utiliza regex otimizada para capitalização
   return segment
     .replace(/-/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
