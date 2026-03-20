@@ -35,8 +35,7 @@ export async function generateStaticParams() {
 }
 
 /**
- * Geração de Metadados Dinâmicos (SSR/ISR)
- * React 19: Params agora é uma Promise
+ * Geração de Metadados Dinâmicos
  */
 export async function generateMetadata({ 
   params 
@@ -51,7 +50,6 @@ export async function generateMetadata({
   const dict = await getServerDictionary(locale);
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
 
-  // BuildMetadata centralizado para SEO consistente
   const metadata = buildMetadata({
     title: dict.seo.title,
     description: dict.seo.description,
@@ -86,7 +84,6 @@ export const viewport: Viewport = {
 
 /**
  * ROOT LAYOUT MULTILINGUE
- * Implementa transição suave e integração total com Node 24 / React 19.
  */
 export default async function LangLayout(props: {
   children: ReactNode;
@@ -100,8 +97,6 @@ export default async function LangLayout(props: {
   const dict = await getServerDictionary(locale);
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfoliosantossergio.vercel.app";
-  
-  // Define a direção do texto e o idioma base (ex: "es" para es-AR)
   const baseLanguage = locale.split("-")[0];
 
   return (
@@ -111,7 +106,7 @@ export default async function LangLayout(props: {
       suppressHydrationWarning
     >
       <head>
-        {/* Injeção do Componente OpenGraph Customizado */}
+        {/* SEO: OpenGraph Dinâmico por Idioma */}
         <OpenGraph 
           title={dict.seo.title}
           description={dict.seo.description}
@@ -119,7 +114,32 @@ export default async function LangLayout(props: {
           locale={locale}
         />
         
-        {/* Sua Tag Global do Google Analytics vinculada ao GA_ID */}
+        {/* SEO: Dados Estruturados Principais (JSON-LD) */}
+        <JsonLd 
+          schema={[
+            {
+              "@context": "https://schema.org",
+              "@type": "Person",
+              "name": "Sérgio Santos",
+              "url": baseUrl,
+              "jobTitle": "Cientista de Dados",
+              "image": `${baseUrl}/images/sergio-santos-profile.png`,
+              "sameAs": [
+                "https://www.linkedin.com/in/santossergioluiz",
+                "https://github.com/Santosdevbjj"
+              ]
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": dict.seo.siteName,
+              "url": `${baseUrl}/${locale}`,
+              "inLanguage": locale
+            }
+          ]}
+        />
+        
+        {/* Google Analytics */}
         {gaId && (
           <>
             <Script
@@ -138,14 +158,12 @@ export default async function LangLayout(props: {
         )}
       </head>
 
-      {/* INTEGRAÇÃO: Suavização de Transição (Prevent Flash) e Tailwind 4.2 */}
       <body className="antialiased min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-50 transition-colors duration-300 ease-in-out">
         
-        {/* Efeito de Fade Global para Mudança de Idioma */}
+        {/* INTEGRAÇÃO: Transição Suave de Idioma (Fade-in) */}
         <div className="animate-in fade-in duration-700 flex flex-col min-h-screen">
           
           <ScrollSpyProvider>
-            {/* Acessibilidade: Skip Link */}
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-2xl"
@@ -153,24 +171,21 @@ export default async function LangLayout(props: {
               {dict.common.skipToContent}
             </a>
 
-            {/* Navbar Multilingue */}
             <Navbar lang={locale} common={dict.common} contact={dict.contact} />
 
             <main id="main-content" className="flex-grow flex flex-col">
-              {/* Metadados Estruturados: Breadcrumbs JSON-LD */}
+              {/* SEO: Breadcrumbs JSON-LD e UI */}
               <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
               
               <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-6">
                 <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
               </div>
 
-              {/* Injeção do Conteúdo da Página */}
               <section className="flex-grow w-full">
                 {props.children}
               </section>
             </main>
 
-            {/* Rodapé Alinhado com Dicionários */}
             <Footer 
               lang={locale} 
               common={dict.common} 
