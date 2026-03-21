@@ -1,6 +1,7 @@
 /**
  * src/components/ArticleCard.tsx
  * Componente de UI moderno com Tailwind 4.2 e React 19.
+ * Corrigido para conformidade estrita com index signature do TS 6.
  */
 
 import type { GitHubItem } from "@/lib/github/types";
@@ -11,18 +12,26 @@ interface ArticleCardProps {
 }
 
 // Mapeamento de cores baseado nas categorias do GitHub
+// Usamos Record<string, string> para permitir categorias dinâmicas
 const categoryStyles: Record<string, string> = {
   react: "bg-blue-500/10 text-blue-600 border-blue-200 dark:border-blue-500/30",
   autoconhecimento: "bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30",
   geral: "bg-slate-500/10 text-slate-600 border-slate-200 dark:border-slate-500/30",
   // Fallback para novas categorias
-  default: "bg-purple-500/10 text-purple-600 border-purple-200 dark:border-purple-500/30",
+  fallback: "bg-purple-500/10 text-purple-600 border-purple-200 dark:border-purple-500/30",
 };
 
 export function ArticleCard({ article }: ArticleCardProps) {
   // Normaliza a categoria para encontrar no mapa
   const categoryKey = article.category.toLowerCase();
-  const badgeStyle = categoryStyles[categoryKey] || categoryStyles.default;
+  
+  /**
+   * CORREÇÃO TS 6: 
+   * Acessamos via ['key'] para satisfazer a regra de index signature.
+   * Mudamos o nome de 'default' para 'fallback' para evitar confusão com palavra reservada,
+   * embora o acesso via colchetes ['default'] também funcionaria.
+   */
+  const badgeStyle = categoryStyles[categoryKey] || categoryStyles['fallback'];
 
   return (
     <div className="group relative flex flex-col justify-between p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 hover:shadow-xl hover:shadow-zinc-500/5 hover:-translate-y-1">
