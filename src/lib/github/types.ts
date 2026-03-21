@@ -1,14 +1,28 @@
+
 /**
- * src/lib/github/types.ts (Sugestão de separação)
+ * src/lib/github/types.ts
+ * Definições de tipos para a API do GitHub - TS 6 & React 19 compatível.
  */
+
 export interface GitHubItem {
   name: string;
   path: string;
   url: string;
   type: 'file' | 'dir';
   download_url: string | null;
-  category?: string;
+  category: string; // Garantimos que a categoria sempre exista após o mapeamento
 }
+
+// Tipo auxiliar para a resposta crua da API do GitHub antes do processamento
+export interface GitHubRawItem {
+  name: string;
+  path: string;
+  url: string;
+  type: 'file' | 'dir';
+  download_url: string | null;
+}
+
+
 
 /**
  * src/lib/github/service.ts 
