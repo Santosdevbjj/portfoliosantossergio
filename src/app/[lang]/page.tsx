@@ -31,6 +31,7 @@ import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { CareerHighlights } from "@/components/CareerHighlights";
 import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 import ProfileForm from "@/components/profile/ProfileForm";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
