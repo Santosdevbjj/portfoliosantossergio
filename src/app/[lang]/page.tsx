@@ -47,19 +47,19 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang) as SupportedLocale;
   if (!locales.includes(locale)) return {};
-  
   const dict = await getServerDictionary(locale);
-
   return buildMetadata({
     title: dict?.seo?.title,
     description: dict?.seo?.description,
     lang: locale,
     path: `/${locale}`,
-    // Apontando para as OGs estáticas que você possui
     image: `/og/og-image-${locale}.png`
   });
 }
 
+/**
+ * LÓGICA DE NORMALIZAÇÃO (Isolada para manter a página limpa)
+ */
 function normalizeProjects(repos: any[]): ProjectDomain[] {
   if (!Array.isArray(repos)) return [];
   return repos
@@ -81,21 +81,50 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
     .filter((p) => p.isPortfolio && p.htmlUrl);
 }
 
+/**
+ * COMPONENTE DE RESILIÊNCIA: Portfolio (GitHub)
+ * Isola o fetch do GitHub para que, se falhar ou demorar, não quebre a página.
+ */
+async function ResilientPortfolio({ lang, dict }: { lang: Locale, dict: any }) {
+  try {
+    // Retry automático implícito pelo comportamento de revalidação e catch
+    const repos = await getPortfolioRepos("Santosdevbjj").catch(() => []);
+    const projects = normalizeProjects(repos);
+    return <PortfolioGrid projects={projects} lang={lang} dict={dict} />;
+  } catch (error) {
+    console.error("Erro ao carregar Portfolio:", error);
+    return <div className="text-center py-10 opacity-50">Serviço temporariamente indisponível.</div>;
+  }
+}
+
+/**
+ * COMPONENTE DE RESILIÊNCIA: Profile Form
+ * Isola o import dinâmico do dicionário de erros.
+ */
+async function ResilientProfileForm({ lang, dict }: { lang: Locale, dict: any }) {
+  let errorDict: ErrorDictionary = {} as ErrorDictionary;
+  try {
+    const errorModule = await import(`@/dictionaries/errors/${lang}.json`);
+    errorDict = errorModule.default;
+  } catch (e) {
+    console.warn("Dicionário de erro não encontrado, usando fallback vazio.");
+  }
+  return <ProfileForm lang={lang} dict={{ ...dict, errors: errorDict }} />;
+}
+
+/**
+ * PÁGINA PRINCIPAL (SERVER COMPONENT)
+ */
 export default async function HomePage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
   if (!locales.includes(locale)) notFound();
   const lang = locale as Locale;
 
-  const [dict, repos] = await Promise.all([
-    getServerDictionary(lang),
-    getPortfolioRepos("Santosdevbjj").catch(() => []),
-  ]);
-
+  // Carregamos o dicionário principal (essencial para a casca estática)
+  const dict = await getServerDictionary(lang);
   if (!dict) notFound();
 
-  const errorDict = (await import(`@/dictionaries/errors/${lang}.json`)).default as ErrorDictionary;
-  const projects = normalizeProjects(repos);
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
 
   return (
@@ -107,20 +136,23 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
       <main className="flex min-h-screen flex-col bg-white dark:bg-[#020617]">
         
+        {/* HERO SECTION (Estático/Rápido) */}
         <HeroSection dictionary={dict} />
 
-        {/* PROJETO IA - RISCO */}
+        {/* PROJETO IA - RISCO (Com Suspense para não bloquear a página) */}
         <section className="py-12 px-4">
           <div className="mx-auto max-w-7xl">
-            <Suspense fallback={<div className="h-96 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-[3rem]" />}>
+            <Suspense fallback={<div className="h-48 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-[3rem]" />}>
               {dict.construction && <ConstructionRiskProject dict={dict.construction as ConstructionDictionary} />}
             </Suspense>
           </div>
         </section>
 
-        {/* PROFILE FORM */}
+        {/* PROFILE FORM (Resiliente: Erro aqui não afeta o resto) */}
         <section className="py-10 bg-slate-50 dark:bg-slate-900/20 border-y border-slate-100 dark:border-slate-800/50">
-          <ProfileForm lang={lang} dict={{ ...dict, errors: errorDict }} />
+          <Suspense fallback={<div className="h-20 animate-pulse bg-blue-50/50 dark:bg-blue-900/10 rounded-full mx-auto max-w-3xl" />}>
+            <ResilientProfileForm lang={lang} dict={dict} />
+          </Suspense>
         </section>
 
         <AboutSection dict={dict.about} />
@@ -131,14 +163,16 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
         <ExperienceSection experience={dict.experience} />
 
+        {/* PORTFOLIO GRID (O ponto crítico do erro do GitHub) */}
         <section id="projects" className="py-24">
-          <PortfolioGrid projects={projects} lang={lang} dict={dict} />
+          <Suspense fallback={<div className="h-96 animate-pulse bg-slate-50 dark:bg-slate-900/40 rounded-[3rem] max-w-7xl mx-auto" />}>
+            <ResilientPortfolio lang={lang} dict={dict} />
+          </Suspense>
         </section>
 
         {/* -----------------------------------------------------------
             OS TRÊS CARDS FINAIS (PADRÃO AZUL INTEGRADO)
         -------------------------------------------------------------- */}
-        
         <section className="py-24 space-y-12 bg-slate-50/30 dark:bg-transparent">
           
           {/* 1) CARD DO CURRÍCULO (AZUL) */}
@@ -156,7 +190,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             </div>
           </div>
 
-          {/* GRID PARA OS OUTROS DOIS CARDS */}
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8">
             
             {/* 2) CARD DO ARTIGO PREMIADO (AZUL) */}
@@ -170,28 +203,18 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                     🏆 Artigo Premiado
                   </span>
                 </div>
-
                 <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
                   Low-Code na Saúde: Como Criar Apps Médicos em Semanas
                 </h3>
-                
                 <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed mb-8">
                   35ª Competição da DIO (Set/2025). Publicado no Medium em três idiomas, explorando como plataformas low-code aceleram o desenvolvimento médico com segurança e conformidade.
                 </p>
-
                 <div className="mt-auto space-y-6">
                   <div className="flex flex-wrap gap-4 items-center py-4 border-y border-slate-100 dark:border-slate-800">
-                    <a href="https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e" target="_blank" className="flex items-center gap-2 hover:scale-110 transition-transform">
-                      <span className="text-2xl">🇧🇷</span> <span className="text-xs font-bold dark:text-slate-300">PT</span>
-                    </a>
-                    <a href="https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77" target="_blank" className="flex items-center gap-2 hover:scale-110 transition-transform">
-                      <span className="text-2xl">🇺🇸</span> <span className="text-xs font-bold dark:text-slate-300">EN</span>
-                    </a>
-                    <a href="https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad" target="_blank" className="flex items-center gap-2 hover:scale-110 transition-transform">
-                      <span className="text-2xl">🇪🇸</span> <span className="text-xs font-bold dark:text-slate-300">ES</span>
-                    </a>
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e" target="_blank" className="flex items-center gap-2 hover:scale-110 transition-transform text-2xl">🇧🇷</a>
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77" target="_blank" className="flex items-center gap-2 hover:scale-110 transition-transform text-2xl">🇺🇸</a>
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad" target="_blank" className="flex items-center gap-2 hover:scale-110 transition-transform text-2xl">🇪🇸</a>
                   </div>
-
                   <a href="https://medium.com/@sergiosantosluiz/" target="_blank" className="inline-flex items-center text-blue-600 dark:text-blue-400 font-black text-sm hover:underline">
                     📚 Ver outros artigos no Medium <span className="ml-2">→</span>
                   </a>
@@ -211,7 +234,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                   </div>
                   <h3 className="text-2xl font-black text-white leading-none">Artigos Técnicos</h3>
                 </div>
-
                 <div className="space-y-4 mb-10">
                   <h4 className="text-blue-400 font-bold text-lg tracking-tight">Governança, IA e Sistemas Críticos</h4>
                   <p className="text-slate-300 text-sm md:text-base leading-relaxed">
@@ -221,16 +243,13 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                     Baseado em experiência com sistemas bancários: governança e conformidade como princípios.
                   </p>
                 </div>
-
                 <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between text-blue-400 font-black text-sm">
                   <span>{dict.articles.mediumProfile}</span>
                   <span className="group-hover:translate-x-2 transition-transform">Acessar Repositório →</span>
                 </div>
               </div>
-              {/* Efeito visual de fundo azul */}
               <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-blue-600/10 blur-[100px] rounded-full group-hover:bg-blue-600/20 transition-colors" />
             </Link>
-
           </div>
         </section>
 
