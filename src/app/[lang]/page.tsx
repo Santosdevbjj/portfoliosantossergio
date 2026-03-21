@@ -31,7 +31,7 @@ import { PortfolioGrid } from "@/components/PortfolioGrid";
 import { CareerHighlights } from "@/components/CareerHighlights";
 import ConstructionRiskProject from "@/components/ConstructionRiskProject";
 import ProfileForm from "@/components/profile/ProfileForm";
-// import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
@@ -224,6 +224,12 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
             </div>
 
             {/* 3) CARD REPOSITÓRIO GITHUB (AZUL) */}
+            // ... dentro do map de artigos
+                  <div className="flex flex-col gap-2">
+                  <CategoryBadge category={artigo.category} />
+                  <h3 className="text-lg font-bold">{artigo.name.replace('.md', '')}</h3>
+                  </div> 
+            
             <Link 
               href={`/${lang}/artigos`} 
               className="group relative flex flex-col bg-slate-900 dark:bg-blue-950/20 border border-blue-900/30 rounded-[3rem] p-8 md:p-12 shadow-2xl overflow-hidden hover:border-blue-500 transition-all"
