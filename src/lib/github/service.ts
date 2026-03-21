@@ -1,48 +1,56 @@
 /**
  * src/lib/github/service.ts
- * * Implementação resiliente seguindo Next.js 16.2.0, React 19 e TS 6.
- * Resolve o erro de acesso ao index signature do process.env.
+ * Implementação Resiliente e Recursiva - Next.js 16.2.0 & TS 6.
+ * Capaz de varrer subpastas para encontrar todos os seus artigos .md
  */
 
 export async function getArticlesWithRetry(retries = 2): Promise<any[]> {
-  // Acessamos via colchetes para satisfazer o TypeScript 6 ou garantimos a tipagem
   const GITHUB_TOKEN = process.env['GITHUB_TOKEN'];
+  const OWNER = "Santosdevbjj";
+  const REPO = "myArticles";
   
-  // URL do seu repositório de artigos (ajuste para o seu endpoint real)
-  const GITHUB_API_URL = "https://api.github.com/repos/Santosdevbjj/NOME_DO_REPO/contents/artigos";
+  // Começamos pela pasta principal 'artigos'
+  const BASE_URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/artigos`;
 
-  try {
-    const res = await fetch(GITHUB_API_URL, {
+  async function fetchRecursive(url: string): Promise<any[]> {
+    const res = await fetch(url, {
       headers: { 
-        // Uso de Template Literals padrão ES2026/Node 24
         Authorization: `Bearer ${GITHUB_TOKEN ?? ''}`,
         "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "Portfolio-Sergio-Santos"
+        "User-Agent": "Portfolio-Sergio-Santos-v16"
       },
-      // Next.js 16.2.0 Data Fetching (Time-based Revalidation)
-      next: { 
-        revalidate: 3600,
-        tags: ['github-articles'] 
-      },
+      next: { revalidate: 3600, tags: ['github-articles'] },
     });
 
-    if (!res.ok) {
-      // Log detalhado para o Browser Log Forwarding da 16.2
-      console.error(`[GitHub Service] Erro HTTP: ${res.status}`);
-      throw new Error(`Falha no GitHub: ${res.statusText}`);
+    if (!res.ok) throw new Error(`GitHub API Error: ${res.status}`);
+
+    const items = await res.json();
+    let allFiles: any[] = [];
+
+    for (const item of items) {
+      if (item.type === 'dir') {
+        // Se for uma pasta (ex: low_code), entra nela recursivamente
+        const subFiles = await fetchRecursive(item.url);
+        allFiles = [...allFiles, ...subFiles];
+      } else if (item.name.endsWith('.md') && item.name !== 'README.md') {
+        // Se for um arquivo markdown, adiciona à lista
+        allFiles.push({
+          ...item,
+          category: url.split('/').pop() // Usa o nome da pasta como categoria
+        });
+      }
     }
+    return allFiles;
+  }
 
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
-
+  try {
+    return await fetchRecursive(BASE_URL);
   } catch (error) {
     if (retries > 0) {
-      console.warn(`[GitHub Service] Tentando novamente... Restam ${retries} tentativas.`);
+      console.warn(`[GitHub Service] Falha na recursão. Tentando novamente... (${retries})`);
       return getArticlesWithRetry(retries - 1);
     }
-    
-    // Fallback silencioso para não quebrar a UI conforme o padrão "Veredito"
-    console.error("[GitHub Service] Limite de retentativas atingido ou erro crítico:", error);
-    return []; 
+    console.error("[GitHub Service] Erro crítico na estrutura de pastas:", error);
+    return []; // Retorno seguro para evitar Erro 500
   }
 }
