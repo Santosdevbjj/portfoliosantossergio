@@ -246,7 +246,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                 </div>
                 <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between text-blue-400 font-black text-sm">
                   <span>{dict.articles.mediumProfile}</span>
-                  <span className="group-hover:translate-x-2 transition-transform">Acessar Repositório →</span>
+                  <span className="group-hover:translate-x-2 transition-transform">Ler Artigos →</span>
                 </div>
               </div>
               <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-blue-600/10 blur-[100px] rounded-full group-hover:bg-blue-600/20 transition-colors" />
