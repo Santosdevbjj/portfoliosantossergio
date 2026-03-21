@@ -4,11 +4,9 @@
  * Stack: Next.js 16.2.0, TS 6, Node 24, React 19.
  */
 
-// Uso de 'import type' para satisfazer verbatimModuleSyntax do TS 6
 import type { GitHubItem, GitHubRawItem } from './types';
 
 export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
-  // Acesso via colchetes para conformidade rigorosa com TS 6
   const rawToken = process.env['GITHUB_TOKEN'];
   const GITHUB_TOKEN = typeof rawToken === 'string' ? rawToken.trim() : undefined;
   
@@ -17,7 +15,6 @@ export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
   const BASE_URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/artigos`;
 
   async function fetchRecursive(url: string): Promise<GitHubItem[]> {
-    // 1. TIMEOUT: Aborta a requisição se o GitHub demorar mais de 8 segundos
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
@@ -29,7 +26,6 @@ export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
           ...(GITHUB_TOKEN && { "Authorization": `token ${GITHUB_TOKEN}` })
         },
         signal: controller.signal,
-        // Cache nativo Next.js 16.2
         next: { 
           revalidate: 3600, 
           tags: ['github-articles'] 
@@ -40,16 +36,16 @@ export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
 
       if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
-          console.error(`[GitHub Service] Erro ${res.status}: Credenciais ou Rate Limit.`);
+          console.error(`[GitHub Service] Erro ${res.status}: Auth/Rate Limit.`);
           return [];
         }
         throw new Error(`GitHub API Error: ${res.status}`);
       }
 
-      const items: GitHubRawItem[] = await res.json();
+      const items = (await res.json()) as GitHubRawItem[];
       if (!Array.isArray(items)) return [];
 
-      // 2. PARALELISMO: Dispara as subpastas simultaneamente (Performance Node 24)
+      // 1. Processamento paralelo de subpastas
       const folderPromises = items
         .filter(item => item.type === 'dir')
         .map(dir => fetchRecursive(dir.url));
@@ -57,15 +53,20 @@ export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
       const nestedResults = await Promise.all(folderPromises);
       const filesFromSubfolders = nestedResults.flat();
 
-      // 3. MAPEAMENTO: Filtra MDs e injeta a categoria
+      // 2. Mapeamento explícito para garantir compatibilidade com GitHubItem[]
       const currentLevelFiles: GitHubItem[] = items
         .filter(item => item.name.endsWith('.md') && item.name.toLowerCase() !== 'readme.md')
-        .map(file => {
+        .map((file): GitHubItem => {
           const pathParts = file.path.split('/');
-          const categoryName = pathParts.length > 2 ? pathParts[pathParts.length - 2] : 'geral';
+          // Garante que categoryName seja string (evita undefined para o TS 6)
+          const categoryName = (pathParts.length > 2 ? pathParts[pathParts.length - 2] : 'geral') || 'geral';
           
           return {
-            ...file,
+            name: file.name,
+            path: file.path,
+            url: file.url,
+            type: file.type,
+            download_url: file.download_url,
             category: categoryName
           };
         });
@@ -75,7 +76,7 @@ export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
     } catch (err: any) {
       clearTimeout(timeoutId);
       if (err.name === 'AbortError') {
-        console.error(`[GitHub Service] Timeout atingido para: ${url}`);
+        console.error(`[GitHub Service] Timeout em: ${url}`);
       }
       throw err;
     }
@@ -85,11 +86,11 @@ export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
     return await fetchRecursive(BASE_URL);
   } catch (error) {
     if (retries > 0) {
-      console.warn(`[GitHub Service] Falha detectada. Retentando em 1s... Restam: ${retries}`);
+      console.warn(`[GitHub Service] Falha. Retentando... Restam: ${retries}`);
       await new Promise(r => setTimeout(r, 1000));
       return getArticlesWithRetry(retries - 1);
     }
-    console.error("[GitHub Service] Falha crítica após todas as tentativas:", error);
-    return []; // Resiliência para não quebrar o build do Next.js
+    console.error("[GitHub Service] Erro crítico final:", error);
+    return [];
   }
 }
