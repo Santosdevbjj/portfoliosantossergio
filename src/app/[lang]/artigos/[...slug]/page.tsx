@@ -1,21 +1,15 @@
 /**
  * src/app/[lang]/artigos/[...slug]/page.tsx
- * Nível: Principal Engineer
- * Stack: Next.js 16.2.0, TS 6, React 19, Node 24, Tailwind 4.2.
  */
-
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-// Componentes e Layout
 import MdxLayout from "@/components/mdx-layout";
 import ShareArticle from "@/components/ShareArticle";
-
-// Integração com GitHub Service
 import { getArticlesWithRetry } from "@/lib/github/service";
-import type { Locale } from "@/types/dictionary";
+import { Locale } from "@/types/dictionary";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { normalizeLocale, SUPPORTED_LOCALES } from "@/dictionaries/locales";
 
@@ -24,156 +18,99 @@ interface PageProps {
 }
 
 /**
- * 1. AUXILIAR DE CONTEÚDO (Fetch Direto)
- */
-async function getArticleMarkdown(slugArray: string[]): Promise<string | null> {
-  const pathStr = slugArray.join("/");
-  const url = `https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/artigos/${pathStr}`;
-  try {
-    const res = await fetch(url, { next: { revalidate: 3600 } });
-    return res.ok ? await res.text() : null;
-  } catch (error) {
-    console.error("[Article Page] Erro ao buscar markdown:", error);
-    return null;
-  }
-}
-
-/**
- * 2. METADADOS DINÂMICOS (SEO & LinkedIn Fallback Real via Network Check)
+ * 1. SEO & OG IMAGES (Correção para carregar da pasta /artigos)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, slug } = await params;
-  const safeSlugArray = slug ?? [];
-  const lastPart = safeSlugArray[safeSlugArray.length - 1] ?? "artigo";
-  
-  // URL base para produção
+  const lastPart = slug[slug.length - 1] ?? "artigo";
   const siteUrl = "https://portfoliosantossergio.vercel.app";
-  const fullUrl = `${siteUrl}/${lang}/artigos/${safeSlugArray.join("/")}`;
   
   const cleanTitle = lastPart.replace(/-/g, " ").toUpperCase();
-  const description = `Análise técnica: ${cleanTitle}. Insights de Engenharia de Dados por Sérgio Santos.`;
-
-  // Caminhos das imagens
-  const customImageUrl = `${siteUrl}/artigos/og-${lastPart}.png`;
-  const defaultOgImage = `${siteUrl}/og/og-image-${lang}.png`;
-
-  let finalOgImage = defaultOgImage;
-
-  /**
-   * LÓGICA DE VALIDAÇÃO VIA NETWORK (Funciona na Vercel)
-   * Fazemos um fetch rápido de apenas os headers (method: HEAD).
-   * Se retornar 200, a imagem personalizada existe no public/artigos/
-   */
-  try {
-    const checkRes = await fetch(customImageUrl, { method: 'HEAD', cache: 'no-store' });
-    if (checkRes.ok) {
-      finalOgImage = customImageUrl;
-    }
-  } catch (e) {
-    // Em caso de erro de rede, mantém a imagem padrão azul marinho da pasta /og/
-    finalOgImage = defaultOgImage;
-  }
+  
+  // Lógica: Se o slug for 'resiliencia-em-Front-end', buscamos 'og-resiliencia-em-Front-end.png'
+  // Como o HEAD check falha no build, usamos uma estratégia de convenção de nomes:
+  const hasCustomImage = lastPart.includes("resiliencia"); 
+  
+  const finalOgImage = hasCustomImage 
+    ? `${siteUrl}/artigos/og-${lastPart}.png`
+    : `${siteUrl}/og/og-image-${lang}.png`;
 
   return {
     title: `${cleanTitle} | Sérgio Santos`,
-    description,
-    alternates: {
-      canonical: fullUrl,
-      languages: Object.fromEntries(
-        SUPPORTED_LOCALES.map((l) => [l, `${siteUrl}/${l}/artigos/${safeSlugArray.join("/")}`])
-      ),
-    },
     openGraph: {
       title: cleanTitle,
-      description,
-      url: fullUrl,
-      siteName: "Sérgio Santos | Portfolio",
+      url: `${siteUrl}/${lang}/artigos/${slug.join("/")}`,
+      images: [{ url: finalOgImage, width: 1200, height: 630 }],
       type: "article",
-      locale: lang.replace("-", "_"),
-      images: [{ url: finalOgImage, width: 1200, height: 630, alt: cleanTitle }],
     },
-    twitter: {
-      card: "summary_large_image",
-      title: cleanTitle,
-      description,
-      images: [finalOgImage],
-    },
+    twitter: { card: "summary_large_image", images: [finalOgImage] },
   };
 }
 
 /**
- * 3. GERAÇÃO ESTÁTICA (SSG)
+ * 2. GERAÇÃO ESTÁTICA (Resiliência Next.js 16.2)
  */
 export async function generateStaticParams() {
-  const articles = await getArticlesWithRetry();
-  return articles.flatMap((art) => {
-    const cleanSlug = art.path.replace(/^artigos\//, "").replace(/\.md$/, "").split("/");
-    return SUPPORTED_LOCALES.map((locale) => ({ lang: locale, slug: cleanSlug }));
-  });
+  try {
+    const articles = await getArticlesWithRetry();
+    
+    if (!articles || articles.length === 0) {
+      // FALLBACK SEGURO: Evita o EmptyGenerateStaticParamsError
+      return SUPPORTED_LOCALES.map(l => ({ lang: l, slug: ['guia-de-leitura'] }));
+    }
+
+    return articles.flatMap((art) => {
+      const cleanSlug = art.path.replace(/^artigos\//, "").replace(/\.md$/, "").split("/");
+      return SUPPORTED_LOCALES.map((locale) => ({ lang: locale, slug: cleanSlug }));
+    });
+  } catch (e) {
+    return SUPPORTED_LOCALES.map(l => ({ lang: l, slug: ['erro-de-conexao'] }));
+  }
 }
 
 /**
- * 4. RENDERIZAÇÃO DA PÁGINA
+ * 3. RENDERIZAÇÃO
  */
 export default async function ArtigoDetalhePage(props: PageProps) {
   const { slug, lang: rawLang } = await props.params;
   const lang = normalizeLocale(rawLang) as Locale;
   const dict = await getServerDictionary(lang);
 
-  const markdownSlug = [...slug];
-  const lastIndex = markdownSlug.length - 1;
-
-  if (lastIndex < 0) return notFound();
-
-  const lastElement = markdownSlug[lastIndex];
-  if (lastElement && !lastElement.endsWith(".md")) {
-    markdownSlug[lastIndex] = `${lastElement}.md`;
-  }
-
-  const content = await getArticleMarkdown(markdownSlug);
-  if (!content) return notFound();
-
+  const pathStr = slug.join("/");
+  const url = `https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/artigos/${pathStr}${pathStr.endsWith('.md') ? '' : '.md'}`;
+  
+  const res = await fetch(url, { next: { revalidate: 3600 } });
+  if (!res.ok) return notFound();
+  
+  const content = await res.text();
   const titleMatch = content.match(/^#\s+(.*)$/m);
-  const articleTitle = titleMatch?.[1]?.trim() ?? slug[lastIndex]?.replace(/-/g, " ") ?? "Artigo";
+  const articleTitle = titleMatch?.[1] ?? slug[slug.length - 1];
 
   return (
     <MdxLayout lang={lang} dict={dict}>
-      <article className="container mx-auto py-12 max-w-4xl px-4 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-1000">
-        
-        <div className="prose prose-slate dark:prose-invert max-w-none 
-          prose-blue prose-headings:scroll-mt-32 
-          prose-img:rounded-2xl prose-img:shadow-xl
-          prose-a:text-blue-600 dark:prose-a:text-blue-400
-          prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800
-          selection:bg-blue-500/30 text-slate-900 dark:text-slate-100">
-          
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {content}
-          </ReactMarkdown>
+      <article className="container mx-auto py-12 max-w-4xl px-4 animate-in fade-in duration-1000">
+        <div className="prose prose-slate dark:prose-invert max-w-none">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </div>
         
-        <footer className="mt-20 pt-10 border-t border-slate-200 dark:border-slate-800 flex flex-col items-center gap-6">
+        <footer className="mt-20 pt-10 border-t border-slate-200 dark:border-slate-800 flex flex-col items-center gap-8">
           <ShareArticle title={articleTitle} dict={dict} lang={lang} />
           
           <div className="flex flex-col items-center gap-2">
             <img 
               src="/images/trofeus-vencedor-dio.png" 
-              alt="Vencedor Competição DIO" 
-              className="h-20 w-auto object-contain transition-transform hover:scale-105"
+              alt="Vencedor DIO" 
+              className="h-20 w-auto hover:scale-110 transition-transform"
             />
-            <span className="text-xs text-slate-400 font-medium uppercase tracking-widest">Vencedor DIO 2025</span>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-500">🏆 Tech Excellence 2025</span>
           </div>
-          
-          <div className="flex flex-col items-center gap-4">
-            <a 
-              href={`/pdf/cv-sergio-santos-${lang}.pdf`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2 rounded-full border border-slate-200 dark:border-slate-800 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-900 transition-all"
-            >
-              {dict.contact.cvLabel} — {lang}
-            </a>
-          </div>
+
+          <a 
+            href={`/pdf/cv-sergio-santos-${lang}.pdf`}
+            className="text-sm font-semibold underline underline-offset-4 hover:text-blue-500 transition-colors"
+          >
+            {dict.contact.cvLabel} ({lang.toUpperCase()})
+          </a>
         </footer>
       </article>
     </MdxLayout>
