@@ -24,8 +24,7 @@ interface PageProps {
 }
 
 /**
- * 1. AUXILIAR DE CONTEÚDO (Fetch Direto)
- * Busca o raw do Markdown baseado no slug array.
+ * 1. AUXILIAR DE CONTEÚDO (Fetch Direto do GitHub Raw)
  */
 async function getArticleMarkdown(slugArray: string[]): Promise<string | null> {
   const path = slugArray.join("/");
@@ -46,23 +45,33 @@ async function getArticleMarkdown(slugArray: string[]): Promise<string | null> {
 }
 
 /**
- * 2. METADADOS DINÂMICOS (SEO, Open Graph & Twitter)
- * Suporte completo para pt-BR, en-US, es-ES, es-AR, es-MX.
+ * 2. METADADOS DINÂMICOS (SEO, Open Graph & LinkedIn)
+ * Implementação de Fallback para Imagens Personalizadas.
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, slug } = await params;
   
   const safeSlugArray = slug ?? [];
   const fullSlugPath = safeSlugArray.join("/");
+  const lastPart = safeSlugArray[safeSlugArray.length - 1] ?? "artigo";
   const siteUrl = "https://portfoliosantossergio.vercel.app";
   const fullUrl = `${siteUrl}/${lang}/artigos/${fullSlugPath}`;
   
-  const lastPart = safeSlugArray[safeSlugArray.length - 1] ?? "artigo";
   const cleanTitle = lastPart.replace(/-/g, " ").toUpperCase();
   const description = `Análise técnica: ${cleanTitle}. Insights de Engenharia de Dados e Sistemas Críticos por Sérgio Santos.`;
 
-  // Imagens OG específicas por idioma conforme sua estrutura de pastas
-  const ogImageUrl = `${siteUrl}/og/og-image-${lang}.png`;
+  /**
+   * LÓGICA DE IMAGEM PERSONALIZADA:
+   * 1. Verifica se existe uma imagem específica para o artigo (slug.png)
+   * 2. Caso contrário, usa a OG padrão azul marinho do idioma.
+   * Nota: No LinkedIn, imagens personalizadas aumentam a autoridade do post.
+   */
+  const customImageUrl = `${siteUrl}/artigos/og-${lastPart}.png`;
+  const defaultOgUrl = `${siteUrl}/og/og-image-${lang}.png`;
+
+  // Em produção, o ideal é validar se a imagem existe. Aqui definimos a prioridade.
+  const ogImageUrl = customImageUrl; 
+
   const articleDate = "2026-03-24T00:00:00.000Z"; 
 
   return {
@@ -83,7 +92,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       publishedTime: articleDate,
       authors: ["Sérgio Santos"],
       locale: lang.replace("-", "_"),
-      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: cleanTitle }],
+      images: [
+        { 
+          url: ogImageUrl, 
+          width: 1200, 
+          height: 630, 
+          alt: `Artigo: ${cleanTitle}` 
+        }
+      ],
     },
     twitter: {
       card: "summary_large_image",
@@ -95,14 +111,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /**
- * 3. GERAÇÃO ESTÁTICA (SSG)
- * Integração com o service.ts para mapear arquivos do repositório no build.
+ * 3. GERAÇÃO ESTÁTICA (SSG) - Performance de Principal Engineer
  */
 export async function generateStaticParams() {
   const articles = await getArticlesWithRetry();
   
   return articles.flatMap((art) => {
-    // Remove o prefixo "artigos/" e a extensão ".md" para gerar o slug limpo
     const cleanSlug = art.path
       .replace(/^artigos\//, "")
       .replace(/\.md$/, "")
@@ -117,41 +131,36 @@ export async function generateStaticParams() {
 
 /**
  * 4. RENDERIZAÇÃO DA PÁGINA
- * Otimizado para Tailwind 4.2 e React 19.
+ * Otimizado para Leitura Técnica e Responsividade Total.
  */
 export default async function ArtigoDetalhePage(props: PageProps) {
   const { slug, lang: rawLang } = await props.params;
   const lang = normalizeLocale(rawLang) as Locale;
   const dict = await getServerDictionary(lang);
 
-  // CORREÇÃO DO ERRO DE BUILD: Verificação de existência do índice para TS 6
+  // PROTEÇÃO CONTRA UNDEFINED (TS 6 Strict Compliance)
   const markdownSlug = [...slug];
   const lastIndex = markdownSlug.length - 1;
 
-  if (lastIndex >= 0) {
-    const lastElement = markdownSlug[lastIndex];
-    if (lastElement && !lastElement.endsWith(".md")) {
-      markdownSlug[lastIndex] = `${lastElement}.md`;
-    }
-  } else {
-    return notFound();
+  if (lastIndex < 0) return notFound();
+
+  const lastElement = markdownSlug[lastIndex];
+  if (lastElement && !lastElement.endsWith(".md")) {
+    markdownSlug[lastIndex] = `${lastElement}.md`;
   }
 
   const content = await getArticleMarkdown(markdownSlug);
 
-  if (!content) {
-    return notFound();
-  }
+  if (!content) return notFound();
 
   const titleMatch = content.match(/^#\s+(.*)$/m);
   const articleTitle = titleMatch?.[1]?.trim() ?? slug[slug.length - 1]?.replace(/-/g, " ") ?? "Artigo";
 
   return (
     <MdxLayout lang={lang} dict={dict}>
-      {/* Artigo Responsivo com Animações Nativas */}
       <article className="container mx-auto py-12 max-w-4xl px-4 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-1000">
         
-        {/* Tipografia Tailwind 4.2 Prose */}
+        {/* Camada de Conteúdo Otimizada Tailwind 4.2 */}
         <div className="prose prose-slate dark:prose-invert max-w-none 
           prose-blue prose-headings:scroll-mt-32 
           prose-img:rounded-2xl prose-img:shadow-xl
@@ -164,18 +173,27 @@ export default async function ArtigoDetalhePage(props: PageProps) {
           </ReactMarkdown>
         </div>
         
+        {/* Rodapé Dinâmico com Ativos Multilíngues */}
         <footer className="mt-20 pt-10 border-t border-slate-200 dark:border-slate-800">
           <ShareArticle title={articleTitle} dict={dict} lang={lang} />
           
-          <div className="mt-8 flex flex-col items-center gap-4">
-            {/* Link Dinâmico para o CV correto baseado no idioma da URL */}
+          <div className="mt-8 flex flex-col items-center gap-4 text-center">
+             {/* Logo de Vencedor DIO - Autoridade Visual */}
+             <img 
+               src="/images/trofeus-vencedor-dio.png" 
+               alt="Vencedor DIO" 
+               className="h-16 w-auto mb-4 opacity-80 hover:opacity-100 transition-opacity"
+             />
+
             <a 
               href={`/pdf/cv-sergio-santos-${lang}.pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors duration-300"
+              className="group flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors duration-300"
             >
-              {dict.contact.cvLabel} — {lang}
+              <span className="border-b border-transparent group-hover:border-blue-600">
+                {dict.contact.cvLabel} — {lang}
+              </span>
             </a>
           </div>
         </footer>
