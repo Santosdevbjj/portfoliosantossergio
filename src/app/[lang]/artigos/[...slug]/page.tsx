@@ -8,6 +8,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import path from "node:path";
+import fs from "node:fs/promises";
 
 // Componentes e Layout
 import MdxLayout from "@/components/mdx-layout";
@@ -27,8 +29,8 @@ interface PageProps {
  * 1. AUXILIAR DE CONTEÚDO (Fetch Direto)
  */
 async function getArticleMarkdown(slugArray: string[]): Promise<string | null> {
-  const path = slugArray.join("/");
-  const url = `https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/artigos/${path}`;
+  const pathStr = slugArray.join("/");
+  const url = `https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/artigos/${pathStr}`;
   try {
     const res = await fetch(url, { next: { revalidate: 3600 } });
     return res.ok ? await res.text() : null;
@@ -39,7 +41,7 @@ async function getArticleMarkdown(slugArray: string[]): Promise<string | null> {
 }
 
 /**
- * 2. METADADOS DINÂMICOS (SEO & LinkedIn Fallback)
+ * 2. METADADOS DINÂMICOS (SEO & LinkedIn Fallback Real)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, slug } = await params;
@@ -51,21 +53,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const cleanTitle = lastPart.replace(/-/g, " ").toUpperCase();
   const description = `Análise técnica: ${cleanTitle}. Insights de Engenharia de Dados por Sérgio Santos.`;
 
-  // Array de imagens para Fallback: O Crawler tenta a primeira, se falhar usa a segunda.
-  const images = [
-    {
-      url: `${siteUrl}/artigos/og-${lastPart}.png`, // Personalizada (ex: og-resiliencia-em-Front-end.png)
-      width: 1200,
-      height: 630,
-      alt: cleanTitle,
-    },
-    {
-      url: `${siteUrl}/og/og-image-${lang}.png`,    // Padrão Azul Marinho (Fallback)
-      width: 1200,
-      height: 630,
-      alt: "Sérgio Santos | Portfolio",
-    }
-  ];
+  // --- LÓGICA DE FALLBACK ROBUSTA (Node 24) ---
+  const customImageName = `og-${lastPart}.png`;
+  const customImagePath = path.join(process.cwd(), "public", "artigos", customImageName);
+  
+  let finalOgImage = `${siteUrl}/og/og-image-${lang}.png`; // Default: Azul Marinho
+
+  try {
+    // Checa se o arquivo físico existe na pasta public/artigos/
+    await fs.access(customImagePath);
+    finalOgImage = `${siteUrl}/artigos/${customImageName}`; // Se existir, usa a personalizada
+  } catch {
+    // Se não existir, mantém a default já definida acima
+  }
 
   return {
     title: `${cleanTitle} | Sérgio Santos`,
@@ -83,13 +83,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: "Sérgio Santos | Portfolio",
       type: "article",
       locale: lang.replace("-", "_"),
-      images: images,
+      images: [{ url: finalOgImage, width: 1200, height: 630, alt: cleanTitle }],
     },
     twitter: {
       card: "summary_large_image",
       title: cleanTitle,
       description,
-      images: [`${siteUrl}/artigos/og-${lastPart}.png`],
+      images: [finalOgImage],
     },
   };
 }
@@ -106,14 +106,13 @@ export async function generateStaticParams() {
 }
 
 /**
- * 4. RENDERIZAÇÃO DA PÁGINA (Responsiva e Multilíngue)
+ * 4. RENDERIZAÇÃO DA PÁGINA
  */
 export default async function ArtigoDetalhePage(props: PageProps) {
   const { slug, lang: rawLang } = await props.params;
   const lang = normalizeLocale(rawLang) as Locale;
   const dict = await getServerDictionary(lang);
 
-  // Tratamento do Slug para busca no GitHub
   const markdownSlug = [...slug];
   const lastIndex = markdownSlug.length - 1;
 
@@ -149,7 +148,6 @@ export default async function ArtigoDetalhePage(props: PageProps) {
         <footer className="mt-20 pt-10 border-t border-slate-200 dark:border-slate-800 flex flex-col items-center gap-6">
           <ShareArticle title={articleTitle} dict={dict} lang={lang} />
           
-          {/* Troféus de Autoridade */}
           <div className="flex flex-col items-center gap-2">
             <img 
               src="/images/trofeus-vencedor-dio.png" 
