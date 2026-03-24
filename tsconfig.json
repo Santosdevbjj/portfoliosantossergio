@@ -2,9 +2,7 @@
   "compilerOptions": {
     /* --- MOTOR NATIVO TS 6.0.2 (PONTE PARA O COMPILADOR GO) --- */
     "target": "ES2025",
-    "lib": ["dom", "esnext"], 
-    /* Nota: 'dom.iterable' agora está incluso em 'dom' no TS 6.0, removido para evitar redundância */
-    
+    "lib": ["dom", "esnext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "moduleDetection": "force",
@@ -18,10 +16,9 @@
     "incremental": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    "noUncheckedSideEffectImports": true, 
-    /* Novo padrão TS 6.0: evita erros em imports de CSS/Assets sem efeitos colaterais */
+    "noUncheckedSideEffectImports": true,
 
-    /* --- RIGOR DE NÍVEL PRINCIPAL ENGINEER (SAFETY FIRST) --- */
+    /* --- RIGOR DE NÍVEL PRINCIPAL ENGINEER --- */
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -32,24 +29,18 @@
     "noPropertyAccessFromIndexSignature": true,
     "allowUnreachableCode": false,
 
-    /* --- INTEROP & SECURITY (MODERN STANDARDS) --- */
+    /* --- INTEROP & SECURITY --- */
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* --- PERFORMANCE & CACHE ESTRUTURAL --- */
+    /* --- PERFORMANCE & CACHE --- */
     "tsBuildInfoFile": "node_modules/.cache/tsconfig.tsbuildinfo",
-    /* No TS 6.0, o 'types' vazio acelera o build em 50%. Mantemos apenas o essencial. */
     "types": ["node"],
-    
-    /* Remoção do baseUrl: O TS 6.0 depreciou o uso de baseUrl para resolução de caminhos. 
-       Agora usamos apenas paths relativos ao rootDir (que por padrão é onde está o tsconfig). */
 
-    /* --- INFRASTRUCTURE PATHS (TS 6.0 SUBPATH COMPLIANCE) --- */
     "paths": {
       "@/*": ["./src/*"],
-      "#/*": ["./src/*"] 
-      /* Aderente ao novo padrão Node.js e TS 6.0 para subpath imports */
+      "#/*": ["./src/*"]
     },
 
     "plugins": [
@@ -63,13 +54,12 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    /* Compatível com a nova estrutura de tipos do Next.js 16.2 */
+    /* Ajustado conforme exigência do compilador Next.js 16.2 no log de erro */
     ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
     "src/**/*",
     "next.config.ts",
-    "postcss.config.ts", 
-    /* Turbopack agora suporta PostCSS em TS, incluímos para checagem */
-    "AGENTS.md"
+    "postcss.config.ts"
   ],
 
   "exclude": [
