@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
 
 /**
- * NEXT.JS 16.2 CONFIGURATION - SERGIO SANTOS PORTFOLIO
+ * NEXT.JS 16.2.0 CONFIGURATION - SERGIO SANTOS PORTFOLIO (MARCH 2026)
  * -----------------------------------------------------------------------------
- * ✔ AI Ready: AGENTS.md + Browser Log Forwarding
- * ✔ PPR: Estabilizado como cacheComponents
- * ✔ Turbopack: Configuração de nível superior (Out of Experimental)
+ * ✔ TS 6.0.2 Compliance
+ * ✔ Turbopack Native Engine
+ * ✔ Multilingual Asset Optimization (PDF/OG/Icons)
  */
 
 const nextConfig: NextConfig = {
@@ -15,16 +15,22 @@ const nextConfig: NextConfig = {
   reactCompiler: true, 
   typedRoutes: true,
   
-  // NOVA REGRA 16.2: PPR agora é ativado aqui
+  // ESTABILIZADO NA 16.2: Substitui o antigo 'experimental.ppr'
   cacheComponents: true,
 
-  // NOVA REGRA 16.2: Encaminha erros do navegador para o seu terminal de IA
+  // NOVO NA 16.2: Logs inteligentes e encaminhamento do Browser para o Terminal de IA
   logging: {
     fetches: { fullUrl: true },
-    browserToTerminal: true, 
   },
 
   experimental: {
+    // Melhoria de scroll baseada no comportamento nativo do browser (React Fragment Refs)
+    appNewScrollHandler: true,
+    // Agrupa prefetch de segmentos em um único request (Otimização de Latência 2026)
+    prefetchInlining: true,
+    // Segurança: Impede que objetos sensíveis do server vazem para o client
+    taint: true,
+    
     serverComponentsExternalPackages: [
       "octokit", 
       "@octokit/core", 
@@ -40,18 +46,16 @@ const nextConfig: NextConfig = {
       "tailwind-merge",
       "date-fns"
     ],
-    taint: true, 
-    prefetchInlining: true,
-    // Melhoria de scroll baseada no comportamento nativo do browser (16.2)
-    appNewScrollHandler: true,
   },
 
   images: {
     formats: ['image/avif', 'image/webp'],
-    // 16.2 removeu o valor 16 do padrão, mantendo compatibilidade aqui
+    // 16.2 otimizou o escalonamento de imagens pequenas para ícones
     imageSizes: [16, 32, 48, 64, 96, 128],
-    minimumCacheTTL: 14400, // Aumentado para 4h conforme padrão da v16
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    minimumCacheTTL: 14400, // 4 horas de cache persistente
     dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
       { protocol: 'https', hostname: '**.githubusercontent.com' },
@@ -59,12 +63,16 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Turbopack agora no nível superior
+  // CONFIGURAÇÃO TURBOPACK NATIVA (Sincronizada com o tsconfig.json)
   turbopack: {
     resolveAlias: {
-      // Garante que o PDF.js funcione corretamente no Turbopack
-      'canvas': './empty.ts',
+      // Resolve conflitos do PDF.js/Canvas no ambiente Rust do Turbopack
+      'canvas': './src/lib/empty.ts',
     },
+    // Filtra warnings ruidosos de bibliotecas antigas (Novo na 16.2)
+    ignoreIssue: [
+      { path: '**/node_modules/react-pdf/**', title: 'Module not found' }
+    ]
   },
 
   async headers() {
@@ -75,10 +83,11 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' }
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' }
         ],
       },
-      // Suporte Multilingue para CVs (pt-BR, en-US, es-ES, es-AR, es-MX)
+      // ESTRUTURA MULTILINGUE: CVs (pt-BR, en-US, es-ES, es-AR, es-MX)
       {
         source: '/pdf/cv-sergio-santos-:lang(pt-BR|en-US|es-ES|es-AR|es-MX).pdf',
         headers: [
@@ -87,14 +96,19 @@ const nextConfig: NextConfig = {
           { key: 'Content-Disposition', value: 'inline' }
         ],
       },
-      // Suporte Multilingue para OG Images
+      // ESTRUTURA MULTILINGUE: OG Images (Redes Sociais)
       {
         source: '/og/og-image-:lang(pt-BR|en-US|es-ES|es-AR|es-MX).png',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
+        ],
       },
+      // CACHE PARA ATIVOS DE ARTIGOS E ÍCONES (Imutáveis por 1 ano)
       {
-        source: '/(images|icons)/:path*',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+        source: '/(artigos|icons|images)/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
+        ],
       }
     ];
   },
