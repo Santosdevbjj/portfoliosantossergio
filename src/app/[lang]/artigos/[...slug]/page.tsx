@@ -8,8 +8,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import path from "node:path";
-import fs from "node:fs/promises";
 
 // Componentes e Layout
 import MdxLayout from "@/components/mdx-layout";
@@ -41,30 +39,39 @@ async function getArticleMarkdown(slugArray: string[]): Promise<string | null> {
 }
 
 /**
- * 2. METADADOS DINÂMICOS (SEO & LinkedIn Fallback Real)
+ * 2. METADADOS DINÂMICOS (SEO & LinkedIn Fallback Real via Network Check)
  */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, slug } = await params;
   const safeSlugArray = slug ?? [];
   const lastPart = safeSlugArray[safeSlugArray.length - 1] ?? "artigo";
+  
+  // URL base para produção
   const siteUrl = "https://portfoliosantossergio.vercel.app";
   const fullUrl = `${siteUrl}/${lang}/artigos/${safeSlugArray.join("/")}`;
   
   const cleanTitle = lastPart.replace(/-/g, " ").toUpperCase();
   const description = `Análise técnica: ${cleanTitle}. Insights de Engenharia de Dados por Sérgio Santos.`;
 
-  // --- LÓGICA DE FALLBACK ROBUSTA (Node 24) ---
-  const customImageName = `og-${lastPart}.png`;
-  const customImagePath = path.join(process.cwd(), "public", "artigos", customImageName);
-  
-  let finalOgImage = `${siteUrl}/og/og-image-${lang}.png`; // Default: Azul Marinho
+  // Caminhos das imagens
+  const customImageUrl = `${siteUrl}/artigos/og-${lastPart}.png`;
+  const defaultOgImage = `${siteUrl}/og/og-image-${lang}.png`;
 
+  let finalOgImage = defaultOgImage;
+
+  /**
+   * LÓGICA DE VALIDAÇÃO VIA NETWORK (Funciona na Vercel)
+   * Fazemos um fetch rápido de apenas os headers (method: HEAD).
+   * Se retornar 200, a imagem personalizada existe no public/artigos/
+   */
   try {
-    // Checa se o arquivo físico existe na pasta public/artigos/
-    await fs.access(customImagePath);
-    finalOgImage = `${siteUrl}/artigos/${customImageName}`; // Se existir, usa a personalizada
-  } catch {
-    // Se não existir, mantém a default já definida acima
+    const checkRes = await fetch(customImageUrl, { method: 'HEAD', cache: 'no-store' });
+    if (checkRes.ok) {
+      finalOgImage = customImageUrl;
+    }
+  } catch (e) {
+    // Em caso de erro de rede, mantém a imagem padrão azul marinho da pasta /og/
+    finalOgImage = defaultOgImage;
   }
 
   return {
