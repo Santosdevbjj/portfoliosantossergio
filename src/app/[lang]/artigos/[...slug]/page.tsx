@@ -34,13 +34,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   /**
    * LÓGICA DE IMAGEM PERSONALIZADA:
    * Se o artigo for sobre 'resiliencia', ele usa a imagem da pasta /artigos.
-   * Caso contrário, usa a OG Image padrão do idioma na pasta /og.
+   * Caso contrário, usa a OG Image padrão do idioma na pasta /artigos.
    */
   const isResiliencia = lastPart.toLowerCase().includes("resiliencia");
   
   const finalOgImage = isResiliencia 
     ? `${siteUrl}/artigos/og-resiliencia-em-Front-end.png`
-    : `${siteUrl}/og/og-image-${lang}.png`;
+    : `${siteUrl}/artigos/og-image-${lang}.png`;
 
   return {
     title: `${cleanTitle} | Sérgio Santos`,
