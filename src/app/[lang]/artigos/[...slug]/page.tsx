@@ -157,7 +157,7 @@ export default async function ArtigoDetalhePage(props: PageProps) {
               <a 
                 href={`/pdf/cv-sergio-santos-${lang}.pdf`}
                 target="_blank"
-                className="text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 px-8 py-3 rounded-full transition-all shadow-lg hover:shadow-blue-500/20"
+                className="text-sm font-bold text-blue-600 bg-slate-900 hover:text-blue-500 px-8 py-3 rounded-full transition-all shadow-lg hover:shadow-blue-500/20"
               >
                 Download CV ({lang.toUpperCase()})
               </a>
