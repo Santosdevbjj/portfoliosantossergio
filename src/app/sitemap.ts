@@ -4,26 +4,21 @@ import { getArticlesWithRetry } from "@/lib/github/service";
 
 /**
  * CONFIGURAÇÃO SITEMAP - NEXT.JS 16.2.1 + TS 6.0.2
- * -----------------------------------------------------------------------------
- * ✔️ Correção do Erro de Type Check (as const em ternários)
- * ✔️ Compatibilidade com Node 24 e TypeScript 6.0
- * ✔️ SEO Internacional com Hreflang (alternates)
  */
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Acesso seguro via colchetes para TS 6.0 e Node 24
   const baseUrl = (process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app").replace(/\/$/, "");
   const lastModified = new Date();
 
-  // Rotas estáticas
+  // Rotas estáticas principais
   const pages = ["", "about", "experience", "projects", "artigos", "contact", "resume"] as const;
 
-  // Helper para construir os alternates (hreflang) de forma robusta
+  // Helper para construir os alternates (hreflang) multilingues
   const buildAlternates = (pathname: string) => {
     const languages: Record<string, string> = {};
     SUPPORTED_LOCALES.forEach((locale) => {
       languages[locale] = `${baseUrl}/${locale}${pathname}`;
     });
+    // SEO: x-default deve apontar para a versão principal (pt-BR)
     languages["x-default"] = `${baseUrl}/${DEFAULT_LOCALE}${pathname}`;
     return { languages };
   };
@@ -32,8 +27,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const localizedPages: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap((locale) =>
     pages.map((page) => {
       const pathname = page ? `/${page}` : "";
-      
-      // CORREÇÃO TS 6.0: Definindo a frequência antes para evitar erro de asserção no ternário
       const frequency: "daily" | "weekly" = page === "" ? "daily" : "weekly";
 
       return {
@@ -46,18 +39,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  // 2. Artigos Dinâmicos do GitHub (Usando seu service.ts)
+  // 2. Artigos Dinâmicos do GitHub
   let articles: MetadataRoute.Sitemap = [];
   try {
     const gitHubItems = await getArticlesWithRetry();
     articles = gitHubItems.flatMap((item) => {
-      // Limpeza do slug: remove 'artigos/' e '.md'
       const slug = item.path.replace(/^artigos\//, "").replace(/\.md$/, "");
       
       return SUPPORTED_LOCALES.map((locale) => ({
         url: `${baseUrl}/${locale}/artigos/${slug}`,
         lastModified,
-        changeFrequency: "weekly" as const, // Literal direto é aceito pelo TS 6.0
+        changeFrequency: "weekly" as const,
         priority: 0.7,
         alternates: buildAlternates(`/artigos/${slug}`),
       }));
@@ -66,7 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("❌ Erro ao gerar sitemap de artigos:", e);
   }
 
-  // 3. Documentos PDFs Oficiais (Mapeamento exato da sua lista)
+  // 3. Documentos PDFs Oficiais (CVs por idioma)
   const documents: MetadataRoute.Sitemap = SUPPORTED_LOCALES.map((locale) => ({
     url: `${baseUrl}/pdf/cv-sergio-santos-${locale}.pdf`,
     lastModified,
@@ -74,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  // 4. Ativos de Imagem Estratégicos (SEO Google Images)
+  // 4. Imagens Estratégicas para o Google Images
   const keyImages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/images/sergio-santos-profile.png`,
