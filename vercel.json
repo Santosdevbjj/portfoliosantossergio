@@ -1,11 +1,54 @@
 {
+  "redirects": [
+    {
+      "source": "/pt-BR/pt",
+      "destination": "/pt-BR",
+      "permanent": true
+    },
+    {
+      "source": "/en-US/en",
+      "destination": "/en-US",
+      "permanent": true
+    },
+    {
+      "source": "/es-ES/es",
+      "destination": "/es-ES",
+      "permanent": true
+    },
+    {
+      "source": "/es-AR/es",
+      "destination": "/es-AR",
+      "permanent": true
+    },
+    {
+      "source": "/es-MX/es",
+      "destination": "/es-MX",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/pdf/(.*).pdf",
       "headers": [
         { "key": "Content-Disposition", "value": "inline" },
+        { "key": "Content-Type", "value": "application/pdf" },
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
         { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    },
+    {
+      "source": "/(og|artigos|images|icons)/(.*).(png|jpg|jpeg|svg|ico)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "index, follow" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" }
       ]
     }
   ]
