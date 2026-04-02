@@ -1,39 +1,3 @@
-/**
- * src/app/[lang]/artigos/[...slug]/page.tsx
- * Nível: Principal Engineer
- * Stack: Next.js 16.2.0, TS 6.0.2, React 19, Tailwind 4.2
- */
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-
-// Correção VerbatimModuleSyntax: Importação type-only
-import type { Locale } from "@/types/dictionary";
-
-import MdxLayout from "@/components/mdx-layout";
-import ShareArticle from "@/components/ShareArticle";
-import { getArticlesWithRetry } from "@/lib/github/service";
-import { getServerDictionary } from "@/lib/getServerDictionary";
-import { normalizeLocale, SUPPORTED_LOCALES } from "@/dictionaries/locales";
-
-interface PageProps {
-  params: Promise<{ slug: string[]; lang: string }>;
-}
-
-/**
- * 1. SEO & OG IMAGES DINÂMICAS
- * Tenta encontrar og-{nome-do-artigo}.png, caso contrário usa a genérica.
- */
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { lang, slug } = await params;
-  const lastPart = slug[slug.length - 1] ?? "artigo";
-  const siteUrl = "https://portfoliosantossergio.vercel.app";
-  
-  const cleanTitle = lastPart.replace(/-/g, " ").toUpperCase();
-  
-  // Lógica de Detecção de Imagem:
-  // Se for o artigo de resiliência, aponta para a imagem que já existe.
   // Para novos artigos, o código já segue o padrão 'og-nome-do-slug.png'
   const isResiliencia = lastPart.toLowerCase().includes("resiliencia");
   
