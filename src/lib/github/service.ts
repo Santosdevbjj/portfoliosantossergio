@@ -50,8 +50,10 @@ export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
         // Filtra apenas arquivos Markdown, ignorando README
         if (rawItem.name.endsWith('.md') && rawItem.name.toLowerCase() !== 'readme.md') {
           const pathParts = rawItem.path.split('/');
-          // A categoria é o nome da pasta pai ou 'geral'
-          const categoryName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : 'geral';
+          
+          // Correção do Erro: Garantimos que categoryName seja sempre uma string
+          // Se pathParts[length - 2] for undefined, ele assume 'geral'
+          const categoryName = (pathParts.length > 1 ? pathParts[pathParts.length - 2] : 'geral') || 'geral';
           
           return [{
             name: rawItem.name,
@@ -59,7 +61,7 @@ export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
             url: rawItem.url,
             type: 'file',
             download_url: rawItem.download_url,
-            category: categoryName
+            category: categoryName // Agora garantido como string
           }];
         }
         return [];
