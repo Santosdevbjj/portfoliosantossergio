@@ -25,8 +25,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const cleanTitle = lastPart.replace(/-/g, " ").toUpperCase();
   
   const isResiliencia = lastPart.toLowerCase().includes("resiliencia");
-  const ogImageName = isResiliencia ? `og-resiliencia-em-Front-end.png` : `og-image-generica.png`;
-  const finalOgImage = `${siteUrl}/artigos/${ogImageName}`;
+  
+  // Lógica de Imagem baseada na sua estrutura confirmada:
+  // Se for resiliência, usa a imagem específica em /artigos/
+  // Se não, tenta usar a OG específica do idioma em /og/
+  const finalOgImage = isResiliencia 
+    ? `${siteUrl}/artigos/og-resiliencia-em-Front-end.png` 
+    : `${siteUrl}/og/og-image-${lang}.png`;
 
   return {
     title: `${cleanTitle} | Sérgio Santos`,
@@ -62,7 +67,6 @@ export default async function ArtigoDetalhePage({ params }: PageProps) {
   const dict = await getServerDictionary(lang);
 
   const pathStr = slug.join("/");
-  // URL Raw do GitHub (Sempre aponta para o MD original)
   const url = `https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/artigos/${pathStr}${pathStr.endsWith('.md') ? '' : '.md'}`;
   
   const res = await fetch(url, { next: { revalidate: 3600 } });
@@ -102,6 +106,9 @@ export default async function ArtigoDetalhePage({ params }: PageProps) {
                 <span className="block text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">
                   Tech Excellence 2025
                 </span>
+                <span className="text-[9px] text-slate-500 uppercase tracking-widest block mt-1">
+                  DIO Competition - 35ª Edição
+                </span>
               </div>
             </div>
 
@@ -109,9 +116,9 @@ export default async function ArtigoDetalhePage({ params }: PageProps) {
               <a 
                 href={`/pdf/cv-sergio-santos-${lang}.pdf`}
                 target="_blank"
-                className="text-xs md:text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 px-8 py-4 rounded-full transition-all shadow-xl"
+                className="text-xs md:text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 px-8 py-4 rounded-full transition-all shadow-xl hover:shadow-blue-500/20"
               >
-                Download CV ({lang})
+                Download CV ({lang.toUpperCase()})
               </a>
             </div>
           </footer>
