@@ -12,7 +12,17 @@ export interface GitHubItem {
   category: string; 
 }
 
-// Representa o item bruto vindo da API antes do processamento de categoria
+// Representa o item bruto vindo da API de Trees
+export interface GitHubRawTreeItem {
+  path?: string;
+  mode?: string;
+  type?: string;
+  sha?: string;
+  size?: number;
+  url?: string;
+}
+
+// Para compatibilidade com outras partes do código
 export interface GitHubRawItem {
   name: string;
   path: string;
@@ -20,4 +30,4 @@ export interface GitHubRawItem {
   type: string;
   download_url: string | null;
   sha: string;
-} 
+}
