@@ -30,8 +30,6 @@ export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
           "X-GitHub-Api-Version": API_VERSION,
           "User-Agent": "Portfolio-Sergio-Santos-v16",
         },
-        // No Next.js 16, as opções de fetch são passadas via request object se necessário,
-        // mas o Octokit utiliza o fetch global que já herda o cache do servidor.
       });
 
       const items = response.data;
@@ -41,23 +39,26 @@ export async function getArticlesWithRetry(retries = 2): Promise<GitHubItem[]> {
       }
 
       const results = await Promise.all(items.map(async (item: any): Promise<GitHubItem[]> => {
+        // Tipagem interna usando o GitHubRawItem para validar a estrutura vinda da API
+        const rawItem = item as GitHubRawItem;
+
         // Se for um diretório, mergulha recursivamente
-        if (item.type === 'dir') {
-          return fetchRecursive(item.path);
+        if (rawItem.type === 'dir') {
+          return fetchRecursive(rawItem.path);
         }
         
         // Filtra apenas arquivos Markdown, ignorando README
-        if (item.name.endsWith('.md') && item.name.toLowerCase() !== 'readme.md') {
-          const pathParts = item.path.split('/');
+        if (rawItem.name.endsWith('.md') && rawItem.name.toLowerCase() !== 'readme.md') {
+          const pathParts = rawItem.path.split('/');
           // A categoria é o nome da pasta pai ou 'geral'
           const categoryName = pathParts.length > 1 ? pathParts[pathParts.length - 2] : 'geral';
           
           return [{
-            name: item.name,
-            path: item.path,
-            url: item.url,
+            name: rawItem.name,
+            path: rawItem.path,
+            url: rawItem.url,
             type: 'file',
-            download_url: item.download_url,
+            download_url: rawItem.download_url,
             category: categoryName
           }];
         }
