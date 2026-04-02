@@ -8,20 +8,21 @@ import { getArticlesWithRetry } from "@/lib/github/service";
 import { ArticleCard } from "@/components/ArticleCard";
 import MdxLayout from "@/components/mdx-layout";
 import { getServerDictionary } from "@/lib/getServerDictionary";
+import { headers } from "next/headers"; // Importado para garantir contexto dinâmico sem a flag 'dynamic'
 
 // Importações de tipo separadas (VerbatimModuleSyntax)
 import type { Locale } from "@/types/dictionary";
 import type { GitHubItem } from "@/lib/github/types";
-
-// Força renderização dinâmica para evitar o erro de Math.random() no build da Octokit
-export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ lang: string }>;
 }
 
 export default async function ArticlesListPage({ params }: PageProps) {
-  // 1. RESOLUÇÃO DE PARAMS (Obrigatório Next 16/React 19)
+  // 1. RESOLUÇÃO DE PARAMS & HEADERS
+  // Chamar headers() garante que o Next trate a rota como dinâmica para a Octokit 
+  // sem gerar o erro de conflito com cacheComponents.
+  await headers(); 
   const { lang } = await params;
   const locale = lang as Locale;
   
@@ -62,7 +63,7 @@ export default async function ArticlesListPage({ params }: PageProps) {
           </p>
         </header>
 
-        {/* LISTAGEM POR CATEGORIAS - Responsivo Grid */}
+        {/* LISTAGEM POR CATEGORIAS */}
         <div className="space-y-32">
           {Object.entries(categories).map(([category, articles]) => (
             <section key={category} className="group/section scroll-mt-20">
