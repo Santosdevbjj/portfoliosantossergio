@@ -1,5 +1,6 @@
 /**
  * src/lib/github/types.ts
+ * Tipagens para o ecossistema GitHub API v2026
  */
 
 export interface GitHubItem {
@@ -11,10 +12,12 @@ export interface GitHubItem {
   category: string; 
 }
 
+// Representa o item bruto vindo da API antes do processamento de categoria
 export interface GitHubRawItem {
   name: string;
   path: string;
   url: string;
-  type: 'file' | 'dir';
+  type: string;
   download_url: string | null;
+  sha: string;
 } 
