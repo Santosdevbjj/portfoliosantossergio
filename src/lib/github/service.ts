@@ -1,10 +1,11 @@
 /**
  * src/lib/github/service.ts
- * Implementação Otimizada com Paginate e Recursive Trees (v2026)
- * CORRIGIDO: Tipagem estrita para evitar erro de build no Vercel
+ * Implementação Otimizada (v2026)
+ * CORRIGIDO: Prevenção de erro de Prerender Random e Tipagem TS 6.0
  */
 import { Octokit } from "octokit";
 import { cache } from 'react'; 
+import { headers } from "next/headers"; // Necessário para Next 16.2
 import type { GitHubItem, GitHubRawTreeItem } from './types';
 
 const GITHUB_TOKEN = process.env['GITHUB_TOKEN']?.trim();
@@ -16,14 +17,12 @@ const OWNER = "Santosdevbjj";
 const REPO = "myArticles";
 const API_VERSION = "2026-03-10";
 
-/**
- * Busca todos os artigos usando a estratégia de Tree Recursiva + Paginate.
- */
 export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubItem[]> => {
   try {
-    console.log(`[GitHub Service] Iniciando busca otimizada de artigos...`);
+    // ESSENCIAL NEXT 16.2: Consumir um dado de request ANTES de operações que usem Math.random() 
+    // internamente (como o Octokit/Fetch no Node 24).
+    try { await headers(); } catch { /* Ignore se estiver fora de request context */ }
 
-    // 1. Usamos o paginate para buscar a árvore completa
     const treeData = await octokit.paginate(
       "GET /repos/{owner}/{repo}/git/trees/{tree_sha}",
       {
@@ -38,11 +37,8 @@ export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubIte
       }
     ) as GitHubRawTreeItem[];
 
-    // 2. Processamos a lista plana retornada
     const articles: GitHubItem[] = treeData
       .filter((item): item is Required<Pick<GitHubRawTreeItem, 'path' | 'type' | 'url'>> & GitHubRawTreeItem => {
-        // Filtramos: apenas arquivos na pasta 'artigos/', que terminam em .md e não são README
-        // Garantimos que 'path' existe para satisfazer o TS no próximo passo (.map)
         return (
           item.type === "blob" && 
           !!item.path &&
@@ -52,41 +48,28 @@ export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubIte
         );
       })
       .map((item) => {
-        const fullPath = item.path; // Aqui o TS já sabe que path existe devido ao filtro
+        const fullPath = item.path;
         const pathParts = fullPath.split("/");
-        
-        // O nome do arquivo é a última parte. Se por algum motivo for vazio, usamos fallback.
-        const fileName = pathParts[pathParts.length - 1] || "arquivo-sem-nome.md";
-        
-        // A categoria é a pasta imediatamente anterior ao arquivo
-        // Ex: artigos/frontend/react.md -> categoria é 'frontend'
+        const fileName = pathParts[pathParts.length - 1] || "artigo.md";
         const categoryName = pathParts.length > 2 ? pathParts[pathParts.length - 2] : "geral";
 
         return {
           name: fileName,
           path: fullPath,
           url: item.url || "",
-          type: 'file', // Forçamos o literal 'file' conforme exigido no GitHubItem
+          type: 'file',
           download_url: `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${fullPath}`,
-          category: categoryName || "geral" // Garante que nunca será undefined
+          category: categoryName
         };
       });
 
     return articles;
 
   } catch (error: any) {
-    if (error.status === 403 || error.status === 401) {
-      console.error(`[GitHub Service] Erro de Cota/Auth: ${error.status}. Verifique o GITHUB_TOKEN na Vercel.`);
-    }
-
     if (retries > 0) {
-      const waitTime = 2000 * (3 - retries);
-      console.warn(`[GitHub Service] Erro detectado. Tentando novamente em ${waitTime/1000}s...`);
-      await new Promise(r => setTimeout(r, waitTime));
+      await new Promise(r => setTimeout(r, 1000));
       return getArticlesWithRetry(retries - 1);
     }
-
-    console.error("[GitHub Service] Falha total. Retornando array vazio.");
     return [];
   }
 });
