@@ -1,7 +1,7 @@
 /**
  * src/lib/github/service.ts
  * Implementação Sênior (v2026)
- * STATUS: CORRIGIDO (Nome da Variável de Ambiente: GITHUB_ACCESS_TOKEN)
+ * STATUS: CORRIGIDO (Suporte a .md e .mdx)
  * STACK: Next.js 16.2.2, React 19, TS 6.0.2, Node 24
  */
 import { Octokit } from "octokit";
@@ -59,13 +59,12 @@ export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubIte
         },
       },
       (response): any[] => {
-        // Força tipagem como array de objetos
         const data = response.data as any[];
         if (Array.isArray(data)) {
           return data.filter(
             (item: any) =>
               item.type === "file" &&
-              item.name.endsWith(".md") &&
+              (item.name.endsWith(".md") || item.name.endsWith(".mdx")) &&
               !item.name.toLowerCase().includes("readme")
           );
         }
@@ -78,7 +77,7 @@ export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubIte
       const fullPath = item.path;
       const pathParts = fullPath.split("/");
 
-      // Lógica de Categoria: artigos/[categoria]/arquivo.md
+      // Lógica de Categoria: artigos/[categoria]/arquivo.md ou .mdx
       const categoryName =
         pathParts.length > 2 ? pathParts[pathParts.length - 2] : "geral";
       const safeCategory: string = categoryName || "geral";
