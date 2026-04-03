@@ -1,4 +1,5 @@
-{
+{ 
+  "extends": "@octokit/tsconfig",
   "compilerOptions": {
     /* --- MOTOR NATIVO TS 6.0.2 (PONTE PARA O COMPILADOR GO) --- */
     "target": "ES2025",
@@ -7,8 +8,7 @@
     "moduleResolution": "Bundler",
     "moduleDetection": "force",
     "jsx": "react-jsx",
-    "extends": "@octokit/tsconfig",
-
+    
     /* --- COMPLIANCE NEXT.JS 16.2 & TURBOPACK (RUST) --- */
     "noEmit": true,
     "allowJs": true,
