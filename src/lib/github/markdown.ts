@@ -1,10 +1,18 @@
+/**
+ * src/lib/github/markdown.ts
+ * Renderizador de Markdown para artigos do GitHub
+ * STACK: Next.js 16.2.2, React 19, TS 6.0.2, Node 24
+ */
 import { Octokit } from "octokit";
 import { remark } from "remark";
 import html from "remark-html";
 import matter from "gray-matter";
 
+// CORREÇÃO: acesso seguro à variável de ambiente
+const GITHUB_TOKEN = process.env["GITHUB_ACCESS_TOKEN"]?.trim();
+
 const octokit = new Octokit({
-  auth: process.env.GITHUB_ACCESS_TOKEN,
+  auth: GITHUB_TOKEN,
 });
 
 const OWNER = "Santosdevbjj";
@@ -15,6 +23,10 @@ const REPO = "myArticles";
  * e converte para HTML renderizável.
  */
 export async function getMarkdownContent(path: string) {
+  if (!GITHUB_TOKEN) {
+    throw new Error("Token GitHub não encontrado nas variáveis de ambiente.");
+  }
+
   const response = await octokit.rest.repos.getContent({
     owner: OWNER,
     repo: REPO,
