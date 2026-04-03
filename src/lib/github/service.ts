@@ -59,9 +59,10 @@ export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubIte
         },
       },
       (response): any[] => {
-        // Filtra apenas arquivos .md
-        if (Array.isArray(response.data)) {
-          return response.data.filter(
+        // Força tipagem como array de objetos
+        const data = response.data as any[];
+        if (Array.isArray(data)) {
+          return data.filter(
             (item: any) =>
               item.type === "file" &&
               item.name.endsWith(".md") &&
