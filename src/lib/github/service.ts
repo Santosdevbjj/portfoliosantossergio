@@ -46,7 +46,7 @@ export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubIte
     }
 
     // 3. Execução da paginação para buscar todos os arquivos dentro de /artigos
-    const files = await octokit.paginate(
+    const files: any[] = await octokit.paginate(
       octokit.rest.repos.getContent,
       {
         owner: OWNER,
@@ -58,16 +58,17 @@ export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubIte
           "User-Agent": "Portfolio-Sergio-Santos-v2026",
         },
       },
-      (response) => {
+      (response): any[] => {
         // Filtra apenas arquivos .md
-        return Array.isArray(response.data)
-          ? response.data.filter(
-              (item: any) =>
-                item.type === "file" &&
-                item.name.endsWith(".md") &&
-                !item.name.toLowerCase().includes("readme")
-            )
-          : [];
+        if (Array.isArray(response.data)) {
+          return response.data.filter(
+            (item: any) =>
+              item.type === "file" &&
+              item.name.endsWith(".md") &&
+              !item.name.toLowerCase().includes("readme")
+          );
+        }
+        return [];
       }
     );
 
