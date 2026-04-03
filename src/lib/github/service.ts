@@ -6,15 +6,15 @@
  */
 import { Octokit } from "octokit";
 import { paginateRest } from "@octokit/plugin-paginate-rest";
-import { cache } from 'react'; 
+import { cache } from "react";
 import { headers } from "next/headers";
-import type { GitHubItem, GitHubRawTreeItem } from './types';
+import type { GitHubItem } from "./types";
 
 // 1. Extensão do Octokit com plugin de paginação
 const MyOctokit = Octokit.plugin(paginateRest);
 
 // CORREÇÃO: Lendo a variável conforme configurado no Dashboard da Vercel
-const GITHUB_TOKEN = process.env['GITHUB_ACCESS_TOKEN']?.trim();
+const GITHUB_TOKEN = process.env["GITHUB_ACCESS_TOKEN"]?.trim();
 
 // 2. Inicialização segura
 const octokit = new MyOctokit({
@@ -31,74 +31,80 @@ const API_VERSION = "2026-03-10";
  */
 export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubItem[]> => {
   try {
-    /**
-     * WORKAROUND NEXT 16.2: Invocar headers() para garantir contexto dinâmico
-     * e evitar erros de Prerender Random no Node 24.
-     */
-    try { await headers(); } catch { /* Fallback build-time */ }
+    // Workaround Next 16.2: headers() para garantir contexto dinâmico
+    try {
+      await headers();
+    } catch {
+      /* Fallback build-time */
+    }
 
     if (!GITHUB_TOKEN) {
-      console.error("[GitHub Service] ERRO CRÍTICO: GITHUB_ACCESS_TOKEN não encontrado nas variáveis de ambiente.");
+      console.error(
+        "[GitHub Service] ERRO CRÍTICO: GITHUB_ACCESS_TOKEN não encontrado nas variáveis de ambiente."
+      );
       return [];
     }
 
-    // 3. Execução da paginação para buscar toda a árvore do repositório
-    const treeData = await octokit.paginate(
-      "GET /repos/{owner}/{repo}/git/trees/{tree_sha}",
+    // 3. Execução da paginação para buscar todos os arquivos dentro de /artigos
+    const files = await octokit.paginate(
+      octokit.rest.repos.getContent,
       {
         owner: OWNER,
         repo: REPO,
-        tree_sha: "main",
-        recursive: "true",
+        path: "artigos",
+        per_page: 100,
         headers: {
           "X-GitHub-Api-Version": API_VERSION,
           "User-Agent": "Portfolio-Sergio-Santos-v2026",
         },
+      },
+      (response) => {
+        // Filtra apenas arquivos .md
+        return Array.isArray(response.data)
+          ? response.data.filter(
+              (item: any) =>
+                item.type === "file" &&
+                item.name.endsWith(".md") &&
+                !item.name.toLowerCase().includes("readme")
+            )
+          : [];
       }
-    ) as GitHubRawTreeItem[];
+    );
 
-    // 4. Filtragem e Processamento (Type Guard Strict)
-    const articles: GitHubItem[] = treeData
-      .filter((item): item is Required<Pick<GitHubRawTreeItem, 'path' | 'type' | 'url'>> & GitHubRawTreeItem => {
-        return (
-          item.type === "blob" && 
-          !!item.path &&
-          item.path.startsWith("artigos/") && 
-          item.path.endsWith(".md") &&
-          !item.path.toLowerCase().endsWith("readme.md")
-        );
-      })
-      .map((item) => {
-        const fullPath = item.path;
-        const pathParts = fullPath.split("/");
-        
-        // Lógica de Categoria: artigos/[categoria]/arquivo.md
-        const categoryName = pathParts.length > 2 ? pathParts[pathParts.length - 2] : "geral";
-        const safeCategory: string = categoryName || "geral";
-        const fileName = pathParts[pathParts.length - 1] || "artigo.md";
+    // 4. Processamento dos arquivos
+    const articles: GitHubItem[] = files.map((item: any) => {
+      const fullPath = item.path;
+      const pathParts = fullPath.split("/");
 
-        return {
-          name: fileName,
-          path: fullPath,
-          url: item.url,
-          type: 'file', 
-          download_url: `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${fullPath}`,
-          category: safeCategory
-        };
-      });
+      // Lógica de Categoria: artigos/[categoria]/arquivo.md
+      const categoryName =
+        pathParts.length > 2 ? pathParts[pathParts.length - 2] : "geral";
+      const safeCategory: string = categoryName || "geral";
+      const fileName = pathParts[pathParts.length - 1] || "artigo.md";
+
+      return {
+        name: fileName,
+        path: fullPath,
+        url: item.url,
+        type: "file",
+        download_url: item.download_url,
+        category: safeCategory,
+      };
+    });
 
     console.log(`[GitHub Service] Sucesso: ${articles.length} artigos encontrados.`);
     return articles;
-
   } catch (error: any) {
-    console.error(`[GitHub Service] Falha na requisição (Tentativas restantes: ${retries}): ${error.message}`);
-    
+    console.error(
+      `[GitHub Service] Falha na requisição (Tentativas restantes: ${retries}): ${error.message}`
+    );
+
     if (retries > 0) {
       const wait = (3 - retries) * 1000;
-      await new Promise(r => setTimeout(r, wait));
+      await new Promise((r) => setTimeout(r, wait));
       return getArticlesWithRetry(retries - 1);
     }
-    
+
     return [];
   }
 });
