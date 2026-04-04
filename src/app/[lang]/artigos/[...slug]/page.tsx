@@ -1,7 +1,7 @@
 /**
  * src/app/[lang]/artigos/[...slug]/page.tsx
- * Stack: Next.js 16.2.2, React 19, TS 6.0.2, Tailwind 4.2
- * Status: CORRIGIDO E INTEGRADO COM DICTIONARY
+ * Stack: Next.js 16.2.2, React 19, TS 6.0.2, Tailwind 4.2, Node 24
+ * Status: CORRIGIDO (EmptyGenerateStaticParamsError & TS Strict)
  */
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -25,7 +25,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const lastPart = slug[slug.length - 1] ?? "artigo";
   const siteUrl = "https://portfoliosantossergio.vercel.app";
   
-  // Rota dinâmica para a OG Image gerada pelo route.tsx
   const ogImage = `${siteUrl}/api/og/article?lang=${lang}&slug=${encodeURIComponent(slug.join("/"))}`;
 
   return {
@@ -40,24 +39,46 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+/**
+ * SOLUÇÃO PARA O ERRO: EmptyGenerateStaticParamsError
+ * No Next.js 16.2.2, se a API falhar ou estiver vazia no build, 
+ * precisamos retornar ao menos um objeto para evitar quebra do build.
+ */
 export async function generateStaticParams() {
   try {
     const articles = await getArticlesWithRetry();
-    if (!articles || articles.length === 0) return [];
+    
+    // Fallback: Se não houver artigos, gera um slug 'index' para cada idioma 
+    // apenas para satisfazer a validação de build-time do Next.js 16.
+    if (!articles || articles.length === 0) {
+      return SUPPORTED_LOCALES.map((locale) => ({ 
+        lang: locale, 
+        slug: ["index"] 
+      }));
+    }
 
     return articles.flatMap((art) => {
       const cleanSlug = art.path
         .replace(/^artigos\//, "")
         .replace(/\.(md|mdx)$/, "")
         .split("/");
-      return SUPPORTED_LOCALES.map((locale) => ({ lang: locale, slug: cleanSlug }));
+      
+      return SUPPORTED_LOCALES.map((locale) => ({ 
+        lang: locale, 
+        slug: cleanSlug 
+      }));
     });
-  } catch {
-    return [];
+  } catch (error) {
+    console.warn("[Build] Falha ao gerar params estáticos, usando fallback.");
+    return SUPPORTED_LOCALES.map((locale) => ({ 
+      lang: locale, 
+      slug: ["error-fallback"] 
+    }));
   }
 }
 
 export default async function ArtigoDetalhePage({ params }: PageProps) {
+  // 1. Aguarda params e consome headers para garantir contexto dinâmico no Node 24
   const resolvedParams = await params;
   await headers(); 
 
@@ -65,19 +86,22 @@ export default async function ArtigoDetalhePage({ params }: PageProps) {
   const lang = normalizeLocale(rawLang) as Locale;
   const dict = await getServerDictionary(lang);
 
+  // 2. Construção da URL do GitHub
   const pathStr = slug.join("/");
-  // Tenta buscar .md por padrão
+  if (pathStr === "index" || pathStr === "error-fallback") return notFound();
+
   const fileName = pathStr.endsWith('.md') || pathStr.endsWith('.mdx') ? pathStr : `${pathStr}.md`;
   const url = `https://raw.githubusercontent.com/Santosdevbjj/myArticles/main/artigos/${fileName}`;
   
+  // 3. Fetch com Cache Revalidate (ISR)
   const res = await fetch(url, { next: { revalidate: 3600 } });
   if (!res.ok) return notFound();
   
   const content = await res.text();
   
-  // Extração do título do H1 do Markdown
+  // 4. Extração de metadados via Regex (compatível com TS 6.0.2)
   const match = content.match(/^#\s+(.*)$/m);
-  const articleTitle = match?.[1]?.trim() ?? slug[slug.length - 1]?.replace(/-/g, " ") ?? "Artigo";
+  const articleTitle: string = match?.[1]?.trim() ?? slug[slug.length - 1]?.replace(/-/g, " ") ?? "Artigo";
 
   return (
     <MdxLayout lang={lang} dict={dict}>
@@ -105,11 +129,12 @@ export default async function ArtigoDetalhePage({ params }: PageProps) {
             </div>
           </header>
 
+          {/* Renderização de Markdown com Tailwind 4.2 Typography */}
           <div className="prose prose-zinc dark:prose-invert max-w-none 
             prose-headings:font-black prose-headings:tracking-tighter
             prose-a:text-blue-600 dark:prose-a:text-blue-400 
             prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800
-            prose-img:rounded-3xl prose-img:shadow-2xl">
+            prose-img:rounded-3xl prose-img:shadow-2xl transition-colors">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {content}
             </ReactMarkdown>
@@ -120,7 +145,6 @@ export default async function ArtigoDetalhePage({ params }: PageProps) {
               <ShareArticle title={articleTitle} dict={dict} lang={lang} />
               
               <div className="flex flex-wrap justify-center gap-4">
-                {/* Link dinâmico para o CV correto baseado no idioma */}
                 <a 
                   href={`/pdf/cv-sergio-santos-${lang}.pdf`} 
                   target="_blank"
