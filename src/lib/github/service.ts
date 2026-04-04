@@ -1,14 +1,14 @@
 /**
  * src/lib/github/service.ts
  * Implementação Sênior (v2026)
- * STATUS: CORRIGIDO (Suporte a .md e .mdx)
+ * STATUS: CORRIGIDO (Suporte recursivo a .md e .mdx via Git Trees)
  * STACK: Next.js 16.2.2, React 19, TS 6.0.2, Node 24
  */
 import { Octokit } from "octokit";
 import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { cache } from "react";
 import { headers } from "next/headers";
-import type { GitHubItem } from "./types";
+import type { GitHubItem, GitHubRawTreeItem } from "./types";
 
 // 1. Extensão do Octokit com plugin de paginação
 const MyOctokit = Octokit.plugin(paginateRest);
@@ -26,7 +26,7 @@ const REPO = "myArticles";
 const API_VERSION = "2026-03-10";
 
 /**
- * Busca artigos no GitHub utilizando octokit.paginate.
+ * Busca artigos no GitHub utilizando octokit.paginate + Git Trees.
  * O uso do cache('react') evita múltiplas requisições idênticas no mesmo ciclo de render.
  */
 export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubItem[]> => {
@@ -45,53 +45,50 @@ export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubIte
       return [];
     }
 
-    // 3. Execução da paginação para buscar todos os arquivos dentro de /artigos
-    const files: any[] = await octokit.paginate(
-      octokit.rest.repos.getContent,
+    // 3. Execução da paginação para buscar toda a árvore do repositório
+    const treeData: GitHubRawTreeItem[] = await octokit.paginate(
+      "GET /repos/{owner}/{repo}/git/trees/{tree_sha}",
       {
         owner: OWNER,
         repo: REPO,
-        path: "artigos",
-        per_page: 100,
+        tree_sha: "main",
+        recursive: "true", // garante que entre em todas as subpastas
         headers: {
           "X-GitHub-Api-Version": API_VERSION,
           "User-Agent": "Portfolio-Sergio-Santos-v2026",
         },
-      },
-      (response): any[] => {
-        const data = response.data as any[];
-        if (Array.isArray(data)) {
-          return data.filter(
-            (item: any) =>
-              item.type === "file" &&
-              (item.name.endsWith(".md") || item.name.endsWith(".mdx")) &&
-              !item.name.toLowerCase().includes("readme")
-          );
-        }
-        return [];
       }
     );
 
-    // 4. Processamento dos arquivos
-    const articles: GitHubItem[] = files.map((item: any) => {
-      const fullPath = item.path;
-      const pathParts = fullPath.split("/");
+    // 4. Filtragem e Processamento
+    const articles: GitHubItem[] = treeData
+      .filter((item): item is Required<Pick<GitHubRawTreeItem, "path" | "type" | "url">> & GitHubRawTreeItem => {
+        return (
+          item.type === "blob" &&
+          !!item.path &&
+          item.path.startsWith("artigos/") &&
+          (item.path.endsWith(".md") || item.path.endsWith(".mdx")) &&
+          !item.path.toLowerCase().includes("readme")
+        );
+      })
+      .map((item) => {
+        const fullPath = item.path!;
+        const pathParts = fullPath.split("/");
 
-      // Lógica de Categoria: artigos/[categoria]/arquivo.md ou .mdx
-      const categoryName =
-        pathParts.length > 2 ? pathParts[pathParts.length - 2] : "geral";
-      const safeCategory: string = categoryName || "geral";
-      const fileName = pathParts[pathParts.length - 1] || "artigo.md";
+        // Lógica de Categoria: artigos/[categoria]/arquivo.md ou .mdx
+        const categoryName = pathParts.length > 2 ? pathParts[pathParts.length - 2] : "geral";
+        const safeCategory: string = categoryName || "geral";
+        const fileName = pathParts[pathParts.length - 1] || "artigo.md";
 
-      return {
-        name: fileName,
-        path: fullPath,
-        url: item.url,
-        type: "file",
-        download_url: item.download_url,
-        category: safeCategory,
-      };
-    });
+        return {
+          name: fileName,
+          path: fullPath,
+          url: item.url!,
+          type: "file",
+          download_url: `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${fullPath}`,
+          category: safeCategory,
+        };
+      });
 
     console.log(`[GitHub Service] Sucesso: ${articles.length} artigos encontrados.`);
     return articles;
