@@ -1,108 +1,110 @@
 /**
  * src/lib/github/service.ts
- * Implementação Sênior (v2026)
- * STATUS: CORRIGIDO (Suporte recursivo a .md e .mdx via Git Trees)
+ * Versão Resiliente (v2026) - Otimizada para CI&T
+ * STATUS: CORRIGIDO (Recursão manual estável + Suporte .md e .mdx)
  * STACK: Next.js 16.2.2, React 19, TS 6.0.2, Node 24
  */
-import { Octokit } from "octokit";
-import { paginateRest } from "@octokit/plugin-paginate-rest";
 import { cache } from "react";
 import { headers } from "next/headers";
-import type { GitHubItem, GitHubRawTreeItem } from "./types";
+import type { GitHubItem, GitHubRawItem } from "./types";
 
-// 1. Extensão do Octokit com plugin de paginação
-const MyOctokit = Octokit.plugin(paginateRest);
-
-// CORREÇÃO: Lendo a variável conforme configurado no Dashboard da Vercel
-const GITHUB_TOKEN = process.env["GITHUB_ACCESS_TOKEN"]?.trim();
-
-// 2. Inicialização segura
-const octokit = new MyOctokit({
-  auth: GITHUB_TOKEN,
-});
+// Tenta ler de ambas as variáveis possíveis para máxima compatibilidade no Deploy
+const GITHUB_TOKEN = (process.env["GITHUB_ACCESS_TOKEN"] || process.env["GITHUB_TOKEN"])?.trim();
 
 const OWNER = "Santosdevbjj";
 const REPO = "myArticles";
-const API_VERSION = "2026-03-10";
+const BASE_URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/artigos`;
 
 /**
- * Busca artigos no GitHub utilizando octokit.paginate + Git Trees.
- * O uso do cache('react') evita múltiplas requisições idênticas no mesmo ciclo de render.
+ * Busca artigos de forma recursiva. 
+ * Esta abordagem é mais lenta que Git Trees, porém MUITO mais estável no Vercel Edge.
+ */
+async function fetchRecursive(url: string): Promise<GitHubItem[]> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "Portfolio-Sergio-Santos-v2026",
+        ...(GITHUB_TOKEN && { "Authorization": `Bearer ${GITHUB_TOKEN}` })
+      },
+      signal: controller.signal,
+      next: { revalidate: 3600 } // ISR: Atualiza a cada 1 hora
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      console.error(`[GitHub Service] Erro ${res.status} em ${url}`);
+      throw new Error(`GH_ERROR_${res.status}`);
+    }
+
+    const items = (await res.json()) as GitHubRawItem[];
+    if (!Array.isArray(items)) return [];
+
+    const results = await Promise.all(items.map(async (item): Promise<GitHubItem[]> => {
+      // 1. Se for diretório, entra nele (Recursão)
+      if (item.type === 'dir') {
+        return fetchRecursive(item.url);
+      }
+
+      // 2. Filtra arquivos: .md ou .mdx (Ignora README)
+      const isMarkdown = item.name.endsWith('.md') || item.name.endsWith('.mdx');
+      const isNotReadme = !item.name.toLowerCase().includes('readme');
+
+      if (isMarkdown && isNotReadme) {
+        const pathParts = item.path.split('/');
+        // Pega a pasta imediatamente acima do arquivo como categoria
+        const categoryName = pathParts.length > 2 ? pathParts[pathParts.length - 2] : 'geral';
+
+        return [{
+          name: item.name,
+          path: item.path,
+          url: item.url,
+          type: 'file',
+          download_url: item.download_url,
+          category: categoryName
+        }];
+      }
+
+      return [];
+    }));
+
+    return results.flat();
+
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    console.error(`[GitHub Service] Falha ao buscar em ${url}:`, err.message);
+    throw err;
+  }
+}
+
+/**
+ * Função exportada com cache do React 19 para evitar Over-fetching
  */
 export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubItem[]> => {
   try {
-    // Workaround Next 16.2: headers() para garantir contexto dinâmico
-    try {
-      await headers();
-    } catch {
-      /* Fallback build-time */
-    }
+    // Garante contexto dinâmico no Next.js 16.2.2
+    try { await headers(); } catch { /* Build-time fallback */ }
 
     if (!GITHUB_TOKEN) {
-      console.error(
-        "[GitHub Service] ERRO CRÍTICO: GITHUB_ACCESS_TOKEN não encontrado nas variáveis de ambiente."
-      );
-      return [];
+      console.warn("[GitHub Service] Aviso: GITHUB_TOKEN não configurado. Usando requisição não autenticada (Limite reduzido).");
     }
 
-    // 3. Execução da paginação para buscar toda a árvore do repositório
-    const treeData: GitHubRawTreeItem[] = await octokit.paginate(
-      "GET /repos/{owner}/{repo}/git/trees/{tree_sha}",
-      {
-        owner: OWNER,
-        repo: REPO,
-        tree_sha: "main",
-        recursive: "true", // garante que entre em todas as subpastas
-        headers: {
-          "X-GitHub-Api-Version": API_VERSION,
-          "User-Agent": "Portfolio-Sergio-Santos-v2026",
-        },
-      }
-    );
-
-    // 4. Filtragem e Processamento
-    const articles: GitHubItem[] = treeData
-      .filter((item): item is Required<Pick<GitHubRawTreeItem, "path" | "type" | "url">> & GitHubRawTreeItem => {
-        return (
-          item.type === "blob" &&
-          !!item.path &&
-          item.path.startsWith("artigos/") &&
-          (item.path.endsWith(".md") || item.path.endsWith(".mdx")) &&
-          !item.path.toLowerCase().includes("readme")
-        );
-      })
-      .map((item) => {
-        const fullPath = item.path!;
-        const pathParts = fullPath.split("/");
-
-        // Lógica de Categoria: artigos/[categoria]/arquivo.md ou .mdx
-        const categoryName = pathParts.length > 2 ? pathParts[pathParts.length - 2] : "geral";
-        const safeCategory: string = categoryName || "geral";
-        const fileName = pathParts[pathParts.length - 1] || "artigo.md";
-
-        return {
-          name: fileName,
-          path: fullPath,
-          url: item.url!,
-          type: "file",
-          download_url: `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${fullPath}`,
-          category: safeCategory,
-        };
-      });
-
+    const articles = await fetchRecursive(BASE_URL);
     console.log(`[GitHub Service] Sucesso: ${articles.length} artigos encontrados.`);
     return articles;
-  } catch (error: any) {
-    console.error(
-      `[GitHub Service] Falha na requisição (Tentativas restantes: ${retries}): ${error.message}`
-    );
 
+  } catch (error: any) {
     if (retries > 0) {
-      const wait = (3 - retries) * 1000;
-      await new Promise((r) => setTimeout(r, wait));
+      console.log(`[GitHub Service] Tentando novamente... (${retries} restantes)`);
+      await new Promise(r => setTimeout(r, 2000));
       return getArticlesWithRetry(retries - 1);
     }
 
+    console.error("[GitHub Service] Falha crítica após todas as tentativas.");
     return [];
   }
 });
