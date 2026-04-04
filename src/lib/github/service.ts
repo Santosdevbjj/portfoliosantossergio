@@ -1,7 +1,7 @@
 /**
  * src/lib/github/service.ts
  * Versão Resiliente (v2026) - Otimizada para CI&T
- * STATUS: CORRIGIDO (Recursão manual estável + Suporte .md e .mdx)
+ * STATUS: CORRIGIDO (TypeScript Strict Mode Fixed)
  * STACK: Next.js 16.2.2, React 19, TS 6.0.2, Node 24
  */
 import { cache } from "react";
@@ -17,7 +17,7 @@ const BASE_URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/artigos
 
 /**
  * Busca artigos de forma recursiva. 
- * Esta abordagem é mais lenta que Git Trees, porém MUITO mais estável no Vercel Edge.
+ * Esta abordagem garante que todos os arquivos em subpastas sejam encontrados.
  */
 async function fetchRecursive(url: string): Promise<GitHubItem[]> {
   const controller = new AbortController();
@@ -31,7 +31,7 @@ async function fetchRecursive(url: string): Promise<GitHubItem[]> {
         ...(GITHUB_TOKEN && { "Authorization": `Bearer ${GITHUB_TOKEN}` })
       },
       signal: controller.signal,
-      next: { revalidate: 3600 } // ISR: Atualiza a cada 1 hora
+      next: { revalidate: 3600 } 
     });
 
     clearTimeout(timeoutId);
@@ -56,14 +56,17 @@ async function fetchRecursive(url: string): Promise<GitHubItem[]> {
 
       if (isMarkdown && isNotReadme) {
         const pathParts = item.path.split('/');
-        // Pega a pasta imediatamente acima do arquivo como categoria
-        const categoryName = pathParts.length > 2 ? pathParts[pathParts.length - 2] : 'geral';
+        
+        // CORREÇÃO TS: Garantindo que categoryName seja sempre string (fallback para 'geral')
+        const categoryName: string = pathParts.length > 2 
+          ? (pathParts[pathParts.length - 2] ?? 'geral') 
+          : 'geral';
 
         return [{
           name: item.name,
           path: item.path,
           url: item.url,
-          type: 'file',
+          type: 'file' as const, // Força o literal 'file' para bater com a Interface
           download_url: item.download_url,
           category: categoryName
         }];
@@ -82,16 +85,12 @@ async function fetchRecursive(url: string): Promise<GitHubItem[]> {
 }
 
 /**
- * Função exportada com cache do React 19 para evitar Over-fetching
+ * Função principal com retry e cache do React 19
  */
 export const getArticlesWithRetry = cache(async (retries = 2): Promise<GitHubItem[]> => {
   try {
-    // Garante contexto dinâmico no Next.js 16.2.2
-    try { await headers(); } catch { /* Build-time fallback */ }
-
-    if (!GITHUB_TOKEN) {
-      console.warn("[GitHub Service] Aviso: GITHUB_TOKEN não configurado. Usando requisição não autenticada (Limite reduzido).");
-    }
+    // Força comportamento dinâmico para evitar cache estático antigo no build
+    try { await headers(); } catch { /* Ignore build-time */ }
 
     const articles = await fetchRecursive(BASE_URL);
     console.log(`[GitHub Service] Sucesso: ${articles.length} artigos encontrados.`);
