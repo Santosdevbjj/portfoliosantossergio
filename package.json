@@ -85,7 +85,6 @@
     "rehype-pretty-code": "^0.14.1",
     "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "remark-slug": "8.0.0",
     "@vercel/next-browser": "latest"
   }
 }
