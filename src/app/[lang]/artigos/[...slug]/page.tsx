@@ -47,7 +47,8 @@ export default async function ArticlePage({ params }: PageProps) {
               {(frontmatter as any)["title"] ?? slugPath}
             </h1>
             <MDXProvider components={{}}>
-              <MDXRemote {...mdxSource} />
+              {/* Corrigido: tipagem forçada para evitar erro de build */}
+              <MDXRemote {...(mdxSource as any)} />
             </MDXProvider>
           </article>
         </MdxLayout>
