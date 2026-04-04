@@ -8,7 +8,6 @@ import { getMdxContent } from "@/lib/github/mdx";
 import MdxLayout from "@/components/mdx-layout";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { MDXProvider } from "@mdx-js/react";
 import { headers } from "next/headers";
 import type { Locale } from "@/types/dictionary";
 
@@ -46,10 +45,8 @@ export default async function ArticlePage({ params }: PageProps) {
             <h1 className="text-4xl font-bold mb-8">
               {(frontmatter as any)["title"] ?? slugPath}
             </h1>
-            <MDXProvider components={{}}>
-              {/* Corrigido: tipagem forçada para evitar erro de build */}
-              <MDXRemote {...(mdxSource as any)} />
-            </MDXProvider>
+            {/* MDXRemote já suporta RSC sem MDXProvider */}
+            <MDXRemote {...(mdxSource as any)} components={{}} />
           </article>
         </MdxLayout>
       );
