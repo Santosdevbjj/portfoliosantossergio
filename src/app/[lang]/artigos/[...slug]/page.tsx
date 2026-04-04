@@ -44,7 +44,7 @@ export default async function ArticlePage({ params }: PageProps) {
         <MdxLayout lang={locale} dict={dict}>
           <article className="prose prose-lg dark:prose-invert mx-auto px-4 py-12">
             <h1 className="text-4xl font-bold mb-8">
-              {frontmatter.title ?? slugPath}
+              {(frontmatter as any)["title"] ?? slugPath}
             </h1>
             <MDXProvider components={{}}>
               <MDXRemote {...mdxSource} />
@@ -60,7 +60,7 @@ export default async function ArticlePage({ params }: PageProps) {
         <MdxLayout lang={locale} dict={dict}>
           <article className="prose prose-lg dark:prose-invert mx-auto px-4 py-12">
             <h1 className="text-4xl font-bold mb-8">
-              {frontmatter.title ?? slugPath}
+              {(frontmatter as any)["title"] ?? slugPath}
             </h1>
             <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
           </article>
