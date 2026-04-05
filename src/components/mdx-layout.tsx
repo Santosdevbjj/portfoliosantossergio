@@ -104,8 +104,9 @@ export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
         <aside className="lg:w-80 w-full order-1 lg:order-2">
           <div className="lg:sticky lg:top-32 space-y-10">
             
-            {/* Componente de Sumário (TOC) */}
-            <TableOfContents dict={dict} />
+            {/* Componente de Sumário (TOC) */} 
+            <TableOfContents dict={dict} lang={lang} />
+           // <TableOfContents dict={dict} />
             
             {/* CARD DO AUTOR - RESPONSIVIDADE TAILWIND 4.2 */}
             <div className="hidden lg:block p-8 rounded-[3rem] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
