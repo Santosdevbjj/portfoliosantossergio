@@ -72,7 +72,7 @@
     "next-mdx-remote": "^6.0.0",
     "gray-matter": "^4.0.3",
     "@tailwindcss/cli": "4.2.1",
-    "@tailwindcss/postcss": "4.2.1",
+    "@tailwindcss/postcss": "4.2.2",
     "@tailwindcss/typography": "^0.5.19",
     "@types/mdx": "^2.0.13",
     "eslint": "10.0.0",
