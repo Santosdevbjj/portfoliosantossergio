@@ -18,7 +18,7 @@ interface Heading {
 
 interface TableOfContentsProps {
   readonly dict: Dictionary;
-  readonly lang: Locale; // Adicionado para suporte regional
+  readonly lang: Locale; 
 }
 
 export default function TableOfContents({ dict, lang }: TableOfContentsProps) {
@@ -28,7 +28,7 @@ export default function TableOfContents({ dict, lang }: TableOfContentsProps) {
 
   /**
    * I18N REGIONAL (TS 6.0 Safe):
-   * Define o título do sumário baseado no idioma e variante.
+   * Baseado no dicionário e na localidade atual.
    */
   const tocTitle = useMemo(() => {
     const isPt = lang.startsWith("pt");
@@ -37,23 +37,18 @@ export default function TableOfContents({ dict, lang }: TableOfContentsProps) {
     if (isPt) return "Índice do Artigo";
     if (isEn) return "Table of Contents";
     
-    // Variantes de Espanhol
+    // Variantes de Espanhol (Regionalismo 2026)
     if (lang === "es-AR") return "Contenido del Artículo";
-    return "Índice de Contenidos"; // es-ES, es-MX fallback
+    if (lang === "es-MX") return "Tabla de Contenido";
+    return "Índice de Contenidos"; // es-ES fallback
   }, [lang]);
 
-  /**
-   * MOTOR DE EXTRAÇÃO DE HEADINGS:
-   * Compatível com a renderização do motor MDX do Next.js 16.2.
-   */
   const extractHeadings = useCallback(() => {
     const article = document.querySelector("article");
     if (!article) return;
 
     const elements = Array.from(article.querySelectorAll("h2, h3")).map((elem) => {
       const text = elem.textContent || "";
-      
-      // Gerador de ID resiliente (Slugify 2026)
       const id = elem.id || text.toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -62,32 +57,21 @@ export default function TableOfContents({ dict, lang }: TableOfContentsProps) {
       
       if (!elem.id) elem.id = id;
       
-      return { 
-        id, 
-        text, 
-        level: Number(elem.tagName.charAt(1)) 
-      };
+      return { id, text, level: Number(elem.tagName.charAt(1)) };
     });
 
     setHeadings(elements);
   }, []);
 
   useEffect(() => {
-    // Pequeno delay para garantir que o Turbopack finalizou a hidratação do MDX
-    const timer = setTimeout(extractHeadings, 100);
-
+    const timer = setTimeout(extractHeadings, 150);
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
+          if (entry.isIntersecting) setActiveId(entry.target.id);
         });
       },
-      { 
-        rootMargin: "-100px 0% -60% 0%", 
-        threshold: 1.0 
-      }
+      { rootMargin: "-100px 0% -60% 0%", threshold: 1.0 }
     );
 
     document.querySelectorAll("article h2, article h3").forEach((h) => observer.observe(h));
@@ -102,11 +86,11 @@ export default function TableOfContents({ dict, lang }: TableOfContentsProps) {
 
   return (
     <nav className="w-full lg:w-72 not-prose" aria-label={tocTitle}>
-      {/* MOBILE: Accordion Minimalista (Tailwind 4.2) */}
+      {/* MOBILE ACCORDION */}
       <div className="lg:hidden mb-8">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex flex-col gap-1 p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl transition-transform active:scale-95"
+          className="w-full flex flex-col gap-1 p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl transition-all active:scale-95"
         >
           <div className="flex items-center justify-between w-full">
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400">
@@ -119,12 +103,12 @@ export default function TableOfContents({ dict, lang }: TableOfContentsProps) {
             </div>
           </div>
           <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 truncate w-full text-left">
-            {headings.find(h => h.id === activeId)?.text || dict.states.loading}
+            {headings.find(h => h.id === activeId)?.text || dict.common.loading}
           </span>
         </button>
       </div>
 
-      {/* DESKTOP: Sidebar List (Sticky) */}
+      {/* DESKTOP SIDEBAR */}
       <div className={`
         ${isOpen ? 'max-h-[80vh] opacity-100 mb-10' : 'max-h-0 opacity-0 lg:max-h-none lg:opacity-100'} 
         overflow-y-auto lg:overflow-visible transition-all duration-700
@@ -136,16 +120,11 @@ export default function TableOfContents({ dict, lang }: TableOfContentsProps) {
         
         <ul className="space-y-5">
           {headings.map((h) => (
-            <li 
-              key={h.id} 
-              style={{ paddingLeft: h.level > 2 ? '1.25rem' : '0' }}
-              className="relative"
-            >
+            <li key={h.id} style={{ paddingLeft: h.level > 2 ? '1.25rem' : '0' }} className="relative">
               <a 
                 href={`#${h.id}`}
                 onClick={(e) => {
                   setIsOpen(false);
-                  // Smooth scroll manual para evitar saltos bruscos no React 19
                   e.preventDefault();
                   document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth' });
                 }}
