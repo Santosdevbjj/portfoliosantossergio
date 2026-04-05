@@ -1,15 +1,14 @@
+/**
+ * src/components/TableOfContents.tsx
+ * Versão: Abril de 2026
+ * Stack: Next.js 16.2.2 | React 19 | TS 6.0.2 | Tailwind 4.2 | Node 24
+ * Status: COMPATÍVEL COM .MD/.MDX | MULTILÍNGUE (PT, EN, ES-ES, ES-AR, ES-MX)
+ */
+
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import type { Dictionary } from "@/types/dictionary";
-
-/**
- * TABLE OF CONTENTS COMPONENT - SÉRGIO SANTOS PORTFOLIO
- * -----------------------------------------------------------------------------
- * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16.2
- * ✔ Performance: Intersection Observer com otimização de CPU
- * ✔ Responsividade: Accordion Móvel e Sidebar Desktop Sticky
- */
+import { useEffect, useState, useMemo, useCallback } from "react";
+import type { Dictionary, Locale } from "@/types/dictionary";
 
 interface Heading {
   id: string;
@@ -19,31 +18,42 @@ interface Heading {
 
 interface TableOfContentsProps {
   readonly dict: Dictionary;
+  readonly lang: Locale; // Adicionado para suporte regional
 }
 
-export default function TableOfContents({ dict }: TableOfContentsProps) {
+export default function TableOfContents({ dict, lang }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<Heading[]>([]);
   const [activeId, setActiveId] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
 
   /**
-   * RESOLUÇÃO DE TIPAGEM TS 6.0:
-   * Acesso seguro ao SeoDictionary para evitar erros de build 'possibly undefined'.
+   * I18N REGIONAL (TS 6.0 Safe):
+   * Define o título do sumário baseado no idioma e variante.
    */
   const tocTitle = useMemo(() => {
-    return dict.seo.pages?.["articles"]?.title ?? dict.articles.title;
-  }, [dict]);
+    const isPt = lang.startsWith("pt");
+    const isEn = lang.startsWith("en");
+    
+    if (isPt) return "Índice do Artigo";
+    if (isEn) return "Table of Contents";
+    
+    // Variantes de Espanhol
+    if (lang === "es-AR") return "Contenido del Artículo";
+    return "Índice de Contenidos"; // es-ES, es-MX fallback
+  }, [lang]);
 
-  useEffect(() => {
-    // Busca dentro do elemento 'article' injetado pelo MDX
+  /**
+   * MOTOR DE EXTRAÇÃO DE HEADINGS:
+   * Compatível com a renderização do motor MDX do Next.js 16.2.
+   */
+  const extractHeadings = useCallback(() => {
     const article = document.querySelector("article");
     if (!article) return;
 
-    // Mapeamento de H2 e H3 para o sumário
     const elements = Array.from(article.querySelectorAll("h2, h3")).map((elem) => {
       const text = elem.textContent || "";
       
-      // Slugify: Normalização robusta de IDs para compatibilidade com links
+      // Gerador de ID resiliente (Slugify 2026)
       const id = elem.id || text.toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -60,8 +70,12 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
     });
 
     setHeadings(elements);
+  }, []);
 
-    // Observador de interseção para destacar a seção atual no scroll
+  useEffect(() => {
+    // Pequeno delay para garantir que o Turbopack finalizou a hidratação do MDX
+    const timer = setTimeout(extractHeadings, 100);
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -71,80 +85,80 @@ export default function TableOfContents({ dict }: TableOfContentsProps) {
         });
       },
       { 
-        rootMargin: "-80px 0% -70% 0%", // Ajustado para compensar o Header fixo
+        rootMargin: "-100px 0% -60% 0%", 
         threshold: 1.0 
       }
     );
 
-    article.querySelectorAll("h2, h3").forEach((h) => observer.observe(h));
+    document.querySelectorAll("article h2, article h3").forEach((h) => observer.observe(h));
     
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [extractHeadings]);
 
-  // Não renderiza nada se o artigo não tiver subtítulos
   if (headings.length === 0) return null;
 
   return (
-    <nav 
-      className="w-full lg:w-72 flex flex-col"
-      aria-label={dict.common.navigation}
-    >
-      {/* VERSÃO MOBILE: Accordion Premium */}
-      <div className="lg:hidden mb-6">
+    <nav className="w-full lg:w-72 not-prose" aria-label={tocTitle}>
+      {/* MOBILE: Accordion Minimalista (Tailwind 4.2) */}
+      <div className="lg:hidden mb-8">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          aria-expanded={isOpen}
-          className="flex items-center justify-between w-full p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all active:scale-[0.98]"
+          className="w-full flex flex-col gap-1 p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl transition-transform active:scale-95"
         >
-          <div className="flex flex-col items-start text-left">
-            <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400">
               {tocTitle}
             </span>
-            <span className="text-xs font-bold text-slate-500 truncate max-w-[200px]">
-              {headings.find(h => h.id === activeId)?.text || dict.states.loading}
-            </span>
+            <div className={`transition-transform duration-500 ${isOpen ? 'rotate-180' : ''}`}>
+              <svg className="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
           </div>
-          <div className={`p-2 rounded-full bg-slate-50 dark:bg-slate-800 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-            <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
+          <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 truncate w-full text-left">
+            {headings.find(h => h.id === activeId)?.text || dict.states.loading}
+          </span>
         </button>
       </div>
 
-      {/* LISTAGEM DE TÓPICOS: Sticky em LG+ */}
-      <div 
-        className={`
-          ${isOpen ? 'max-h-[1000px] opacity-100 mb-8' : 'max-h-0 opacity-0 lg:max-h-none lg:opacity-100'} 
-          overflow-hidden lg:block transition-all duration-500 ease-in-out
-          lg:border-l lg:border-slate-200 lg:dark:border-slate-800 lg:pl-6
-        `}
-      >
-        <h4 className="hidden lg:block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 mb-6">
+      {/* DESKTOP: Sidebar List (Sticky) */}
+      <div className={`
+        ${isOpen ? 'max-h-[80vh] opacity-100 mb-10' : 'max-h-0 opacity-0 lg:max-h-none lg:opacity-100'} 
+        overflow-y-auto lg:overflow-visible transition-all duration-700
+        lg:border-l lg:border-zinc-200 lg:dark:border-zinc-800 lg:pl-8
+      `}>
+        <h4 className="hidden lg:block text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400 dark:text-zinc-600 mb-8">
           {tocTitle}
         </h4>
         
-        <ul className="space-y-4">
+        <ul className="space-y-5">
           {headings.map((h) => (
             <li 
               key={h.id} 
-              style={{ paddingLeft: h.level > 2 ? `${(h.level - 2) * 12}px` : '0px' }}
-              className="group relative"
+              style={{ paddingLeft: h.level > 2 ? '1.25rem' : '0' }}
+              className="relative"
             >
               <a 
                 href={`#${h.id}`}
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => {
+                  setIsOpen(false);
+                  // Smooth scroll manual para evitar saltos bruscos no React 19
+                  e.preventDefault();
+                  document.getElementById(h.id)?.scrollIntoView({ behavior: 'smooth' });
+                }}
                 className={`
-                  text-sm font-bold transition-all duration-300 block leading-snug
+                  text-sm font-bold block leading-snug transition-all duration-300
                   ${activeId === h.id 
-                    ? "text-blue-600 dark:text-blue-400 translate-x-1" 
-                    : "text-slate-400 hover:text-slate-900 dark:text-slate-500 dark:hover:text-slate-300"
+                    ? "text-blue-600 dark:text-blue-400 translate-x-2" 
+                    : "text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-200"
                   }
                 `}
               >
-                {/* Indicador de Seção Ativa */}
                 {activeId === h.id && (
-                  <span className="absolute -left-6 top-1/2 -translate-y-1/2 w-1 h-4 rounded-full bg-blue-600 animate-in fade-in zoom-in lg:-left-6.5" />
+                  <span className="absolute -left-8 lg:-left-[33px] top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.5)]" />
                 )}
                 {h.text}
               </a>
