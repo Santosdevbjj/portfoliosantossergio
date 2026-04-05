@@ -2,11 +2,13 @@
  * src/mdx-components.tsx
  * Versão: Abril de 2026
  * Stack: Next.js 16.2.2 | React 19 | TS 6.0.2 | Tailwind 4.2
+ * Correção: Importação de tipos para compatibilidade com verbatimModuleSyntax
  */
 import type { MDXComponents } from 'mdx/types';
-import Image, { ImageProps } from 'next/image';
+import Image from 'next/image';
+import type { ImageProps } from 'next/image'; // CORREÇÃO: Importação type-only
 import Link from 'next/link';
-import { ComponentPropsWithoutRef } from 'react';
+import { type ComponentPropsWithoutRef } from 'react'; // CORREÇÃO: Importação type-only
 
 // Função obrigatória no App Router para habilitar suporte a MDX/MD
 export function useMDXComponents(components: MDXComponents): MDXComponents {
