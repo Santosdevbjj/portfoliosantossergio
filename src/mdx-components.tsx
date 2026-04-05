@@ -2,7 +2,7 @@
  * src/mdx-components.tsx
  * Versão: Abril de 2026
  * Stack: Next.js 16.2.2 | React 19 | TS 6.0.2 | Tailwind 4.2 | Node 24
- * Correção: Incompatibilidade de LinkProps com exactOptionalPropertyTypes
+ * Correção: Filtragem rigorosa de props para Link (Incompatibilidade exata de tipos)
  */
 import type { MDXComponents } from 'mdx/types';
 import Image from 'next/image';
@@ -12,7 +12,7 @@ import { type ComponentPropsWithoutRef } from 'react';
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    // 1. Títulos Otimizados (Tailwind 4.2)
+    // 1. Títulos Otimizados (Tailwind 4.2 Engine)
     h1: ({ children, ...props }: ComponentPropsWithoutRef<'h1'>) => (
       <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-zinc-900 dark:text-white mt-12 mb-6" {...props}>
         {children}
@@ -23,42 +23,37 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {children}
       </h2>
     ),
-    h3: ({ children, ...props }: ComponentPropsWithoutRef<'h3'>) => (
-      <h3 className="text-xl font-bold text-zinc-800 dark:text-zinc-200 mt-8 mb-3" {...props}>
-        {children}
-      </h3>
-    ),
 
-    // 2. Parágrafos e Texto (Node 24 Performance)
+    // 2. Parágrafos e Texto
     p: ({ children, ...props }: ComponentPropsWithoutRef<'p'>) => (
       <p className="text-base md:text-lg leading-relaxed text-zinc-600 dark:text-zinc-400 mb-6" {...props}>
         {children}
       </p>
     ),
 
-    // 3. Links (CORREÇÃO DO ERRO DE TYPE CHECK)
+    // 3. Links (SOLUÇÃO DEFINITIVA PARA O ERRO DE TYPE CHECK)
     a: ({ href, children, ...props }: ComponentPropsWithoutRef<'a'>) => {
       const isInternal = href?.startsWith('/') || href?.startsWith('#');
       const className = "font-medium text-blue-600 dark:text-blue-400 underline decoration-2 underline-offset-4 hover:text-blue-700 transition-colors";
       
       if (isInternal) {
-        // CORREÇÃO: Extraímos propriedades que causam conflito com o Link do Next.js
-        // Evita erro de 'undefined' em propriedades opcionais estritas
-        const { onMouseEnter, onMouseLeave, onClick, ...rest } = props;
-        
+        /** * No TS 6.0.2, não podemos passar o spread {...props} diretamente para o Link 
+         * devido a incompatibilidades de eventos (onMouseEnter, onTouchStart, etc) sendo undefined.
+         * Extraímos apenas o essencial para o roteamento.
+         */
         return (
           <Link 
             href={href as string} 
             className={className}
-            {...(onMouseEnter ? { onMouseEnter } : {})}
-            {...(onMouseLeave ? { onMouseLeave } : {})}
-            {...(onClick ? { onClick } : {})}
-            {...rest}
+            title={props.title}
+            id={props.id}
           >
             {children}
           </Link>
         );
       }
+
+      // Para links externos, a tag <a> normal aceita todas as props perfeitamente
       return (
         <a 
           href={href} 
@@ -72,7 +67,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       );
     },
 
-    // 4. Imagens (Next.js 16.2 Turbopack optimized)
+    // 4. Imagens (Otimizadas para Turbopack)
     img: (props) => (
       <Image
         sizes="100vw"
@@ -81,23 +76,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         width={1200}
         height={630}
         {...(props as ImageProps)}
-        alt={props.alt || "Ilustração do artigo técnico"}
+        alt={props.alt || "Ilustração técnica"}
       />
     ),
 
-    // 5. Listas
-    ul: ({ children, ...props }: ComponentPropsWithoutRef<'ul'>) => (
-      <ul className="list-disc list-inside space-y-2 mb-6 text-zinc-600 dark:text-zinc-400" {...props}>
-        {children}
-      </ul>
-    ),
-    ol: ({ children, ...props }: ComponentPropsWithoutRef<'ol'>) => (
-      <ol className="list-decimal list-inside space-y-2 mb-6 text-zinc-600 dark:text-zinc-400" {...props}>
-        {children}
-      </ol>
-    ),
-
-    // 6. Blocos de Código e Citações
+    // 5. Blocos de Código (Sintaxe Modernizada)
     code: ({ children, ...props }: ComponentPropsWithoutRef<'code'>) => (
       <code className="bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-sm font-mono text-pink-600 dark:text-pink-400" {...props}>
         {children}
@@ -107,6 +90,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <pre className="bg-zinc-950 text-zinc-100 p-6 rounded-2xl overflow-x-auto my-8 border border-zinc-800 shadow-xl" {...props}>
         {children}
       </pre>
+    ),
+
+    // 6. Listas e Blockquotes
+    ul: ({ children, ...props }: ComponentPropsWithoutRef<'ul'>) => (
+      <ul className="list-disc list-inside space-y-2 mb-6 text-zinc-600 dark:text-zinc-400" {...props}>
+        {children}
+      </ul>
     ),
     blockquote: ({ children, ...props }: ComponentPropsWithoutRef<'blockquote'>) => (
       <blockquote className="border-l-4 border-blue-600 pl-6 italic my-10 text-zinc-500 dark:text-zinc-400" {...props}>
