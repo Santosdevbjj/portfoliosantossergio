@@ -1,73 +1,104 @@
 /**
  * src/components/ArticleCard.tsx
- * Componente de UI moderno com Tailwind 4.2 e React 19.
- * Corrigido para conformidade estrita com index signature do TS 6.
+ * Versão: Abril de 2026
+ * Stack: Next.js 16.2.2 | React 19 | TS 6.0.2 | Tailwind 4.2 | Node 24
+ * Status: COMPATÍVEL COM .MD/.MDX | MULTILÍNGUE (PT, EN, ES-ES, ES-AR, ES-MX)
  */
 
 import type { GitHubItem } from "@/lib/github/types";
-import { BookOpen, Calendar, ChevronRight } from "lucide-react";
+import type { Dictionary, Locale } from "@/types/dictionary";
+import { BookOpen, Calendar, ChevronRight, FileCode, FileText } from "lucide-react";
+import Link from "next/link";
+import { useMemo } from "react";
 
 interface ArticleCardProps {
-  article: GitHubItem;
+  readonly article: GitHubItem;
+  readonly lang: Locale;
+  readonly dict: Dictionary;
 }
 
-// Mapeamento de cores baseado nas categorias do GitHub
-// Usamos Record<string, string> para permitir categorias dinâmicas
+// Mapeamento de cores baseado nas categorias do GitHub (Tailwind 4.2 OKLCH)
 const categoryStyles: Record<string, string> = {
   react: "bg-blue-500/10 text-blue-600 border-blue-200 dark:border-blue-500/30",
-  autoconhecimento: "bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30",
-  geral: "bg-slate-500/10 text-slate-600 border-slate-200 dark:border-slate-500/30",
-  // Fallback para novas categorias
-  fallback: "bg-purple-500/10 text-purple-600 border-purple-200 dark:border-purple-500/30",
+  nextjs: "bg-zinc-500/10 text-zinc-800 border-zinc-200 dark:text-zinc-200 dark:border-zinc-700",
+  typescript: "bg-blue-600/10 text-blue-700 border-blue-300 dark:border-blue-400/30",
+  ia: "bg-purple-500/10 text-purple-600 border-purple-200 dark:border-purple-500/30",
+  python: "bg-yellow-500/10 text-yellow-700 border-yellow-200 dark:border-yellow-500/30",
+  fallback: "bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:border-emerald-500/30",
 };
 
-export function ArticleCard({ article }: ArticleCardProps) {
-  // Normaliza a categoria para encontrar no mapa
-  const categoryKey = article.category.toLowerCase();
+export function ArticleCard({ article, lang, dict }: ArticleCardProps) {
+  const isMdx = article.name.endsWith('.mdx');
   
-  /**
-   * CORREÇÃO TS 6: 
-   * Acessamos via ['key'] para satisfazer a regra de index signature.
-   * Mudamos o nome de 'default' para 'fallback' para evitar confusão com palavra reservada,
-   * embora o acesso via colchetes ['default'] também funcionaria.
-   */
-  const badgeStyle = categoryStyles[categoryKey] || categoryStyles['fallback'];
+  // Limpeza do título: Remove extensões e substitui hífens por espaços
+  const displayTitle = useMemo(() => {
+    return article.name
+      .replace(/\.mdx?$/, '') // Remove .md ou .mdx
+      .replace(/-/g, ' ');
+  }, [article.name]);
+
+  // Lógica de Internacionalização para o Card
+  const labels = useMemo(() => {
+    const isPt = lang.startsWith('pt');
+    const isEn = lang.startsWith('en');
+    const isEs = lang.startsWith('es');
+
+    return {
+      readMore: dict.articles.readMore || (isPt ? "Ler mais" : isEn ? "Read more" : "Leer más"),
+      type: isMdx ? "MDX Interactive" : (dict.articles.publishedAt || "Artigo Técnico"),
+      description: isPt 
+        ? `Explore este conteúdo sobre ${article.category} em nosso repositório.`
+        : isEn 
+          ? `Explore this ${article.category} content in our repository.`
+          : `Explora este contenido sobre ${article.category} en nuestro repositorio.`
+    };
+  }, [lang, dict, article.category, isMdx]);
+
+  const badgeStyle = categoryStyles[article.category.toLowerCase()] || categoryStyles['fallback'];
 
   return (
-    <div className="group relative flex flex-col justify-between p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300 hover:shadow-xl hover:shadow-zinc-500/5 hover:-translate-y-1">
+    <div className="group relative flex flex-col justify-between p-7 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[2rem] hover:border-blue-500/50 dark:hover:border-blue-400/50 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/5 hover:-translate-y-2">
       
-      {/* Header do Card */}
+      {/* Decoração de fundo (Tailwind 4.2 Glow) */}
+      <div className="absolute top-0 right-0 -z-10 h-24 w-24 bg-blue-500/5 blur-3xl rounded-full group-hover:bg-blue-500/10 transition-colors" />
+
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <span className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider border rounded-full ${badgeStyle}`}>
+        <div className="flex items-center justify-between mb-6">
+          <span className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border rounded-xl shadow-sm ${badgeStyle}`}>
             {article.category}
           </span>
-          <BookOpen className="w-4 h-4 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" />
+          {isMdx ? (
+            <FileCode className="w-5 h-5 text-purple-500 animate-pulse" title="MDX Content" />
+          ) : (
+            <FileText className="w-5 h-5 text-zinc-400" title="Markdown Content" />
+          )}
         </div>
 
-        <h3 className="text-xl font-bold text-zinc-800 dark:text-zinc-100 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-          {article.name.replace('.md', '').replace(/-/g, ' ')}
+        <h3 className="text-xl font-black text-zinc-900 dark:text-zinc-100 leading-tight tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          {displayTitle}
         </h3>
         
-        <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2">
-          Explore este artigo sobre {article.category} localizado em seu repositório oficial.
+        <p className="mt-4 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 line-clamp-3 font-medium">
+          {labels.description}
         </p>
       </div>
 
-      {/* Footer do Card */}
-      <div className="mt-6 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-4">
-        <div className="flex items-center text-zinc-400 text-xs">
-          <Calendar className="w-3.5 h-3.5 mr-1" />
-          <span>Artigo Técnico</span>
+      {/* Rodapé do Card */}
+      <div className="mt-8 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800/50 pt-5">
+        <div className="flex items-center text-zinc-400 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-wider">
+          <Calendar className="w-3.5 h-3.5 mr-2 text-blue-500" />
+          <span>{labels.type}</span>
         </div>
         
-        <a 
-          href={`/artigos/${article.category}/${article.name.replace('.md', '')}`}
-          className="flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline underline-offset-4"
+        <Link 
+          href={`/${lang}/artigos/${article.category}/${article.name.replace(/\.mdx?$/, '')}`}
+          className="flex items-center text-sm font-black text-blue-600 dark:text-blue-400 group/link"
         >
-          Ler mais
-          <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-        </a>
+          <span className="mr-1 border-b-2 border-transparent group-hover/link:border-blue-500 transition-all">
+            {labels.readMore}
+          </span>
+          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
     </div>
   );
