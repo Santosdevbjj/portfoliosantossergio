@@ -1,3 +1,10 @@
+/**
+ * src/components/mdx-layout.tsx
+ * Versão: Abril de 2026
+ * Stack: Next.js 16.2.2 | React 19 | TS 6.0.2 | Tailwind 4.2 | Node 24
+ * Status: TOTALMENTE RESPONSIVO & MULTILÍNGUE (PT, EN, ES-ES, ES-AR, ES-MX)
+ */
+
 'use client';
 
 import Link from "next/link";
@@ -5,15 +12,6 @@ import { useMemo } from "react";
 import TableOfContents from "./TableOfContents";
 import ShareArticle from "./ShareArticle";
 import type { Dictionary, Locale } from "@/types/dictionary";
-
-/**
- * MDX LAYOUT COMPONENT - SÉRGIO SANTOS PORTFOLIO
- * -----------------------------------------------------------------------------
- * ✔ Next.js 16.2: App Router & Client Optimization
- * ✔ React 19: UseMemo para cálculos de tradução de alto desempenho
- * ✔ TypeScript 6.0: Strict Null Checks & Index Signature Safety
- * ✔ Tailwind 4.2: Typography Engine com suporte a Dark Mode Oklch
- */
 
 interface MdxLayoutProps {
   readonly children: React.ReactNode;
@@ -24,98 +22,112 @@ interface MdxLayoutProps {
 export default function MdxLayout({ children, lang, dict }: MdxLayoutProps) {
   
   /**
-   * TS 6.0 SAFETY:
-   * Resolvemos o acesso ao dicionário de SEO garantindo que a chave 'articles'
-   * seja tratada de forma segura para evitar o erro de 'possibly undefined'.
+   * SEO & TITLES (TS 6.0 Safe):
+   * Recupera o título da página de artigos de forma resiliente.
    */
   const articlesTitle = useMemo(() => {
-    const pageSeo = dict.seo.pages?.["articles"];
-    return pageSeo?.title ?? dict.articles.title ?? "Artigos";
+    // Acesso seguro ao dicionário evitando 'undefined' em tempo de execução
+    const pageSeoTitle = dict.seo.pages?.["articles"]?.title;
+    return pageSeoTitle ?? dict.articles?.title ?? "Artigos";
   }, [dict]);
 
   /**
-   * GRAMÁTICA DINÂMICA (I18N):
-   * Constrói a label de retorno baseada no idioma detectado (PT, EN, ES variações).
+   * I18N DINÂMICO (Português, Inglês, Espanhol Regional):
+   * Constrói a navegação baseada na gramática correta de cada localidade.
    */
   const backLabel = useMemo(() => {
-    const action = dict.states.emptyProjects.cta; // "Voltar"
+    const action = dict.states.emptyProjects.cta; // Ex: "Voltar" / "Back" / "Volver"
     
     if (lang.startsWith('pt')) return `${action} para ${articlesTitle}`;
     if (lang.startsWith('en')) return `${action} to ${articlesTitle}`;
-    // Fallback para es-ES, es-AR, es-MX
-    return `${action} a ${articlesTitle}`;
+    
+    // Suporte para es-ES, es-AR, es-MX
+    if (lang.startsWith('es')) {
+      const preposition = lang === 'es-AR' ? 'hacia' : 'a'; // Ajuste sutil regional
+      return `${action} ${preposition} ${articlesTitle}`;
+    }
+
+    return `${action} ${articlesTitle}`;
   }, [lang, dict, articlesTitle]);
 
-  // Título dinâmico para o componente de compartilhamento
-  const shareTitle = dict.articles.items[0]?.title ?? articlesTitle;
+  // Título para o ShareArticle (Fallback seguro)
+  const currentTitle = dict.articles.items?.[0]?.title ?? articlesTitle;
 
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-20 selection:bg-blue-500/30 transition-colors duration-500">
-      <div className="container mx-auto px-4 sm:px-6 max-w-7xl flex flex-col lg:flex-row gap-8 lg:gap-12">
+    <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 pt-24 pb-20 selection:bg-blue-500/20 transition-colors duration-700">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-12">
         
-        {/* COLUNA PRINCIPAL: ARTIGO */}
-        <article className="flex-1 max-w-4xl w-full order-2 lg:order-1">
+        {/* COLUNA DO CONTEÚDO (Prioridade Mobile) */}
+        <article className="flex-1 min-w-0 order-2 lg:order-1 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           
-          {/* NAVEGAÇÃO SUPERIOR */}
-          <nav className="mb-10 animate-in fade-in slide-in-from-left-4 duration-700" aria-label="Breadcrumb">
+          {/* BREADCRUMB RESPONSIVO */}
+          <nav className="mb-12" aria-label="Breadcrumb">
             <Link 
               href={`/${lang}/artigos`} 
-              className="group inline-flex items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-all duration-300"
+              className="group inline-flex items-center text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400 transition-all"
             >
-              <span className="mr-3 flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 dark:border-slate-800 group-hover:border-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-sm">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
+              <span className="mr-4 flex h-10 w-10 items-center justify-center rounded-2xl border border-zinc-200 dark:border-zinc-800 group-hover:border-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                 </svg>
               </span>
               {backLabel}
             </Link>
           </nav>
 
-          {/* MOTOR DE TIPOGRAFIA - TAILWIND 4.2 */}
-          <div className="prose prose-slate dark:prose-invert lg:prose-xl 
+          {/* MOTOR DE TIPOGRAFIA TAILWIND 4.2 - SUPORTE .MD E .MDX */}
+          <div className="prose prose-zinc dark:prose-invert 
             max-w-none
+            sm:prose-lg
+            lg:prose-xl
             prose-headings:font-black prose-headings:tracking-tighter
-            prose-h1:text-4xl md:text-5xl lg:text-7xl prose-h1:mb-8 prose-h1:leading-tight
-            prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:font-bold prose-a:no-underline hover:prose-a:underline
-            prose-blockquote:border-l-4 prose-blockquote:border-blue-600 prose-blockquote:bg-blue-50/50 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:rounded-r-2xl prose-blockquote:not-italic
-            prose-code:text-blue-700 dark:prose-code:text-blue-300 prose-code:bg-blue-500/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
-            prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 prose-pre:shadow-2xl prose-pre:rounded-3xl
-            prose-img:rounded-3xl prose-img:shadow-2xl prose-img:border dark:prose-img:border-slate-800">
+            prose-h1:text-5xl md:text-6xl lg:text-7xl prose-h1:leading-[0.9] prose-h1:mb-12
+            prose-p:leading-relaxed prose-p:text-zinc-600 dark:prose-p:text-zinc-400
+            prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:decoration-2 prose-a:underline-offset-4
+            prose-blockquote:border-l-4 prose-blockquote:border-blue-600 prose-blockquote:bg-blue-50/30 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:py-2 prose-blockquote:rounded-r-3xl
+            prose-pre:rounded-[2rem] prose-pre:border prose-pre:border-zinc-200 dark:prose-pre:border-zinc-800 prose-pre:bg-zinc-950 prose-pre:shadow-2xl
+            prose-img:rounded-[2.5rem] prose-img:shadow-premium prose-img:mx-auto">
             {children}
           </div>
 
-          {/* COMPARTILHAMENTO AO FINAL DO CONTEÚDO */}
-          <div className="mt-16 pt-10 border-t border-slate-200 dark:border-slate-800">
+          {/* FOOTER DO ARTIGO: SHARE & INTERAÇÃO */}
+          <footer className="mt-24 pt-12 border-t border-zinc-200 dark:border-zinc-900">
             <ShareArticle 
-              title={shareTitle} 
+              title={currentTitle} 
               dict={dict} 
               lang={lang} 
             />
-          </div>
+          </footer>
         </article>
 
-        {/* SIDEBAR: SUMÁRIO E INFO DO AUTOR */}
+        {/* SIDEBAR (Sticky no Desktop) */}
         <aside className="lg:w-80 w-full order-1 lg:order-2">
-          <div className="lg:sticky lg:top-32 space-y-8">
+          <div className="lg:sticky lg:top-32 space-y-10">
             
-            {/* Componente de Tabela de Conteúdos */}
+            {/* Componente de Sumário (TOC) */}
             <TableOfContents dict={dict} />
             
-            {/* CARD DO AUTOR (Contextual para Cientista de Dados) */}
-            <div className="hidden lg:block p-8 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-premium transition-all hover:border-blue-500/40">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 mb-4">
-                {dict.meta.author}
-              </h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                {dict.hero.headline}
+            {/* CARD DO AUTOR - RESPONSIVIDADE TAILWIND 4.2 */}
+            <div className="hidden lg:block p-8 rounded-[3rem] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-1 w-8 bg-blue-600 rounded-full" />
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600">
+                  {dict.meta.author}
+                </h4>
+              </div>
+              
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed italic">
+                "{dict.hero.headline}"
               </p>
               
-              <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800/50">
-                <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                  {dict.about.stats.automation}
-                </p>
+              <div className="mt-8 pt-6 border-t border-zinc-50 dark:border-zinc-800/50">
+                <div className="flex items-center justify-between text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
+                  <span>{dict.about.stats.automation}</span>
+                  <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                </div>
               </div>
             </div>
+
           </div>
         </aside>
       </div>
