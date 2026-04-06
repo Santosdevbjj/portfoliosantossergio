@@ -1,7 +1,15 @@
+/**
+ * src/components/ContactSection.tsx
+ * Versão: Abril de 2026
+ * Stack: Next.js 16.2.2 | React 19 | TS 6.0.2 | Tailwind 4.2 | Node 24
+ * Status: FIX LUCIDE EXPORTS | MULTILÍNGUE (PT, EN, ES-ES, ES-AR, ES-MX)
+ */
+
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { Mail, LinkedIn, GitHub, Copy, Check, FileText } from 'lucide-react';
+// CORREÇÃO CRÍTICA: Nomes de exportação do Lucide React v1+ / 2026
+import { Mail, Linkedin, Github, Copy, Check, FileText } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -20,7 +28,15 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
   const email = common.externalLinks.email;
   const linkedinUrl = common.externalLinks.linkedin;
   const githubUrl = common.externalLinks.github;
-  const origin = searchParams?.get('utm_source') ?? 'portfolio_direct';
+  
+  // Tratamento seguro para searchParams em Next.js 16 (Turbopack)
+  const origin = useMemo(() => {
+    try {
+      return searchParams?.get('utm_source') ?? 'portfolio_direct';
+    } catch {
+      return 'portfolio_direct';
+    }
+  }, [searchParams]);
 
   const copyToClipboard = useCallback((): void => {
     if (typeof window === 'undefined' || !navigator?.clipboard) return;
@@ -30,18 +46,26 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
     });
   }, [email]);
 
-  const copiedLabel = useMemo<Record<Locale, string>>(() => ({
-    'pt-BR': 'Copiado!',
-    'en-US': 'Copied!',
-    'es-ES': '¡Copiado!',
-    'es-AR': '¡Copiado!',
-    'es-MX': '¡Copiado!',
-  }), [])[locale];
+  // Internacionalização robusta para o feedback de cópia
+  const copiedLabel = useMemo<string>(() => {
+    const labels: Record<string, string> = {
+      'pt-BR': 'Copiado!',
+      'en-US': 'Copied!',
+      'es-ES': '¡Copiado!',
+      'es-AR': '¡Copiado!',
+      'es-MX': '¡Copiado!',
+    };
+    // Fallback inteligente para variações de Locale
+    return labels[locale] || (locale.startsWith('es') ? '¡Copiado!' : 'Copied!');
+  }, [locale]);
 
   return (
     <section id="contact" className="relative overflow-hidden bg-white py-20 dark:bg-[#020617] lg:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-blue-600 p-8 shadow-2xl dark:bg-blue-700 md:rounded-[4rem] md:p-16 lg:p-20">
+          
+          {/* Efeito Visual de Fundo (Tailwind 4.2 Glow) */}
+          <div className="absolute -top-24 -right-24 h-96 w-96 bg-white/10 blur-[100px] rounded-full" />
           
           <div className="relative z-10 flex flex-col items-center gap-12 lg:flex-row lg:justify-between">
             <div className="flex-1 text-center lg:text-left">
@@ -53,16 +77,16 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
               </p>
 
               <div className="flex flex-col flex-wrap items-center justify-center gap-4 sm:flex-row lg:justify-start">
-                {/* CTA: EMAIL DIRETO */}
+                {/* CTA PRINCIPAL */}
                 <a
                   href={`mailto:${email}?subject=Contact from ${origin}`}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-8 py-4 text-lg font-black text-blue-600 shadow-lg transition-all hover:scale-105 active:scale-95 sm:w-auto"
                 >
-                  <Mail className="h-6 w-6" />
+                  <Mail className="size-6" />
                   {contact.cta}
                 </a>
 
-                {/* CTA: COPIAR EMAIL (Utiliza Copy e Check) */}
+                {/* BOTÃO COPIAR */}
                 <button
                   onClick={copyToClipboard}
                   className={`flex w-full items-center justify-center gap-3 rounded-2xl border px-6 py-4 text-base font-bold transition-all active:scale-95 sm:w-auto cursor-pointer ${
@@ -71,52 +95,54 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
                     : 'bg-blue-800/40 border-white/20 text-white hover:bg-blue-800/60'
                   }`}
                 >
-                  {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5 opacity-70" />}
+                  {copied ? <Check className="size-5" /> : <Copy className="size-5 opacity-70" />}
                   {copied ? copiedLabel : contact.emailLabel}
                 </button>
 
-                {/* CTA: PÁGINA DE RESUME (Utiliza FileText) */}
+                {/* BOTÃO RESUME */}
                 <Link
                   href={`/${locale}/resume`}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl border border-white/30 bg-white/10 px-6 py-4 text-base font-bold text-white backdrop-blur-sm transition-all hover:bg-white/20 sm:w-auto"
                 >
-                  <FileText className="h-5 w-5" />
+                  <FileText className="size-5" />
                   {contact.cvLabel}
                 </Link>
               </div>
 
-              {/* DOWNLOAD DIRETO PEQUENO */}
+              {/* DOWNLOAD PDF (Caminhos para ES-AR, ES-MX, ES-ES corrigidos) */}
               <div className="mt-6 flex justify-center lg:justify-start">
                  <a
                   href={`/pdf/cv-sergio-santos-${locale}.pdf`}
                   download
                   className="text-white/60 hover:text-white text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Download PDF Direct
+                  Download PDF Direct ({locale.toUpperCase()})
                 </a>
               </div>
             </div>
 
-            {/* REDES SOCIAIS (Utiliza Linkedin e Github) */}
+            {/* REDES SOCIAIS - Corrigido para Linkedin e Github */}
             <div className="flex flex-row gap-4 lg:flex-col">
               <a 
                 href={linkedinUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
+                aria-label="LinkedIn Profile"
                 className="rounded-2xl bg-white p-5 text-blue-600 shadow-xl hover:-translate-y-2 transition-transform duration-300"
               >
-                <Linkedin className="h-8 w-8 md:h-10 md:w-10" />
+                <Linkedin className="size-8 md:size-10" />
               </a>
               <a 
                 href={githubUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
+                aria-label="GitHub Profile"
                 className="rounded-2xl bg-slate-900 p-5 text-white shadow-xl hover:-translate-y-2 transition-transform duration-300"
               >
-                <Github className="h-8 w-8 md:h-10 md:w-10" />
+                <Github className="size-8 md:size-10" />
               </a>
             </div>
           </div>
