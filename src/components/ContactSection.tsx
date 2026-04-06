@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { Mail, Linkedin, Github, Copy, Check, FileText } from 'lucide-react';
+import { Mail, LinkedIn, GitHub, Copy, Check, FileText } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
