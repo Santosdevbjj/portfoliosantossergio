@@ -10,7 +10,7 @@
  */
 
 import {
-  Github,
+  GitHub,
   ExternalLink,
   Folder,
   Star,
