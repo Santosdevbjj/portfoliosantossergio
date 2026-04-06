@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import type { ReactNode, JSX } from 'react';
 import {
-  Linkedin,
-  Github,
+  LinkedIn,
+  GitHub,
   Mail,
   Globe,
   Code2,
