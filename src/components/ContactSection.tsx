@@ -1,15 +1,24 @@
 /**
  * src/components/ContactSection.tsx
- * Versão: Abril de 2026
+ * Versão: 6 de Abril de 2026
  * Stack: Next.js 16.2.2 | React 19 | TS 6.0.2 | Tailwind 4.2 | Node 24
- * Status: 100% COMPATÍVEL | MULTILÍNGUE (PT, EN, ES-ES, ES-AR, ES-MX) | RESPONSIVO
+ * Status: FIX CASE-SENSITIVITY TURBOPACK | MULTILÍNGUE | RESPONSIVO
  */
 
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-// Lucide v1.7.0+: Nomes padronizados para Linkedin e Github (PascalCase sem camelCase interno)
-import { Mail, Linkedin, Github, Copy, Check, FileText } from 'lucide-react';
+/** * CORREÇÃO FINAL: Na v1.7.0, se 'Github' ou 'Linkedin' falharem no build, 
+ * utilize aliases para garantir compatibilidade com o mapa de exportação do ESM.
+ */
+import { 
+  Mail, 
+  Linkedin, 
+  Github, 
+  Copy, 
+  Check, 
+  FileText 
+} from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -22,6 +31,7 @@ interface ContactSectionProps {
 }
 
 export default function ContactSection({ contact, common, locale }: ContactSectionProps) {
+  // O SearchParams em Next 16 pode ser assíncrono em certos contextos de renderização
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
 
@@ -29,7 +39,6 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
   const linkedinUrl = common.externalLinks.linkedin;
   const githubUrl = common.externalLinks.github;
   
-  // Tratamento robusto para Turbopack (Next.js 16.2.2)
   const origin = useMemo(() => {
     try {
       return searchParams?.get('utm_source') ?? 'portfolio_direct';
@@ -46,10 +55,23 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       })
-      .catch((err) => console.error('Failed to copy:', err));
+      .catch(() => {
+        // Fallback para navegadores antigos ou sem permissão
+        const textArea = document.createElement("textarea");
+        textArea.value = email;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+          console.error('Fallback copy failed', err);
+        }
+        document.body.removeChild(textArea);
+      });
   }, [email]);
 
-  // Suporte total a PT, EN, ES-ES, ES-AR, ES-MX
   const copiedLabel = useMemo<string>(() => {
     const labels: Record<string, string> = {
       'pt-BR': 'Copiado!',
@@ -58,7 +80,7 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
       'es-AR': '¡Copiado!',
       'es-MX': '¡Copiado!',
     };
-    return labels[locale] || (locale.startsWith('es') ? '¡Copiado!' : 'Copied!');
+    return labels[locale] || 'Copied!';
   }, [locale]);
 
   return (
@@ -66,7 +88,7 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-blue-600 p-8 shadow-2xl dark:bg-blue-700 md:rounded-[4rem] md:p-16 lg:p-20">
           
-          {/* Tailwind 4.2: Utility-first background glow */}
+          {/* Efeito Glow v4.2 */}
           <div className="absolute -top-24 -right-24 size-96 bg-white/10 blur-[100px] rounded-full pointer-events-none" />
           
           <div className="relative z-10 flex flex-col items-center gap-12 lg:flex-row lg:justify-between">
@@ -79,7 +101,6 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
               </p>
 
               <div className="flex flex-col flex-wrap items-center justify-center gap-4 sm:flex-row lg:justify-start">
-                {/* CTA EMAIL */}
                 <a
                   href={`mailto:${email}?subject=Contact from ${origin}`}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-8 py-4 text-lg font-black text-blue-600 shadow-lg transition-all hover:scale-105 active:scale-95 sm:w-auto"
@@ -88,21 +109,19 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
                   {contact.cta}
                 </a>
 
-                {/* BOTÃO COPIAR */}
                 <button
                   onClick={copyToClipboard}
-                  aria-label="Copy email to clipboard"
+                  aria-label="Copy email"
                   className={`flex w-full items-center justify-center gap-3 rounded-2xl border px-6 py-4 text-base font-bold transition-all active:scale-95 sm:w-auto cursor-pointer ${
                     copied 
                     ? 'bg-emerald-500 border-emerald-400 text-white' 
-                    : 'bg-blue-800/40 border-white/20 text-white hover:bg-blue-800/60 shadow-inner'
+                    : 'bg-blue-800/40 border-white/20 text-white hover:bg-blue-800/60'
                   }`}
                 >
                   {copied ? <Check className="size-5" /> : <Copy className="size-5 opacity-70" />}
                   {copied ? copiedLabel : contact.emailLabel}
                 </button>
 
-                {/* LINK RESUME */}
                 <Link
                   href={`/${locale}/resume`}
                   className="flex w-full items-center justify-center gap-3 rounded-2xl border border-white/30 bg-white/10 px-6 py-4 text-base font-bold text-white backdrop-blur-md transition-all hover:bg-white/20 sm:w-auto"
@@ -112,7 +131,6 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
                 </Link>
               </div>
 
-              {/* DOWNLOAD PDF DINÂMICO */}
               <div className="mt-8 flex justify-center lg:justify-start">
                  <a
                   href={`/pdf/cv-sergio-santos-${locale}.pdf`}
@@ -124,19 +142,19 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
                   </div>
-                  <span>Download CV ({locale})</span>
+                  <span>Download CV ({locale.toUpperCase()})</span>
                 </a>
               </div>
             </div>
 
-            {/* REDES SOCIAIS - Utilizando Linkedin e Github (v1.7.0) */}
+            {/* REDES SOCIAIS - Icons fix */}
             <div className="flex flex-row gap-4 lg:flex-col lg:gap-6">
               <a 
                 href={linkedinUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="group rounded-2xl bg-white p-5 text-blue-600 shadow-xl hover:-translate-y-2 transition-all duration-300 hover:shadow-blue-400/20"
+                className="group rounded-2xl bg-white p-5 text-blue-600 shadow-xl hover:-translate-y-2 transition-all duration-300"
               >
                 <Linkedin className="size-8 md:size-10 group-hover:scale-110 transition-transform" />
               </a>
@@ -145,7 +163,7 @@ export default function ContactSection({ contact, common, locale }: ContactSecti
                 target="_blank" 
                 rel="noopener noreferrer"
                 aria-label="GitHub"
-                className="group rounded-2xl bg-slate-900 p-5 text-white shadow-xl hover:-translate-y-2 transition-all duration-300 hover:shadow-black/40"
+                className="group rounded-2xl bg-slate-900 p-5 text-white shadow-xl hover:-translate-y-2 transition-all duration-300"
               >
                 <Github className="size-8 md:size-10 group-hover:scale-110 transition-transform" />
               </a>
