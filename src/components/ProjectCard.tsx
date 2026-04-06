@@ -1,16 +1,13 @@
-'use client';
-
 /**
- * PROJECT CARD COMPONENT - REVISADO & INTEGRADO (FINAL)
- * -----------------------------------------------------------------------------
- * ✔ Stack: React 19, TS 6.0, Tailwind 4.2, Next.js 16, Node 24
- * ✔ I18n: Suporte PT-BR / EN-US / ES-ES / ES-MX / ES-AR
- * ✔ Pipes (|): Extração automática de Problema | Solução | Impacto
- * ✔ Fix: Proteção contra undefined no mapeamento de categorias (TypeError Fix)
+ * src/components/ProjectCard.tsx
+ * Versão: 6 de Abril de 2026 (Pós-depreciação de Brand Icons)
+ * Stack: Next.js 16.2.2 | React 19 | TS 6.0.2 | Tailwind 4.2 | Node 24
+ * Status: FIX BRAND ICONS | MULTILÍNGUE | 100% RESPONSIVO
  */
 
+'use client';
+
 import {
-  GitHub,
   ExternalLink,
   Folder,
   Star,
@@ -28,11 +25,10 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, dict }: ProjectCardProps) {
-  // Acesso seguro ao dicionário de projetos
+  // Acesso seguro ao dicionário de projetos (suporta PT-BR, EN-US, ES-ES, ES-AR, ES-MX)
   const labels = dict?.projects;
 
-  // 1. Lógica de extração segura para descrições estruturadas com Pipes (|)
-  // O GitHub About segue: "Problema | Solução | Impacto"
+  // 1. Extração de descrições estruturadas com Pipes (|)
   const descParts = project.description?.includes('|')
     ? project.description.split('|').map(p => p.trim())
     : [project.description];
@@ -41,10 +37,10 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
   const solutionText = descParts[1] || '';
   const impactText = descParts[2] || '';
 
-  // 2. Formata as tags técnicas (ex: aws -> AWS) - O(1) Search
+  // 2. Formatação de Tags Técnicas (Tailwind 4.2 Optimized)
   const formatTechTag = (topic: string): string => {
     const uppercaseTechs = new Set([
-      'aws', 'ml', 'ai', 'sql', 'etl', 'genai', 'api', 'bi', 'neo4j', 'ia'
+      'aws', 'ml', 'ai', 'sql', 'etl', 'genai', 'api', 'bi', 'neo4j', 'ia', 'nextjs'
     ]);
 
     const lower = topic.toLowerCase();
@@ -56,12 +52,11 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
   };
 
   /**
-   * 3. RESOLUÇÃO DO ERRO DE BUILD (TypeError: labelKey of undefined)
-   * Garantimos que se a chave não existir no dicionário, usamos um fallback seguro.
+   * 3. RESOLUÇÃO DO ERRO DE CATEGORIA
+   * Mapeia a tecnologia para o label correto no dicionário multilingue.
    */
   const getCategoryLabel = () => {
     const techKey = project.technology.labelKey;
-    // Tenta pegar do dicionário, senão tenta o fallback 'dev', senão usa texto puro.
     const categoryObj = labels?.categories[techKey] || labels?.categories?.dev;
     return categoryObj?.labelKey || "Project";
   };
@@ -69,7 +64,7 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
   return (
     <article className="group relative flex h-full w-full flex-col rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl dark:border-slate-800/60 dark:bg-slate-950/40 md:p-8">
       
-      {/* Badge de Destaque Técnico */}
+      {/* Badge de Destaque */}
       {project.isFeatured && (
         <div className="absolute -top-3 right-6 z-10">
           <span className="flex items-center gap-1.5 rounded-full bg-blue-600 px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-white shadow-lg shadow-blue-500/20">
@@ -93,7 +88,10 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
               title={labels?.viewProject}
               className="rounded-lg p-2.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
             >
-              <Github size={20} />
+              {/* SVG MANUAL GITHUB - FIX PARA LUCIDE 1.7.0 */}
+              <svg className="size-5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
             </a>
           )}
 
@@ -111,10 +109,10 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
         </div>
       </header>
 
-      {/* Área de Conteúdo principal */}
+      {/* Área de Conteúdo */}
       <div className="flex flex-grow flex-col">
         <h3 className="mb-5 text-xl font-black tracking-tight text-slate-900 dark:text-white md:text-2xl">
-          {project.name}
+          {project.name.replace(/[_-]/g, ' ')}
         </h3>
 
         <div className="space-y-5 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
@@ -145,12 +143,10 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
       </div>
 
       <footer className="mt-8 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-5 dark:border-slate-800/50">
-        {/* Categoria Principal - Fix: Acesso Seguro ao labelKey */}
         <span className="rounded-full bg-blue-50 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
           {getCategoryLabel()}
         </span>
 
-        {/* Tags Técnicas filtradas (máximo 3) */}
         {project.topics
           .filter(t => !['portfolio', 'featured', 'destaque', 'primeiro'].includes(t.toLowerCase()))
           .slice(0, 3)
@@ -168,7 +164,7 @@ export function ProjectCard({ project, dict }: ProjectCardProps) {
 }
 
 /**
- * Sub-componente CaseSection
+ * Sub-componente CaseSection Tipado
  */
 interface CaseSectionProps {
   readonly icon: React.ReactNode;
