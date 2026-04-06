@@ -3,15 +3,15 @@
 /**
  * FEATURED PROJECT
  * -----------------------------------------------------------------------------
+ * ✔ FIX: Lucide v1.7.0 Brand Icon Deprecation (Github SVG manual)
  * ✔ Alinhado com ProjectDomain e Dictionary Types
- * ✔ Multilíngue (PT / EN / ES)
- * ✔ 100% Responsivo
+ * ✔ Multilíngue (PT-BR / EN-US / ES-ES / ES-AR / ES-MX)
+ * ✔ 100% Responsivo & Tailwind 4.2 Optimized
  * ✔ Compatível com TypeScript 6.0 e Next.js 16 (Turbopack)
  */
 
 import Script from 'next/script'
 import {
-  Github,
   Star,
   ArrowRight,
   ExternalLink,
@@ -54,7 +54,7 @@ export const FeaturedProject = ({
       : descriptionParts[1] ?? null
 
   /**
-   * Remove tags estruturais internas para exibição limpa de badges
+   * Filtro de badges para evitar redundância visual
    */
   const displayTopics = project.topics.filter(
     (t) =>
@@ -69,16 +69,14 @@ export const FeaturedProject = ({
   )
 
   /**
-   * CORREÇÃO DO ERRO DE TIPO:
-   * Acessa a propriedade .labelKey conforme definido em Dictionary.ts
-   * Fallback para o ID da tecnologia caso a tradução falhe.
+   * Acessa a tradução da categoria conforme Dictionary.ts
    */
   const categoryLabel = 
     projects.categories[project.technology.labelKey]?.labelKey ?? 
     project.technology.id
 
   /**
-   * Structured Data (SEO) - Schema.org
+   * Structured Data (SEO) - Schema.org para Software
    */
   const softwareSchema = {
     '@context': 'https://schema.org',
@@ -111,7 +109,7 @@ export const FeaturedProject = ({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[580px]">
 
-          {/* COLUNA VISUAL (RESPONSIVA) */}
+          {/* COLUNA VISUAL */}
           <div className="relative h-72 sm:h-80 lg:h-auto bg-slate-50 dark:bg-slate-950/40 flex items-center justify-center overflow-hidden border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-800/50">
 
             <div className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20">
@@ -139,7 +137,6 @@ export const FeaturedProject = ({
               {project.name.replace(/[_-]/g, ' ')}
             </h3>
 
-            {/* Categoria Traduzida (Corrigido para renderizar string) */}
             <p className="text-xs uppercase tracking-widest text-blue-500 font-bold mb-6">
               {categoryLabel}
             </p>
@@ -191,7 +188,10 @@ export const FeaturedProject = ({
                 rel="noopener noreferrer"
                 className="group/btn flex-1 bg-slate-900 dark:bg-blue-600 text-white py-5 sm:py-6 px-8 rounded-2xl font-black uppercase text-[10px] sm:text-xs tracking-[0.25em] flex items-center justify-center gap-4 shadow-xl hover:shadow-blue-500/20 active:scale-95 transition-all"
               >
-                <Github size={20} className="group-hover/btn:rotate-12 transition-transform" />
+                {/* SVG OFICIAL GITHUB - FIX PARA LUCIDE 1.7.0 */}
+                <svg className="size-5 group-hover/btn:rotate-12 transition-transform fill-current" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
                 {projects.viewProject}
               </a>
 
