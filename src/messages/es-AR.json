@@ -1,3 +1,39 @@
 {
-  "privacy": "## Política de Privacidad\n\nEste portafolio personal es administrado por Sergio Santos y está destinado a compartir proyectos y contenidos profesionales. La privacidad de los visitantes se respeta conforme a la Ley 25.326 de Argentina y al GDPR.\n\n- **Cookies necesarias**: se utilizan para garantizar el funcionamiento básico del sitio.\n- **Cookies de análisis**: se activan solo si otorgás tu consentimiento.\n- **Compartición de datos**: ninguna información se vende o comparte con terceros.\n\nPodés modificar tus preferencias en cualquier momento."
+  "privacy": {
+    "title": "Política de Privacidad",
+    "description": "Este portafolio es administrado por Sergio Santos conforme a la Ley 25.326 y el GDPR.",
+
+    "dataCollection": {
+      "title": "Recopilación de datos",
+      "items": [
+        "No se recolectan datos personales de forma intencional.",
+        "Datos técnicos pueden usarse con fines estadísticos.",
+        "Servicios externos procesan datos de forma anónima."
+      ]
+    },
+
+    "cookies": {
+      "title": "Cookies",
+      "items": [
+        "Cookies necesarias para funcionamiento.",
+        "Cookies analíticas con consentimiento.",
+        "Podés modificar tus preferencias."
+      ]
+    },
+
+    "rights": {
+      "title": "Derechos",
+      "items": [
+        "Acceso, actualización o eliminación de datos.",
+        "Retiro del consentimiento."
+      ]
+    },
+
+    "contact": {
+      "title": "Contacto",
+      "description": "Consultas a través de la sección de contacto."
+    },
+
+    "controller": "Responsable: Sergio Santos."
+  }
 }
