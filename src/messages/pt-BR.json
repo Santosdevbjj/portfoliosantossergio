@@ -1,3 +1,54 @@
 {
-  "privacy": "## Política de Privacidade\n\nEste portfólio pessoal é mantido por Sergio Santos e tem como finalidade apresentar projetos e conteúdos profissionais. Não coletamos informações pessoais dos visitantes, nem utilizamos cookies para rastreamento ou publicidade.\n\n- **Cookies essenciais**: podem ser usados apenas para garantir o funcionamento básico do site (ex.: preferências de idioma).\n- **Cookies de análise**: só serão ativados se você consentir, e servem exclusivamente para entender métricas de acesso de forma agregada.\n- **Compartilhamento de dados**: nenhuma informação é vendida ou compartilhada com terceiros.\n\nVocê pode gerenciar suas preferências de cookies a qualquer momento através do banner exibido no rodapé do site."
+  "privacy": {
+    "title": "Política de Privacidade",
+    "description": "Este portfólio pessoal é mantido por Sergio Santos e tem como finalidade apresentar projetos, artigos e informações profissionais. A proteção da privacidade dos visitantes é tratada com seriedade e em conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018, Brasil) e com o Regulamento Geral de Proteção de Dados (GDPR – Regulamento (UE) 2016/679, União Europeia).",
+    
+    "dataCollection": {
+      "title": "1. Coleta e uso de dados",
+      "items": [
+        "Não coletamos intencionalmente dados pessoais identificáveis de forma automática.",
+        "Dados técnicos (como endereço IP, navegador e dispositivo) podem ser tratados de forma limitada para fins de segurança, desempenho e estatísticas, sem identificação direta do usuário.",
+        "Caso sejam utilizados serviços de terceiros (ex.: Google Analytics), os dados serão processados de forma agregada e anonimizada."
+      ],
+      "legalBasis": "Base legal para tratamento: consentimento do titular (Art. 7º, I, LGPD e Art. 6(1)(a) GDPR)."
+    },
+
+    "cookies": {
+      "title": "2. Cookies",
+      "items": [
+        "Cookies essenciais: utilizados apenas para garantir o funcionamento básico do site (ex.: idioma).",
+        "Cookies de análise: ativados somente mediante consentimento explícito.",
+        "O usuário pode gerenciar ou revogar suas preferências a qualquer momento."
+      ]
+    },
+
+    "dataSharing": {
+      "title": "3. Compartilhamento de dados",
+      "items": [
+        "Nenhum dado pessoal é vendido, alugado ou compartilhado para fins comerciais.",
+        "Integrações com serviços externos (GitHub, LinkedIn) seguem as políticas próprias dessas plataformas."
+      ]
+    },
+
+    "rights": {
+      "title": "4. Direitos dos titulares",
+      "items": [
+        "Confirmação da existência de tratamento de dados.",
+        "Acesso, correção ou exclusão de dados.",
+        "Revogação do consentimento."
+      ]
+    },
+
+    "security": {
+      "title": "5. Segurança",
+      "description": "Medidas técnicas e organizacionais são adotadas para proteger os dados contra acesso não autorizado."
+    },
+
+    "contact": {
+      "title": "6. Contato",
+      "description": "Para dúvidas ou solicitações, utilize o e-mail disponível na seção de contato."
+    },
+
+    "controller": "Controlador de dados: Sergio Santos."
+  }
 }
