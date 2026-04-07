@@ -3,11 +3,11 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, JSX } from "react";
+import { Suspense } from "react";
+import type { JSX } from "react"; // Fix: Type-only import para TS 6.0
 
 // SEO & Schema
 import { buildMetadata } from "@/lib/seo";
-import { personSchema, websiteSchema } from "@/lib/schema";
 
 // Dicionários e Tipos
 import type { Locale, ConstructionDictionary, Dictionary } from "@/types/dictionary";
@@ -47,7 +47,9 @@ export const viewport: Viewport = {
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang) as SupportedLocale;
+  
   if (!locales.includes(locale)) return {};
+  
   const dict = await getServerDictionary(locale);
   
   return buildMetadata({
@@ -111,7 +113,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
   const dict = await getServerDictionary(lang);
   if (!dict) notFound();
 
-  // URL correta conforme sua estrutura de pastas informada
+  // URL correta conforme os nomes dos arquivos enviados
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
 
   const githubArticles = await getArticlesWithRetry(1);
@@ -119,11 +121,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
   return (
     <ProxyPage lang={lang}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([personSchema(), websiteSchema()]) }}
-      />
-
       <main className="flex min-h-screen flex-col bg-white dark:bg-[#020617]">
         
         <HeroSection dictionary={dict} />
@@ -142,7 +139,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           </Suspense>
         </section>
 
-        {/* CORREÇÃO DO ERRO DE BUILD: Passando 'dict' e 'lang' conforme interface AboutSectionProps */}
+        {/* AboutSection já inclui o StructuredData internamente */}
         <AboutSection dict={dict.about} lang={lang} />
         
         <div className="mx-auto max-w-7xl px-4 py-16">
