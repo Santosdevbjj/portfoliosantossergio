@@ -65,7 +65,7 @@ export default function ProxyClient({
       >
         <HeroSection dictionary={dictionary} />
         
-        <AboutSection dict={dictionary.about} />
+        <AboutSection dict={dictionary.about} lang={locale} />
         
         <ExperienceSection experience={dictionary.experience} />
         
