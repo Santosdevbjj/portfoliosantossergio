@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, JSX } from "react";
 
 // SEO & Schema
 import { buildMetadata } from "@/lib/seo";
@@ -16,7 +16,7 @@ import type { ProjectDomain } from "@/domain/projects";
 import { resolveProjectTechnology } from "@/domain/projects";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { getPortfolioRepos } from "@/lib/github";
-import { getArticlesWithRetry } from "@/lib/github/service"; // Importação do serviço de artigos
+import { getArticlesWithRetry } from "@/lib/github/service";
 import { locales, normalizeLocale, type SupportedLocale } from "@/dictionaries/locales";
 
 // Componentes de UI
@@ -80,23 +80,16 @@ function normalizeProjects(repos: any[]): ProjectDomain[] {
     .filter((p) => p.isPortfolio && p.htmlUrl);
 }
 
-/**
- * COMPONENTE DE RESILIÊNCIA: Portfolio (GitHub)
- */
 async function ResilientPortfolio({ lang, dict }: { lang: Locale, dict: Dictionary }) {
   try {
     const repos = await getPortfolioRepos("Santosdevbjj").catch(() => []);
     const projects = normalizeProjects(repos);
     return <PortfolioGrid projects={projects} lang={lang} dict={dict} />;
   } catch (error) {
-    console.error("Erro ao carregar Portfolio:", error);
     return <div className="text-center py-10 opacity-50">Serviço temporariamente indisponível.</div>;
   }
 }
 
-/**
- * COMPONENTE DE RESILIÊNCIA: Profile Form
- */
 async function ResilientProfileForm({ lang, dict }: { lang: Locale, dict: Dictionary }) {
   let errorDict: ErrorDictionary = {} as ErrorDictionary;
   try {
@@ -108,18 +101,19 @@ async function ResilientProfileForm({ lang, dict }: { lang: Locale, dict: Dictio
   return <ProfileForm lang={lang} dict={{ ...dict, errors: errorDict }} />;
 }
 
-export default async function HomePage({ params }: { params: Promise<{ lang: string }> }) {
+export default async function HomePage({ params }: { params: Promise<{ lang: string }> }): Promise<JSX.Element> {
   const { lang: rawLang } = await params;
   const locale = normalizeLocale(rawLang);
+  
   if (!locales.includes(locale)) notFound();
   const lang = locale as Locale;
 
   const dict = await getServerDictionary(lang);
   if (!dict) notFound();
 
+  // URL correta conforme sua estrutura de pastas informada
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
 
-  // Buscamos os artigos técnicos do repositório recursivo para o card lateral
   const githubArticles = await getArticlesWithRetry(1);
   const latestArticle = githubArticles[0] || null;
 
@@ -148,7 +142,8 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           </Suspense>
         </section>
 
-        <AboutSection dict={dict.about} />
+        {/* CORREÇÃO DO ERRO DE BUILD: Passando 'dict' e 'lang' conforme interface AboutSectionProps */}
+        <AboutSection dict={dict.about} lang={lang} />
         
         <div className="mx-auto max-w-7xl px-4 py-16">
           <CareerHighlights dict={dict} />
@@ -164,14 +159,13 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
         <section className="py-24 space-y-12 bg-slate-50/30 dark:bg-transparent">
           
-          {/* CARD DO CURRÍCULO */}
           <div id="resume" className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-10">
               <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
                 Curriculum <span className="text-blue-600">Vitae</span>
               </h2>
               <div className="mt-6 max-w-xs mx-auto">
-                <ResumeLangSelector currentLang={lang as SupportedLocale} dict={dict.resume} />
+                <ResumeLangSelector currentLang={lang} dict={dict.resume} />
               </div>
             </div>
             <div className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl overflow-hidden border border-blue-100 dark:border-blue-900/30">
@@ -186,7 +180,12 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
               <div className="flex flex-col h-full">
                 <div className="flex items-start justify-between mb-8">
                   <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-lg border-2 border-blue-50 rotate-[-3deg] group-hover:rotate-0 transition-transform">
-                    <Image src="/images/trofeus-vencedor-dio.png" alt="Troféu DIO" fill className="object-cover" />
+                    <Image 
+                      src="/images/trofeus-vencedor-dio.png" 
+                      alt="Troféu DIO" 
+                      fill 
+                      className="object-cover" 
+                    />
                   </div>
                   <span className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-blue-500/30">
                     🏆 {dict.articles.awardWinner}
@@ -196,15 +195,15 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                   Low-Code na Saúde: Como Criar Apps Médicos em Semanas
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed mb-8">
-                  35ª Competição da DIO (Set/2025). Publicado no Medium em três idiomas, explorando como plataformas low-code aceleram o desenvolvimento médico.
+                  35ª Competição da DIO (Set/2025). Publicado no Medium em três idiomas.
                 </p>
                 <div className="mt-auto space-y-6">
                   <div className="flex flex-wrap gap-4 items-center py-4 border-y border-slate-100 dark:border-slate-800">
-                    <a href="https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e" target="_blank" className="hover:scale-110 transition-transform text-2xl">🇧🇷</a>
-                    <a href="https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77" target="_blank" className="hover:scale-110 transition-transform text-2xl">🇺🇸</a>
-                    <a href="https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad" target="_blank" className="hover:scale-110 transition-transform text-2xl">🇪🇸</a>
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-na-sa%C3%BAde-como-criar-apps-m%C3%A9dicos-em-semanas-1c6f05c2c89e" target="_blank" rel="noopener" className="hover:scale-110 transition-transform text-2xl">🇧🇷</a>
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-in-healthcare-how-to-build-medical-apps-in-weeks-2679bf08ba77" target="_blank" rel="noopener" className="hover:scale-110 transition-transform text-2xl">🇺🇸</a>
+                    <a href="https://medium.com/@sergiosantosluiz/low-code-en-la-salud-c%C3%B3mo-crear-apps-m%C3%A9dicos-em-semanas-5474e7dddfad" target="_blank" rel="noopener" className="hover:scale-110 transition-transform text-2xl">🇪🇸</a>
                   </div>
-                  <a href={dict.common.externalLinks.medium} target="_blank" className="inline-flex items-center text-blue-600 dark:text-blue-400 font-black text-sm hover:underline">
+                  <a href={dict.common.externalLinks.medium} target="_blank" rel="noopener" className="inline-flex items-center text-blue-600 dark:text-blue-400 font-black text-sm hover:underline">
                     📚 {dict.articles.mediumProfile} <span className="ml-2">→</span>
                   </a>
                 </div>
@@ -229,7 +228,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
                     {latestArticle ? latestArticle.name.replace('.md', '') : "Artigos Técnicos"}
                   </h3>
                   <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-                    Cloud, IA Generativa e Engenharia de Software aplicadas a problemas reais. Cada conteúdo nasce de um desafio concreto.
+                    Cloud, IA Generativa e Engenharia de Software aplicadas a problemas reais.
                   </p>
                 </div>
 
