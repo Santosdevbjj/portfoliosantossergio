@@ -1,3 +1,59 @@
 {
-  "privacy": "## Privacy Policy\n\nThis personal portfolio is maintained by Sergio Santos and aims to present professional projects and articles. We respect your privacy and comply with the LGPD (Brazil) and GDPR (EU).\n\n- **Essential cookies**: used only to ensure the basic functionality of the site.\n- **Analytics cookies**: activated only with your explicit consent via the cookie banner.\n- **Data sharing**: no personal data is sold or shared with third parties.\n\nYou can manage or revoke your preferences at any time."
+  "privacy": {
+    "title": "Privacy Policy",
+    "description": "This personal portfolio is maintained by Sergio Santos and aims to present professional projects and articles. We respect your privacy and comply with the Brazilian General Data Protection Law (LGPD – Law No. 13.709/2018) and the European General Data Protection Regulation (GDPR – Regulation (EU) 2016/679).",
+
+    "dataCollection": {
+      "title": "Data Collection",
+      "items": [
+        "We do not intentionally collect personally identifiable data.",
+        "Technical data (such as IP address, browser, or device) may be processed for security, performance, and analytics purposes without direct identification.",
+        "If third-party services (e.g., Google Analytics) are used, data is processed in an anonymized and aggregated manner."
+      ],
+      "legalBasis": "Processing is based on user consent (Article 6(1)(a) GDPR and LGPD Art. 7º, I)."
+    },
+
+    "cookies": {
+      "title": "Cookies",
+      "items": [
+        "Essential cookies: required for basic functionality (e.g., language settings).",
+        "Analytics cookies: only activated with explicit user consent.",
+        "You may manage or withdraw your preferences at any time."
+      ]
+    },
+
+    "dataSharing": {
+      "title": "Data Sharing",
+      "items": [
+        "No personal data is sold, rented, or shared for commercial purposes.",
+        "External services (GitHub, LinkedIn) are governed by their own policies."
+      ]
+    },
+
+    "rights": {
+      "title": "Your Rights",
+      "items": [
+        "Confirm whether your data is processed.",
+        "Request access, correction, or deletion.",
+        "Withdraw consent at any time."
+      ]
+    },
+
+    "ccpa": {
+      "title": "U.S. Privacy Rights (CCPA/CPRA)",
+      "description": "Under applicable U.S. laws, users may request that their personal data is not sold or shared. This website does not sell personal data."
+    },
+
+    "security": {
+      "title": "Security",
+      "description": "We apply appropriate technical and organizational measures to protect your data."
+    },
+
+    "contact": {
+      "title": "Contact",
+      "description": "For privacy-related inquiries, please use the contact information provided in this portfolio."
+    },
+
+    "controller": "Data Controller: Sergio Santos."
+  }
 }
