@@ -1,3 +1,39 @@
 {
-  "privacy": "## Aviso de Privacidad\n\nEste portafolio personal es operado por Sergio Santos y tiene como objetivo mostrar proyectos y artículos profesionales. La privacidad de los usuarios se protege conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (México) y al GDPR.\n\n- **Cookies esenciales**: necesarias para el correcto funcionamiento del sitio.\n- **Cookies de análisis**: se activan únicamente con tu consentimiento explícito.\n- **Compartición de datos**: ninguna información se vende o comparte con terceros.\n\nPuedes cambiar tus preferencias en cualquier momento."
+  "privacy": {
+    "title": "Aviso de Privacidad",
+    "description": "Este portafolio cumple con la legislación mexicana y el GDPR.",
+
+    "dataCollection": {
+      "title": "Recopilación de datos",
+      "items": [
+        "No se recopilan datos personales de forma intencional.",
+        "Datos técnicos se usan para seguridad y rendimiento.",
+        "Servicios externos procesan datos de forma anonimizada."
+      ]
+    },
+
+    "cookies": {
+      "title": "Cookies",
+      "items": [
+        "Cookies esenciales para funcionamiento.",
+        "Cookies analíticas solo con consentimiento.",
+        "Puedes cambiar tus preferencias."
+      ]
+    },
+
+    "rights": {
+      "title": "Derechos ARCO",
+      "items": [
+        "Acceso, Rectificación, Cancelación y Oposición.",
+        "Revocación del consentimiento."
+      ]
+    },
+
+    "contact": {
+      "title": "Contacto",
+      "description": "Consulta la sección de contacto del portafolio."
+    },
+
+    "controller": "Responsable del tratamiento: Sergio Santos."
+  }
 }
