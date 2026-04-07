@@ -4,10 +4,11 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import type { JSX } from "react"; // Fix: Type-only import para TS 6.0
+import type { JSX } from "react";
 
 // SEO & Schema
 import { buildMetadata } from "@/lib/seo";
+import { personSchema, websiteSchema } from "@/lib/schema"; // Importação necessária adicionada
 
 // Dicionários e Tipos
 import type { Locale, ConstructionDictionary, Dictionary } from "@/types/dictionary";
@@ -52,11 +53,12 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   
   const dict = await getServerDictionary(locale);
   
+  // buildMetadata agora cuida da Canonical Tag para evitar erro de cópia
   return buildMetadata({
     title: dict?.seo?.title,
     description: dict?.seo?.description,
     lang: locale,
-    path: `/${locale}`,
+    path: "", // Path vazio pois já estamos na home do idioma selecionado
     image: `/og/og-image-${locale}.png`
   });
 }
@@ -113,14 +115,21 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
   const dict = await getServerDictionary(lang);
   if (!dict) notFound();
 
-  // URL correta conforme os nomes dos arquivos enviados
   const pdfFile = `/pdf/cv-sergio-santos-${lang}.pdf`;
-
   const githubArticles = await getArticlesWithRetry(1);
   const latestArticle = githubArticles[0] || null;
 
+  // Gerar os dados estruturados (Schema.org)
+  const jsonLd = [personSchema(), websiteSchema(lang)];
+
   return (
     <ProxyPage lang={lang}>
+      {/* Injeção de Dados Estruturados para o Google Search Console */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <main className="flex min-h-screen flex-col bg-white dark:bg-[#020617]">
         
         <HeroSection dictionary={dict} />
@@ -139,7 +148,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
           </Suspense>
         </section>
 
-        {/* AboutSection já inclui o StructuredData internamente */}
         <AboutSection dict={dict.about} lang={lang} />
         
         <div className="mx-auto max-w-7xl px-4 py-16">
@@ -172,14 +180,14 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8">
             
-            {/* CARD DO ARTIGO PREMIADO */}
+            {/* CARD DO ARTIGO PREMIADO - Linkado com os troféus oficiais */}
             <div className="group relative flex flex-col bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-900/30 rounded-[3rem] p-8 md:p-12 shadow-xl hover:shadow-blue-500/10 transition-all">
               <div className="flex flex-col h-full">
                 <div className="flex items-start justify-between mb-8">
                   <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-lg border-2 border-blue-50 rotate-[-3deg] group-hover:rotate-0 transition-transform">
                     <Image 
                       src="/images/trofeus-vencedor-dio.png" 
-                      alt="Troféu DIO" 
+                      alt="Troféu DIO Sérgio Santos" 
                       fill 
                       className="object-cover" 
                     />
@@ -207,7 +215,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
               </div>
             </div>
 
-            {/* CARD REPOSITÓRIO GITHUB DINÂMICO */}
             <Link 
               href={`/${lang}/artigos`} 
               className="group relative flex flex-col bg-slate-900 dark:bg-blue-950/20 border border-blue-900/30 rounded-[3rem] p-8 md:p-12 shadow-2xl overflow-hidden hover:border-blue-500 transition-all"
