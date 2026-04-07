@@ -1,3 +1,40 @@
 {
-  "privacy": "## Política de Privacidad\n\nEste portafolio personal es mantenido por Sergio Santos y tiene como finalidad mostrar proyectos y artículos profesionales. Respetamos tu privacidad y cumplimos con el GDPR.\n\n- **Cookies esenciales**: necesarias para el funcionamiento básico del sitio.\n- **Cookies de análisis**: activadas únicamente con tu consentimiento explícito.\n- **Compartición de datos**: ninguna información se vende o comparte con terceros.\n\nPuedes gestionar o revocar tus preferencias en cualquier momento."
+  "privacy": {
+    "title": "Política de Privacidad",
+    "description": "Este portafolio es mantenido por Sergio Santos y cumple con el GDPR (Reglamento (UE) 2016/679).",
+
+    "dataCollection": {
+      "title": "Recopilación de datos",
+      "items": [
+        "No recopilamos intencionadamente datos personales identificables.",
+        "Datos técnicos pueden tratarse con fines de seguridad y rendimiento.",
+        "Servicios de terceros procesan datos de forma anonimizada."
+      ],
+      "legalBasis": "Base legal: consentimiento del usuario (Art. 6(1)(a) GDPR)."
+    },
+
+    "cookies": {
+      "title": "Cookies",
+      "items": [
+        "Cookies esenciales para funcionamiento.",
+        "Cookies analíticas solo con consentimiento.",
+        "Puedes revocar tu consentimiento en cualquier momento."
+      ]
+    },
+
+    "rights": {
+      "title": "Derechos",
+      "items": [
+        "Acceso, rectificación y supresión de datos.",
+        "Retirada del consentimiento."
+      ]
+    },
+
+    "contact": {
+      "title": "Contacto",
+      "description": "Consulta la sección de contacto del portafolio."
+    },
+
+    "controller": "Responsable del tratamiento: Sergio Santos."
+  }
 }
