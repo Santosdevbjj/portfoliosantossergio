@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = (process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app").replace(/\/$/, "");
+  const baseUrl = "https://portfoliosantossergio.vercel.app";
 
   return {
     rules: [
@@ -10,27 +10,32 @@ export default function robots(): MetadataRoute.Robots {
         allow: [
           "/", 
           "/*/projects", 
-          "/*/artigos", // Corrigido de articles para artigos (seguindo suas URLs)
+          "/*/artigos", 
           "/*/about", 
           "/*/resume",
-          "/pdf/cv-*.pdf", 
+          "/pdf/cv-sergio-santos-*.pdf", // Nome específico dos seus PDFs
           "/images/", 
           "/og/",
-          "/artigos/*.png"
+          "/artigos/*.png",
+          "/icons/"
         ],
         disallow: [
           "/api/", 
           "/_next/", 
           "/admin/", 
-          "/*?*",      // Bloqueia parâmetros de busca que geram conteúdo duplicado
+          "/*?*", // Bloqueia parâmetros (ex: ?fbclid=...) para evitar o erro de "Cópia sem canônica"
           "/private/"
         ],
       },
       {
-        userAgent: ["GPTBot", "ClaudeBot"], // Permite que IAs leiam seus artigos para te citarem
-        allow: ["/", "/*/artigos/*"],
+        // Incentiva IAs a indexarem seus artigos técnicos para te dar autoridade
+        userAgent: ["GPTBot", "ClaudeBot", "PerplexityBot"],
+        allow: ["/*/artigos/*"],
       }
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: [
+      `${baseUrl}/sitemap.xml`,
+      `${baseUrl}/resume-sitemap.xml`
+    ],
   };
 }
