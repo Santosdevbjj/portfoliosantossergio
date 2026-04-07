@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 import type { ReactNode } from "react";
 
-// Configurações de Dicionário e SEO
+// Configurações de Dicionário e Locales
 import { locales, type SupportedLocale, normalizeLocale } from "@/dictionaries/locales";
 import { getServerDictionary } from "@/lib/getServerDictionary";
 import { ScrollSpyProvider } from "@/contexts/scroll-spy.client";
@@ -13,6 +13,7 @@ import { buildMetadata } from "@/lib/seo";
 // Componentes de Layout e SEO
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { CookieBanner } from "@/components/CookieBanner";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { BreadcrumbsJsonLd } from "@/components/seo/BreadcrumbsJsonLd";
 import OpenGraph from "@/components/seo/OpenGraph";
@@ -28,14 +29,14 @@ const inter = Inter({
 });
 
 /**
- * Next.js 16.2.0: Geração Estática de Parâmetros
+ * Next.js 16.2.2: Geração Estática de Parâmetros para os Locales
  */
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
 /**
- * Geração de Metadados Dinâmicos
+ * Geração de Metadados Dinâmicos (SEO Multilingue)
  */
 export async function generateMetadata({ 
   params 
@@ -60,7 +61,7 @@ export async function generateMetadata({
     ...metadata,
     metadataBase: new URL(baseUrl),
     verification: {
-      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
+      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0", // TAG PRESERVADA
     },
     alternates: {
       canonical: `${baseUrl}/${locale}`,
@@ -70,7 +71,19 @@ export async function generateMetadata({
         "es-ES": `${baseUrl}/es-ES`,
         "es-AR": `${baseUrl}/es-AR`,
         "es-MX": `${baseUrl}/es-MX`,
+        "x-default": `${baseUrl}/pt-BR`,
       },
+    },
+    openGraph: {
+      ...metadata.openGraph,
+      images: [
+        {
+          url: `/og/og-image-${locale}.png`,
+          width: 1200,
+          height: 630,
+          alt: dict.seo.title,
+        },
+      ],
     },
     icons: {
       icon: [
@@ -97,16 +110,19 @@ export default async function LangLayout(props: {
   const { lang } = await props.params;
   const locale = normalizeLocale(lang) as SupportedLocale;
 
+  // Validação de segurança para o locale
   if (!locales.includes(locale)) notFound();
 
   const dict = await getServerDictionary(locale);
   const gaId = process.env['NEXT_PUBLIC_GA_ID'];
   const baseUrl = process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app";
-  const baseLanguage = locale.split("-")[0];
+  
+  // Extrai apenas o prefixo do idioma (ex: 'pt', 'en', 'es') para a tag html
+  const htmlLang = locale.split("-")[0];
 
   return (
     <html 
-      lang={baseLanguage} 
+      lang={htmlLang} 
       className={`${inter.variable} scroll-smooth`} 
       suppressHydrationWarning
     >
@@ -119,6 +135,7 @@ export default async function LangLayout(props: {
         />
         <StructuredData lang={locale} />
         
+        {/* Google Analytics Integration */}
         {gaId && (
           <>
             <Script
@@ -130,29 +147,30 @@ export default async function LangLayout(props: {
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${gaId}');
+                gtag('config', '${gaId}', {
+                  page_path: window.location.pathname,
+                });
               `}
             </Script>
           </>
         )}
       </head>
 
-      <body className="antialiased min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-50 transition-colors duration-300">
+      <body className="antialiased min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-50 selection:bg-blue-500/30 transition-colors duration-300">
         
-        {/* CORREÇÃO: Removido 'opacity-0' que causava a tela branca */}
         <div className="flex flex-col min-h-screen">
-          
           <ScrollSpyProvider>
+            {/* Skip to Content - Acessibilidade */}
             <a
               href="#main-content"
-              className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[110] bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-2xl"
+              className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[210] bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-2xl"
             >
               {dict.common.skipToContent}
             </a>
 
             <Navbar lang={locale} common={dict.common} contact={dict.contact} />
 
-            <main id="main-content" className="flex-grow flex flex-col">
+            <main id="main-content" className="flex-grow flex flex-col focus:outline-none">
               <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
               
               <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-6">
@@ -170,8 +188,10 @@ export default async function LangLayout(props: {
               contact={dict.contact} 
               articles={dict.articles} 
             />
-          </ScrollSpyProvider>
 
+            {/* Injeção do Banner de Cookies - Carregamento Client-Side */}
+            <CookieBanner dict={dict} />
+          </ScrollSpyProvider>
         </div>
       </body>
     </html>
