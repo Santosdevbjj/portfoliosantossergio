@@ -6,7 +6,7 @@ import type { Dictionary } from '@/types/dictionary';
 import type { CookieConsent } from '@/types/cookies';
 
 /**
- * 🔒 CONSENTIMENTO — CONFIG
+ * 🔒 CONFIG
  */
 const CONSENT_KEY = 'santos-sergio-consent';
 const CONSENT_VERSION = '1.0';
@@ -54,7 +54,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, []);
 
   /**
-   * 🔍 Verifica consentimento existente + versão
+   * 🔍 Verifica consentimento existente
    */
   useEffect(() => {
     try {
@@ -67,7 +67,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
 
       const parsed: CookieConsent = JSON.parse(stored);
 
-      // 🔥 FORÇA NOVO CONSENTIMENTO se versão mudou
+      // 🔥 Validação de versão (GDPR)
       if (parsed.version !== CONSENT_VERSION) {
         setIsOpen(true);
         return;
@@ -83,12 +83,12 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, [loadAnalytics]);
 
   /**
-   * 💾 Persistência de consentimento (LGPD + GDPR)
+   * 💾 Persistência de consentimento
    */
   const persistConsent = useCallback((consent: CookieConsent) => {
     startTransition(() => {
       try {
-        const enrichedConsent: CookieConsent = {
+        const enrichedConsent = {
           ...consent,
           version: CONSENT_VERSION,
           userAgent: navigator.userAgent,
@@ -116,7 +116,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, [loadAnalytics]);
 
   /**
-   * 🎯 Ações do usuário
+   * 🎯 Ações
    */
   const handleAcceptAll = () => {
     persistConsent({
@@ -181,7 +181,6 @@ export function CookieBanner({ dict }: CookieBannerProps) {
 
         {/* OPTIONS */}
         <div className="space-y-3 mb-6">
-          {/* NECESSARY */}
           <div className="flex justify-between p-4 rounded-2xl bg-slate-50">
             <div className="flex items-center gap-2">
               <ShieldCheck size={18} />
@@ -194,7 +193,6 @@ export function CookieBanner({ dict }: CookieBannerProps) {
             </span>
           </div>
 
-          {/* ANALYTICS */}
           <label className="flex justify-between p-4 rounded-2xl border cursor-pointer">
             <span className="text-xs font-bold">
               {cookie.analytics}
@@ -209,15 +207,27 @@ export function CookieBanner({ dict }: CookieBannerProps) {
 
         {/* ACTIONS */}
         <div className="flex flex-col gap-3">
-          <button onClick={handleAcceptAll} className="btn-primary">
+          <button
+            onClick={handleAcceptAll}
+            disabled={isPending}
+            className="w-full bg-slate-900 text-white py-3 rounded-xl text-xs font-bold disabled:opacity-50"
+          >
             {cookie.acceptAll}
           </button>
 
-          <button onClick={handleRejectAll} className="btn-secondary">
+          <button
+            onClick={handleRejectAll}
+            disabled={isPending}
+            className="w-full bg-slate-200 py-3 rounded-xl text-xs font-bold disabled:opacity-50"
+          >
             Recusar
           </button>
 
-          <button onClick={handleSavePreferences} className="btn-outline">
+          <button
+            onClick={handleSavePreferences}
+            disabled={isPending}
+            className="w-full border py-3 rounded-xl text-xs font-bold disabled:opacity-50"
+          >
             {cookie.savePreferences}
           </button>
         </div>
