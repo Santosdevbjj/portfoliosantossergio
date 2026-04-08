@@ -32,8 +32,12 @@ export function CookieBanner({ dict }: CookieBannerProps) {
     window.dataLayer = window.dataLayer || [];
 
     if (!window.gtag) {
-      window.gtag = function (...args: any[]) {
-        window.dataLayer?.push(args);
+      window.gtag = (
+        command: 'config' | 'event' | 'consent' | 'js',
+        targetId: string | Date,
+        params?: Record<string, unknown>
+      ) => {
+        window.dataLayer?.push([command, targetId, params]);
       };
     }
 
