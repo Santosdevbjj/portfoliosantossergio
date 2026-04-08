@@ -3,76 +3,136 @@
 import { useEffect, useState, useCallback, useTransition } from 'react';
 import { Cookie, ShieldCheck, X } from 'lucide-react';
 import type { Dictionary } from '@/types/dictionary';
+import type { CookieConsent } from '@/types/cookies';
 
 /**
- * COMPONENTE: CookieBanner
- * -----------------------------------------------------------------------------
- * ✔ Next.js 16.2.2 & React 19: Persistência via useTransition.
- * ✔ TypeScript 6.0.2: Tipagem estrita via interface Dictionary.
- * ✔ Tailwind CSS 4.2: Design fluido e ultra-responsivo.
- * ✔ I18n: Suporte completo para PT, EN e variações de ES.
+ * 🔒 CONSENTIMENTO — CONFIG
  */
+const CONSENT_KEY = 'santos-sergio-consent';
+const CONSENT_VERSION = '1.0';
 
 interface CookieBannerProps {
   readonly dict: Dictionary;
 }
-
-const CONSENT_KEY = 'santos-sergio-consent';
-
-type CookieConsent = {
-  necessary: true;
-  analytics: boolean;
-  date: string;
-};
 
 export function CookieBanner({ dict }: CookieBannerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // Acesso tipado e seguro conforme src/types/dictionary.ts
   const { cookie, common } = dict;
   const { menu } = common;
 
+  /**
+   * 🚀 Load Google Analytics SOMENTE após consentimento
+   */
+  const loadAnalytics = useCallback(() => {
+    const gaId = process.env.NEXT_PUBLIC_GA_ID;
+    if (!gaId) return;
+    if (typeof window === 'undefined') return;
+
+    // Evita duplicação
+    if ((window as any).gtag) return;
+
+    const script1 = document.createElement('script');
+    script1.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+    script1.async = true;
+
+    const script2 = document.createElement('script');
+    script2.innerHTML = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', '${gaId}', {
+        anonymize_ip: true
+      });
+    `;
+
+    document.head.appendChild(script1);
+    document.head.appendChild(script2);
+  }, []);
+
+  /**
+   * 🔍 Verifica consentimento existente + versão
+   */
   useEffect(() => {
     try {
-      const hasConsent = localStorage.getItem(CONSENT_KEY);
-      if (!hasConsent) {
-        // Delay suave para não impactar o First Contentful Paint (FCP)
+      const stored = localStorage.getItem(CONSENT_KEY);
+
+      if (!stored) {
         const timer = setTimeout(() => setIsOpen(true), 2500);
         return () => clearTimeout(timer);
       }
-    } catch {
-      // Fallback para navegadores com armazenamento restrito
-    }
-  }, []);
 
+      const parsed: CookieConsent = JSON.parse(stored);
+
+      // 🔥 FORÇA NOVO CONSENTIMENTO se versão mudou
+      if (parsed.version !== CONSENT_VERSION) {
+        setIsOpen(true);
+        return;
+      }
+
+      // 🔥 Se já aceitou analytics → carrega
+      if (parsed.analytics) {
+        loadAnalytics();
+      }
+    } catch {
+      setIsOpen(true);
+    }
+  }, [loadAnalytics]);
+
+  /**
+   * 💾 Persistência de consentimento (LGPD + GDPR)
+   */
   const persistConsent = useCallback((consent: CookieConsent) => {
     startTransition(() => {
       try {
-        localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
+        const enrichedConsent: CookieConsent = {
+          ...consent,
+          version: CONSENT_VERSION,
+          userAgent: navigator.userAgent,
+          locale: navigator.language,
+        };
+
+        localStorage.setItem(CONSENT_KEY, JSON.stringify(enrichedConsent));
 
         const isProd = process.env.NODE_ENV === 'production';
         const secure = isProd ? 'Secure;' : '';
-        const sameSite = 'SameSite=Lax;';
-        
-        // Define o cookie de consentimento para o servidor (Next.js Middleware)
+
         document.cookie = `${CONSENT_KEY}=${
-          consent.analytics ? 'all' : 'min'
-        }; path=/; max-age=31536000; ${sameSite} ${secure}`;
+          consent.analytics ? 'all' : 'essential'
+        }; path=/; max-age=31536000; SameSite=Lax; ${secure}`;
+
+        if (consent.analytics) {
+          loadAnalytics();
+        }
 
         setIsOpen(false);
-      } catch (error) {
+      } catch {
         setIsOpen(false);
       }
     });
-  }, []);
+  }, [loadAnalytics]);
 
+  /**
+   * 🎯 Ações do usuário
+   */
   const handleAcceptAll = () => {
     persistConsent({
       necessary: true,
       analytics: true,
       date: new Date().toISOString(),
+      version: CONSENT_VERSION,
+    });
+  };
+
+  const handleRejectAll = () => {
+    persistConsent({
+      necessary: true,
+      analytics: false,
+      date: new Date().toISOString(),
+      version: CONSENT_VERSION,
     });
   };
 
@@ -81,6 +141,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
       necessary: true,
       analytics: analyticsEnabled,
       date: new Date().toISOString(),
+      version: CONSENT_VERSION,
     });
   };
 
@@ -98,94 +159,74 @@ export function CookieBanner({ dict }: CookieBannerProps) {
       <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl
                       border border-slate-200 dark:border-slate-800
                       rounded-[2rem] p-5 md:p-7 shadow-2xl">
-        
+
         {/* HEADER */}
         <div className="flex items-start gap-4 mb-6">
-          <div className="flex-shrink-0 p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-500/20">
-            <Cookie size={24} aria-hidden="true" />
+          <div className="p-3 bg-blue-600 rounded-2xl text-white">
+            <Cookie size={24} />
           </div>
           <div className="pr-6">
-            <h2 id="cookie-heading" className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400 mb-1">
+            <h2 id="cookie-heading" className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">
               {cookie.title}
             </h2>
-            <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+            <p className="text-sm font-bold">
               {common.rights}
             </p>
           </div>
         </div>
 
-        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+        <p className="text-sm text-slate-600 mb-6">
           {cookie.description}
         </p>
 
-        {/* OPTIONS CONTAINER */}
-        <div className="space-y-3 mb-8">
-          {/* NECESSARY (Always On) */}
-          <div className="flex items-center justify-between p-4 rounded-2xl
-                          bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/50">
+        {/* OPTIONS */}
+        <div className="space-y-3 mb-6">
+          {/* NECESSARY */}
+          <div className="flex justify-between p-4 rounded-2xl bg-slate-50">
             <div className="flex items-center gap-2">
-              <ShieldCheck size={18} className="text-green-500" />
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              <ShieldCheck size={18} />
+              <span className="text-xs font-bold">
                 {cookie.necessary}
               </span>
             </div>
-            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">
+            <span className="text-xs">
               {cookie.alwaysActive}
             </span>
           </div>
 
-          {/* ANALYTICS (Toggle) */}
-          <label className="flex items-center justify-between p-4 rounded-2xl
-                            bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800
-                            hover:border-blue-500 dark:hover:border-blue-500 transition-colors cursor-pointer group">
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+          {/* ANALYTICS */}
+          <label className="flex justify-between p-4 rounded-2xl border cursor-pointer">
+            <span className="text-xs font-bold">
               {cookie.analytics}
             </span>
-            <div className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={analyticsEnabled}
-                onChange={(e) => setAnalyticsEnabled(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer 
-                            peer-checked:after:translate-x-full peer-checked:bg-blue-600 
-                            after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
-                            after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all
-                            shadow-inner"></div>
-            </div>
+            <input
+              type="checkbox"
+              checked={analyticsEnabled}
+              onChange={(e) => setAnalyticsEnabled(e.target.checked)}
+            />
           </label>
         </div>
 
-        {/* ACTION BUTTONS */}
+        {/* ACTIONS */}
         <div className="flex flex-col gap-3">
-          <button
-            onClick={handleAcceptAll}
-            disabled={isPending}
-            className="w-full bg-slate-900 dark:bg-blue-600 text-white py-4 rounded-2xl
-                       font-black text-xs uppercase tracking-widest
-                       hover:scale-[1.02] active:scale-[0.98] transition-all 
-                       disabled:opacity-50 shadow-xl shadow-blue-500/10"
-          >
+          <button onClick={handleAcceptAll} className="btn-primary">
             {cookie.acceptAll}
           </button>
 
-          <button
-            onClick={handleSavePreferences}
-            disabled={isPending}
-            className="w-full bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white py-4 rounded-2xl
-                       font-black text-xs uppercase tracking-widest
-                       hover:bg-slate-200 dark:hover:bg-slate-700 transition-all disabled:opacity-50"
-          >
+          <button onClick={handleRejectAll} className="btn-secondary">
+            Recusar
+          </button>
+
+          <button onClick={handleSavePreferences} className="btn-outline">
             {cookie.savePreferences}
           </button>
         </div>
 
-        {/* CLOSE BUTTON */}
+        {/* CLOSE */}
         <button
           onClick={() => setIsOpen(false)}
           aria-label={menu.aria.close}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-blue-600 dark:hover:text-white transition-colors"
+          className="absolute top-4 right-4"
         >
           <X size={20} />
         </button>
