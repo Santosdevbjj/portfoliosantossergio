@@ -15,10 +15,13 @@ interface CookieBannerProps {
   readonly dict: Dictionary;
 }
 
+/**
+ * ✅ FIX: evitar conflito global com gtag
+ */
 declare global {
   interface Window {
-    dataLayer: any[];
-    gtag: (...args: any[]) => void;
+    dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
@@ -37,10 +40,12 @@ export function CookieBanner({ dict }: CookieBannerProps) {
     if (typeof window === 'undefined') return;
 
     window.dataLayer = window.dataLayer || [];
-    function gtag(...args: any[]) {
-      window.dataLayer.push(args);
+
+    if (!window.gtag) {
+      window.gtag = function (...args: unknown[]) {
+        window.dataLayer?.push(args);
+      };
     }
-    window.gtag = window.gtag || gtag;
 
     window.gtag('consent', 'default', {
       analytics_storage: 'denied',
@@ -52,7 +57,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, []);
 
   /**
-   * 🚀 Atualiza consentimento (GRANTED / DENIED)
+   * 🚀 Atualiza consentimento
    */
   const updateConsent = useCallback((granted: boolean) => {
     if (typeof window === 'undefined' || !window.gtag) return;
@@ -66,7 +71,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, []);
 
   /**
-   * 📊 Carrega Google Analytics (APÓS consentimento)
+   * 📊 Carrega GA4
    */
   const loadAnalytics = useCallback(() => {
     const gaId = process.env.NEXT_PUBLIC_GA_ID;
@@ -82,8 +87,8 @@ export function CookieBanner({ dict }: CookieBannerProps) {
 
     const inlineScript = document.createElement('script');
     inlineScript.innerHTML = `
-      gtag('js', new Date());
-      gtag('config', '${gaId}', {
+      window.gtag('js', new Date());
+      window.gtag('config', '${gaId}', {
         anonymize_ip: true
       });
     `;
@@ -113,7 +118,6 @@ export function CookieBanner({ dict }: CookieBannerProps) {
         return;
       }
 
-      // 🔥 Atualiza consent mode
       updateConsent(parsed.analytics);
 
       if (parsed.analytics) {
@@ -127,7 +131,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, [initConsentMode, updateConsent, loadAnalytics]);
 
   /**
-   * 💾 Persistência (LGPD + GDPR compliant)
+   * 💾 Persistência
    */
   const persistConsent = useCallback(
     (consent: CookieConsent) => {
@@ -145,14 +149,12 @@ export function CookieBanner({ dict }: CookieBannerProps) {
             JSON.stringify(enrichedConsent)
           );
 
-          // 🔥 Atualiza Google Consent Mode
           updateConsent(consent.analytics);
 
           if (consent.analytics) {
             loadAnalytics();
           }
 
-          // Cookie técnico (prova de consentimento)
           const isProd = process.env.NODE_ENV === 'production';
           const secure = isProd ? 'Secure;' : '';
 
@@ -214,7 +216,6 @@ export function CookieBanner({ dict }: CookieBannerProps) {
                       border border-slate-200 dark:border-slate-800
                       rounded-[2rem] p-5 md:p-7 shadow-2xl">
 
-        {/* HEADER */}
         <div className="flex items-start gap-4 mb-6">
           <div className="p-3 bg-blue-600 rounded-2xl text-white">
             <Cookie size={24} />
@@ -233,7 +234,6 @@ export function CookieBanner({ dict }: CookieBannerProps) {
           {cookie.description}
         </p>
 
-        {/* OPTIONS */}
         <div className="space-y-3 mb-6">
           <div className="flex justify-between p-4 rounded-2xl bg-slate-50">
             <div className="flex items-center gap-2">
@@ -259,7 +259,6 @@ export function CookieBanner({ dict }: CookieBannerProps) {
           </label>
         </div>
 
-        {/* ACTIONS */}
         <div className="flex flex-col gap-3">
           <button
             onClick={handleAcceptAll}
@@ -286,7 +285,6 @@ export function CookieBanner({ dict }: CookieBannerProps) {
           </button>
         </div>
 
-        {/* CLOSE */}
         <button
           onClick={() => setIsOpen(false)}
           aria-label={menu.aria.close}
