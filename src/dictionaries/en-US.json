@@ -204,6 +204,7 @@
     "alwaysActive": "Active",
     "analytics": "Analytics",
     "acceptAll": "Accept All",
+    "rejectAll" : "Reject” ,
     "savePreferences": "Save"
   },
 
