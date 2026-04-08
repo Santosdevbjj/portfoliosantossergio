@@ -19,10 +19,10 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const { cookie, common } = dict;
+  const { cookie } = dict;
 
   /**
-   * 🧠 Inicializa Consent Mode
+   * 🧠 Inicializa Consent Mode (DEFAULT DENIED)
    */
   const initConsentMode = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -30,11 +30,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
     window.dataLayer = window.dataLayer || [];
 
     if (!window.gtag) {
-      window.gtag = (
-        command: 'config' | 'event' | 'consent' | 'js',
-        targetId: string | Date,
-        params?: Record<string, unknown>
-      ) => {
+      window.gtag = (command, targetId, params) => {
         window.dataLayer?.push([command, targetId, params]);
       };
     }
@@ -63,7 +59,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, []);
 
   /**
-   * 📊 Carrega GA4
+   * 📊 Carrega Google Analytics (APÓS consentimento)
    */
   const loadAnalytics = useCallback(() => {
     const gaId = process.env.NEXT_PUBLIC_GA_ID;
@@ -90,7 +86,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, []);
 
   /**
-   * 🔍 Verifica consentimento
+   * 🔍 Verifica consentimento existente
    */
   useEffect(() => {
     initConsentMode();
@@ -123,7 +119,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, [initConsentMode, updateConsent, loadAnalytics]);
 
   /**
-   * 💾 Persistência
+   * 💾 Persistência (LGPD + GDPR)
    */
   const persistConsent = useCallback(
     (consent: CookieConsent) => {
@@ -184,28 +180,21 @@ export function CookieBanner({ dict }: CookieBannerProps) {
     });
   };
 
-  const handleSavePreferences = () => {
-    persistConsent({
-      necessary: true,
-      analytics: analyticsEnabled,
-      date: new Date().toISOString(),
-      version: CONSENT_VERSION,
-    });
-  };
-
   if (!isOpen) return null;
 
   return (
     <aside className="fixed bottom-0 left-0 right-0 z-[200] p-4">
-      {/* Banner simplificado (sem UI detalhada para evitar imports não usados) */}
-      <div className="bg-white p-4 shadow rounded">
-        <p className="text-sm mb-3">{cookie.description}</p>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-4 max-w-md mx-auto">
+
+        <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
+          {cookie.description}
+        </p>
 
         <div className="flex gap-2">
           <button
             onClick={handleAcceptAll}
             disabled={isPending}
-            className="bg-black text-white px-3 py-2 rounded text-xs"
+            className="flex-1 bg-black text-white px-3 py-2 rounded text-xs font-bold"
           >
             {cookie.acceptAll}
           </button>
@@ -213,7 +202,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
           <button
             onClick={handleRejectAll}
             disabled={isPending}
-            className="bg-gray-200 px-3 py-2 rounded text-xs"
+            className="flex-1 bg-gray-200 dark:bg-slate-700 px-3 py-2 rounded text-xs font-bold"
           >
             {cookie.rejectAll ?? 'Recusar'}
           </button>
