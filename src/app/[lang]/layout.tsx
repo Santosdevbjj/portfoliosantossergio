@@ -1,7 +1,8 @@
+// src/app/[lang]/layout.tsx
+
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
-import Script from "next/script";
 import type { ReactNode } from "react";
 
 // Configurações de Dicionário e Locales
@@ -29,14 +30,14 @@ const inter = Inter({
 });
 
 /**
- * Next.js 16.2.2: Geração Estática de Parâmetros para os Locales
+ * Next.js 16.2.2: Geração Estática de Parâmetros para os Locales (PPR Ready)
  */
 export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
 /**
- * Geração de Metadados Dinâmicos (SEO Multilingue)
+ * Geração de Metadados Dinâmicos (SEO Multilingue e Regional)
  */
 export async function generateMetadata({ 
   params 
@@ -61,7 +62,7 @@ export async function generateMetadata({
     ...metadata,
     metadataBase: new URL(baseUrl),
     verification: {
-      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0", // TAG PRESERVADA
+      google: "0eQpOZSmJw5rFx70_NBmJCSkcBbwTs-qAJzfts5s-R0",
     },
     alternates: {
       canonical: `${baseUrl}/${locale}`,
@@ -76,6 +77,7 @@ export async function generateMetadata({
     },
     openGraph: {
       ...metadata.openGraph,
+      locale: locale.replace("-", "_"),
       images: [
         {
           url: `/og/og-image-${locale}.png`,
@@ -91,7 +93,10 @@ export async function generateMetadata({
         { url: "/icons/icon.png", type: "image/png" },
       ],
       shortcut: "/icons/favicon.ico",
-      apple: "/icons/apple-touch-icon.png",
+      apple: [
+        { url: "/icons/apple-touch-icon.png" },
+        { url: "/icons/apple-icon.png" },
+      ]
     }
   };
 }
@@ -114,10 +119,9 @@ export default async function LangLayout(props: {
   if (!locales.includes(locale)) notFound();
 
   const dict = await getServerDictionary(locale);
-  const gaId = process.env['NEXT_PUBLIC_GA_ID'];
   const baseUrl = process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app";
   
-  // Extrai apenas o prefixo do idioma (ex: 'pt', 'en', 'es') para a tag html
+  // Extrai o prefixo (pt, en, es) para a tag html
   const htmlLang = locale.split("-")[0];
 
   return (
@@ -135,35 +139,20 @@ export default async function LangLayout(props: {
         />
         <StructuredData lang={locale} />
         
-        {/* Google Analytics Integration */}
-        {gaId && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${gaId}', {
-                  page_path: window.location.pathname,
-                });
-              `}
-            </Script>
-          </>
-        )}
+        {/* NOTA: O Google Analytics foi removido daqui para conformidade LGPD/GDPR.
+          A inicialização do 'gtag' e o carregamento do script agora ocorrem 
+          dentro do componente CookieBanner.tsx somente após o consentimento.
+        */}
       </head>
 
       <body className="antialiased min-h-screen bg-white dark:bg-[#020617] text-slate-900 dark:text-slate-50 selection:bg-blue-500/30 transition-colors duration-300">
         
         <div className="flex flex-col min-h-screen">
           <ScrollSpyProvider>
-            {/* Skip to Content - Acessibilidade */}
+            {/* Skip to Content - Acessibilidade (WCAG 2.1) */}
             <a
               href="#main-content"
-              className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[210] bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-2xl"
+              className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-[210] bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-2xl transition-all"
             >
               {dict.common.skipToContent}
             </a>
@@ -173,11 +162,13 @@ export default async function LangLayout(props: {
             <main id="main-content" className="flex-grow flex flex-col focus:outline-none">
               <BreadcrumbsJsonLd lang={locale} dict={dict} baseUrl={baseUrl} />
               
+              {/* Container Responsivo para Breadcrumbs */}
               <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-6">
                 <Breadcrumbs lang={locale} dictionary={dict} baseUrl={baseUrl} />
               </div>
 
-              <section className="flex-grow w-full">
+              {/* Seção Principal de Conteúdo */}
+              <section className="flex-grow w-full overflow-x-hidden">
                 {props.children}
               </section>
             </main>
@@ -189,7 +180,9 @@ export default async function LangLayout(props: {
               articles={dict.articles} 
             />
 
-            {/* Injeção do Banner de Cookies - Carregamento Client-Side */}
+            {/* Banner de Cookies: Centralizador da Privacidade (GDPR/LGPD/CCPA).
+              Este componente injeta o Google Analytics dinamicamente se permitido.
+            */}
             <CookieBanner dict={dict} />
           </ScrollSpyProvider>
         </div>
