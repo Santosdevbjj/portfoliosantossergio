@@ -9,10 +9,17 @@ import type { CookieConsent } from '@/types/cookies';
  * 🔒 CONFIG
  */
 const CONSENT_KEY = 'santos-sergio-consent';
-const CONSENT_VERSION = '1.0';
+const CONSENT_VERSION = '1.1';
 
 interface CookieBannerProps {
   readonly dict: Dictionary;
+}
+
+declare global {
+  interface Window {
+    dataLayer: any[];
+    gtag: (...args: any[]) => void;
+  }
 }
 
 export function CookieBanner({ dict }: CookieBannerProps) {
@@ -24,96 +31,143 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   const { menu } = common;
 
   /**
-   * 🚀 Load Google Analytics SOMENTE após consentimento
+   * 🧠 Inicializa Consent Mode (DEFAULT DENIED)
+   */
+  const initConsentMode = useCallback(() => {
+    if (typeof window === 'undefined') return;
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag(...args: any[]) {
+      window.dataLayer.push(args);
+    }
+    window.gtag = window.gtag || gtag;
+
+    window.gtag('consent', 'default', {
+      analytics_storage: 'denied',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      wait_for_update: 500,
+    });
+  }, []);
+
+  /**
+   * 🚀 Atualiza consentimento (GRANTED / DENIED)
+   */
+  const updateConsent = useCallback((granted: boolean) => {
+    if (typeof window === 'undefined' || !window.gtag) return;
+
+    window.gtag('consent', 'update', {
+      analytics_storage: granted ? 'granted' : 'denied',
+      ad_storage: granted ? 'granted' : 'denied',
+      ad_user_data: granted ? 'granted' : 'denied',
+      ad_personalization: granted ? 'granted' : 'denied',
+    });
+  }, []);
+
+  /**
+   * 📊 Carrega Google Analytics (APÓS consentimento)
    */
   const loadAnalytics = useCallback(() => {
-    const gaId = process.env['NEXT_PUBLIC_GA_ID'];
+    const gaId = process.env.NEXT_PUBLIC_GA_ID;
     if (!gaId) return;
     if (typeof window === 'undefined') return;
 
-    // Evita duplicação
-    if ((window as any).gtag) return;
+    if (document.getElementById('ga-script')) return;
 
-    const script1 = document.createElement('script');
-    script1.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
-    script1.async = true;
+    const script = document.createElement('script');
+    script.id = 'ga-script';
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+    script.async = true;
 
-    const script2 = document.createElement('script');
-    script2.innerHTML = `
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      window.gtag = gtag;
+    const inlineScript = document.createElement('script');
+    inlineScript.innerHTML = `
       gtag('js', new Date());
       gtag('config', '${gaId}', {
         anonymize_ip: true
       });
     `;
 
-    document.head.appendChild(script1);
-    document.head.appendChild(script2);
+    document.head.appendChild(script);
+    document.head.appendChild(inlineScript);
   }, []);
 
   /**
    * 🔍 Verifica consentimento existente
    */
   useEffect(() => {
+    initConsentMode();
+
     try {
       const stored = localStorage.getItem(CONSENT_KEY);
 
       if (!stored) {
-        const timer = setTimeout(() => setIsOpen(true), 2500);
+        const timer = setTimeout(() => setIsOpen(true), 1500);
         return () => clearTimeout(timer);
       }
 
       const parsed: CookieConsent = JSON.parse(stored);
 
-      // 🔥 Validação de versão (GDPR)
       if (parsed.version !== CONSENT_VERSION) {
         setIsOpen(true);
         return;
       }
 
-      // 🔥 Se já aceitou analytics → carrega
+      // 🔥 Atualiza consent mode
+      updateConsent(parsed.analytics);
+
       if (parsed.analytics) {
         loadAnalytics();
       }
+
+      setAnalyticsEnabled(parsed.analytics);
     } catch {
       setIsOpen(true);
     }
-  }, [loadAnalytics]);
+  }, [initConsentMode, updateConsent, loadAnalytics]);
 
   /**
-   * 💾 Persistência de consentimento
+   * 💾 Persistência (LGPD + GDPR compliant)
    */
-  const persistConsent = useCallback((consent: CookieConsent) => {
-    startTransition(() => {
-      try {
-        const enrichedConsent = {
-          ...consent,
-          version: CONSENT_VERSION,
-          userAgent: navigator.userAgent,
-          locale: navigator.language,
-        };
+  const persistConsent = useCallback(
+    (consent: CookieConsent) => {
+      startTransition(() => {
+        try {
+          const enrichedConsent = {
+            ...consent,
+            version: CONSENT_VERSION,
+            userAgent: navigator.userAgent,
+            locale: navigator.language,
+          };
 
-        localStorage.setItem(CONSENT_KEY, JSON.stringify(enrichedConsent));
+          localStorage.setItem(
+            CONSENT_KEY,
+            JSON.stringify(enrichedConsent)
+          );
 
-        const isProd = process.env.NODE_ENV === 'production';
-        const secure = isProd ? 'Secure;' : '';
+          // 🔥 Atualiza Google Consent Mode
+          updateConsent(consent.analytics);
 
-        document.cookie = `${CONSENT_KEY}=${
-          consent.analytics ? 'all' : 'essential'
-        }; path=/; max-age=31536000; SameSite=Lax; ${secure}`;
+          if (consent.analytics) {
+            loadAnalytics();
+          }
 
-        if (consent.analytics) {
-          loadAnalytics();
+          // Cookie técnico (prova de consentimento)
+          const isProd = process.env.NODE_ENV === 'production';
+          const secure = isProd ? 'Secure;' : '';
+
+          document.cookie = `${CONSENT_KEY}=${
+            consent.analytics ? 'all' : 'essential'
+          }; path=/; max-age=31536000; SameSite=Lax; ${secure}`;
+
+          setIsOpen(false);
+        } catch {
+          setIsOpen(false);
         }
-
-        setIsOpen(false);
-      } catch {
-        setIsOpen(false);
-      }
-    });
-  }, [loadAnalytics]);
+      });
+    },
+    [loadAnalytics, updateConsent]
+  );
 
   /**
    * 🎯 Ações
@@ -154,7 +208,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
       aria-labelledby="cookie-heading"
       className="fixed bottom-0 left-0 right-0 z-[200] p-4 
                  md:bottom-6 md:right-6 md:left-auto md:max-w-md
-                 animate-in fade-in slide-in-from-bottom-5 duration-500 ease-out"
+                 animate-in fade-in slide-in-from-bottom-5 duration-500"
     >
       <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl
                       border border-slate-200 dark:border-slate-800
@@ -210,7 +264,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
           <button
             onClick={handleAcceptAll}
             disabled={isPending}
-            className="w-full bg-slate-900 text-white py-3 rounded-xl text-xs font-bold disabled:opacity-50"
+            className="w-full bg-slate-900 text-white py-3 rounded-xl text-xs font-bold"
           >
             {cookie.acceptAll}
           </button>
@@ -218,15 +272,15 @@ export function CookieBanner({ dict }: CookieBannerProps) {
           <button
             onClick={handleRejectAll}
             disabled={isPending}
-            className="w-full bg-slate-200 py-3 rounded-xl text-xs font-bold disabled:opacity-50"
+            className="w-full bg-slate-200 py-3 rounded-xl text-xs font-bold"
           >
-            Recusar
+            {cookie.rejectAll ?? 'Recusar'}
           </button>
 
           <button
             onClick={handleSavePreferences}
             disabled={isPending}
-            className="w-full border py-3 rounded-xl text-xs font-bold disabled:opacity-50"
+            className="w-full border py-3 rounded-xl text-xs font-bold"
           >
             {cookie.savePreferences}
           </button>
