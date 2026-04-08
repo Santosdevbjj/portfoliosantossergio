@@ -22,18 +22,16 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   const { cookie } = dict;
 
   /**
-   * 🧠 Helper seguro para gtag
+   * 🧠 Safe gtag accessor
    */
   const getGtag = () => {
     if (typeof window === 'undefined') return null;
 
-    return window.gtag as
-      | ((...args: unknown[]) => void)
-      | undefined;
+    return window.gtag as ((...args: unknown[]) => void) | undefined;
   };
 
   /**
-   * 🧠 Inicializa Consent Mode (DEFAULT DENIED)
+   * 🧠 Init Consent Mode (DEFAULT DENIED)
    */
   const initConsentMode = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -59,7 +57,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, []);
 
   /**
-   * 🚀 Atualiza consentimento
+   * 🚀 Update consent
    */
   const updateConsent = useCallback((granted: boolean) => {
     const gtag = getGtag();
@@ -74,7 +72,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, []);
 
   /**
-   * 📊 Carrega Google Analytics (lazy)
+   * 📊 Load GA (lazy)
    */
   const loadAnalytics = useCallback(() => {
     const gaId = process.env['NEXT_PUBLIC_GA_ID'];
@@ -98,7 +96,24 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, []);
 
   /**
-   * 🔍 Verifica consentimento existente
+   * 🔥 EVENT-DRIVEN CONSENT (INTEGRAÇÃO COM FOOTER)
+   */
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handler = () => {
+      setIsOpen(true);
+    };
+
+    window.addEventListener('open-cookie-settings', handler);
+
+    return () => {
+      window.removeEventListener('open-cookie-settings', handler);
+    };
+  }, []);
+
+  /**
+   * 🔍 Check stored consent
    */
   useEffect(() => {
     initConsentMode();
@@ -128,7 +143,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, [initConsentMode, updateConsent, loadAnalytics]);
 
   /**
-   * 💾 Persistência (LGPD + GDPR)
+   * 💾 Persist consent (LGPD + GDPR)
    */
   const persistConsent = useCallback(
     (analytics: boolean) => {
@@ -169,7 +184,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   );
 
   /**
-   * 🎯 Ações
+   * 🎯 Actions
    */
   const handleAcceptAll = () => persistConsent(true);
   const handleRejectAll = () => persistConsent(false);
