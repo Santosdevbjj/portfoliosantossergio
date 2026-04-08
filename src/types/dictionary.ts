@@ -269,6 +269,7 @@ export interface CookieDictionary {
   alwaysActive: string;
   analytics: string;
   acceptAll: string;
+  rejectAll : string;
   savePreferences: string;
 }
 
