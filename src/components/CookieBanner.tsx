@@ -22,6 +22,17 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   const { cookie } = dict;
 
   /**
+   * 🧠 Helper seguro para gtag
+   */
+  const getGtag = () => {
+    if (typeof window === 'undefined') return null;
+
+    return window.gtag as
+      | ((...args: unknown[]) => void)
+      | undefined;
+  };
+
+  /**
    * 🧠 Inicializa Consent Mode (DEFAULT DENIED)
    */
   const initConsentMode = useCallback(() => {
@@ -30,12 +41,15 @@ export function CookieBanner({ dict }: CookieBannerProps) {
     window.dataLayer = window.dataLayer || [];
 
     if (!window.gtag) {
-      window.gtag = (command, targetId, params) => {
-        window.dataLayer?.push([command, targetId, params]);
+      window.gtag = (...args: unknown[]) => {
+        window.dataLayer?.push(args);
       };
     }
 
-    window.gtag('consent', 'default', {
+    const gtag = getGtag();
+    if (!gtag) return;
+
+    gtag('consent', 'default', {
       analytics_storage: 'denied',
       ad_storage: 'denied',
       ad_user_data: 'denied',
@@ -48,9 +62,10 @@ export function CookieBanner({ dict }: CookieBannerProps) {
    * 🚀 Atualiza consentimento
    */
   const updateConsent = useCallback((granted: boolean) => {
-    if (typeof window === 'undefined' || !window.gtag) return;
+    const gtag = getGtag();
+    if (!gtag) return;
 
-    window.gtag('consent', 'update', {
+    gtag('consent', 'update', {
       analytics_storage: granted ? 'granted' : 'denied',
       ad_storage: granted ? 'granted' : 'denied',
       ad_user_data: granted ? 'granted' : 'denied',
@@ -63,8 +78,8 @@ export function CookieBanner({ dict }: CookieBannerProps) {
    */
   const loadAnalytics = useCallback(() => {
     const gaId = process.env.NEXT_PUBLIC_GA_ID;
-    if (!gaId || typeof window === 'undefined') return;
 
+    if (!gaId || typeof window === 'undefined') return;
     if (document.getElementById('ga-script')) return;
 
     const script = document.createElement('script');
@@ -166,12 +181,10 @@ export function CookieBanner({ dict }: CookieBannerProps) {
     <aside className="fixed bottom-0 left-0 right-0 z-[200] p-4">
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-5 max-w-md mx-auto backdrop-blur-xl">
 
-        {/* Texto */}
         <p className="text-sm text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
           {cookie.description}
         </p>
 
-        {/* Toggle (FAANG UX) */}
         <label className="flex items-center justify-between mb-4 cursor-pointer">
           <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
             {cookie.analytics}
@@ -185,7 +198,6 @@ export function CookieBanner({ dict }: CookieBannerProps) {
           />
         </label>
 
-        {/* Botões */}
         <div className="flex flex-col gap-2">
           <button
             onClick={handleAcceptAll}
