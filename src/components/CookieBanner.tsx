@@ -27,7 +27,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
    * 🚀 Load Google Analytics SOMENTE após consentimento
    */
   const loadAnalytics = useCallback(() => {
-    const gaId = process.env.NEXT_PUBLIC_GA_ID;
+    const gaId = process.env['NEXT_PUBLIC_GA_ID'];
     if (!gaId) return;
     if (typeof window === 'undefined') return;
 
