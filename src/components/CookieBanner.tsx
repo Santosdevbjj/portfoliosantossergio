@@ -77,7 +77,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
    * 📊 Carrega Google Analytics (lazy)
    */
   const loadAnalytics = useCallback(() => {
-    const gaId = process.env.NEXT_PUBLIC_GA_ID;
+    const gaId = process.env['NEXT_PUBLIC_GA_ID'];
 
     if (!gaId || typeof window === 'undefined') return;
     if (document.getElementById('ga-script')) return;
