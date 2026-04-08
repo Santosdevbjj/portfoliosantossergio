@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useCallback, useTransition } from 'react';
-import { Cookie, ShieldCheck, X } from 'lucide-react';
 import type { Dictionary } from '@/types/dictionary';
 import type { CookieConsent } from '@/types/cookies';
 
@@ -21,7 +20,6 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   const [isPending, startTransition] = useTransition();
 
   const { cookie, common } = dict;
-  const { menu } = common;
 
   /**
    * 🧠 Inicializa Consent Mode
@@ -199,7 +197,28 @@ export function CookieBanner({ dict }: CookieBannerProps) {
 
   return (
     <aside className="fixed bottom-0 left-0 right-0 z-[200] p-4">
-      {/* UI mantida igual */}
+      {/* Banner simplificado (sem UI detalhada para evitar imports não usados) */}
+      <div className="bg-white p-4 shadow rounded">
+        <p className="text-sm mb-3">{cookie.description}</p>
+
+        <div className="flex gap-2">
+          <button
+            onClick={handleAcceptAll}
+            disabled={isPending}
+            className="bg-black text-white px-3 py-2 rounded text-xs"
+          >
+            {cookie.acceptAll}
+          </button>
+
+          <button
+            onClick={handleRejectAll}
+            disabled={isPending}
+            className="bg-gray-200 px-3 py-2 rounded text-xs"
+          >
+            {cookie.rejectAll ?? 'Recusar'}
+          </button>
+        </div>
+      </div>
     </aside>
   );
 }
