@@ -59,12 +59,11 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   }, []);
 
   /**
-   * 📊 Carrega Google Analytics (APÓS consentimento)
+   * 📊 Carrega Google Analytics (lazy)
    */
   const loadAnalytics = useCallback(() => {
     const gaId = process.env.NEXT_PUBLIC_GA_ID;
-    if (!gaId) return;
-    if (typeof window === 'undefined') return;
+    if (!gaId || typeof window === 'undefined') return;
 
     if (document.getElementById('ga-script')) return;
 
@@ -76,9 +75,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
     const inlineScript = document.createElement('script');
     inlineScript.innerHTML = `
       window.gtag('js', new Date());
-      window.gtag('config', '${gaId}', {
-        anonymize_ip: true
-      });
+      window.gtag('config', '${gaId}', { anonymize_ip: true });
     `;
 
     document.head.appendChild(script);
@@ -95,7 +92,7 @@ export function CookieBanner({ dict }: CookieBannerProps) {
       const stored = localStorage.getItem(CONSENT_KEY);
 
       if (!stored) {
-        const timer = setTimeout(() => setIsOpen(true), 1500);
+        const timer = setTimeout(() => setIsOpen(true), 1200);
         return () => clearTimeout(timer);
       }
 
@@ -106,13 +103,10 @@ export function CookieBanner({ dict }: CookieBannerProps) {
         return;
       }
 
+      setAnalyticsEnabled(parsed.analytics);
       updateConsent(parsed.analytics);
 
-      if (parsed.analytics) {
-        loadAnalytics();
-      }
-
-      setAnalyticsEnabled(parsed.analytics);
+      if (parsed.analytics) loadAnalytics();
     } catch {
       setIsOpen(true);
     }
@@ -122,32 +116,32 @@ export function CookieBanner({ dict }: CookieBannerProps) {
    * 💾 Persistência (LGPD + GDPR)
    */
   const persistConsent = useCallback(
-    (consent: CookieConsent) => {
+    (analytics: boolean) => {
       startTransition(() => {
         try {
-          const enrichedConsent = {
-            ...consent,
+          const consent: CookieConsent = {
+            necessary: true,
+            analytics,
+            date: new Date().toISOString(),
             version: CONSENT_VERSION,
+          };
+
+          const enriched = {
+            ...consent,
             userAgent: navigator.userAgent,
             locale: navigator.language,
           };
 
-          localStorage.setItem(
-            CONSENT_KEY,
-            JSON.stringify(enrichedConsent)
-          );
+          localStorage.setItem(CONSENT_KEY, JSON.stringify(enriched));
 
-          updateConsent(consent.analytics);
+          updateConsent(analytics);
+          if (analytics) loadAnalytics();
 
-          if (consent.analytics) {
-            loadAnalytics();
-          }
-
-          const isProd = process.env.NODE_ENV === 'production';
-          const secure = isProd ? 'Secure;' : '';
+          const secure =
+            process.env.NODE_ENV === 'production' ? 'Secure;' : '';
 
           document.cookie = `${CONSENT_KEY}=${
-            consent.analytics ? 'all' : 'essential'
+            analytics ? 'all' : 'essential'
           }; path=/; max-age=31536000; SameSite=Lax; ${secure}`;
 
           setIsOpen(false);
@@ -162,39 +156,41 @@ export function CookieBanner({ dict }: CookieBannerProps) {
   /**
    * 🎯 Ações
    */
-  const handleAcceptAll = () => {
-    persistConsent({
-      necessary: true,
-      analytics: true,
-      date: new Date().toISOString(),
-      version: CONSENT_VERSION,
-    });
-  };
-
-  const handleRejectAll = () => {
-    persistConsent({
-      necessary: true,
-      analytics: false,
-      date: new Date().toISOString(),
-      version: CONSENT_VERSION,
-    });
-  };
+  const handleAcceptAll = () => persistConsent(true);
+  const handleRejectAll = () => persistConsent(false);
+  const handleSavePreferences = () => persistConsent(analyticsEnabled);
 
   if (!isOpen) return null;
 
   return (
     <aside className="fixed bottom-0 left-0 right-0 z-[200] p-4">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-4 max-w-md mx-auto">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-5 max-w-md mx-auto backdrop-blur-xl">
 
-        <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
+        {/* Texto */}
+        <p className="text-sm text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
           {cookie.description}
         </p>
 
-        <div className="flex gap-2">
+        {/* Toggle (FAANG UX) */}
+        <label className="flex items-center justify-between mb-4 cursor-pointer">
+          <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+            {cookie.analytics}
+          </span>
+
+          <input
+            type="checkbox"
+            checked={analyticsEnabled}
+            onChange={(e) => setAnalyticsEnabled(e.target.checked)}
+            className="w-4 h-4"
+          />
+        </label>
+
+        {/* Botões */}
+        <div className="flex flex-col gap-2">
           <button
             onClick={handleAcceptAll}
             disabled={isPending}
-            className="flex-1 bg-black text-white px-3 py-2 rounded text-xs font-bold"
+            className="w-full bg-black text-white py-2 rounded-lg text-xs font-bold hover:opacity-90 transition"
           >
             {cookie.acceptAll}
           </button>
@@ -202,9 +198,17 @@ export function CookieBanner({ dict }: CookieBannerProps) {
           <button
             onClick={handleRejectAll}
             disabled={isPending}
-            className="flex-1 bg-gray-200 dark:bg-slate-700 px-3 py-2 rounded text-xs font-bold"
+            className="w-full bg-gray-200 dark:bg-slate-700 py-2 rounded-lg text-xs font-bold"
           >
             {cookie.rejectAll ?? 'Recusar'}
+          </button>
+
+          <button
+            onClick={handleSavePreferences}
+            disabled={isPending}
+            className="w-full border py-2 rounded-lg text-xs font-bold"
+          >
+            {cookie.savePreferences ?? 'Salvar preferências'}
           </button>
         </div>
       </div>
