@@ -34,6 +34,6 @@ export function proxy(request: NextRequest) {
 export const config = {
   // Matcher atualizado para syntax Next.js 16
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\..*).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|resume-sitemap.xml|robots.txt|.*\\..*).*)',
   ],
 };
