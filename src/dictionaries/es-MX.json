@@ -145,7 +145,7 @@
     "role": "Científico de Datos | Python | SQL | Azure",
     "footer": "© 2026 Sérgio Santos. Todos los derechos reservados.",
     "rights": "Todos los derechos reservados",
-    "builtWith": "Desarrollado con Next.js 16.2.2 & TypeScript 6.0.2",
+    "builtWith": "Desarrollado con Next.js 16.2.3 & TypeScript 6.0.2",
     "loading": "Cargando...",
     "error": "Algo salió mal.",
     "socialLinks": "Abrir perfil de {platform}",
