@@ -1,6 +1,6 @@
 /**
  * src/lib/github/service.ts
- * Versão Resiliente (v2026) - Otimizada para CI&T
+ * Versão Resiliente (v2026)
  * STATUS: CORRIGIDO (TypeScript Strict Mode Fixed)
  * STACK: Next.js 16.2.2, React 19, TS 6.0.2, Node 24
  */
