@@ -6,10 +6,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://portfoliosantossergio.vercel.app";
   const lastModified = new Date();
 
-  // Rotas estáticas que possuem tradução
+  // 1. Definição das páginas estáticas traduzidas
   const pages = ["", "about", "experience", "projects", "artigos", "contact", "resume"] as const;
 
-  // Helper para construir os alternates (essencial para evitar o erro de "Cópia sem canônica")
+  // Helper para construir os alternates (Hreflang no Sitemap)
+  // Isso evita o erro de "página duplicada sem canônica" no GSC
   const buildAlternates = (pathname: string) => {
     const languages: Record<string, string> = {};
     SUPPORTED_LOCALES.forEach((locale) => {
@@ -19,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return { languages };
   };
 
-  // 1. Páginas Estáticas Multilingues
+  // 2. Geração das Páginas Estáticas Multilingues
   const localizedPages: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap((locale) =>
     pages.map((page) => {
       const pathname = page ? `/${page}` : "";
@@ -33,12 +34,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  // 2. Artigos Dinâmicos do GitHub (Com slug corrigido)
+  // 3. Artigos Dinâmicos do GitHub
   let articles: MetadataRoute.Sitemap = [];
   try {
     const gitHubItems = await getArticlesWithRetry();
     articles = gitHubItems.flatMap((item) => {
-      // Remove o prefixo da pasta e a extensão .md
       const slug = item.path.split('/').pop()?.replace(/\.md$/, "") || "";
       
       return SUPPORTED_LOCALES.map((locale) => ({
@@ -53,19 +53,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("❌ Erro ao gerar sitemap de artigos:", e);
   }
 
-  // 3. Imagens Estratégicas (Importante para aparecer no Google Images)
+  // 4. Arquivos PDF (Currículos por Idioma)
+  // Adicionados aqui para garantir indexação no "Google Documentos/Busca"
+  const resumePdfs: MetadataRoute.Sitemap = SUPPORTED_LOCALES.map((lang) => ({
+    url: `${baseUrl}/pdf/cv-sergio-santos-${lang}.pdf`,
+    lastModified,
+    changeFrequency: "monthly",
+    priority: 0.6, // Prioridade um pouco menor que a página HTML correspondente
+  }));
+
+  // 5. Imagens e Ativos Estratégicos (SEO de Imagem)
   const keyImages: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}/images/sergio-santos-profile.png`,
+    { url: `${baseUrl}/images/sergio-santos-profile.png`, lastModified, priority: 0.5 },
+    { url: `${baseUrl}/images/trofeus-vencedor-dio.png`, lastModified, priority: 0.5 },
+    // Adicionando as OGs principais para indexação rápida
+    ...SUPPORTED_LOCALES.map(lang => ({
+      url: `${baseUrl}/og/og-image-${lang}.png`,
       lastModified,
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/images/trofeus-vencedor-dio.png`,
-      lastModified,
-      priority: 0.6,
-    }
+      priority: 0.4
+    }))
   ];
 
-  return [...localizedPages, ...articles, ...keyImages];
+  // Retorno final unificado
+  return [...localizedPages, ...articles, ...resumePdfs, ...keyImages];
 }
