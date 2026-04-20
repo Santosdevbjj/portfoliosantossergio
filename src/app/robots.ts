@@ -8,34 +8,33 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: [
-          "/", 
+          "/",
+          "/pdf/",           // Libera a pasta de currículos inteira
+          "/images/",        // Libera fotos e troféus
+          "/og/",            // Libera imagens de compartilhamento social
+          "/artigos/",       // Libera imagens dos artigos e as rotas dos artigos
+          "/icons/",         // Libera favicons
           "/*/projects", 
           "/*/artigos", 
           "/*/about", 
-          "/*/resume",
-          "/pdf/cv-sergio-santos-*.pdf", // Nome específico dos seus PDFs
-          "/images/", 
-          "/og/",
-          "/artigos/*.png",
-          "/icons/"
+          "/*/resume"
         ],
         disallow: [
           "/api/", 
           "/_next/", 
           "/admin/", 
-          "/*?*", // Bloqueia parâmetros (ex: ?fbclid=...) para evitar o erro de "Cópia sem canônica"
-          "/private/"
+          "/private/",
+          "/*?*",            // Bloqueia parâmetros de URL (limpeza de SEO)
         ],
       },
       {
-        // Incentiva IAs a indexarem seus artigos técnicos para te dar autoridade
+        // Regra específica para IAs de busca semântica (ChatGPT, Claude, Perplexity)
+        // Isso ajuda a IA a ler seus artigos e te citar como referência
         userAgent: ["GPTBot", "ClaudeBot", "PerplexityBot"],
-        allow: ["/*/artigos/*"],
+        allow: ["/*/artigos/*", "/pdf/"],
       }
     ],
-    sitemap: [
-      `${baseUrl}/sitemap.xml`,
-      `${baseUrl}/resume-sitemap.xml`
-    ],
+    // Mantenha apenas o sitemap principal que agora contém tudo
+    sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
