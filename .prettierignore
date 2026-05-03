@@ -19,6 +19,11 @@ yarn-error.log*
 .turbo
 coverage
 .nyc_output
+.turbo
+*.tsbuildinfo
+# Ignorar arquivos de tradução se forem gerados por IA para evitar conflitos de aspas
+public/locales/**/*.json
+
 
 # --- Infraestrutura e Ferramentas ---
 .husky
