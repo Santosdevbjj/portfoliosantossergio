@@ -33,6 +33,7 @@ next-env.d.ts
 # VARIÁVEIS DE AMBIENTE — SEGURANÇA MÁXIMA
 # =====================================================
 .env
+.env.[^example]*
 .env.local
 .env.development.local
 .env.test.local
@@ -119,7 +120,7 @@ __pycache__/
 *.old
 *.patch
 
-# Adicione na seção de IDEs/Agentes
+# IDEs/Agentes
 .cursorrules
 .clinerules
 .mcp.json
