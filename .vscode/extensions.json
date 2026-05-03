@@ -1,10 +1,11 @@
 {
   "recommendations": [
     // ======================================================
-    // Next.js / React / TypeScript
+    // Next.js / React / TypeScript 7.0 (Nativo)
     // ======================================================
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
+    "ms-vscode.typescript-native-preview", // CRÍTICO: Suporte ao TS 7.0 Beta
 
     // ======================================================
     // Tailwind CSS (DX completo)
