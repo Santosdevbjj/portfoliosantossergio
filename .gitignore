@@ -118,3 +118,10 @@ __pycache__/
 *.bak
 *.old
 *.patch
+
+# Adicione na seção de IDEs/Agentes
+.cursorrules
+.clinerules
+.mcp.json
+mcp-env.js
+
