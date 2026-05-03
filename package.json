@@ -71,6 +71,7 @@
     "react-markdown": "^10.1.0"
   },
   "devDependencies": {
+    "@typescript/native-preview": "^7.0.0-dev.20260421.2",
     "typescript": "^6.0.3",
     "@octokit/tsconfig": "^4.0.0",
     "@types/node": "24.0.0",
