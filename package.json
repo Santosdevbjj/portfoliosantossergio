@@ -71,7 +71,7 @@
     "react-markdown": "^10.1.0"
   },
   "devDependencies": {
-    "typescript": "^6.0.2",
+    "typescript": "^6.0.3",
     "@octokit/tsconfig": "^4.0.0",
     "@types/node": "24.0.0",
     "@types/react": "19.2.14",
