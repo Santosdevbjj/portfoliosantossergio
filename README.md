@@ -288,10 +288,10 @@ Em uma próxima iteração, duas mudanças seriam prioritárias: implementar os 
 
 ​Para testar a velocidade do novo compilador no ambiente de desenvolvimento:
 
-# Instalação do preview nativo
+## Instalação do preview nativo
 npm install -D @typescript/native-preview@beta
 
-# Execução via motor Go
+## Execução via motor Go
 npx tsgo --noEmit
 
 
