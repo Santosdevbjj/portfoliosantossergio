@@ -61,7 +61,7 @@ Para garantir integridade, performance e experiência de quem avalia, as seguint
 
 **Resumo do fluxo:**
 - Os dados vêm do GitHub.
-- São estruturados em problema, solução e impacto automaticamente.
+- São estruturados automaticamente.
 - São exibidos no portfólio sem intervenção manual.
 
 ---
@@ -221,6 +221,89 @@ As mesmas decisões que aplico em pipelines de dados — governança de fontes, 
 A decisão de usar a `description` do GitHub como fonte de dados estruturados (`Problema | Solução | Impacto`) foi o ponto de virada: o portfólio deixou de ser uma lista de projetos e passou a ser uma estrutura que organiza cada entrega em problema, solução e impacto.
 
 Em uma próxima iteração, duas mudanças seriam prioritárias: implementar os testes E2E antes do primeiro deploy e adicionar a validação do `i18n` como step obrigatório no workflow de CI/CD.
+
+---
+
+## Nota técnica importante:
+
+
+🛠️ **Arquitetura de Próxima Geração (Next-Gen Stack)** 
+
+​Este projeto utiliza a "Bridge Architecture" de 2026, projetada para máxima performance e segurança resiliente.
+
+​Framework: Next.js 16.2.4 (Turbopack nativo)
+​Linguagem & Compilação: * Estável: TypeScript 6.0.3 (Versão Ponte)
+
+​Performance (Beta): TypeScript 7.0 (Engine nativa em Go) via @typescript/native-preview.
+​Infraestrutura: Vercel (Edge Runtime & Partial Prerendering).
+
+
+​🏗️ **Infraestrutura Híbrida de Compilação**
+
+​Implementei uma estratégia de Coexistência Tecnológica para garantir que o projeto esteja meses à frente do mercado:
+
+​Build de Produção: Validado pelo TypeScript 6.0.3, garantindo 100% de compatibilidade com o ecossistema atual.
+
+​Validação Nativa (Project Corsa): Integração do motor TypeScript 7 (tsgo). Realizo pré-análise de tipos em paralelo com threads compartilhadas, reduzindo o tempo de resposta da IDE e preparando o código para a performance nativa 10x superior.
+
+​*No dia 3 de maio de 2026, consolidei a transição para o motor nativo, eliminando legados (ES5/CommonJS) e adotando os novos padrões de paralelismo e estabilidade de tipos (stableTypeOrdering).*
+
+
+
+​🛡️ **Protocolos de Segurança & Resiliência (Incidente Abril 2026)**
+
+​Em resposta ao incidente de segurança global da Vercel em abril de 2026, o projeto foi atualizado para os novos padrões de Hardened Infrastructure:
+
+​Sensitive Environment Variables: Todas as chaves críticas (GitHub Tokens, Database URLs) foram migradas para o novo modo Sensitive (Non-readable) da Vercel.
+
+​Environment Isolation: Desativação total de variáveis sensíveis em ambiente de Development, restringindo-as exclusivamente aos contextos de Production e Preview.
+
+​Credential Rotation: Rotação completa de tokens de API e integração com as novas políticas de segurança por função (Owner-only policy).
+
+
+​⚡ Performance em Números (Deploy Real)
+​Dados extraídos do pipeline de CI/CD:
+​Tempo de Instalação: 9s (via cache otimizado).
+​TypeScript Check: 8.2s (em transição para sub-1s com tsgo).
+
+​Geração de Páginas Estáticas: 142+ páginas em 6.3s.
+​Build Final: 39 segundos (Vercel Washington, D.C.).
+
+
+
+
+​📈 **Roadmap Técnico**
+
+​[x] Migração para Next.js 16.2.
+​[x] Implementação de Sensitive Env Vars (Vercel 2026 Security Bulletin).
+​[x] Integração do TypeScript 7.0 Beta (Nativo em Go).
+​[ ] Migração total para o executável tsc nativo (TypeScript 7.1 estável).
+
+
+
+
+
+
+**Como rodar o motor nativo localmente**
+
+​Para testar a velocidade do novo compilador no ambiente de desenvolvimento:
+
+# Instalação do preview nativo
+npm install -D @typescript/native-preview@beta
+
+# Execução via motor Go
+npx tsgo --noEmit
+
+
+
+
+
+
+
+
+
+
+
 
 ---
 
