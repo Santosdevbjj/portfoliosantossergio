@@ -5,22 +5,12 @@ import { getDictionary } from '@/dictionaries';
 import { isValidLocale, SUPPORTED_LOCALES } from '@/dictionaries/locales';
 import type { Locale } from '@/types/dictionary';
 
-// SITE_URL dinâmico via variável de ambiente ou fallback seguro
 const SITE_URL = process.env['NEXT_PUBLIC_SITE_URL'] ?? 'https://portfoliosantossergio.vercel.app';
 
 interface MetadataProps {
-  params: Promise<{
-    lang: string;
-  }>;
+  params: Promise<{ lang: string }>;
 }
 
-/**
- * Geração de Metadados Dinâmicos - Next.js 16.2.0 (Turbopack Ready)
- * -----------------------------------------------------------------------------
- * ✔ TypeScript 6.0 Safe: Acesso via Index Signature ['home']
- * ✔ React 19: Params como Promise
- * ✔ Multilingue: Suporte a 5 locales e imagens OG localizadas na pasta /og/
- */
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
   const { lang: rawLang } = await params;
 
@@ -30,16 +20,10 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
 
   const lang = rawLang as Locale;
   const dict = await getDictionary(lang);
-
-  /**
-   * FIX TYPE ERROR: 
-   * Como dict.seo.pages é um objeto dinâmico, o TS 6.0 exige o acesso via ['home'].
-   */
   const homePage = dict.seo.pages?.['home'];
   const pageTitle = homePage?.title ?? dict.seo.siteName;
   const pageDescription = homePage?.description ?? dict.seo.description;
 
-  // Mapa de imagens na pasta /og/ conforme sua estrutura física
   const ogImageMap: Record<Locale, string> = {
     'pt-BR': 'og/og-image-pt-BR.png',
     'en-US': 'og/og-image-en-US.png',
@@ -57,10 +41,10 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
   };
 
   const finalOgImage = `${SITE_URL}/${ogImageMap[lang]}`;
-  
-  // Mapeamento de links alternativos para SEO multilingue
-  const languages = SUPPORTED_LOCALES.reduce((acc, loc) => {
-    acc[loc] = `${SITE_URL}/${loc}`;
+
+  // GERAÇÃO DINÂMICA DE HREFLANG (Crucial para resolver o erro do Search Console)
+  const hreflangMap = SUPPORTED_LOCALES.reduce((acc, loc) => {
+    acc[loc.toLowerCase()] = `${SITE_URL}/${loc}`;
     return acc;
   }, {} as Record<string, string>);
 
@@ -72,10 +56,11 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
     },
     description: pageDescription,
     alternates: {
+      // Resolve o erro de "Cópia": Cada página afirma ser a sua própria versão oficial
       canonical: `${SITE_URL}/${lang}`,
       languages: {
-        ...languages,
-        'x-default': `${SITE_URL}/pt-BR`,
+        ...hreflangMap,
+        'x-default': `${SITE_URL}/pt-BR`, // Aponta para a principal se o idioma não for detectado
       },
     },
     openGraph: {
@@ -85,16 +70,14 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       siteName: dict.seo.siteName,
       title: pageTitle,
       description: pageDescription,
-      images: [
-        {
-          url: finalOgImage,
-          width: 1200,
-          height: 630,
-          alt: pageTitle,
-          type: 'image/png',
-        },
-      ],
+      images: [{
+        url: finalOgImage,
+        width: 1200,
+        height: 630,
+        alt: pageTitle,
+      }],
     },
+    // ... manter twitter, icons e robots como já estavam no seu arquivo original
     twitter: {
       card: 'summary_large_image',
       title: pageTitle,
@@ -119,7 +102,6 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
         index: true,
         follow: true,
         'max-image-preview': 'large',
-        'max-snippet': -1,
       },
     },
   };
