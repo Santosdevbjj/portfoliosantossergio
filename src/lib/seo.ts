@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 /**
  * CONFIGURAÇÃO SEO - PORTFÓLIO SÉRGIO SANTOS
  * ✔ Resolução de erro "Cópia sem página canônica" do Search Console.
+ * ✔ Suporte total a hreflang para 5 idiomas.
  */
 
 export const siteConfig = {
@@ -10,7 +11,8 @@ export const siteConfig = {
   title: "Sérgio Santos — Especialista em IA e Ciência de Dados",
   description:
     "Portfólio de Sérgio Santos — Engenheiro de Software especializado em IA Generativa, Next.js, Python e Arquiteturas de Missão Crítica.",
-  url: process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app",
+  // Garante que não haja barra no final para evitar duplicidade de //
+  url: (process.env['NEXT_PUBLIC_SITE_URL'] ?? "https://portfoliosantossergio.vercel.app").replace(/\/$/, ""),
   author: "Sérgio Santos",
   links: {
     github: "https://github.com/Santosdevbjj",
@@ -19,15 +21,15 @@ export const siteConfig = {
 };
 
 export function absoluteUrl(path: string = "") {
-  const base = siteConfig.url.replace(/\/$/, "");
+  // Limpa o path para evitar barras duplas (ex: //pt-BR)
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
-  return `${base}${cleanPath}`;
+  return `${siteConfig.url}${cleanPath}`;
 }
 
 interface MetadataProps {
   title?: string;
   description?: string;
-  path?: string; // Ex: "/artigos/meu-post"
+  path?: string; // Ex: "/artigos" ou "/artigos/meu-post"
   image?: string;
   lang?: "pt-BR" | "en-US" | "es-ES" | "es-AR" | "es-MX";
 }
@@ -42,11 +44,13 @@ export function buildMetadata({
   const metaTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.title;
   const metaDescription = description ?? siteConfig.description;
 
-  // Define a URL canônica correta: Base + Idioma + Caminho da página
-  // Isso remove o erro de "Cópia sem canônica"
-  const canonicalUrl = absoluteUrl(`/${lang}${path}`);
+  // Garante que o path não venha com o locale duplicado se já for passado no path
+  const cleanPath = path.replace(/^\/(pt-BR|en-US|es-ES|es-AR|es-MX)/, "");
+
+  // Define a URL canônica correta para a página atual
+  const canonicalUrl = absoluteUrl(`/${lang}${cleanPath}`);
   
-  // OG Image baseada no idioma ou imagem personalizada do artigo
+  // OG Image: Prioriza imagem do artigo, senão usa a imagem padrão do idioma
   const ogImagePath = image || `/og/og-image-${lang}.png`;
 
   return {
@@ -56,12 +60,14 @@ export function buildMetadata({
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        "pt-BR": absoluteUrl(`/pt-BR${path}`),
-        "en-US": absoluteUrl(`/en-US${path}`),
-        "es-ES": absoluteUrl(`/es-ES${path}`),
-        "es-AR": absoluteUrl(`/es-AR${path}`),
-        "es-MX": absoluteUrl(`/es-MX${path}`),
-        "x-default": absoluteUrl(`/pt-BR${path}`),
+        "pt-br": absoluteUrl(`/pt-BR${cleanPath}`),
+        "en-us": absoluteUrl(`/en-US${cleanPath}`),
+        "es-es": absoluteUrl(`/es-ES${cleanPath}`),
+        "es-ar": absoluteUrl(`/es-AR${cleanPath}`),
+        "es-mx": absoluteUrl(`/es-MX${cleanPath}`),
+        // x-default é essencial: o Google recomenda apontar para a versão principal 
+        // ou para uma página de seleção de idioma.
+        "x-default": absoluteUrl(`/pt-BR${cleanPath}`),
       },
     },
     authors: [{ name: siteConfig.author }],
@@ -89,8 +95,10 @@ export function buildMetadata({
       creator: "@sergiosantos",
     },
     icons: {
-      icon: "/icons/favicon.ico",
-      shortcut: "/icons/icon.png",
+      icon: [
+        { url: "/icons/favicon.ico", sizes: "any" },
+        { url: "/icons/icon.png", type: "image/png", sizes: "32x32" },
+      ],
       apple: "/icons/apple-touch-icon.png",
     },
     robots: {
