@@ -42,8 +42,7 @@
   // ======================================================
   "files.exclude": {
     "**/.next": true,
-    "**/.turbo": true,
-    "**/*.tsbuildinfo": true
+    "**/.turbo": true
   },
   "search.exclude": {
     "**/node_modules": true,
@@ -70,7 +69,7 @@
   "[ignore]": { "editor.formatOnSave": false },
 
   // ======================================================
-  // Integração TypeScript 6.0.3 + Next.js 16
+  // Integração TypeScript 7.x + Next.js 16 (Nativo em Go)
   // ======================================================
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
@@ -79,7 +78,7 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
 
   // ======================================================
-  // Integração Nativa (Go-Based)
+  // Preferências de Autocomplete e Importação
   // ======================================================
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "javascript.suggest.autoImports": true,
