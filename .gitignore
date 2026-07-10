@@ -24,8 +24,8 @@ build/
 dist/
 .vercel/
 
-# TypeScript 6.0 Incremental & Metadata
-*.tsbuildinfo
+# TypeScript 7.x Incremental & Metadata
+# NOTA: Removemos o *.tsbuildinfo daqui para permitir que o cache em Go viaje com o Git
 next-env.d.ts
 .next/server-reference-manifest.json
 
@@ -125,4 +125,3 @@ __pycache__/
 .clinerules
 .mcp.json
 mcp-env.js
-
