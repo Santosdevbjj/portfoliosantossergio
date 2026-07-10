@@ -19,8 +19,10 @@ yarn-error.log*
 .turbo
 coverage
 .nyc_output
-.turbo
+
+# Cache Incremental do TypeScript 7 (CRÍTICO: não formatar para não corromper o cache em Go)
 *.tsbuildinfo
+
 # Ignorar arquivos de tradução se forem gerados por IA para evitar conflitos de aspas
 public/locales/**/*.json
 
@@ -33,7 +35,6 @@ mcp-env.js
 .npmrc
 .env*
 next-env.d.ts
-*.tsbuildinfo
 
 # --- Assets Estáticos (Binários e Otimizados) ---
 # Ignora currículos e imagens OG para evitar corrupção de metadados
