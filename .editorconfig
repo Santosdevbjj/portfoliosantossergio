@@ -39,7 +39,7 @@ trim_trailing_whitespace = false
 
 # ======================================================
 # Desenvolvimento Web Moderno
-# Next.js, React, TypeScript, CSS, Tailwind, Infra YAML
+# Next.js, React, TypeScript 7.x, CSS, Tailwind, Infra YAML
 # ======================================================
 [*.{js,jsx,ts,tsx,cjs,mjs,cts,mts,css,scss,html,yml,yaml,toml}]
 indent_style = space
@@ -80,9 +80,10 @@ indent_style = tab
 indent_size = 4
 
 # ======================================================
-# Dados brutos e logs (não remover whitespace)
+# Dados brutos, logs e Caches do Compilador (Não modificar)
+# Inclui os arquivos .tsbuildinfo do TS 7 em Go
 # ======================================================
-[*.{csv,log}]
+[*.{csv,log,tsbuildinfo}]
 trim_trailing_whitespace = false
 insert_final_newline = false
 
