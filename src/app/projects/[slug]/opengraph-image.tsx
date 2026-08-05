@@ -7,8 +7,8 @@ import { Octokit } from 'octokit';
  * runtime: 'nodejs' para suporte completo a bibliotecas nativas no Node 24.
  * revalidate: 86400 (24 horas) para persistência no Vercel Edge Cache.
  */
-// removido -  export const runtime = 'nodejs';
-// removido  - export const revalidate = 86400;
+
+
 
 // Configurações da imagem para Redes Sociais
 export const alt = 'GitHub Project Detail - Sérgio Santos';
