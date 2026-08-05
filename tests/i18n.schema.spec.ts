@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest"; // Se usar Jest, altere para "jest"
 import type { Dictionary } from "../src/types/dictionary";
 
 import ptBR from "../src/dictionaries/pt-BR.json";
@@ -11,40 +12,43 @@ import esMX from "../src/dictionaries/es-MX.json";
  */
 const baseLocale = "pt-BR";
 
+/**
+ * Asserção dupla (as unknown as Dictionary) para evitar o erro TS2352
+ * no TypeScript 7.0.2 com JSONs
+ */
 const dictionaries: Record<string, Dictionary> = {
-  "pt-BR": ptBR as Dictionary,
-  "en-US": enUS as Dictionary,
-  "es-ES": esES as Dictionary,
-  "es-AR": esAR as Dictionary,
-  "es-MX": esMX as Dictionary,
+  "pt-BR": ptBR as unknown as Dictionary,
+  "en-US": enUS as unknown as Dictionary,
+  "es-ES": esES as unknown as Dictionary,
+  "es-AR": esAR as unknown as Dictionary,
+  "es-MX": esMX as unknown as Dictionary,
 };
 
 /**
  * Regex para detectar placeholders
- * Ex:
- * {name}
- * {count}
- * {articleId}
+ * Ex: {name}, {count}, {articleId}
  */
 const PLACEHOLDER_REGEX = /\{(.*?)\}/g;
 
 /**
- * Extrai placeholders de uma string
+ * Extrai placeholders de uma string (Tratado contra 'undefined' - TS2322)
  */
 function extractPlaceholders(text: string): string[] {
   const matches = [...text.matchAll(PLACEHOLDER_REGEX)];
-  return matches.map((m) => m[1]).sort();
+  return matches
+    .map((m) => m[1])
+    .filter((m): m is string => Boolean(m))
+    .sort();
 }
 
 /**
- * Percorre o dicionário recursivamente
- * e coleta todas strings
+ * Percorre o dicionário recursivamente e coleta todas as strings
  */
 function walkDictionary(
-  obj: any,
+  obj: unknown,
   path: string[] = [],
   collector: Record<string, string> = {}
-) {
+): Record<string, string> {
   if (typeof obj === "string") {
     collector[path.join(".")] = obj;
     return collector;
@@ -72,9 +76,9 @@ function walkDictionary(
 function comparePlaceholders(
   base: Record<string, string>,
   target: Record<string, string>,
-  baseLocale: string,
-  locale: string
-) {
+  baseLocaleName: string,
+  targetLocaleName: string
+): string[] {
   const errors: string[] = [];
 
   Object.entries(base).forEach(([key, baseValue]) => {
@@ -87,9 +91,9 @@ function comparePlaceholders(
 
     if (baseVars.join(",") !== targetVars.join(",")) {
       errors.push(
-        `[${locale}] placeholder mismatch at "${key}" → ${baseLocale}: {${baseVars.join(
+        `[${targetLocaleName}] placeholder mismatch at "${key}" → ${baseLocaleName}: {${baseVars.join(
           ", "
-        )}} vs ${locale}: {${targetVars.join(", ")}}`
+        )}} vs ${targetLocaleName}: {${targetVars.join(", ")}}`
       );
     }
   });
@@ -98,7 +102,12 @@ function comparePlaceholders(
 }
 
 describe("i18n placeholder validation", () => {
-  const baseDictionary = walkDictionary(dictionaries[baseLocale]);
+  const baseDict = dictionaries[baseLocale];
+  if (!baseDict) {
+    throw new Error(`Dicionário base "${baseLocale}" não encontrado.`);
+  }
+
+  const baseDictionary = walkDictionary(baseDict);
 
   Object.entries(dictionaries).forEach(([locale, dictionary]) => {
     if (locale === baseLocale) return;
