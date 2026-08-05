@@ -4,8 +4,8 @@ import { Octokit } from 'octokit';
 /**
  * CONFIGURAÇÃO DE RUNTIME E CACHE (Next.js 16.3.0 + Node 24)
  * -----------------------------------------------------------------------------
- * runtime: 'nodejs' para suporte completo a bibliotecas nativas no Node 24.
- * revalidate: 86400 (24 horas) para persistência no Vercel Edge Cache.
+ * 
+ * 
  */
 
 
