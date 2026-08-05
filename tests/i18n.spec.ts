@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest"; // Se usar Jest, altere para "jest"
 import type { Dictionary } from "../src/types/dictionary";
 
 import { validateDictionary } from "../src/dictionaries/validator";
@@ -16,20 +17,20 @@ import esMX from "../src/dictionaries/es-MX.json";
  */
 const baseLocale = "pt-BR";
 
+/**
+ * Conversão dupla (as unknown as Dictionary) para compatibilidade estrita TS 7.0.2
+ */
 const dictionaries: Record<string, Dictionary> = {
-  "pt-BR": ptBR as Dictionary,
-  "en-US": enUS as Dictionary,
-  "es-ES": esES as Dictionary,
-  "es-AR": esAR as Dictionary,
-  "es-MX": esMX as Dictionary,
+  "pt-BR": ptBR as unknown as Dictionary,
+  "en-US": enUS as unknown as Dictionary,
+  "es-ES": esES as unknown as Dictionary,
+  "es-AR": esAR as unknown as Dictionary,
+  "es-MX": esMX as unknown as Dictionary,
 };
 
 describe("i18n dictionaries validation", () => {
   /**
-   * --------------------------------------------------------
    * 1. Validação estrutural individual
-   * --------------------------------------------------------
-   * Garante que cada dicionário possui as seções obrigatórias
    */
   describe("individual dictionary validation", () => {
     Object.entries(dictionaries).forEach(([locale, dictionary]) => {
@@ -47,13 +48,14 @@ describe("i18n dictionaries validation", () => {
   });
 
   /**
-   * --------------------------------------------------------
    * 2. Validação cross-locale
-   * --------------------------------------------------------
-   * Garante que todos os idiomas possuem a mesma estrutura
    */
   describe("cross-locale structure consistency", () => {
     const base = dictionaries[baseLocale];
+
+    if (!base) {
+      throw new Error(`Dicionário base "${baseLocale}" não foi carregado corretamente.`);
+    }
 
     Object.entries(dictionaries).forEach(([locale, dictionary]) => {
       if (locale === baseLocale) return;
