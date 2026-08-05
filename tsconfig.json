@@ -6,7 +6,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
 
     /* --- COMPLIANCE NEXT.JS 16.3.0 & TURBOPACK --- */
     "noEmit": true,
