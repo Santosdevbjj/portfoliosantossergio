@@ -1,7 +1,7 @@
 { 
   "extends": "@octokit/tsconfig",
   "compilerOptions": {
-    /* --- MOTOR NATIVO TS 6.0.2 (PONTE PARA O COMPILADOR GO) --- */
+    /* --- MOTOR NATIVO TS 7.0.2 (COMPILADOR GO) --- */
     "target": "ES2025",
     "lib": ["dom", "esnext"],
     "module": "ESNext",
@@ -10,7 +10,7 @@
     "jsx": "react-jsx",
     "jsx": "preserve",
     
-    /* --- COMPLIANCE NEXT.JS 16.2 & TURBOPACK (RUST) --- */
+    /* --- COMPLIANCE NEXT.JS 16.3.0 & TURBOPACK (RUST) --- */
     "noEmit": true,
     "allowJs": true,
     "checkJs": false,
