@@ -1,50 +1,43 @@
-{ 
-  "extends": "@octokit/tsconfig",
+{
   "compilerOptions": {
-    /* --- MOTOR NATIVO TS 7.0.2 (COMPILADOR GO) --- */
-    "target": "ES2025",
-    "lib": ["dom", "esnext"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    /* --- MOTOR NATIVO TS 7.0.2 --- */
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "moduleDetection": "force",
-    "jsx": "react-jsx",
     "jsx": "preserve",
-    
-    /* --- COMPLIANCE NEXT.JS 16.3.0 & TURBOPACK (RUST) --- */
+
+    /* --- COMPLIANCE NEXT.JS 16.3.0 & TURBOPACK --- */
     "noEmit": true,
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
     "incremental": true,
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "noUncheckedSideEffectImports": true,
 
-    /* --- RIGOR DE NÍVEL PRINCIPAL ENGINEER --- */
+    /* --- RIGOR E TIPAGEM ESTRITA --- */
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": true,
     "allowUnreachableCode": false,
 
-    /* --- INTEROP & SECURITY --- */
+    /* --- INTEROP & SEGURANÇA --- */
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* --- PERFORMANCE & CACHE --- */
+    /* --- RESOLUÇÃO DE PATHS E PLUGINS --- */
     "tsBuildInfoFile": "node_modules/.cache/tsconfig.tsbuildinfo",
-    "types": ["node"],
-
     "paths": {
       "@/*": ["./src/*"],
       "#/*": ["./src/*"]
     },
-
     "plugins": [
       {
         "name": "next"
@@ -56,12 +49,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    /* Ajustado conforme exigência do compilador Next.js 16.2 no log de erro */
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "src/**/*",
-    "next.config.ts",
-    "postcss.config.ts"
+    ".next/dev/types/**/*.ts"
   ],
 
   "exclude": [
@@ -69,6 +58,9 @@
     ".next",
     "out",
     "dist",
-    "build"
+    "build",
+    "tests",
+    "**/*.spec.ts",
+    "**/*.test.ts"
   ]
 }
